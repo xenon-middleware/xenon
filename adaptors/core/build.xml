@@ -1,0 +1,40 @@
+<project name="Core-Adaptors" default="build" basedir=".">
+	<description>
+	Build file for Core Adaptors.
+    </description>
+
+	<property name="version" value="" />
+
+	<property name="octopus.dist" location="../../dist"/>
+
+	<target name="build" description="build">
+		<!-- first build all adaptors -->
+		<ant dir="local" />
+
+		<!-- create core adaptors in main octopus dist -->
+		<jar jarfile="${octopus.dist}/octopus-adaptors-core${version}.jar">
+			<manifest>
+				<attribute name="Octopus-Adaptors" value="Core" />
+			</manifest>
+
+			<!-- shared libs -->
+			<zipfileset dir="shared-libs" prefix="adaptors/Shared" />
+
+			<!-- The name set in the prefix here is used as the name of the adaptor class
+			     e.g. Local -> adaptors.local.LocalAdaptor -->
+
+			<zipfileset dir="local/dist" prefix="adaptors/Local" />
+			
+			<!--
+			<zipfileset dir="sftp/external" prefix="adaptors/Sftp" />
+			<zipfileset dir="ssh/external" prefix="adaptors/Ssh" />
+			<zipfileset dir="ssh-pbs/external" prefix="adaptors/SshPbs" />
+			<zipfileset dir="ssh-sge/external" prefix="adaptors/SshSge" />
+			-->
+		</jar>
+	</target>
+
+	<target name="clean" description="clean all adaptors">
+		<ant dir="local" target="clean" />
+	</target>
+</project>

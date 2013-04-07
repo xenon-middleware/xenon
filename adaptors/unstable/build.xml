@@ -1,0 +1,36 @@
+<project name="Unstable-Adaptors" default="build" basedir=".">
+	<description>
+	Build file for Unstable Adaptors.
+    </description>
+
+	<property name="version" value="" />
+
+	<property name="octopus.dist" location="../../dist"/>
+
+	<target name="build" description="build">
+		<!-- first build all adaptors -->
+
+		<!-- <ant dir="local" /> -->
+
+		<!-- create adaptors jar in main dist folder -->
+		<jar jarfile="${octopus.dist}/octopus-adaptors-unstable${version}.jar">
+			<manifest>
+				<attribute name="Octopus-Adaptors" value="Unstable" />
+			</manifest>
+
+			<zipfileset dir="shared-libs" prefix="adaptors/Shared" />
+
+			<!-- <zipfileset dir="local/lib" prefix="adaptors/local" /> -->
+
+			<!-- The name set in the prefix here is used as the name of the adaptor class
+			     e.g. Local -> adaptors.local.LocalAdaptor -->
+			
+			<!-- <zipfileset dir="glite/external" prefix="adaptors/Glite" /> -->
+		</jar>
+
+	</target>
+
+	<target name="clean" description="clean all adaptors">
+		<!--<ant dir="local" target="clean" />-->
+	</target>
+</project>

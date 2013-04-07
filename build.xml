@@ -1,0 +1,86 @@
+<project name="Octopus" default="build" basedir=".">
+	<description>
+	Build file for Octopus
+    </description>
+
+	<property name="build.sysclasspath" value="ignore" />
+
+	<property name="version" value="" />
+
+	<path id="lib.jars">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="build" depends="clean, compile, adaptors" description="build everything" />
+
+	<target name="build-all" depends="clean, compile, all-adaptors" description="build everything, including unstable adaptors" />
+
+	<target name="adaptors" description="build the adaptors">
+		<ant dir="adaptors" />
+	</target>
+
+	<target name="all-adaptors" description="build the adaptors">
+		<ant dir="adaptors" target="build-all" />
+	</target>
+
+	<target name="test" description="run the tests">
+		<ant dir="test" target="test" />
+	</target>
+
+	<target name="xml-test" description="run the tests, output to xml reports">
+		<ant dir="test" target="xml-test" />
+	</target>
+
+	<target name="compile" description="compile the source ">
+		<mkdir dir="tmp" />
+		<mkdir dir="dist" />
+
+		<!-- Compile the java code from src into tmp -->
+		<javac srcdir="src" destdir="tmp" debug="on">
+			<classpath refid="lib.jars" />
+		</javac>
+
+		<!-- Put everything in tmp into the jar file -->
+		<jar jarfile="dist/octopus${version}.jar" basedir="tmp" />
+
+		<!-- Copy external dependancies to dist directory -->
+		<copy todir="dist">
+			<fileset dir="lib" />
+		</copy>
+
+		<delete dir="tmp" />
+	</target>
+
+	<target name="javadoc" description="generate javadoc for users">
+		<delete dir="doc/javadoc" />
+		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false">
+			<link href="http://docs.oracle.com/javase/7/docs/api/" />
+			<classpath refid="lib.jars" />
+			<excludepackage name="nl.esciencecenter.octopus.engine.*" />
+		</javadoc>
+	</target>
+
+	<target name="javadoc-devel" description="generate javadoc for users">
+		<delete dir="doc/javadoc-devel" />
+		<javadoc destdir="doc/javadoc-devel" access="private" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false">
+			<link href="http://docs.oracle.com/javase/7/docs/api/" />
+			<classpath refid="lib.jars" />
+		</javadoc>
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="tmp" />
+		<delete dir="dist" />
+
+		<ant dir="adaptors" target="clean" />
+
+		<ant dir="test" target="clean" />
+	</target>
+
+	<target name="allclean" depends="clean" description="clean up everything">
+		<delete dir="doc/javadoc" />
+	</target>
+
+</project>

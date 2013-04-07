@@ -1,0 +1,34 @@
+<project name="Examples" default="build" basedir=".">
+	<description>Build file for the examples</description>
+
+	<property name="octopus.dist" location="../dist" />
+
+	<property name="build.sysclasspath" value="ignore" />
+
+	<path id="default.classpath">
+		<fileset dir="${octopus.dist}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="build" depends="clean" description="build the JARs and documentation">
+		<!-- Create the distribution end tmp directory -->
+		<mkdir dir="dist" />
+		<mkdir dir="tmp" />
+
+		<!-- Compile the java code from ${src} into ${tmp} -->
+		<javac srcdir="src" destdir="tmp" debug="on">
+			<classpath refid="default.classpath" />
+		</javac>
+
+		<jar jarfile="dist/octopus-examples.jar" basedir="tmp" includes="**" />
+
+		<delete dir="tmp" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="tmp" />
+		<delete dir="dist" />
+	</target>
+
+</project>

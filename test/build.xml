@@ -1,0 +1,75 @@
+<project name="Tests" default="build" basedir=".">
+	<description>
+      		Build file for tests
+    	</description>
+
+	<property name="octopus.dist" location="../dist" />
+
+	<property name="build.sysclasspath" value="ignore" />
+
+	<path id="default.classpath">
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="dist">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${octopus.dist}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="."/>
+		<pathelement location="${octopus.dist}"/>
+	</path>
+
+	<target name="compile" description="compile the source ">
+		<mkdir dir="tmp" />
+		<mkdir dir="dist" />
+
+		<!-- Compile the java code from ${src} into ${tmp} -->
+		<javac srcdir="src" destdir="tmp" debug="on">
+			<classpath refid="default.classpath" />
+		</javac>
+
+		<!-- Put everything in ${tmp} into the jar file -->
+		<jar jarfile="dist/octopus-tests.jar" basedir="tmp" />
+
+		<delete dir="tmp" />
+	</target>
+
+	<target name="build" description="build everything" depends="clean,compile" />
+
+	<target name="xml-test" description="run tests" depends="build">
+		<mkdir dir="xml-reports"/>
+		<junit>
+			<classpath refid="default.classpath"/>
+
+			<batchtest fork="yes" todir="xml-reports">
+				<formatter type="xml"/>
+				<fileset dir="src">
+					<include name="**/*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="test" description="run tests" depends="build">
+		<mkdir dir="reports"/>
+		<junit printsummary="yes">
+			<classpath refid="default.classpath" />
+
+			<batchtest fork="yes" todir="reports">
+				<formatter type="plain"/>
+				<fileset dir="src">
+					<include name="**/*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="tmp" />
+		<delete dir="dist" />
+		<delete dir="reports" />
+		<delete dir="xml-reports" />
+	</target>
+</project>
