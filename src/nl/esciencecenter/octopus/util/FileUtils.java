@@ -205,7 +205,7 @@ public class FileUtils {
      */
     public static Path walkFileTree(Octopus octopus, Path start, boolean followLinks, int maxDepth, FileVisitor visitor)
             throws OctopusException {
-        FileAttributes attributes = octopus.files().readAttributes(start);
+        FileAttributes attributes = octopus.files().getAttributes(start);
 
         walk(octopus, start, attributes, followLinks, maxDepth, visitor);
 
@@ -255,7 +255,7 @@ public class FileUtils {
             } else if (attributes.isSymbolicLink()) {
                 if (followLinks) {
                     Path target = octopus.files().readSymbolicLink(path);
-                    return walk(octopus, target, octopus.files().readAttributes(target), followLinks, maxDepth - 1, visitor);
+                    return walk(octopus, target, octopus.files().getAttributes(target), followLinks, maxDepth - 1, visitor);
                 } else {
                     // visit the link itself
                     return visitor.visitFile(path, attributes, octopus);

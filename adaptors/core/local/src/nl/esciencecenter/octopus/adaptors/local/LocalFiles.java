@@ -22,7 +22,7 @@ import nl.esciencecenter.octopus.ImmutableTypedProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
-import nl.esciencecenter.octopus.engine.files.PathCpi;
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -60,7 +60,7 @@ public class LocalFiles implements FilesAdaptor {
     public Path newPath(ImmutableTypedProperties properties, Credentials credentials, URI location)
             throws OctopusException {
         localAdaptor.checkURI(location);
-        return new PathCpi(properties, credentials, location, localAdaptor.getName(), octopusEngine);
+        return new PathImplementation(properties, credentials, location, localAdaptor.getName(), octopusEngine);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class LocalFiles implements FilesAdaptor {
         try {
             java.nio.file.Path target = Files.readSymbolicLink(LocalUtils.javaPath(link));
 
-            return new PathCpi(link.getProperties(), link.getCredentials(), target.toUri(), link.getAdaptorName(),
+            return new PathImplementation(link.getProperties(), link.getCredentials(), target.toUri(), link.getAdaptorName(),
                     octopusEngine);
         } catch (IOException e) {
             throw new OctopusException("could not create symbolic link", e, null, null);

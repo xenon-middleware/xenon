@@ -30,14 +30,14 @@ class ParallelProcess {
     private final MergingOutputStream stderrStream;
 
     ParallelProcess(int count, String executable, List<String> arguments, Map<String, String> environment,
-            String workingDirectory, Path stdin, Path stdout, Path stderr, OctopusEngine engine) throws IOException {
+            Path workingDirectory, Path stdin, Path stdout, Path stderr, OctopusEngine engine) throws IOException {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(executable);
         builder.command().addAll(arguments);
 
         builder.environment().putAll(environment);
-        builder.directory(new java.io.File(workingDirectory));
+        builder.directory(new java.io.File(workingDirectory.getPath()));
 
         // buffered streams, will also synchronize
         stdoutStream = new MergingOutputStream(engine.files().newOutputStream(stdout));

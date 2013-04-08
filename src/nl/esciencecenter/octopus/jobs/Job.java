@@ -1,7 +1,5 @@
 package nl.esciencecenter.octopus.jobs;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-
 public interface Job {
 
     /**
@@ -12,41 +10,16 @@ public interface Job {
     public JobDescription getJobDescription();
 
     /**
-     * This method returns the state of the Job.
+     * Returns the {@link Scheduler} that was used to create this Job.
      * 
-     * @return This method returns the state of the associated Job
+     * @return the Scheduler used to create this job.
      */
-    public JobState getState();
-
-    /**
-     * Register a state listener for this job. Whenever the state of this job is
-     * updated, the listener will be called.
-     * 
-     * @param listener
-     */
-    public void registerStateLister(JobStateListener listener);
+    public Scheduler getScheduler();
     
-    public void unRegisterStateLister(JobStateListener listener);
-
     /**
-     * Returns the exit status of a job.
+     * Returns the identifier that was assigned to this job by the scheduler.
      * 
-     * @return the exit status of a job.
-     * 
+     * @return the identifier that was assigned to this job by the scheduler.
      */
-    public int getExitStatus() throws OctopusException;
-
-    /**
-     * In case of an error while running a job, this function will return the
-     * error.
-     * 
-     */
-    public Exception getError();
-
-    /**
-     * Will forcibly stop a job.
-     */
-    public void kill() throws OctopusException;
-
-    public boolean isDone() throws OctopusException;
+    public String getIdentifier();    
 }

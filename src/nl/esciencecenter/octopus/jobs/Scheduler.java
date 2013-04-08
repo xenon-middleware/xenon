@@ -1,16 +1,17 @@
 package nl.esciencecenter.octopus.jobs;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import java.net.URI;
+
+import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.security.Credentials;
 
 public interface Scheduler {
 
-    public String[] getQueueNames() throws OctopusException;
-    
-    public Job[] getJobs(String queueName) throws OctopusException;
-    
-    public Job submitJob(JobDescription description) throws OctopusException;
+	 public URI getUri();
 
-    public Job submitJob(JobDescription description, JobStateListener listener)
-            throws OctopusException;
+	 public ImmutableTypedProperties getProperties();
 
+	 public Credentials getCredentials();
+
+	 public String getAdaptorName();
 }

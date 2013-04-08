@@ -1,50 +1,52 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.jobs.JobCpi;
-import nl.esciencecenter.octopus.engine.jobs.Sandbox;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.JobState;
-import nl.esciencecenter.octopus.jobs.JobStateListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocalJob extends JobCpi implements Runnable {
+public class LocalJobExecutor implements Runnable {
 
-    protected static Logger logger = LoggerFactory.getLogger(LocalJob.class);
+    protected static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
     
     private final OctopusEngine engine;
 
+    private final Job job;
+    
     private int exitStatus;
 
     private Thread thread = null;
 
     private boolean killed = false;
+    
+    private boolean done = false;
 
-    public LocalJob(JobDescription description, JobStateListener listener, OctopusEngine engine) throws BadParameterException {
-        super(description, listener);
-        this.engine = engine;
+    private String state = "INITIAL";
+    
+    private Exception error;
+    
+    public LocalJobExecutor(Job job, OctopusEngine engine) throws BadParameterException {
 
-        if (description.getProcessesPerNode() <= 0) {
+    	this.engine = engine;
+    	this.job = job;
+
+        if (job.getJobDescription().getProcessesPerNode() <= 0) {
             throw new BadParameterException("number of processes cannot be negative or 0", "local", null);
         }
         
-        if (description.getNodeCount() != 1) {
+        if (job.getJobDescription().getNodeCount() != 1) {
             throw new BadParameterException("number of nodes must be 1", "local", null);
         }
 
         // thread will be started by local scheduler
     }
 
-    @Override
     public synchronized int getExitStatus() throws OctopusException {
         if (!isDone()) {
             throw new OctopusException("Cannot get state, job not done yet", "local", null);
@@ -56,7 +58,6 @@ public class LocalJob extends JobCpi implements Runnable {
         this.exitStatus = exitStatus;
     }
 
-    @Override
     public synchronized void kill() throws OctopusException {
         killed = true;
 
@@ -64,41 +65,59 @@ public class LocalJob extends JobCpi implements Runnable {
             thread.interrupt();
         }
     }
+    
+    private synchronized void updateState(String state) {
+        this.state = state;
+    }
+    
+    private synchronized void setError(Exception e) { 
+    	error = e;
+    }
+	
+	public synchronized boolean isDone() { 
+		return done;
+	}
+    
+	public Job getJob() {
+		return job;
+	}
 
+	public synchronized String getState() { 
+		return state;
+	}
+	
+	public synchronized Exception getError() { 
+		return error;
+	}
+	
     @Override
     public void run() {
-        Sandbox sandbox = null;
-        try {
-            this.updateState(JobState.INITIAL);
-
+        
+    	try {
+          
             synchronized (this) {
                 if (killed) {
-                    throw new IOException("Job killed");
+                	updateState("KILLED");
+                	throw new IOException("Job killed");
                 }
                 this.thread = Thread.currentThread();
             }
 
-            this.updateState(JobState.PRE_STAGING);
-
-            JobDescription description = this.getJobDescription();
-            
-            Path sandboxRoot = engine.files().newPath(new URI("local://~/.deploy-sandboxes/"));
-
-            sandbox = new Sandbox(description, engine, sandboxRoot);
-
-            sandbox.preStage();
-
-            this.updateState(JobState.SCHEDULED);
+            updateState("INITIAL");
 
             if (Thread.currentThread().isInterrupted()) {
+            	updateState("KILLED");
                 throw new IOException("Job killed");
             }
 
+            JobDescription description = job.getJobDescription();
+            
             ParallelProcess parallelProcess = new ParallelProcess(description.getProcessesPerNode(),
                     description.getExecutable(), description.getArguments(), description.getEnvironment(),
-                    sandbox.getWorkingDirectory(), sandbox.getStdin(), sandbox.getStdout(), sandbox.getStderr(), engine);
+                    description.getWorkingDirectory(), description.getStdin(), description.getStdout(), description.getStderr(), 
+                    engine);
 
-            this.updateState(JobState.RUNNING);
+            updateState("RUNNING");
 
             try {
                 setExitStatus(parallelProcess.waitFor());
@@ -106,20 +125,9 @@ public class LocalJob extends JobCpi implements Runnable {
                 parallelProcess.destroy();
             }
 
-            sandbox.postState();
-
-        } catch (IOException | URISyntaxException e) {
-            setError(e);
-
-            if (sandbox != null) {
-                try {
-                    sandbox.postState();
-                } catch (OctopusException e1) {
-                    e.addSuppressed(e1);
-                }
-            }
-
-            updateState(JobState.ERROR);
+        } catch (IOException e) {
+        	setError(e);
+            updateState("ERROR");
         }
     }
 }

@@ -56,7 +56,7 @@ public class FilesEngine implements Files {
     
     @Override
     public boolean isDirectory(Path path) throws OctopusException {
-        return readAttributes(path).isDirectory();
+        return getAttributes(path).isDirectory();
     }
     
     @Override
@@ -197,7 +197,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public FileAttributes readAttributes(Path path) throws OctopusException {
+    public FileAttributes getAttributes(Path path) throws OctopusException {
         return getAdaptor(path).filesAdaptor().readAttributes(path);
     }
 

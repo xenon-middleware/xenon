@@ -22,7 +22,7 @@ public interface Octopus {
 
     public void setDefaultProperties(Properties properties);
     
-    AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
+    public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
     
     public AdaptorInfo[] getAdaptorInfos();
     

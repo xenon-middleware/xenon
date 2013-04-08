@@ -39,7 +39,7 @@ public interface Files {
      * @throws OctopusException
      *             if an I/O error occurs
      * */
-    Path copy(Path source, Path target, CopyOption... options) throws OctopusException;
+    public Path copy(Path source, Path target, CopyOption... options) throws OctopusException;
 
     /**
      * Creates a directory by creating all nonexistent parent directories first.
@@ -51,7 +51,7 @@ public interface Files {
      *             if {@code dir} exists but is not a directory <i>(optional
      *             specific exception)</i>
      */
-    Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
+    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
     
     /**
      * Creates a directory by creating all nonexistent parent directories first.
@@ -63,7 +63,7 @@ public interface Files {
      *             if {@code dir} exists but is not a directory <i>(optional
      *             specific exception)</i>
      */
-    Path createDirectories(Path dir) throws OctopusException;
+    public Path createDirectories(Path dir) throws OctopusException;
 
     /**
      * Creates a new directory.
@@ -78,7 +78,7 @@ public interface Files {
      * @throws OctopusException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
+    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
     
     /**
      * Creates a new directory.
@@ -93,7 +93,7 @@ public interface Files {
      * @throws OctopusException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    Path createDirectory(Path dir) throws OctopusException;
+    public Path createDirectory(Path dir) throws OctopusException;
 
     /**
      * Creates a new and empty file, failing if the file already exists.
@@ -107,7 +107,7 @@ public interface Files {
      * @throws OctopusException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
+    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
 
     /**
      * Creates a symbolic link to a target (optional operation).
@@ -120,27 +120,27 @@ public interface Files {
      * @throws OctopusException
      *             if an I/O error occurs
      */
-    Path createSymbolicLink(Path link, Path target) throws OctopusException;
+    public Path createSymbolicLink(Path link, Path target) throws OctopusException;
 
     /**
      * Deletes a file.
      */
-    void delete(Path path, DeleteOption... options) throws OctopusException;
+    public void delete(Path path, DeleteOption... options) throws OctopusException;
 
     /**
      * Deletes a file if it exists.
      */
-    boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusException;
+    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusException;
 
     /**
      * Tests whether a file exists.
      */
-    boolean exists(Path path) throws OctopusException;
+    public boolean exists(Path path) throws OctopusException;
 
     /**
      * Tests whether a file is a directory.
      */
-    boolean isDirectory(Path path) throws OctopusException;
+    public boolean isDirectory(Path path) throws OctopusException;
 
     /**
      * Move or rename a file to a target file.
@@ -158,33 +158,32 @@ public interface Files {
      * @throws OctopusException
      *             if an I/O error occurs
      */
-    Path move(Path source, Path target, CopyOption... options) throws OctopusException;
+    public Path move(Path source, Path target, CopyOption... options) throws OctopusException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over all
      * entries in the directory.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusException;
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the
      * entries in the directory.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
 
     /**
-     * Opens a directory, returning a DirectoryStream to iterate over all
-     * entries in the directory. Extra functionality in RAL to efficiently fetch
-     * all attributes for a directory.
+     * Opens a directory, returning a DirectoryStream to iterate over the PathAttributes of all 
+     * entries in the directory. 
      */
-    DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir) throws OctopusException;
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir) throws OctopusException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the
      * entries in the directory. Extra functionality in RAL to efficiently fetch
      * all attributes for a directory.
      */
-    DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
             throws OctopusException;
 
     /** Opens a file, returning an input stream to read from the file. */
@@ -195,13 +194,13 @@ public interface Files {
      * write bytes to the file. If no options are present then this method works
      * as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
      */
-    OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException;
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException;
 
     /**
      * Opens or creates a file, returning a seekable byte channel to access the
      * file.
      */
-    SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
+    public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
             throws OctopusException;
 
     /**
@@ -213,31 +212,31 @@ public interface Files {
     /**
      * Reads a file's attributes.
      */
-    FileAttributes readAttributes(Path path) throws OctopusException;
+    public FileAttributes getAttributes(Path path) throws OctopusException;
 
     /**
      * Reads the target of a symbolic link (optional operation).
      */
-    Path readSymbolicLink(Path link) throws OctopusException;
+    public Path readSymbolicLink(Path link) throws OctopusException;
 
     /**
      * Updates the file owner and group. Use null for either to keep current owner/group
      */
-    void setOwner(Path path, String user, String group) throws OctopusException;
+    public void setOwner(Path path, String user, String group) throws OctopusException;
 
     /**
      * Sets a file's POSIX permissions.
      */
-    void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
 
     /**
      * Updates a file's last modified, last access, and create time attribute. Use -1 to not set a certain
      * attribute
      */
-    void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException;
+    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException;
 
     /**
      * Updates (replace) the access control list.
      */
-    void setAcl(Path path, List<AclEntry> acl) throws OctopusException;
+    public void setAcl(Path path, List<AclEntry> acl) throws OctopusException;
 }
