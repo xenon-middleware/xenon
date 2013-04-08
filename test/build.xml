@@ -22,18 +22,16 @@
 	</path>
 
 	<target name="compile" description="compile the source ">
-		<mkdir dir="tmp" />
+		<mkdir dir="classes" />
 		<mkdir dir="dist" />
 
-		<!-- Compile the java code from ${src} into ${tmp} -->
-		<javac srcdir="src" destdir="tmp" debug="on">
+		<!-- Compile the java code from ${src} into ${classes} -->
+		<javac srcdir="src" destdir="classes" debug="on">
 			<classpath refid="default.classpath" />
 		</javac>
 
-		<!-- Put everything in ${tmp} into the jar file -->
-		<jar jarfile="dist/octopus-tests.jar" basedir="tmp" />
-
-		<delete dir="tmp" />
+		<!-- Put everything in ${classes} into the jar file -->
+		<jar jarfile="dist/octopus-tests.jar" basedir="classes" />
 	</target>
 
 	<target name="build" description="build everything" depends="clean,compile" />
@@ -96,8 +94,11 @@
 
 			<structure name="octopus">
 				<classfiles>
-					<fileset dir="${octopus.dist}">
-						<include name="**/octopus*.jar" />
+					<fileset dir="../classes">
+						<include name="**/*.class" />
+					</fileset>
+					<fileset dir="../adaptors/core/local/classes">
+						<include name="**/*.class" />
 					</fileset>
 				</classfiles>
 				<sourcefiles>
@@ -107,11 +108,12 @@
 			</structure>
 
 			<html destdir="reports/jacoco" />
+			<xml destfile="reports/jacoco/coverage.xml" />
 		</jacoco:report>
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="tmp" />
+		<delete dir="classes" />
 		<delete dir="dist" />
 		<delete dir="reports" />
 		<delete dir="xml-reports" />
