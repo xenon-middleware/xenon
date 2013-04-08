@@ -33,6 +33,10 @@
 		<ant dir="test" target="xml-test" />
 	</target>
 
+	<target name="coverage" description="run the tests with JaCoCo coverage">
+		<ant dir="test" target="coverage" />
+	</target>
+
 	<target name="compile" description="compile the source ">
 		<mkdir dir="tmp" />
 		<mkdir dir="dist" />
