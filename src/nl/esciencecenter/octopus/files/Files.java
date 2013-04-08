@@ -26,7 +26,6 @@ public interface Files {
     /**
      * Copy a file to a target file.
      * 
-     * 
      * @throws UnsupportedOperationException
      *             if the array contains a copy option that is not supported
      * @throws FileAlreadyExistsException

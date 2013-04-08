@@ -34,7 +34,7 @@ public interface Octopus {
     public Files files();
     
     /**
-     * Get a reference to the Jobs package
+     * Get a reference to the Jobs package interface.
      * 
      * @return a reference to the Files package interface.
      */
