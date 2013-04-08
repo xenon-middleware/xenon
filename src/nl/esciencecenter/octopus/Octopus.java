@@ -8,7 +8,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.security.Credentials;
 
 /**
- * Main interface to Octopus. Provides an acces point to all packages of Octopus, as well as some utility functions.
+ * Main interface to Octopus. Provides an access point to all packages of Octopus, as well as some utility functions.
  * 
  * @author Niels Drost
  */
@@ -44,7 +44,7 @@ public interface Octopus {
     //Future extension: clouds
     //public Clouds clouds();
     
-    //Future extension: bandwith on demand
+    //Future extension: bandwidth on demand
     //public Networks networks();
     
     //public ??
