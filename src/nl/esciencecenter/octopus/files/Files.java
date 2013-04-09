@@ -13,7 +13,6 @@ import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public interface Files {
 
@@ -21,7 +20,7 @@ public interface Files {
 
     public Path newPath(URI location) throws OctopusException;
 
-    public Path newPath(Properties properties, Credentials credentials, URI location) throws OctopusException;
+    public Path newPath(Properties properties, URI location) throws OctopusException;
 
     /**
      * Copy a file to a target file.

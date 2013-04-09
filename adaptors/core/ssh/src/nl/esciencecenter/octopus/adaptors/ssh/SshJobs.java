@@ -12,6 +12,7 @@ import nl.esciencecenter.octopus.ImmutableTypedProperties;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.adaptors.local.LocalJobExecutor;
 import nl.esciencecenter.octopus.adaptors.local.LocalJobs;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
@@ -20,7 +21,6 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public class SshJobs implements JobsAdaptor {
 
@@ -49,7 +49,7 @@ public class SshJobs implements JobsAdaptor {
     }
     
     @Override
-    public Scheduler newScheduler(ImmutableTypedProperties properties, Credentials credentials, URI location)
+    public Scheduler newScheduler(ImmutableTypedProperties properties, URI location)
             throws OctopusException {
         // TODO Auto-generated method stub
         return null;

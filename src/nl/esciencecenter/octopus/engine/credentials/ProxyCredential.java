@@ -1,7 +1,5 @@
-/*
- * Created on Jul 29, 2005
- */
-package nl.esciencecenter.octopus.security;
+package nl.esciencecenter.octopus.engine.credentials;
+
 
 /**
  * This context is used if you have a credential stored in a myproxy server. You

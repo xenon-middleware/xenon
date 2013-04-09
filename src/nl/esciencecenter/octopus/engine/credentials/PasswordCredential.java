@@ -1,4 +1,5 @@
-package nl.esciencecenter.octopus.security;
+package nl.esciencecenter.octopus.engine.credentials;
+
 
 /**
  * A security context based upon user name, password combination.

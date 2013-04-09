@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.security;
+package nl.esciencecenter.octopus.engine.credentials;
 
 import java.util.HashMap;
 import java.util.StringTokenizer;

@@ -22,10 +22,13 @@ public class LocalAdaptor implements Adaptor {
     
     private final LocalJobs jobsAdaptor;
 
+    private final LocalCredentials credentialsAdaptor;
+    
     public LocalAdaptor(ImmutableTypedProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.filesAdaptor = new LocalFiles(properties, this, octopusEngine);
         this.jobsAdaptor = new LocalJobs(properties, this, octopusEngine);
+        this.credentialsAdaptor = new LocalCredentials();
     }
 
     @Override
@@ -88,6 +91,10 @@ public class LocalAdaptor implements Adaptor {
         return jobsAdaptor;
     }
 
+    @Override
+    public LocalCredentials credentialsAdaptor() {
+        return credentialsAdaptor;
+    }
 
     @Override
     public void end() {

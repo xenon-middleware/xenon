@@ -24,10 +24,11 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.security.Credentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jcraft.jsch.ChannelSftp;
 
 public class SshFiles implements FilesAdaptor {
     private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
@@ -47,9 +48,9 @@ public class SshFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path newPath(ImmutableTypedProperties properties, Credentials credentials, URI location) throws OctopusException {
+    public Path newPath(ImmutableTypedProperties properties, URI location) throws OctopusException {
         sshAdaptor.checkURI(location);
-        return new PathImplementation(properties, credentials, location, sshAdaptor.getName(), octopusEngine);
+        return new PathImplementation(properties, location, sshAdaptor.getName(), octopusEngine);
     }
 
     @Override
@@ -96,6 +97,11 @@ public class SshFiles implements FilesAdaptor {
 
     @Override
     public boolean exists(Path path) throws OctopusException {
+        ChannelSftp channel = sshAdaptor.getSftpChannel("rob", "localhost", 22);
+
+//        channel.lstat(path);
+        //channel.stat(path);
+        
         // TODO Auto-generated method stub
         return false;
     }

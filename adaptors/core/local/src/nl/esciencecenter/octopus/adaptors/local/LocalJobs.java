@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
@@ -17,7 +18,6 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.security.Credentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,7 @@ public class LocalJobs implements JobsAdaptor {
     }
 
     @Override
-    public Scheduler newScheduler(ImmutableTypedProperties properties, Credentials credentials, URI location)
+    public Scheduler newScheduler(ImmutableTypedProperties properties, URI location)
             throws OctopusException {
 
     	localAdaptor.checkURI(location);
@@ -91,7 +91,7 @@ public class LocalJobs implements JobsAdaptor {
             throw new OctopusException("Non-empty path in a local scheduler uri is not allowed", "local", location);
         }
 
-        return new SchedulerImplementation(location, properties, credentials, "local");
+        return new SchedulerImplementation(location, properties, "local");
     }
 
     public void end() {

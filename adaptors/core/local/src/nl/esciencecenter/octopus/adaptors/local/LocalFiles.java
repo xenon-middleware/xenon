@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
@@ -36,7 +37,6 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public class LocalFiles implements FilesAdaptor {
 
@@ -57,10 +57,10 @@ public class LocalFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path newPath(ImmutableTypedProperties properties, Credentials credentials, URI location)
+    public Path newPath(ImmutableTypedProperties properties, URI location)
             throws OctopusException {
         localAdaptor.checkURI(location);
-        return new PathImplementation(properties, credentials, location, localAdaptor.getName(), octopusEngine);
+        return new PathImplementation(properties, location, localAdaptor.getName(), octopusEngine);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class LocalFiles implements FilesAdaptor {
         try {
             java.nio.file.Path target = Files.readSymbolicLink(LocalUtils.javaPath(link));
 
-            return new PathImplementation(link.getProperties(), link.getCredentials(), target.toUri(), link.getAdaptorName(),
+            return new PathImplementation(link.getProperties(), target.toUri(), link.getAdaptorName(),
                     octopusEngine);
         } catch (IOException e) {
             throw new OctopusException("could not create symbolic link", e, null, null);

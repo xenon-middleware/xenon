@@ -7,12 +7,12 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.util.OSUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.security.Credentials;
 
 /**
  * Default implementation of Path. Will create new Paths directly, using
@@ -24,15 +24,13 @@ public class PathImplementation implements Path {
     private static final class PathIterator implements Iterator<Path> {
 
         private ImmutableTypedProperties properties;
-        private Credentials credentials;
         private URI location;
         private String[] elements;
 
         private int next = 0;
 
-        PathIterator(ImmutableTypedProperties properties, Credentials credentials, URI location, String[] elements) {
+        PathIterator(ImmutableTypedProperties properties, URI location, String[] elements) {
             this.properties = properties;
-            this.credentials = credentials;
             this.location = location;
             this.elements = elements;
         }
@@ -47,7 +45,7 @@ public class PathImplementation implements Path {
             if (!hasNext()) {
                 throw new NoSuchElementException("no more elements in path");
             }
-            return new PathImplementation(properties, credentials, location, "local", null, elements[next++]);
+            return new PathImplementation(properties, location, "local", null, elements[next++]);
         }
 
         @Override
@@ -87,8 +85,6 @@ public class PathImplementation implements Path {
 
     private final ImmutableTypedProperties properties;
 
-    private final Credentials credentials;
-
     private final URI location;
 
     // root of path, or null if relative
@@ -101,10 +97,9 @@ public class PathImplementation implements Path {
     private final OctopusEngine octopusEngine;
 
 
-    public PathImplementation(ImmutableTypedProperties properties, Credentials credentials, URI location, String adaptorName,
+    public PathImplementation(ImmutableTypedProperties properties, URI location, String adaptorName,
             OctopusEngine octopusEngine) {
         this.properties = properties;
-        this.credentials = credentials;
         this.location = location;
         this.adaptorName = adaptorName;
         this.octopusEngine = octopusEngine;
@@ -138,10 +133,9 @@ public class PathImplementation implements Path {
      * Creates a new path based on an existing path, with a new location based
      * on the old location and the given root and elements.
      */
-    private PathImplementation(ImmutableTypedProperties properties, Credentials credentials, URI baseLocation, String adaptorName,
+    private PathImplementation(ImmutableTypedProperties properties, URI baseLocation, String adaptorName,
             OctopusEngine octopusEngine, String root, String... elements) {
         this.properties = properties;
-        this.credentials = credentials;
         this.adaptorName = adaptorName;
         this.octopusEngine = octopusEngine;
 
@@ -165,7 +159,7 @@ public class PathImplementation implements Path {
 
         String[] newElements = new String[0];
 
-        return new PathImplementation(properties, credentials, location, adaptorName, octopusEngine, root, newElements);
+        return new PathImplementation(properties, location, adaptorName, octopusEngine, root, newElements);
     }
 
     @Override
@@ -175,7 +169,7 @@ public class PathImplementation implements Path {
         }
         String fileName = elements[elements.length - 1];
 
-        return new PathImplementation(properties, credentials, location, "local", null, fileName);
+        return new PathImplementation(properties, location, "local", null, fileName);
     }
 
     @Override
@@ -186,7 +180,7 @@ public class PathImplementation implements Path {
 
         String[] parentElements = Arrays.copyOfRange(elements, 0, elements.length - 1);
 
-        return new PathImplementation(properties, credentials, location, adaptorName, octopusEngine, root, parentElements);
+        return new PathImplementation(properties, location, adaptorName, octopusEngine, root, parentElements);
     }
 
     @Override
@@ -199,12 +193,12 @@ public class PathImplementation implements Path {
         if (index >= elements.length) {
             throw new IllegalArgumentException("index " + index + " not present in path " + this);
         }
-        return new PathImplementation(properties, credentials, location, "local", null, elements[index]);
+        return new PathImplementation(properties, location, "local", null, elements[index]);
     }
 
     @Override
     public Path subpath(int beginIndex, int endIndex) {
-        return new PathImplementation(properties, credentials, location, "local", octopusEngine, null, Arrays.copyOfRange(elements,
+        return new PathImplementation(properties, location, "local", octopusEngine, null, Arrays.copyOfRange(elements,
                 beginIndex, endIndex));
     }
 
@@ -235,7 +229,7 @@ public class PathImplementation implements Path {
 
     @Override
     public Path normalize() {
-        return new PathImplementation(properties, credentials, location.normalize(), adaptorName, octopusEngine);
+        return new PathImplementation(properties, location.normalize(), adaptorName, octopusEngine);
     }
 
     @Override
@@ -244,7 +238,7 @@ public class PathImplementation implements Path {
             return other;
         }
 
-        return new PathImplementation(properties, credentials, location.resolve(other.toUri()), adaptorName, octopusEngine);
+        return new PathImplementation(properties, location.resolve(other.toUri()), adaptorName, octopusEngine);
     }
 
     @Override
@@ -290,7 +284,7 @@ public class PathImplementation implements Path {
             throw new OctopusException("cannot relativize against an already relative path", null, null);
         }
 
-        return new PathImplementation(properties, credentials, location.relativize(other.toUri()), "local", octopusEngine);
+        return new PathImplementation(properties, location.relativize(other.toUri()), "local", octopusEngine);
     }
 
     @Override
@@ -304,11 +298,6 @@ public class PathImplementation implements Path {
     }
 
     @Override
-    public Credentials getCredentials() {
-        return credentials;
-    }
-
-    @Override
     public Path toAbsolutePath() throws OctopusException {
         if (isAbsolute()) {
             return this;
@@ -316,7 +305,7 @@ public class PathImplementation implements Path {
 
         if (isLocal()) {
             // Path for cwd
-            Path cwd = new PathImplementation(properties, credentials, URI.create(System.getProperty("user.dir")), "local", octopusEngine);
+            Path cwd = new PathImplementation(properties, URI.create(System.getProperty("user.dir")), "local", octopusEngine);
 
             return cwd.resolve(this);
         }
@@ -326,7 +315,7 @@ public class PathImplementation implements Path {
 
     @Override
     public Iterator<Path> iterator() {
-        return new PathIterator(properties, credentials, location, elements);
+        return new PathIterator(properties, location, elements);
     }
 
     @Override

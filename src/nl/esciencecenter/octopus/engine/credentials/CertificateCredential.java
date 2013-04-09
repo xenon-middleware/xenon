@@ -1,6 +1,7 @@
-package nl.esciencecenter.octopus.security;
+package nl.esciencecenter.octopus.engine.credentials;
 
 import java.net.URI;
+
 
 /**
  * A container for security Information based upon certificates. Contexts based

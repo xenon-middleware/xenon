@@ -22,7 +22,6 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.security.Credentials;
 
 /**
  * Engine for File operations. Implements functionality using File operations,
@@ -51,7 +50,7 @@ public class FilesEngine implements Files {
 
     @Override
     public Path newPath(URI location) throws OctopusException {
-        return newPath(null, null, location);
+        return newPath(null, location);
     }
     
     @Override
@@ -81,11 +80,10 @@ public class FilesEngine implements Files {
     //Functions that need a File Adaptors to do the work
 
     @Override
-    public Path newPath(Properties properties, Credentials credentials, URI location) throws OctopusException {
+    public Path newPath(Properties properties, URI location) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
 
-        return adaptor.filesAdaptor().newPath(octopusEngine.getCombinedProperties(properties),
-                octopusEngine.getCombinedCredentials(credentials), location);
+        return adaptor.filesAdaptor().newPath(octopusEngine.getCombinedProperties(properties), location);
     }
 
     @Override

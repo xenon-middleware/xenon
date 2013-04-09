@@ -13,7 +13,7 @@ public class LocalFileTests {
 
     @org.junit.Test
     public void test1() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null, null);
+        Octopus octopus = OctopusFactory.newOctopus(null);
         
         URI location = new URI(System.getProperty("java.io.tmpdir"));
 
@@ -29,7 +29,7 @@ public class LocalFileTests {
 
     @org.junit.Test
     public void test2() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null, null);
+        Octopus octopus = OctopusFactory.newOctopus(null);
         
         Path tmpDir = octopus.files().newPath(new URI(System.getProperty("java.io.tmpdir")));
         
@@ -55,7 +55,4 @@ public class LocalFileTests {
         octopus.end();
         
     }
-
-    
-    
 }

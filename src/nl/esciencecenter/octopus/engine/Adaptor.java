@@ -1,6 +1,7 @@
 package nl.esciencecenter.octopus.engine;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 
@@ -27,7 +28,8 @@ public interface Adaptor extends AdaptorInfo {
     public JobsAdaptor jobsAdaptor();
     
     public FilesAdaptor filesAdaptor();
+    
+    public CredentialsAdaptor credentialsAdaptor();
 
     public void end();
-
 }

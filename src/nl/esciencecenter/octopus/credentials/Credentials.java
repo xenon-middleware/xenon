@@ -1,92 +1,65 @@
-package nl.esciencecenter.octopus.security;
+package nl.esciencecenter.octopus.credentials;
 
-import java.util.HashSet;
+import java.net.URI;
+import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.files.Path;
 
 /**
- * Container class for Credentials.
+ * @author Rob van Nieuwpoort
  * 
- * @author Niels Drost
- * 
+ *         Creates new credentials, and store them in the credential set. All credentials can be limited in scope with the
+ *         validFor parameter. This parameter specifies the set of URI for which this credential is valid. This can be used to
+ *         restrict credentials to a host, port, scheme, username, etc...
  */
-public class Credentials {
-    
-    private static final Logger logger = LoggerFactory.getLogger(Credentials.class);
+public interface Credentials {
 
-    private final HashSet<Credential> credentials;
+    /**
+     * Constructs a certificate Credential out of a {@link Path} pointing to the private key, a {@link Path} pointing to the
+     * certificate, a username and a password.
+     * 
+     * @param keyfile
+     *            the private key file (for example userkey.pem)
+     * @param certfile
+     *            the certificate file (for example usercert.pem)
+     * @param username
+     *            the username
+     * @param password
+     *            the password or passphrase belonging to the key and certificate.
+     * @returns an ID for the credential, which can be used to remove it from the credential set again.
+     */
+    public UUID newCertificateCredential(Path keyfile, Path certfile, String username, String password, URI... validFor) throws OctopusException;
 
-    private final boolean readOnly;
+    /**
+     * Constructs a password credential. If a username is given in the URIs, it must be identical to username parameter.
+     * 
+     * @param username
+     *            the username.
+     * @param password
+     *            the password.
+     */
+    public UUID newPasswordCredential(String username, String password, URI... validFor) throws OctopusException;
 
-    public Credentials(boolean readOnly, Credentials... initialContent) {
-        this.readOnly = readOnly;
-        credentials = new HashSet<Credential>();
-        
-        logger.debug("new credentials, read-only = " + readOnly + " initial content = " + initialContent);
-        
-        if (initialContent != null) {
-            for (Credentials element : initialContent) {
-                if (element != null) {
-                    logger.debug("adding new element = " + element);
-                    credentials.addAll(element.credentials);
-                }
-            }
-        }
-    }
+    /**
+     * Creates a proxy credential.
+     * 
+     * @param host
+     *            the hostname of the proxy server
+     * @param port
+     *            the port where the proxy server runs, -1 for the default port
+     * @param username
+     *            the username to use to connect to the proxy server
+     * @param password
+     *            the password to use to connect to the proxy server
+     */
+    public UUID newProxyCredential(String host, int port, String username, String password, URI... validFor) throws OctopusException;
 
-    public Credentials(boolean readOnly, Credential... initialContent) {
-        this.readOnly = readOnly;
-        credentials = new HashSet<Credential>();
-
-        for (Credential element : initialContent) {
-            credentials.add(element);
-        }
-    }
-
-    public Credentials() {
-        credentials = new HashSet<Credential>();
-        readOnly = false;
-    }
-
-    public boolean isReadOnly() {
-        return readOnly;
-    }
-
-    public synchronized void add(Credential credential) {
-        if (credential == null) {
-            return;
-        }
-        if (readOnly) {
-            throw new DeployRuntimeException("cannot add credential to read only credentials object", null, null);
-        }
-        credentials.add(credential);
-    }
-
-    public synchronized void remove(Credential credential) {
-        if (readOnly) {
-            throw new DeployRuntimeException("cannot remove credential from read only credentials object", null, null);
-        }
-
-        credentials.remove(credential);
-    }
-
-    public synchronized void addAll(Credentials moreCredentials) {
-        if (moreCredentials == null) {
-            return;
-        }
-        if (readOnly) {
-            throw new DeployRuntimeException("cannot add credentials to read only credentials object", null, null);
-        }
-        this.credentials.addAll(moreCredentials.credentials);
-    }
-    
-    public String toString() {
-        return "credentials, read-only = " + readOnly + " content = " + credentials;
-    }
-    
-
+    /**
+     * Removes credentials from the credential set.
+     * 
+     * @param credentialID 
+     * @param validFor remove from given URIs, or from all if no URIs are given. 
+     */
+    public void remove(UUID credentialID, URI... validFor) throws OctopusException;
 }

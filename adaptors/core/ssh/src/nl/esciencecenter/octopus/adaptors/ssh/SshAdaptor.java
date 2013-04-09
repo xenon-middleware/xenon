@@ -7,6 +7,7 @@ import java.util.Map;
 import nl.esciencecenter.octopus.ImmutableTypedProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 import com.jcraft.jsch.Channel;
@@ -28,12 +29,15 @@ public class SshAdaptor implements Adaptor {
 
     private final SshJobs jobsAdaptor;
 
+    private final SshCredentials credentialsAdaptor;
+
     private JSch jsch;
 
     public SshAdaptor(ImmutableTypedProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.filesAdaptor = new SshFiles(properties, this, octopusEngine);
         this.jobsAdaptor = new SshJobs(properties, this, octopusEngine);
+        this.credentialsAdaptor = new SshCredentials(properties, this, octopusEngine);
         jsch = new JSch();
     }
 
@@ -89,6 +93,11 @@ public class SshAdaptor implements Adaptor {
     }
 
     @Override
+    public CredentialsAdaptor credentialsAdaptor() {
+        return credentialsAdaptor;
+    }
+
+    @Override
     public void end() {
         jobsAdaptor.end();
         filesAdaptor.end();
@@ -101,7 +110,7 @@ public class SshAdaptor implements Adaptor {
 
     // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
     // TODO cache van sessions / channels
-    
+
     protected Session getSession(String user, String host, int port) {
         Session session;
         try {
@@ -126,16 +135,16 @@ public class SshAdaptor implements Adaptor {
             return null;
         }
     }
-    
+
     protected ChannelSftp getSftpChannel(String user, String host, int port) {
         Session session = getSession(user, host, port);
         return getSftpChannel(session);
     }
-    
+
     protected void closeSession(Session session) {
         session.disconnect();
     }
-    
+
     protected void closeChannel(Channel channel) {
         channel.disconnect();
     }
