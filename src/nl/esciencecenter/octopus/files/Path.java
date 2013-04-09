@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public interface Path extends Serializable {
 
@@ -62,7 +61,4 @@ public interface Path extends Serializable {
     public String getPath();
 
     public OctopusProperties getProperties();
-
-    public Credentials getCredentials();
-
 }

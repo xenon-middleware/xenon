@@ -77,7 +77,7 @@ public class LocalJobs implements JobsAdaptor {
     }
 
     @Override
-    public Scheduler newScheduler(OctopusProperties properties, Credentials credentials, URI location) throws OctopusException {
+    public Scheduler newScheduler(OctopusProperties properties, URI location) throws OctopusException {
 
         localAdaptor.checkURI(location);
 
@@ -86,7 +86,7 @@ public class LocalJobs implements JobsAdaptor {
         }
 
         // FIXME: This simply returns a new SchedulerImplementation, but ignores properties and credentials completely.    	
-        return new SchedulerImplementation(location, properties, credentials, "local");
+        return new SchedulerImplementation(location, properties, "local");
     }
 
     public void end() {
