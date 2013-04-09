@@ -30,7 +30,7 @@ public class LocalAdaptor extends Adaptor {
     public static final String MAX_HISTORY = QUEUE + "historySize";
 
     /** All our multi queue properties start with this prefix. */
-    public static final String MULTIQ = QUEUE + "multiq.";
+    public static final String MULTIQ = QUEUE + "multi.";
 
     /** Maximum number of concurrent jobs in the multiq */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
