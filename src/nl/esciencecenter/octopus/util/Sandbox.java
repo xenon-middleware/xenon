@@ -8,7 +8,6 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DeleteOption;
-import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 
 public class Sandbox {
@@ -90,10 +89,8 @@ public class Sandbox {
 
     private void copy(List<Pair> pairs) throws OctopusException {
 
-        Files files = octopus.files();
-
         for (Pair pair : pairs) {
-            files.copy(pair.source, pair.destination, CopyOption.COPY_ATTRIBUTES, CopyOption.RECURSIVE);
+            FileUtils.recursiveCopy(octopus, pair.source, pair.destination, CopyOption.COPY_ATTRIBUTES);
         }
     }
 

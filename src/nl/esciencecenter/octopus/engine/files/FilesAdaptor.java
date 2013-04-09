@@ -5,10 +5,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
@@ -28,7 +27,7 @@ public interface FilesAdaptor {
 
     // functions used to create files and streams
 
-    public Path newPath(ImmutableTypedProperties properties, URI location) throws OctopusException;
+    public Path newPath(OctopusProperties properties, URI location) throws OctopusException;
 
     /**
      * Copy a file to a target file.

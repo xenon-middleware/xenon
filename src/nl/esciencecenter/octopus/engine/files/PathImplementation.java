@@ -6,8 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
-import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.util.OSUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -22,13 +21,13 @@ public class PathImplementation implements Path {
 
     private static final class PathIterator implements Iterator<Path> {
 
-        private ImmutableTypedProperties properties;
+        private OctopusProperties properties;
         private URI location;
         private String[] elements;
 
         private int next = 0;
 
-        PathIterator(ImmutableTypedProperties properties, URI location, String[] elements) {
+        PathIterator(OctopusProperties properties, URI location, String[] elements) {
             this.properties = properties;
             this.location = location;
             this.elements = elements;
@@ -82,7 +81,7 @@ public class PathImplementation implements Path {
 
     }
 
-    private final ImmutableTypedProperties properties;
+    private final OctopusProperties properties;
 
     private final URI location;
 
@@ -95,7 +94,8 @@ public class PathImplementation implements Path {
 
     private final OctopusEngine octopusEngine;
 
-    public PathImplementation(ImmutableTypedProperties properties, URI location, String adaptorName, OctopusEngine octopusEngine) {
+    public PathImplementation(OctopusProperties properties, URI location, String adaptorName,
+            OctopusEngine octopusEngine) {
         this.properties = properties;
         this.location = location;
         this.adaptorName = adaptorName;
@@ -130,7 +130,7 @@ public class PathImplementation implements Path {
      * Creates a new path based on an existing path, with a new location based
      * on the old location and the given root and elements.
      */
-    private PathImplementation(ImmutableTypedProperties properties, URI baseLocation, String adaptorName,
+    private PathImplementation(OctopusProperties properties, URI baseLocation, String adaptorName,
             OctopusEngine octopusEngine, String root, String... elements) {
         this.properties = properties;
         this.adaptorName = adaptorName;
@@ -195,8 +195,8 @@ public class PathImplementation implements Path {
 
     @Override
     public Path subpath(int beginIndex, int endIndex) {
-        return new PathImplementation(properties, location, "local", octopusEngine, null, Arrays.copyOfRange(elements,
-                beginIndex, endIndex));
+        return new PathImplementation(properties, location, "local", octopusEngine, null, Arrays.copyOfRange(
+                elements, beginIndex, endIndex));
     }
 
     @Override
@@ -290,7 +290,7 @@ public class PathImplementation implements Path {
     }
 
     @Override
-    public ImmutableTypedProperties getProperties() {
+    public OctopusProperties getProperties() {
         return properties;
     }
 
@@ -302,7 +302,9 @@ public class PathImplementation implements Path {
 
         if (isLocal()) {
             // Path for cwd
-            Path cwd = new PathImplementation(properties, URI.create(System.getProperty("user.dir")), "local", octopusEngine);
+            Path cwd =
+                    new PathImplementation(properties, URI.create(System.getProperty("user.dir")), "local",
+                            octopusEngine);
 
             return cwd.resolve(this);
         }

@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 public class JarFileSystem {
 
+    public static final String ADAPTOR_DIR = "octopus-adaptors";
+
     private static final Logger logger = LoggerFactory.getLogger(JarFileSystem.class);
 
     private final JarFile mainJarFile;
@@ -36,7 +38,7 @@ public class JarFileSystem {
 
         Enumeration<JarEntry> entries = mainJarFile.entries();
 
-        int firstSlash = "adaptors/".indexOf('/');
+        int firstSlash = ADAPTOR_DIR.length() + 1;
 
         long now = System.currentTimeMillis();
 
@@ -47,7 +49,7 @@ public class JarFileSystem {
             // logger.debug("next entry: " + entry.getName());
 
             String name = entry.getName();
-            if (!name.startsWith("adaptors/")) {
+            if (!name.startsWith(ADAPTOR_DIR)) {
                 continue;
             }
 
@@ -58,7 +60,7 @@ public class JarFileSystem {
                 continue;
             }
 
-            String adaptorName = name.substring(firstSlash + 1, secondSlashIndex);
+            String adaptorName = name.substring(firstSlash, secondSlashIndex);
 
             // logger.debug("adaptor name = " + adaptorName);
 
@@ -114,7 +116,7 @@ public class JarFileSystem {
         // search for the asked for file in the main jar file.
         // DO NOT SEARCH FOR CLASS FILES IN MAIN JAR FILE
         if (!filename.endsWith(".class")) {
-            String mainEntryName = "adaptors/" + adaptorName + "/" + filename;
+            String mainEntryName = ADAPTOR_DIR + "/" + adaptorName + "/" + filename;
 
             if (mainEntries.contains(mainEntryName)) {
                 JarFsFile result = new JarFsFile(adaptorName, filename, mainJarFile.getJarEntry(mainEntryName), true);

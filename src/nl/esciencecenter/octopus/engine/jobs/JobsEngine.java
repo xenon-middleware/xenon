@@ -7,7 +7,6 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;

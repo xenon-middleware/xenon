@@ -11,7 +11,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.loader.JarFileSystem;
 import nl.esciencecenter.octopus.engine.loader.JarFsClassLoader;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -122,15 +122,14 @@ class AdaptorLoader {
         return result;
     }
 
-    private static Adaptor newAdaptor(ClassLoader loader, String name, ImmutableTypedProperties properties,
-            OctopusEngine octopusEngine) throws OctopusException {
+    private static Adaptor newAdaptor(ClassLoader loader, String name, OctopusProperties properties, OctopusEngine octopusEngine)
+            throws OctopusException {
         try {
             Thread.currentThread().setContextClassLoader(loader);
             Class<?> clazz =
                     loader.loadClass("nl.esciencecenter.octopus.adaptors." + name.toLowerCase() + "." + name + "Adaptor");
 
-            Constructor<?> constructor =
-                    clazz.getConstructor(new Class[] { ImmutableTypedProperties.class, OctopusEngine.class });
+            Constructor<?> constructor = clazz.getConstructor(new Class[] { OctopusProperties.class, OctopusEngine.class });
 
             Adaptor result = (Adaptor) constructor.newInstance(new Object[] { properties, octopusEngine });
 
@@ -148,7 +147,7 @@ class AdaptorLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(AdaptorLoader.class);
 
-    static Adaptor[] loadAdaptors(ImmutableTypedProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+    static Adaptor[] loadAdaptors(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         ArrayList<File> candidateFiles = new ArrayList<File>();
 
         // find jar files that potentially contain adaptors
