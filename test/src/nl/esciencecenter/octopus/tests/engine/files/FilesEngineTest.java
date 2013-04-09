@@ -24,18 +24,23 @@ public class FilesEngineTest {
 
     @Test
     public void testFilesEngine() throws OctopusException {
-//        OctopusEngine octopus = (OctopusEngine) OctopusFactory.newOctopus(null);
-//        new FilesEngine(octopus);
+        OctopusEngine octopus = mock(OctopusEngine.class);
+
+        FilesEngine engine = new FilesEngine(octopus);
+
+        // TODO verify octopus is in engine
     }
 
     @Test
     public void testNewPathURI() throws URISyntaxException, OctopusException {
         URI location = new URI("file:///tmp/bla.txt");
-        FilesAdaptor files_adaptor = mock(FilesAdaptor.class);
-        OctopusProperties octopus_properties = new OctopusProperties();
-        Adaptor adaptor = mock(Adaptor.class);
+        // create stubs, so we don't have to use a real adaptor
+        // a real adaptor touches filesystem, uses network, requires credentials etc.
         OctopusEngine octopus = mock(OctopusEngine.class);
+        OctopusProperties octopus_properties = new OctopusProperties();
         Path path = new PathImplementation(octopus_properties, location, "mock", octopus);
+        Adaptor adaptor = mock(Adaptor.class);
+        FilesAdaptor files_adaptor = mock(FilesAdaptor.class);
         when(adaptor.filesAdaptor()).thenReturn(files_adaptor);
         when(octopus.getAdaptorFor("file")).thenReturn(adaptor);
         when(octopus.getCombinedProperties(null)).thenReturn(octopus_properties);
