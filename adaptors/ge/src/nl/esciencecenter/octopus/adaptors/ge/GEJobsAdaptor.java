@@ -2,7 +2,7 @@ package nl.esciencecenter.octopus.adaptors.ge;
 
 import java.net.URI;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -14,7 +14,7 @@ import nl.esciencecenter.octopus.security.Credentials;
 
 public class GEJobsAdaptor implements JobsAdaptor {
 
-    public GEJobsAdaptor(ImmutableTypedProperties properties, OctopusEngine octopusEngine) {
+    public GEJobsAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) {
         // TODO Auto-generated constructor stub
     }
 
@@ -24,7 +24,7 @@ public class GEJobsAdaptor implements JobsAdaptor {
     }
 
     @Override
-    public Scheduler newScheduler(ImmutableTypedProperties properties, Credentials credentials, URI location)
+    public Scheduler newScheduler(OctopusProperties properties, Credentials credentials, URI location)
             throws OctopusException {
         // TODO Auto-generated method stub
         return null;

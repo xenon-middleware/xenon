@@ -4,25 +4,29 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class GEAdaptor extends Adaptor {
-    
+
     private static final String ADAPTOR_NAME = "gridengine";
 
-    private static final String ADAPTOR_DESCRIPTION = "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local " +
-            "or the ssh adaptor to gain access to the scheduler machine.";
+    private static final String ADAPTOR_DESCRIPTION =
+            "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
+                    + "or the ssh adaptor to gain access to the scheduler machine.";
 
     private static final String[] ADAPTOR_SCHEME = new String[] { "ge" };
-    
+
+    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
+    private static final String[][] validPropertiesList = new String[][] { {}, {} };
+
     private final GEJobsAdaptor jobsAdaptor;
 
-    public GEAdaptor(ImmutableTypedProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME);
+    public GEAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
 
         this.jobsAdaptor = new GEJobsAdaptor(properties, octopusEngine);
     }
@@ -40,8 +44,8 @@ public class GEAdaptor extends Adaptor {
 
     @Override
     public String getDescription() {
-        return "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local " +
-        		"or the ssh adaptor to gain access to the scheduler machine.";
+        return "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
+                + "or the ssh adaptor to gain access to the scheduler machine.";
     }
 
     @Override

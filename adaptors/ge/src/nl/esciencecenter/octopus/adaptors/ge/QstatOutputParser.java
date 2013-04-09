@@ -1,24 +1,25 @@
 package nl.esciencecenter.octopus.adaptors.ge;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
+import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.files.Path;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-public class QstatOutput {
+public class QstatOutputParser {
 
     public static String[] KNOWN_VERSIONS = { "1.11" };
 
-    QstatOutput() {
+    QstatOutputParser(Octopus octopus, Path path) {
+        
 
     }
     
