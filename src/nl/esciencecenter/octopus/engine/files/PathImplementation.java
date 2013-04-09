@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.util.OSUtils;
+import nl.esciencecenter.octopus.engine.util.URLUTF8Encoder;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
 import nl.esciencecenter.octopus.files.Path;
@@ -55,6 +56,11 @@ public class PathImplementation implements Path {
 
     private static final long serialVersionUID = 1L;
 
+    public static String encode(String uriString) {
+        // encode non accepted URI chars. 
+        return URLUTF8Encoder.encode(uriString); 
+    }
+    
     private static URI createURIFor(URI location, String root, String... elements) {
         String path = root;
         if (path == null) {
@@ -240,10 +246,12 @@ public class PathImplementation implements Path {
 
     @Override
     public Path resolve(String other) throws OctopusException {
-        Path otherPath = octopusEngine.files().newPath(URI.create(other));
-
-        return resolve(otherPath);
+        // Resolve relative path to this URI: 
+        Path otherPath=octopusEngine.files().newPath(this.toUri().resolve(encode(other)));
+        return otherPath; 
     }
+
+  
 
     @Override
     public Path resolveSibling(Path other) {
