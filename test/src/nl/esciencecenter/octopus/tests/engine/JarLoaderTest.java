@@ -14,7 +14,7 @@ public class JarLoaderTest {
     @org.junit.Test
     public void test1() throws Exception {
         JarFileSystem fs = new JarFileSystem(new JarFile(new File(
-                "dist/octopus-adaptors-core.jar")));
+                "dist/octopus-adaptor-local.jar")));
     }
 
     /**
@@ -28,9 +28,9 @@ public class JarLoaderTest {
 
         //fileSystems.add(new JarFileSystem(new JarFile(new File(
         //        "lib/estep-deploy-adaptors-additional.jar"))));
-        
+
         fileSystems.add(new JarFileSystem(new JarFile(new File(
-                "dist/octopus-adaptors-core.jar"))));
+                "dist/octopus-adaptor-local.jar"))));
 
         JarFsClassLoader sharedLoader = new JarFsClassLoader(fileSystems, "Shared");
 

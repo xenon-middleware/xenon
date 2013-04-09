@@ -1,7 +1,7 @@
 <project name="LocalAdaptor" default="build" basedir=".">
 	<description>Build file for Local Adaptor</description>
 
-	<property name="octopus.dist" location="../../../dist" />
+	<property name="octopus.dist" location="../../dist" />
 
 	<property name="build.sysclasspath" value="ignore" />
 
@@ -14,20 +14,30 @@
 	<target name="build" depends="clean" description="build the JARs and documentation">
 		<!-- Create the distribution end tmp directory -->
 		<mkdir dir="dist" />
-		<mkdir dir="tmp" />
+		<mkdir dir="build/classes" />
 
 		<!-- Compile the java code from ${src} into ${tmp} -->
-		<javac srcdir="src" destdir="tmp" debug="on">
+		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="external.jars" />
 		</javac>
 
-		<jar jarfile="dist/octopus-local-adaptor.jar" basedir="tmp" includes="**" />
+		<jar jarfile="dist/octopus-local-adaptor${version}.jar" basedir="build/classes" includes="**" />
 
-		<delete dir="tmp" />
+		<jar jarfile="${octopus.dist}/octopus-adaptor-local${version}.jar">
+			<manifest>
+				<attribute name="Octopus-Adaptors" value="Local" />
+			</manifest>
+
+			<!-- The name set in the prefix here is used as the name of the adaptor class
+		                 e.g. Local -> adaptors.local.LocalAdaptor -->
+
+			<zipfileset dir="dist" prefix="octopus-adaptors/Local" />
+		</jar>
+
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="tmp" />
+		<delete dir="build" />
 		<delete dir="dist" />
 	</target>
 
