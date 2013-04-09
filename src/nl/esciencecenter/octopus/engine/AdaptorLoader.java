@@ -148,6 +148,7 @@ class AdaptorLoader {
     private static final Logger logger = LoggerFactory.getLogger(AdaptorLoader.class);
 
     static Adaptor[] loadAdaptors(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+                
         ArrayList<File> candidateFiles = new ArrayList<File>();
 
         // find jar files that potentially contain adaptors
@@ -203,7 +204,6 @@ class AdaptorLoader {
             }
 
             try {
-
                 JarFile jarFile = new JarFile(file);
 
                 Manifest manifest = jarFile.getManifest();
@@ -243,12 +243,17 @@ class AdaptorLoader {
         // load and initialize all adaptors
         ArrayList<Adaptor> adaptors = new ArrayList<Adaptor>();
 
+        String [] adaptorsToLoad = properties.getStringList(OctopusEngine.LOAD);
+        
         for (String adaptorName : adaptorNames) {
-            ClassLoader adaptorClassLoader = new JarFsClassLoader(fileSystems, adaptorName, sharedLoader);
-            Adaptor adaptor = newAdaptor(adaptorClassLoader, adaptorName, properties, octopusEngine);
+            
+            if (checkAdaptorName(adaptorName, adaptorsToLoad)) { 
+                ClassLoader adaptorClassLoader = new JarFsClassLoader(fileSystems, adaptorName, sharedLoader);
+                Adaptor adaptor = newAdaptor(adaptorClassLoader, adaptorName, properties, octopusEngine);
 
-            if (adaptor != null) {
-                adaptors.add(adaptor);
+                if (adaptor != null) {
+                    adaptors.add(adaptor);
+                }
             }
         }
 
@@ -257,5 +262,20 @@ class AdaptorLoader {
         }
 
         return adaptors.toArray(new Adaptor[adaptors.size()]);
+    }
+    
+    private static boolean checkAdaptorName(String adaptorName, String [] adaptorsToLoad) { 
+        
+        if (adaptorsToLoad == null || adaptorsToLoad.length == 0) { 
+            return true;
+        }
+        
+        for (int i=0;i<adaptorName.length();i++) { 
+            if (adaptorName.equals(adaptorsToLoad[i])) { 
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
