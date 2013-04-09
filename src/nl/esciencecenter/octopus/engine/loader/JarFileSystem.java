@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class JarFileSystem {
 
-	public static final String ADAPTOR_DIR = "octopus-adaptors";
+    public static final String ADAPTOR_DIR = "octopus-adaptors";
 
     private static final Logger logger = LoggerFactory.getLogger(JarFileSystem.class);
 
@@ -82,8 +82,8 @@ public class JarFileSystem {
             mainEntries.add(entry.getName());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug(this + " contains adaptors: " + indexes.keySet().toString() + ". Indexing "
-                    + mainJarFile.size() + " entries took " + (System.currentTimeMillis() - now) + " milliseconds");
+            logger.debug(this + " contains adaptors: " + indexes.keySet().toString() + ". Indexing " + mainJarFile.size()
+                    + " entries took " + (System.currentTimeMillis() - now) + " milliseconds");
         }
 
     }

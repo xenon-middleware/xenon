@@ -7,7 +7,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.security.Credentials;
 
 public class OctopusFactory {
-    
+
     private OctopusFactory() {
         //DO NOT USE
     }

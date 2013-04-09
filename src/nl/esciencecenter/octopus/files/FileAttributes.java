@@ -16,7 +16,7 @@ public interface FileAttributes {
     boolean isSymbolicLink() throws AttributeNotSupportedException;
 
     long creationTime() throws AttributeNotSupportedException;
-    
+
     long lastAccessTime() throws AttributeNotSupportedException;
 
     long lastModifiedTime() throws AttributeNotSupportedException;
@@ -35,7 +35,7 @@ public interface FileAttributes {
      * Reads the access control list.
      */
     List<AclEntry> getAcl() throws AttributeNotSupportedException;
-    
+
     // non-java-nio attributes
 
     boolean isExecutable() throws AttributeNotSupportedException;

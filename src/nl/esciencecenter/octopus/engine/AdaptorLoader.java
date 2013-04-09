@@ -11,7 +11,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.loader.JarFileSystem;
 import nl.esciencecenter.octopus.engine.loader.JarFsClassLoader;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 class AdaptorLoader {
 
     /**
-     * A helper class to compare java.io.File names, so that they can be sorted,
-     * and the order becomes predictable and reproducible.
+     * A helper class to compare java.io.File names, so that they can be sorted, and the order becomes predictable and
+     * reproducible.
      */
     private static class FileComparator implements Comparator<java.io.File> {
         public int compare(java.io.File f1, java.io.File f2) {
@@ -38,9 +38,8 @@ class AdaptorLoader {
     }
 
     /**
-     * A helper class to get the call context. It subclasses SecurityManager to
-     * make getClassContext() accessible. Don't install this as an actual
-     * security manager!
+     * A helper class to get the call context. It subclasses SecurityManager to make getClassContext() accessible. Don't install
+     * this as an actual security manager!
      */
     private static final class CallerResolver extends SecurityManager {
         protected Class<?>[] getClassContext() {
@@ -70,12 +69,10 @@ class AdaptorLoader {
     }
 
     /**
-     * This method tries to determine a suitable classloader to be used as
-     * parent classloader for the URLClassloaders of the adaptors. Sometimes,
-     * the classloader that loaded the OctopusEngine class is not a good
-     * candidate because this probably is just the system classloader. A better
-     * candidate might be the classloader of the class that prompted the loading
-     * of Octopus in the first place, or the context classloader.
+     * This method tries to determine a suitable classloader to be used as parent classloader for the URLClassloaders of the
+     * adaptors. Sometimes, the classloader that loaded the OctopusEngine class is not a good candidate because this probably is
+     * just the system classloader. A better candidate might be the classloader of the class that prompted the loading of Octopus
+     * in the first place, or the context classloader.
      * 
      * @return the classloader to be used.
      */
@@ -125,15 +122,14 @@ class AdaptorLoader {
         return result;
     }
 
-    private static Adaptor newAdaptor(ClassLoader loader, String name, ImmutableTypedProperties properties,
-            OctopusEngine octopusEngine) throws OctopusException {
+    private static Adaptor newAdaptor(ClassLoader loader, String name, OctopusProperties properties, OctopusEngine octopusEngine)
+            throws OctopusException {
         try {
             Thread.currentThread().setContextClassLoader(loader);
-            Class<?> clazz = loader.loadClass("nl.esciencecenter.octopus.adaptors." + name.toLowerCase() + "." + name
-                    + "Adaptor");
+            Class<?> clazz =
+                    loader.loadClass("nl.esciencecenter.octopus.adaptors." + name.toLowerCase() + "." + name + "Adaptor");
 
-            Constructor<?> constructor = clazz.getConstructor(new Class[] { ImmutableTypedProperties.class,
-                    OctopusEngine.class });
+            Constructor<?> constructor = clazz.getConstructor(new Class[] { OctopusProperties.class, OctopusEngine.class });
 
             Adaptor result = (Adaptor) constructor.newInstance(new Object[] { properties, octopusEngine });
 
@@ -151,8 +147,7 @@ class AdaptorLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(AdaptorLoader.class);
 
-    static Adaptor[] loadAdaptors(ImmutableTypedProperties properties, OctopusEngine octopusEngine)
-            throws OctopusException {
+    static Adaptor[] loadAdaptors(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         ArrayList<File> candidateFiles = new ArrayList<File>();
 
         // find jar files that potentially contain adaptors
@@ -177,8 +172,7 @@ class AdaptorLoader {
             java.io.File adaptorRoot = new java.io.File(properties.getProperty(ADAPTOR_DIR_PROPERTY));
 
             if (!adaptorRoot.isDirectory()) {
-                throw new OctopusException(ADAPTOR_DIR_PROPERTY + " (" + adaptorRoot + ") is not a directory", null,
-                        null);
+                throw new OctopusException(ADAPTOR_DIR_PROPERTY + " (" + adaptorRoot + ") is not a directory", null, null);
             }
 
             File[] files = adaptorRoot.listFiles();
@@ -223,8 +217,7 @@ class AdaptorLoader {
                 }
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Loading adaptor set: "
-                            + manifest.getMainAttributes().getValue(ADAPTOR_ATTRIBUTE_NAME));
+                    logger.debug("Loading adaptor set: " + manifest.getMainAttributes().getValue(ADAPTOR_ATTRIBUTE_NAME));
                 }
 
                 JarFileSystem fileSystem = new JarFileSystem(jarFile);

@@ -17,16 +17,30 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
 
 /**
- * Read-only properties implementation. Also contains some utility functions for
- * getting typed properties.
+ * Read-only properties implementation. Also contains some utility functions for getting typed properties.
  */
-public class ImmutableTypedProperties extends Properties {
+public class OctopusProperties extends Properties {
 
     private static final long serialVersionUID = 1L;
 
     /** Constructs a properties object. */
-    public ImmutableTypedProperties(Properties... content) {
+    public OctopusProperties(Properties... content) {
         super();
+        for (Properties properties : content) {
+            addProperties(properties);
+        }
+    }
+
+    /** Constructs a properties object. */
+    public OctopusProperties(String[][] defaults, Properties... content) {
+        super();
+
+        for (String[] element : defaults) {
+            if (element[1] != null) {
+                super.put(element[0], element[1]);
+            }
+        }
+
         for (Properties properties : content) {
             addProperties(properties);
         }
@@ -91,8 +105,8 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Tries to load properties from a file, which is located relative to the
-     * users home directory. Does not throw any exceptions if unsuccessful.
+     * Tries to load properties from a file, which is located relative to the users home directory. Does not throw any exceptions
+     * if unsuccessful.
      * 
      * @param fileName
      *            name of file to load from.
@@ -102,9 +116,8 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Returns true if property <code>name</code> is defined and has a value
-     * that is conventionally associated with 'true' (as in Ant): any of 1, on,
-     * true, yes, or nothing.
+     * Returns true if property <code>name</code> is defined and has a value that is conventionally associated with 'true' (as in
+     * Ant): any of 1, on, true, yes, or nothing.
      * 
      * @return true if property is defined and set
      * @param name
@@ -115,10 +128,8 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Returns true if property <code>name</code> has a value that is
-     * conventionally associated with 'true' (as in Ant): any of 1, on, true,
-     * yes, or nothing. If the property is not defined, return the specified
-     * default value.
+     * Returns true if property <code>name</code> has a value that is conventionally associated with 'true' (as in Ant): any of 1,
+     * on, true, yes, or nothing. If the property is not defined, return the specified default value.
      * 
      * @return true if property is defined and set
      * @param key
@@ -130,8 +141,7 @@ public class ImmutableTypedProperties extends Properties {
         String value = getProperty(key);
 
         if (value != null) {
-            return value.equals("1") || value.equals("on") || value.equals("") || value.equals("true")
-                    || value.equals("yes");
+            return value.equals("1") || value.equals("on") || value.equals("") || value.equals("true") || value.equals("yes");
         }
 
         return defaultValue;
@@ -378,10 +388,8 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Returns the long value of a size property. Valid values for the property
-     * are a long, a long followed by K, a long followed by M or a long followed
-     * by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3
-     * respectively.
+     * Returns the long value of a size property. Valid values for the property are a long, a long followed by K, a long followed
+     * by M or a long followed by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3 respectively.
      * 
      * @return the size value of property
      * @param key
@@ -400,10 +408,9 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Returns the long value of a size property. Valid values for the property
-     * are a long, a long followed by K, a long followed by M or a long followed
-     * by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3
-     * respectively. Returns the default value if the property is undefined.
+     * Returns the long value of a size property. Valid values for the property are a long, a long followed by K, a long followed
+     * by M or a long followed by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3 respectively. Returns the
+     * default value if the property is undefined.
      * 
      * @return the size value of property
      * @param key
@@ -437,17 +444,14 @@ public class ImmutableTypedProperties extends Properties {
             return Long.parseLong(value);
 
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Long[G|g|M|m|K|k] expected for property " + key + ", not \"" + value
-                    + "\"");
+            throw new NumberFormatException("Long[G|g|M|m|K|k] expected for property " + key + ", not \"" + value + "\"");
         }
     }
 
     /**
-     * Returns the split-up value of a string property. The value is supposed to
-     * be a comma-separated string, with each comma preceded and followed by any
-     * amount of whitespace. See {@link java.lang.String#split(String)} for
-     * details of the splitting. If the property is not defined, an empty array
-     * of strings is returned.
+     * Returns the split-up value of a string property. The value is supposed to be a comma-separated string, with each comma
+     * preceded and followed by any amount of whitespace. See {@link java.lang.String#split(String)} for details of the splitting.
+     * If the property is not defined, an empty array of strings is returned.
      * 
      * @param key
      *            the property name
@@ -458,10 +462,9 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Returns the split-up value of a string property. The value is split up
-     * according to the specified delimiter. See
-     * {@link java.lang.String#split(String)} for details of the splitting. If
-     * the property is not defined, an empty array of strings is returned.
+     * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
+     * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, an empty array of
+     * strings is returned.
      * 
      * @param key
      *            the property name
@@ -474,10 +477,9 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Returns the split-up value of a string property. The value is split up
-     * according to the specified delimiter. See
-     * {@link java.lang.String#split(String)} for details of the splitting. If
-     * the property is not defined, the specified default value is returned.
+     * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
+     * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, the specified default
+     * value is returned.
      * 
      * @param key
      *            the property name
@@ -548,14 +550,12 @@ public class ImmutableTypedProperties extends Properties {
      * @param validKeys
      *            the set of valid keys (all with the prefix).
      * @param validSubPrefixes
-     *            if a propery starts with one of these prefixes, it is declared
-     *            valid
+     *            if a property starts with one of these prefixes, it is declared valid
      * @param printWarning
-     *            if true, a warning is printed to standard error for each
-     *            unknown property
+     *            if true, a warning is printed to standard error for each unknown property
      */
-    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes,
-            boolean printWarning) {
+    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes, boolean printWarning) {
+
         Properties result = new Properties();
 
         if (prefix == null) {
@@ -577,6 +577,7 @@ public class ImmutableTypedProperties extends Properties {
                 }
             }
         }
+
         return result;
     }
 
@@ -589,10 +590,9 @@ public class ImmutableTypedProperties extends Properties {
      * @param removePrefix
      *            should the prefix be removed from the property name?
      * @param removeProperties
-     *            should the returned properties be removed from the current
-     *            properties?
+     *            should the returned properties be removed from the current properties?
      */
-    private Properties filter(String prefix, boolean removePrefix, boolean removeProperties) {
+    public OctopusProperties filter(String prefix) {
 
         Properties result = new Properties();
 
@@ -604,33 +604,11 @@ public class ImmutableTypedProperties extends Properties {
             String key = (String) e.nextElement();
 
             if (key.startsWith(prefix)) {
-
-                String value = getProperty(key);
-
-                if (removePrefix) {
-                    result.put(key.substring(prefix.length()), value);
-                } else {
-                    result.put(key, value);
-                }
-
-                if (removeProperties) {
-                    remove(key);
-                }
+                result.put(key, getProperty(key));
             }
         }
 
-        return result;
-    }
-
-    /**
-     * Returns all properties who's key start with a certain prefix.
-     * 
-     * @return a Property object containing all matching properties.
-     * @param prefix
-     *            the desired prefix
-     */
-    private Properties filter(String prefix) {
-        return filter(prefix, false, false);
+        return new OctopusProperties(result);
     }
 
     /**
@@ -639,8 +617,7 @@ public class ImmutableTypedProperties extends Properties {
      * @param out
      *            The stream to write output to.
      * @param prefix
-     *            Only print properties which start with the given prefix. If
-     *            null, will print all properties
+     *            Only print properties which start with the given prefix. If null, will print all properties
      */
     public void printProperties(PrintStream out, String prefix) {
         if (prefix == null) {
@@ -687,8 +664,7 @@ public class ImmutableTypedProperties extends Properties {
     }
 
     /**
-     * Compares this object to the specified object. They are equal if they have
-     * the same property names and values.
+     * Compares this object to the specified object. They are equal if they have the same property names and values.
      * 
      * @param object
      *            object to compare to.

@@ -4,8 +4,8 @@
 package nl.esciencecenter.octopus.security;
 
 /**
- * This context is used if you have a credential stored in a myproxy server. You
- * need to specify a host, port, username and password to the myproxy server.
+ * This context is used if you have a credential stored in a myproxy server. You need to specify a host, port, username and
+ * password to the myproxy server.
  * 
  * @author rob
  */
@@ -27,8 +27,7 @@ public class ProxyCredential extends Credential {
      * @param host
      *            the hostname of the myproxy server
      * @param port
-     *            the port where the myproxy server runs, -1 for the default
-     *            port
+     *            the port where the myproxy server runs, -1 for the default port
      * @param username
      *            the username to use to connect to the myproxy server
      * @param password

@@ -14,12 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class Index {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Index.class);
 
     private final Map<JarEntry, HashSet<String>> entries;
 
-    Index()  {
+    Index() {
         entries = new HashMap<JarEntry, HashSet<String>>();
     }
 
@@ -27,24 +27,24 @@ class Index {
     public void add(JarEntry entry, JarFile mainJarFile) throws OctopusException {
         HashSet<String> names = new HashSet<String>();
         entries.put(entry, names);
-        
+
         try (JarInputStream subJarStream = new JarInputStream(mainJarFile.getInputStream(entry))) {
             while (true) {
                 JarEntry subEntry = subJarStream.getNextJarEntry();
                 if (subEntry == null) {
                     return;
                 }
-                
+
                 names.add(subEntry.getName());
             }
         } catch (IOException e) {
-           throw new OctopusException("failed to get adaptor files from jar", e);
+            throw new OctopusException("failed to get adaptor files from jar", e);
         }
 
     }
 
     public JarEntry findEntryFor(String filename) {
-        for(Map.Entry<JarEntry, HashSet<String>> entry: entries.entrySet()) {
+        for (Map.Entry<JarEntry, HashSet<String>> entry : entries.entrySet()) {
             if (entry.getValue().contains(filename)) {
                 return entry.getKey();
             }

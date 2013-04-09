@@ -18,7 +18,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
@@ -45,7 +45,7 @@ public class LocalFiles implements FilesAdaptor {
     private final OctopusEngine octopusEngine;
     private final LocalAdaptor localAdaptor;
 
-    public LocalFiles(ImmutableTypedProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine) {
+    public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
 
@@ -55,10 +55,9 @@ public class LocalFiles implements FilesAdaptor {
             logger.debug(Arrays.toString(attributeViews.toArray()));
         }
     }
-    
+
     @Override
-    public Path newPath(ImmutableTypedProperties properties, Credentials credentials, URI location)
-            throws OctopusException {
+    public Path newPath(OctopusProperties properties, Credentials credentials, URI location) throws OctopusException {
         localAdaptor.checkURI(location);
         return new PathImplementation(properties, credentials, location, localAdaptor.getName(), octopusEngine);
     }
@@ -72,8 +71,7 @@ public class LocalFiles implements FilesAdaptor {
                         source.toUri());
             }
         } else if (exists(target)) {
-            throw new FileAlreadyExistsException("cannot copy to " + target + " as it already exists", "local",
-                    source.toUri());
+            throw new FileAlreadyExistsException("cannot copy to " + target + " as it already exists", "local", source.toUri());
         }
 
         try {
@@ -82,11 +80,11 @@ public class LocalFiles implements FilesAdaptor {
             throw new OctopusException("could not copy file", e, null, null);
         }
 
-//        if (CopyOption.contains(options, CopyOption.RECURSIVE) && isDirectory(source)) {
-//            for (Path child : newDirectoryStream(source, FilesEngine.ACCEPT_ALL_FILTER)) {
-//                copy(child, target.resolve(child.getFileName()), options);
-//            }
-//        }
+        //        if (CopyOption.contains(options, CopyOption.RECURSIVE) && isDirectory(source)) {
+        //            for (Path child : newDirectoryStream(source, FilesEngine.ACCEPT_ALL_FILTER)) {
+        //                copy(child, target.resolve(child.getFileName()), options);
+        //            }
+        //        }
 
         return target;
     }
@@ -117,8 +115,8 @@ public class LocalFiles implements FilesAdaptor {
     @Override
     public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
         if (exists(dir) && !isDirectory(dir)) {
-            throw new FileAlreadyExistsException(
-                    "Cannot create directory, as it already exists (but is not a directory).", "local", dir.toUri());
+            throw new FileAlreadyExistsException("Cannot create directory, as it already exists (but is not a directory).",
+                    "local", dir.toUri());
         }
 
         try {
@@ -163,8 +161,8 @@ public class LocalFiles implements FilesAdaptor {
     @Override
     public Path createSymbolicLink(Path link, Path target) throws OctopusException {
         if (exists(link)) {
-            throw new FileAlreadyExistsException("Cannot create link, as a file with this name already exists",
-                    "local", link.toUri());
+            throw new FileAlreadyExistsException("Cannot create link, as a file with this name already exists", "local",
+                    link.toUri());
         }
 
         try {
@@ -290,19 +288,18 @@ public class LocalFiles implements FilesAdaptor {
     @Override
     public Path setOwner(Path path, String user, String group) throws OctopusException {
         try {
-            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path),
-                    PosixFileAttributeView.class);
+            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
             if (user != null) {
-                UserPrincipal userPrincipal = FileSystems.getDefault().getUserPrincipalLookupService()
-                        .lookupPrincipalByName(user);
+                UserPrincipal userPrincipal =
+                        FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(user);
 
                 view.setOwner(userPrincipal);
             }
 
             if (group != null) {
-                GroupPrincipal groupPrincipal = FileSystems.getDefault().getUserPrincipalLookupService()
-                        .lookupPrincipalByGroupName(group);
+                GroupPrincipal groupPrincipal =
+                        FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByGroupName(group);
 
                 view.setGroup(groupPrincipal);
             }
@@ -317,11 +314,10 @@ public class LocalFiles implements FilesAdaptor {
     @Override
     public Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
         try {
-            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path),
-                    PosixFileAttributeView.class);
+            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
             view.setPermissions(LocalUtils.javaPermissions(permissions));
-            
+
             return path;
         } catch (IOException e) {
             throw new OctopusException("Unable to set permissions", e, null, null);
@@ -329,16 +325,14 @@ public class LocalFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusException {
+    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException {
         try {
-            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path),
-                    PosixFileAttributeView.class);
-            
+            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
+
             FileTime lastModifiedFileTime = null;
             FileTime lastAccessFileTime = null;
             FileTime createFileTime = null;
-            
+
             if (lastModifiedTime != -1) {
                 lastModifiedFileTime = FileTime.fromMillis(lastModifiedTime);
             }
@@ -352,7 +346,7 @@ public class LocalFiles implements FilesAdaptor {
             }
 
             view.setTimes(lastModifiedFileTime, lastAccessFileTime, createFileTime);
-            
+
             return path;
         } catch (IOException e) {
             throw new OctopusException("Unable to set file times", e, "local", path.toUri());

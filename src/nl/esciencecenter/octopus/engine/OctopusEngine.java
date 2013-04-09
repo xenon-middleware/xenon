@@ -4,7 +4,7 @@ import java.util.Properties;
 import java.util.Vector;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
@@ -17,8 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of Octopus Interface class. Redirects calls to adaptors, and
- * the FilesEngine
+ * Implementation of Octopus Interface class. Redirects calls to adaptors, and the FilesEngine
  * 
  * @author Niels Drost
  */
@@ -77,7 +76,7 @@ public class OctopusEngine implements Octopus {
             defaultCredentials = credentials;
         }
 
-        adaptors = AdaptorLoader.loadAdaptors(new ImmutableTypedProperties(defaultProperties), this);
+        adaptors = AdaptorLoader.loadAdaptors(new OctopusProperties(defaultProperties), this);
 
         filesEngine = new FilesEngine(this);
 
@@ -86,8 +85,8 @@ public class OctopusEngine implements Octopus {
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }
 
-    public synchronized ImmutableTypedProperties getCombinedProperties(Properties properties) {
-        ImmutableTypedProperties result = new ImmutableTypedProperties(defaultProperties, properties);
+    public synchronized OctopusProperties getCombinedProperties(Properties properties) {
+        OctopusProperties result = new OctopusProperties(defaultProperties, properties);
 
         return result;
     }

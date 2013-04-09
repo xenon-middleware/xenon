@@ -46,7 +46,7 @@ class LocalUtils {
     static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions)
             throws OctopusException {
         Set<java.nio.file.attribute.PosixFilePermission> result = new HashSet<java.nio.file.attribute.PosixFilePermission>();
-        
+
         if (permissions == null) {
             return result;
         }
@@ -55,8 +55,7 @@ class LocalUtils {
             try {
                 result.add(java.nio.file.attribute.PosixFilePermission.valueOf(permission.toString()));
             } catch (IllegalArgumentException e) {
-                throw new UnsupportedOperationException("Posix permission " + permission
-                        + " not recognized by Local adaptor");
+                throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
             }
         }
 
@@ -74,8 +73,8 @@ class LocalUtils {
             try {
                 result.add(PosixFilePermission.valueOf(permission.toString()));
             } catch (IllegalArgumentException e) {
-                throw new DeployRuntimeException("Posix permission " + permission + " not recognized by Local adaptor",
-                        "local", null);
+                throw new DeployRuntimeException("Posix permission " + permission + " not recognized by Local adaptor", "local",
+                        null);
             }
         }
 

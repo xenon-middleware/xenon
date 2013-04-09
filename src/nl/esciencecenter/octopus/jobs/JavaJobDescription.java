@@ -19,8 +19,7 @@ public class JavaJobDescription extends JobDescription {
     private String javaClassPath;
 
     /**
-     * Create a {@link JavaJobDescription}, which describes the java
-     * application.
+     * Create a {@link JavaJobDescription}, which describes the java application.
      */
     public JavaJobDescription() {
         super();
@@ -56,9 +55,8 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Sets the system properties. A system property should be passed as a key
-     * value pair <"a", "b">, not as <"-Da", "b">, Octopus will add the -D to
-     * the property.
+     * Sets the system properties. A system property should be passed as a key value pair <"a", "b">, not as <"-Da", "b">, Octopus
+     * will add the -D to the property.
      * 
      * @param systemProperties
      *            the system properties.
@@ -68,14 +66,12 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Adds a system property to the current set of system properties. The key
-     * of the system property should not start with "-D".
+     * Adds a system property to the current set of system properties. The key of the system property should not start with "-D".
      * 
      * @param key
      *            the key of the system property to be added
      * @param value
-     *            the value belonging to the key of the system property to be
-     *            added
+     *            the value belonging to the key of the system property to be added
      */
     public void addJavaSystemProperty(String key, String value) {
         if (javaSystemProperties == null) {
@@ -124,11 +120,9 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * <b>This method should not be used</b>. This method will ignore all
-     * arguments. The methods {@link #setJavaClassPath(String)},
-     * {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)},
-     * {@link #setJavaMain(String)} and {@link #setJavaArguments(String[])}
-     * should be used to construct the command line arguments.
+     * <b>This method should not be used</b>. This method will ignore all arguments. The methods {@link #setJavaClassPath(String)}
+     * , {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)}, {@link #setJavaMain(String)} and
+     * {@link #setJavaArguments(String[])} should be used to construct the command line arguments.
      * 
      * @param arguments
      */
@@ -136,8 +130,8 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Constructs the command line arguments from the class path, the jvm
-     * options, the system properties, the main and the java arguments.
+     * Constructs the command line arguments from the class path, the jvm options, the system properties, the main and the java
+     * arguments.
      * 
      * @return the command line arguments
      */
@@ -176,8 +170,7 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Returns the executable. If no executable is set the default executable
-     * will be "java".
+     * Returns the executable. If no executable is set the default executable will be "java".
      * 
      * @return Returns the executable.
      */

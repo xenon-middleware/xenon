@@ -5,7 +5,7 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
 
 public class AbstractPathAttributes implements PathAttributes {
-    
+
     private final Path path;
     private final FileAttributes attributes;
 
