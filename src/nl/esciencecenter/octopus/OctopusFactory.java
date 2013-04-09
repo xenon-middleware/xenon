@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public class OctopusFactory {
 
@@ -23,8 +22,8 @@ public class OctopusFactory {
      * @throws OctopusException
      *             in case the engine fails to initialize.
      */
-    public static Octopus newOctopus(Properties properties, Credentials credentials) throws OctopusException {
-        return OctopusEngine.newEngine(properties, credentials);
+    public static Octopus newOctopus(Properties properties) throws OctopusException {
+        return OctopusEngine.newEngine(properties);
     }
 
     public void end() {

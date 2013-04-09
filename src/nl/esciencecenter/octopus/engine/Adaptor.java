@@ -6,6 +6,7 @@ import java.util.Set;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
 import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -26,7 +27,6 @@ public abstract class Adaptor implements AdaptorInfo {
     protected final OctopusEngine octopusEngine;
 
     private final String[][] defaultProperties;
-
     private final OctopusProperties properties;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
@@ -93,6 +93,8 @@ public abstract class Adaptor implements AdaptorInfo {
     public abstract FilesAdaptor filesAdaptor() throws OctopusException;
 
     public abstract JobsAdaptor jobsAdaptor() throws OctopusException;
+
+    public abstract CredentialsAdaptor credentialsAdaptor() throws OctopusException;
 
     public abstract void end();
 }
