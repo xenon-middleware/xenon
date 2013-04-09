@@ -57,16 +57,16 @@
 
 	<target name="javadoc" description="generate javadoc for users">
 		<delete dir="doc/javadoc" />
-		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false">
+		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" doclet="org.jboss.apiviz.APIviz" docletpath="lib/apiviz-1.3.2.GA.jar" additionalparam="-author -version -keywords -sourceclasspath build/classes">
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 			<classpath refid="lib.jars" />
 			<excludepackage name="nl.esciencecenter.octopus.engine.*" />
 		</javadoc>
 	</target>
 
-	<target name="javadoc-devel" description="generate javadoc for users">
+	<target name="javadoc-devel" description="generate javadoc for developers">
 		<delete dir="doc/javadoc-devel" />
-		<javadoc destdir="doc/javadoc-devel" access="private" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false">
+		<javadoc destdir="doc/javadoc-devel" access="private" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" doclet="org.jboss.apiviz.APIviz" additionalparam="-author -version -keywords -sourceclasspath build/classes" docletpath="lib/apiviz-1.3.2.GA.jar">
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 			<classpath refid="lib.jars" />
 		</javadoc>
