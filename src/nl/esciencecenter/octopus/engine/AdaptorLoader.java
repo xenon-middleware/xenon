@@ -121,13 +121,21 @@ class AdaptorLoader {
 
         return result;
     }
+    
+    private static String fixName(String name) {
+        if (name.length() == 1) { 
+            return name.substring(0, 1).toUpperCase();
+        }
+        
+        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+    }
 
     private static Adaptor newAdaptor(ClassLoader loader, String name, OctopusProperties properties, OctopusEngine octopusEngine)
             throws OctopusException {
         try {
             Thread.currentThread().setContextClassLoader(loader);
             Class<?> clazz =
-                    loader.loadClass("nl.esciencecenter.octopus.adaptors." + name.toLowerCase() + "." + name + "Adaptor");
+                    loader.loadClass("nl.esciencecenter.octopus.adaptors." + name + "." + fixName(name) + "Adaptor");
 
             Constructor<?> constructor = clazz.getConstructor(new Class[] { OctopusProperties.class, OctopusEngine.class });
 
@@ -193,8 +201,8 @@ class AdaptorLoader {
         }
 
         // filter out jar files that contain adaptors, create JarFileSystems
-
         HashSet<JarFileSystem> fileSystems = new HashSet<JarFileSystem>();
+
         HashSet<String> adaptorNames = new HashSet<String>();
 
         for (File file : candidateFiles) {
@@ -278,7 +286,7 @@ class AdaptorLoader {
             return true;
         }
         
-        for (int i=0;i<adaptorName.length();i++) { 
+        for (int i=0;i<adaptorsToLoad.length;i++) { 
             if (adaptorName.equals(adaptorsToLoad[i])) { 
                 return true;
             }

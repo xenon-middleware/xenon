@@ -14,7 +14,7 @@ public class BasicTests {
     @org.junit.Test
     public void test1() throws Exception {
 
-        Octopus octopus = OctopusFactory.newOctopus(null, null);
+        Octopus octopus = OctopusFactory.newOctopus(null);
 
         octopus.end();
     }
@@ -26,7 +26,7 @@ public class BasicTests {
 
         properties.setProperty("some.key", "some.value");
 
-        Octopus octopus = OctopusFactory.newOctopus(properties, null);
+        Octopus octopus = OctopusFactory.newOctopus(properties);
 
         assertEquals(octopus.getDefaultProperties().get("some.key"), "some.value");
 
@@ -36,7 +36,7 @@ public class BasicTests {
     @org.junit.Test
     public void test3() throws Exception {
 
-        Octopus octopus = OctopusFactory.newOctopus(null, null);
+        Octopus octopus = OctopusFactory.newOctopus(null);
 
         //test if the local adaptor exists
         AdaptorInfo localInfo = octopus.getAdaptorInfo("local");
@@ -48,5 +48,4 @@ public class BasicTests {
 
         octopus.end();
     }
-
 }

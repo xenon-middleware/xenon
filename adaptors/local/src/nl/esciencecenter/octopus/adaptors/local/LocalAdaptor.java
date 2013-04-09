@@ -42,12 +42,14 @@ public class LocalAdaptor extends Adaptor {
 
     private final LocalFiles localFiles;
     private final LocalJobs localJobs;
+    private final LocalCredentials localCredentials;
 
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
-        localFiles = new LocalFiles(properties, this, octopusEngine);
-        localJobs = new LocalJobs(properties, this, octopusEngine);
+        localFiles = new LocalFiles(getProperties(), this, octopusEngine);
+        localJobs = new LocalJobs(getProperties(), this, octopusEngine);
+        localCredentials = new LocalCredentials();
     }
 
     void checkURI(URI location) throws OctopusException {
@@ -89,5 +91,10 @@ public class LocalAdaptor extends Adaptor {
     @Override
     public JobsAdaptor jobsAdaptor() {
         return localJobs;
+    }
+
+    @Override
+    public LocalCredentials credentialsAdaptor() {
+        return localCredentials;
     }
 }

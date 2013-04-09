@@ -6,12 +6,13 @@ import java.util.Vector;
 import nl.esciencecenter.octopus.AdaptorInfo;
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsEngine;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.security.Credentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +42,8 @@ public class OctopusEngine implements Octopus {
     // list of all octopusEngines, so we can end them all in one go.
     private static final Vector<OctopusEngine> octopusEngines = new Vector<OctopusEngine>();
 
-    public static Octopus newEngine(Properties properties, Credentials credentials) throws OctopusException {
-        OctopusEngine result = new OctopusEngine(properties, credentials);
+    public static Octopus newEngine(Properties properties) throws OctopusException {
+        OctopusEngine result = new OctopusEngine(properties);
 
         octopusEngines.add(result);
 
@@ -57,13 +58,13 @@ public class OctopusEngine implements Octopus {
 
     private boolean ended = false;
 
-    private Credentials defaultCredentials = new Credentials();
-
     private OctopusProperties defaultProperties;
 
     private final FilesEngine filesEngine;
 
     private final JobsEngine jobsEngine;
+
+    private final CredentialsEngine credentialsEngine;
 
     private final Adaptor[] adaptors;
 
@@ -76,34 +77,23 @@ public class OctopusEngine implements Octopus {
      *            the properties to use. Will NOT be copied.
      * @throws OctopusException
      */
-    private OctopusEngine(Properties properties, Credentials credentials) throws OctopusException {
+    private OctopusEngine(Properties properties) throws OctopusException {
       
         defaultProperties = new OctopusProperties(VALID_PROPERTIES, properties);
         
-        if (credentials == null) {
-            defaultCredentials = new Credentials();
-        } else {
-            defaultCredentials = credentials;
-        }
-
         adaptors = AdaptorLoader.loadAdaptors(defaultProperties, this);
 
         filesEngine = new FilesEngine(this);
 
         jobsEngine = new JobsEngine(this);
 
+        credentialsEngine = new CredentialsEngine(this);
+
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }
     
     public synchronized OctopusProperties getCombinedProperties(Properties properties) {
         OctopusProperties result = new OctopusProperties(defaultProperties, properties);
-
-        return result;
-    }
-
-    public synchronized Credentials getCombinedCredentials(Credentials credentials) {
-        // read only credentials
-        Credentials result = new Credentials(true, defaultCredentials, credentials);
 
         return result;
     }
@@ -146,14 +136,8 @@ public class OctopusEngine implements Octopus {
         throw new OctopusException("could not find adaptor named " + name, null, null);
     }
 
-    @Override
-    public synchronized Credentials getDefaultCredentials() {
-        return defaultCredentials;
-    }
-
-    @Override
-    public synchronized void setDefaultCredentials(Credentials credentials) {
-        defaultCredentials = credentials;
+    public Adaptor[] getAdaptors() {
+        return adaptors;
     }
 
     @Override
@@ -182,6 +166,11 @@ public class OctopusEngine implements Octopus {
     }
 
     @Override
+    public Credentials credentials() {
+        return credentialsEngine;
+    }
+
+    @Override
     public void end() {
         synchronized (this) {
             if (ended) {
@@ -195,5 +184,4 @@ public class OctopusEngine implements Octopus {
             adaptor.end();
         }
     }
-
 }

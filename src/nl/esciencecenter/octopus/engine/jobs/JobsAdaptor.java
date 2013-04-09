@@ -8,11 +8,10 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public interface JobsAdaptor {
 
-    public Scheduler newScheduler(OctopusProperties properties, Credentials credentials, URI location) throws OctopusException;
+    public Scheduler newScheduler(OctopusProperties properties, URI location) throws OctopusException;
 
     public String[] getQueueNames(Scheduler scheduler) throws OctopusException;
 

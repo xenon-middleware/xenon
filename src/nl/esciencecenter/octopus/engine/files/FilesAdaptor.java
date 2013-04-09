@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -21,13 +22,12 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public interface FilesAdaptor {
 
     // functions used to create files and streams
 
-    public Path newPath(OctopusProperties properties, Credentials credentials, URI location) throws OctopusException;
+    public Path newPath(OctopusProperties properties, URI location) throws OctopusException;
 
     /**
      * Copy a file to a target file.
