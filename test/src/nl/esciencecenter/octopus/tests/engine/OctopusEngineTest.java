@@ -30,7 +30,7 @@ public class OctopusEngineTest {
 
     public OctopusEngine getEngineWithOnlyLocalAdaptor() throws OctopusException {
         Properties properties = new Properties();
-        properties.setProperty("octopus.adaptors.load", "Local");
+        properties.setProperty("octopus.adaptors.load", "local");
         Octopus octopus = null;
         octopus = OctopusEngine.newEngine(properties, null);
         return (OctopusEngine) octopus;
@@ -40,13 +40,13 @@ public class OctopusEngineTest {
     public void testGetAdaptorFor() throws OctopusException {
         OctopusEngine octopus = getEngineWithOnlyLocalAdaptor();
         Adaptor adaptor = octopus.getAdaptorFor("file");
-        assertThat(adaptor.getName(), is("Local"));
+        assertThat(adaptor.getName(), is("local"));
     }
 
     @Test
     public void testGetAdaptor() throws OctopusException {
         OctopusEngine octopus = getEngineWithOnlyLocalAdaptor();
-        Adaptor adaptor = octopus.getAdaptor("Local");
-        assertThat(adaptor.getName(), is("Local"));
+        Adaptor adaptor = octopus.getAdaptor("local");
+        assertThat(adaptor.getName(), is("local"));
     }
 }
