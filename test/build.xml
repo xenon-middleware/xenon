@@ -93,11 +93,11 @@
 			<structure name="octopus">
 				<classfiles>
 					<fileset dir="../build/classes" />
-					<fileset dir="../adaptors/core/local/build/classes" />
+					<fileset dir="../adaptors/local/build/classes" />
 				</classfiles>
 				<sourcefiles>
 					<fileset dir="../src" />
-					<fileset dir="../adaptors/core/local/src" />
+					<fileset dir="../adaptors/local/src" />
 				</sourcefiles>
 			</structure>
 
