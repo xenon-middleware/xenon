@@ -3,6 +3,7 @@ package nl.esciencecenter.octopus.engine;
 import nl.esciencecenter.octopus.AdaptorInfo;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * New-style adaptor interface. Adaptors are expected to implement one or more
@@ -59,9 +60,9 @@ public abstract class Adaptor implements AdaptorInfo {
         return false;
     }
 
-    public abstract FilesAdaptor filesAdaptor(); 
+    public abstract FilesAdaptor filesAdaptor() throws OctopusException; 
     
-    public abstract JobsAdaptor jobsAdaptor();
+    public abstract JobsAdaptor jobsAdaptor() throws OctopusException;
 
     public abstract void end();
 }
