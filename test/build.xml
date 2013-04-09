@@ -1,4 +1,4 @@
-<project name="Tests" default="build" basedir=".">
+<project name="Tests" default="build" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
 	<description>
       		Build file for tests
     	</description>
@@ -17,34 +17,32 @@
 		<fileset dir="${octopus.dist}">
 			<include name="*.jar" />
 		</fileset>
-		<pathelement location="."/>
-		<pathelement location="${octopus.dist}"/>
+		<pathelement location="." />
+		<pathelement location="${octopus.dist}" />
 	</path>
 
 	<target name="compile" description="compile the source ">
-		<mkdir dir="tmp" />
+		<mkdir dir="build/classes" />
 		<mkdir dir="dist" />
 
-		<!-- Compile the java code from ${src} into ${tmp} -->
-		<javac srcdir="src" destdir="tmp" debug="on">
+		<!-- Compile the java code from ${src} into ${classes} -->
+		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="default.classpath" />
 		</javac>
 
-		<!-- Put everything in ${tmp} into the jar file -->
-		<jar jarfile="dist/octopus-tests.jar" basedir="tmp" />
-
-		<delete dir="tmp" />
+		<!-- Put everything in ${classes} into the jar file -->
+		<jar jarfile="dist/octopus-tests.jar" basedir="build/classes" />
 	</target>
 
 	<target name="build" description="build everything" depends="clean,compile" />
 
 	<target name="xml-test" description="run tests" depends="build">
-		<mkdir dir="xml-reports"/>
+		<mkdir dir="reports" />
 		<junit>
-			<classpath refid="default.classpath"/>
+			<classpath refid="default.classpath" />
 
-			<batchtest fork="yes" todir="xml-reports">
-				<formatter type="xml"/>
+			<batchtest fork="yes" todir="reports">
+				<formatter type="xml" />
 				<fileset dir="src">
 					<include name="**/*.java" />
 				</fileset>
@@ -53,12 +51,12 @@
 	</target>
 
 	<target name="test" description="run tests" depends="build">
-		<mkdir dir="reports"/>
+		<mkdir dir="reports" />
 		<junit printsummary="yes">
 			<classpath refid="default.classpath" />
 
 			<batchtest fork="yes" todir="reports">
-				<formatter type="plain"/>
+				<formatter type="plain" />
 				<fileset dir="src">
 					<include name="**/*.java" />
 				</fileset>
@@ -66,10 +64,51 @@
 		</junit>
 	</target>
 
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="lib/jacocoant.jar" />
+	</taskdef>
+
+	<target name="coverage" description="analyze test code coverage" depends="build">
+		<delete file="reports/jacoco/jacoco.exec" />
+		<mkdir dir="reports/jacoco" />
+
+		<jacoco:coverage destfile="reports/jacoco/jacoco.exec">
+			<junit fork="yes">
+				<classpath refid="default.classpath" />
+
+				<batchtest fork="yes" todir="reports">
+					<formatter type="xml" />
+					<fileset dir="src">
+						<include name="**/*.java" />
+					</fileset>
+				</batchtest>
+			</junit>
+		</jacoco:coverage>
+
+		<jacoco:report>
+			<executiondata>
+				<file file="reports/jacoco/jacoco.exec" />
+			</executiondata>
+
+			<structure name="octopus">
+				<classfiles>
+					<fileset dir="../build/classes" />
+					<fileset dir="../adaptors/core/local/build/classes" />
+				</classfiles>
+				<sourcefiles>
+					<fileset dir="../src" />
+					<fileset dir="../adaptors/core/local/src" />
+				</sourcefiles>
+			</structure>
+
+			<html destdir="reports/jacoco" />
+			<xml destfile="reports/jacoco/coverage.xml" />
+		</jacoco:report>
+	</target>
+
 	<target name="clean" description="clean up">
-		<delete dir="tmp" />
+		<delete dir="build" />
 		<delete dir="dist" />
 		<delete dir="reports" />
-		<delete dir="xml-reports" />
 	</target>
 </project>

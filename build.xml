@@ -33,24 +33,26 @@
 		<ant dir="test" target="xml-test" />
 	</target>
 
+	<target name="coverage" description="run the tests with JaCoCo coverage">
+		<ant dir="test" target="coverage" />
+	</target>
+
 	<target name="compile" description="compile the source ">
-		<mkdir dir="tmp" />
+		<mkdir dir="build/classes" />
 		<mkdir dir="dist" />
 
-		<!-- Compile the java code from src into tmp -->
-		<javac srcdir="src" destdir="tmp" debug="on">
+		<!-- Compile the java code from src into classes -->
+		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="lib.jars" />
 		</javac>
 
-		<!-- Put everything in tmp into the jar file -->
-		<jar jarfile="dist/octopus${version}.jar" basedir="tmp" />
+		<!-- Put everything in classes into the jar file -->
+		<jar jarfile="dist/octopus${version}.jar" basedir="build/classes" />
 
 		<!-- Copy external dependancies to dist directory -->
 		<copy todir="dist">
 			<fileset dir="lib" />
 		</copy>
-
-		<delete dir="tmp" />
 	</target>
 
 	<target name="javadoc" description="generate javadoc for users">
@@ -71,7 +73,7 @@
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="tmp" />
+		<delete dir="build" />
 		<delete dir="dist" />
 
 		<ant dir="adaptors" target="clean" />
