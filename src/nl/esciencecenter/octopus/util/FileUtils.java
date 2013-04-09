@@ -268,5 +268,9 @@ public class FileUtils {
         }
     }
 
-    
+    public static Path recursiveCopy(Octopus octopus, Path source, Path target, CopyOption... options) throws OctopusException {
+    	// MUST ALSO HANDLE DIRECT FILE COPIES!    	
+    	// FIXME!!!
+    	throw new OctopusException("NOT IMPLEMENTED!");
+    }    
 }

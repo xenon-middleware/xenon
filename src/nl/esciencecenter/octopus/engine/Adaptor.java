@@ -12,22 +12,56 @@ import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
  * @author Niels Drost
  * 
  */
-public interface Adaptor extends AdaptorInfo {
+public abstract class Adaptor implements AdaptorInfo {
 
-    // Adaptor(TypedProperties properties, OctopusEngine engine)
+	private final String name;
+	private final String description;
+	private final String [] supportedSchemes;
+	
+    protected final OctopusEngine octopusEngine;
 
-    /**
-     * Returns if this adaptor supports the given scheme.
-     * 
-     * @param scheme
-     * @return if this adaptor supports the given scheme.
-     */
-    public boolean supports(String scheme);
+    // FIXME: Add properties!
+    protected Adaptor(OctopusEngine octopusEngine, String name, String description, String [] supportedSchemes) {
+		
+    	super();
+		
+    	this.name = name;
+		this.description = description;
+		this.supportedSchemes = supportedSchemes;
+		
+		this.octopusEngine = octopusEngine;
+	}
     
-    public JobsAdaptor jobsAdaptor();
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+    	return description;
+    }
     
-    public FilesAdaptor filesAdaptor();
+    public String[] getSupportedSchemes() {
+        return supportedSchemes.clone();
+    }
+    
+    public boolean supports(String scheme) {
+    
+    	for (String s : supportedSchemes) {
+            if (s.equalsIgnoreCase(scheme)) {
+                return true;
+            }
+        }
+        
+//    	if (scheme == null) {
+//            return true;
+//        }
+        
+        return false;
+    }
 
-    public void end();
+    public abstract FilesAdaptor filesAdaptor(); 
+    
+    public abstract JobsAdaptor jobsAdaptor();
 
+    public abstract void end();
 }

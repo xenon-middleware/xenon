@@ -7,69 +7,46 @@ import java.util.Map;
 import nl.esciencecenter.octopus.ImmutableTypedProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
+import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-public class LocalAdaptor implements Adaptor {
+public class LocalAdaptor extends Adaptor {
+	
+	private static final String ADAPTOR_NAME = "local";
+	
+	private static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with " +
+			" standard java classes such as java.lang.Process and java.nio.file.Files." ;
     
-    public static final String LOCAL_MULTIQ_MAX_JOBS = "local.multiq.max.concurrent.jobs";
-    public static final String LOCAL_Q_HISTORY_SIZE = "local.q.history.size";
+	private static final String [] ADAPTOR_SCHEME = new String [] { "local", "file" };
+	
+    protected static final String LOCAL_MULTIQ_MAX_JOBS = "local.multiq.maxConcurrentJobs";
+    protected static final String LOCAL_Q_HISTORY_SIZE = "local.queue.historySize";
     
-    public static final int DEFAULT_LOCAL_Q_HISTORY_SIZE = 1000;
+    protected static final int DEFAULT_LOCAL_Q_HISTORY_SIZE = 1000;
 
-    private final OctopusEngine octopusEngine;
-
-    private final LocalFiles filesAdaptor;
+    private final LocalFiles localFiles;
+    private final LocalJobs localJobs;
     
-    private final LocalJobs jobsAdaptor;
-
     public LocalAdaptor(ImmutableTypedProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-        this.octopusEngine = octopusEngine;
-        this.filesAdaptor = new LocalFiles(properties, this, octopusEngine);
-        this.jobsAdaptor = new LocalJobs(properties, this, octopusEngine);
-    }
-
-    @Override
-    public String[] getSupportedSchemes() {
-        return new String[] { "local", "file", ""};
-    }
-
-    @Override
-    public boolean supports(String scheme) {
-        for (String string : getSupportedSchemes()) {
-            if (string.equalsIgnoreCase(scheme)) {
-                return true;
-            }
-        }
-        if (scheme == null) {
-            return true;
-        }
-        
-        return false;
+    	super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME);
+    			
+    	localFiles = new LocalFiles(properties, this, octopusEngine);
+    	localJobs = new LocalJobs(properties, this, octopusEngine);
     }
     
     void checkURI(URI location) throws OctopusException {
-        if (!supports(location.getScheme())) {
-            throw new OctopusException("Local adaptor does not support scheme " + location.getScheme(), "local", location);
-        }
 
+    	if (!supports(location.getScheme())) {
+            throw new OctopusException("Local adaptor does not support scheme " + location.getScheme(), ADAPTOR_NAME, location);
+        }
+        
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
             throw new OctopusException("Local adaptor only supports url with empty host or \"localhost\", not \""
-                    + location.getHost() + "\"", "local", location);
+                    + location.getHost() + "\"", ADAPTOR_NAME, location);
         }
-    }
-
-
-    @Override
-    public String getName() {
-        return "local";
-    }
-
-    @Override
-    public String getDescription() {
-        return "The Local adaptor implements all functionality with standard java classes such "
-                + "as java.lang.Process and java.nio.file.Files.";
     }
 
     @Override
@@ -77,21 +54,9 @@ public class LocalAdaptor implements Adaptor {
         return new HashMap<String, String>();
     }
 
-    
-    @Override
-    public LocalFiles filesAdaptor() {
-        return filesAdaptor;
-    }
-    
-    @Override
-    public LocalJobs jobsAdaptor() {
-        return jobsAdaptor;
-    }
-
-
     @Override
     public void end() {
-        jobsAdaptor.end();
+    	localJobs.end();
     }
     
     @Override
@@ -99,4 +64,13 @@ public class LocalAdaptor implements Adaptor {
         return getName();
     }
 
+	@Override
+	public FilesAdaptor filesAdaptor() {
+		return localFiles;
+	}
+
+	@Override
+	public JobsAdaptor jobsAdaptor() {
+		return localJobs;
+	}
 }
