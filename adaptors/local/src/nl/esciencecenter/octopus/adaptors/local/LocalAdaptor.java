@@ -56,7 +56,7 @@ public class LocalAdaptor extends Adaptor {
 
         String scheme = location.getScheme();
 
-        if (scheme != null && !supports(scheme)) {
+        if (!supports(scheme)) {
             throw new OctopusException("Local adaptor does not support scheme " + scheme, ADAPTOR_NAME, location);
         }
 
@@ -67,6 +67,17 @@ public class LocalAdaptor extends Adaptor {
                     + location.getHost() + "\"", ADAPTOR_NAME, location);
         }
     }
+    
+    @Override
+    public boolean supports(String scheme) {
+
+        if (scheme == null) { 
+            return true;
+        }
+        
+        return super.supports(scheme);
+    }
+    
 
     @Override
     public Map<String, String> getSupportedProperties() {
