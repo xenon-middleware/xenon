@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 
- * Simple stream forwarder. Uses a daemon thread to read and write data, has a
- * small buffer, and ignores all exceptions.
+ * Simple stream forwarder. Uses a daemon thread to read and write data, has a small buffer, and ignores all exceptions.
  * 
  * @author Niels Drost
  * 

@@ -13,5 +13,5 @@ public class AttributeNotSupportedException extends OctopusException {
     public AttributeNotSupportedException(String message, Throwable t, String adaptorName, URI uri) {
         super(message, t, adaptorName, uri);
     }
-    
+
 }

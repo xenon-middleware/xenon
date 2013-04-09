@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of Octopus Interface class. Redirects calls to adaptors, and
- * the FilesEngine
+ * Implementation of Octopus Interface class. Redirects calls to adaptors, and the FilesEngine
  * 
  * @author Niels Drost
  */
@@ -53,7 +52,7 @@ public class OctopusEngine implements Octopus {
     private final JobsEngine jobsEngine;
 
     private final CredentialsEngine credentialsEngine;
-    
+
     private final Adaptor[] adaptors;
 
     /**
@@ -79,7 +78,7 @@ public class OctopusEngine implements Octopus {
         jobsEngine = new JobsEngine(this);
 
         credentialsEngine = new CredentialsEngine(this);
-        
+
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }
 
@@ -126,7 +125,7 @@ public class OctopusEngine implements Octopus {
 
         throw new OctopusException("could not find adaptor named " + name, null, null);
     }
-    
+
     public Adaptor[] getAdaptors() {
         return adaptors;
     }
@@ -155,7 +154,7 @@ public class OctopusEngine implements Octopus {
     public Credentials credentials() {
         return credentialsEngine;
     }
-    
+
     @Override
     public void end() {
         synchronized (this) {

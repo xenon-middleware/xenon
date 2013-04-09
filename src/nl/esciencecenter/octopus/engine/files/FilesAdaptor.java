@@ -25,7 +25,7 @@ import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 public interface FilesAdaptor {
-    
+
     // functions used to create files and streams
 
     public Path newPath(ImmutableTypedProperties properties, URI location) throws OctopusException;
@@ -37,13 +37,11 @@ public interface FilesAdaptor {
      * @throws UnsupportedOperationException
      *             if the array contains a copy option that is not supported
      * @throws FileAlreadyExistsException
-     *             if the target file exists but cannot be replaced because the
-     *             {@code REPLACE_EXISTING} option is not specified <i>(optional
-     *             specific exception)</i>
-     * @throws DirectoryNotEmptyException
-     *             the {@code REPLACE_EXISTING} option is specified but the file
-     *             cannot be replaced because it is a non-empty directory
+     *             if the target file exists but cannot be replaced because the {@code REPLACE_EXISTING} option is not specified
      *             <i>(optional specific exception)</i>
+     * @throws DirectoryNotEmptyException
+     *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
+     *             directory <i>(optional specific exception)</i>
      * @throws OctopusException
      *             if an I/O error occurs
      * */
@@ -53,11 +51,9 @@ public interface FilesAdaptor {
      * Creates a directory by creating all nonexistent parent directories first.
      * 
      * @throws UnsupportedOperationException
-     *             if the given Permissions cannot be set when the file is
-     *             created
+     *             if the given Permissions cannot be set when the file is created
      * @throws FileAlreadyExistsException
-     *             if {@code dir} exists but is not a directory <i>(optional
-     *             specific exception)</i>
+     *             if {@code dir} exists but is not a directory <i>(optional specific exception)</i>
      */
     Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
 
@@ -65,11 +61,9 @@ public interface FilesAdaptor {
      * Creates a new directory.
      * 
      * @throws UnsupportedOperationException
-     *             if the given Permissions cannot be set when the file is
-     *             created
+     *             if the given Permissions cannot be set when the file is created
      * @throws FileAlreadyExistsException
-     *             if a directory could not otherwise be created because a file
-     *             of that name already exists <i>(optional specific
+     *             if a directory could not otherwise be created because a file of that name already exists <i>(optional specific
      *             exception)</i>
      * @throws OctopusException
      *             if an I/O error occurs or the parent directory does not exist
@@ -80,11 +74,9 @@ public interface FilesAdaptor {
      * Creates a new and empty file, failing if the file already exists.
      * 
      * @throws UnsupportedOperationException
-     *             if the given Permissions cannot be set when the file is
-     *             created
+     *             if the given Permissions cannot be set when the file is created
      * @throws FileAlreadyExistsException
-     *             if a file of that name already exists <i>(optional specific
-     *             exception)</i>
+     *             if a file of that name already exists <i>(optional specific exception)</i>
      * @throws OctopusException
      *             if an I/O error occurs or the parent directory does not exist
      */
@@ -96,8 +88,7 @@ public interface FilesAdaptor {
      * @throws UnsupportedOperationException
      *             if the adaptor used does not support symbolic links.
      * @throws FileAlreadyExistsException
-     *             if a file with the name already exists <i>(optional specific
-     *             exception)</i>
+     *             if a file with the name already exists <i>(optional specific exception)</i>
      * @throws OctopusException
      *             if an I/O error occurs
      */
@@ -129,50 +120,41 @@ public interface FilesAdaptor {
      * @throws UnsupportedOperationException
      *             if the array contains a copy option that is not supported
      * @throws FileAlreadyExistsException
-     *             if the target file exists but cannot be replaced because the
-     *             {@code REPLACE_EXISTING} option is not specified <i>(optional
-     *             specific exception)</i>
-     * @throws DirectoryNotEmptyException
-     *             the {@code REPLACE_EXISTING} option is specified but the file
-     *             cannot be replaced because it is a non-empty directory
+     *             if the target file exists but cannot be replaced because the {@code REPLACE_EXISTING} option is not specified
      *             <i>(optional specific exception)</i>
+     * @throws DirectoryNotEmptyException
+     *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
+     *             directory <i>(optional specific exception)</i>
      * @throws OctopusException
      *             if an I/O error occurs
      */
     Path move(Path source, Path target, CopyOption... options) throws OctopusException;
 
     /**
-     * Opens a directory, returning a DirectoryStream to iterate over the
-     * entries in the directory.
+     * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory.
      */
     DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
 
-
     /**
-     * Opens a directory, returning a DirectoryStream to iterate over the
-     * entries in the directory. Extra functionality in RAL to efficiently fetch
-     * all attributes for a directory.
+     * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory. Extra functionality in RAL to
+     * efficiently fetch all attributes for a directory.
      */
-    DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
-            throws OctopusException;
+    DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
 
     /** Opens a file, returning an input stream to read from the file. */
     InputStream newInputStream(Path path) throws OctopusException;
 
     /**
-     * Opens or creates a file, returning an output stream that may be used to
-     * write bytes to the file. If no options are present then this method works
-     * as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
+     * Opens or creates a file, returning an output stream that may be used to write bytes to the file. If no options are present
+     * then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
      */
     OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException;
 
     /**
-     * Opens or creates a file, returning a seekable byte channel to access the
-     * file.
+     * Opens or creates a file, returning a seekable byte channel to access the file.
      */
     SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
             throws OctopusException;
-
 
     /**
      * Reads a file's attributes.
@@ -195,8 +177,7 @@ public interface FilesAdaptor {
     Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
 
     /**
-     * Updates a file's last modified, last access, and create time attribute. Use -1 to not set a certain
-     * attribute
+     * Updates a file's last modified, last access, and create time attribute. Use -1 to not set a certain attribute
      */
     Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException;
 

@@ -21,7 +21,8 @@ public abstract class CredentialsAdaptor {
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public abstract void newCertificateCredential(UUID uuid, Path keyfile, Path certfile, String username, String password, URI validFor) throws OctopusException;
+    public abstract void newCertificateCredential(UUID uuid, Path keyfile, Path certfile, String username, String password,
+            URI validFor) throws OctopusException;
 
     /**
      * Constructs a password credential. If a username is given in the URIs, it must be identical to username parameter.
@@ -45,13 +46,15 @@ public abstract class CredentialsAdaptor {
      * @param password
      *            the password to use to connect to the proxy server
      */
-    public abstract UUID newProxyCredential(UUID uuid, String host, int port, String username, String password, URI validFor) throws OctopusException;
+    public abstract UUID newProxyCredential(UUID uuid, String host, int port, String username, String password, URI validFor)
+            throws OctopusException;
 
     /**
      * Removes credentials from the credential set.
      * 
-     * @param credentialID 
-     * @param validFor remove from given URIs, or from all if null is passed in. 
+     * @param credentialID
+     * @param validFor
+     *            remove from given URIs, or from all if null is passed in.
      */
     public abstract void remove(UUID credentialID, URI validFor) throws OctopusException;
 }

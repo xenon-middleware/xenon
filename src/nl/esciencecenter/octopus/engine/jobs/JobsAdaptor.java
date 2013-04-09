@@ -11,23 +11,22 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 public interface JobsAdaptor {
-    
-    public Scheduler newScheduler(ImmutableTypedProperties properties, URI location)
-            throws OctopusException;
-    
+
+    public Scheduler newScheduler(ImmutableTypedProperties properties, URI location) throws OctopusException;
+
     public String[] getQueueNames(Scheduler scheduler) throws OctopusException;
-        
+
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException;
-    
+
     public JobStatus getJobStatus(Job job) throws OctopusException;
-    
+
     public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException;
 
     public void cancelJob(Job job) throws OctopusException;
-    
+
     public void cancelJobs(Job... jobs) throws OctopusException;
- 
+
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException;
-    
-    public Job[] submitJobs(Scheduler scheduler, JobDescription... descriptions) throws OctopusException;    
+
+    public Job[] submitJobs(Scheduler scheduler, JobDescription... descriptions) throws OctopusException;
 }

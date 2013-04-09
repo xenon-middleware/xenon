@@ -61,13 +61,13 @@ public class CredentialsEngine implements Credentials {
 
     @Override
     public void remove(UUID credentialID, URI... validFor) throws OctopusException {
-        if(validFor.length == 0) {
-            for (Adaptor adaptor: octopusEngine.getAdaptors()) {
+        if (validFor.length == 0) {
+            for (Adaptor adaptor : octopusEngine.getAdaptors()) {
                 adaptor.credentialsAdaptor().remove(credentialID, null);
             }
             return;
         }
-        
+
         for (URI uri : validFor) {
             Adaptor adaptor = octopusEngine.getAdaptorFor(uri.getScheme());
             adaptor.credentialsAdaptor().remove(credentialID, uri);

@@ -80,8 +80,8 @@ public class JarFileSystem {
             mainEntries.add(entry.getName());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug(this + " contains adaptors: " + indexes.keySet().toString() + ". Indexing "
-                    + mainJarFile.size() + " entries took " + (System.currentTimeMillis() - now) + " milliseconds");
+            logger.debug(this + " contains adaptors: " + indexes.keySet().toString() + ". Indexing " + mainJarFile.size()
+                    + " entries took " + (System.currentTimeMillis() - now) + " milliseconds");
         }
 
     }

@@ -25,32 +25,31 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 public class SshJobs implements JobsAdaptor {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
-    
+
     private final OctopusEngine octopusEngine;
 
     private final int maxQSize;
-    
+
     private final SshAdaptor sshAdaptor;
-    
+
     private final ImmutableTypedProperties properties;
 
     public SshJobs(ImmutableTypedProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine)
             throws OctopusException {
-        
+
         this.octopusEngine = octopusEngine;
         this.sshAdaptor = sshAdaptor;
         this.properties = properties;
 
         maxQSize = properties.getIntProperty(LocalAdaptor.LOCAL_Q_HISTORY_SIZE, LocalAdaptor.DEFAULT_LOCAL_Q_HISTORY_SIZE);
-        
+
         if (maxQSize < 0 && maxQSize != -1) {
             throw new BadParameterException("max q size cannot be negative (excluding -1 for unlimited)", "local", null);
         }
     }
-    
+
     @Override
-    public Scheduler newScheduler(ImmutableTypedProperties properties, URI location)
-            throws OctopusException {
+    public Scheduler newScheduler(ImmutableTypedProperties properties, URI location) throws OctopusException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -82,13 +81,13 @@ public class SshJobs implements JobsAdaptor {
     @Override
     public void cancelJob(Job job) throws OctopusException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void cancelJobs(Job... jobs) throws OctopusException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -104,6 +103,6 @@ public class SshJobs implements JobsAdaptor {
     }
 
     protected void end() {
-        
+
     }
 }

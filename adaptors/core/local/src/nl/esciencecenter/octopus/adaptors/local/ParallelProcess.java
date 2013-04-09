@@ -29,8 +29,8 @@ class ParallelProcess {
 
     private final MergingOutputStream stderrStream;
 
-    ParallelProcess(int count, String executable, List<String> arguments, Map<String, String> environment,
-            Path workingDirectory, Path stdin, Path stdout, Path stderr, OctopusEngine engine) throws IOException {
+    ParallelProcess(int count, String executable, List<String> arguments, Map<String, String> environment, Path workingDirectory,
+            Path stdin, Path stdout, Path stderr, OctopusEngine engine) throws IOException {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(executable);
@@ -49,8 +49,7 @@ class ParallelProcess {
         stderrForwarders = new StreamForwarder[count];
         for (int i = 0; i < count; i++) {
             processes[i] = builder.start();
-            stdinForwarders[i] = new StreamForwarder(engine.files().newInputStream(stdin),
-                    processes[i].getOutputStream());
+            stdinForwarders[i] = new StreamForwarder(engine.files().newInputStream(stdin), processes[i].getOutputStream());
             stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), stdoutStream);
             stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
         }

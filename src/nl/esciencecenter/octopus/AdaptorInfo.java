@@ -5,8 +5,8 @@ import java.util.Map;
 public interface AdaptorInfo {
 
     /**
-     * Get the schemes this adaptor supports for creating objects. Does not
-     * imply it supports all schemes for all Octopus functions.
+     * Get the schemes this adaptor supports for creating objects. Does not imply it supports all schemes for all Octopus
+     * functions.
      * 
      * @return the schemes this adaptor supports
      */
@@ -23,6 +23,7 @@ public interface AdaptorInfo {
 
     /**
      * Returns a map containing supported properties, and a small description for each.
+     * 
      * @return map containing supported properties, and a small description for each.
      */
     public abstract Map<String, String> getSupportedProperties();

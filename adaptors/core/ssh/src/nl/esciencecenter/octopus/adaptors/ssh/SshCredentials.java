@@ -25,7 +25,7 @@ public class SshCredentials extends CredentialsAdaptor {
     public void newCertificateCredential(UUID uuid, Path keyfile, Path certfile, String username, String password, URI validFor)
             throws OctopusException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -44,6 +44,6 @@ public class SshCredentials extends CredentialsAdaptor {
     @Override
     public void remove(UUID credentialID, URI validFor) throws OctopusException {
         // TODO Auto-generated method stub
-        
+
     }
 }

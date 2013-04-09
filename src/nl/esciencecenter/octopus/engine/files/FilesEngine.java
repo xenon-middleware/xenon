@@ -24,20 +24,20 @@ import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 /**
- * Engine for File operations. Implements functionality using File operations,
- * Octopus create functions, and Adaptors' Files object.
+ * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
+ * object.
  * 
  * @author Niels Drost
  * 
  */
 public class FilesEngine implements Files {
-    
+
     public static DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
         public boolean accept(Path file) throws OctopusException {
             return true;
         }
     };
-    
+
     public static final int BUFFER_SIZE = 10240;
 
     private final OctopusEngine octopusEngine;
@@ -45,27 +45,25 @@ public class FilesEngine implements Files {
     public FilesEngine(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
     }
-    
+
     //Functions already implemented by the Engine:
 
     @Override
     public Path newPath(URI location) throws OctopusException {
         return newPath(null, location);
     }
-    
+
     @Override
     public boolean isDirectory(Path path) throws OctopusException {
         return getAttributes(path).isDirectory();
     }
-    
+
     @Override
     public SeekableByteChannel newByteChannel(Path path, OpenOption... options) throws OctopusException {
         return newByteChannel(path, null, options);
     }
 
     // Iterators
-
-
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusException {
@@ -103,18 +101,17 @@ public class FilesEngine implements Files {
     public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
         return getAdaptor(dir).filesAdaptor().createDirectories(dir, permissions);
     }
-    
+
     @Override
     public Path createDirectories(Path dir) throws OctopusException {
         return createDirectories(dir, null);
     }
 
-
     @Override
     public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
         return getAdaptor(dir).filesAdaptor().createDirectory(dir, permissions);
     }
-    
+
     @Override
     public Path createDirectory(Path dir) throws OctopusException {
         return createDirectory(dir, null);
@@ -168,8 +165,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, Filter filter)
-            throws OctopusException {
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, Filter filter) throws OctopusException {
         return getAdaptor(dir).filesAdaptor().newAttributesDirectoryStream(dir, filter);
     }
 
@@ -180,7 +176,8 @@ public class FilesEngine implements Files {
 
     @Override
     // TODO: set default options for all functions, not just this one
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException {
+            public
+            OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException {
         if (options == null || options.length == 0) {
             options = new OpenOption[] { OpenOption.CREATE, OpenOption.TRUNCATE_EXISTING, OpenOption.WRITE };
         }
@@ -215,8 +212,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusException {
+    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException {
         getAdaptor(path).filesAdaptor().setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
     }
 

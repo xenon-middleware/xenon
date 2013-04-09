@@ -1,14 +1,12 @@
 package nl.esciencecenter.octopus.engine.credentials;
 
-
 /**
  * A security context based upon user name, password combination.
  */
 public class PasswordCredential extends Credential {
 
     /**
-     * Constructs a {@link PasswordCredential} with the given
-     * <code>username</code> and <code>password</code>.
+     * Constructs a {@link PasswordCredential} with the given <code>username</code> and <code>password</code>.
      * 
      * @param username
      *            the username

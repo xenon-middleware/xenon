@@ -7,9 +7,9 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 
 public interface Scheduler {
 
-	 public URI getUri();
+    public URI getUri();
 
-	 public ImmutableTypedProperties getProperties();
+    public ImmutableTypedProperties getProperties();
 
-	 public String getAdaptorName();
+    public String getAdaptorName();
 }

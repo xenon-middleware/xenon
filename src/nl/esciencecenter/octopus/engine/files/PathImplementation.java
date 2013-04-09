@@ -15,9 +15,8 @@ import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
 import nl.esciencecenter.octopus.files.Path;
 
 /**
- * Default implementation of Path. Will create new Paths directly, using
- * either an adaptor identical to the original in case of an absolute path,
- * or the local adaptor in case of a relative path.
+ * Default implementation of Path. Will create new Paths directly, using either an adaptor identical to the original in case of an
+ * absolute path, or the local adaptor in case of a relative path.
  */
 public class PathImplementation implements Path {
 
@@ -96,9 +95,7 @@ public class PathImplementation implements Path {
 
     private final OctopusEngine octopusEngine;
 
-
-    public PathImplementation(ImmutableTypedProperties properties, URI location, String adaptorName,
-            OctopusEngine octopusEngine) {
+    public PathImplementation(ImmutableTypedProperties properties, URI location, String adaptorName, OctopusEngine octopusEngine) {
         this.properties = properties;
         this.location = location;
         this.adaptorName = adaptorName;
@@ -291,10 +288,10 @@ public class PathImplementation implements Path {
     public URI toUri() {
         return location;
     }
-    
+
     @Override
     public ImmutableTypedProperties getProperties() {
-       return properties;
+        return properties;
     }
 
     @Override

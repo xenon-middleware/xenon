@@ -73,8 +73,7 @@ public class CommandRunner {
         try {
             p = builder.start();
         } catch (IOException e) {
-            throw new CommandNotFoundException("CommandRunner cannot run command " + Arrays.toString(command), e, null,
-                    null);
+            throw new CommandNotFoundException("CommandRunner cannot run command " + Arrays.toString(command), e, null, null);
         }
 
         // close stdin.

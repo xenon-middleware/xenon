@@ -6,8 +6,6 @@ import java.util.jar.Manifest;
 
 public class JarFsFile {
 
-  
-
     private final String adaptor;
     private final String filename;
     private final JarEntry jarEntry;
@@ -27,7 +25,7 @@ public class JarFsFile {
     public String getAdaptor() {
         return adaptor;
     }
-    
+
     public String getFilename() {
         return filename;
     }
@@ -35,11 +33,11 @@ public class JarFsFile {
     public JarEntry getJarEntry() {
         return jarEntry;
     }
-    
+
     public boolean inMainJar() {
         return inMainJar;
     }
-    
+
     public ByteBuffer getBytes() {
         return bytes;
     }
@@ -55,11 +53,11 @@ public class JarFsFile {
     void setManifest(Manifest manifest) {
         this.manifest = manifest;
     }
-    
+
     @Override
     public String toString() {
-        return "JarFsFile [adaptor=" + adaptor + ", filename=" + filename + ", jarEntry=" + jarEntry + ", inMainJar="
-                + inMainJar + ", manifest=" + manifest + ", bytes=" + bytes + "]";
+        return "JarFsFile [adaptor=" + adaptor + ", filename=" + filename + ", jarEntry=" + jarEntry + ", inMainJar=" + inMainJar
+                + ", manifest=" + manifest + ", bytes=" + bytes + "]";
     }
 
 }

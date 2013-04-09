@@ -6,14 +6,12 @@ import java.util.StringTokenizer;
 /**
  * A container for security Information.
  * <p>
- * Each context has a data object associated with it. The data object is opaque
- * to the Octopus API and is used and manipulated by adaptors based upon their
- * interpretation of the context. A globus adaptor could store a GSI credential
- * in it, while an SSH adaptor could store the private key in the data object.
+ * Each context has a data object associated with it. The data object is opaque to the Octopus API and is used and manipulated by
+ * adaptors based upon their interpretation of the context. A globus adaptor could store a GSI credential in it, while an SSH
+ * adaptor could store the private key in the data object.
  * <p>
- * Notes restrict the access to the context because it is a bad idea to
- * broadcast passwords / credentials, so it is useful to restrict those to a set
- * of hosts or adaptors.
+ * Notes restrict the access to the context because it is a bad idea to broadcast passwords / credentials, so it is useful to
+ * restrict those to a set of hosts or adaptors.
  * 
  */
 public abstract class Credential implements Cloneable {
@@ -27,9 +25,8 @@ public abstract class Credential implements Cloneable {
     protected String password = null;
 
     /**
-     * The data objects are used to store adaptor-specific information in the
-     * security context. They are transparent for Octopus users, and should not be
-     * touched.
+     * The data objects are used to store adaptor-specific information in the security context. They are transparent for Octopus
+     * users, and should not be touched.
      */
     protected HashMap<String, Object> dataObjects = new HashMap<String, Object>();
 
@@ -52,8 +49,7 @@ public abstract class Credential implements Cloneable {
     public abstract Object clone() throws CloneNotSupportedException;
 
     /**
-     * This method is used by adaptors to get adaptor-specific data associated
-     * with this context.
+     * This method is used by adaptors to get adaptor-specific data associated with this context.
      * 
      * @param key
      *            the key that was used to store the data
@@ -64,8 +60,7 @@ public abstract class Credential implements Cloneable {
     }
 
     /**
-     * This method is used by adaptors to get adaptor-specific data associated
-     * with this context.
+     * This method is used by adaptors to get adaptor-specific data associated with this context.
      * 
      * @param key
      *            the key that should be used to store the data
@@ -77,8 +72,7 @@ public abstract class Credential implements Cloneable {
     }
 
     /**
-     * This method is used by adaptors to remove adaptor-specific data
-     * associated with this context.
+     * This method is used by adaptors to remove adaptor-specific data associated with this context.
      * 
      * @param key
      *            the key that was used to store the data
@@ -88,26 +82,22 @@ public abstract class Credential implements Cloneable {
     }
 
     /**
-     * Add notes to this context. Notes are used to give information to the
-     * adaptors. An example is:
+     * Add notes to this context. Notes are used to give information to the adaptors. An example is:
      * <p>
      * <code>addNote("host", "machine1.cs.vu.nl")</code>
      * <p>
-     * to indicate that this context is only valid for the machine above. Notes
-     * restrict and precise the usage of the authentication data. So an adaptor
-     * can verify in advance the usefulness of the authentication data for the
-     * host it want to access (e.g. for job submission).
+     * to indicate that this context is only valid for the machine above. Notes restrict and precise the usage of the
+     * authentication data. So an adaptor can verify in advance the usefulness of the authentication data for the host it want to
+     * access (e.g. for job submission).
      * <p>
-     * If no notes are defined, adaptors are allowed to use the context for any
-     * machine. If at least one note is defined, access is restricted to the
-     * adaptor/machine defined in the note(s)
+     * If no notes are defined, adaptors are allowed to use the context for any machine. If at least one note is defined, access
+     * is restricted to the adaptor/machine defined in the note(s)
      * <p>
      * the set of notes known so far is:
      * <p>
      * <TABLE border="2" frame="box" rules="groups" summary="Minimum set of * supported notes">
-     * <CAPTION>Minimum set of supported key/value pairs </CAPTION> <COLGROUP
-     * align="left"> <COLGROUP align="center"> <COLGROUP align="left" > <THEAD
-     * valign="top">
+     * <CAPTION>Minimum set of supported key/value pairs </CAPTION> <COLGROUP align="left"> <COLGROUP align="center"> <COLGROUP
+     * align="left" > <THEAD valign="top">
      * <TR>
      * <TH>Key
      * <TH>Value
@@ -157,8 +147,8 @@ public abstract class Credential implements Cloneable {
     }
 
     /**
-     * This method checks the notes associated with this security context, and
-     * sees if the context is usable by a particular adaptor.
+     * This method checks the notes associated with this security context, and sees if the context is usable by a particular
+     * adaptor.
      * 
      * @param adaptorName
      *            the name of the adaptor that wants to use this context

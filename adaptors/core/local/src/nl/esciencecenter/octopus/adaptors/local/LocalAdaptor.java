@@ -10,20 +10,20 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class LocalAdaptor implements Adaptor {
-    
+
     public static final String LOCAL_MULTIQ_MAX_JOBS = "local.multiq.max.concurrent.jobs";
     public static final String LOCAL_Q_HISTORY_SIZE = "local.q.history.size";
-    
+
     public static final int DEFAULT_LOCAL_Q_HISTORY_SIZE = 1000;
 
     private final OctopusEngine octopusEngine;
 
     private final LocalFiles filesAdaptor;
-    
+
     private final LocalJobs jobsAdaptor;
 
     private final LocalCredentials credentialsAdaptor;
-    
+
     public LocalAdaptor(ImmutableTypedProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.filesAdaptor = new LocalFiles(properties, this, octopusEngine);
@@ -33,7 +33,7 @@ public class LocalAdaptor implements Adaptor {
 
     @Override
     public String[] getSupportedSchemes() {
-        return new String[] { "local", "file", ""};
+        return new String[] { "local", "file", "" };
     }
 
     @Override
@@ -46,10 +46,10 @@ public class LocalAdaptor implements Adaptor {
         if (scheme == null) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     void checkURI(URI location) throws OctopusException {
         if (!supports(location.getScheme())) {
             throw new OctopusException("Local adaptor does not support scheme " + location.getScheme(), "local", location);
@@ -62,7 +62,6 @@ public class LocalAdaptor implements Adaptor {
                     + location.getHost() + "\"", "local", location);
         }
     }
-
 
     @Override
     public String getName() {
@@ -80,12 +79,11 @@ public class LocalAdaptor implements Adaptor {
         return new HashMap<String, String>();
     }
 
-    
     @Override
     public LocalFiles filesAdaptor() {
         return filesAdaptor;
     }
-    
+
     @Override
     public LocalJobs jobsAdaptor() {
         return jobsAdaptor;
@@ -100,7 +98,7 @@ public class LocalAdaptor implements Adaptor {
     public void end() {
         jobsAdaptor.end();
     }
-    
+
     @Override
     public String toString() {
         return getName();

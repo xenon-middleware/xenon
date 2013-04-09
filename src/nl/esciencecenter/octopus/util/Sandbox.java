@@ -12,38 +12,38 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 
 public class Sandbox {
-    
+
     private final Octopus octopus;
-    
+
     private final Path path;
-    
+
     private List<Pair> uploadFiles = new LinkedList<Pair>();
 
-    private List<Pair> downloadFiles = new LinkedList<Pair>();        
-    
+    private List<Pair> downloadFiles = new LinkedList<Pair>();
+
     public class Pair {
-    	
-    	final Path source;
-    	final Path destination;
-		
-    	public Pair(Path source, Path destination) {
-			this.source = source;
-			this.destination = destination;
-		} 
+
+        final Path source;
+        final Path destination;
+
+        public Pair(Path source, Path destination) {
+            this.source = source;
+            this.destination = destination;
+        }
     }
-    
+
     public Sandbox(Octopus octopus, Path root, Path sandboxName) throws OctopusException {
-    	this.octopus = octopus;
-    	
-    	if (sandboxName == null) {
-    		path = root.resolve("octopus_sandbox_" + UUID.randomUUID());
-    	} else { 
-    		path = root.resolve(sandboxName);
-    	}
+        this.octopus = octopus;
+
+        if (sandboxName == null) {
+            path = root.resolve("octopus_sandbox_" + UUID.randomUUID());
+        } else {
+            path = root.resolve(sandboxName);
+        }
     }
-        	
+
     public List<Pair> getUploadFiles() {
-    	return uploadFiles;
+        return uploadFiles;
     }
 
     public void setUploadFiles(Path... files) {
@@ -54,14 +54,14 @@ public class Sandbox {
     }
 
     public void addUploadFile(Path src) {
-       addUploadFile(src, null);
+        addUploadFile(src, null);
     }
 
     public void addUploadFile(Path src, Path dest) {
         if (src == null) {
             throw new NullPointerException("the source file cannot be null when adding a preStaged file");
         }
-        
+
         uploadFiles.add(new Pair(src, path.resolve(dest)));
     }
 
@@ -84,32 +84,32 @@ public class Sandbox {
         if (src == null) {
             throw new NullPointerException("the source file cannot be null when adding a postStaged file");
         }
-        
+
         downloadFiles.add(new Pair(path.resolve(src), dest));
     }
 
-    private void copy(List<Pair> pairs) throws OctopusException { 
-    	
-    	Files files = octopus.files();
-    	
-    	for (Pair pair : pairs) { 
-    		files.copy(pair.source, pair.destination, CopyOption.COPY_ATTRIBUTES, CopyOption.RECURSIVE);    		
-    	}
+    private void copy(List<Pair> pairs) throws OctopusException {
+
+        Files files = octopus.files();
+
+        for (Pair pair : pairs) {
+            files.copy(pair.source, pair.destination, CopyOption.COPY_ATTRIBUTES, CopyOption.RECURSIVE);
+        }
     }
-    
+
     public void upload() throws OctopusException {
-    	copy(uploadFiles);
+        copy(uploadFiles);
     }
-    
-    public void download() throws OctopusException { 
-    	copy(downloadFiles);
+
+    public void download() throws OctopusException {
+        copy(downloadFiles);
     }
-    
+
     public void wipe() throws OctopusException {
-    	octopus.files().delete(path, DeleteOption.RECURSIVE, DeleteOption.WIPE);
+        octopus.files().delete(path, DeleteOption.RECURSIVE, DeleteOption.WIPE);
     }
-    
+
     public void delete() throws OctopusException {
-    	octopus.files().delete(path, DeleteOption.RECURSIVE);
+        octopus.files().delete(path, DeleteOption.RECURSIVE);
     }
 }

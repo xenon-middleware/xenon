@@ -17,18 +17,18 @@ public interface Octopus {
     public Properties getDefaultProperties();
 
     public void setDefaultProperties(Properties properties);
-    
+
     public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
-    
+
     public AdaptorInfo[] getAdaptorInfos();
-    
+
     /**
      * Get a reference to the Files package interface.
      * 
      * @return a reference to the Files interface.
      */
     public Files files();
-    
+
     /**
      * Get a reference to the Jobs package interface.
      * 
@@ -45,10 +45,10 @@ public interface Octopus {
 
     //Future extension: clouds
     //public Clouds clouds();
-    
+
     //Future extension: bandwidth on demand
     //public Networks networks();
-    
+
     //public ??
 
     public void end() throws Exception;

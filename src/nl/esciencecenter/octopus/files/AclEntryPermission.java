@@ -35,8 +35,7 @@ public enum AclEntryPermission {
      */
     READ_NAMED_ATTRS,
     /**
-     * Permission to access file locally at the server with synchronous reads
-     * and writes.
+     * Permission to access file locally at the server with synchronous reads and writes.
      */
     SYNCHRONIZE,
     /**

@@ -3,7 +3,7 @@ package nl.esciencecenter.octopus.exceptions;
 import java.net.URI;
 
 public class CouldNotInitializeCredentialException extends OctopusException {
-    
+
     private static final long serialVersionUID = 1L;
 
     public CouldNotInitializeCredentialException(String s, String adaptorName, URI uri) {

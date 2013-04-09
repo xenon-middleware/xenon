@@ -94,8 +94,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
     @Override
     public synchronized void remove() {
-        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local",
-                dir.toUri());
+        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local", dir.toUri());
 
     }
 }

@@ -86,7 +86,7 @@ public class SshFiles implements FilesAdaptor {
     @Override
     public void delete(Path path, DeleteOption... options) throws OctopusException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -99,9 +99,9 @@ public class SshFiles implements FilesAdaptor {
     public boolean exists(Path path) throws OctopusException {
         ChannelSftp channel = sshAdaptor.getSftpChannel("rob", "localhost", 22);
 
-//        channel.lstat(path);
+        //        channel.lstat(path);
         //channel.stat(path);
-        
+
         // TODO Auto-generated method stub
         return false;
     }
@@ -182,9 +182,9 @@ public class SshFiles implements FilesAdaptor {
     @Override
     public void setAcl(Path path, List<AclEntry> acl) throws OctopusException {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     protected void end() {
     }
 }

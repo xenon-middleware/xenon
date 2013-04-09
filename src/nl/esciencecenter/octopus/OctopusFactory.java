@@ -6,7 +6,7 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class OctopusFactory {
-    
+
     private OctopusFactory() {
         //DO NOT USE
     }

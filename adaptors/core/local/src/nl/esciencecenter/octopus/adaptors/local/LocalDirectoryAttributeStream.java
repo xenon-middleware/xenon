@@ -103,8 +103,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
 
     @Override
     public synchronized void remove() {
-        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local",
-                dir.toUri());
+        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local", dir.toUri());
 
     }
 }

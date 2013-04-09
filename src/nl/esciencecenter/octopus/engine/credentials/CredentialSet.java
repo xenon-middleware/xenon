@@ -15,7 +15,7 @@ import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
  * 
  */
 public class CredentialSet {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CredentialSet.class);
 
     private final HashSet<Credential> credentials;
@@ -25,9 +25,9 @@ public class CredentialSet {
     public CredentialSet(boolean readOnly, CredentialSet... initialContent) {
         this.readOnly = readOnly;
         credentials = new HashSet<Credential>();
-        
+
         logger.debug("new credentials, read-only = " + readOnly + " initial content = " + initialContent);
-        
+
         if (initialContent != null) {
             for (CredentialSet element : initialContent) {
                 if (element != null) {
@@ -83,10 +83,9 @@ public class CredentialSet {
         }
         this.credentials.addAll(moreCredentials.credentials);
     }
-    
+
     public String toString() {
         return "credentials, read-only = " + readOnly + " content = " + credentials;
     }
-    
 
 }
