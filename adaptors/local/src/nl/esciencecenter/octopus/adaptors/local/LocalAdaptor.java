@@ -21,7 +21,7 @@ public class LocalAdaptor extends Adaptor {
     private static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = "octopus.adaptors.local.";
+    public static final String PREFIX = OctopusEngine.ADAPTORS + "local.";
 
     /** All our own queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
@@ -36,7 +36,7 @@ public class LocalAdaptor extends Adaptor {
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] validPropertiesList = new String[][] {
+    private static final String[][] VALID_PROPERTIES = new String[][] {
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
 
@@ -44,7 +44,7 @@ public class LocalAdaptor extends Adaptor {
     private final LocalJobs localJobs;
 
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
         localFiles = new LocalFiles(properties, this, octopusEngine);
         localJobs = new LocalJobs(properties, this, octopusEngine);

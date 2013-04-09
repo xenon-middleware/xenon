@@ -23,6 +23,19 @@ import org.slf4j.LoggerFactory;
  */
 public class OctopusEngine implements Octopus {
 
+    /** All our own properties start with this prefix. */
+    public static final String PREFIX = "octopus.";
+
+    /** All our own queue properties start with this prefix. */
+    public static final String ADAPTORS = PREFIX + "adaptors.";
+
+    /** All our own queue properties start with this prefix. */
+    public static final String LOAD = ADAPTORS + "load";
+
+    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
+    private static final String[][] VALID_PROPERTIES = new String[][] {
+            { LOAD, null, "List: comma separated list of the adaptors to load." }};
+    
     private static final Logger logger = LoggerFactory.getLogger(OctopusEngine.class);
 
     // list of all octopusEngines, so we can end them all in one go.
@@ -46,7 +59,7 @@ public class OctopusEngine implements Octopus {
 
     private Credentials defaultCredentials = new Credentials();
 
-    private Properties defaultProperties = new Properties();
+    private OctopusProperties defaultProperties;
 
     private final FilesEngine filesEngine;
 
@@ -64,19 +77,16 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      */
     private OctopusEngine(Properties properties, Credentials credentials) throws OctopusException {
-        if (properties == null) {
-            defaultProperties = new Properties();
-        } else {
-            defaultProperties = properties;
-        }
-
+      
+        defaultProperties = new OctopusProperties(VALID_PROPERTIES, properties);
+        
         if (credentials == null) {
             defaultCredentials = new Credentials();
         } else {
             defaultCredentials = credentials;
         }
 
-        adaptors = AdaptorLoader.loadAdaptors(new OctopusProperties(defaultProperties), this);
+        adaptors = AdaptorLoader.loadAdaptors(defaultProperties, this);
 
         filesEngine = new FilesEngine(this);
 
@@ -84,7 +94,7 @@ public class OctopusEngine implements Octopus {
 
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }
-
+    
     public synchronized OctopusProperties getCombinedProperties(Properties properties) {
         OctopusProperties result = new OctopusProperties(defaultProperties, properties);
 
@@ -153,7 +163,12 @@ public class OctopusEngine implements Octopus {
 
     @Override
     public synchronized void setDefaultProperties(Properties properties) {
-        defaultProperties = properties;
+        
+        synchronized (this) {
+            defaultProperties = new OctopusProperties(VALID_PROPERTIES, properties);
+        }
+        
+        // FIXME: Should check properties here!
     }
 
     @Override

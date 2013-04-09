@@ -16,11 +16,11 @@ public interface Octopus {
 
     public Credentials getDefaultCredentials();
 
-    public void setDefaultCredentials(Credentials credentials);
+    public void setDefaultCredentials(Credentials credentials) throws OctopusException;
 
     public Properties getDefaultProperties();
 
-    public void setDefaultProperties(Properties properties);
+    public void setDefaultProperties(Properties properties) throws OctopusException;
 
     public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
 
