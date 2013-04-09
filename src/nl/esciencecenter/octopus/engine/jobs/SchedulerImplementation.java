@@ -4,19 +4,16 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.security.Credentials;
 
 public class SchedulerImplementation implements Scheduler {
 
     private final URI uri;
     private final OctopusProperties properties;
-    private final Credentials credentials;
     private final String adaptorName;
 
-    public SchedulerImplementation(URI uri, OctopusProperties properties, Credentials credentials, String adaptorName) {
+    public SchedulerImplementation(URI uri, OctopusProperties properties, String adaptorName) {
         this.uri = uri;
         this.properties = properties;
-        this.credentials = credentials;
         this.adaptorName = adaptorName;
     }
 
@@ -30,14 +27,9 @@ public class SchedulerImplementation implements Scheduler {
         return properties;
     }
 
-    @Override
-    public Credentials getCredentials() {
-        return credentials;
-    }
 
     @Override
     public String getAdaptorName() {
         return adaptorName;
     }
-
 }

@@ -8,12 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,12 +58,12 @@ public class JarFsClassLoader extends ClassLoader {
     }
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String fullyQualifiedClassName) throws ClassNotFoundException {
         // file we are looking for
-        String classFilename = name.replace(".", "/") + ".class";
+        String classFilename = fullyQualifiedClassName.replace(".", "/") + ".class";
 
         if (logger.isDebugEnabled()) {
-            logger.debug(this + " looking for class " + name + " in file " + classFilename);
+            logger.debug(this + " looking for class " + fullyQualifiedClassName + " in file " + classFilename);
         }
 
         try {
@@ -79,8 +76,8 @@ public class JarFsClassLoader extends ClassLoader {
 
                 // logger.debug("found " + jarFsFile);
 
-                addPackage(name, classFilename, jarFsFile.getJarEntry().getName(), jarFsFile.getManifest());
-                return super.defineClass(name, jarFsFile.getBytes().array(), jarFsFile.getBytes().position(), jarFsFile
+                addPackage(fullyQualifiedClassName, classFilename, jarFsFile.getJarEntry().getName(), jarFsFile.getManifest());
+                return super.defineClass(fullyQualifiedClassName, jarFsFile.getBytes().array(), jarFsFile.getBytes().position(), jarFsFile
                         .getBytes().remaining());
             }
         } catch (IOException e) {

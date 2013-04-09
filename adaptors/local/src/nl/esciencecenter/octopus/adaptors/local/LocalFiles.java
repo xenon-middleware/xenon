@@ -15,9 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
@@ -25,8 +22,8 @@ import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AclEntry;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DeleteOption;
@@ -36,7 +33,9 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.security.Credentials;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocalFiles implements FilesAdaptor {
 
@@ -57,9 +56,9 @@ public class LocalFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path newPath(OctopusProperties properties, Credentials credentials, URI location) throws OctopusException {
+    public Path newPath(OctopusProperties properties, URI location) throws OctopusException {
         localAdaptor.checkURI(location);
-        return new PathImplementation(properties, credentials, location, localAdaptor.getName(), octopusEngine);
+        return new PathImplementation(properties, location, localAdaptor.getName(), octopusEngine);
     }
 
     @Override
@@ -179,7 +178,7 @@ public class LocalFiles implements FilesAdaptor {
         try {
             java.nio.file.Path target = Files.readSymbolicLink(LocalUtils.javaPath(link));
 
-            return new PathImplementation(link.getProperties(), link.getCredentials(), target.toUri(), link.getAdaptorName(),
+            return new PathImplementation(link.getProperties(), target.toUri(), link.getAdaptorName(),
                     octopusEngine);
         } catch (IOException e) {
             throw new OctopusException("could not create symbolic link", e, null, null);

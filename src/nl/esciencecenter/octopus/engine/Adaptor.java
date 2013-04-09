@@ -6,6 +6,7 @@ import java.util.Set;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
 import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -26,7 +27,6 @@ public abstract class Adaptor implements AdaptorInfo {
     protected final OctopusEngine octopusEngine;
 
     private final String[][] defaultProperties;
-
     private final OctopusProperties properties;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
@@ -41,12 +41,10 @@ public abstract class Adaptor implements AdaptorInfo {
         this.supportedSchemes = supportedSchemes;
 
         this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
-        this.properties = properties;
-
-        checkProperties();
+        this.properties = processProperties(properties);
     }
 
-    public void checkProperties() throws OctopusException {
+    private OctopusProperties processProperties(OctopusProperties properties) throws OctopusException {
 
         Set<String> validSet = new HashSet<String>();
 
@@ -61,8 +59,14 @@ public abstract class Adaptor implements AdaptorInfo {
                 throw new OctopusException("Unknown property " + entry);
             }
         }
+        
+        return new OctopusProperties(defaultProperties, p);
     }
 
+    public OctopusProperties getProperties() { 
+        return properties;
+    }
+    
     public String getName() {
         return name;
     }
@@ -89,6 +93,8 @@ public abstract class Adaptor implements AdaptorInfo {
     public abstract FilesAdaptor filesAdaptor() throws OctopusException;
 
     public abstract JobsAdaptor jobsAdaptor() throws OctopusException;
+
+    public abstract CredentialsAdaptor credentialsAdaptor() throws OctopusException;
 
     public abstract void end();
 }

@@ -21,7 +21,7 @@ public class LocalAdaptor extends Adaptor {
     private static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = "octopus.adaptors.local.";
+    public static final String PREFIX = OctopusEngine.ADAPTORS + "local.";
 
     /** All our own queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
@@ -30,31 +30,33 @@ public class LocalAdaptor extends Adaptor {
     public static final String MAX_HISTORY = QUEUE + "historySize";
 
     /** All our multi queue properties start with this prefix. */
-    public static final String MULTIQ = QUEUE + "multiq.";
+    public static final String MULTIQ = QUEUE + "multi.";
 
     /** Maximum number of concurrent jobs in the multiq */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] validPropertiesList = new String[][] {
+    private static final String[][] VALID_PROPERTIES = new String[][] {
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
 
     private final LocalFiles localFiles;
     private final LocalJobs localJobs;
+    private final LocalCredentials localCredentials;
 
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
-        localFiles = new LocalFiles(properties, this, octopusEngine);
-        localJobs = new LocalJobs(properties, this, octopusEngine);
+        localFiles = new LocalFiles(getProperties(), this, octopusEngine);
+        localJobs = new LocalJobs(getProperties(), this, octopusEngine);
+        localCredentials = new LocalCredentials();
     }
 
     void checkURI(URI location) throws OctopusException {
 
         String scheme = location.getScheme();
 
-        if (scheme != null && !supports(scheme)) {
+        if (!supports(scheme)) {
             throw new OctopusException("Local adaptor does not support scheme " + scheme, ADAPTOR_NAME, location);
         }
 
@@ -65,6 +67,17 @@ public class LocalAdaptor extends Adaptor {
                     + location.getHost() + "\"", ADAPTOR_NAME, location);
         }
     }
+    
+    @Override
+    public boolean supports(String scheme) {
+
+        if (scheme == null) { 
+            return true;
+        }
+        
+        return super.supports(scheme);
+    }
+    
 
     @Override
     public Map<String, String> getSupportedProperties() {
@@ -89,5 +102,10 @@ public class LocalAdaptor extends Adaptor {
     @Override
     public JobsAdaptor jobsAdaptor() {
         return localJobs;
+    }
+
+    @Override
+    public LocalCredentials credentialsAdaptor() {
+        return localCredentials;
     }
 }

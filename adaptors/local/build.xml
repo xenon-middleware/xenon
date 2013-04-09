@@ -25,13 +25,13 @@
 
 		<jar jarfile="${octopus.dist}/octopus-adaptor-local${version}.jar">
 			<manifest>
-				<attribute name="Octopus-Adaptors" value="Local" />
+				<attribute name="Octopus-Adaptors" value="local" />
 			</manifest>
 
 			<!-- The name set in the prefix here is used as the name of the adaptor class
 		                 e.g. Local -> adaptors.local.LocalAdaptor -->
 
-			<zipfileset dir="dist" prefix="octopus-adaptors/Local" />
+			<zipfileset dir="dist" prefix="octopus-adaptors/local" />
 		</jar>
 
 	</target>
