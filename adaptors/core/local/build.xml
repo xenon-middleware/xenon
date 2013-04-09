@@ -12,22 +12,20 @@
 	</path>
 
 	<target name="build" depends="clean" description="build the JARs and documentation">
-		<!-- Create the distribution end tmp directory -->
+		<!-- Create the distribution end classes directory -->
 		<mkdir dir="dist" />
-		<mkdir dir="tmp" />
+		<mkdir dir="build/classes" />
 
-		<!-- Compile the java code from ${src} into ${tmp} -->
-		<javac srcdir="src" destdir="tmp" debug="on">
+		<!-- Compile the java code from ${src} into ${classes} -->
+		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="external.jars" />
 		</javac>
 
-		<jar jarfile="dist/octopus-local-adaptor.jar" basedir="tmp" includes="**" />
-
-		<delete dir="tmp" />
+		<jar jarfile="dist/octopus-local-adaptor.jar" basedir="build/classes" includes="**" />
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="tmp" />
+		<delete dir="build/classes" />
 		<delete dir="dist" />
 	</target>
 
