@@ -14,18 +14,18 @@
 	<target name="build" depends="clean" description="build the JARs and documentation">
 		<!-- Create the distribution end classes directory -->
 		<mkdir dir="dist" />
-		<mkdir dir="classes" />
+		<mkdir dir="build/classes" />
 
 		<!-- Compile the java code from ${src} into ${classes} -->
-		<javac srcdir="src" destdir="classes" debug="on">
+		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="external.jars" />
 		</javac>
 
-		<jar jarfile="dist/octopus-local-adaptor.jar" basedir="classes" includes="**" />
+		<jar jarfile="dist/octopus-local-adaptor.jar" basedir="build/classes" includes="**" />
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="classes" />
+		<delete dir="build/classes" />
 		<delete dir="dist" />
 	</target>
 

@@ -38,16 +38,16 @@
 	</target>
 
 	<target name="compile" description="compile the source ">
-		<mkdir dir="classes" />
+		<mkdir dir="build/classes" />
 		<mkdir dir="dist" />
 
 		<!-- Compile the java code from src into classes -->
-		<javac srcdir="src" destdir="classes" debug="on">
+		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="lib.jars" />
 		</javac>
 
 		<!-- Put everything in classes into the jar file -->
-		<jar jarfile="dist/octopus${version}.jar" basedir="classes" />
+		<jar jarfile="dist/octopus${version}.jar" basedir="build/classes" />
 
 		<!-- Copy external dependancies to dist directory -->
 		<copy todir="dist">
@@ -73,7 +73,7 @@
 	</target>
 
 	<target name="clean" description="clean up">
-		<delete dir="classes" />
+		<delete dir="build" />
 		<delete dir="dist" />
 
 		<ant dir="adaptors" target="clean" />
