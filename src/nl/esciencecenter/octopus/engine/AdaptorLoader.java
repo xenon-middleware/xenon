@@ -264,6 +264,14 @@ class AdaptorLoader {
         return adaptors.toArray(new Adaptor[adaptors.size()]);
     }
     
+    /** 
+     * Check if the adaptor name is present in the list. 
+     * 
+     * @param adaptorName adaptor name to check for. 
+     * @param adaptorsToLoad list of adaptor names. 
+     * 
+     * @return if the adaptor name is present in the list.
+     */
     private static boolean checkAdaptorName(String adaptorName, String [] adaptorsToLoad) { 
         
         if (adaptorsToLoad == null || adaptorsToLoad.length == 0) { 
