@@ -8,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OutputStream useful for merging output streams. Uses a seperate thread to
- * write the data to the underlying output stream. May block if the queue is
- * full. Currently not a very efficient implementation.
+ * OutputStream useful for merging output streams. Uses a seperate thread to write the data to the underlying output stream. May
+ * block if the queue is full. Currently not a very efficient implementation.
  * 
  * @author Niels Drost
  * 

@@ -19,8 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Classloader which loads classes from jar files (and other files) within a
- * jar.
+ * Classloader which loads classes from jar files (and other files) within a jar.
  * 
  * @author Niels Drost
  * 
@@ -52,7 +51,7 @@ public class JarFsClassLoader extends ClassLoader {
 
         logger.debug("Loading classes for " + adaptorName + " from " + Arrays.toString(this.fileSystems));
     }
-    
+
     public JarFsClassLoader(Set<JarFileSystem> fileSystems, String adaptorName, ClassLoader parent) {
         super(parent);
         this.fileSystems = filterFileSystems(fileSystems, adaptorName);
@@ -132,8 +131,7 @@ public class JarFsClassLoader extends ClassLoader {
             }
         }
 
-        super.definePackage(packageName, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor,
-                sealBase);
+        super.definePackage(packageName, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor, sealBase);
     }
 
     @Override
@@ -156,8 +154,8 @@ public class JarFsClassLoader extends ClassLoader {
                 JarFsFile jarFsFile = fileSystem.findFile(adaptorName, name, true);
 
                 if (jarFsFile != null) {
-                    return new ByteArrayInputStream(jarFsFile.getBytes().array(), jarFsFile.getBytes().position(),
-                            jarFsFile.getBytes().remaining());
+                    return new ByteArrayInputStream(jarFsFile.getBytes().array(), jarFsFile.getBytes().position(), jarFsFile
+                            .getBytes().remaining());
                 }
             }
         } catch (IOException e) {

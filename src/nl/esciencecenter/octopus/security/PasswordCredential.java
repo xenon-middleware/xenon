@@ -6,8 +6,7 @@ package nl.esciencecenter.octopus.security;
 public class PasswordCredential extends Credential {
 
     /**
-     * Constructs a {@link PasswordCredential} with the given
-     * <code>username</code> and <code>password</code>.
+     * Constructs a {@link PasswordCredential} with the given <code>username</code> and <code>password</code>.
      * 
      * @param username
      *            the username

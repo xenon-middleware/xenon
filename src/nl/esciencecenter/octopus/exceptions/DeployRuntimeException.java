@@ -12,8 +12,8 @@ public class DeployRuntimeException extends RuntimeException {
 
     public DeployRuntimeException(String s, String adaptorName, URI uri) {
         super(s);
-      this.adaptorName = adaptorName;
-      this.uri = uri;
+        this.adaptorName = adaptorName;
+        this.uri = uri;
     }
 
     public DeployRuntimeException(String message, Throwable t, String adaptorName, URI uri) {

@@ -3,8 +3,7 @@ package nl.esciencecenter.octopus.files;
 public enum AclEntryType {
 
     /**
-     * Generate an alarm, in a system dependent way, the access specified in the
-     * permissions component of the ACL entry.
+     * Generate an alarm, in a system dependent way, the access specified in the permissions component of the ACL entry.
      */
     ALARM,
 
@@ -13,8 +12,7 @@ public enum AclEntryType {
      */
     ALLOW,
     /**
-     * Log, in a system dependent way, the access specified in the permissions
-     * component of the ACL entry.
+     * Log, in a system dependent way, the access specified in the permissions component of the ACL entry.
      */
     AUDIT,
     /**

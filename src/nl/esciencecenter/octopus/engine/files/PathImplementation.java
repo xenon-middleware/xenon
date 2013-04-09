@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.util.OSUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -15,22 +15,21 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.security.Credentials;
 
 /**
- * Default implementation of Path. Will create new Paths directly, using
- * either an adaptor identical to the original in case of an absolute path,
- * or the local adaptor in case of a relative path.
+ * Default implementation of Path. Will create new Paths directly, using either an adaptor identical to the original in case of an
+ * absolute path, or the local adaptor in case of a relative path.
  */
 public class PathImplementation implements Path {
 
     private static final class PathIterator implements Iterator<Path> {
 
-        private ImmutableTypedProperties properties;
+        private OctopusProperties properties;
         private Credentials credentials;
         private URI location;
         private String[] elements;
 
         private int next = 0;
 
-        PathIterator(ImmutableTypedProperties properties, Credentials credentials, URI location, String[] elements) {
+        PathIterator(OctopusProperties properties, Credentials credentials, URI location, String[] elements) {
             this.properties = properties;
             this.credentials = credentials;
             this.location = location;
@@ -85,7 +84,7 @@ public class PathImplementation implements Path {
 
     }
 
-    private final ImmutableTypedProperties properties;
+    private final OctopusProperties properties;
 
     private final Credentials credentials;
 
@@ -100,8 +99,7 @@ public class PathImplementation implements Path {
 
     private final OctopusEngine octopusEngine;
 
-
-    public PathImplementation(ImmutableTypedProperties properties, Credentials credentials, URI location, String adaptorName,
+    public PathImplementation(OctopusProperties properties, Credentials credentials, URI location, String adaptorName,
             OctopusEngine octopusEngine) {
         this.properties = properties;
         this.credentials = credentials;
@@ -138,7 +136,7 @@ public class PathImplementation implements Path {
      * Creates a new path based on an existing path, with a new location based
      * on the old location and the given root and elements.
      */
-    private PathImplementation(ImmutableTypedProperties properties, Credentials credentials, URI baseLocation, String adaptorName,
+    private PathImplementation(OctopusProperties properties, Credentials credentials, URI baseLocation, String adaptorName,
             OctopusEngine octopusEngine, String root, String... elements) {
         this.properties = properties;
         this.credentials = credentials;
@@ -204,8 +202,8 @@ public class PathImplementation implements Path {
 
     @Override
     public Path subpath(int beginIndex, int endIndex) {
-        return new PathImplementation(properties, credentials, location, "local", octopusEngine, null, Arrays.copyOfRange(elements,
-                beginIndex, endIndex));
+        return new PathImplementation(properties, credentials, location, "local", octopusEngine, null, Arrays.copyOfRange(
+                elements, beginIndex, endIndex));
     }
 
     @Override
@@ -297,10 +295,10 @@ public class PathImplementation implements Path {
     public URI toUri() {
         return location;
     }
-    
+
     @Override
-    public ImmutableTypedProperties getProperties() {
-       return properties;
+    public OctopusProperties getProperties() {
+        return properties;
     }
 
     @Override
@@ -316,7 +314,9 @@ public class PathImplementation implements Path {
 
         if (isLocal()) {
             // Path for cwd
-            Path cwd = new PathImplementation(properties, credentials, URI.create(System.getProperty("user.dir")), "local", octopusEngine);
+            Path cwd =
+                    new PathImplementation(properties, credentials, URI.create(System.getProperty("user.dir")), "local",
+                            octopusEngine);
 
             return cwd.resolve(this);
         }

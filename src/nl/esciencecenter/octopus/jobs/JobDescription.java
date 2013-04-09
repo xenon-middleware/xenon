@@ -33,7 +33,7 @@ public class JobDescription {
     private Path stderr = null;
 
     private Path workingDirectory = null;
-    
+
     private boolean offlineMode = false;
 
     public JobDescription() {
@@ -50,8 +50,7 @@ public class JobDescription {
     }
 
     /**
-     * Set the number of resources, which is the total number of resources where
-     * the number of processes should be distributed on.
+     * Set the number of resources, which is the total number of resources where the number of processes should be distributed on.
      * 
      * @param resourceCount
      *            the number of resources
@@ -61,8 +60,8 @@ public class JobDescription {
     }
 
     /**
-     * Get the number of processes started on each node. The total number of
-     * processes started is getProcessesPerNode() * getNodeCount()
+     * Get the number of processes started on each node. The total number of processes started is getProcessesPerNode() *
+     * getNodeCount()
      * 
      * @return the number of processes
      */
@@ -97,9 +96,8 @@ public class JobDescription {
     }
 
     /**
-     * Returns the path to the executable. For the following commandline
-     * <code>"/bin/cat hello world > out"</code> it will return a {@link String}
-     * "/bin/cat".
+     * Returns the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will return
+     * a {@link String} "/bin/cat".
      * 
      * @return the path to the executable.
      */
@@ -108,9 +106,8 @@ public class JobDescription {
     }
 
     /**
-     * Sets the path to the executable. For the following commandline
-     * <code>"/bin/cat hello world > out"</code> the {@link String} "/bin/cat"
-     * should be provided.
+     * Sets the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> the {@link String}
+     * "/bin/cat" should be provided.
      * 
      * @param executable
      *            The path to the executable.
@@ -120,9 +117,8 @@ public class JobDescription {
     }
 
     /**
-     * Returns the arguments of the executable. For the following commandline
-     * <code>"/bin/cat hello world > out"</code> it will return a {@link String}
-     * []{"hello", "world", ">", "out"}
+     * Returns the arguments of the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will
+     * return a {@link String} []{"hello", "world", ">", "out"}
      * 
      * @return Returns the commandline arguments.
      */
@@ -131,9 +127,8 @@ public class JobDescription {
     }
 
     /**
-     * Sets the arguments of the executable. For the following commandline
-     * <code>"/bin/cat hello world"</code> the {@link String}[]{"hello",
-     * "world"} contains the arguments.
+     * Sets the arguments of the executable. For the following commandline <code>"/bin/cat hello world"</code> the {@link String}
+     * []{"hello", "world"} contains the arguments.
      * 
      * @param arguments
      *            The commandline arguments to set.
@@ -144,9 +139,8 @@ public class JobDescription {
     }
 
     /**
-     * Returns the environment of the executable. The environment of the
-     * executable consists of a {@link Map} of environment variables with their
-     * values (for instance the key, value pair "JAVA_HOME", "/path/to/java").
+     * Returns the environment of the executable. The environment of the executable consists of a {@link Map} of environment
+     * variables with their values (for instance the key, value pair "JAVA_HOME", "/path/to/java").
      * 
      * @return the environment
      */
@@ -155,9 +149,8 @@ public class JobDescription {
     }
 
     /**
-     * Sets the environment of the executable. The environment of the executable
-     * consists of a {@link Map} of environment variables with their values (for
-     * instance the key, value pair "JAVA_HOME", "/path/to/java").
+     * Sets the environment of the executable. The environment of the executable consists of a {@link Map} of environment
+     * variables with their values (for instance the key, value pair "JAVA_HOME", "/path/to/java").
      * 
      * @param environment
      *            The environment to set.
@@ -195,10 +188,8 @@ public class JobDescription {
     }
 
     /**
-     * Sets the stdout {@link Path}. Note that stdout will be redirected to
-     * either a {@link Path} or a {@link OutputStream}. The last invocation of
-     * <code>setStdout()</code> determines whether the destination of the
-     * output.
+     * Sets the stdout {@link Path}. Note that stdout will be redirected to either a {@link Path} or a {@link OutputStream}. The
+     * last invocation of <code>setStdout()</code> determines whether the destination of the output.
      * 
      * @param stdout
      *            The {@link Path} where stdout is redirected to.
@@ -217,10 +208,8 @@ public class JobDescription {
     }
 
     /**
-     * Sets the stderr {@link Path}. Note that stderr will be redirected to
-     * either a {@link Path} or a {@link OutputStream}. The last invocation of
-     * <code>setStderr()</code> determines whether the destination of the
-     * output.
+     * Sets the stderr {@link Path}. Note that stderr will be redirected to either a {@link Path} or a {@link OutputStream}. The
+     * last invocation of <code>setStderr()</code> determines whether the destination of the output.
      * 
      * @param stderr
      *            The {@link Path} where stderr is redirected to.
@@ -230,18 +219,18 @@ public class JobDescription {
     }
 
     public void setWorkingDirectory(Path workingDirectory) throws OctopusException {
-    	
-    	if (!workingDirectory.isLocal()) { 
-    		throw new OctopusException("Working directory must be local not " + workingDirectory);
-    	}
-    	
-    	this.workingDirectory = workingDirectory;
+
+        if (!workingDirectory.isLocal()) {
+            throw new OctopusException("Working directory must be local not " + workingDirectory);
+        }
+
+        this.workingDirectory = workingDirectory;
     }
 
     public Path getWorkingDirectory() {
         return workingDirectory;
     }
-    
+
     public boolean offlineMode() {
         return offlineMode;
     }
@@ -266,7 +255,7 @@ public class JobDescription {
 
         //res += ", preStagedFiles: " + preStagedFiles;
         //res += ", postStagedFiles: " + postStagedFiles;
-        
+
         //res += ", deleteSandbox: " + deleteSandbox;
         //res += ", wipeSandbox: " + wipeSandbox;
         res += ", offlineMode: " + offlineMode;

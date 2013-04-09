@@ -5,7 +5,6 @@ import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
 
 /**
@@ -15,7 +14,7 @@ import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
  * 
  */
 public class Credentials {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Credentials.class);
 
     private final HashSet<Credential> credentials;
@@ -25,9 +24,9 @@ public class Credentials {
     public Credentials(boolean readOnly, Credentials... initialContent) {
         this.readOnly = readOnly;
         credentials = new HashSet<Credential>();
-        
+
         logger.debug("new credentials, read-only = " + readOnly + " initial content = " + initialContent);
-        
+
         if (initialContent != null) {
             for (Credentials element : initialContent) {
                 if (element != null) {
@@ -83,10 +82,9 @@ public class Credentials {
         }
         this.credentials.addAll(moreCredentials.credentials);
     }
-    
+
     public String toString() {
         return "credentials, read-only = " + readOnly + " content = " + credentials;
     }
-    
 
 }

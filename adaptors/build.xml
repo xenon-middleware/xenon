@@ -3,19 +3,15 @@
 	Build file for Adaptors.
     </description>
 
-	<target name="build" description="build core adaptors">
-		<ant dir="core" />
+	<target name="build" description="build local adaptors">
+		<ant dir="local" />
 	</target>
 
-	<target name="build-all" description="build all adaptors (core, additional, and unstable)">
-		<ant dir="core" />
-		<ant dir="additional" />
-		<ant dir="unstable" />
+	<target name="build-all" description="build all adaptors (local, additional, and unstable)">
+		<ant dir="local" />
 	</target>
 
 	<target name="clean" description="clean all adaptors">
-		<ant dir="core" target="clean" />
-		<ant dir="additional" target="clean" />
-		<ant dir="unstable" target="clean" />
+		<ant dir="local" target="clean" />
 	</target>
 </project>

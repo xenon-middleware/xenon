@@ -3,9 +3,8 @@ package nl.esciencecenter.octopus.security;
 import java.net.URI;
 
 /**
- * A container for security Information based upon certificates. Contexts based
- * upon these mechanisms can be used by adaptors to create further contexts
- * containing opaque data objects, e.g. GSSAPI credentials.
+ * A container for security Information based upon certificates. Contexts based upon these mechanisms can be used by adaptors to
+ * create further contexts containing opaque data objects, e.g. GSSAPI credentials.
  */
 public class CertificateCredential extends Credential {
 
@@ -22,9 +21,8 @@ public class CertificateCredential extends Credential {
     private URI certfile = null;
 
     /**
-     * Constructs a {@link CertificateCredential} out of a {@link URI} pointing
-     * to the private key, a {@link URI} pointing to the certificate, a username
-     * and a password.
+     * Constructs a {@link CertificateCredential} out of a {@link URI} pointing to the private key, a {@link URI} pointing to the
+     * certificate, a username and a password.
      * 
      * @param keyfile
      *            the private key file (for example userkey.pem)
@@ -33,8 +31,7 @@ public class CertificateCredential extends Credential {
      * @param username
      *            the username
      * @param password
-     *            the password or passphrase belonging to the key and
-     *            certificate.
+     *            the password or passphrase belonging to the key and certificate.
      */
     public CertificateCredential(URI keyfile, URI certfile, String username, String password) {
         super(username, password);
@@ -43,17 +40,15 @@ public class CertificateCredential extends Credential {
     }
 
     /**
-     * Constructs a {@link CertificateCredential} out of a {@link URI} pointing
-     * to the private key, a {@link URI} pointing to the certificate and a
-     * password.
+     * Constructs a {@link CertificateCredential} out of a {@link URI} pointing to the private key, a {@link URI} pointing to the
+     * certificate and a password.
      * 
      * @param keyfile
      *            the private key file (for example userkey.pem)
      * @param certfile
      *            the certificate file (for example usercert.pem)
      * @param password
-     *            the password or passphrase belonging to the key and
-     *            certificate.
+     *            the password or passphrase belonging to the key and certificate.
      */
     public CertificateCredential(URI keyfile, URI certfile, String password) {
         this(keyfile, certfile, null, password);
@@ -82,8 +77,7 @@ public class CertificateCredential extends Credential {
     /**
      * Returns a clone of this context.
      * 
-     * @return the clone of this security context (but not the associated
-     *         adaptor data)
+     * @return the clone of this security context (but not the associated adaptor data)
      */
     public Object clone() throws CloneNotSupportedException {
         return new CertificateCredential(keyfile, certfile, username, password);
@@ -119,8 +113,7 @@ public class CertificateCredential extends Credential {
     }
 
     /**
-     * Returns the private key slot. Some ssh implementations on windows
-     * (tunnelier) use a private key slot.
+     * Returns the private key slot. Some ssh implementations on windows (tunnelier) use a private key slot.
      * 
      * @return the private key slot.
      */
@@ -129,8 +122,7 @@ public class CertificateCredential extends Credential {
     }
 
     /**
-     * Sets the private key slot. Some ssh implementations on windows
-     * (tunnelier) use a private key slot.
+     * Sets the private key slot. Some ssh implementations on windows (tunnelier) use a private key slot.
      * 
      * @param privateKeySlot
      *            the new private key slot.

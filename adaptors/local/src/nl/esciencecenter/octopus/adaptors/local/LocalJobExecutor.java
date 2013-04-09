@@ -14,32 +14,32 @@ import org.slf4j.LoggerFactory;
 public class LocalJobExecutor implements Runnable {
 
     protected static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
-    
+
     private final OctopusEngine engine;
 
     private final Job job;
-    
+
     private int exitStatus;
 
     private Thread thread = null;
 
     private boolean killed = false;
-    
+
     private boolean done = false;
 
     private String state = "INITIAL";
-    
+
     private Exception error;
-    
+
     public LocalJobExecutor(Job job, OctopusEngine engine) throws BadParameterException {
 
-    	this.engine = engine;
-    	this.job = job;
+        this.engine = engine;
+        this.job = job;
 
         if (job.getJobDescription().getProcessesPerNode() <= 0) {
             throw new BadParameterException("number of processes cannot be negative or 0", "local", null);
         }
-        
+
         if (job.getJobDescription().getNodeCount() != 1) {
             throw new BadParameterException("number of nodes must be 1", "local", null);
         }
@@ -65,40 +65,40 @@ public class LocalJobExecutor implements Runnable {
             thread.interrupt();
         }
     }
-    
+
     private synchronized void updateState(String state) {
         this.state = state;
     }
-    
-    private synchronized void setError(Exception e) { 
-    	error = e;
-    }
-	
-	public synchronized boolean isDone() { 
-		return done;
-	}
-    
-	public Job getJob() {
-		return job;
-	}
 
-	public synchronized String getState() { 
-		return state;
-	}
-	
-	public synchronized Exception getError() { 
-		return error;
-	}
-	
+    private synchronized void setError(Exception e) {
+        error = e;
+    }
+
+    public synchronized boolean isDone() {
+        return done;
+    }
+
+    public Job getJob() {
+        return job;
+    }
+
+    public synchronized String getState() {
+        return state;
+    }
+
+    public synchronized Exception getError() {
+        return error;
+    }
+
     @Override
     public void run() {
-        
-    	try {
-          
+
+        try {
+
             synchronized (this) {
                 if (killed) {
-                	updateState("KILLED");
-                	throw new IOException("Job killed");
+                    updateState("KILLED");
+                    throw new IOException("Job killed");
                 }
                 this.thread = Thread.currentThread();
             }
@@ -106,16 +106,16 @@ public class LocalJobExecutor implements Runnable {
             updateState("INITIAL");
 
             if (Thread.currentThread().isInterrupted()) {
-            	updateState("KILLED");
+                updateState("KILLED");
                 throw new IOException("Job killed");
             }
 
             JobDescription description = job.getJobDescription();
-            
-            ParallelProcess parallelProcess = new ParallelProcess(description.getProcessesPerNode(),
-                    description.getExecutable(), description.getArguments(), description.getEnvironment(),
-                    description.getWorkingDirectory(), description.getStdin(), description.getStdout(), description.getStderr(), 
-                    engine);
+
+            ParallelProcess parallelProcess =
+                    new ParallelProcess(description.getProcessesPerNode(), description.getExecutable(),
+                            description.getArguments(), description.getEnvironment(), description.getWorkingDirectory(),
+                            description.getStdin(), description.getStdout(), description.getStderr(), engine);
 
             updateState("RUNNING");
 
@@ -126,7 +126,7 @@ public class LocalJobExecutor implements Runnable {
             }
 
         } catch (IOException e) {
-        	setError(e);
+            setError(e);
             updateState("ERROR");
         }
     }

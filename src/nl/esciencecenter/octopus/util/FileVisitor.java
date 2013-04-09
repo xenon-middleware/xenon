@@ -8,8 +8,7 @@ import nl.esciencecenter.octopus.files.Path;
 public interface FileVisitor {
 
     /**
-     * Invoked for a directory after entries in the directory, and all of their
-     * descendants, have been visited.
+     * Invoked for a directory after entries in the directory, and all of their descendants, have been visited.
      */
     FileVisitResult postVisitDirectory(Path dir, OctopusException exception, Octopus octopus) throws OctopusException;
 

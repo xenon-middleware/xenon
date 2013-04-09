@@ -2,16 +2,16 @@ package nl.esciencecenter.octopus.jobs;
 
 import java.net.URI;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.security.Credentials;
 
 public interface Scheduler {
 
-	 public URI getUri();
+    public URI getUri();
 
-	 public ImmutableTypedProperties getProperties();
+    public OctopusProperties getProperties();
 
-	 public Credentials getCredentials();
+    public Credentials getCredentials();
 
-	 public String getAdaptorName();
+    public String getAdaptorName();
 }

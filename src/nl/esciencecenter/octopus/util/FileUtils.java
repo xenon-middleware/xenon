@@ -25,13 +25,13 @@ import nl.esciencecenter.octopus.files.PathAttributes;
 
 /**
  * Some additional functionality build on top of the standard API
+ * 
  * @author Niels Drost
- *
+ * 
  */
 public class FileUtils {
 
     public static final int BUFFER_SIZE = 10240;
-
 
     /**
      * Copies all bytes from an input stream to a file.
@@ -39,16 +39,13 @@ public class FileUtils {
      * @throws OctopusException
      *             if an I/O error occurs when reading or writing
      * @throws FileAlreadyExistsException
-     *             if the target file exists but cannot be replaced because the
-     *             {@code REPLACE_EXISTING} option is not specified <i>(optional
-     *             specific exception)</i>
+     *             if the target file exists but cannot be replaced because the {@code REPLACE_EXISTING} option is not specified
+     *             <i>(optional specific exception)</i>
      * @throws DirectoryNotEmptyException
-     *             the {@code REPLACE_EXISTING} option is specified but the file
-     *             cannot be replaced because it is a non-empty directory
-     *             <i>(optional specific exception)</i> *
+     *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
+     *             directory <i>(optional specific exception)</i> *
      * @throws UnsupportedOperationException
-     *             if {@code options} contains a copy option that is not
-     *             supported
+     *             if {@code options} contains a copy option that is not supported
      */
     public static long copy(Octopus octopus, InputStream in, Path target, CopyOption... options) throws OctopusException {
         byte[] buffer = new byte[BUFFER_SIZE];
@@ -106,10 +103,8 @@ public class FileUtils {
         }
     }
 
-    
     /**
-     * Opens a file for reading, returning a BufferedReader that may be used to
-     * read text from the file in an efficient manner.
+     * Opens a file for reading, returning a BufferedReader that may be used to read text from the file in an efficient manner.
      */
     public static BufferedReader newBufferedReader(Octopus octopus, Path path, Charset cs) throws OctopusException {
         InputStream in = octopus.files().newInputStream(path);
@@ -117,13 +112,12 @@ public class FileUtils {
         return new BufferedReader(new InputStreamReader(in, cs));
     }
 
-    
-
     /**
-     * Opens or creates a file for writing, returning a BufferedWriter that may
-     * be used to write text to the file in an efficient manner.
+     * Opens or creates a file for writing, returning a BufferedWriter that may be used to write text to the file in an efficient
+     * manner.
      */
-    public static BufferedWriter newBufferedWriter(Octopus octopus, Path path, Charset cs, OpenOption... options) throws OctopusException {
+    public static BufferedWriter newBufferedWriter(Octopus octopus, Path path, Charset cs, OpenOption... options)
+            throws OctopusException {
         OutputStream out = octopus.files().newOutputStream(path, options);
 
         return new BufferedWriter(new OutputStreamWriter(out, cs));
@@ -141,7 +135,6 @@ public class FileUtils {
 
     }
 
-    
     /**
      * Read all lines from a file.
      */
@@ -175,13 +168,12 @@ public class FileUtils {
         return path;
     }
 
-    
     /**
      * Write lines of text to a file.
      * 
      */
-    public static Path write(Octopus octopus, Path path, Iterable<? extends CharSequence> lines, Charset cs, OpenOption... options)
-            throws OctopusException {
+    public static Path write(Octopus octopus, Path path, Iterable<? extends CharSequence> lines, Charset cs,
+            OpenOption... options) throws OctopusException {
         try (BufferedWriter writer = newBufferedWriter(octopus, path, cs, options)) {
             for (CharSequence line : lines) {
                 writer.write(line.toString());
@@ -199,7 +191,7 @@ public class FileUtils {
     public static Path walkFileTree(Octopus octopus, Path start, FileVisitor visitor) throws OctopusException {
         return walkFileTree(octopus, start, false, Integer.MAX_VALUE, visitor);
     }
-    
+
     /**
      * Walks a file tree.
      */
@@ -212,8 +204,6 @@ public class FileUtils {
         return start;
     }
 
-
-    
     // Walk a file tree.
     private static FileVisitResult walk(Octopus octopus, Path path, FileAttributes attributes, boolean followLinks, int maxDepth,
             FileVisitor visitor) throws OctopusException {
@@ -227,8 +217,9 @@ public class FileUtils {
                     try {
                         for (PathAttributes attributesEntry : octopus.files().newAttributesDirectoryStream(path)) {
                             // recursion step
-                            FileVisitResult result = walk(octopus, attributesEntry.path(), attributesEntry.attributes(),
-                                    followLinks, maxDepth - 1, visitor);
+                            FileVisitResult result =
+                                    walk(octopus, attributesEntry.path(), attributesEntry.attributes(), followLinks,
+                                            maxDepth - 1, visitor);
 
                             if (result == FileVisitResult.SKIP_SIBLINGS) {
                                 // stop handling entries in this directory`
@@ -268,5 +259,9 @@ public class FileUtils {
         }
     }
 
-    
+    public static Path recursiveCopy(Octopus octopus, Path source, Path target, CopyOption... options) throws OctopusException {
+        // MUST ALSO HANDLE DIRECT FILE COPIES!    	
+        // FIXME!!!
+        throw new OctopusException("NOT IMPLEMENTED!");
+    }
 }

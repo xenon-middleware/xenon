@@ -31,7 +31,7 @@ public class LocalFileAttributes implements FileAttributes {
             readable = Files.isReadable(javaPath);
             writable = Files.isWritable(javaPath);
             hidden = Files.isHidden(javaPath);
-            
+
         } catch (IOException e) {
             throw new OctopusException("Cannot read attributes", e, null, null);
         }

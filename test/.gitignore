@@ -1,2 +1,4 @@
 /reports
 /dist
+/jacoco.exec
+/xml-reports

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Iterator;
 
-import nl.esciencecenter.octopus.ImmutableTypedProperties;
+import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.security.Credentials;
 
@@ -61,7 +61,7 @@ public interface Path extends Serializable {
 
     public String getPath();
 
-    public ImmutableTypedProperties getProperties();
+    public OctopusProperties getProperties();
 
     public Credentials getCredentials();
 
