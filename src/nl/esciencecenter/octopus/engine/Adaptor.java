@@ -41,12 +41,10 @@ public abstract class Adaptor implements AdaptorInfo {
         this.supportedSchemes = supportedSchemes;
 
         this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
-        this.properties = properties;
-
-        checkProperties();
+        this.properties = processProperties(properties);
     }
 
-    public void checkProperties() throws OctopusException {
+    private OctopusProperties processProperties(OctopusProperties properties) throws OctopusException {
 
         Set<String> validSet = new HashSet<String>();
 
@@ -61,8 +59,14 @@ public abstract class Adaptor implements AdaptorInfo {
                 throw new OctopusException("Unknown property " + entry);
             }
         }
+        
+        return new OctopusProperties(defaultProperties, p);
     }
 
+    public OctopusProperties getProperties() { 
+        return properties;
+    }
+    
     public String getName() {
         return name;
     }
