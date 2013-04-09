@@ -121,13 +121,21 @@ class AdaptorLoader {
 
         return result;
     }
+    
+    private static String fixName(String name) {
+        if (name.length() == 1) { 
+            return name.substring(0, 1).toUpperCase();
+        }
+        
+        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+    }
 
     private static Adaptor newAdaptor(ClassLoader loader, String name, OctopusProperties properties, OctopusEngine octopusEngine)
             throws OctopusException {
         try {
             Thread.currentThread().setContextClassLoader(loader);
             Class<?> clazz =
-                    loader.loadClass("nl.esciencecenter.octopus.adaptors." + name.toLowerCase() + "." + name + "Adaptor");
+                    loader.loadClass("nl.esciencecenter.octopus.adaptors." + name + "." + fixName(name) + "Adaptor");
 
             Constructor<?> constructor = clazz.getConstructor(new Class[] { OctopusProperties.class, OctopusEngine.class });
 
@@ -148,6 +156,7 @@ class AdaptorLoader {
     private static final Logger logger = LoggerFactory.getLogger(AdaptorLoader.class);
 
     static Adaptor[] loadAdaptors(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+                
         ArrayList<File> candidateFiles = new ArrayList<File>();
 
         // find jar files that potentially contain adaptors
@@ -192,8 +201,8 @@ class AdaptorLoader {
         }
 
         // filter out jar files that contain adaptors, create JarFileSystems
-
         HashSet<JarFileSystem> fileSystems = new HashSet<JarFileSystem>();
+
         HashSet<String> adaptorNames = new HashSet<String>();
 
         for (File file : candidateFiles) {
@@ -203,7 +212,6 @@ class AdaptorLoader {
             }
 
             try {
-
                 JarFile jarFile = new JarFile(file);
 
                 Manifest manifest = jarFile.getManifest();
@@ -243,12 +251,17 @@ class AdaptorLoader {
         // load and initialize all adaptors
         ArrayList<Adaptor> adaptors = new ArrayList<Adaptor>();
 
+        String [] adaptorsToLoad = properties.getStringList(OctopusEngine.LOAD);
+        
         for (String adaptorName : adaptorNames) {
-            ClassLoader adaptorClassLoader = new JarFsClassLoader(fileSystems, adaptorName, sharedLoader);
-            Adaptor adaptor = newAdaptor(adaptorClassLoader, adaptorName, properties, octopusEngine);
+            
+            if (checkAdaptorName(adaptorName, adaptorsToLoad)) { 
+                ClassLoader adaptorClassLoader = new JarFsClassLoader(fileSystems, adaptorName, sharedLoader);
+                Adaptor adaptor = newAdaptor(adaptorClassLoader, adaptorName, properties, octopusEngine);
 
-            if (adaptor != null) {
-                adaptors.add(adaptor);
+                if (adaptor != null) {
+                    adaptors.add(adaptor);
+                }
             }
         }
 
@@ -257,5 +270,28 @@ class AdaptorLoader {
         }
 
         return adaptors.toArray(new Adaptor[adaptors.size()]);
+    }
+    
+    /** 
+     * Check if the adaptor name is present in the list. 
+     * 
+     * @param adaptorName adaptor name to check for. 
+     * @param adaptorsToLoad list of adaptor names. 
+     * 
+     * @return if the adaptor name is present in the list.
+     */
+    private static boolean checkAdaptorName(String adaptorName, String [] adaptorsToLoad) { 
+        
+        if (adaptorsToLoad == null || adaptorsToLoad.length == 0) { 
+            return true;
+        }
+        
+        for (int i=0;i<adaptorsToLoad.length;i++) { 
+            if (adaptorName.equals(adaptorsToLoad[i])) { 
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
