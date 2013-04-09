@@ -55,7 +55,7 @@ public class LocalFiles implements FilesAdaptor {
             logger.debug(Arrays.toString(attributeViews.toArray()));
         }
     }
-
+    
     @Override
     public Path newPath(ImmutableTypedProperties properties, Credentials credentials, URI location)
             throws OctopusException {
@@ -82,11 +82,11 @@ public class LocalFiles implements FilesAdaptor {
             throw new OctopusException("could not copy file", e, null, null);
         }
 
-        if (CopyOption.contains(options, CopyOption.RECURSIVE) && isDirectory(source)) {
-            for (Path child : newDirectoryStream(source, FilesEngine.ACCEPT_ALL_FILTER)) {
-                copy(child, target.resolve(child.getFileName()), options);
-            }
-        }
+//        if (CopyOption.contains(options, CopyOption.RECURSIVE) && isDirectory(source)) {
+//            for (Path child : newDirectoryStream(source, FilesEngine.ACCEPT_ALL_FILTER)) {
+//                copy(child, target.resolve(child.getFileName()), options);
+//            }
+//        }
 
         return target;
     }

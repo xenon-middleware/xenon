@@ -28,10 +28,6 @@ class LocalUtils {
         ArrayList<java.nio.file.CopyOption> result = new ArrayList<java.nio.file.CopyOption>();
 
         for (int i = 0; i < options.length; i++) {
-            if (options[i] == CopyOption.RECURSIVE) {
-                // skip, java doesn't have this option
-                continue;
-            }
             try {
                 result.add(java.nio.file.StandardCopyOption.valueOf(options[i].toString()));
             } catch (IllegalArgumentException e) {

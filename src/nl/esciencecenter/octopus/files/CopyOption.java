@@ -11,14 +11,6 @@ public enum CopyOption {
      * Replace an existing file if it exists.
      */
     REPLACE_EXISTING,
-
-    /**
-     * Copy directories recursively. By default only the directory itself is
-     * copied, not its contents. Will not follow symlinks, if symlinks are
-     * detectable by the adaptor.
-     */
-    RECURSIVE,
-    
     ;
 
     public static boolean contains(CopyOption[] options, CopyOption option) {

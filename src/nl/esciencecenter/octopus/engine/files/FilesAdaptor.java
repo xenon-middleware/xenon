@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.ImmutableTypedProperties;

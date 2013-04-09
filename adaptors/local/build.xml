@@ -12,11 +12,11 @@
 	</path>
 
 	<target name="build" depends="clean" description="build the JARs and documentation">
-		<!-- Create the distribution end tmp directory -->
+		<!-- Create the distribution end classes directory -->
 		<mkdir dir="dist" />
 		<mkdir dir="build/classes" />
 
-		<!-- Compile the java code from ${src} into ${tmp} -->
+		<!-- Compile the java code from ${src} into ${classes} -->
 		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="external.jars" />
 		</javac>

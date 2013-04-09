@@ -88,9 +88,10 @@ public class LocalJobs implements JobsAdaptor {
     	localAdaptor.checkURI(location);
 
         if (location.getPath() != null && location.getPath().length() > 0) {
-            throw new OctopusException("Non-empty path in a local scheduler uri is not allowed", "local", location);
+            throw new OctopusException("Non-empty path in a local scheduler URI is not allowed", "local", location);
         }
 
+    	// FIXME: This simply returns a new SchedulerImplementation, but ignores properties and credentials completely.    	
         return new SchedulerImplementation(location, properties, credentials, "local");
     }
 
