@@ -6,9 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Properties;
 
-import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -163,8 +161,21 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testSetOwner() {
-        fail("Not yet implemented");
+    public void testSetOwner_MockedFilesAdaptor_FilesAdaptorSetOwnerCalled() throws URISyntaxException, OctopusException {
+        FilesAdaptor files_adaptor = mock(FilesAdaptor.class);
+        OctopusProperties octopus_properties = new OctopusProperties();
+        Adaptor adaptor = mock(Adaptor.class);
+        OctopusEngine octopus = mock(OctopusEngine.class);
+        when(adaptor.filesAdaptor()).thenReturn(files_adaptor);
+        when(octopus.getAdaptor("mock")).thenReturn(adaptor);
+
+        FilesEngine engine = new FilesEngine(octopus);
+        URI location = new URI("file:///tmp/bla.txt");
+        Path path = new PathImplementation(octopus_properties, location, "mock", octopus);
+
+        engine.setOwner(path, "someone", "somegroup");
+
+        verify(files_adaptor).setOwner(path, "someone", "somegroup");
     }
 
     @Test
