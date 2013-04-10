@@ -4,30 +4,28 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
-import nl.esciencecenter.octopus.engine.credentials.Credential;
-import nl.esciencecenter.octopus.engine.credentials.CredentialSet;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
-import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
+
     private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
 
     private static final int DEFAULT_PORT = 22; // The default ssh port.
@@ -149,15 +147,17 @@ public class SshAdaptor extends Adaptor {
             throw new OctopusException("ssh", "Could not set known_hosts file", e);
         }
 
-        HostKeyRepository hkr = jsch.getHostKeyRepository();
-        HostKey[] hks = hkr.getHostKey();
-        if (hks != null) {
-            System.out.println("Host keys in " + hkr.getKnownHostsRepositoryID());
-            for (int i = 0; i < hks.length; i++) {
-                HostKey hk = hks[i];
-                System.out.println(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
+        if (logger.isTraceEnabled()) {
+            HostKeyRepository hkr = jsch.getHostKeyRepository();
+            HostKey[] hks = hkr.getHostKey();
+            if (hks != null) {
+                logger.debug("Host keys in " + hkr.getKnownHostsRepositoryID());
+                for (int i = 0; i < hks.length; i++) {
+                    HostKey hk = hks[i];
+                    logger.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
+                }
+                logger.debug("");
             }
-            System.out.println("");
         }
     }
 
@@ -205,15 +205,14 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected ChannelSftp getSftpChannel(Session session) {
+    protected ChannelSftp getSftpChannel(Session session) throws OctopusException {
         Channel channel;
         try {
             channel = session.openChannel("sftp");
             channel.connect();
             return (ChannelSftp) channel;
         } catch (JSchException e) {
-            e.printStackTrace();
-            return null;
+            throw new OctopusException("ssh", e.getMessage(), e);
         }
     }
 
@@ -222,11 +221,11 @@ public class SshAdaptor extends Adaptor {
         return getSftpChannel(session);
     }
 
-    protected void closeSession(Session session) {
-        session.disconnect();
+    protected void putSftpChannel(URI uri, ChannelSftp channel) {
+        
     }
-
-    protected void closeChannel(Channel channel) {
-        channel.disconnect();
+    
+    private void closeSession(Session session) {
+        session.disconnect();
     }
 }

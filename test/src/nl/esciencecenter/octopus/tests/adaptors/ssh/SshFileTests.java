@@ -1,5 +1,8 @@
 package nl.esciencecenter.octopus.tests.adaptors.ssh;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 
 import junit.framework.Assert;
@@ -15,9 +18,13 @@ public class SshFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Credentials c = octopus.credentials();
-        c.newCertificateCredential(octopus.files().newPath(new URI("/home/rob/.ssh/id_rsa")), octopus.files().newPath(new URI(".ssh/id_rsa.pub")), "rob", "", new URI("ssh:localhost"));
-        
-        URI location = new URI("ssh://rob@localhost" + System.getProperty("java.io.tmpdir"));
+
+        String username = System.getProperty("user.name");
+
+        c.newCertificateCredential(octopus.files().newPath(new URI("/home/" + username + "/.ssh/id_rsa")), octopus.files()
+                .newPath(new URI(".ssh/id_rsa.pub")), username, "", new URI("ssh:localhost"));
+
+        URI location = new URI("ssh://" + username + "@localhost" + System.getProperty("java.io.tmpdir"));
 
         System.err.println("tmpdir = " + location);
 
@@ -28,7 +35,32 @@ public class SshFileTests {
         octopus.end();
     }
 
+    @org.junit.Test
+    public void test2() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        Credentials c = octopus.credentials();
+        String username = System.getProperty("user.name");
+
+        c.newCertificateCredential(octopus.files().newPath(new URI("/home/" + username + "/.ssh/id_rsa")), octopus.files()
+                .newPath(new URI(".ssh/id_rsa.pub")), username, "", new URI("ssh:localhost"));
+
+        URI location = new URI("ssh://" + username + "@localhost/home/rob/.bashrc");
+        System.err.println("location = " + location);
+        Path path = octopus.files().newPath(location);
+
+        InputStream in = octopus.files().newInputStream(path);
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+        while (true) {
+            String line = br.readLine();
+            if (line == null)
+                break;
+            System.err.println(line);
+        }
+
+        octopus.end();
+    }
+
     // test connection refused
     // test com.jcraft.jsch.JSchException: UnknownHostKey: localhost. RSA key fingerprint is a7:08:d3:10:af:df:94:85:d6:65:74:3c:a4:6d:80:48
-
 }
