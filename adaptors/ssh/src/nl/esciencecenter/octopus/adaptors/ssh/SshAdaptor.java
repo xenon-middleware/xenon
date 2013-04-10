@@ -4,21 +4,34 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
+import nl.esciencecenter.octopus.engine.credentials.Credential;
+import nl.esciencecenter.octopus.engine.credentials.CredentialSet;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.HostKey;
+import com.jcraft.jsch.HostKeyRepository;
+import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
+    private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+
+    private static final int DEFAULT_PORT = 22; // The default ssh port.
+
     private static final String ADAPTOR_NAME = "ssh";
 
     private static final String ADAPTOR_DESCRIPTION = "The Ssh adaptor implements all functionality with remove ssh servers.";
@@ -125,14 +138,61 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
+    void setKnownHostsFile(String knownHostsFile) throws OctopusException {
+        try {
+            jsch.setKnownHosts(knownHostsFile);
+        } catch (JSchException e) {
+            throw new OctopusException("ssh", "Could not set known_hosts file", e);
+        }
+
+        HostKeyRepository hkr = jsch.getHostKeyRepository();
+        HostKey[] hks = hkr.getHostKey();
+        if (hks != null) {
+            System.out.println("Host keys in " + hkr.getKnownHostsRepositoryID());
+            for (int i = 0; i < hks.length; i++) {
+                HostKey hk = hks[i];
+                System.out.println(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
+            }
+            System.out.println("");
+        }
+    }
+
     // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
     // TODO cache van sessions / channels
 
-    protected Session getSession(String user, String host, int port) {
+    protected Session getSession(URI uri) throws OctopusException {
+
+        String user = uri.getUserInfo();
+        String host = uri.getHost();
+        int port = uri.getPort();
+
+        if (port < 0) {
+            port = DEFAULT_PORT;
+        }
+        if (host == null) {
+            host = "localhost";
+        }
+
+        CertificateCredential credential = (CertificateCredential) credentialsAdaptor.getCredentialFor(uri);
+        if (credential == null) {
+            throw new OctopusException("ssh", "Could not find any valid credential.");
+        }
+
+        // TODO: sessions are per filesystem, that is when the credential is given. 
+        try {
+            jsch.addIdentity(credential.getKeyfile().getPath(), credential.getPassword());
+        } catch (JSchException e) {
+            throw new OctopusException("ssh", "Could not read private key file.", e);
+        }
+
+        setKnownHostsFile("/home/rob/.ssh/known_hosts");
+
         Session session;
         try {
             session = jsch.getSession(user, host, port);
             // session.setPassword("password");
+            session.setConfig("StrictHostKeyChecking", "no"); // TODO remove
+
             session.connect();
             return session;
         } catch (JSchException e) {
@@ -153,8 +213,8 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected ChannelSftp getSftpChannel(String user, String host, int port) {
-        Session session = getSession(user, host, port);
+    protected ChannelSftp getSftpChannel(URI uri) throws OctopusException {
+        Session session = getSession(uri);
         return getSftpChannel(session);
     }
 

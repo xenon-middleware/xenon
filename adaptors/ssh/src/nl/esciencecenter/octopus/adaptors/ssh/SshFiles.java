@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
 public class SshFiles implements FilesAdaptor {
@@ -99,8 +98,13 @@ public class SshFiles implements FilesAdaptor {
     }
 
     @Override
-    public boolean exists(Path path) throws OctopusIOException {
-        ChannelSftp channel = sshAdaptor.getSftpChannel("rob", "localhost", 22);
+    public boolean exists(Path path) throws OctopusIOException { // TODO more specific exception, octopus really is couldnotinitcredential
+        ChannelSftp channel;
+        try {
+            channel = sshAdaptor.getSftpChannel(path.toUri());
+        } catch (OctopusException e) {
+            throw new OctopusIOException("ssh", e.getMessage(), e);
+        }
 
         try {
             channel.lstat(path.getPath());
