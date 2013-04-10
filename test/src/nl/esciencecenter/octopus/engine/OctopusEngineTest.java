@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.tests.engine;
+package nl.esciencecenter.octopus.engine;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;

@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.tests.engine.files;
+package nl.esciencecenter.octopus.engine.files;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
