@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DeleteOption;
 import nl.esciencecenter.octopus.files.Path;
@@ -87,26 +88,26 @@ public class Sandbox {
         downloadFiles.add(new Pair(path.resolve(src), dest));
     }
 
-    private void copy(List<Pair> pairs) throws OctopusException {
+    private void copy(List<Pair> pairs) throws OctopusIOException {
 
         for (Pair pair : pairs) {
             FileUtils.recursiveCopy(octopus, pair.source, pair.destination, CopyOption.COPY_ATTRIBUTES);
         }
     }
 
-    public void upload() throws OctopusException {
+    public void upload() throws OctopusIOException {
         copy(uploadFiles);
     }
 
-    public void download() throws OctopusException {
+    public void download() throws OctopusIOException {
         copy(downloadFiles);
     }
 
-    public void wipe() throws OctopusException {
+    public void wipe() throws OctopusIOException {
         octopus.files().delete(path, DeleteOption.RECURSIVE, DeleteOption.WIPE);
     }
 
-    public void delete() throws OctopusException {
+    public void delete() throws OctopusIOException {
         octopus.files().delete(path, DeleteOption.RECURSIVE);
     }
 }

@@ -55,7 +55,7 @@ public class CommandRunner {
         return exe;
     }
 
-    public CommandRunner(File workingDir, String... command) throws OctopusException {
+    public CommandRunner(File workingDir, String... command) throws CommandNotFoundException {
         if (command.length == 0) {
             throw new ArrayIndexOutOfBoundsException("runCommand: command array has length 0");
         }
@@ -73,7 +73,7 @@ public class CommandRunner {
         try {
             p = builder.start();
         } catch (IOException e) {
-            throw new CommandNotFoundException("CommandRunner cannot run command " + Arrays.toString(command), e, null, null);
+            throw new CommandNotFoundException(getClass().getName(), "CommandRunner cannot run command " + Arrays.toString(command), e);
         }
 
         // close stdin.

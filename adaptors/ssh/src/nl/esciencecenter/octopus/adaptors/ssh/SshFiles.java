@@ -14,6 +14,7 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AclEntry;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DeleteOption;
@@ -29,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpATTRS;
+import com.jcraft.jsch.SftpException;
 
 public class SshFiles implements FilesAdaptor {
     private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
@@ -54,133 +57,135 @@ public class SshFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path copy(Path source, Path target, CopyOption... options) throws OctopusException {
+    public Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path createSymbolicLink(Path link, Path target) throws OctopusException {
+    public Path createSymbolicLink(Path link, Path target) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void delete(Path path, DeleteOption... options) throws OctopusException {
+    public void delete(Path path, DeleteOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusException {
+    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean exists(Path path) throws OctopusException {
+    public boolean exists(Path path) throws OctopusIOException {
         ChannelSftp channel = sshAdaptor.getSftpChannel("rob", "localhost", 22);
 
-        //        channel.lstat(path);
-        //channel.stat(path);
+        try {
+            SftpATTRS attributes = channel.lstat(path.getPath());
+        } catch (SftpException e) {
+            // TODO throw new 
+        }
 
+        return false;
+    }
+
+    @Override
+    public boolean isDirectory(Path path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isDirectory(Path path) throws OctopusException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Path move(Path source, Path target, CopyOption... options) throws OctopusException {
+    public Path move(Path source, Path target, CopyOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws OctopusException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, Filter filter) throws OctopusException {
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, Filter filter) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws OctopusException {
+    public InputStream newInputStream(Path path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusException {
+            throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public FileAttributes readAttributes(Path path) throws OctopusException {
+    public FileAttributes readAttributes(Path path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws OctopusException {
+    public Path readSymbolicLink(Path link) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path setOwner(Path path, String owner, String group) throws OctopusException {
+    public Path setOwner(Path path, String owner, String group) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException {
+    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void setAcl(Path path, List<AclEntry> acl) throws OctopusException {
+    public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException {
         // TODO Auto-generated method stub
 
     }

@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.Path;
 
@@ -23,7 +24,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
     private final Path dir;
 
-    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException {
+    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException {
         try {
             this.dir = dir;
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
@@ -32,11 +33,11 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
             this.readAhead = new ArrayList<Path>();
 
         } catch (IOException e) {
-            throw new OctopusException("could not create directory stream", e, null, null);
+            throw new OctopusIOException("LocalDirectoryStream", "could not create directory stream", e);
         }
     }
 
-    private Path gatPath(java.nio.file.Path path) throws OctopusException {
+    private Path getPath(java.nio.file.Path path) throws OctopusException {
         return dir.resolve(path.getFileName().toString());
     }
 
@@ -46,11 +47,11 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     }
 
     @Override
-    public void close() throws OctopusException {
+    public void close() throws OctopusIOException {
         try {
             stream.close();
         } catch (IOException e) {
-            throw new OctopusException("Cannot close stream", e, null, null);
+            throw new OctopusIOException("LocalDirectoryStream", "Cannot close stream", e);
         }
     }
 
@@ -61,7 +62,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
                 return true;
             }
             while (iterator.hasNext()) {
-                Path next = gatPath(iterator.next());
+                Path next = getPath(iterator.next());
                 if (filter.accept(next)) {
                     readAhead.add(next);
                     return true;
@@ -69,7 +70,9 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
             }
             return false;
         } catch (OctopusException e) {
-            throw new DirectoryIteratorException("error on getting next element", e, "local", dir.toUri());
+            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
+        } catch (OctopusIOException e) {
+            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
         }
     }
 
@@ -81,20 +84,21 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
         try {
             while (iterator.hasNext()) {
-                Path next = gatPath(iterator.next());
+                Path next = getPath(iterator.next());
                 if (filter.accept(next)) {
                     return next;
                 }
             }
             throw new NoSuchElementException("no more files in directory");
         } catch (OctopusException e) {
-            throw new DirectoryIteratorException("error on getting next element", e, "local", dir.toUri());
+            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
+        } catch (OctopusIOException e) {
+            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
         }
     }
 
     @Override
     public synchronized void remove() {
-        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local", dir.toUri());
-
+        throw new DirectoryIteratorException("LocalDirectoryStream", "DirectoryStream iterator does not support remove");
     }
 }

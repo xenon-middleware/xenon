@@ -79,7 +79,7 @@ public class LocalJobs implements JobsAdaptor {
         localAdaptor.checkURI(location);
 
         if (location.getPath() != null && location.getPath().length() > 0) {
-            throw new OctopusException("Non-empty path in a local scheduler URI is not allowed", "local", location);
+            throw new OctopusException("local", "Non-empty path in a local scheduler URI is not allowed");
         }
 
         // FIXME: This simply returns a new SchedulerImplementation, but ignores properties and credentials completely.    	
@@ -171,7 +171,7 @@ public class LocalJobs implements JobsAdaptor {
             }
         }        
         
-        throw new OctopusException("Job not found: " + job.getIdentifier());        
+        throw new OctopusException("local", "Job not found: " + job.getIdentifier());        
     }
         
     @Override
@@ -180,7 +180,7 @@ public class LocalJobs implements JobsAdaptor {
         Scheduler s = job.getScheduler();
         
         if (!s.getAdaptorName().equals(localAdaptor.getName())) { 
-            throw new OctopusException("Job was not started by adaptor " + localAdaptor.getName());
+            throw new OctopusException("local", "Job was not started by adaptor " + localAdaptor.getName());
         }
         
         LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
