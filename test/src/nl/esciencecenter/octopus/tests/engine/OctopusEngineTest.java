@@ -18,7 +18,7 @@ public class OctopusEngineTest {
     @Test
     public void testNewEngineWithNulls() throws OctopusException {
         Octopus octopus = OctopusEngine.newEngine(null);
-        assertThat(octopus.getDefaultProperties(), is(new Properties()));
+        assertThat(octopus.getProperties(), is(new Properties()));
     }
 
     @Test
@@ -26,7 +26,7 @@ public class OctopusEngineTest {
         Properties properties = new Properties();
         properties.setProperty("key", "value");
         Octopus octopus = OctopusEngine.newEngine(properties);
-        assertThat(octopus.getDefaultProperties(), is(properties));
+        assertThat(octopus.getProperties(), is(properties));
     }
 
     public OctopusEngine getEngineWithOnlyLocalAdaptor() throws OctopusException {
