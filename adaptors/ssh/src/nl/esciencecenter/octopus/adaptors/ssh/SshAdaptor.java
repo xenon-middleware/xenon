@@ -67,12 +67,16 @@ public class SshAdaptor extends Adaptor {
     private JSch jsch;
 
     public SshAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+        this(properties, octopusEngine, new JSch());
+    }
+
+    public SshAdaptor(OctopusProperties properties, OctopusEngine octopusEngine, JSch jsch) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
         this.filesAdaptor = new SshFiles(properties, this, octopusEngine);
         this.jobsAdaptor = new SshJobs(properties, this, octopusEngine);
         this.credentialsAdaptor = new SshCredentials(properties, this, octopusEngine);
-        jsch = new JSch();
+        this.jsch = jsch;
     }
 
     void checkURI(URI location) throws OctopusException {
@@ -191,7 +195,7 @@ public class SshAdaptor extends Adaptor {
         try {
             session = jsch.getSession(user, host, port);
             // session.setPassword("password");
-            session.setConfig("StrictHostKeyChecking", "no"); // TODO remove
+            // session.setConfig("StrictHostKeyChecking", "no");
 
             session.connect();
             return session;

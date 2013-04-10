@@ -13,6 +13,7 @@ import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
+import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AclEntry;
@@ -30,17 +31,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
 public class SshFiles implements FilesAdaptor {
     private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
 
     private final OctopusEngine octopusEngine;
-    private final SshAdaptor sshAdaptor;
+    private final SshAdaptor adaptor;
 
     public SshFiles(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
-        this.sshAdaptor = sshAdaptor;
+        this.adaptor = sshAdaptor;
 
         if (logger.isDebugEnabled()) {
             Set<String> attributeViews = FileSystems.getDefault().supportedFileAttributeViews();
@@ -51,8 +53,8 @@ public class SshFiles implements FilesAdaptor {
 
     @Override
     public Path newPath(OctopusProperties properties, URI location) throws OctopusException {
-        sshAdaptor.checkURI(location);
-        return new PathImplementation(properties, location, sshAdaptor.getName(), octopusEngine);
+        adaptor.checkURI(location);
+        return new PathImplementation(properties, location, adaptor.getName(), octopusEngine);
     }
 
     @Override
@@ -69,8 +71,24 @@ public class SshFiles implements FilesAdaptor {
 
     @Override
     public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        if (exists(dir)) {
+            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
+        }
+        
+        ChannelSftp channel;
+        try {
+            channel = adaptor.getSftpChannel(dir.toUri());
+        } catch (OctopusException e) { // TODO more specific exception types
+            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+        }
+
+        try {
+            channel.mkdir(dir.getPath());
+        } catch (SftpException e) {
+            throw adaptor.sftpExceptionToOctopusException(e);
+        }
+
+        return dir;
     }
 
     @Override
@@ -87,7 +105,6 @@ public class SshFiles implements FilesAdaptor {
 
     @Override
     public void delete(Path path, DeleteOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
 
     }
 
@@ -101,9 +118,9 @@ public class SshFiles implements FilesAdaptor {
     public boolean exists(Path path) throws OctopusIOException { // TODO more specific exception, octopus really is couldnotinitcredential
         ChannelSftp channel;
         try {
-            channel = sshAdaptor.getSftpChannel(path.toUri());
-        } catch (OctopusException e) {
-            throw new OctopusIOException("ssh", e.getMessage(), e);
+            channel = adaptor.getSftpChannel(path.toUri());
+        } catch (OctopusException e) { // TODO more specific exception types
+            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
         }
 
         try {
@@ -113,7 +130,7 @@ public class SshFiles implements FilesAdaptor {
                 return false;
             }
                 
-            throw sshAdaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToOctopusException(e);
         }
 
         return true;
@@ -121,8 +138,19 @@ public class SshFiles implements FilesAdaptor {
 
     @Override
     public boolean isDirectory(Path path) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return false;
+        ChannelSftp channel;
+        try {
+            channel = adaptor.getSftpChannel(path.toUri());
+        } catch (OctopusException e) { // TODO more specific exception types
+            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+        }
+
+        try {
+            SftpATTRS attributes = channel.lstat(path.getPath());
+            return attributes.isDir();
+        } catch (SftpException e) {
+            throw adaptor.sftpExceptionToOctopusException(e);
+        }
     }
 
     @Override
