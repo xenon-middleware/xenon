@@ -56,7 +56,7 @@ public class FileUtils {
 
         for (CopyOption copyOption : options) {
             if (copyOption != CopyOption.REPLACE_EXISTING) {
-                throw new UnsupportedOperationException("FileUtils", "unsupported copy option " + copyOption + " for " + target.toUri());
+                throw new UnsupportedOperationException("FileUtils", "unsupported copy option " + copyOption + " for " + target);
             }
             openOption = OpenOption.TRUNCATE_EXISTING;
         }
@@ -265,5 +265,13 @@ public class FileUtils {
         // MUST ALSO HANDLE DIRECT FILE COPIES!    	
         // FIXME!!!
         throw new OctopusIOException("FileUtils", "NOT IMPLEMENTED!");
+    }
+
+    public static void recursiveDelete(Octopus octopus, Path path) {
+        // TODO Auto-generated method stub
+    }
+
+    public static void recursiveWipe(Octopus octopus, Path path) {
+        // TODO Auto-generated method stub
     }
 }

@@ -2,7 +2,6 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -16,8 +15,6 @@ import org.slf4j.LoggerFactory;
 public class LocalJobExecutor implements Runnable {
 
     protected static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
-
-    private final OctopusEngine engine;
 
     private final Job job;
 
@@ -33,17 +30,16 @@ public class LocalJobExecutor implements Runnable {
 
     private Exception error;
 
-    public LocalJobExecutor(Job job, OctopusEngine engine) throws BadParameterException {
+    public LocalJobExecutor(Job job) throws BadParameterException {
 
-        this.engine = engine;
         this.job = job;
 
         if (job.getJobDescription().getProcessesPerNode() <= 0) {
-            throw new BadParameterException("number of processes cannot be negative or 0", "local", null);
+            throw new BadParameterException("number of processes cannot be negative or 0", LocalAdaptor.ADAPTOR_NAME, null);
         }
 
         if (job.getJobDescription().getNodeCount() != 1) {
-            throw new BadParameterException("number of nodes must be 1", "local", null);
+            throw new BadParameterException("number of nodes must be 1", LocalAdaptor.ADAPTOR_NAME, null);
         }
 
         // thread will be started by local scheduler
@@ -51,7 +47,7 @@ public class LocalJobExecutor implements Runnable {
 
     public synchronized int getExitStatus() throws OctopusException {
         if (!isDone()) {
-            throw new OctopusException("Cannot get state, job not done yet", "local", null);
+            throw new OctopusException("Cannot get state, job not done yet", LocalAdaptor.ADAPTOR_NAME, null);
         }
         return exitCode;
     }
@@ -85,7 +81,7 @@ public class LocalJobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
-        return new JobStatusImplementation(job, state, exitCode, error, done);
+        return new JobStatusImplementation(job, state, exitCode, error, done, null);
     }
     
     public synchronized String getState() {
@@ -120,7 +116,7 @@ public class LocalJobExecutor implements Runnable {
             ParallelProcess parallelProcess =
                     new ParallelProcess(description.getProcessesPerNode(), description.getExecutable(),
                             description.getArguments(), description.getEnvironment(), description.getWorkingDirectory(),
-                            description.getStdin(), description.getStdout(), description.getStderr(), engine);
+                            description.getStdin(), description.getStdout(), description.getStderr());
 
             updateState("RUNNING");
 

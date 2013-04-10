@@ -1,20 +1,23 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
+import java.util.Properties;
 
 import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SshJobs implements JobsAdaptor {
+public class SshJobs implements Jobs {
 
     private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
 
@@ -24,16 +27,26 @@ public class SshJobs implements JobsAdaptor {
 
     private final OctopusProperties properties;
 
-    public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine)
-            throws OctopusException {
+    public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
 
         this.octopusEngine = octopusEngine;
         this.sshAdaptor = sshAdaptor;
         this.properties = properties;
     }
-    
+
+    protected void end() {
+
+    }
+
     @Override
-    public Scheduler newScheduler(OctopusProperties properties, URI location) throws OctopusException {
+    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+            OctopusIOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public JobDescription newJobDescription() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -45,7 +58,13 @@ public class SshJobs implements JobsAdaptor {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException {
+    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -57,7 +76,7 @@ public class SshJobs implements JobsAdaptor {
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException {
+    public JobStatus[] getJobStatuses(Job... jobs) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -65,28 +84,6 @@ public class SshJobs implements JobsAdaptor {
     @Override
     public void cancelJob(Job job) throws OctopusException {
         // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void cancelJobs(Job... jobs) throws OctopusException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Job[] submitJobs(Scheduler scheduler, JobDescription... descriptions) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    protected void end() {
 
     }
 }

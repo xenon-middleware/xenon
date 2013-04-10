@@ -4,25 +4,43 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
-import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.DirectoryStream;
 
 public interface Files {
 
     // functions used to create files and streams
+    
+    /**
+     * Create a new FileSystem that represents a (possibly remote) data store at the given location and using the given 
+     * credentials.  
+     * 
+     * @param location the location of the FileSystem.
+     * @param credential the credentials to use to get access to the FileSystem. 
+     * @param properties optional properties to use when creating the FileSystem.
+     * @return
+     * @throws OctopusException
+     * @throws OctopusIOException
+     */
+    public FileSystem newFileSystem(URI location, Credential credential, OctopusProperties properties) 
+            throws OctopusException, OctopusIOException;
 
-    public Path newPath(URI location) throws OctopusException;
-
-    public Path newPath(Properties properties, URI location) throws OctopusException;
-
+    // FIXME add getCWDFileSystem()
+    // FIXME add getHomeFileSystem()
+    
+    public Path newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException;
+    
+    public void close(FileSystem filesystem) throws OctopusException, OctopusIOException;
+    
+    public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException;
+        
     /**
      * Copy a file to a target file.
      * 
@@ -47,7 +65,7 @@ public interface Files {
      * @throws FileAlreadyExistsException
      *             if {@code dir} exists but is not a directory <i>(optional specific exception)</i>
      */
-    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
+    //public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Creates a directory by creating all nonexistent parent directories first.
@@ -70,7 +88,7 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
+   // public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Creates a new directory.
@@ -95,8 +113,11 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
+    //public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
+    public Path createFile(Path path) throws OctopusIOException;
+
+    
     /**
      * Creates a symbolic link to a target (optional operation).
      * 
@@ -112,13 +133,8 @@ public interface Files {
     /**
      * Deletes a file.
      */
-    public void delete(Path path, DeleteOption... options) throws OctopusIOException;
-
-    /**
-     * Deletes a file if it exists.
-     */
-    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException;
-
+    public void delete(Path path) throws OctopusIOException;
+    
     /**
      * Tests whether a file exists.
      */
@@ -168,7 +184,7 @@ public interface Files {
             throws OctopusIOException;
 
     /** Opens a file, returning an input stream to read from the file. */
-    InputStream newInputStream(Path path) throws OctopusIOException;
+    public InputStream newInputStream(Path path) throws OctopusIOException;
 
     /**
      * Opens or creates a file, returning an output stream that may be used to write bytes to the file. If no options are present
@@ -215,5 +231,5 @@ public interface Files {
     /**
      * Updates (replace) the access control list.
      */
-    public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException;
+    // public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException;
 }

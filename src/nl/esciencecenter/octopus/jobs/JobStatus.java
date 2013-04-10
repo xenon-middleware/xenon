@@ -1,5 +1,7 @@
 package nl.esciencecenter.octopus.jobs;
 
+import java.util.Map;
+
 public interface JobStatus {
 
     public Job getJob();
@@ -8,9 +10,11 @@ public interface JobStatus {
 
     public Integer getExitCode();
 
-    public Exception getError();
+    public Exception getException();
 
     public boolean isDone();
 
-    public boolean hasError();
+    public boolean hasException();
+    
+    public Map<String, String> getSchedulerSpecficInformation();    
 }

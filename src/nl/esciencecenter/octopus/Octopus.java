@@ -14,9 +14,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
  */
 public interface Octopus {
 
-    public Properties getDefaultProperties();
-
-    public void setDefaultProperties(Properties properties);
+    public Properties getProperties();
 
     public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
 

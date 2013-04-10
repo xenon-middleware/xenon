@@ -8,7 +8,9 @@ import java.net.URI;
 import junit.framework.Assert;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Path;
 
 public class SshFileTests {
@@ -21,14 +23,15 @@ public class SshFileTests {
 
         String username = System.getProperty("user.name");
 
-        c.newCertificateCredential(octopus.files().newPath(new URI("/home/" + username + "/.ssh/id_rsa")), octopus.files()
-                .newPath(new URI(".ssh/id_rsa.pub")), username, "", new URI("ssh:localhost"));
+        Credential credential = c.newCertificateCredential("/home/" + username + "/.ssh/id_rsa", ".ssh/id_rsa.pub", username, "");
 
         URI location = new URI("ssh://" + username + "@localhost" + System.getProperty("java.io.tmpdir"));
 
         System.err.println("tmpdir = " + location);
 
-        Path path = octopus.files().newPath(location);
+        FileSystem fileSystem = octopus.files().newFileSystem(new URI("/"), credential, null); 
+
+        Path path = octopus.files().newPath(fileSystem, location.getPath());
 
         Assert.assertTrue(octopus.files().exists(path));
 
@@ -40,13 +43,10 @@ public class SshFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
+        Credential credential = c.newCertificateCredential("/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
 
-        c.newCertificateCredential(octopus.files().newPath(new URI("/home/" + username + "/.ssh/id_rsa")), octopus.files()
-                .newPath(new URI(".ssh/id_rsa.pub")), username, "", new URI("ssh:localhost"));
-
-        URI location = new URI("ssh://" + username + "@localhost/home/rob/.bashrc");
-        System.err.println("location = " + location);
-        Path path = octopus.files().newPath(location);
+        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost/home/rob"), credential, null); 
+        Path path = octopus.files().newPath(fileSystem, ".bashrc");
 
         InputStream in = octopus.files().newInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));

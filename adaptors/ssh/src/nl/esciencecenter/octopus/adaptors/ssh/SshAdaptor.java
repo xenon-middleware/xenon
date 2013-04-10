@@ -5,12 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.jobs.Jobs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,17 +92,17 @@ public class SshAdaptor extends Adaptor {
     }
 
     @Override
-    public SshFiles filesAdaptor() {
+    public Files filesAdaptor() {
         return filesAdaptor;
     }
 
     @Override
-    public SshJobs jobsAdaptor() {
+    public Jobs jobsAdaptor() {
         return jobsAdaptor;
     }
 
     @Override
-    public CredentialsAdaptor credentialsAdaptor() {
+    public Credentials credentialsAdaptor() {
         return credentialsAdaptor;
     }
 
