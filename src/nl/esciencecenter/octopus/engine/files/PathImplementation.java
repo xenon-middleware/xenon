@@ -252,4 +252,9 @@ public final class PathImplementation implements Path {
         return null;
     }
 
+    @Override
+    public boolean isLocal() {
+        return filesystem.getAdaptorName().equals("local");
+    }
+
 }

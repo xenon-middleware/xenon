@@ -35,4 +35,6 @@ public interface Path {
     public Iterator<Path> iterator();
 
     public String getPath();
+    
+    public boolean isLocal();
 }
