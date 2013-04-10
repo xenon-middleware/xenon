@@ -71,8 +71,6 @@ public class LocalJobs implements JobsAdaptor {
         if (maxQSize < 0 && maxQSize != -1) {
             throw new BadParameterException("max q size cannot be negative (excluding -1 for unlimited)", "local", null);
         }
-
-        // this.scheduler = new LocalScheduler(properties, octopusEngine);
     }
 
     @Override
@@ -138,6 +136,9 @@ public class LocalJobs implements JobsAdaptor {
     @Override
     public synchronized Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException {
 
+        
+        
+        
         if (queueName == null || queueName.equals("single")) {
             return getJobs(singleQ.toArray(new LocalJobExecutor[0]));
         } else if (queueName.equals("multi")) {
@@ -149,29 +150,69 @@ public class LocalJobs implements JobsAdaptor {
         }
     }
 
+    private LinkedList<LocalJobExecutor> findQueue(String queueName) throws OctopusException { 
+        
+        if (queueName == null || queueName.equals("single")) {
+            return singleQ;
+        } else if (queueName.equals("multi")) {
+            return multiQ;
+        } else if (queueName.equals("unlimited")) {
+            return unlimitedQ;
+        } else {
+            throw new OctopusException("queue \"" + queueName + "\" does not exist", "local", null);
+        }        
+    }
+    
+    private LocalJobExecutor findJob(LinkedList<LocalJobExecutor> queue, Job job) throws OctopusException { 
+        
+        for (LocalJobExecutor e : queue) { 
+            if (e.getJob().equals(job)) { 
+                return e;
+            }
+        }        
+        
+        throw new OctopusException("local", "Job not found: " + job.getIdentifier());        
+    }
+        
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException {
-
-        // TODO Auto-generated method stub
-        return null;
+        
+        Scheduler s = job.getScheduler();
+        
+        if (!s.getAdaptorName().equals(localAdaptor.getName())) { 
+            throw new OctopusException("local", "Job was not started by adaptor " + localAdaptor.getName());
+        }
+        
+        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        LocalJobExecutor executor = findJob(tmp, job);
+        return executor.getStatus();
     }
 
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        
+        JobStatus[] result = new JobStatus[jobs.length];
+
+        for (int i=0;i<jobs.length;i++) { 
+            result[i] = getJobStatus(jobs[i]);
+        }
+        
+        return result;
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
-        // TODO Auto-generated method stub
-
-    }
+    public void cancelJob(Job job) throws OctopusException {   
+        // FIXME: What if job is already gone?
+        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        findJob(tmp, job).kill();
+    }        
 
     @Override
     public void cancelJobs(Job... jobs) throws OctopusException {
-        // TODO Auto-generated method stub
-
+        // FIXME: What if job is already gone?
+        for (Job j : jobs) { 
+            cancelJob(j);
+        }
     }
 
     @Override

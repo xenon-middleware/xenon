@@ -119,6 +119,7 @@ public class OctopusEngine implements Octopus {
      * @return the adaptor
      */
     public Adaptor getAdaptorFor(String scheme) throws OctopusException {
+        
         for (Adaptor adaptor : adaptors) {
             if (adaptor.supports(scheme)) {
                 return adaptor;

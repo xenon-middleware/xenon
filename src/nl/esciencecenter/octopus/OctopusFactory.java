@@ -26,7 +26,7 @@ public class OctopusFactory {
         return OctopusEngine.newEngine(properties);
     }
 
-    public void end() {
+    public static void end() {
         OctopusEngine.endEngines();
     }
 }
