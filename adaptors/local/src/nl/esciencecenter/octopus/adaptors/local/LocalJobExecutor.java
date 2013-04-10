@@ -3,10 +3,12 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.io.IOException;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.JobStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,7 @@ public class LocalJobExecutor implements Runnable {
 
     private final Job job;
 
-    private int exitStatus;
+    private Integer exitCode;
 
     private Thread thread = null;
 
@@ -51,11 +53,11 @@ public class LocalJobExecutor implements Runnable {
         if (!isDone()) {
             throw new OctopusException("Cannot get state, job not done yet", "local", null);
         }
-        return exitStatus;
+        return exitCode;
     }
 
     private synchronized void setExitStatus(int exitStatus) {
-        this.exitStatus = exitStatus;
+        this.exitCode = exitStatus;
     }
 
     public synchronized void kill() throws OctopusException {
@@ -82,6 +84,10 @@ public class LocalJobExecutor implements Runnable {
         return job;
     }
 
+    public synchronized JobStatus getStatus() {
+        return new JobStatusImplementation(job, state, exitCode, error, done);
+    }
+    
     public synchronized String getState() {
         return state;
     }
@@ -94,7 +100,6 @@ public class LocalJobExecutor implements Runnable {
     public void run() {
 
         try {
-
             synchronized (this) {
                 if (killed) {
                     updateState("KILLED");
