@@ -103,12 +103,16 @@ public class SshFiles implements FilesAdaptor {
         ChannelSftp channel = sshAdaptor.getSftpChannel("rob", "localhost", 22);
 
         try {
-            SftpATTRS attributes = channel.lstat(path.getPath());
+            channel.lstat(path.getPath());
         } catch (SftpException e) {
-            // TODO throw new 
+            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+                return false;
+            }
+                
+            throw sshAdaptor.sftpExceptionToOctopusException(e);
         }
 
-        return false;
+        return true;
     }
 
     @Override

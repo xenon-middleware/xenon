@@ -9,12 +9,14 @@ import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
     private static final String ADAPTOR_NAME = "ssh";
@@ -53,7 +55,7 @@ public class SshAdaptor extends Adaptor {
 
     public SshAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
-        
+
         this.filesAdaptor = new SshFiles(properties, this, octopusEngine);
         this.jobsAdaptor = new SshJobs(properties, this, octopusEngine);
         this.credentialsAdaptor = new SshCredentials(properties, this, octopusEngine);
@@ -97,6 +99,32 @@ public class SshAdaptor extends Adaptor {
         return getName();
     }
 
+    // TODO make specific exceptions
+    OctopusIOException sftpExceptionToOctopusException(SftpException e) {
+        switch (e.id) {
+        case ChannelSftp.SSH_FX_OK:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_EOF:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_NO_SUCH_FILE:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_PERMISSION_DENIED:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_FAILURE:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_BAD_MESSAGE:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_NO_CONNECTION:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_CONNECTION_LOST:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        default:
+            return new OctopusIOException("ssh", e.getMessage(), e);
+        }
+    }
+
     // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
     // TODO cache van sessions / channels
 
@@ -104,7 +132,7 @@ public class SshAdaptor extends Adaptor {
         Session session;
         try {
             session = jsch.getSession(user, host, port);
-            session.setPassword("password");
+            // session.setPassword("password");
             session.connect();
             return session;
         } catch (JSchException e) {
