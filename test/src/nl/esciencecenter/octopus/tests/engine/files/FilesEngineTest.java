@@ -14,6 +14,7 @@ import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 
 import org.junit.Test;
@@ -115,7 +116,7 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testCopy_SameAdaptors_MockedAdaptorCopies() throws OctopusException, URISyntaxException {
+    public void testCopy_SameAdaptors_MockedAdaptorCopies() throws URISyntaxException, OctopusIOException, OctopusException {
         FilesAdaptor files_adaptor = mock(FilesAdaptor.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
         FilesEngine engine = new FilesEngine(octopus);
@@ -145,13 +146,13 @@ public class FilesEngineTest {
         try {
             engine.copy(source, target);
             fail("No exception thrown");
-        } catch (OctopusException e) {
+        } catch (OctopusIOException e) {
             assertThat(e.getMessage(), is("cannot do inter-scheme third party copy (yet)"));
         }
     }
 
     @Test
-    public void testCopy_SourceIsLocalAdaptor_TargetAdaptorCopies() throws URISyntaxException, OctopusException {
+    public void testCopy_SourceIsLocalAdaptor_TargetAdaptorCopies() throws URISyntaxException, OctopusException, OctopusIOException {
         FilesAdaptor source_adaptor = mock(FilesAdaptor.class);
         FilesAdaptor target_adaptor = mock(FilesAdaptor.class);
         OctopusEngine octopus = fakeOctopus(source_adaptor, "alocal", "file");
@@ -169,7 +170,7 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testCopy_TargetIsLocalAdaptor_SourceAdaptorCopies() throws URISyntaxException, OctopusException {
+    public void testCopy_TargetIsLocalAdaptor_SourceAdaptorCopies() throws URISyntaxException, OctopusException, OctopusIOException {
         FilesAdaptor source_adaptor = mock(FilesAdaptor.class);
         FilesAdaptor target_adaptor = mock(FilesAdaptor.class);
         OctopusEngine octopus = fakeOctopus(source_adaptor, "agridftp", "gridftp");
@@ -272,7 +273,7 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testSetOwner_MockedFilesAdaptor_FilesAdaptorSetOwnerCalled() throws URISyntaxException, OctopusException {
+    public void testSetOwner_MockedFilesAdaptor_FilesAdaptorSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
         FilesAdaptor files_adaptor = mock(FilesAdaptor.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
 
