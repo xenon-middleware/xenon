@@ -10,7 +10,7 @@ import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.util.OSUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.Path;
 
 /**
@@ -75,10 +75,9 @@ public class PathImplementation implements Path {
             try {
                 return new URI(location.getScheme(), location.getAuthority(), path, null, null);
             } catch (URISyntaxException e) {
-                throw new DeployRuntimeException("Could not create URI", e, null, null);
+                throw new OctopusRuntimeException("PathImplementation", "Could not create URI", e);
             }
         }
-
     }
 
     private final OctopusProperties properties;

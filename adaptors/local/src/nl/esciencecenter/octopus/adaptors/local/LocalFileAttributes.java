@@ -8,6 +8,7 @@ import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AclEntry;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Path;
@@ -21,7 +22,7 @@ public class LocalFileAttributes implements FileAttributes {
     private final boolean writable;
     private final boolean hidden;
 
-    public LocalFileAttributes(Path path) throws OctopusException {
+    public LocalFileAttributes(Path path) throws OctopusIOException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
 
@@ -33,7 +34,7 @@ public class LocalFileAttributes implements FileAttributes {
             hidden = Files.isHidden(javaPath);
 
         } catch (IOException e) {
-            throw new OctopusException("Cannot read attributes", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Cannot read attributes", e);
         }
     }
 

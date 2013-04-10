@@ -53,18 +53,17 @@ public class LocalAdaptor extends Adaptor {
     }
 
     void checkURI(URI location) throws OctopusException {
-
         String scheme = location.getScheme();
 
-        if (!supports(scheme)) {
-            throw new OctopusException("Local adaptor does not support scheme " + scheme, ADAPTOR_NAME, location);
+        if (scheme != null && !supports(scheme)) {
+            throw new OctopusException(getClass().getName(), "Local adaptor does not support scheme " + scheme);
         }
 
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
-            throw new OctopusException("Local adaptor only supports url with empty host or \"localhost\", not \""
-                    + location.getHost() + "\"", ADAPTOR_NAME, location);
+            throw new OctopusException(getClass().getName(), "Local adaptor only supports url with empty host or \"localhost\", not \""
+                    + location.getHost() + "\"");
         }
     }
     

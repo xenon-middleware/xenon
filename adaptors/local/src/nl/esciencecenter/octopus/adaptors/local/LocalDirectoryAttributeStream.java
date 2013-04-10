@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import nl.esciencecenter.octopus.engine.files.AbstractPathAttributes;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Path;
@@ -28,7 +29,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
 
     private final Path dir;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, Path dir, DirectoryStream.Filter filter) throws OctopusException {
+    LocalDirectoryAttributeStream(LocalFiles localFiles, Path dir, DirectoryStream.Filter filter) throws OctopusIOException {
         this.localFiles = localFiles;
         this.dir = dir;
         this.filter = filter;
@@ -38,12 +39,16 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
         } catch (IOException e) {
-            throw new OctopusException("could not create directory stream", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not create directory stream", e);
         }
     }
 
-    private Path gatPath(java.nio.file.Path path) throws OctopusException {
-        return dir.resolve(path.getFileName().toString());
+    private Path gatPath(java.nio.file.Path path) throws OctopusIOException {
+        try {
+            return dir.resolve(path.getFileName().toString());
+        } catch (OctopusException e) {
+            throw new OctopusIOException(getClass().getName(), e.getMessage(), e);
+        }
     }
 
     @Override
@@ -52,11 +57,11 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
     }
 
     @Override
-    public void close() throws OctopusException {
+    public void close() throws OctopusIOException {
         try {
             stream.close();
         } catch (IOException e) {
-            throw new OctopusException("Cannot close stream", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Cannot close stream", e);
         }
     }
 
@@ -74,8 +79,8 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
                 }
             }
             return false;
-        } catch (OctopusException e) {
-            throw new DirectoryIteratorException("error on getting next element", e, "local", dir.toUri());
+        } catch (OctopusIOException e) {
+            throw new DirectoryIteratorException(getClass().getName(), "error on getting next element", e);
         }
     }
 
@@ -96,14 +101,13 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
                 }
             }
             throw new NoSuchElementException("no more files in directory");
-        } catch (OctopusException e) {
-            throw new DirectoryIteratorException("error on getting next element", e, "local", dir.toUri());
+        } catch (OctopusIOException e) {
+            throw new DirectoryIteratorException(getClass().getName(), "error on getting next element", e);
         }
     }
 
     @Override
     public synchronized void remove() {
-        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local", dir.toUri());
-
+        throw new DirectoryIteratorException(getClass().getName(), "DirectoryStream iterator does not support remove");
     }
 }

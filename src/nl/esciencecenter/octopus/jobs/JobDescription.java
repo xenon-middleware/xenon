@@ -221,7 +221,7 @@ public class JobDescription {
     public void setWorkingDirectory(Path workingDirectory) throws OctopusException {
 
         if (!workingDirectory.isLocal()) {
-            throw new OctopusException("Working directory must be local not " + workingDirectory);
+            throw new OctopusException("JobDescription", "Working directory must be local not " + workingDirectory);
         }
 
         this.workingDirectory = workingDirectory;

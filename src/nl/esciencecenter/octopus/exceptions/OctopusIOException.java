@@ -1,25 +1,21 @@
 package nl.esciencecenter.octopus.exceptions;
 
-import java.net.URI;
+import java.io.IOException;
 
-public class DeployRuntimeException extends RuntimeException {
+public class OctopusIOException extends IOException {
 
     private static final long serialVersionUID = 1L;
 
     private final String adaptorName;
 
-    private final URI uri;
-
-    public DeployRuntimeException(String s, String adaptorName, URI uri) {
-        super(s);
+    public OctopusIOException(String adaptorName, String message) {
+        super(message);
         this.adaptorName = adaptorName;
-        this.uri = uri;
     }
 
-    public DeployRuntimeException(String message, Throwable t, String adaptorName, URI uri) {
+    public OctopusIOException(String adaptorName, String message, Throwable t) {
         super(message, t);
         this.adaptorName = adaptorName;
-        this.uri = uri;
     }
 
     @Override
@@ -27,10 +23,6 @@ public class DeployRuntimeException extends RuntimeException {
         String result = super.getMessage();
         if (adaptorName != null) {
             result = adaptorName + " adaptor: " + result;
-        }
-
-        if (uri != null) {
-            result = result + " (uri = " + uri + ")";
         }
 
         return result;

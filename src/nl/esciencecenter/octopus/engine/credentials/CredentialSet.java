@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 
 /**
  * Container class for Credentials.
@@ -61,14 +61,14 @@ public class CredentialSet {
             return;
         }
         if (readOnly) {
-            throw new DeployRuntimeException("cannot add credential to read only credentials object", null, null);
+            throw new OctopusRuntimeException("cannot add credential to read only credentials object", null, null);
         }
         credentials.add(credential);
     }
 
     public synchronized void remove(Credential credential) {
         if (readOnly) {
-            throw new DeployRuntimeException("cannot remove credential from read only credentials object", null, null);
+            throw new OctopusRuntimeException("cannot remove credential from read only credentials object", null, null);
         }
 
         credentials.remove(credential);
@@ -79,7 +79,7 @@ public class CredentialSet {
             return;
         }
         if (readOnly) {
-            throw new DeployRuntimeException("cannot add credentials to read only credentials object", null, null);
+            throw new OctopusRuntimeException("cannot add credentials to read only credentials object", null, null);
         }
         this.credentials.addAll(moreCredentials.credentials);
     }

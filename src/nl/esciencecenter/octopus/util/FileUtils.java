@@ -16,6 +16,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -55,7 +56,7 @@ public class FileUtils {
 
         for (CopyOption copyOption : options) {
             if (copyOption != CopyOption.REPLACE_EXISTING) {
-                throw new UnsupportedOperationException("unsupported copy option " + copyOption, null, target.toUri());
+                throw new UnsupportedOperationException("FileUtils", "unsupported copy option " + copyOption + " for " + target.toUri());
             }
             openOption = OpenOption.TRUNCATE_EXISTING;
         }
@@ -72,7 +73,7 @@ public class FileUtils {
                 totalBytes += read;
             }
         } catch (IOException e) {
-            throw new OctopusException("failed to copy stream to file", e, null, null);
+            throw new OctopusException("FileUtils", "failed to copy stream to file", e);
         }
     }
 
@@ -99,14 +100,15 @@ public class FileUtils {
                 totalBytes += read;
             }
         } catch (IOException e) {
-            throw new OctopusException("failed to copy stream to file", e, null, null);
+            throw new OctopusException("FileUtils", "failed to copy stream to file", e);
         }
     }
 
     /**
      * Opens a file for reading, returning a BufferedReader that may be used to read text from the file in an efficient manner.
+     * @throws OctopusIOException 
      */
-    public static BufferedReader newBufferedReader(Octopus octopus, Path path, Charset cs) throws OctopusException {
+    public static BufferedReader newBufferedReader(Octopus octopus, Path path, Charset cs) throws OctopusIOException {
         InputStream in = octopus.files().newInputStream(path);
 
         return new BufferedReader(new InputStreamReader(in, cs));
@@ -117,7 +119,7 @@ public class FileUtils {
      * manner.
      */
     public static BufferedWriter newBufferedWriter(Octopus octopus, Path path, Charset cs, OpenOption... options)
-            throws OctopusException {
+            throws OctopusIOException {
         OutputStream out = octopus.files().newOutputStream(path, options);
 
         return new BufferedWriter(new OutputStreamWriter(out, cs));
@@ -138,7 +140,7 @@ public class FileUtils {
     /**
      * Read all lines from a file.
      */
-    public static List<String> readAllLines(Octopus octopus, Path path, Charset cs) throws OctopusException {
+    public static List<String> readAllLines(Octopus octopus, Path path, Charset cs) throws OctopusIOException {
         ArrayList<String> result = new ArrayList<String>();
 
         try (BufferedReader reader = newBufferedReader(octopus, path, cs)) {
@@ -151,7 +153,7 @@ public class FileUtils {
                 }
             }
         } catch (IOException e) {
-            throw new OctopusException("failed to read lines", e, null, null);
+            throw new OctopusIOException("FileUtils", "failed to read lines", e);
         }
 
     }
@@ -159,11 +161,11 @@ public class FileUtils {
     /**
      * Writes bytes to a file.
      */
-    public static Path write(Octopus octopus, Path path, byte[] bytes, OpenOption... options) throws OctopusException {
+    public static Path write(Octopus octopus, Path path, byte[] bytes, OpenOption... options) throws OctopusIOException {
         try (OutputStream out = octopus.files().newOutputStream(path, options)) {
             out.write(bytes);
         } catch (IOException e) {
-            throw new OctopusException("failed to copy stream to file", e, null, null);
+            throw new OctopusIOException("FileUtils", "failed to copy stream to file", e);
         }
         return path;
     }
@@ -173,14 +175,14 @@ public class FileUtils {
      * 
      */
     public static Path write(Octopus octopus, Path path, Iterable<? extends CharSequence> lines, Charset cs,
-            OpenOption... options) throws OctopusException {
+            OpenOption... options) throws OctopusIOException {
         try (BufferedWriter writer = newBufferedWriter(octopus, path, cs, options)) {
             for (CharSequence line : lines) {
                 writer.write(line.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
-            throw new OctopusException("failed to write lines", e, null, null);
+            throw new OctopusIOException("FileUtils", "failed to write lines", e);
         }
         return path;
     }
@@ -188,7 +190,7 @@ public class FileUtils {
     /**
      * Walks a file tree.
      */
-    public static Path walkFileTree(Octopus octopus, Path start, FileVisitor visitor) throws OctopusException {
+    public static Path walkFileTree(Octopus octopus, Path start, FileVisitor visitor) throws OctopusIOException {
         return walkFileTree(octopus, start, false, Integer.MAX_VALUE, visitor);
     }
 
@@ -196,7 +198,7 @@ public class FileUtils {
      * Walks a file tree.
      */
     public static Path walkFileTree(Octopus octopus, Path start, boolean followLinks, int maxDepth, FileVisitor visitor)
-            throws OctopusException {
+            throws OctopusIOException {
         FileAttributes attributes = octopus.files().getAttributes(start);
 
         walk(octopus, start, attributes, followLinks, maxDepth, visitor);
@@ -206,9 +208,9 @@ public class FileUtils {
 
     // Walk a file tree.
     private static FileVisitResult walk(Octopus octopus, Path path, FileAttributes attributes, boolean followLinks, int maxDepth,
-            FileVisitor visitor) throws OctopusException {
+            FileVisitor visitor) throws OctopusIOException {
         FileVisitResult visitResult;
-        OctopusException exception = null;
+        OctopusIOException exception = null;
 
         try {
             if (attributes.isDirectory() && maxDepth > 0) {
@@ -228,7 +230,7 @@ public class FileUtils {
                                 return FileVisitResult.TERMINATE;
                             }
                         }
-                    } catch (OctopusException e) {
+                    } catch (OctopusIOException e) {
                         exception = e;
                     }
                     return visitor.postVisitDirectory(path, exception, octopus);
@@ -254,14 +256,14 @@ public class FileUtils {
             } else {
                 return visitor.visitFile(path, attributes, octopus);
             }
-        } catch (OctopusException e) {
+        } catch (OctopusIOException e) {
             return visitor.visitFileFailed(path, e, octopus);
         }
     }
 
-    public static Path recursiveCopy(Octopus octopus, Path source, Path target, CopyOption... options) throws OctopusException {
+    public static Path recursiveCopy(Octopus octopus, Path source, Path target, CopyOption... options) throws OctopusIOException {
         // MUST ALSO HANDLE DIRECT FILE COPIES!    	
         // FIXME!!!
-        throw new OctopusException("NOT IMPLEMENTED!");
+        throw new OctopusIOException("FileUtils", "NOT IMPLEMENTED!");
     }
 }
