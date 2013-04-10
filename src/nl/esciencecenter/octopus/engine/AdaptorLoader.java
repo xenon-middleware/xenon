@@ -166,7 +166,7 @@ class AdaptorLoader {
             String classPath = System.getProperty("java.class.path");
 
             if (classPath == null) {
-                throw new OctopusException("Failed to load adaptors. Cannot get classpath, and " + ADAPTOR_DIR_PROPERTY
+                throw new OctopusException("AdaptorLoader", "Failed to load adaptors. Cannot get classpath, and " + ADAPTOR_DIR_PROPERTY
                         + " not set");
             }
 
@@ -187,7 +187,7 @@ class AdaptorLoader {
             File[] files = adaptorRoot.listFiles();
 
             if (files == null) {
-                throw new OctopusException("cannot list files in " + adaptorRoot);
+                throw new OctopusException("AdaptorLoader", "cannot list files in " + adaptorRoot);
             }
 
             // sort files

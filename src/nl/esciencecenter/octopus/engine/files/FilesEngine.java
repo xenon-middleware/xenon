@@ -11,6 +11,8 @@ import java.util.Set;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.AclEntry;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DeleteOption;
@@ -33,7 +35,7 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
 public class FilesEngine implements Files {
 
     public static DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
-        public boolean accept(Path file) throws OctopusException {
+        public boolean accept(Path file) throws OctopusIOException {
             return true;
         }
     };
@@ -54,24 +56,24 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public boolean isDirectory(Path path) throws OctopusException {
+    public boolean isDirectory(Path path) throws OctopusIOException {
         return getAttributes(path).isDirectory();
     }
 
     @Override
-    public SeekableByteChannel newByteChannel(Path path, OpenOption... options) throws OctopusException {
+    public SeekableByteChannel newByteChannel(Path path, OpenOption... options) throws OctopusIOException {
         return newByteChannel(path, null, options);
     }
 
     // Iterators
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusIOException {
         return newDirectoryStream(dir, ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir) throws OctopusException {
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir) throws OctopusIOException {
         return newAttributesDirectoryStream(dir, ACCEPT_ALL_FILTER);
     }
 
@@ -85,7 +87,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Path copy(Path source, Path target, CopyOption... options) throws OctopusException {
+    public Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException {
         if (source.getAdaptorName().equals(target.getAdaptorName())) {
             return getAdaptor(source).filesAdaptor().copy(source, target, options);
         } else if (source.isLocal()) {
@@ -93,61 +95,67 @@ public class FilesEngine implements Files {
         } else if (target.isLocal()) {
             return getAdaptor(source).filesAdaptor().copy(source, target, options);
         } else {
-            throw new OctopusException("cannot do inter-scheme third party copy (yet)", null, null);
+            throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
         }
     }
 
     @Override
-    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
         return getAdaptor(dir).filesAdaptor().createDirectories(dir, permissions);
     }
 
     @Override
-    public Path createDirectories(Path dir) throws OctopusException {
+    public Path createDirectories(Path dir) throws OctopusIOException {
         return createDirectories(dir, null);
     }
 
     @Override
-    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
         return getAdaptor(dir).filesAdaptor().createDirectory(dir, permissions);
     }
 
     @Override
-    public Path createDirectory(Path dir) throws OctopusException {
+    public Path createDirectory(Path dir) throws OctopusIOException {
         return createDirectory(dir, null);
     }
 
     @Override
-    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         return getAdaptor(path).filesAdaptor().createFile(path, permissions);
     }
 
     @Override
-    public Path createSymbolicLink(Path link, Path target) throws OctopusException {
+    public Path createSymbolicLink(Path link, Path target) throws OctopusIOException {
         return getAdaptor(link).filesAdaptor().createSymbolicLink(link, target);
     }
 
     @Override
-    public void delete(Path path, DeleteOption... options) throws OctopusException {
+    public void delete(Path path, DeleteOption... options) throws OctopusIOException {
         getAdaptor(path).filesAdaptor().delete(path, options);
     }
 
     @Override
-    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusException {
+    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException {
         return getAdaptor(path).filesAdaptor().deleteIfExists(path);
     }
 
     @Override
-    public boolean exists(Path path) throws OctopusException {
+    public boolean exists(Path path) throws OctopusIOException {
         return getAdaptor(path).filesAdaptor().exists(path);
     }
 
-    private Adaptor getAdaptor(Path path) throws OctopusException {
-        return octopusEngine.getAdaptor(path.getAdaptorName());
+    private Adaptor getAdaptor(Path path) {
+        try {
+            return octopusEngine.getAdaptor(path.getAdaptorName());
+        } catch (OctopusException e) {
+            // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
+            // Therefore, we make this a runtime exception.
+            throw new OctopusRuntimeException(getClass().getName(), "could not find adaptor named " + path.getAdaptorName(), e);
+        }
     }
 
     @Override
-    public Path move(Path source, Path target, CopyOption... options) throws OctopusException {
+    public Path move(Path source, Path target, CopyOption... options) throws OctopusIOException {
         if (source.getAdaptorName().equals(target.getAdaptorName())) {
             return getAdaptor(source).filesAdaptor().move(source, target, options);
         } else if (source.isLocal()) {
@@ -155,29 +163,28 @@ public class FilesEngine implements Files {
         } else if (target.isLocal()) {
             return getAdaptor(source).filesAdaptor().move(source, target, options);
         } else {
-            throw new OctopusException("cannot do inter-scheme third party move (yet)", null, null);
+            throw new OctopusIOException("cannot do inter-scheme third party move (yet)", null, null);
         }
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws OctopusException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws OctopusIOException {
         return getAdaptor(dir).filesAdaptor().newDirectoryStream(dir, filter);
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, Filter filter) throws OctopusException {
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, Filter filter) throws OctopusIOException {
         return getAdaptor(dir).filesAdaptor().newAttributesDirectoryStream(dir, filter);
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws OctopusException {
+    public InputStream newInputStream(Path path) throws OctopusIOException {
         return getAdaptor(path).filesAdaptor().newInputStream(path);
     }
 
     @Override
-    // TODO: set default options for all functions, not just this one
-            public
-            OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
+        // TODO: set default options for all functions, not just this one
         if (options == null || options.length == 0) {
             options = new OpenOption[] { OpenOption.CREATE, OpenOption.TRUNCATE_EXISTING, OpenOption.WRITE };
         }
@@ -187,37 +194,37 @@ public class FilesEngine implements Files {
 
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusException {
+            throws OctopusIOException {
         return getAdaptor(path).filesAdaptor().newByteChannel(path, permissions, options);
     }
 
     @Override
-    public FileAttributes getAttributes(Path path) throws OctopusException {
+    public FileAttributes getAttributes(Path path) throws OctopusIOException {
         return getAdaptor(path).filesAdaptor().readAttributes(path);
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws OctopusException {
+    public Path readSymbolicLink(Path link) throws OctopusIOException {
         return getAdaptor(link).filesAdaptor().readSymbolicLink(link);
     }
 
     @Override
-    public void setOwner(Path path, String owner, String group) throws OctopusException {
+    public void setOwner(Path path, String owner, String group) throws OctopusIOException {
         getAdaptor(path).filesAdaptor().setOwner(path, owner, group);
     }
 
     @Override
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         getAdaptor(path).filesAdaptor().setPosixFilePermissions(path, permissions);
     }
 
     @Override
-    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException {
+    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
         getAdaptor(path).filesAdaptor().setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
     }
 
     @Override
-    public void setAcl(Path path, List<AclEntry> acl) throws OctopusException {
+    public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException {
         getAdaptor(path).filesAdaptor().setAcl(path, acl);
     }
 }
