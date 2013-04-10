@@ -1,17 +1,15 @@
 package nl.esciencecenter.octopus.exceptions;
 
-import java.net.URI;
-
-public class AttributeNotSupportedException extends OctopusException {
+public class AttributeNotSupportedException extends OctopusIOException {
 
     private static final long serialVersionUID = 1L;
 
-    public AttributeNotSupportedException(String s, String adaptorName, URI uri) {
-        super(s, adaptorName, uri);
+    public AttributeNotSupportedException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
     }
 
-    public AttributeNotSupportedException(String message, Throwable t, String adaptorName, URI uri) {
-        super(message, t, adaptorName, uri);
+    public AttributeNotSupportedException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 
 }

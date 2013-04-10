@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.OctopusProperties;
-import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AclEntry;
 import nl.esciencecenter.octopus.files.CopyOption;
@@ -41,10 +41,10 @@ public interface FilesAdaptor {
      * @throws DirectoryNotEmptyException
      *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
      *             directory <i>(optional specific exception)</i>
-     * @throws OctopusException
+     * @throws OctopusIOException
      *             if an I/O error occurs
      * */
-    Path copy(Path source, Path target, CopyOption... options) throws OctopusException;
+    Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException;
 
     /**
      * Creates a directory by creating all nonexistent parent directories first.
@@ -54,7 +54,7 @@ public interface FilesAdaptor {
      * @throws FileAlreadyExistsException
      *             if {@code dir} exists but is not a directory <i>(optional specific exception)</i>
      */
-    Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
+    Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Creates a new directory.
@@ -64,10 +64,10 @@ public interface FilesAdaptor {
      * @throws FileAlreadyExistsException
      *             if a directory could not otherwise be created because a file of that name already exists <i>(optional specific
      *             exception)</i>
-     * @throws OctopusException
+     * @throws OctopusIOException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException;
+    Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Creates a new and empty file, failing if the file already exists.
@@ -76,10 +76,10 @@ public interface FilesAdaptor {
      *             if the given Permissions cannot be set when the file is created
      * @throws FileAlreadyExistsException
      *             if a file of that name already exists <i>(optional specific exception)</i>
-     * @throws OctopusException
+     * @throws OctopusIOException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
+    Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Creates a symbolic link to a target (optional operation).
@@ -88,30 +88,30 @@ public interface FilesAdaptor {
      *             if the adaptor used does not support symbolic links.
      * @throws FileAlreadyExistsException
      *             if a file with the name already exists <i>(optional specific exception)</i>
-     * @throws OctopusException
+     * @throws OctopusIOException
      *             if an I/O error occurs
      */
-    Path createSymbolicLink(Path link, Path target) throws OctopusException;
+    Path createSymbolicLink(Path link, Path target) throws OctopusIOException;
 
     /**
      * Deletes a file.
      */
-    void delete(Path path, DeleteOption... options) throws OctopusException;
+    void delete(Path path, DeleteOption... options) throws OctopusIOException;
 
     /**
      * Deletes a file if it exists.
      */
-    boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusException;
+    boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException;
 
     /**
      * Tests whether a file exists.
      */
-    boolean exists(Path path) throws OctopusException;
+    boolean exists(Path path) throws OctopusIOException;
 
     /**
      * Tests whether a file is a directory.
      */
-    boolean isDirectory(Path path) throws OctopusException;
+    boolean isDirectory(Path path) throws OctopusIOException;
 
     /**
      * Move or rename a file to a target file.
@@ -124,65 +124,65 @@ public interface FilesAdaptor {
      * @throws DirectoryNotEmptyException
      *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
      *             directory <i>(optional specific exception)</i>
-     * @throws OctopusException
+     * @throws OctopusIOException
      *             if an I/O error occurs
      */
-    Path move(Path source, Path target, CopyOption... options) throws OctopusException;
+    Path move(Path source, Path target, CopyOption... options) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
+    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory. Extra functionality in RAL to
      * efficiently fetch all attributes for a directory.
      */
-    DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
+    DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException;
 
     /** Opens a file, returning an input stream to read from the file. */
-    InputStream newInputStream(Path path) throws OctopusException;
+    InputStream newInputStream(Path path) throws OctopusIOException;
 
     /**
      * Opens or creates a file, returning an output stream that may be used to write bytes to the file. If no options are present
      * then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
      */
-    OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException;
+    OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException;
 
     /**
      * Opens or creates a file, returning a seekable byte channel to access the file.
      */
     SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusException;
+            throws OctopusIOException;
 
     /**
      * Reads a file's attributes.
      */
-    FileAttributes readAttributes(Path path) throws OctopusException;
+    FileAttributes readAttributes(Path path) throws OctopusIOException;
 
     /**
      * Reads the target of a symbolic link (optional operation).
      */
-    Path readSymbolicLink(Path link) throws OctopusException;
+    Path readSymbolicLink(Path link) throws OctopusIOException;
 
     /**
      * Updates the file owner and group. Use null for either to keep current owner/group
      */
-    Path setOwner(Path path, String owner, String group) throws OctopusException;
+    Path setOwner(Path path, String owner, String group) throws OctopusIOException;
 
     /**
      * Sets a file's POSIX permissions.
      */
-    Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
+    Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Updates a file's last modified, last access, and create time attribute. Use -1 to not set a certain attribute
      */
-    Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException;
+    Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException;
 
     /**
      * Updates (replace) the access control list.
      */
-    void setAcl(Path path, List<AclEntry> acl) throws OctopusException;
+    void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException;
 
 }

@@ -37,7 +37,7 @@ public class CredentialsEngine implements Credentials {
             Adaptor adaptor = octopusEngine.getAdaptorFor(uri.getScheme());
 
             if (uri.getUserInfo() != null && !uri.getUserInfo().equals(username)) {
-                throw new OctopusException("If usernames in URIs are given, they must be identical to the username parameter.");
+                throw new OctopusException("CredentialsEngine", "If usernames in URIs are given, they must be identical to the username parameter.");
             }
 
             adaptor.credentialsAdaptor().newPasswordCredential(uuid, username, password, uri);

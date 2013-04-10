@@ -56,7 +56,7 @@ public abstract class Adaptor implements AdaptorInfo {
 
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             if (!validSet.contains(entry.getKey())) {
-                throw new OctopusException("Unknown property " + entry);
+                throw new OctopusException(getName(), "Unknown property " + entry);
             }
         }
         
@@ -90,11 +90,11 @@ public abstract class Adaptor implements AdaptorInfo {
         return false;
     }
 
-    public abstract FilesAdaptor filesAdaptor() throws OctopusException;
+    public abstract FilesAdaptor filesAdaptor();
 
-    public abstract JobsAdaptor jobsAdaptor() throws OctopusException;
+    public abstract JobsAdaptor jobsAdaptor();
 
-    public abstract CredentialsAdaptor credentialsAdaptor() throws OctopusException;
+    public abstract CredentialsAdaptor credentialsAdaptor();
 
     public abstract void end();
 }

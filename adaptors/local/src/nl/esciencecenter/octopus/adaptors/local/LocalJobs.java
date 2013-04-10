@@ -17,7 +17,6 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.security.Credentials;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,7 @@ public class LocalJobs implements JobsAdaptor {
         localAdaptor.checkURI(location);
 
         if (location.getPath() != null && location.getPath().length() > 0) {
-            throw new OctopusException("Non-empty path in a local scheduler URI is not allowed", "local", location);
+            throw new OctopusException("local", "Non-empty path in a local scheduler URI is not allowed");
         }
 
         // FIXME: This simply returns a new SchedulerImplementation, but ignores properties and credentials completely.    	

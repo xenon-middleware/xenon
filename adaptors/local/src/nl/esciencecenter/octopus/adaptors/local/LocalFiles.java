@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AclEntry;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DeleteOption;
@@ -62,21 +63,20 @@ public class LocalFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path copy(Path source, Path target, CopyOption... options) throws OctopusException {
+    public Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException {
         if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
             if (exists(target) && isDirectory(target)
                     && newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
-                throw new DirectoryNotEmptyException("cannot replace dir " + target + " as it is not empty", "local",
-                        source.toUri());
+                throw new DirectoryNotEmptyException(getClass().getName(), "cannot replace dir " + target + " as it is not empty");
             }
         } else if (exists(target)) {
-            throw new FileAlreadyExistsException("cannot copy to " + target + " as it already exists", "local", source.toUri());
+            throw new FileAlreadyExistsException(getClass().getName(), "cannot copy to " + target + " as it already exists");
         }
 
         try {
             Files.copy(LocalUtils.javaPath(source), LocalUtils.javaPath(target), LocalUtils.javaCopyOptions(options));
         } catch (IOException e) {
-            throw new OctopusException("could not copy file", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not copy file", e);
         }
 
         //        if (CopyOption.contains(options, CopyOption.RECURSIVE) && isDirectory(source)) {
@@ -89,7 +89,7 @@ public class LocalFiles implements FilesAdaptor {
     }
 
     @Override
-    public Path move(Path source, Path target, CopyOption... options) throws OctopusException {
+    public Path move(Path source, Path target, CopyOption... options) throws OctopusIOException {
         if (source.normalize().equals(target.normalize())) {
             return target;
         }
@@ -97,7 +97,7 @@ public class LocalFiles implements FilesAdaptor {
         if (exists(target) && isDirectory(target)
                 && newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()
                 && !CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
-            throw new OctopusException("cannot move file, target already exists", null, null);
+            throw new OctopusIOException("cannot move file, target already exists", null, null);
         }
 
         // FIXME: test if this also works across different partitions/drives in
@@ -105,90 +105,88 @@ public class LocalFiles implements FilesAdaptor {
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target), LocalUtils.javaCopyOptions(options));
         } catch (IOException e) {
-            throw new OctopusException("could not move files", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not move files", e);
         }
 
         return target;
     }
 
     @Override
-    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
         if (exists(dir) && !isDirectory(dir)) {
-            throw new FileAlreadyExistsException("Cannot create directory, as it already exists (but is not a directory).",
-                    "local", dir.toUri());
+            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists (but is not a directory).");
         }
 
         try {
             Files.createDirectories(LocalUtils.javaPath(dir), LocalUtils.javaPermissionAttribute(permissions));
         } catch (IOException e) {
-            throw new OctopusException("could not create directories", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not create directories", e);
         }
 
         return dir;
     }
 
     @Override
-    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
         if (exists(dir)) {
-            throw new FileAlreadyExistsException("Cannot create directory, as it already exists.", "local", dir.toUri());
+            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
         }
 
         try {
             Files.createDirectories(LocalUtils.javaPath(dir), LocalUtils.javaPermissionAttribute(permissions));
         } catch (IOException e) {
-            throw new OctopusException("could not create directory", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not create directory", e);
         }
 
         return dir;
     }
 
     @Override
-    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         if (exists(path)) {
-            throw new FileAlreadyExistsException("Cannot create file, as it already exists", "local", path.toUri());
+            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create file, as it already exists");
         }
 
         try {
             Files.createFile(LocalUtils.javaPath(path), LocalUtils.javaPermissionAttribute(permissions));
         } catch (IOException e) {
-            throw new OctopusException("could not create file", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not create file", e);
         }
 
         return path;
     }
 
     @Override
-    public Path createSymbolicLink(Path link, Path target) throws OctopusException {
+    public Path createSymbolicLink(Path link, Path target) throws OctopusIOException {
         if (exists(link)) {
-            throw new FileAlreadyExistsException("Cannot create link, as a file with this name already exists", "local",
-                    link.toUri());
+            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create link, as a file with this name already exists");
         }
 
         try {
             Files.createSymbolicLink(LocalUtils.javaPath(link), LocalUtils.javaPath(target));
         } catch (IOException e) {
-            throw new OctopusException("could not create symbolic link", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not create symbolic link", e);
         }
 
         return link;
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws OctopusException {
+    public Path readSymbolicLink(Path link) throws OctopusIOException {
         try {
             java.nio.file.Path target = Files.readSymbolicLink(LocalUtils.javaPath(link));
 
             return new PathImplementation(link.getProperties(), target.toUri(), link.getAdaptorName(),
                     octopusEngine);
         } catch (IOException e) {
-            throw new OctopusException("could not create symbolic link", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not create symbolic link", e);
         }
     }
 
     @Override
-    public void delete(Path path, DeleteOption... options) throws OctopusException {
+    public void delete(Path path, DeleteOption... options) throws OctopusIOException {
         if (!exists(path)) {
-            throw new NoSuchFileException("cannot delete file, as it does not exist", "local", path.toUri());
+            throw new NoSuchFileException(getClass().getName(), "cannot delete file, as it does not exist");
         }
 
         // recursion step
@@ -201,12 +199,12 @@ public class LocalFiles implements FilesAdaptor {
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (IOException e) {
-            throw new OctopusException("could not delete file", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not delete file", e);
         }
     }
 
     @Override
-    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusException {
+    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException {
         if (isDirectory(path) && DeleteOption.contains(options, DeleteOption.RECURSIVE)) {
             for (Path child : newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER)) {
                 delete(child, options);
@@ -216,14 +214,14 @@ public class LocalFiles implements FilesAdaptor {
         try {
             return Files.deleteIfExists(LocalUtils.javaPath(path));
         } catch (IOException e) {
-            throw new OctopusException("could not delete file", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "could not delete file", e);
         }
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException {
         if (!isDirectory(dir)) {
-            throw new OctopusException("Cannot create directorystream, file is not a directory", null, null);
+            throw new OctopusIOException(getClass().getName(), "Cannot create directorystream, file is not a directory");
         }
 
         return new LocalDirectoryStream(dir, filter);
@@ -231,61 +229,61 @@ public class LocalFiles implements FilesAdaptor {
 
     @Override
     public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
-            throws OctopusException {
+            throws OctopusIOException {
         if (!isDirectory(dir)) {
-            throw new OctopusException("Cannot create DirectoryAttributeStream, file is not a directory", null, null);
+            throw new OctopusIOException(getClass().getName(), "Cannot create DirectoryAttributeStream, file is not a directory");
         }
 
         return new LocalDirectoryAttributeStream(this, dir, filter);
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws OctopusException {
+    public InputStream newInputStream(Path path) throws OctopusIOException {
         try {
             return Files.newInputStream(LocalUtils.javaPath(path));
         } catch (IOException e) {
-            throw new OctopusException("Could not create input stream", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Could not create input stream", e);
         }
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
         try {
             return Files.newOutputStream(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
         } catch (IOException e) {
-            throw new OctopusException("Could not output stream", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Could not output stream", e);
         }
 
     }
 
     @Override
     public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusException {
+            throws OctopusIOException {
         try {
             return Files.newByteChannel(LocalUtils.javaPath(path), LocalUtils.javaOpenOptionsSet(options),
                     LocalUtils.javaPermissionAttribute(permissions));
         } catch (IOException e) {
-            throw new OctopusException("Could not create byte channel", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Could not create byte channel", e);
         }
     }
 
     @Override
-    public FileAttributes readAttributes(Path path) throws OctopusException {
+    public FileAttributes readAttributes(Path path) throws OctopusIOException {
         return new LocalFileAttributes(path);
     }
 
     @Override
-    public boolean exists(Path path) throws OctopusException {
+    public boolean exists(Path path) throws OctopusIOException {
         return Files.exists(LocalUtils.javaPath(path));
     }
 
     @Override
-    public boolean isDirectory(Path path) throws OctopusException {
+    public boolean isDirectory(Path path) throws OctopusIOException {
         return Files.isDirectory(LocalUtils.javaPath(path));
     }
 
     @Override
-    public Path setOwner(Path path, String user, String group) throws OctopusException {
+    public Path setOwner(Path path, String user, String group) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
@@ -305,13 +303,13 @@ public class LocalFiles implements FilesAdaptor {
 
             return path;
         } catch (IOException e) {
-            throw new OctopusException("Unable to set user and group", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Unable to set user and group", e);
         }
 
     }
 
     @Override
-    public Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
+    public Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
@@ -319,12 +317,12 @@ public class LocalFiles implements FilesAdaptor {
 
             return path;
         } catch (IOException e) {
-            throw new OctopusException("Unable to set permissions", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Unable to set permissions", e);
         }
     }
 
     @Override
-    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusException {
+    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
@@ -348,12 +346,12 @@ public class LocalFiles implements FilesAdaptor {
 
             return path;
         } catch (IOException e) {
-            throw new OctopusException("Unable to set file times", e, "local", path.toUri());
+            throw new OctopusIOException(getClass().getName(), "Unable to set file times", e);
         }
     }
 
     @Override
-    public void setAcl(Path path, List<AclEntry> acl) throws OctopusException {
+    public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException {
         throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
     }
 

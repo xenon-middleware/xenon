@@ -62,7 +62,7 @@ public class SshAdaptor extends Adaptor {
 
     void checkURI(URI location) throws OctopusException {
         if (!supports(location.getScheme())) {
-            throw new OctopusException("Ssh adaptor does not support scheme " + location.getScheme(), getName(), location);
+            throw new OctopusException(getName(), "Ssh adaptor does not support scheme " + location.getScheme());
         }
     }
 
