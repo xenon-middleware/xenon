@@ -1,5 +1,8 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -8,12 +11,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.engine.util.MergingOutputStream;
 import nl.esciencecenter.octopus.engine.util.StreamForwarder;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
 
 class ParallelProcess {
 
@@ -26,22 +27,21 @@ class ParallelProcess {
     private final StreamForwarder[] stderrForwarders;
 
     private final MergingOutputStream stdoutStream;
-
     private final MergingOutputStream stderrStream;
 
-    ParallelProcess(int count, String executable, List<String> arguments, Map<String, String> environment, Path workingDirectory,
-            Path stdin, Path stdout, Path stderr, OctopusEngine engine) throws IOException {
+    ParallelProcess(int count, String executable, List<String> arguments, Map<String, String> environment, 
+            String workingDirectory, String stdin, String stdout, String stderr) throws IOException {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(executable);
         builder.command().addAll(arguments);
 
         builder.environment().putAll(environment);
-        builder.directory(new java.io.File(workingDirectory.getPath()));
+        builder.directory(new java.io.File(workingDirectory));
 
         // buffered streams, will also synchronize
-        stdoutStream = new MergingOutputStream(engine.files().newOutputStream(stdout));
-        stderrStream = new MergingOutputStream(engine.files().newOutputStream(stderr));
+        stdoutStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stdout));
+        stderrStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stderr));
 
         processes = new Process[count];
         stdinForwarders = new StreamForwarder[count];
@@ -49,7 +49,8 @@ class ParallelProcess {
         stderrForwarders = new StreamForwarder[count];
         for (int i = 0; i < count; i++) {
             processes[i] = builder.start();
-            stdinForwarders[i] = new StreamForwarder(engine.files().newInputStream(stdin), processes[i].getOutputStream());
+            stdinForwarders[i] = new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin), 
+                    processes[i].getOutputStream());
             stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), stdoutStream);
             stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
         }

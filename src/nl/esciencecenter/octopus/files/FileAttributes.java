@@ -1,6 +1,5 @@
 package nl.esciencecenter.octopus.files;
 
-import java.util.List;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
@@ -34,7 +33,7 @@ public interface FileAttributes {
     /**
      * Reads the access control list.
      */
-    List<AclEntry> getAcl() throws AttributeNotSupportedException;
+    //List<AclEntry> getAcl() throws AttributeNotSupportedException;
 
     // non-java-nio attributes
 

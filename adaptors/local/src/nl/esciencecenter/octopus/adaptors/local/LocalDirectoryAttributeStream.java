@@ -44,11 +44,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
     }
 
     private Path gatPath(java.nio.file.Path path) throws OctopusIOException {
-        try {
-            return dir.resolve(path.getFileName().toString());
-        } catch (OctopusException e) {
-            throw new OctopusIOException(getClass().getName(), e.getMessage(), e);
-        }
+        return dir.resolve(path.getFileName().toString());
     }
 
     @Override
@@ -89,14 +85,14 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
         try {
             if (!readAhead.isEmpty()) {
                 Path path = readAhead.remove(0);
-                FileAttributes attributes = this.localFiles.readAttributes(path);
+                FileAttributes attributes = this.localFiles.getAttributes(path);
                 return new AbstractPathAttributes(path, attributes);
             }
 
             while (iterator.hasNext()) {
                 Path next = gatPath(iterator.next());
                 if (filter.accept(next)) {
-                    FileAttributes attributes = this.localFiles.readAttributes(next);
+                    FileAttributes attributes = this.localFiles.getAttributes(next);
                     return new AbstractPathAttributes(next, attributes);
                 }
             }

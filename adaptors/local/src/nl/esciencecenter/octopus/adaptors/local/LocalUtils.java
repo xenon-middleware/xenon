@@ -62,7 +62,7 @@ class LocalUtils {
         return result;
     }
 
-    static Set<PosixFilePermission> gatPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
+    static Set<PosixFilePermission> octopusPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
         if (permissions == null) {
             return null;
         }

@@ -8,7 +8,6 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.CopyOption;
-import nl.esciencecenter.octopus.files.DeleteOption;
 import nl.esciencecenter.octopus.files.Path;
 
 public class Sandbox {
@@ -32,7 +31,7 @@ public class Sandbox {
         }
     }
 
-    public Sandbox(Octopus octopus, Path root, Path sandboxName) throws OctopusException {
+    public Sandbox(Octopus octopus, Path root, String sandboxName) throws OctopusException {
         this.octopus = octopus;
 
         if (sandboxName == null) {
@@ -57,7 +56,7 @@ public class Sandbox {
         addUploadFile(src, null);
     }
 
-    public void addUploadFile(Path src, Path dest) {
+    public void addUploadFile(Path src, String dest) {
         if (src == null) {
             throw new NullPointerException("the source file cannot be null when adding a preStaged file");
         }
@@ -69,18 +68,18 @@ public class Sandbox {
         return downloadFiles;
     }
 
-    public void setDownloadFiles(Path... files) {
+    public void setDownloadFiles(String... files) {
         downloadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
             addDownloadFile(files[i]);
         }
     }
 
-    public void addDownloadFile(Path src) {
+    public void addDownloadFile(String src) {
         addDownloadFile(src, null);
     }
 
-    public void addDownloadFile(Path src, Path dest) {
+    public void addDownloadFile(String src, Path dest) {
         if (src == null) {
             throw new NullPointerException("the source file cannot be null when adding a postStaged file");
         }
@@ -104,10 +103,10 @@ public class Sandbox {
     }
 
     public void wipe() throws OctopusIOException {
-        octopus.files().delete(path, DeleteOption.RECURSIVE, DeleteOption.WIPE);
+        FileUtils.recursiveWipe(octopus, path);
     }
 
     public void delete() throws OctopusIOException {
-        octopus.files().delete(path, DeleteOption.RECURSIVE);
+        FileUtils.recursiveDelete(octopus, path);
     }
 }

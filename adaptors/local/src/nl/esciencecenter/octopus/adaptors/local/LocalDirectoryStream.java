@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.Path;
@@ -37,7 +36,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
         }
     }
 
-    private Path getPath(java.nio.file.Path path) throws OctopusException {
+    private Path getPath(java.nio.file.Path path) {
         return dir.resolve(path.getFileName().toString());
     }
 
@@ -57,7 +56,6 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
     @Override
     public synchronized boolean hasNext() {
-        try {
             if (!readAhead.isEmpty()) {
                 return true;
             }
@@ -69,11 +67,6 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
                 }
             }
             return false;
-        } catch (OctopusException e) {
-            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
-        } catch (OctopusIOException e) {
-            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
-        }
     }
 
     @Override
@@ -82,19 +75,14 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
             return readAhead.remove(0);
         }
 
-        try {
-            while (iterator.hasNext()) {
-                Path next = getPath(iterator.next());
-                if (filter.accept(next)) {
-                    return next;
-                }
+        while (iterator.hasNext()) {
+            Path next = getPath(iterator.next());
+            if (filter.accept(next)) {
+                return next;
             }
-            throw new NoSuchElementException("no more files in directory");
-        } catch (OctopusException e) {
-            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
-        } catch (OctopusIOException e) {
-            throw new DirectoryIteratorException("LocalDirectoryStream", "error on getting next element", e);
         }
+        throw new NoSuchElementException("no more files in directory");
+
     }
 
     @Override
