@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -30,36 +31,34 @@ public class FilesEngineTest {
      * @return
      * @throws OctopusException
      */
-    public OctopusEngine fakeOctopus(Files files_adaptor, String adaptor_name, String scheme_name) throws OctopusException {
+    public OctopusEngine fakeOctopus(Files files_adaptor, String adaptor_name) throws OctopusException {
         OctopusEngine octopus = mock(OctopusEngine.class);
-        addAdaptor2Octopus(octopus, files_adaptor, adaptor_name, scheme_name);
+        addAdaptor2Octopus(octopus, files_adaptor, adaptor_name);
         return octopus;
     }
 
     /**
      * Add a fake file adaptor to Octopus instance.
+     *
      * @param octopus
      * @param files_adaptor
      * @param adaptor_name
      * @param scheme_name
      * @throws OctopusException
      */
-    public void addAdaptor2Octopus(OctopusEngine octopus, Files files_adaptor, String adaptor_name, String scheme_name) throws OctopusException {
+    public void addAdaptor2Octopus(OctopusEngine octopus, Files files_adaptor, String adaptor_name) throws OctopusException {
         Adaptor adaptor = mock(Adaptor.class);
         when(adaptor.getName()).thenReturn(adaptor_name);
         when(adaptor.filesAdaptor()).thenReturn(files_adaptor);
         when(octopus.getAdaptor(adaptor_name)).thenReturn(adaptor);
-        when(octopus.getAdaptorFor(scheme_name)).thenReturn(adaptor);
     }
 
-    public Path fakePath(OctopusEngine octopus, URI uri) throws URISyntaxException {
-        return fakePath(octopus, uri, "mock");
-    }
-
-    public Path fakePath(OctopusEngine octopus, URI uri, String adaptor_name) {
-        Path path = mock(PathImplementation.class);
-        when(path.getFileSystem().getAdaptorName()).thenReturn(adaptor_name);
-        return path;
+    public FileSystemImplementation getFileSystem(String adaptor_name) throws URISyntaxException {
+        String fs_uid = "1";
+        URI root_location = new URI("file:///");
+        OctopusProperties oprops = new OctopusProperties();
+        FileSystemImplementation filesystem = new FileSystemImplementation(adaptor_name, fs_uid, root_location, oprops);
+        return filesystem;
     }
 
     @Test
@@ -72,26 +71,21 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testNewPathURI() throws URISyntaxException, OctopusException {
+    public void testNewPathURI() throws URISyntaxException, OctopusException, OctopusIOException {
+        String adaptor_name = "Local";
+        FileSystemImplementation filesystem = getFileSystem(adaptor_name);
+        PathImplementation expected_path = new PathImplementation(filesystem, "file:///tmp/bla.txt");
         // create stubs, so we don't have to use a real adaptor
-        // a real adaptor touches filesystem, uses network, requires credentials etc.
+        // a real adaptor touches filesystem, uses network, requires credentials
+        // etc.
         Files files_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
-
-        URI location = new URI("file:///tmp/bla.txt");
-        Path path = fakePath(octopus, location);
-        OctopusProperties octopus_properties = new OctopusProperties();
-        
-        
-  // FIXME      
-        
-//        when(octopus.getProperties()).thenReturn(octopus_properties);
-        //when(files_adaptor.newPath(octopus_properties, location)).thenReturn(path);
+        OctopusEngine octopus = fakeOctopus(files_adaptor, adaptor_name);
+        when(files_adaptor.newPath(filesystem, "file:///tmp/bla.txt")).thenReturn(expected_path);
 
         FilesEngine engine = new FilesEngine(octopus);
-//        Path newpath = engine.newPath(location);
+        Path newpath = engine.newPath(filesystem, "file:///tmp/bla.txt");
 
-       // assertThat(newpath, is(path));
+        assertThat((PathImplementation) newpath, is(expected_path));
     }
 
     @Test
@@ -122,12 +116,12 @@ public class FilesEngineTest {
     @Test
     public void testCopy_SameAdaptors_MockedAdaptorCopies() throws URISyntaxException, OctopusIOException, OctopusException {
         Files files_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
+        OctopusEngine octopus = fakeOctopus(files_adaptor, "Local");
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("file:///tmp/bar.txt"));
-        when(source.isLocal()).thenReturn(false);
-        Path target = fakePath(octopus, new URI("file:///tmp/foo.txt"));
-        when(target.isLocal()).thenReturn(false);
+        FileSystemImplementation source_filesystem = getFileSystem("Local");
+        Path source = new PathImplementation(source_filesystem, "file:///tmp/bla.txt");
+        FileSystemImplementation target_filesystem = getFileSystem("Local");
+        Path target = new PathImplementation(target_filesystem, "file:///tmp/foo.txt");
 
         engine.copy(source, target);
 
@@ -137,36 +131,36 @@ public class FilesEngineTest {
     @Test
     public void testCopy_NonEqualNonLocalAdaptors_Exception() throws URISyntaxException, OctopusException {
         Files source_adaptor = mock(Files.class);
+        OctopusEngine octopus = fakeOctopus(source_adaptor, "ssh");
         Files target_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(source_adaptor, "assh", "ssh");
-        addAdaptor2Octopus(octopus, target_adaptor, "agridftp", "gridftp");
-
+        addAdaptor2Octopus(octopus, target_adaptor, "gridftp");
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("ssh://localhost/tmp/bar.txt"), "assh");
-        when(source.isLocal()).thenReturn(false);
-        Path target = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
-        when(target.isLocal()).thenReturn(false);
+        FileSystemImplementation source_filesystem = getFileSystem("ssh");
+        Path source = new PathImplementation(source_filesystem, "ssh://localhost/tmp/bar.txt");
+        FileSystemImplementation target_filesystem = getFileSystem("gridftp");
+        Path target = new PathImplementation(target_filesystem, "gridftp://somewhere/tmp/foo.txt");
 
         try {
             engine.copy(source, target);
             fail("No exception thrown");
         } catch (OctopusIOException e) {
-            assertThat(e.getMessage(), is("cannot do inter-scheme third party copy (yet)"));
+            // TODO should throw exception with no adaptor, but with paths
+            assertThat(e.getMessage(), is("cannot do inter-scheme third party copy (yet) adaptor: null"));
         }
     }
 
     @Test
-    public void testCopy_SourceIsLocalAdaptor_TargetAdaptorCopies() throws URISyntaxException, OctopusException, OctopusIOException {
+    public void testCopy_SourceIsLocalAdaptor_TargetAdaptorCopies() throws URISyntaxException, OctopusException,
+            OctopusIOException {
         Files source_adaptor = mock(Files.class);
+        OctopusEngine octopus = fakeOctopus(source_adaptor, "Local");
         Files target_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(source_adaptor, "alocal", "file");
-        addAdaptor2Octopus(octopus, target_adaptor, "agridftp", "gridftp");
-
+        addAdaptor2Octopus(octopus, target_adaptor, "gridftp");
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("file:///tmp/bar.txt"), "alocal");
-        when(source.isLocal()).thenReturn(true);
-        Path target = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
-        when(target.isLocal()).thenReturn(false);
+        FileSystemImplementation source_filesystem = getFileSystem("Local");
+        Path source = new PathImplementation(source_filesystem, "file:///tmp/bar.txt");
+        FileSystemImplementation target_filesystem = getFileSystem("gridftp");
+        Path target = new PathImplementation(target_filesystem, "gridftp://somewhere/tmp/foo.txt");
 
         engine.copy(source, target);
 
@@ -174,17 +168,17 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testCopy_TargetIsLocalAdaptor_SourceAdaptorCopies() throws URISyntaxException, OctopusException, OctopusIOException {
+    public void testCopy_TargetIsLocalAdaptor_SourceAdaptorCopies() throws URISyntaxException, OctopusException,
+            OctopusIOException {
         Files source_adaptor = mock(Files.class);
+        OctopusEngine octopus = fakeOctopus(source_adaptor, "ssh");
         Files target_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(source_adaptor, "agridftp", "gridftp");
-        addAdaptor2Octopus(octopus, target_adaptor, "alocal", "file");
-
+        addAdaptor2Octopus(octopus, target_adaptor, "Local");
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
-        when(source.isLocal()).thenReturn(false);
-        Path target = fakePath(octopus, new URI("file:///tmp/bar.txt"), "alocal");
-        when(target.isLocal()).thenReturn(true);
+        FileSystemImplementation source_filesystem = getFileSystem("ssh");
+        Path source = new PathImplementation(source_filesystem, "ssh://localhost/tmp/bar.txt");
+        FileSystemImplementation target_filesystem = getFileSystem("Local");
+        Path target = new PathImplementation(target_filesystem, "file:///tmp/bar.txt");
 
         engine.copy(source, target);
 
@@ -278,11 +272,15 @@ public class FilesEngineTest {
 
     @Test
     public void testSetOwner_MockedFiles_FilesSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
+        FileSystemImplementation filesystem = getFileSystem("Local");
+        PathImplementation path = new PathImplementation(filesystem, "file:///tmp/bla.txt");
+        // create stubs, so we don't have to use a real adaptor
+        // a real adaptor touches filesystem, uses network, requires credentials
+        // etc.
         Files files_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
+        OctopusEngine octopus = fakeOctopus(files_adaptor, "Local");
 
         FilesEngine engine = new FilesEngine(octopus);
-        Path path = fakePath(octopus, new URI("file:///tmp/bla.txt"));
 
         engine.setOwner(path, "someone", "somegroup");
 
