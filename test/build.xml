@@ -94,10 +94,12 @@
 				<classfiles>
 					<fileset dir="../build/classes" />
 					<fileset dir="../adaptors/local/build/classes" />
+					<fileset dir="../adaptors/ssh/build/classes" />
 				</classfiles>
 				<sourcefiles>
 					<fileset dir="../src" />
 					<fileset dir="../adaptors/local/src" />
+					<fileset dir="../adaptors/ssh/src" />
 				</sourcefiles>
 			</structure>
 
