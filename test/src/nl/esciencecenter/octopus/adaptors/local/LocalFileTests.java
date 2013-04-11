@@ -22,7 +22,7 @@ public class LocalFileTests {
         
         System.err.println("tmpdir = " + tmpdir);
 
-        FileSystem fs = octopus.files().newFileSystem(new URI("local"), null, null);
+        FileSystem fs = octopus.files().newFileSystem(new URI("file:///"), null, null);
         
         AbsolutePath path = octopus.files().newPath(fs, new RelativePath(tmpdir));
 
@@ -36,7 +36,7 @@ public class LocalFileTests {
     public void test2() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
-        FileSystem fs = octopus.files().newFileSystem(new URI("local"), null, null);
+        FileSystem fs = octopus.files().newFileSystem(new URI("file:///"), null, null);
         
         AbsolutePath tmpDir = octopus.files().newPath(fs, new RelativePath(System.getProperty("java.io.tmpdir")));
 
