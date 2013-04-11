@@ -22,6 +22,7 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.slf4j.Logger;
@@ -29,8 +30,10 @@ import org.slf4j.LoggerFactory;
 
 public class LocalJobs implements Jobs {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
 
+    @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
     private final LocalAdaptor localAdaptor;
@@ -71,7 +74,8 @@ public class LocalJobs implements Jobs {
             throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
         }
         
-        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, properties);
+        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
+                new String[] { "single", "multi", "unlimited" }, properties);
 
         singleQ = new LinkedList<LocalJobExecutor>();
         multiQ = new LinkedList<LocalJobExecutor>();
@@ -124,11 +128,6 @@ public class LocalJobs implements Jobs {
     public JobDescription newJobDescription() {
         // FIXME: Not needed ? 
         return null;
-    }
-    
-    @Override
-    public String[] getQueueNames(Scheduler scheduler) throws OctopusException {
-        return new String[] { "single", "multi", "unlimited" };
     }
 
     private Job[] getJobs(LocalJobExecutor[] executors) {
@@ -278,5 +277,17 @@ public class LocalJobs implements Jobs {
         singleExecutor.shutdownNow();
         multiExecutor.shutdownNow();
         unlimitedExecutor.shutdownNow();
+    }
+
+    @Override
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
+        // TODO Auto-generated method stub
+        return null;
     }    
 }

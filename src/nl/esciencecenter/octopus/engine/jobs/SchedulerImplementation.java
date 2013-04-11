@@ -12,11 +12,13 @@ public final class SchedulerImplementation implements Scheduler {
     
     private final URI uri;
     private final OctopusProperties properties;
+    private final String [] queueNames;
     
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, OctopusProperties properties) {
+    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, OctopusProperties properties) {
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
+        this.queueNames = queueNames;
         this.properties = properties;
     }
 
@@ -68,5 +70,10 @@ public final class SchedulerImplementation implements Scheduler {
         } else if (!uniqueID.equals(other.uniqueID))
             return false;
         return true;
+    }
+
+    @Override
+    public String[] getQueueNames() {
+        return queueNames.clone();
     }
 }

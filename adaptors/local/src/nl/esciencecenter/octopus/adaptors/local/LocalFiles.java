@@ -46,6 +46,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalFiles.class);
 
+    @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
     private final LocalAdaptor localAdaptor;
 

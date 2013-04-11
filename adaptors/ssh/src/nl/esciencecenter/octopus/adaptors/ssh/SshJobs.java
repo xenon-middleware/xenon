@@ -12,6 +12,7 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.slf4j.Logger;
@@ -52,12 +53,6 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public String[] getQueueNames(Scheduler scheduler) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return null;
@@ -90,5 +85,17 @@ public class SshJobs implements Jobs {
     @Override
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
         throw new OctopusException(getClass().getName(), "getLocalScheduler not supported!");
+    }
+
+    @Override
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

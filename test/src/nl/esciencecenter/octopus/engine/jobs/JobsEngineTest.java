@@ -62,7 +62,8 @@ public class JobsEngineTest {
     public void testSubmitJob_StubbedLocalAdaptor_LocalJob() throws OctopusIOException, OctopusException, URISyntaxException {
         URI sheduler_location = new URI("local:///");
         JobDescriptionImplementation job_description = new JobDescriptionImplementation();
-        SchedulerImplementation scheduler = new SchedulerImplementation("local", "1", sheduler_location, null);
+        SchedulerImplementation scheduler = new SchedulerImplementation("local", "1", sheduler_location, 
+                new String [] { "single" }, null);
         // stub adaptor
         OctopusEngine octopus = mock(OctopusEngine.class);
         Adaptor adaptor = mock(Adaptor.class);
