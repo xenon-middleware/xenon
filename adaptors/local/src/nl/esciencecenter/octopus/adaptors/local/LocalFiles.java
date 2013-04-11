@@ -364,18 +364,14 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     
         localAdaptor.checkURI(location);
       
-        String path = location.getPath();
-        
-        if (path == null) { 
-            path = System.getProperty("user.dir");
+        if (location.getPath() != null) {
+            throw new OctopusException("local", "Cannot create local file system with path!");
         }
         
-        if (path == null) { 
-            path = "/";
-        }
+        String path = System.getProperty("user.home");
         
         if (!LocalUtils.exists(path)) { 
-            throw new OctopusException("local", "Cannot create FileSystem with non-existing entry path!");
+            throw new OctopusException("local", "Cannot create FileSystem with non-existing entry path (" + path + ")");
         }
             
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, 
