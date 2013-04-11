@@ -84,6 +84,11 @@ public class CredentialSet {
         this.credentials.addAll(moreCredentials.credentials);
     }
 
+// TODO remove
+    public Credential[] getAll() {
+        return credentials.toArray(new Credential[0]);
+    }
+    
     public String toString() {
         return "credentials, read-only = " + readOnly + " content = " + credentials;
     }

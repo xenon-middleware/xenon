@@ -3,15 +3,18 @@
 	Build file for Adaptors.
     </description>
 
-	<target name="build" description="build local adaptors">
+	<target name="build" description="build local, ssh adaptors">
 		<ant dir="local" />
+		<ant dir="ssh" />
 	</target>
 
 	<target name="build-all" description="build all adaptors (local, additional, and unstable)">
 		<ant dir="local" />
+		<ant dir="ssh" />
 	</target>
 
 	<target name="clean" description="clean all adaptors">
 		<ant dir="local" target="clean" />
+		<ant dir="ssh" target="clean" />
 	</target>
 </project>
