@@ -34,6 +34,12 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
+    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
+        Adaptor adaptor = octopusEngine.getAdaptorFor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+        return adaptor.jobsAdaptor().getLocalScheduler();
+    }
+    
+    @Override
     public JobStatus getJobStatus(Job job) throws OctopusException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
     }
@@ -80,5 +86,7 @@ public class JobsEngine implements Jobs {
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().submitJob(scheduler, description);
     }
+
+    
 
 }

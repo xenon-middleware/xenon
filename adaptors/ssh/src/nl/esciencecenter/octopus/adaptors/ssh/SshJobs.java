@@ -86,4 +86,9 @@ public class SshJobs implements Jobs {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
+        throw new OctopusException(getClass().getName(), "getLocalScheduler not supported!");
+    }
 }
