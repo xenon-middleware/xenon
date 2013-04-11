@@ -2,6 +2,7 @@ package nl.esciencecenter.octopus.engine.files;
 
 import java.net.URI;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.files.FileSystem;
 
@@ -11,16 +12,21 @@ public class FileSystemImplementation implements FileSystem {
     private final String uniqueID; 
     
     private final URI uri;
+    private final Credential credential;
     private final OctopusProperties properties;
     
-    public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, OctopusProperties properties) {
+    public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, Credential credential, OctopusProperties properties) {
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
+        this.credential = credential;
         this.properties = properties;
     }
 
-    @Override
+    public Credential getCredential() { 
+        return credential;
+    }
+    
     public String getUniqueID() {
         return uniqueID;
     }

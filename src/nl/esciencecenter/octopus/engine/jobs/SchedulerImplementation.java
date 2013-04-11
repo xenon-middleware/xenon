@@ -20,7 +20,6 @@ public final class SchedulerImplementation implements Scheduler {
         this.properties = properties;
     }
 
-    @Override
     public String getUniqueID() {
         return uniqueID;
     }

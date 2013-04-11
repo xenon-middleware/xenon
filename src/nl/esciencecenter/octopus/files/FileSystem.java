@@ -7,8 +7,6 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 public interface FileSystem {
     
     public String getAdaptorName();
-
-    public String getUniqueID();
     
     public URI getUri();
 

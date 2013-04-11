@@ -51,7 +51,7 @@ public class FilesEngine implements Files {
             return octopusEngine.getAdaptor(filesystem.getAdaptorName());
         } catch (OctopusException e) { 
             throw new OctopusIOException("Failed to locate adaptor for FileSystem!",  
-                    filesystem.getAdaptorName() + "/" + filesystem.getUniqueID());
+                    filesystem.getAdaptorName());
         }
     }
     
