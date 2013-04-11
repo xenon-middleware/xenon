@@ -16,6 +16,6 @@ public class OctopusFactoryTest {
     @Test
     public void testNewOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
-        assertThat(octopus.getDefaultProperties(), is(new Properties()));
+        assertThat(octopus.getProperties(), is(new Properties()));
     }
 }

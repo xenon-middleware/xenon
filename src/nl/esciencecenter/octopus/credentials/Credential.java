@@ -1,16 +1,12 @@
-package nl.esciencecenter.octopus.jobs;
-
-import java.net.URI;
+package nl.esciencecenter.octopus.credentials;
 
 import nl.esciencecenter.octopus.OctopusProperties;
 
-public interface Scheduler {
-
+public interface Credential {
+ 
     public String getAdaptorName();
     
     public String getUniqueID();
-
-    public URI getUri();
 
     public OctopusProperties getProperties();
 }

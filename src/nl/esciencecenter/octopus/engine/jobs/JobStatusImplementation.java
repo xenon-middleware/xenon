@@ -1,24 +1,30 @@
 package nl.esciencecenter.octopus.engine.jobs;
 
+import java.util.Map;
+
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 
-public class JobStatusImplementation implements JobStatus {
+public final class JobStatusImplementation implements JobStatus {
 
     private final Job job;
     private final String state;
     private final Integer exitCode;
-    private final Exception error;
+    private final Exception exception;
     private final boolean done;
+    private final Map<String, String> schedulerSpecificInformation;
     
-    public JobStatusImplementation(Job job, String state, Integer exitCode, Exception error, boolean done) {
+    public JobStatusImplementation(Job job, String state, Integer exitCode, Exception error, boolean done, 
+            Map<String, String> schedulerSpecificInformation) {
+        
         super();
     
         this.job = job;
         this.state = state;
         this.exitCode = exitCode;
-        this.error = error;
+        this.exception = error;
         this.done = done;
+        this.schedulerSpecificInformation = schedulerSpecificInformation;
     }
 
     @Override
@@ -37,17 +43,22 @@ public class JobStatusImplementation implements JobStatus {
     }
 
     @Override
-    public Exception getError() {
-        return error;
-    }
-
-    @Override
     public boolean isDone() {
         return done;
     }
 
     @Override
-    public boolean hasError() {
-        return (error != null);
+    public Exception getException() {
+        return exception;
+    }
+
+    @Override
+    public boolean hasException() {
+        return (exception != null);
+    }
+
+    @Override
+    public Map<String, String> getSchedulerSpecficInformation() {
+        return schedulerSpecificInformation;
     }
 }

@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.jobs;
+package nl.esciencecenter.octopus.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JavaJobDescription extends JobDescription {
+import nl.esciencecenter.octopus.jobs.JobDescription;
 
+public class JavaJobDescription implements JobDescription {
+
+    // FIXME: BROKEN BROKEN BROKEN!!! Implement!!! Changed to facade, but hav not changed implementation!!!
+    
     private List<String> javaOptions = new ArrayList<String>();
 
     private Map<String, String> javaSystemProperties = new HashMap<String, String>();
@@ -18,11 +22,14 @@ public class JavaJobDescription extends JobDescription {
 
     private String javaClassPath;
 
+    private final JobDescription destination;
+    
     /**
      * Create a {@link JavaJobDescription}, which describes the java application.
      */
-    public JavaJobDescription() {
+    public JavaJobDescription(JobDescription destination) {
         super();
+        this.destination = destination;
     }
 
     /**
@@ -175,14 +182,26 @@ public class JavaJobDescription extends JobDescription {
      * @return Returns the executable.
      */
     public String getExecutable() {
-        if (super.getExecutable() == null) {
+        if (destination.getExecutable() == null) {
             return "java";
         } else {
-            return super.getExecutable();
+            return destination.getExecutable();
         }
     }
 
-    /**
+    /**    
+    @Override
+    public void setWorkingDirectory(Path workingDirectory) throws OctopusException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Path getWorkingDirectory() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
      * Returns the java class path.
      * 
      * @return the java class path.
@@ -199,6 +218,132 @@ public class JavaJobDescription extends JobDescription {
      */
     public void setJavaClassPath(String javaClassPath) {
         this.javaClassPath = javaClassPath;
+    }
+
+    @Override
+    public int getNodeCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setNodeCount(int resourceCount) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public int getProcessesPerNode() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void setProcessesPerNode(int ppn) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String getQueueName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setQueueName(String queueName) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public int getMaxTime() {
+        // TODO Auto-generated method stub
+        return 0;    
+    }
+
+    @Override
+    public void setMaxTime(int maxTime) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setExecutable(String executable) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Map<String, String> getEnvironment() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setEnvironment(Map<String, String> environment) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean offlineMode() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void setOfflineMode(boolean offlineMode) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setStdin(String stdin) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setStdout(String stdout) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setStderr(String stderr) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setWorkingDirectory(String workingDirectory) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String getStdin() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getStdout() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getStderr() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getWorkingDirectory() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
