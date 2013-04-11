@@ -17,6 +17,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class SandboxedLocalJobIT {
      * @throws IOException
      */
     @Test
-    public void test() throws OctopusException, URISyntaxException, InterruptedException, IOException {
+    public void test() throws Exception, OctopusException, URISyntaxException, InterruptedException, IOException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         URI fs_location = new URI("file:///");
         FileSystem filesystem = octopus.files().newFileSystem(fs_location, null, null);
@@ -53,6 +54,7 @@ public class SandboxedLocalJobIT {
         JobDescription description = octopus.jobs().newJobDescription();
         description.setArguments(input_file);
         description.setExecutable("/usr/bin/wc");
+        description.setStdin(null);
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
         description.setWorkingDirectory(location.getPath());
@@ -65,6 +67,11 @@ public class SandboxedLocalJobIT {
         // TODO add timeout
         while (!octopus.jobs().getJobStatus(job).isDone()) {
             Thread.sleep(500);
+        }
+
+        JobStatus status = octopus.jobs().getJobStatus(job);
+        if (status.hasException()) {
+            throw status.getException();
         }
 
         // TODO copy file from sandbox to somewhere
