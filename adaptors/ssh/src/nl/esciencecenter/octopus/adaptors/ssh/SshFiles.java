@@ -1,6 +1,5 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -133,7 +132,7 @@ public class SshFiles implements Files {
     @Override
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
 
-        logger.debug( "ssh copy");
+        logger.debug("ssh copy");
         // two cases: remote -> local and local -> remote
 
         FileSystem sourcefs = source.getFileSystem();
@@ -319,7 +318,7 @@ public class SshFiles implements Files {
 
     @Override
     public AbsolutePath move(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
+        // FIXME impossible to implement? 
         return null;
     }
 

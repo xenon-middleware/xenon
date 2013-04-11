@@ -17,7 +17,7 @@ public class SshFileSystem extends FileSystemImplementation {
     private Session session;
     private SshAdaptor adaptor;
     private boolean isOpen;
-    
+
     public SshFileSystem(String adaptorName, String uniqueID, URI location, RelativePath entryPath, Credential credential,
             OctopusProperties properties, SshAdaptor adaptor, Session session) {
         super(adaptorName, uniqueID, location, entryPath, credential, properties);
@@ -25,16 +25,16 @@ public class SshFileSystem extends FileSystemImplementation {
         this.session = session;
         isOpen = true;
     }
-    
+
     protected void close() {
         session.disconnect();
         isOpen = false;
     }
-    
+
     protected boolean isOpen() {
         return isOpen;
     }
-    
+
     protected ChannelSftp getSftpChannel() throws OctopusIOException {
         return getSftpChannel(session);
     }
@@ -49,7 +49,7 @@ public class SshFileSystem extends FileSystemImplementation {
             throw new OctopusIOException("ssh", e.getMessage(), e);
         }
     }
-    
+
     protected void putSftpChannel(ChannelSftp channel) {
         channel.disconnect();
     }
