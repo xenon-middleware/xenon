@@ -18,6 +18,10 @@ class LocalUtils {
     //TODO: test this function
     static boolean exists(String path) {
 
+        if (path == null) { 
+            return false;
+        }
+        
         if (path.startsWith("/~")) {
             path = System.getProperty("user.home") + "/" + path.substring(2);
         }
@@ -28,7 +32,9 @@ class LocalUtils {
     }
     
     static java.nio.file.Path javaPath(AbsolutePath path) {
+        
         String string = path.getPath();
+        
         if (string.startsWith("/~")) {
             string = System.getProperty("user.home") + "/" + string.substring(2);
         }

@@ -182,6 +182,11 @@ public class OctopusProperties extends Properties {
      *             if the property defined and not an integer
      */
     public int getIntProperty(String key, int defaultValue) {
+        
+        if (!containsKey(key)) { 
+            return defaultValue;
+        }
+        
         String value = getProperty(key);
 
         if (value == null) {
