@@ -16,8 +16,6 @@ import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 
 public interface Files {
-
-    // functions used to create files and streams
     
     /**
      * Create a new FileSystem that represents a (possibly remote) data store at the given location and using the given 

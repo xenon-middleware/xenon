@@ -1,37 +1,65 @@
 package nl.esciencecenter.octopus.files;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import java.util.NoSuchElementException;
 
 public class RelativePath {
 
-    public static final String DEFAULT_SEPERATOR = "/";
+    public static final char DEFAULT_SEPERATOR = '/';
     
     private final String[] elements;
     private final String seperator;
     
+    class RelativePathIterator implements Iterator<RelativePath> {
+
+        private int index = 0;
+        
+        @Override
+        public boolean hasNext() {
+            return index <= elements.length; 
+        }
+
+        @Override
+        public RelativePath next() {
+            
+            if (index > elements.length) {
+                throw new NoSuchElementException("No more elements available!");
+            }
+            
+            return new RelativePath(Arrays.copyOf(elements, index++), seperator);
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Remove not supported!");
+        } 
+    }
+    
     public RelativePath(String path) {
-        this(path, DEFAULT_SEPERATOR);
+        this(path, "" + DEFAULT_SEPERATOR);
     }
 
     public RelativePath(String [] elements) {
-        this(elements, DEFAULT_SEPERATOR);
+        this(elements, "" + DEFAULT_SEPERATOR);
     }
     
     public RelativePath(String path, String separator) {
 
-        if (separator != null) { 
-            this.seperator = separator;
+        if (separator == null || separator.length() == 0) {
+            this.seperator = "" + DEFAULT_SEPERATOR;
         } else { 
-            this.seperator = DEFAULT_SEPERATOR;
+            if (separator.length() != 1) { 
+                throw new IllegalArgumentException("Separator may not have more than one character!");
+            }
+            
+            this.seperator = separator;
         }
         
         if (path == null) {
             elements = new String[0];
         } else {
-            // FIXME: does this work for multi char separators???
             this.elements = path.split(this.seperator + "+");
         }
 
@@ -62,10 +90,14 @@ public class RelativePath {
 
     public RelativePath(String[] elements, String separator) {
 
-        if (separator != null) { 
-            this.seperator = separator;
+        if (separator == null || separator.length() == 0) {
+            this.seperator = "" + DEFAULT_SEPERATOR;
         } else { 
-            this.seperator = DEFAULT_SEPERATOR;
+            if (separator.length() != 1) { 
+                throw new IllegalArgumentException("Separator may not have more than one character!");
+            }
+            
+            this.seperator = separator;
         }
 
         if (elements == null) {
@@ -140,23 +172,81 @@ public class RelativePath {
     }
 
     public RelativePath resolve(RelativePath other) {
-        // TODO: implement;
-        return null;
+        
+        if (other == null || other.isEmpty()) { 
+            return this;
+        }
+        
+        int count = elements.length + other.elements.length;
+        
+        String [] tmp = new String[count];
+        
+        System.arraycopy(elements, 0, tmp, 0, elements.length);
+        System.arraycopy(other.elements, 0, tmp, elements.length, other.elements.length);
+        
+        return new RelativePath(tmp, seperator);
     }
 
-    public RelativePath resolveSibling(RelativePath other) throws OctopusException {
-        // TODO: implement;
-        return null;
+    private boolean isEmpty() {
+        return elements.length == 0;
     }
 
-    public RelativePath relativize(RelativePath other) throws OctopusException {
-        // TODO: implement;
-        return null;
+    public RelativePath resolveSibling(RelativePath other) {
+        
+        if (isEmpty()) {
+            if (other == null) { 
+                return this;
+            } else { 
+                return other;
+            }
+        }
+        
+        RelativePath parent = getParent();
+        
+        if (other == null || other.isEmpty()) { 
+            return parent;
+        }
+        
+        return parent.resolve(other);
+    }
+
+    public RelativePath relativize(RelativePath other) throws IllegalArgumentException {
+        
+        if (isEmpty()) { 
+            return other;
+        }
+         
+        if (other.isEmpty()) { 
+            return this;
+        }
+        
+        RelativePath normalized = normalize();
+        RelativePath normalizedOther = other.normalize();
+
+        String [] elts = normalized.elements;
+        String [] eltsOther = normalizedOther.elements;
+        
+        // The source may not be longer that target
+        if (elts.length > eltsOther.length) { 
+            throw new IllegalArgumentException("Cannot relativize " + other.getPath() + " to " + getPath());
+        }
+
+        // If source and target must have the same start.
+        for (int i=0;i<elts.length;i++) { 
+            if (!elts[i].equals(eltsOther[i])) { 
+                throw new IllegalArgumentException("Cannot relativize " + other.getPath() + " to " + getPath());
+            }
+        }
+
+        if (elts.length == eltsOther.length) { 
+            return new RelativePath(new String[0], seperator);
+        }
+
+        return new RelativePath(Arrays.copyOfRange(eltsOther, elts.length, eltsOther.length), seperator);
     }
 
     public Iterator<RelativePath> iterator() {
-        // TODO: implement;
-        return null;
+        return new RelativePathIterator();
     }
 
     public String getPath() {
@@ -176,12 +266,54 @@ public class RelativePath {
     }
 
     public RelativePath normalize() {
-        // TODO Auto-generated method stub
-        return null;
+        
+        if (isEmpty()) { 
+            return this;
+        }
+        
+        ArrayList<String> stack = new ArrayList<String>();
+        
+        for (String s : elements) { 
+            stack.add(s);
+        }
+        
+        boolean change = true;
+        
+        while (change) { 
+            change = false;
+            
+            for (int i=stack.size()-1;i>=0;i--) { 
+
+                if (i < stack.size()) { 
+
+                    String elt = stack.get(i);
+
+                    if (elt.equals(".")) { 
+                        stack.remove(i);
+                        change = true;
+                        
+                    } else if (elt.equals("..")) {
+                        
+                        if (i > 0) { 
+                            String parent = stack.get(i-1);
+                            
+                            if (!(parent.equals(".") || parent.equals(".."))) {
+                                // NOTE: order is VERY important here!
+                                stack.remove(i);
+                                stack.remove(i-1);
+                                change = true;
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+
+        String [] tmp = stack.toArray(new String [stack.size()]);        
+        return new RelativePath(tmp, seperator);
     }
     
     public String toString() {
         return getPath();
     }
-    
 }
