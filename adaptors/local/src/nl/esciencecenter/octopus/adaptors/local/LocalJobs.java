@@ -79,7 +79,7 @@ public class LocalJobs implements Jobs {
         LocalScheduler tmp = schedulers.get(scheduler);
         
         if (tmp == null) { 
-            throw new OctopusException("Scheduler not found " + scheduler.getAdaptorName() + "/" + scheduler.getUniqueID(), 
+            throw new OctopusException("Scheduler not found " + scheduler.getAdaptorName(), 
                     LocalAdaptor.ADAPTOR_NAME);
         }
         
