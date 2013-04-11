@@ -169,6 +169,7 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
+ // TODO more specific exception, octopus really is couldnotinitcredential
     // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
     // TODO cache van sessions / channels
     // session.setConfig("StrictHostKeyChecking", "no");
@@ -236,30 +237,5 @@ public class SshAdaptor extends Adaptor {
         }
 
         return session;
-    }
-
-    protected ChannelSftp getSftpChannel(Session session) throws OctopusException {
-        Channel channel;
-        try {
-            channel = session.openChannel("sftp");
-            channel.connect();
-            return (ChannelSftp) channel;
-        } catch (JSchException e) {
-            throw new OctopusException("ssh", e.getMessage(), e);
-        }
-    }
-
-    protected ChannelSftp getSftpChannel(FileSystem fileSystem) throws OctopusException {
-        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
-        Session session = createNewSession(fs.getUniqueID(), fs.getUri(), fs.getCredential());
-        return getSftpChannel(session);
-    }
-
-    protected void putSftpChannel(URI uri, ChannelSftp channel) {
-
-    }
-
-    private void closeSession(Session session) {
-        session.disconnect();
     }
 }

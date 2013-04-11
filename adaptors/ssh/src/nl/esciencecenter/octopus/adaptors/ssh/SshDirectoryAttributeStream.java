@@ -1,13 +1,11 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Vector;
 
+import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
@@ -49,7 +47,8 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
             current++;
             AbsolutePath nextPath = dir.resolve(new RelativePath(listing.get(current).getLongname()));
             if (filter.accept(nextPath)) {
-                PathAttributesPair next = SshFiles.convertAttributes(nextEntry);
+                SshFileAttributes attributes = new SshFileAttributes(nextEntry.getAttrs(), nextPath);
+                PathAttributesPair next = new PathAttributesPairImplementation(nextPath, attributes);
                 return next;
             }
         }
