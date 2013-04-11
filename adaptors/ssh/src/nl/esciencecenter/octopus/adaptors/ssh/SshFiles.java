@@ -60,9 +60,9 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, OctopusProperties properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        FileSystem fs = new FileSystemImplementation(adaptor.getName(), "uniqueID", location, properties);
+        FileSystem fs = new FileSystemImplementation(adaptor.getName(), "uniqueID", location, new OctopusProperties(properties));
         return fs; // TODO store with unique id in table, store credential
     }
 

@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Properties;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -70,7 +70,7 @@ public class FilesEngine implements Files {
 
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, OctopusProperties properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
         return adaptor.filesAdaptor().newFileSystem(location, credential, properties);

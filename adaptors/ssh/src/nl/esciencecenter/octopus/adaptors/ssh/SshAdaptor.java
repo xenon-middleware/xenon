@@ -9,7 +9,6 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
-import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
@@ -187,7 +186,7 @@ public class SshAdaptor extends Adaptor {
 
         // TODO: sessions are per filesystem, that is when the credential is given. 
         try {
-            jsch.addIdentity(credential.getKeyfile().getPath(), credential.getPassword());
+            jsch.addIdentity(credential.getKeyfile(), credential.getPassword());
         } catch (JSchException e) {
             throw new OctopusException("ssh", "Could not read private key file.", e);
         }

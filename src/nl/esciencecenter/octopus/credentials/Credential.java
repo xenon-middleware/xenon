@@ -1,6 +1,6 @@
 package nl.esciencecenter.octopus.credentials;
 
-import nl.esciencecenter.octopus.OctopusProperties;
+import java.util.Properties;
 
 public interface Credential {
  
@@ -8,5 +8,5 @@ public interface Credential {
     
     public String getUniqueID();
 
-    public OctopusProperties getProperties();
+    public Properties getProperties();
 }

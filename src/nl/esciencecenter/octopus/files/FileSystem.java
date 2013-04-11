@@ -1,8 +1,7 @@
 package nl.esciencecenter.octopus.files;
 
 import java.net.URI;
-
-import nl.esciencecenter.octopus.OctopusProperties;
+import java.util.Properties;
 
 public interface FileSystem {
     
@@ -12,6 +11,6 @@ public interface FileSystem {
     
     public URI getUri();
 
-    public OctopusProperties getProperties();
+    public Properties getProperties();
 
 }

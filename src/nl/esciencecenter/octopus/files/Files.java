@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Properties;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
@@ -29,7 +29,7 @@ public interface Files {
      * @throws OctopusException
      * @throws OctopusIOException
      */
-    public FileSystem newFileSystem(URI location, Credential credential, OctopusProperties properties) 
+    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) 
             throws OctopusException, OctopusIOException;
 
     // FIXME add getCWDFileSystem()
