@@ -13,7 +13,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class GeAdaptor extends Adaptor {
 
-    private static final String ADAPTOR_NAME = "gridengine";
+    public static final String ADAPTOR_NAME = "gridengine";
 
     private static final String ADAPTOR_DESCRIPTION =
             "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "

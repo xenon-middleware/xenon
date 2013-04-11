@@ -2,23 +2,9 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
-import com.sun.grid.xml.qstat.JobInfo;
-import com.sun.grid.xml.qstat.JobInfoT;
-import com.sun.grid.xml.qstat.JobListT;
-import com.sun.grid.xml.qstat.QueueInfoT;
-
 
 public class QStatTest {
 
@@ -56,7 +42,7 @@ public class QStatTest {
 
         //local job read
         FileInputStream in = new FileInputStream(jobFile);
-        JobInfo ji = (JobInfo) u.unmarshal(in);
+//        JobInfo ji = (JobInfo) u.unmarshal(in);
         
         
 //        List list = ((JobInfoT) ji.getJobInfo().get(0)).getJobList();
@@ -68,18 +54,18 @@ public class QStatTest {
 //            System.out.println(jlt.getJBJobNumber() + ": " + jlt.getJBName());
 //        }
         
-        for (QueueInfoT queueInfo: ji.getQueueInfo()) {
-            for(Object object: queueInfo.getQueueListAndJobList()) {
-                if (object instanceof JobListT) {
-                    JobListT jobInfo = (JobListT) object;
-                    
-                    System.out.println("found a job: " + jobInfo.getJBJobNumber());
-                    System.out.println("\towned by: " + jobInfo.getJBOwner());
-                    System.out.println("\tusing slots: " + jobInfo.getSlots());
-                    
-                }
-            }
-        }
+//        for (QueueInfoT queueInfo: ji.getQueueInfo()) {
+//            for(Object object: queueInfo.getQueueListAndJobList()) {
+//                if (object instanceof JobListT) {
+//                    JobListT jobInfo = (JobListT) object;
+//                    
+//                    System.out.println("found a job: " + jobInfo.getJBJobNumber());
+//                    System.out.println("\towned by: " + jobInfo.getJBOwner());
+//                    System.out.println("\tusing slots: " + jobInfo.getSlots());
+//                    
+//                }
+//            }
+//        }
         
     }
 }
