@@ -89,11 +89,11 @@ public abstract class Adaptor implements AdaptorInfo {
         return false;
     }
 
-    public abstract Files filesAdaptor();
+    public abstract Files filesAdaptor() throws OctopusException;
 
-    public abstract Jobs jobsAdaptor();
+    public abstract Jobs jobsAdaptor() throws OctopusException;
 
-    public abstract Credentials credentialsAdaptor();
+    public abstract Credentials credentialsAdaptor() throws OctopusException;
 
     public abstract void end();
 }
