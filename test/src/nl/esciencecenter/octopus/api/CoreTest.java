@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.tests.api;
+package nl.esciencecenter.octopus.api;
 
 public class CoreTest {
 
