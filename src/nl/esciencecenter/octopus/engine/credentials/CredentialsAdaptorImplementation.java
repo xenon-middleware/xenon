@@ -6,7 +6,7 @@ import java.util.UUID;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 
-public abstract class CredentialsAdaptor {
+public abstract class CredentialsAdaptorImplementation {
     /**
      * Constructs a certificate Credential out of a {@link AbsolutePath} pointing to the private key, a {@link AbsolutePath} pointing to the
      * certificate, a username and a password.

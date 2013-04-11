@@ -36,7 +36,9 @@ public class OctopusProperties extends Properties {
         super();
 
         for (String[] element : defaults) {
+            
             if (element[1] != null) {
+            //    System.out.println("Adding property: " + element[0]  + " " + element[1]);
                 super.put(element[0], element[1]);
             }
         }
@@ -56,9 +58,13 @@ public class OctopusProperties extends Properties {
         if (properties == null) {
             return;
         }
+        
         for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             String value = properties.getProperty(key);
+        
+           // System.out.println("** Adding property: " + key  + " " + value);
+            
             super.put(key, value);
         }
     }
@@ -182,6 +188,11 @@ public class OctopusProperties extends Properties {
      *             if the property defined and not an integer
      */
     public int getIntProperty(String key, int defaultValue) {
+        
+        if (!containsKey(key)) { 
+            return defaultValue;
+        }
+        
         String value = getProperty(key);
 
         if (value == null) {
@@ -508,17 +519,17 @@ public class OctopusProperties extends Properties {
      *            the given element.
      * @return true if the given element is a member of the given list.
      */
-    private static boolean contains(String[] list, String element) {
-        if (list == null) {
-            return false;
-        }
-        for (int i = 0; i < list.length; i++) {
-            if (element.equalsIgnoreCase(list[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private static boolean contains(String[] list, String element) {
+//        if (list == null) {
+//            return false;
+//        }
+//        for (int i = 0; i < list.length; i++) {
+//            if (element.equalsIgnoreCase(list[i])) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * Returns true if the given string starts with one of the given prefixes.
@@ -529,17 +540,17 @@ public class OctopusProperties extends Properties {
      *            the given prefixes.
      * @return true if the given string starts with one of the given prefixes.
      */
-    private static boolean startsWith(String string, String[] prefixes) {
-        if (prefixes == null) {
-            return false;
-        }
-        for (int i = 0; i < prefixes.length; i++) {
-            if (string.startsWith(prefixes[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private static boolean startsWith(String string, String[] prefixes) {
+//        if (prefixes == null) {
+//            return false;
+//        }
+//        for (int i = 0; i < prefixes.length; i++) {
+//            if (string.startsWith(prefixes[i])) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * Checks all properties with the given prefix for validity.
@@ -554,32 +565,32 @@ public class OctopusProperties extends Properties {
      * @param printWarning
      *            if true, a warning is printed to standard error for each unknown property
      */
-    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes, boolean printWarning) {
-
-        Properties result = new Properties();
-
-        if (prefix == null) {
-            prefix = "";
-        }
-
-        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-
-            if (key.startsWith(prefix)) {
-                String suffix = key.substring(prefix.length());
-                String value = getProperty(key);
-
-                if (!startsWith(suffix, validSubPrefixes) && !contains(validKeys, key)) {
-                    if (printWarning) {
-                        System.err.println("Warning, unknown property: " + key + " with value: " + value);
-                    }
-                    result.put(key, value);
-                }
-            }
-        }
-
-        return result;
-    }
+//    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes, boolean printWarning) {
+//
+//        Properties result = new Properties();
+//
+//        if (prefix == null) {
+//            prefix = "";
+//        }
+//
+//        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
+//            String key = (String) e.nextElement();
+//
+//            if (key.startsWith(prefix)) {
+//                String suffix = key.substring(prefix.length());
+//                String value = getProperty(key);
+//
+//                if (!startsWith(suffix, validSubPrefixes) && !contains(validKeys, key)) {
+//                    if (printWarning) {
+//                        System.err.println("Warning, unknown property: " + key + " with value: " + value);
+//                    }
+//                    result.put(key, value);
+//                }
+//            }
+//        }
+//
+//        return result;
+//    }
 
     /**
      * Returns all properties who's key start with a certain prefix.

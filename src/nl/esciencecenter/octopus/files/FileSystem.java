@@ -10,5 +10,7 @@ public interface FileSystem {
     public URI getUri();
 
     public Properties getProperties();
+    
+    public RelativePath getEntryPath();
 
 }

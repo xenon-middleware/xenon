@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.octopus.engine.files.AbstractPathAttributes;
+import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
-class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, Iterator<PathAttributes> {
+class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
 
     private final LocalFiles localFiles;
 
@@ -48,7 +48,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
     }
 
     @Override
-    public Iterator<PathAttributes> iterator() {
+    public Iterator<PathAttributesPair> iterator() {
         return this;
     }
 
@@ -81,19 +81,19 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributes>, 
     }
 
     @Override
-    public synchronized PathAttributes next() {
+    public synchronized PathAttributesPair next() {
         try {
             if (!readAhead.isEmpty()) {
                 AbsolutePath path = readAhead.remove(0);
                 FileAttributes attributes = this.localFiles.getAttributes(path);
-                return new AbstractPathAttributes(path, attributes);
+                return new PathAttributesPairImplementation(path, attributes);
             }
 
             while (iterator.hasNext()) {
                 AbsolutePath next = gatPath(iterator.next());
                 if (filter.accept(next)) {
                     FileAttributes attributes = this.localFiles.getAttributes(next);
-                    return new AbstractPathAttributes(next, attributes);
+                    return new PathAttributesPairImplementation(next, attributes);
                 }
             }
             throw new NoSuchElementException("no more files in directory");

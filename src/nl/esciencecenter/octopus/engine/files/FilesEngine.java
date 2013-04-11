@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -45,21 +45,6 @@ public class FilesEngine implements Files {
     public FilesEngine(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
     }
-    
-//    private Adaptor getAdaptor(FileSystem filesystem) throws OctopusIOException {
-//        
-//        try { 
-//            return octopusEngine.getAdaptor(filesystem.getAdaptorName());
-//
-//        } catch (OctopusException e) { 
-//            throw new OctopusIOException("Failed to locate adaptor for FileSystem!",  
-//                    filesystem.getAdaptorName());
-//        }
-//    }
-    
-//    private Adaptor getAdaptor(AbsolutePath path) throws OctopusIOException {
-//        return getAdaptor(path.getFileSystem());
-//    }
 
     private Files getFilesAdaptor(FileSystem filesystem) throws OctopusIOException {
         
@@ -125,9 +110,9 @@ public class FilesEngine implements Files {
         
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).copy(source, target, options);
-        } else if (sourcefs.getAdaptorName().equals("local")) {
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).copy(source, target, options);
-        } else if (targetfs.getAdaptorName().equals("local")) {
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).copy(source, target, options);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
@@ -177,9 +162,9 @@ public class FilesEngine implements Files {
         
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).move(source, target, options);
-        } else if (sourcefs.getAdaptorName().equals("local")) {
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).move(source, target, options);
-        } else if (targetfs.getAdaptorName().equals("local")) {
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).move(source, target, options);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party move (yet)", null, null);
@@ -188,12 +173,12 @@ public class FilesEngine implements Files {
 
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
-        return newDirectoryStream(dir, ACCEPT_ALL_FILTER);
+        return getFilesAdaptor(dir).newDirectoryStream(dir);
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
-        return newAttributesDirectoryStream(dir, ACCEPT_ALL_FILTER);
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
+        return getFilesAdaptor(dir).newAttributesDirectoryStream(dir);
     }
     
     @Override
@@ -202,7 +187,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir, filter);
     }
     
@@ -223,7 +208,7 @@ public class FilesEngine implements Files {
     
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        return newByteChannel(path, null, options);
+        return getFilesAdaptor(path).newByteChannel(path, options);
     }
 
     @Override
@@ -255,5 +240,17 @@ public class FilesEngine implements Files {
     @Override
     public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
         getFilesAdaptor(path).setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
+    }
+
+    @Override
+    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException {
+        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+        return adaptor.filesAdaptor().getLocalCWDFileSystem(properties);
+    }
+
+    @Override
+    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
+        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+        return adaptor.filesAdaptor().getLocalCWDFileSystem(properties);
     }
 }

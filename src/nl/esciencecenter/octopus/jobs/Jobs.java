@@ -16,11 +16,15 @@ public interface Jobs {
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) 
             throws OctopusException, OctopusIOException;
 
+    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
+    
     public JobDescription newJobDescription();
     
-    public String[] getQueueNames(Scheduler scheduler) throws OctopusException;
-
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
+
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException;
+    
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException;
     
     /**
      * Submit a job. 

@@ -10,12 +10,12 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
-class SshDirectoryAttributeStream implements DirectoryStream<PathAttributes>, Iterator<PathAttributes> {
+class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
     private final DirectoryStream.Filter filter;
     private final AbsolutePath dir;
     private Vector<LsEntry> listing;
@@ -29,7 +29,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributes>, It
     }
 
     @Override
-    public Iterator<PathAttributes> iterator() {
+    public Iterator<PathAttributesPair> iterator() {
         return this;
     }
 
@@ -43,13 +43,13 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributes>, It
         return current < listing.size();
     }
     
-    public synchronized PathAttributes next() {
+    public synchronized PathAttributesPair next() {
         while (current < listing.size()) {
             LsEntry nextEntry = listing.get(current);
             current++;
             AbsolutePath nextPath = dir.resolve(new RelativePath(listing.get(current).getLongname()));
             if (filter.accept(nextPath)) {
-                PathAttributes next = SshFiles.convertAttributes(nextEntry);
+                PathAttributesPair next = SshFiles.convertAttributes(nextEntry);
                 return next;
             }
         }

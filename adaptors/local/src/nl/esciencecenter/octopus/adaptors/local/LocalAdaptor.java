@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -13,7 +14,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 
 public class LocalAdaptor extends Adaptor {
 
-    public static final String ADAPTOR_NAME = "local";
+    public static final String ADAPTOR_NAME = OctopusEngine.LOCAL_ADAPTOR_NAME;
 
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
             + " standard java classes such as java.lang.Process and java.nio.file.Files.";
@@ -42,17 +43,20 @@ public class LocalAdaptor extends Adaptor {
 
     private final LocalFiles localFiles;
     private final LocalJobs localJobs;
-    private final LocalCredentials localCredentials;
 
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
         localFiles = new LocalFiles(getProperties(), this, octopusEngine);
         localJobs = new LocalJobs(getProperties(), this, octopusEngine);
-        localCredentials = new LocalCredentials();
     }
 
     void checkURI(URI location) throws OctopusException {
+        
+        if (location == null) { 
+            return;
+        }
+        
         String scheme = location.getScheme();
 
         if (scheme != null && !supports(scheme)) {
@@ -106,7 +110,7 @@ public class LocalAdaptor extends Adaptor {
     }
 
     @Override
-    public LocalCredentials credentialsAdaptor() {
-        return localCredentials;
+    public Credentials credentialsAdaptor() throws OctopusException {
+        throw new OctopusException(ADAPTOR_NAME, "Adaptor does not need or understand credentials.");
     }
 }

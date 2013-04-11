@@ -106,6 +106,18 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 //        }
 
     }
+
+    public AbsolutePathImplementation(FileSystem filesystem, RelativePath... relativePaths) {
+        
+        this.filesystem = filesystem;
+        
+        if (relativePaths.length == 0) { 
+            throw new IllegalArgumentException("AbsolutePathImplementation requires at least one RelativePath");
+        }
+        
+        this.relativePath = new RelativePath(relativePaths);
+    }
+    
     
     @Override
     public FileSystem getFileSystem() {
@@ -191,7 +203,7 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     
     @Override
     public String getPath() {
-        return filesystem.toString() + relativePath.toString();
+        return relativePath.getPath();
     }
     
     public String toString() {
