@@ -5,6 +5,7 @@
 
 	<target name="build" description="build local adaptors">
 		<ant dir="local" />
+		<ant dir="gridengine" />
 	</target>
 
 	<target name="build-all" description="build all adaptors (local, additional, and unstable)">

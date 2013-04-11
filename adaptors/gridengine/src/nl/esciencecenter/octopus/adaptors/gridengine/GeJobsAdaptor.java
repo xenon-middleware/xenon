@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.adaptors.ge;
+package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
 
@@ -12,22 +12,15 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.security.Credentials;
 
-public class GEJobsAdaptor implements JobsAdaptor {
+public class GeJobsAdaptor implements JobsAdaptor {
 
-    public GEJobsAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) {
+    public GeJobsAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) {
         // TODO Auto-generated constructor stub
     }
 
     public void end() {
         // TODO Auto-generated method stub
         
-    }
-
-    @Override
-    public Scheduler newScheduler(OctopusProperties properties, Credentials credentials, URI location)
-            throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -74,6 +67,12 @@ public class GEJobsAdaptor implements JobsAdaptor {
 
     @Override
     public Job[] submitJobs(Scheduler scheduler, JobDescription... descriptions) throws OctopusException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Scheduler newScheduler(OctopusProperties properties, URI location) throws OctopusException {
         // TODO Auto-generated method stub
         return null;
     }

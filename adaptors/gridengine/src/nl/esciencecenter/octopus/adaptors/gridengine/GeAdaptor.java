@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.adaptors.ge;
+package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -7,10 +7,11 @@ import java.util.Map;
 import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-public class GEAdaptor extends Adaptor {
+public class GeAdaptor extends Adaptor {
 
     private static final String ADAPTOR_NAME = "gridengine";
 
@@ -23,12 +24,12 @@ public class GEAdaptor extends Adaptor {
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] validPropertiesList = new String[][] { {}, {} };
 
-    private final GEJobsAdaptor jobsAdaptor;
+    private final GeJobsAdaptor jobsAdaptor;
 
-    public GEAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+    public GeAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
 
-        this.jobsAdaptor = new GEJobsAdaptor(properties, octopusEngine);
+        this.jobsAdaptor = new GeJobsAdaptor(properties, octopusEngine);
     }
 
     void checkURI(URI location) throws OctopusException {
@@ -59,7 +60,7 @@ public class GEAdaptor extends Adaptor {
     }
 
     @Override
-    public GEJobsAdaptor jobsAdaptor() {
+    public GeJobsAdaptor jobsAdaptor() {
         return jobsAdaptor;
     }
 
@@ -71,6 +72,11 @@ public class GEAdaptor extends Adaptor {
     @Override
     public String toString() {
         return getName();
+    }
+
+    @Override
+    public CredentialsAdaptor credentialsAdaptor() throws OctopusException {
+        throw new OctopusException("The SGE adaptor does not support credentials");
     }
 
 }

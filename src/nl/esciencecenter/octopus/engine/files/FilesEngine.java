@@ -38,7 +38,7 @@ public class FilesEngine implements Files {
         }
     };
 
-    public static final int BUFFER_SIZE = 10240;
+   // public static final int BUFFER_SIZE = 10240;
 
     private final OctopusEngine octopusEngine;
 
