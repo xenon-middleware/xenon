@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
  */
 public class OctopusEngine implements Octopus {
 
+    /** The local adaptor is a special case, therefore we publish its name here. */
+    public static final String LOCAL_ADAPTOR_NAME = "local";
+    
     /** All our own properties start with this prefix. */
     public static final String PREFIX = "octopus.";
 

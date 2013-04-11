@@ -57,7 +57,7 @@ public class FilesEngineTest {
     public FileSystemImplementation getFileSystem(String adaptor_name, URI root_location) throws URISyntaxException {
         String fs_uid = "1";
         OctopusProperties oprops = new OctopusProperties();
-        FileSystemImplementation filesystem = new FileSystemImplementation(adaptor_name, fs_uid, root_location, null, oprops);
+        FileSystemImplementation filesystem = new FileSystemImplementation(adaptor_name, fs_uid, root_location, null, null, oprops);
         return filesystem;
     }
 

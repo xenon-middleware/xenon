@@ -14,7 +14,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 
 public class LocalAdaptor extends Adaptor {
 
-    public static final String ADAPTOR_NAME = "local";
+    public static final String ADAPTOR_NAME = OctopusEngine.LOCAL_ADAPTOR_NAME;
 
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
             + " standard java classes such as java.lang.Process and java.nio.file.Files.";
@@ -52,6 +52,11 @@ public class LocalAdaptor extends Adaptor {
     }
 
     void checkURI(URI location) throws OctopusException {
+        
+        if (location == null) { 
+            return;
+        }
+        
         String scheme = location.getScheme();
 
         if (scheme != null && !supports(scheme)) {
