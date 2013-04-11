@@ -18,17 +18,19 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class SandboxedLocalJobIT {
+
     /**
+     * Octopus usage example:
      * <ol>
      * <li>Add `test/fixtures/lorem_ipsum.txt` to sandbox.</li>
      * <li>Submit `/usr/bin/wc` of sandboxed file to local.</li>
      * <li>Poll job until isDone</li>
      * <li>Verify stdout</li>
+     * <li>Clean up sandbox</li>
      * </ol>
      *
      * @throws OctopusException
@@ -55,7 +57,7 @@ public class SandboxedLocalJobIT {
         description.setStderr("stderr.txt");
         description.setWorkingDirectory(location.getPath());
 
-        URI sh_location = new URI("file:///");
+        URI sh_location = new URI("local:///");
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, null, null);
 
         Job job = octopus.jobs().submitJob(scheduler, description);
@@ -69,6 +71,8 @@ public class SandboxedLocalJobIT {
 
         File stdout = new File(root.getPath()+"/stdout.txt");
         assertThat(FileUtils.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
+
+//        sandbox.delete();
         octopus.files().delete(root);
     }
 }

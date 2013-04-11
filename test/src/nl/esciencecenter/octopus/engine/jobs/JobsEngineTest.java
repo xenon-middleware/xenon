@@ -65,7 +65,6 @@ public class JobsEngineTest {
         SchedulerImplementation scheduler = new SchedulerImplementation("local", "1", sheduler_location, null);
         // stub adaptor
         OctopusEngine octopus = mock(OctopusEngine.class);
-        JobsEngine engine = new JobsEngine(octopus);
         Adaptor adaptor = mock(Adaptor.class);
         Jobs job_adaptor = mock(Jobs.class);
         Job expected_job = new JobImplementation(job_description, scheduler, null);
@@ -74,6 +73,7 @@ public class JobsEngineTest {
         when(adaptor.jobsAdaptor()).thenReturn(job_adaptor);
         when(job_adaptor.newScheduler(sheduler_location, null, null)).thenReturn(scheduler);
         when(job_adaptor.submitJob(scheduler, job_description)).thenReturn(expected_job);
+        JobsEngine engine = new JobsEngine(octopus);
 
         Job job = engine.submitJob(scheduler, job_description);
 
