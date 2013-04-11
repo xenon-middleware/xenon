@@ -1,48 +1,42 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.util.Properties;
+
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.credentials.CredentialSet;
+import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
+import nl.esciencecenter.octopus.engine.credentials.PasswordCredential;
+import nl.esciencecenter.octopus.engine.credentials.ProxyCredential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SshCredentials implements Credentials {
-    private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+    OctopusProperties properties;
+    SshAdaptor adaptor;
+    OctopusEngine octopusEngine;
 
-    private OctopusProperties properties;
-    private SshAdaptor sshAdaptor;
-    private OctopusEngine octopusEngine;
-
-    private CredentialSet credentialSet = new CredentialSet();
-    
-    public SshCredentials(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine)
-            throws OctopusException {
+    public SshCredentials(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.properties = properties;
-        this.sshAdaptor = sshAdaptor;
+        this.adaptor = sshAdaptor;
         this.octopusEngine = octopusEngine;
     }
 
     @Override
-    public nl.esciencecenter.octopus.credentials.Credential newCertificateCredential(String keyfile, String certfile,
+    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
             String username, String password) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        return new CertificateCredential(adaptor.getName(), new OctopusProperties(properties), keyfile, certfile, username, password);
     }
 
     @Override
-    public nl.esciencecenter.octopus.credentials.Credential newPasswordCredential(String username, String password)
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password)
             throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        return new PasswordCredential(adaptor.getName(), new OctopusProperties(properties), username, password);
     }
 
     @Override
-    public nl.esciencecenter.octopus.credentials.Credential newProxyCredential(String host, int port, String username,
+    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
             String password) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        return new ProxyCredential(adaptor.getName(), new OctopusProperties(properties), host, port, username, password);
     }
 }

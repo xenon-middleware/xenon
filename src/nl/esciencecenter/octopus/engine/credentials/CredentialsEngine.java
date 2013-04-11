@@ -1,7 +1,10 @@
 package nl.esciencecenter.octopus.engine.credentials;
 
+import java.util.Properties;
+
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
@@ -13,79 +16,21 @@ public class CredentialsEngine implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String keyfile, String certfile, String username, String password)
+    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile, String username, String password)
             throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        return adaptor.credentialsAdaptor().newCertificateCredential(scheme, properties, keyfile, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String username, String password) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password) throws OctopusException {
+        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        return adaptor.credentialsAdaptor().newPasswordCredential(scheme, properties, username, password);
     }
 
     @Override
-    public Credential newProxyCredential(String host, int port, String username, String password) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username, String password) throws OctopusException {
+        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        return adaptor.credentialsAdaptor().newProxyCredential(scheme, properties, host, port, username, password);
     }
-
-//    @Override
-//    public UUID newCertificateCredential(Path keyfile, Path certfile, String username, String password, URI... validFor)
-//            throws OctopusException {
-//        UUID uuid = UUID.randomUUID();
-//
-//        for (URI uri : validFor) {
-//            Adaptor adaptor = octopusEngine.getAdaptorFor(uri.getScheme());
-//            adaptor.credentialsAdaptor().newCertificateCredential(uuid, keyfile, certfile, username, password, uri);
-//        }
-//
-//        return uuid;
-//    }
-//
-//    @Override
-//    public UUID newPasswordCredential(String username, String password, URI... validFor) throws OctopusException {
-//        UUID uuid = UUID.randomUUID();
-//
-//        for (URI uri : validFor) {
-//            Adaptor adaptor = octopusEngine.getAdaptorFor(uri.getScheme());
-//
-//            if (uri.getUserInfo() != null && !uri.getUserInfo().equals(username)) {
-//                throw new OctopusException("CredentialsEngine", "If usernames in URIs are given, they must be identical to the username parameter.");
-//            }
-//
-//            adaptor.credentialsAdaptor().newPasswordCredential(uuid, username, password, uri);
-//        }
-//
-//        return uuid;
-//    }
-//
-//    @Override
-//    public UUID newProxyCredential(String host, int port, String username, String password, URI... validFor)
-//            throws OctopusException {
-//        UUID uuid = UUID.randomUUID();
-//
-//        for (URI uri : validFor) {
-//            Adaptor adaptor = octopusEngine.getAdaptorFor(uri.getScheme());
-//            adaptor.credentialsAdaptor().newProxyCredential(uuid, host, port, username, password, uri);
-//        }
-//
-//        return uuid;
-//    }
-//
-//    @Override
-//    public void remove(UUID credentialID, URI... validFor) throws OctopusException {
-//        if (validFor.length == 0) {
-//            for (Adaptor adaptor : octopusEngine.getAdaptors()) {
-//                adaptor.credentialsAdaptor().remove(credentialID, null);
-//            }
-//            return;
-//        }
-//
-//        for (URI uri : validFor) {
-//            Adaptor adaptor = octopusEngine.getAdaptorFor(uri.getScheme());
-//            adaptor.credentialsAdaptor().remove(credentialID, uri);
-//        }
-//    }
 }

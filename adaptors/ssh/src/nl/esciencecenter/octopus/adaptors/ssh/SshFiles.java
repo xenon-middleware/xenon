@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.Set;
@@ -13,8 +12,8 @@ import java.util.Set;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
-import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
@@ -42,6 +41,13 @@ public class SshFiles implements Files {
     private final OctopusEngine octopusEngine;
     private final SshAdaptor adaptor;
     private final Properties properties;
+    private static int currentID = 1;
+    
+    private static synchronized String getNewUniqueID() {
+        String res = "ssh" + currentID; 
+        currentID++;
+        return res;
+    }
     
     public SshFiles(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
@@ -62,19 +68,17 @@ public class SshFiles implements Files {
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        return new FileSystemImplementation(adaptor.getName(), getNewUniqueID(), location, credential, new OctopusProperties(properties));
     }
 
     @Override
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        return new AbsolutePathImplementation(filesystem, location);
     }
 
     @Override
     public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException {
-        // TODO Auto-generated method stub
+        // TODO
         return null;
     }
 
@@ -127,11 +131,28 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public boolean exists(AbsolutePath path) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean exists(AbsolutePath path) throws OctopusIOException { // TODO more specific exception, octopus really is couldnotinitcredential
+        ChannelSftp channel;
+        try {
+            channel = adaptor.getSftpChannel((FileSystemImplementation)path.getFileSystem());
+        } catch (OctopusException e) { // TODO more specific exception types
+            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+        }
+
+        try {
+            channel.lstat(path.getPath());
+        } catch (SftpException e) {
+            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+                return false;
+            }
+
+            throw adaptor.sftpExceptionToOctopusException(e);
+        }
+
+        return true;
     }
 
+    
     @Override
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
@@ -233,17 +254,6 @@ public class SshFiles implements Files {
     
     // TODO close channels
     
-    @Override
-    public Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
@@ -267,17 +277,6 @@ public class SshFiles implements Files {
         return dir;
     }
 
-    @Override
-    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Path createSymbolicLink(Path link, Path target) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public void delete(Path path, DeleteOption... options) throws OctopusIOException {
@@ -310,34 +309,7 @@ public class SshFiles implements Files {
         }
     }
 
-// TODO will be removed
-    @Override
-    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
-    @Override
-    public boolean exists(Path path) throws OctopusIOException { // TODO more specific exception, octopus really is couldnotinitcredential
-        ChannelSftp channel;
-        try {
-            channel = adaptor.getSftpChannel(path.toUri());
-        } catch (OctopusException e) { // TODO more specific exception types
-            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
-        }
-
-        try {
-            channel.lstat(path.getPath());
-        } catch (SftpException e) {
-            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
-                return false;
-            }
-
-            throw adaptor.sftpExceptionToOctopusException(e);
-        }
-
-        return true;
-    }
 
     @Override
     public boolean isDirectory(Path path) throws OctopusIOException {
@@ -356,11 +328,6 @@ public class SshFiles implements Files {
         }
     }
 
-    @Override
-    public Path move(Path source, Path target, CopyOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -431,54 +398,6 @@ public class SshFiles implements Files {
         }
     }
 
-    @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public FileAttributes readAttributes(Path path) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Path readSymbolicLink(Path link) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Path setOwner(Path path, String owner, String group) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Path setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Path setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException {
-        // TODO Auto-generated method stub
-
-    }
 
     
     */

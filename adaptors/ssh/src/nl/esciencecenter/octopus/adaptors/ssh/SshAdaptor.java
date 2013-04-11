@@ -1,6 +1,7 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -181,19 +182,22 @@ public class SshAdaptor extends Adaptor {
             host = "localhost";
         }
 
+        logger.debug("creating new session to " + user + "@" + host + ":" + port);
+        
         CertificateCredential credential = (CertificateCredential) fs.getCredential();
         if (credential == null) {
-            throw new OctopusException("ssh", "Could not find any valid credential.");
+            throw new OctopusException("ssh", "Please specify a valid credential, credential is 'null'");
         }
 
-        // TODO: sessions are per filesystem, that is when the credential is given. 
+        logger.debug("using credential: " + credential);
+        
         try {
-            jsch.addIdentity(credential.getKeyfile(), credential.getPassword());
+            jsch.addIdentity(credential.getKeyfile(), Arrays.toString(credential.getPassword()));
         } catch (JSchException e) {
             throw new OctopusException("ssh", "Could not read private key file.", e);
         }
 
-        setKnownHostsFile("/home/rob/.ssh/known_hosts");
+        setKnownHostsFile(System.getProperty("user.home") + "/.ssh/known_hosts");
 
         Session session;
         try {
