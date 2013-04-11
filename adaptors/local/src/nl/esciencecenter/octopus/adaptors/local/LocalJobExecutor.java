@@ -54,6 +54,7 @@ public class LocalJobExecutor implements Runnable {
 
     private synchronized void setExitStatus(int exitStatus) {
         this.exitCode = exitStatus;
+        done = true;
     }
 
     public synchronized void kill() throws OctopusException {
@@ -126,6 +127,8 @@ public class LocalJobExecutor implements Runnable {
             } catch (InterruptedException e) {
                 parallelProcess.destroy();
             }
+
+            updateState("DONE");
 
         } catch (IOException e) {
             setError(e);

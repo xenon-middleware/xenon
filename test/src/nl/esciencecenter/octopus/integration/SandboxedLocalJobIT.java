@@ -77,9 +77,11 @@ public class SandboxedLocalJobIT {
         // TODO copy file from sandbox to somewhere
 
         File stdout = new File(root.getPath()+"/stdout.txt");
-        assertThat(FileUtils.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
+        assertThat(FileUtils.readFileToString(stdout), is("   9  525 3581 " + input_file + "\n"));
 
 //        sandbox.delete();
+        octopus.files().delete(root.resolve(new RelativePath("stdout.txt")));
+        octopus.files().delete(root.resolve(new RelativePath("stderr.txt")));
         octopus.files().delete(root);
     }
 }

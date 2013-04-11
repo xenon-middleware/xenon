@@ -23,5 +23,4 @@ public class PathAttributesPairImplementation implements PathAttributesPair {
     public FileAttributes attributes() {
         return attributes;
     }
-
 }

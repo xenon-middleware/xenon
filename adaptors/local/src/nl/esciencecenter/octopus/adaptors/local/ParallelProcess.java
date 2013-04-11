@@ -93,6 +93,7 @@ class ParallelProcess {
         for (int i = 0; i < processes.length; i++) {
             results[i] = processes[i].waitFor();
         }
+        
         return results[0];
     }
 
