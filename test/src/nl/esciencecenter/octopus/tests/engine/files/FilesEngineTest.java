@@ -7,15 +7,15 @@ import static org.hamcrest.CoreMatchers.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
-import nl.esciencecenter.octopus.engine.files.PathImplementation;
+import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 
 import org.junit.Test;
 
@@ -52,12 +52,12 @@ public class FilesEngineTest {
         when(octopus.getAdaptorFor(scheme_name)).thenReturn(adaptor);
     }
 
-    public Path fakePath(OctopusEngine octopus, URI uri) throws URISyntaxException {
+    public AbsolutePath fakePath(OctopusEngine octopus, URI uri) throws URISyntaxException {
         return fakePath(octopus, uri, "mock");
     }
 
-    public Path fakePath(OctopusEngine octopus, URI uri, String adaptor_name) {
-        Path path = mock(PathImplementation.class);
+    public AbsolutePath fakePath(OctopusEngine octopus, URI uri, String adaptor_name) {
+        AbsolutePath path = mock(AbsolutePathImplementation.class);
         when(path.getFileSystem().getAdaptorName()).thenReturn(adaptor_name);
         return path;
     }
@@ -79,7 +79,7 @@ public class FilesEngineTest {
         OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
 
         URI location = new URI("file:///tmp/bla.txt");
-        Path path = fakePath(octopus, location);
+        AbsolutePath path = fakePath(octopus, location);
         OctopusProperties octopus_properties = new OctopusProperties();
         
         
@@ -124,9 +124,9 @@ public class FilesEngineTest {
         Files files_adaptor = mock(Files.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("file:///tmp/bar.txt"));
+        AbsolutePath source = fakePath(octopus, new URI("file:///tmp/bar.txt"));
         when(source.isLocal()).thenReturn(false);
-        Path target = fakePath(octopus, new URI("file:///tmp/foo.txt"));
+        AbsolutePath target = fakePath(octopus, new URI("file:///tmp/foo.txt"));
         when(target.isLocal()).thenReturn(false);
 
         engine.copy(source, target);
@@ -142,9 +142,9 @@ public class FilesEngineTest {
         addAdaptor2Octopus(octopus, target_adaptor, "agridftp", "gridftp");
 
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("ssh://localhost/tmp/bar.txt"), "assh");
+        AbsolutePath source = fakePath(octopus, new URI("ssh://localhost/tmp/bar.txt"), "assh");
         when(source.isLocal()).thenReturn(false);
-        Path target = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
+        AbsolutePath target = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
         when(target.isLocal()).thenReturn(false);
 
         try {
@@ -163,9 +163,9 @@ public class FilesEngineTest {
         addAdaptor2Octopus(octopus, target_adaptor, "agridftp", "gridftp");
 
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("file:///tmp/bar.txt"), "alocal");
+        AbsolutePath source = fakePath(octopus, new URI("file:///tmp/bar.txt"), "alocal");
         when(source.isLocal()).thenReturn(true);
-        Path target = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
+        AbsolutePath target = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
         when(target.isLocal()).thenReturn(false);
 
         engine.copy(source, target);
@@ -181,9 +181,9 @@ public class FilesEngineTest {
         addAdaptor2Octopus(octopus, target_adaptor, "alocal", "file");
 
         FilesEngine engine = new FilesEngine(octopus);
-        Path source = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
+        AbsolutePath source = fakePath(octopus, new URI("gridftp://somewhere/tmp/foo.txt"), "agridftp");
         when(source.isLocal()).thenReturn(false);
-        Path target = fakePath(octopus, new URI("file:///tmp/bar.txt"), "alocal");
+        AbsolutePath target = fakePath(octopus, new URI("file:///tmp/bar.txt"), "alocal");
         when(target.isLocal()).thenReturn(true);
 
         engine.copy(source, target);
@@ -282,7 +282,7 @@ public class FilesEngineTest {
         OctopusEngine octopus = fakeOctopus(files_adaptor, "mock", "file");
 
         FilesEngine engine = new FilesEngine(octopus);
-        Path path = fakePath(octopus, new URI("file:///tmp/bla.txt"));
+        AbsolutePath path = fakePath(octopus, new URI("file:///tmp/bla.txt"));
 
         engine.setOwner(path, "someone", "somegroup");
 

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;

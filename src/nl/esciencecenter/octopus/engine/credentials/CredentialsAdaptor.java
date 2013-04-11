@@ -4,11 +4,11 @@ import java.net.URI;
 import java.util.UUID;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 
 public abstract class CredentialsAdaptor {
     /**
-     * Constructs a certificate Credential out of a {@link Path} pointing to the private key, a {@link Path} pointing to the
+     * Constructs a certificate Credential out of a {@link AbsolutePath} pointing to the private key, a {@link AbsolutePath} pointing to the
      * certificate, a username and a password.
      * 
      * @param keyfile
@@ -21,7 +21,7 @@ public abstract class CredentialsAdaptor {
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public abstract void newCertificateCredential(UUID uuid, Path keyfile, Path certfile, String username, String password,
+    public abstract void newCertificateCredential(UUID uuid, AbsolutePath keyfile, AbsolutePath certfile, String username, String password,
             URI validFor) throws OctopusException;
 
     /**

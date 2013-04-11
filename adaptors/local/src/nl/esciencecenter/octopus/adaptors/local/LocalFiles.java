@@ -12,18 +12,16 @@ import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.UserPrincipal;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
-import nl.esciencecenter.octopus.engine.files.PathImplementation;
+import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.CopyOption;
@@ -31,9 +29,10 @@ import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +57,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
 
     @Override
-    public Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException {
+    public AbsolutePath copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
         
         if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
             if (exists(target) && isDirectory(target)
@@ -85,7 +84,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Path move(Path source, Path target, CopyOption... options) throws OctopusIOException {
+    public AbsolutePath move(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
         
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
@@ -161,7 +160,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 //    }
 
     @Override
-    public Path createSymbolicLink(Path link, Path target) throws OctopusIOException {
+    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
         if (exists(link)) {
             throw new FileAlreadyExistsException(getClass().getName(), "Cannot create link, as a file with this name already exists");
         }
@@ -176,12 +175,12 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws OctopusIOException {
+    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException {
         try {
             java.nio.file.Path target = Files.readSymbolicLink(LocalUtils.javaPath(link));
-
+            
             // FIXME: No clue if this is correct!!
-            return new PathImplementation(link.getFileSystem(), target.toString());
+            return new AbsolutePathImplementation(link.getFileSystem(), new RelativePath(target.toString()));
         } catch (IOException e) {
             throw new OctopusIOException(getClass().getName(), "could not create symbolic link", e);
         }
@@ -223,7 +222,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 //    }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException {
+    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
         if (!isDirectory(dir)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create directorystream, file is not a directory");
         }
@@ -232,7 +231,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException {
         if (!isDirectory(dir)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create DirectoryAttributeStream, file is not a directory");
@@ -242,7 +241,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws OctopusIOException {
+    public InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
         try {
             return Files.newInputStream(LocalUtils.javaPath(path));
         } catch (IOException e) {
@@ -251,7 +250,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
+    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         try {
             return Files.newOutputStream(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
         } catch (IOException e) {
@@ -261,7 +260,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
+    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
             throws OctopusIOException {
         try {
             return Files.newByteChannel(LocalUtils.javaPath(path), LocalUtils.javaOpenOptionsSet(options),
@@ -272,22 +271,22 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public FileAttributes getAttributes(Path path) throws OctopusIOException {
+    public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {
         return new LocalFileAttributes(path);
     }
 
     @Override
-    public boolean exists(Path path) throws OctopusIOException {
+    public boolean exists(AbsolutePath path) throws OctopusIOException {
         return Files.exists(LocalUtils.javaPath(path));
     }
 
     @Override
-    public boolean isDirectory(Path path) throws OctopusIOException {
+    public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
         return Files.isDirectory(LocalUtils.javaPath(path));
     }
 
     @Override
-    public void setOwner(Path path, String user, String group) throws OctopusIOException {
+    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
@@ -311,7 +310,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
+    public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
@@ -321,7 +320,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
+    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
 
@@ -361,7 +360,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     
     @Override
-    public Path newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException {
+    public AbsolutePath newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -379,43 +378,43 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Path createDirectories(Path dir) throws OctopusIOException {
+    public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path createDirectory(Path dir) throws OctopusIOException {
+    public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Path createFile(Path path) throws OctopusIOException {
+    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void delete(Path path) throws OctopusIOException {
+    public void delete(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
         
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusIOException {
+    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir) throws OctopusIOException {
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public SeekableByteChannel newByteChannel(Path path, OpenOption... options) throws OctopusIOException {
+    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }

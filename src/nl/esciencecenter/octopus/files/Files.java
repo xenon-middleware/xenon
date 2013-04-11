@@ -36,7 +36,7 @@ public interface Files {
     // FIXME add getCWDFileSystem()
     // FIXME add getHomeFileSystem()
     
-    public Path newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException;
+    public AbsolutePath newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException;
     
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException;
     
@@ -56,7 +56,7 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs
      * */
-    public Path copy(Path source, Path target, CopyOption... options) throws OctopusIOException;
+    public AbsolutePath copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException;
 
     /**
      * Creates a directory by creating all nonexistent parent directories first.
@@ -76,7 +76,7 @@ public interface Files {
      * @throws FileAlreadyExistsException
      *             if {@code dir} exists but is not a directory <i>(optional specific exception)</i>
      */
-    public Path createDirectories(Path dir) throws OctopusIOException;
+    public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Creates a new directory.
@@ -102,7 +102,7 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    public Path createDirectory(Path dir) throws OctopusIOException;
+    public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Creates a new and empty file, failing if the file already exists.
@@ -116,7 +116,7 @@ public interface Files {
      */
     //public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
-    public Path createFile(Path path) throws OctopusIOException;
+    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
 
     
     /**
@@ -129,22 +129,22 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs
      */
-    public Path createSymbolicLink(Path link, Path target) throws OctopusIOException;
+    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException;
 
     /**
      * Deletes a file.
      */
-    public void delete(Path path) throws OctopusIOException;
+    public void delete(AbsolutePath path) throws OctopusIOException;
     
     /**
      * Tests whether a file exists.
      */
-    public boolean exists(Path path) throws OctopusIOException;
+    public boolean exists(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Tests whether a file is a directory.
      */
-    public boolean isDirectory(Path path) throws OctopusIOException;
+    public boolean isDirectory(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Move or rename a file to a target file.
@@ -160,74 +160,74 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs
      */
-    public Path move(Path source, Path target, CopyOption... options) throws OctopusIOException;
+    public AbsolutePath move(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over all entries in the directory.
      */
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusIOException;
+    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory.
      */
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException;
+    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the PathAttributes of all entries in the directory.
      */
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir) throws OctopusIOException;
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory. Extra functionality in RAL to
      * efficiently fetch all attributes for a directory.
      */
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
     /** Opens a file, returning an input stream to read from the file. */
-    public InputStream newInputStream(Path path) throws OctopusIOException;
+    public InputStream newInputStream(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Opens or creates a file, returning an output stream that may be used to write bytes to the file. If no options are present
      * then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
      */
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException;
+    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     /**
      * Opens or creates a file, returning a seekable byte channel to access the file.
      */
-    public SeekableByteChannel newByteChannel(Path path, Set<PosixFilePermission> permissions, OpenOption... options)
+    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
             throws OctopusIOException;
 
     /**
      * Opens or creates a file, returning a seekable byte channel to access the file.
      */
-    public SeekableByteChannel newByteChannel(Path path, OpenOption... options) throws OctopusIOException;
+    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     /**
      * Reads a file's attributes.
      */
-    public FileAttributes getAttributes(Path path) throws OctopusIOException;
+    public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Reads the target of a symbolic link (optional operation).
      */
-    public Path readSymbolicLink(Path link) throws OctopusIOException;
+    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
 
     /**
      * Updates the file owner and group. Use null for either to keep current owner/group
      */
-    public void setOwner(Path path, String user, String group) throws OctopusIOException;
+    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException;
 
     /**
      * Sets a file's POSIX permissions.
      */
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
+    public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
     /**
      * Updates a file's last modified, last access, and create time attribute. Use -1 to not set a certain attribute
      */
-    public void setFileTimes(Path path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException;
+    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException;
 
     /**
      * Updates (replace) the access control list.

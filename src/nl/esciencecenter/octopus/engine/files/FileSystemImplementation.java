@@ -2,7 +2,7 @@ package nl.esciencecenter.octopus.engine.files;
 
 import java.net.URI;
 
-import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.files.FileSystem;
 
 public class FileSystemImplementation implements FileSystem {

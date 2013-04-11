@@ -2,7 +2,7 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
 
-import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 public final class SchedulerImplementation implements Scheduler {

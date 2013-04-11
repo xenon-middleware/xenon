@@ -8,7 +8,7 @@ package nl.esciencecenter.octopus.files;
  */
 public interface PathAttributes {
 
-    public Path path();
+    public AbsolutePath path();
 
     public FileAttributes attributes();
 }
