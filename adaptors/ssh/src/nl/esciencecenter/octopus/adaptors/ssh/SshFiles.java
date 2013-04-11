@@ -67,10 +67,6 @@ public class SshFiles implements Files {
         }
     }
 
-    protected static PathAttributes convertAttributes(LsEntry entry) {
-        return null; // TODO
-    }
-
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
