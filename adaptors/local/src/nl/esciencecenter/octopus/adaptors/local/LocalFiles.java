@@ -126,51 +126,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return target;
     }
 
-//    @Override
-//    public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
-//        if (exists(dir) && !isDirectory(dir)) {
-//            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists (but is not a directory).");
-//        }
-//
-//        try {
-//            Files.createDirectories(LocalUtils.javaPath(dir), LocalUtils.javaPermissionAttribute(permissions));
-//        } catch (IOException e) {
-//            throw new OctopusIOException(getClass().getName(), "could not create directories", e);
-//        }
-//
-//        return dir;
-//    }
-//
-//    @Override
-//    public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException {
-//        if (exists(dir)) {
-//            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
-//        }
-//
-//        try {
-//            Files.createDirectories(LocalUtils.javaPath(dir), LocalUtils.javaPermissionAttribute(permissions));
-//        } catch (IOException e) {
-//            throw new OctopusIOException(getClass().getName(), "could not create directory", e);
-//        }
-//
-//        return dir;
-//    }
-//
-//    @Override
-//    public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
-//        if (exists(path)) {
-//            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create file, as it already exists");
-//        }
-//
-//        try {
-//            Files.createFile(LocalUtils.javaPath(path), LocalUtils.javaPermissionAttribute(permissions));
-//        } catch (IOException e) {
-//            throw new OctopusIOException(getClass().getName(), "could not create file", e);
-//        }
-//
-//        return path;
-//    }
-
     @Override
     public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
         if (exists(link)) {
@@ -197,41 +152,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusIOException(getClass().getName(), "could not create symbolic link", e);
         }
     }
-
-//    @Override
-//    public void delete(Path path, DeleteOption... options) throws OctopusIOException {
-//        if (!exists(path)) {
-//            throw new NoSuchFileException(getClass().getName(), "cannot delete file, as it does not exist");
-//        }
-//
-//        // recursion step
-//        if (isDirectory(path) && DeleteOption.contains(options, DeleteOption.RECURSIVE)) {
-//            for (Path child : newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER)) {
-//                delete(child, options);
-//            }
-//        }
-//
-//        try {
-//            Files.delete(LocalUtils.javaPath(path));
-//        } catch (IOException e) {
-//            throw new OctopusIOException(getClass().getName(), "could not delete file", e);
-//        }
-//    }
-//
-//    @Override
-//    public boolean deleteIfExists(Path path, DeleteOption... options) throws OctopusIOException {
-//        if (isDirectory(path) && DeleteOption.contains(options, DeleteOption.RECURSIVE)) {
-//            for (Path child : newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER)) {
-//                delete(child, options);
-//            }
-//        }
-//
-//        try {
-//            return Files.deleteIfExists(LocalUtils.javaPath(path));
-//        } catch (IOException e) {
-//            throw new OctopusIOException(getClass().getName(), "could not delete file", e);
-//        }
-//    }
 
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
@@ -268,7 +188,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         } catch (IOException e) {
             throw new OctopusIOException(getClass().getName(), "Could not output stream", e);
         }
-
     }
 
     @Override
@@ -466,11 +385,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         
         try { 
             java.nio.file.Files.delete(LocalUtils.javaPath(path));
-        } catch (NoSuchFileException e1) {
+        } catch (java.nio.file.NoSuchFileException e1) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
             
-        } catch (DirectoryNotEmptyException e2) {
-            // TODO: handle exception
+        } catch (java.nio.file.DirectoryNotEmptyException e2) {
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path.getPath() + " not empty!");
             
         } catch (Exception e) { 
@@ -480,22 +398,22 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
-
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
-
 
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        
+        try {
+            return java.nio.file.Files.newByteChannel(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
+        } catch (Exception e) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create byte channel " + path.getPath(), e);
+        }
     }
 
     @Override
