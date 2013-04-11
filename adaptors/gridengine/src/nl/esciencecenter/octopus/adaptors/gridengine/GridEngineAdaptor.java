@@ -4,14 +4,14 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
-import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.files.Files;
 
-public class GeAdaptor extends Adaptor {
+public class GridEngineAdaptor extends Adaptor {
 
     public static final String ADAPTOR_NAME = "gridengine";
 
@@ -21,20 +21,26 @@ public class GeAdaptor extends Adaptor {
 
     private static final String[] ADAPTOR_SCHEME = new String[] { "ge" };
 
+    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + ADAPTOR_NAME + ".";
+
+    public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
+
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] validPropertiesList = new String[][] { {}, {} };
+    private static final String[][] validPropertiesList =
+            new String[][] { { IGNORE_VERSION_PROPERTY, "false",
+                    "Boolean: If true, the version check is skipped. WARNING: it is not recommended to use this setting in production environments" }, };
 
-    private final GeJobsAdaptor jobsAdaptor;
+    private final GridEngineJobs jobsAdaptor;
 
-    public GeAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+    public GridEngineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
 
-        this.jobsAdaptor = new GeJobsAdaptor(properties, octopusEngine);
+        this.jobsAdaptor = new GridEngineJobs(properties, octopusEngine);
     }
 
     void checkURI(URI location) throws OctopusException {
         if (!supports(location.getScheme())) {
-            throw new OctopusException("SGE adaptor does not support scheme " + location.getScheme(), "sge", location);
+            throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support scheme" + location.getScheme());
         }
     }
 
@@ -55,12 +61,7 @@ public class GeAdaptor extends Adaptor {
     }
 
     @Override
-    public FilesAdaptor filesAdaptor() throws OctopusException {
-        throw new OctopusException("The SGE adaptor does not support files");
-    }
-
-    @Override
-    public GeJobsAdaptor jobsAdaptor() {
+    public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;
     }
 
@@ -75,8 +76,13 @@ public class GeAdaptor extends Adaptor {
     }
 
     @Override
-    public CredentialsAdaptor credentialsAdaptor() throws OctopusException {
-        throw new OctopusException("The SGE adaptor does not support credentials");
+    public Files filesAdaptor() throws OctopusException {
+        throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support files.");
+    }
+
+    @Override
+    public Credentials credentialsAdaptor() throws OctopusException {
+        throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support credentials.");
     }
 
 }
