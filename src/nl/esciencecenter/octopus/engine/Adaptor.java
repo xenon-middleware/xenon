@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
-import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -93,7 +93,7 @@ public abstract class Adaptor implements AdaptorInfo {
 
     public abstract Jobs jobsAdaptor() throws OctopusException;
 
-    public abstract CredentialsAdaptor credentialsAdaptor() throws OctopusException;
+    public abstract Credentials credentialsAdaptor() throws OctopusException;
 
     public abstract void end();
 }

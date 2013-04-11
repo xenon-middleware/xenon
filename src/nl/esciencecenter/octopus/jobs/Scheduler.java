@@ -1,8 +1,7 @@
 package nl.esciencecenter.octopus.jobs;
 
 import java.net.URI;
-
-import nl.esciencecenter.octopus.engine.OctopusProperties;
+import java.util.Properties;
 
 public interface Scheduler {
 
@@ -10,5 +9,5 @@ public interface Scheduler {
     
     public URI getUri();
 
-    public OctopusProperties getProperties();
+    public Properties getProperties();
 }

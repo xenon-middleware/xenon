@@ -11,14 +11,14 @@ public class CertificateCredential extends Credential {
     /**
      * This member variables holds the URI of the keyfile of the SecurityContext
      */
-    private URI keyfile = null;
+    private String keyfile = null;
 
     /**
      * Some ssh implementations on windows (tunnelier) use a private key slot
      */
     private int privateKeySlot = -1;
 
-    private URI certfile = null;
+    private String certfile = null;
 
     /**
      * Constructs a {@link CertificateCredential} out of a {@link URI} pointing to the private key, a {@link URI} pointing to the
@@ -33,7 +33,7 @@ public class CertificateCredential extends Credential {
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredential(URI keyfile, URI certfile, String username, String password) {
+    public CertificateCredential(String keyfile, String certfile, String username, String password) {
         super(username, password);
         this.keyfile = keyfile;
         this.certfile = certfile;
@@ -50,7 +50,7 @@ public class CertificateCredential extends Credential {
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredential(URI keyfile, URI certfile, String password) {
+    public CertificateCredential(String keyfile, String certfile, String password) {
         this(keyfile, certfile, null, password);
     }
 
@@ -88,7 +88,7 @@ public class CertificateCredential extends Credential {
      * 
      * @return The location of the keyfile associated with the context.
      */
-    public URI getKeyfile() {
+    public String getKeyfile() {
         return keyfile;
     }
 
@@ -98,7 +98,7 @@ public class CertificateCredential extends Credential {
      * @param keyfile
      *            the location of the keyfile associated with the context.
      */
-    public void setKeyfile(URI keyfile) {
+    public void setKeyfile(String keyfile) {
         this.keyfile = keyfile;
     }
 
@@ -136,7 +136,7 @@ public class CertificateCredential extends Credential {
      * 
      * @return the {@link URI} of the certificate file.
      */
-    public URI getCertfile() {
+    public String getCertfile() {
         return certfile;
     }
 
@@ -146,7 +146,7 @@ public class CertificateCredential extends Credential {
      * @param certfile
      *            the location of the certificate file.
      */
-    public void setCertfile(URI certfile) {
+    public void setCertfile(String certfile) {
         this.certfile = certfile;
     }
 }

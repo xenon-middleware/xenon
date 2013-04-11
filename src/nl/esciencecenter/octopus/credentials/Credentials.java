@@ -26,7 +26,7 @@ public interface Credentials {
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public Credential newCertificateCredential(AbsolutePath keyfile, AbsolutePath certfile, String username, String password)
+    public Credential newCertificateCredential(String keyfile, String certfile, String username, String password)
             throws OctopusException;
 
     /**
