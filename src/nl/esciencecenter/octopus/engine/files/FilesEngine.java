@@ -173,12 +173,12 @@ public class FilesEngine implements Files {
 
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
-        return newDirectoryStream(dir, ACCEPT_ALL_FILTER);
+        return getFilesAdaptor(dir).newDirectoryStream(dir);
     }
 
     @Override
     public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
-        return newAttributesDirectoryStream(dir, ACCEPT_ALL_FILTER);
+        return getFilesAdaptor(dir).newAttributesDirectoryStream(dir);
     }
     
     @Override
@@ -208,7 +208,7 @@ public class FilesEngine implements Files {
     
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        return newByteChannel(path, null, options);
+        return getFilesAdaptor(path).newByteChannel(path, options);
     }
 
     @Override
