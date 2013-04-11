@@ -203,7 +203,7 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     
     @Override
     public String getPath() {
-        return filesystem.toString() + relativePath.toString();
+        return relativePath.getPath();
     }
     
     public String toString() {

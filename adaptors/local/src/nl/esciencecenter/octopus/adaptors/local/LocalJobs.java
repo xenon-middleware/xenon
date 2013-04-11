@@ -48,7 +48,7 @@ public class LocalJobs implements Jobs {
             OctopusIOException {
 
         localAdaptor.checkURI(location);
-
+        
         if (location.getPath() != null && location.getPath().length() > 0) {
             throw new OctopusException("local", "Non-empty path in a local scheduler URI is not allowed");
         }
