@@ -68,7 +68,8 @@ public class SshFiles implements Files {
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        return new FileSystemImplementation(adaptor.getName(), getNewUniqueID(), location, credential, new OctopusProperties(properties));
+        RelativePath entryPath = new RelativePath("you/idiot");
+        return new FileSystemImplementation(adaptor.getName(), getNewUniqueID(), location, entryPath, credential, new OctopusProperties(properties));
     }
 
     @Override
