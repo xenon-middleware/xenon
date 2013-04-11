@@ -1,16 +1,49 @@
 package nl.esciencecenter.octopus.jobs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface JobDescription {
+public class JobDescription {
 
+    private String queueName = null;
+
+    private String executable = null;
+
+    private String stdin = null;
+
+    private String stdout = "stdout.txt";
+
+    private String stderr = "stderr.txt";
+
+    private String workingDirectory = null;
+
+    private List<String> arguments = new ArrayList<String>();
+
+    private Map<String, String> environment = new HashMap<String, String>();
+
+    private int nodeCount = 1;
+
+    private int processesPerNode = 1;
+
+    private int maxTime = 30; // minutes
+    
+    private boolean offlineMode = false;
+    
+    public JobDescription() { 
+        // nothing
+    }
+    
     /**
      * Get the number of nodes.
      * 
      * @return the number of resources
      */
-    public int getNodeCount();
+    public int getNodeCount() {
+        return nodeCount;
+    }
 
     /**
      * Set the number of resources, which is the total number of resources where the number of processes should be distributed on.
@@ -18,7 +51,9 @@ public interface JobDescription {
      * @param resourceCount
      *            the number of resources
      */
-    public void setNodeCount(int resourceCount); 
+    public void setNodeCount(int resourceCount) {
+        this.nodeCount = resourceCount;
+    }
 
     /**
      * Get the number of processes started on each node. The total number of processes started is getProcessesPerNode() *
@@ -26,7 +61,9 @@ public interface JobDescription {
      * 
      * @return the number of processes
      */
-    public int getProcessesPerNode();
+    public int getProcessesPerNode() {
+        return processesPerNode;
+    }
 
     /**
      * Get the number of processes started on each node.
@@ -34,20 +71,25 @@ public interface JobDescription {
      * @param ppn
      *            the number of processes
      */
-    public void setProcessesPerNode(int ppn);
+    public void setProcessesPerNode(int ppn) {
+        this.processesPerNode = ppn;
+    }
 
-    public String getQueueName();
+    public String getQueueName() {
+        return queueName;
+    }
 
-    /** 
-     * Set the queuename to use in the scheduler. 
-     * 
-     * @param queueName
-     */
-    public void setQueueName(String queueName);
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
 
-    public int getMaxTime();
+    public int getMaxTime() {
+        return maxTime;
+    }
 
-    public void setMaxTime(int maxTime);
+    public void setMaxTime(int maxTime) {
+        this.maxTime = maxTime;
+    }
 
     /**
      * Returns the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will return
@@ -55,7 +97,9 @@ public interface JobDescription {
      * 
      * @return the path to the executable.
      */
-    public String getExecutable();
+    public String getExecutable() {
+        return executable;
+    }
 
     /**
      * Sets the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> the {@link String}
@@ -64,7 +108,9 @@ public interface JobDescription {
      * @param executable
      *            The path to the executable.
      */
-    public void setExecutable(String executable);
+    public void setExecutable(String executable) {
+        this.executable = executable;
+    }
 
     /**
      * Returns the arguments of the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will
@@ -72,7 +118,9 @@ public interface JobDescription {
      * 
      * @return Returns the commandline arguments.
      */
-    public List<String> getArguments();
+    public List<String> getArguments() {
+        return arguments;
+    }
 
     /**
      * Sets the arguments of the executable. For the following commandline <code>"/bin/cat hello world"</code> the {@link String}
@@ -81,7 +129,10 @@ public interface JobDescription {
      * @param arguments
      *            The commandline arguments to set.
      */
-    public void setArguments(String... arguments);
+    public void setArguments(String... arguments) {
+        this.arguments.clear();
+        this.arguments.addAll(Arrays.asList(arguments));
+    }
 
     /**
      * Returns the environment of the executable. The environment of the executable consists of a {@link Map} of environment
@@ -89,7 +140,9 @@ public interface JobDescription {
      * 
      * @return the environment
      */
-    public Map<String, String> getEnvironment();
+    public Map<String, String> getEnvironment() {
+        return environment;
+    }
 
     /**
      * Sets the environment of the executable. The environment of the executable consists of a {@link Map} of environment
@@ -98,52 +151,67 @@ public interface JobDescription {
      * @param environment
      *            The environment to set.
      */
-    public void setEnvironment(Map<String, String> environment);
+    public void setEnvironment(Map<String, String> environment) {
+        this.environment = new HashMap<String, String>(environment);
+    }
 
-    public String getStdin();
+    public boolean offlineMode() {
+        return offlineMode;
+    }
 
-    /**
-     * Set the location of the file providing stdin (relative to the working directory). 
-     *  
-     * Default is "$(workingDirectory)/stdin.txt" 
-     *  
-     * @param stdin the location of the file from which stdin is redirected. 
-     */
-    public void setStdin(String stdin);
+    public void setOfflineMode(boolean offlineMode) {
+        this.offlineMode = offlineMode;
+    }
+    public void setStdin(String stdin) {
+        this.stdin = stdin;
+    }
 
-    public String getStdout();
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
+    }
 
-    /**
-     * Set the location of the file to which to redirect stdout (relative to the working directory). 
-     *  
-     * Default is "$(workingDirectory)/stdout.txt" 
-     *  
-     * @param stdout the location of the file where stdout is redirected to. 
-     */
-    public void setStdout(String stdout);
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
+    }
 
-    public String getStderr();
+    public void setWorkingDirectory(String workingDirectory) {
+        this.workingDirectory = workingDirectory;
+    }
 
-    /**
-     * Set the location of the file to which to redirect stderr (relative to the working directory). 
-     *  
-     * Default is "$(workingDirectory)/stderr.txt" 
-     *  
-     * @param stderr the location of the file where stderr is redirected to. 
-     */
-    public void setStderr(String stderr);
+    public String getStdin() {
+        return stdin;
+    }
+
+    public String getStdout() {
+        return stdout;
+    }
+
+    public String getStderr() {
+        return stderr;
+    }
+
+    public String getWorkingDirectory() {
+        return workingDirectory;
+    }
     
-    /** 
-     * Set the location of the working directory for the job (relative to a scheduler specific root).  
-     * 
-     * @param workingDirectory the location of the working directory.
-     */
-    public void setWorkingDirectory(String workingDirectory);
-    
-    public String getWorkingDirectory();
-    
-    public boolean offlineMode();
+    public String toString() {
+        String res = "JobDescription(";
+        res += "node count: " + nodeCount;
+        res += "ppn: " + processesPerNode;
+        res += "queue: " + queueName;
+        res += "maxTime: " + maxTime;
+        res += "executable: " + executable;
+        res += ", arguments: " + arguments;
+        res += ", environment: " + environment;
 
-    public void setOfflineMode(boolean offlineMode);
+        res += ", stdin: " + stdin;
+        res += ", stdout: " + stdout;
+        res += ", stderr: " + stderr;
 
+        res += ", offlineMode: " + offlineMode;
+
+        res += ")";
+
+        return res;
+    }
 }

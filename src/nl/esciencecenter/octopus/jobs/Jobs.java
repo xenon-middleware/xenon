@@ -22,8 +22,6 @@ public interface Jobs {
     
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
     
-    public JobDescription newJobDescription();
-    
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
 
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException;
