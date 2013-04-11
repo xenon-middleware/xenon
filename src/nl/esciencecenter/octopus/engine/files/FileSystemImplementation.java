@@ -19,7 +19,6 @@ public class FileSystemImplementation implements FileSystem {
         
     public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, RelativePath entryPath, Credential credential, 
             OctopusProperties properties) {
-        
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;

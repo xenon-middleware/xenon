@@ -6,7 +6,5 @@ public interface Credential {
  
     public String getAdaptorName();
     
-    public String getUniqueID();
-
     public Properties getProperties();
 }
