@@ -51,7 +51,7 @@ public class SandboxedLocalJobIT {
         // TODO: use sandbox when done
 //        Sandbox sandbox = new Sandbox(octopus, root, "mysandbox");
 
-        JobDescription description = octopus.jobs().newJobDescription();
+        JobDescription description = new JobDescription();
         description.setArguments(input_file);
         description.setExecutable("/usr/bin/wc");
         description.setStdin(null);

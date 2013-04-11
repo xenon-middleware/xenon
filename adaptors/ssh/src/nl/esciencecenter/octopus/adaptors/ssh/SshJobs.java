@@ -47,12 +47,6 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public JobDescription newJobDescription() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return null;

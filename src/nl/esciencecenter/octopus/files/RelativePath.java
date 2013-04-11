@@ -181,7 +181,7 @@ public class RelativePath {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " not present in path " + this);
         }
 
-        if (endIndex < 0 || endIndex >= elements.length) {
+        if (endIndex < 0 || endIndex > elements.length) {
             throw new IllegalArgumentException("endIndex " + beginIndex + " not present in path " + this);
         }
 

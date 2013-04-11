@@ -126,12 +126,6 @@ public class LocalJobs implements Jobs {
         return localScheduler;
     }
     
-    @Override
-    public JobDescription newJobDescription() {
-        // FIXME: Not needed ? 
-        return null;
-    }
-
     private Job[] getJobs(LocalJobExecutor[] executors) {
 
         LocalJobExecutor[] tmp = singleQ.toArray(new LocalJobExecutor[0]);

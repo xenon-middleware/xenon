@@ -8,7 +8,7 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
-public class JavaJobDescription implements JobDescription {
+public class JavaJobDescription extends JobDescription {
 
     // FIXME: BROKEN BROKEN BROKEN!!! Implement!!! Changed to facade, but hav not changed implementation!!!
     
