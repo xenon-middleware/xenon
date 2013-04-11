@@ -5,16 +5,9 @@ import java.util.StringTokenizer;
 
 /**
  * A container for security Information.
- * <p>
- * Each context has a data object associated with it. The data object is opaque to the Octopus API and is used and manipulated by
- * adaptors based upon their interpretation of the context. A globus adaptor could store a GSI credential in it, while an SSH
- * adaptor could store the private key in the data object.
- * <p>
- * Notes restrict the access to the context because it is a bad idea to broadcast passwords / credentials, so it is useful to
- * restrict those to a set of hosts or adaptors.
  * 
  */
-public abstract class Credential implements Cloneable {
+public abstract class Credential {
 
     /** the user name to use for this context */
     protected String username;
@@ -24,6 +17,7 @@ public abstract class Credential implements Cloneable {
      */
     
     // FIXME must be char array for security!!
+    // (String end up in the constant pool, etc.)
     protected String password = null;
 
     /**

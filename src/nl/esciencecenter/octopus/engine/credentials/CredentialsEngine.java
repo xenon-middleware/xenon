@@ -1,14 +1,9 @@
 package nl.esciencecenter.octopus.engine.credentials;
 
-import java.net.URI;
-import java.util.UUID;
-
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
 
 public class CredentialsEngine implements Credentials {
     private final OctopusEngine octopusEngine;
@@ -18,7 +13,7 @@ public class CredentialsEngine implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(AbsolutePath keyfile, AbsolutePath certfile, String username, String password)
+    public Credential newCertificateCredential(String keyfile, String certfile, String username, String password)
             throws OctopusException {
         // TODO Auto-generated method stub
         return null;
