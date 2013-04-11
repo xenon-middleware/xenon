@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import sun.util.locale.StringTokenIterator;
-
 public class RelativePath {
 
     public static final char DEFAULT_SEPERATOR = '/';
