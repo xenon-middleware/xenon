@@ -6,7 +6,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
  * A container for security Information.
  * 
  */
-public abstract class Credential implements nl.esciencecenter.octopus.credentials.Credential {
+public abstract class CredentialImplementation implements nl.esciencecenter.octopus.credentials.Credential {
 
     private static int currentID = 1;
     
@@ -36,7 +36,7 @@ public abstract class Credential implements nl.esciencecenter.octopus.credential
     protected final OctopusProperties properties;
 
 
-    protected Credential(String adaptorName, OctopusProperties properties, String username, String password) {
+    protected CredentialImplementation(String adaptorName, OctopusProperties properties, String username, String password) {
         this.adaptorName = adaptorName;
         this.properties = properties;
         this.username = username;

@@ -5,17 +5,17 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 /**
  * A security context based upon user name, password combination.
  */
-public class PasswordCredential extends Credential {
+public class PasswordCredentialImplementation extends CredentialImplementation {
 
     /**
-     * Constructs a {@link PasswordCredential} with the given <code>username</code> and <code>password</code>.
+     * Constructs a {@link PasswordCredentialImplementation} with the given <code>username</code> and <code>password</code>.
      * 
      * @param username
      *            the username
      * @param password
      *            the password for the given username
      */
-    public PasswordCredential(String adaptorName, OctopusProperties properties, String username, String password) {
+    public PasswordCredentialImplementation(String adaptorName, OctopusProperties properties, String username, String password) {
         super(adaptorName, properties, username, password);
     }
 

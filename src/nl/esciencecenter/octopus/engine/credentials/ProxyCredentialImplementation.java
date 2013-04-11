@@ -8,7 +8,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
  * 
  * @author rob
  */
-public class ProxyCredential extends Credential {
+public class ProxyCredentialImplementation extends CredentialImplementation {
 
     /**
      * The hostname of the server
@@ -21,7 +21,7 @@ public class ProxyCredential extends Credential {
     protected int port;
 
     /**
-     * Creates a {@link ProxyCredential}.
+     * Creates a {@link ProxyCredentialImplementation}.
      * 
      * @param host
      *            the hostname of the myproxy server
@@ -32,7 +32,7 @@ public class ProxyCredential extends Credential {
      * @param password
      *            the password to use to connect to the myproxy server
      */
-    public ProxyCredential(String adaptorName, OctopusProperties properties, String host, int port, String username, String password) {
+    public ProxyCredentialImplementation(String adaptorName, OctopusProperties properties, String host, int port, String username, String password) {
             super(adaptorName, properties, username, password);
         this.host = host;
         this.port = port;

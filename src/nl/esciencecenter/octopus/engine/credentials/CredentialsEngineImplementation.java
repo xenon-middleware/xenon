@@ -8,10 +8,10 @@ import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-public class CredentialsEngine implements Credentials {
+public class CredentialsEngineImplementation implements Credentials {
     private final OctopusEngine octopusEngine;
 
-    public CredentialsEngine(OctopusEngine octopusEngine) {
+    public CredentialsEngineImplementation(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
     }
 

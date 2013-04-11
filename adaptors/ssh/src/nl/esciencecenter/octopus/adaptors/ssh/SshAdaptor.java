@@ -9,7 +9,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
+import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -184,7 +184,7 @@ public class SshAdaptor extends Adaptor {
 
         logger.debug("creating new session to " + user + "@" + host + ":" + port);
         
-        CertificateCredential credential = (CertificateCredential) fs.getCredential();
+        CertificateCredentialImplementation credential = (CertificateCredentialImplementation) fs.getCredential();
         if (credential == null) {
             throw new OctopusException("ssh", "Please specify a valid credential, credential is 'null'");
         }

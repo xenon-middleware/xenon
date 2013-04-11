@@ -6,7 +6,7 @@ import java.util.Vector;
 import nl.esciencecenter.octopus.AdaptorInfo;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.engine.credentials.CredentialsEngine;
+import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -63,7 +63,7 @@ public class OctopusEngine implements Octopus {
 
     private final JobsEngine jobsEngine;
 
-    private final CredentialsEngine credentialsEngine;
+    private final CredentialsEngineImplementation credentialsEngine;
 
     private final Adaptor[] adaptors;
 
@@ -86,7 +86,7 @@ public class OctopusEngine implements Octopus {
 
         jobsEngine = new JobsEngine(this);
 
-        credentialsEngine = new CredentialsEngine(this);
+        credentialsEngine = new CredentialsEngineImplementation(this);
 
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }

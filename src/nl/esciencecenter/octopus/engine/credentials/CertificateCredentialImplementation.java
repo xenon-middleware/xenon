@@ -8,7 +8,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
  * A container for security Information based upon certificates. Contexts based upon these mechanisms can be used by adaptors to
  * create further contexts containing opaque data objects, e.g. GSSAPI credentials.
  */
-public class CertificateCredential extends Credential {
+public class CertificateCredentialImplementation extends CredentialImplementation {
 
     /**
      * This member variables holds the URI of the keyfile of the SecurityContext
@@ -18,7 +18,7 @@ public class CertificateCredential extends Credential {
     private String certfile = null;
 
     /**
-     * Constructs a {@link CertificateCredential} out of a {@link URI} pointing to the private key, a {@link URI} pointing to the
+     * Constructs a {@link CertificateCredentialImplementation} out of a {@link URI} pointing to the private key, a {@link URI} pointing to the
      * certificate, a username and a password.
      * 
      * @param keyfile
@@ -30,7 +30,7 @@ public class CertificateCredential extends Credential {
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredential(String adaptorName, OctopusProperties properties, String keyfile, String certfile, String username, String password) {
+    public CertificateCredentialImplementation(String adaptorName, OctopusProperties properties, String keyfile, String certfile, String username, String password) {
         super(adaptorName, properties, username, password);
         this.keyfile = keyfile;
         this.certfile = certfile;
