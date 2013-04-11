@@ -24,12 +24,14 @@ public class SshFileTests {
 
         String username = System.getProperty("user.name");
 
-        Credential credential = c.newCertificateCredential("/home/" + username + "/.ssh/id_rsa", ".ssh/id_rsa.pub", username, "");
+        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
 
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
         AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
 
+        System.err.println("path = " + path.getPath());
+        
         Assert.assertTrue(octopus.files().exists(path));
 
         octopus.end();
@@ -40,12 +42,14 @@ public class SshFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
-        Credential credential = c.newCertificateCredential("/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
+        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
        
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(".bashrc"));
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/rob/.bashrc"));
 
+        System.err.println("absolute path = " + path);
+        
         InputStream in = octopus.files().newInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
 

@@ -3,7 +3,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.net.URI;
 import java.util.ArrayList;
 
-import nl.esciencecenter.octopus.engine.credentials.Credential;
+import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -18,7 +18,7 @@ class SshConnection {
     }
     
     private Session session;
-    private Credential credential;
+    private CredentialImplementation credential;
     private URI destination;
     private ArrayList<Channel> channelsInUse;
     private ArrayList<Channel> channelsFree;
