@@ -62,7 +62,7 @@ public class LocalJobs implements Jobs {
         
         OctopusProperties p = new OctopusProperties(this.properties, properties);
         
-        Scheduler scheduler = new SchedulerImplementation("LocalScheduler" + id, LocalAdaptor.ADAPTOR_NAME, location, p);
+        Scheduler scheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler" + id, location, p);
         
         LocalScheduler local = new LocalScheduler(scheduler);        
         schedulers.put(scheduler, local);
