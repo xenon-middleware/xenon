@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.tests.adaptors.local;
+package nl.esciencecenter.octopus.adaptors.local;
 
 import static org.junit.Assert.*;
 
