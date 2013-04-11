@@ -152,7 +152,7 @@ public class RelativePathTest {
             path.subpath(beginIndex, endIndex);
             fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {
-            String expected_message = "endIndex " + beginIndex + " not present in path /a/b/c";
+            String expected_message = "beginIndex " + beginIndex + " not present in path /a/b/c";
             assertEquals(expected_message, e.getMessage());
         }
     }
