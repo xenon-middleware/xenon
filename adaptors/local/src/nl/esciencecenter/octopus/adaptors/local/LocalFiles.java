@@ -364,11 +364,13 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     
         localAdaptor.checkURI(location);
       
-        if (location.getPath() != null) {
+        String path = location.getPath();
+
+        if (path != null && !path.equals("/")) {
             throw new OctopusException("local", "Cannot create local file system with path!");
         }
         
-        String path = System.getProperty("user.home");
+        path = System.getProperty("user.home");
         
         if (!LocalUtils.exists(path)) { 
             throw new OctopusException("local", "Cannot create FileSystem with non-existing entry path (" + path + ")");
@@ -429,7 +431,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
         
         try { 
-            java.nio.file.Files.createDirectory(LocalUtils.javaPath(dir), (FileAttribute<?>) null);
+            java.nio.file.Files.createDirectory(LocalUtils.javaPath(dir));
         } catch (IOException e) { 
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create directory " + dir.getPath(), e);
         }
@@ -449,7 +451,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
         
         try { 
-            java.nio.file.Files.createFile(LocalUtils.javaPath(path), (FileAttribute<?>) null);
+            java.nio.file.Files.createFile(LocalUtils.javaPath(path));
         } catch (IOException e) { 
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path.getPath(), e);
         }

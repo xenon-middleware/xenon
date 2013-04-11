@@ -70,6 +70,7 @@ public class LocalJobExecutor implements Runnable {
 
     private synchronized void setError(Exception e) {
         error = e;
+        done = true;
     }
 
     public synchronized boolean isDone() {

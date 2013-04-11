@@ -53,7 +53,7 @@ public class LocalScheduler {
         int processors = Runtime.getRuntime().availableProcessors();
         
         OctopusProperties properties = new OctopusProperties(scheduler.getProperties());
-        
+       
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         multiExecutor = Executors.newFixedThreadPool(multiQThreads);
 
@@ -139,7 +139,7 @@ public class LocalScheduler {
             unlimitedQ.add(executor);
             unlimitedExecutor.execute(executor);
         } else {
-            throw new BadParameterException("queue \"" + queueName + "\" does not exist", "local", null);
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "queue \"" + queueName + "\" does not exist");
         }
 
         //purge jobs from q if needed (will not actually cancel execution of jobs)
@@ -159,7 +159,7 @@ public class LocalScheduler {
         } else if (queueName.equals("unlimited")) {
             return unlimitedQ;
         } else {
-            throw new OctopusException("queue \"" + queueName + "\" does not exist", "local", null);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "queue \"" + queueName + "\" does not exist");
         }
     }
 
@@ -171,14 +171,13 @@ public class LocalScheduler {
             }
         }
 
-        throw new OctopusException("local", "Job not found: " + job.getIdentifier());
+        throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job not found: " + job.getIdentifier());
     }
 
     public void cancelJob(Job job) throws OctopusException {
 
-        if (job.getScheduler() != this) {
-            throw new OctopusException("Cannot cancel jobs descriptions from other scheduler!", 
-                    scheduler.getAdaptorName());
+        if (job.getScheduler() != scheduler) {
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot cancel jobs descriptions from other scheduler!"); 
         }
 
         // FIXME: What if job is already gone?
@@ -188,9 +187,8 @@ public class LocalScheduler {
 
     public JobStatus getJobStatus(Job job) throws OctopusException {
         
-        if (job.getScheduler() != this) {
-            throw new OctopusException("Cannot cancel jobs descriptions from other scheduler!", 
-                    scheduler.getAdaptorName());
+        if (job.getScheduler() != scheduler) {
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot retrieve job status from other scheduler!");
         }
         
         LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());

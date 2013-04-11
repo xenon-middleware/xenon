@@ -31,6 +31,8 @@ public class LocalJobs implements Jobs {
 
     private final LocalAdaptor localAdaptor;
 
+    private final OctopusProperties properties;
+    
     private static int jobID = 0;
 
     private static synchronized int getNextSchedulerID() {
@@ -41,6 +43,7 @@ public class LocalJobs implements Jobs {
             throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
+        this.properties = properties;
     }
       
     @Override
@@ -48,16 +51,18 @@ public class LocalJobs implements Jobs {
             OctopusIOException {
 
         localAdaptor.checkURI(location);
-        
-        if (location.getPath() != null && location.getPath().length() > 0) {
-            throw new OctopusException("local", "Non-empty path in a local scheduler URI is not allowed");
+
+        String path = location.getPath();
+
+        if (path != null && !path.equals("/")) {
+            throw new OctopusException("local", "Cannot create local scheduler with path!");
         }
 
         int id = getNextSchedulerID();
         
-        OctopusProperties p = new OctopusProperties(properties);
+        OctopusProperties p = new OctopusProperties(this.properties, properties);
         
-        Scheduler scheduler = new SchedulerImplementation("LocalScheduler" + id, LocalAdaptor.ADAPTOR_NAME, location, p);
+        Scheduler scheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler" + id, location, p);
         
         LocalScheduler local = new LocalScheduler(scheduler);        
         schedulers.put(scheduler, local);
@@ -73,14 +78,13 @@ public class LocalJobs implements Jobs {
     private LocalScheduler getLocalScheduler(Scheduler scheduler) throws OctopusException { 
         
         if (scheduler == null) { 
-            throw new OctopusException("Scheduler is null!", LocalAdaptor.ADAPTOR_NAME);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Scheduler is null!");
         }
         
         LocalScheduler tmp = schedulers.get(scheduler);
         
         if (tmp == null) { 
-            throw new OctopusException("Scheduler not found " + scheduler.getAdaptorName(), 
-                    LocalAdaptor.ADAPTOR_NAME);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Scheduler not found " + scheduler.getAdaptorName());
         }
         
         return tmp;

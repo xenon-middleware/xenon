@@ -36,7 +36,9 @@ public class OctopusProperties extends Properties {
         super();
 
         for (String[] element : defaults) {
+            
             if (element[1] != null) {
+            //    System.out.println("Adding property: " + element[0]  + " " + element[1]);
                 super.put(element[0], element[1]);
             }
         }
@@ -56,9 +58,13 @@ public class OctopusProperties extends Properties {
         if (properties == null) {
             return;
         }
+        
         for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             String value = properties.getProperty(key);
+        
+           // System.out.println("** Adding property: " + key  + " " + value);
+            
             super.put(key, value);
         }
     }
@@ -182,6 +188,11 @@ public class OctopusProperties extends Properties {
      *             if the property defined and not an integer
      */
     public int getIntProperty(String key, int defaultValue) {
+        
+        if (!containsKey(key)) { 
+            return defaultValue;
+        }
+        
         String value = getProperty(key);
 
         if (value == null) {
