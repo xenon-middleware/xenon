@@ -4,7 +4,6 @@ import java.util.Properties;
 import java.util.Vector;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsEngine;
@@ -58,7 +57,7 @@ public class OctopusEngine implements Octopus {
 
     private boolean ended = false;
 
-    private OctopusProperties defaultProperties;
+    private OctopusProperties octopusProperties;
 
     private final FilesEngine filesEngine;
 
@@ -79,9 +78,9 @@ public class OctopusEngine implements Octopus {
      */
     private OctopusEngine(Properties properties) throws OctopusException {
       
-        defaultProperties = new OctopusProperties(VALID_PROPERTIES, properties);
+        octopusProperties = new OctopusProperties(VALID_PROPERTIES, properties);
         
-        adaptors = AdaptorLoader.loadAdaptors(defaultProperties, this);
+        adaptors = AdaptorLoader.loadAdaptors(octopusProperties, this);
 
         filesEngine = new FilesEngine(this);
 
@@ -92,11 +91,11 @@ public class OctopusEngine implements Octopus {
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }
     
-    public synchronized OctopusProperties getCombinedProperties(Properties properties) {
-        OctopusProperties result = new OctopusProperties(defaultProperties, properties);
-
-        return result;
-    }
+//    public synchronized OctopusProperties getCombinedProperties(Properties properties) {
+//       OctopusProperties result = new OctopusProperties(octopusProperties, properties);
+//
+//        return result;
+//    }
 
     // ************** Octopus Interface Implementation ***************\\
 
@@ -142,18 +141,8 @@ public class OctopusEngine implements Octopus {
     }
 
     @Override
-    public synchronized Properties getDefaultProperties() {
-        return defaultProperties;
-    }
-
-    @Override
-    public synchronized void setDefaultProperties(Properties properties) {
-        
-        synchronized (this) {
-            defaultProperties = new OctopusProperties(VALID_PROPERTIES, properties);
-        }
-        
-        // FIXME: Should check properties here!
+    public synchronized Properties getProperties() {
+        return octopusProperties;
     }
 
     @Override

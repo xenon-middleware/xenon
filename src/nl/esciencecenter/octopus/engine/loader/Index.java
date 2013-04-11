@@ -38,9 +38,8 @@ class Index {
                 names.add(subEntry.getName());
             }
         } catch (IOException e) {
-            throw new OctopusException("failed to get adaptor files from jar", e);
+            throw new OctopusException("Index", "failed to get adaptor files from jar");
         }
-
     }
 
     public JarEntry findEntryFor(String filename) {

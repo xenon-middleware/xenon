@@ -22,6 +22,8 @@ public abstract class Credential implements Cloneable {
     /**
      * This member variables holds the passphrase of the SecurityContext
      */
+    
+    // FIXME must be char array for security!!
     protected String password = null;
 
     /**

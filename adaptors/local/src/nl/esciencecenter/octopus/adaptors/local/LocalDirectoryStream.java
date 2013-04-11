@@ -7,11 +7,12 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 
-class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
+class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
 
     private final java.nio.file.DirectoryStream<java.nio.file.Path> stream;
 
@@ -19,82 +20,74 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
     private final DirectoryStream.Filter filter;
 
-    private final ArrayList<Path> readAhead;
+    private final ArrayList<AbsolutePath> readAhead;
 
-    private final Path dir;
+    private final AbsolutePath dir;
 
-    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException {
+    LocalDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
         try {
             this.dir = dir;
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
             this.filter = filter;
-            this.readAhead = new ArrayList<Path>();
+            this.readAhead = new ArrayList<AbsolutePath>();
 
         } catch (IOException e) {
-            throw new OctopusException("could not create directory stream", e, null, null);
+            throw new OctopusIOException("LocalDirectoryStream", "could not create directory stream", e);
         }
     }
 
-    private Path gatPath(java.nio.file.Path path) throws OctopusException {
-        return dir.resolve(path.getFileName().toString());
+    private AbsolutePath getPath(java.nio.file.Path path) {
+        return dir.resolve(new RelativePath(path.getFileName().toString()));
     }
 
     @Override
-    public Iterator<Path> iterator() {
+    public Iterator<AbsolutePath> iterator() {
         return this;
     }
 
     @Override
-    public void close() throws OctopusException {
+    public void close() throws OctopusIOException {
         try {
             stream.close();
         } catch (IOException e) {
-            throw new OctopusException("Cannot close stream", e, null, null);
+            throw new OctopusIOException("LocalDirectoryStream", "Cannot close stream", e);
         }
     }
 
     @Override
     public synchronized boolean hasNext() {
-        try {
             if (!readAhead.isEmpty()) {
                 return true;
             }
             while (iterator.hasNext()) {
-                Path next = gatPath(iterator.next());
+                AbsolutePath next = getPath(iterator.next());
                 if (filter.accept(next)) {
                     readAhead.add(next);
                     return true;
                 }
             }
             return false;
-        } catch (OctopusException e) {
-            throw new DirectoryIteratorException("error on getting next element", e, "local", dir.toUri());
-        }
     }
 
     @Override
-    public synchronized Path next() {
+    public synchronized AbsolutePath next() {
         if (!readAhead.isEmpty()) {
             return readAhead.remove(0);
         }
 
-        try {
-            while (iterator.hasNext()) {
-                Path next = gatPath(iterator.next());
-                if (filter.accept(next)) {
-                    return next;
-                }
+        while (iterator.hasNext()) {
+            AbsolutePath next = getPath(iterator.next());
+            if (filter.accept(next)) {
+                return next;
             }
-            throw new NoSuchElementException("no more files in directory");
-        } catch (OctopusException e) {
-            throw new DirectoryIteratorException("error on getting next element", e, "local", dir.toUri());
         }
+        throw new NoSuchElementException("no more files in directory");
+
     }
 
     @Override
     public synchronized void remove() {
-        throw new DirectoryIteratorException("DirectoryStream iterator does not support remove", "local", dir.toUri());
-
+        throw new DirectoryIteratorException("LocalDirectoryStream", "DirectoryStream iterator does not support remove");
     }
 }

@@ -5,11 +5,10 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
-import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
-import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
  * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Octopus interface,
@@ -56,7 +55,7 @@ public abstract class Adaptor implements AdaptorInfo {
 
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             if (!validSet.contains(entry.getKey())) {
-                throw new OctopusException("Unknown property " + entry);
+                throw new OctopusException(getName(), "Unknown property " + entry);
             }
         }
         
@@ -90,11 +89,11 @@ public abstract class Adaptor implements AdaptorInfo {
         return false;
     }
 
-    public abstract FilesAdaptor filesAdaptor() throws OctopusException;
+    public abstract Files filesAdaptor();
 
-    public abstract JobsAdaptor jobsAdaptor() throws OctopusException;
+    public abstract Jobs jobsAdaptor();
 
-    public abstract CredentialsAdaptor credentialsAdaptor() throws OctopusException;
+    public abstract CredentialsAdaptor credentialsAdaptor();
 
     public abstract void end();
 }

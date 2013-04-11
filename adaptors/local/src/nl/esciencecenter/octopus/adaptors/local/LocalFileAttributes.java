@@ -3,14 +3,12 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFileAttributes;
-import java.util.List;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.AclEntry;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileAttributes;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 public class LocalFileAttributes implements FileAttributes {
@@ -21,7 +19,7 @@ public class LocalFileAttributes implements FileAttributes {
     private final boolean writable;
     private final boolean hidden;
 
-    public LocalFileAttributes(Path path) throws OctopusException {
+    public LocalFileAttributes(AbsolutePath path) throws OctopusIOException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
 
@@ -33,7 +31,7 @@ public class LocalFileAttributes implements FileAttributes {
             hidden = Files.isHidden(javaPath);
 
         } catch (IOException e) {
-            throw new OctopusException("Cannot read attributes", e, null, null);
+            throw new OctopusIOException(getClass().getName(), "Cannot read attributes", e);
         }
     }
 
@@ -89,7 +87,7 @@ public class LocalFileAttributes implements FileAttributes {
 
     @Override
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
-        return LocalUtils.gatPermissions(attributes.permissions());
+        return LocalUtils.octopusPermissions(attributes.permissions());
     }
 
     @Override
@@ -112,8 +110,8 @@ public class LocalFileAttributes implements FileAttributes {
         return writable;
     }
 
-    @Override
-    public List<AclEntry> getAcl() throws AttributeNotSupportedException {
-        throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
-    }
+//    @Override
+//    public List<AclEntry> getAcl() throws AttributeNotSupportedException {
+//        throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
+//    }
 }

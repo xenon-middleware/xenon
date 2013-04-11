@@ -3,8 +3,9 @@ package nl.esciencecenter.octopus.jobs;
 import java.net.URI;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * Main interface to the jobs package
@@ -12,17 +13,24 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  */
 public interface Jobs {
 
-    public Scheduler newScheduler(URI location) throws OctopusException;
+    public Scheduler newScheduler(URI location, Credential credential, Properties properties) 
+            throws OctopusException, OctopusIOException;
 
-    public Scheduler newScheduler(Properties properties, Credentials credentials, URI location) throws OctopusException;
-
+    public JobDescription newJobDescription();
+    
     public String[] getQueueNames(Scheduler scheduler) throws OctopusException;
 
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException;
-
+    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
+    
+    /**
+     * Submit a job. 
+     * 
+     * @param description the description of the job to submit.
+     * 
+     * @return Job representing the running job. 
+     * @throws OctopusException if the Job failed to submit. 
+     */
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException;
-
-    public Job[] submitJobs(Scheduler scheduler, JobDescription... descriptions) throws OctopusException;
 
     /**
      * This method returns the state of the Job.
@@ -32,20 +40,16 @@ public interface Jobs {
     public JobStatus getJobStatus(Job job) throws OctopusException;
 
     /**
-     * This method returns the state of the Jobs.
+     * This method returns the state of a set of Jobs.
      * 
-     * @return This method returns the states of the provided jobs.
+     * @return the states of the provided jobs.
+     * 
+     * @throws OctopusException if the the Job failed to submit. 
      */
-    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException;
+    public JobStatus[] getJobStatuses(Job... jobs);
 
     /**
      * Will forcibly stop a job.
      */
     public void cancelJob(Job job) throws OctopusException;
-
-    /**
-     * Will forcibly stop a job.
-     */
-    public void cancelJobs(Job... jobs) throws OctopusException;
-
 }

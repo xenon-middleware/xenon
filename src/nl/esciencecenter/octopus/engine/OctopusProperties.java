@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus;
+package nl.esciencecenter.octopus.engine;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.DeployRuntimeException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
@@ -80,7 +80,7 @@ public class OctopusProperties extends Properties {
 
             result.load(inputStream);
         } catch (IOException e) {
-            throw new OctopusException("cannot load properties from stream", e, null, null);
+            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
         }
 
         return new Properties(result);
@@ -98,7 +98,7 @@ public class OctopusProperties extends Properties {
         try (FileInputStream inputStream = new FileInputStream(fileName)) {
             result.load(inputStream);
         } catch (IOException e) {
-            throw new OctopusException("cannot load properties from stream", e, null, null);
+            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
         }
 
         return new Properties(result);
@@ -701,41 +701,41 @@ public class OctopusProperties extends Properties {
 
     @Override
     public Object setProperty(String key, String value) {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public Object put(Object key, Object value) {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public Object remove(Object key) {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public void putAll(Map<? extends Object, ? extends Object> t) {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public void clear() {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public void load(Reader reader) throws IOException {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public void load(InputStream inStream) throws IOException {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 
     @Override
     public void loadFromXML(InputStream in) throws IOException, InvalidPropertiesFormatException {
-        throw new DeployRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
     }
 }

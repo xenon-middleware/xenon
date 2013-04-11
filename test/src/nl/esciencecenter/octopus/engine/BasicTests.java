@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.tests.engine;
+package nl.esciencecenter.octopus.engine;
 
 import java.util.Arrays;
 import java.util.Properties;
@@ -28,7 +28,7 @@ public class BasicTests {
 
         Octopus octopus = OctopusFactory.newOctopus(properties);
 
-        assertEquals(octopus.getDefaultProperties().get("some.key"), "some.value");
+        assertEquals(octopus.getProperties().get("some.key"), "some.value");
 
         octopus.end();
     }

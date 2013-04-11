@@ -1,53 +1,16 @@
 package nl.esciencecenter.octopus.jobs;
 
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
-
-public class JobDescription {
-
-    private int nodeCount = 1;
-
-    private int processesPerNode = 1;
-
-    private String queueName = null;
-
-    private int maxTime = 30; // minutes
-
-    private String executable = null;
-
-    private List<String> arguments = new ArrayList<String>();
-
-    private Map<String, String> environment = new HashMap<String, String>();
-
-    private Path stdin = null;
-
-    private Path stdout = null;
-
-    private Path stderr = null;
-
-    private Path workingDirectory = null;
-
-    private boolean offlineMode = false;
-
-    public JobDescription() {
-        // NOTHING
-    }
+public interface JobDescription {
 
     /**
      * Get the number of nodes.
      * 
      * @return the number of resources
      */
-    public int getNodeCount() {
-        return nodeCount;
-    }
+    public int getNodeCount();
 
     /**
      * Set the number of resources, which is the total number of resources where the number of processes should be distributed on.
@@ -55,9 +18,7 @@ public class JobDescription {
      * @param resourceCount
      *            the number of resources
      */
-    public void setNodeCount(int resourceCount) {
-        this.nodeCount = resourceCount;
-    }
+    public void setNodeCount(int resourceCount); 
 
     /**
      * Get the number of processes started on each node. The total number of processes started is getProcessesPerNode() *
@@ -65,9 +26,7 @@ public class JobDescription {
      * 
      * @return the number of processes
      */
-    public int getProcessesPerNode() {
-        return processesPerNode;
-    }
+    public int getProcessesPerNode();
 
     /**
      * Get the number of processes started on each node.
@@ -75,25 +34,20 @@ public class JobDescription {
      * @param ppn
      *            the number of processes
      */
-    public void setProcessesPerNode(int ppn) {
-        this.processesPerNode = ppn;
-    }
+    public void setProcessesPerNode(int ppn);
 
-    public String getQueueName() {
-        return queueName;
-    }
+    public String getQueueName();
 
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
+    /** 
+     * Set the queuename to use in the scheduler. 
+     * 
+     * @param queueName
+     */
+    public void setQueueName(String queueName);
 
-    public int getMaxTime() {
-        return maxTime;
-    }
+    public int getMaxTime();
 
-    public void setMaxTime(int maxTime) {
-        this.maxTime = maxTime;
-    }
+    public void setMaxTime(int maxTime);
 
     /**
      * Returns the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will return
@@ -101,9 +55,7 @@ public class JobDescription {
      * 
      * @return the path to the executable.
      */
-    public String getExecutable() {
-        return executable;
-    }
+    public String getExecutable();
 
     /**
      * Sets the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> the {@link String}
@@ -112,9 +64,7 @@ public class JobDescription {
      * @param executable
      *            The path to the executable.
      */
-    public void setExecutable(String executable) {
-        this.executable = executable;
-    }
+    public void setExecutable(String executable);
 
     /**
      * Returns the arguments of the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will
@@ -122,9 +72,7 @@ public class JobDescription {
      * 
      * @return Returns the commandline arguments.
      */
-    public List<String> getArguments() {
-        return arguments;
-    }
+    public List<String> getArguments();
 
     /**
      * Sets the arguments of the executable. For the following commandline <code>"/bin/cat hello world"</code> the {@link String}
@@ -133,10 +81,7 @@ public class JobDescription {
      * @param arguments
      *            The commandline arguments to set.
      */
-    public void setArguments(String... arguments) {
-        this.arguments.clear();
-        this.arguments.addAll(Arrays.asList(arguments));
-    }
+    public void setArguments(String... arguments);
 
     /**
      * Returns the environment of the executable. The environment of the executable consists of a {@link Map} of environment
@@ -144,9 +89,7 @@ public class JobDescription {
      * 
      * @return the environment
      */
-    public Map<String, String> getEnvironment() {
-        return environment;
-    }
+    public Map<String, String> getEnvironment();
 
     /**
      * Sets the environment of the executable. The environment of the executable consists of a {@link Map} of environment
@@ -155,114 +98,52 @@ public class JobDescription {
      * @param environment
      *            The environment to set.
      */
-    public void setEnvironment(Map<String, String> environment) {
-        this.environment = new HashMap<String, String>(environment);
-    }
+    public void setEnvironment(Map<String, String> environment);
+
+    public String getStdin();
 
     /**
-     * Returns the stdin {@link Path}.
-     * 
-     * @return the stdin {@link Path}.
+     * Set the location of the file providing stdin (relative to the working directory). 
+     *  
+     * Default is "$(workingDirectory)/stdin.txt" 
+     *  
+     * @param stdin the location of the file from which stdin is redirected. 
      */
-    public Path getStdin() {
-        return stdin;
-    }
+    public void setStdin(String stdin);
+
+    public String getStdout();
 
     /**
-     * Sets the {@link Path} where stdin is redirected from.
-     * 
-     * @param stdin
-     *            The {@link Path} where stdin is redirected from.
+     * Set the location of the file to which to redirect stdout (relative to the working directory). 
+     *  
+     * Default is "$(workingDirectory)/stdout.txt" 
+     *  
+     * @param stdout the location of the file where stdout is redirected to. 
      */
-    public void setStdin(Path stdin) {
-        this.stdin = stdin;
-    }
+    public void setStdout(String stdout);
+
+    public String getStderr();
 
     /**
-     * Returns the stdout {@link Path}.
-     * 
-     * @return the stdout {@link Path}.
+     * Set the location of the file to which to redirect stderr (relative to the working directory). 
+     *  
+     * Default is "$(workingDirectory)/stderr.txt" 
+     *  
+     * @param stderr the location of the file where stderr is redirected to. 
      */
-    public Path getStdout() {
-        return stdout;
-    }
-
-    /**
-     * Sets the stdout {@link Path}. Note that stdout will be redirected to either a {@link Path} or a {@link OutputStream}. The
-     * last invocation of <code>setStdout()</code> determines whether the destination of the output.
+    public void setStderr(String stderr);
+    
+    /** 
+     * Set the location of the working directory for the job (relative to a scheduler specific root).  
      * 
-     * @param stdout
-     *            The {@link Path} where stdout is redirected to.
+     * @param workingDirectory the location of the working directory.
      */
-    public void setStdout(Path stdout) {
-        this.stdout = stdout;
-    }
+    public void setWorkingDirectory(String workingDirectory);
+    
+    public String getWorkingDirectory();
+    
+    public boolean offlineMode();
 
-    /**
-     * Returns the stderr {@link Path}.
-     * 
-     * @return the stderr {@link Path}
-     */
-    public Path getStderr() {
-        return stderr;
-    }
-
-    /**
-     * Sets the stderr {@link Path}. Note that stderr will be redirected to either a {@link Path} or a {@link OutputStream}. The
-     * last invocation of <code>setStderr()</code> determines whether the destination of the output.
-     * 
-     * @param stderr
-     *            The {@link Path} where stderr is redirected to.
-     */
-    public void setStderr(Path stderr) {
-        this.stderr = stderr;
-    }
-
-    public void setWorkingDirectory(Path workingDirectory) throws OctopusException {
-
-        if (!workingDirectory.isLocal()) {
-            throw new OctopusException("Working directory must be local not " + workingDirectory);
-        }
-
-        this.workingDirectory = workingDirectory;
-    }
-
-    public Path getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    public boolean offlineMode() {
-        return offlineMode;
-    }
-
-    public void setOfflineMode(boolean offlineMode) {
-        this.offlineMode = offlineMode;
-    }
-
-    public String toString() {
-        String res = "JobDescription(";
-        res += "node count: " + nodeCount;
-        res += "ppn: " + processesPerNode;
-        res += "queue: " + queueName;
-        res += "maxTime: " + maxTime;
-        res += "executable: " + executable;
-        res += ", arguments: " + arguments;
-        res += ", environment: " + environment;
-
-        res += ", stdin: " + stdin;
-        res += ", stdout: " + stdout;
-        res += ", stderr: " + stderr;
-
-        //res += ", preStagedFiles: " + preStagedFiles;
-        //res += ", postStagedFiles: " + postStagedFiles;
-
-        //res += ", deleteSandbox: " + deleteSandbox;
-        //res += ", wipeSandbox: " + wipeSandbox;
-        res += ", offlineMode: " + offlineMode;
-
-        res += ")";
-
-        return res;
-    }
+    public void setOfflineMode(boolean offlineMode);
 
 }

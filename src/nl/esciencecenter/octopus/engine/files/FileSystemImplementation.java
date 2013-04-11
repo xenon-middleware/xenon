@@ -1,11 +1,11 @@
-package nl.esciencecenter.octopus.engine.jobs;
+package nl.esciencecenter.octopus.engine.files;
 
 import java.net.URI;
 
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.files.FileSystem;
 
-public final class SchedulerImplementation implements Scheduler {
+public class FileSystemImplementation implements FileSystem {
 
     private final String adaptorName;
     private final String uniqueID; 
@@ -13,7 +13,7 @@ public final class SchedulerImplementation implements Scheduler {
     private final URI uri;
     private final OctopusProperties properties;
     
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, OctopusProperties properties) {
+    public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, OctopusProperties properties) {
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
@@ -57,7 +57,7 @@ public final class SchedulerImplementation implements Scheduler {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SchedulerImplementation other = (SchedulerImplementation) obj;
+        FileSystemImplementation other = (FileSystemImplementation) obj;
         if (adaptorName == null) {
             if (other.adaptorName != null)
                 return false;
@@ -70,4 +70,5 @@ public final class SchedulerImplementation implements Scheduler {
             return false;
         return true;
     }
+    
 }

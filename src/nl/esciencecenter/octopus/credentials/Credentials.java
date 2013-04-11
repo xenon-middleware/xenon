@@ -1,10 +1,7 @@
 package nl.esciencecenter.octopus.credentials;
 
-import java.net.URI;
-import java.util.UUID;
-
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 
 /**
  * @author Rob van Nieuwpoort
@@ -16,7 +13,7 @@ import nl.esciencecenter.octopus.files.Path;
 public interface Credentials {
 
     /**
-     * Constructs a certificate Credential out of a {@link Path} pointing to the private key, a {@link Path} pointing to the
+     * Constructs a certificate Credential out of a {@link AbsolutePath} pointing to the private key, a {@link AbsolutePath} pointing to the
      * certificate, a username and a password.
      * 
      * @param keyfile
@@ -29,7 +26,7 @@ public interface Credentials {
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public UUID newCertificateCredential(Path keyfile, Path certfile, String username, String password, URI... validFor)
+    public Credential newCertificateCredential(AbsolutePath keyfile, AbsolutePath certfile, String username, String password)
             throws OctopusException;
 
     /**
@@ -40,7 +37,7 @@ public interface Credentials {
      * @param password
      *            the password.
      */
-    public UUID newPasswordCredential(String username, String password, URI... validFor) throws OctopusException;
+    public Credential newPasswordCredential(String username, String password) throws OctopusException;
 
     /**
      * Creates a proxy credential.
@@ -54,15 +51,7 @@ public interface Credentials {
      * @param password
      *            the password to use to connect to the proxy server
      */
-    public UUID newProxyCredential(String host, int port, String username, String password, URI... validFor)
+    public Credential newProxyCredential(String host, int port, String username, String password)
             throws OctopusException;
 
-    /**
-     * Removes credentials from the credential set.
-     * 
-     * @param credentialID
-     * @param validFor
-     *            remove from given URIs, or from all if no URIs are given.
-     */
-    public void remove(UUID credentialID, URI... validFor) throws OctopusException;
 }

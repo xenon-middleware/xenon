@@ -4,21 +4,21 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.files.FilesAdaptor;
-import nl.esciencecenter.octopus.engine.jobs.JobsAdaptor;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.jobs.Jobs;
 
 public class LocalAdaptor extends Adaptor {
 
-    private static final String ADAPTOR_NAME = "local";
+    public static final String ADAPTOR_NAME = "local";
 
-    private static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
+    public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
             + " standard java classes such as java.lang.Process and java.nio.file.Files.";
 
-    private static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
+    public static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "local.";
@@ -53,18 +53,17 @@ public class LocalAdaptor extends Adaptor {
     }
 
     void checkURI(URI location) throws OctopusException {
-
         String scheme = location.getScheme();
 
-        if (!supports(scheme)) {
-            throw new OctopusException("Local adaptor does not support scheme " + scheme, ADAPTOR_NAME, location);
+        if (scheme != null && !supports(scheme)) {
+            throw new OctopusException(getClass().getName(), "Local adaptor does not support scheme " + scheme);
         }
 
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
-            throw new OctopusException("Local adaptor only supports url with empty host or \"localhost\", not \""
-                    + location.getHost() + "\"", ADAPTOR_NAME, location);
+            throw new OctopusException(getClass().getName(), "Local adaptor only supports url with empty host or \"localhost\", not \""
+                    + location.getHost() + "\"");
         }
     }
     
@@ -86,7 +85,9 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public void end() {
-        localJobs.end();
+        // TODO: implement!
+        
+        // localJobs.end();
     }
 
     @Override
@@ -95,12 +96,12 @@ public class LocalAdaptor extends Adaptor {
     }
 
     @Override
-    public FilesAdaptor filesAdaptor() {
+    public Files filesAdaptor() {
         return localFiles;
     }
 
     @Override
-    public JobsAdaptor jobsAdaptor() {
+    public Jobs jobsAdaptor() {
         return localJobs;
     }
 

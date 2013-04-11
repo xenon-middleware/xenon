@@ -91,14 +91,20 @@
 			</executiondata>
 
 			<structure name="octopus">
-				<classfiles>
-					<fileset dir="../build/classes" />
-					<fileset dir="../adaptors/local/build/classes" />
-				</classfiles>
 				<sourcefiles>
 					<fileset dir="../src" />
-					<fileset dir="../adaptors/local/src" />
+					<!-- Include src java files from all adaptors -->
+					<fileset dir="../adaptors/">
+						<include name="*/src/**/*.java" />
+					</fileset>
 				</sourcefiles>
+				<classfiles>
+					<fileset dir="../build/classes" />
+					<!-- Include class files from all adaptors -->
+					<fileset dir="../adaptors/">
+						<include name="*/build/classes/**/*.class" />
+					</fileset>
+				</classfiles>
 			</structure>
 
 			<html destdir="reports/jacoco" />
