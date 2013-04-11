@@ -5,12 +5,12 @@ import java.util.UUID;
 
 import nl.esciencecenter.octopus.engine.credentials.CredentialsAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 
 public class LocalCredentials extends CredentialsAdaptor {
 
     @Override
-    public void newCertificateCredential(UUID uuid, Path keyfile, Path certfile, String username, String password, URI validFor)
+    public void newCertificateCredential(UUID uuid, AbsolutePath keyfile, AbsolutePath certfile, String username, String password, URI validFor)
             throws OctopusException {
         throw new OctopusException(getClass().getName(), "The local adaptor does not need or support credentials");
     }

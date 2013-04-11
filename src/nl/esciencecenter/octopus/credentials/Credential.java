@@ -1,6 +1,6 @@
 package nl.esciencecenter.octopus.credentials;
 
-import nl.esciencecenter.octopus.OctopusProperties;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 
 public interface Credential {
  

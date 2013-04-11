@@ -12,7 +12,7 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
         /**
          * Decides if the given directory entry should be accepted or filtered.
          */
-        boolean accept(Path entry);
+        boolean accept(AbsolutePath entry);
     }
 
     public Iterator<T> iterator();

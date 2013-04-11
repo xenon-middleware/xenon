@@ -1,7 +1,7 @@
 package nl.esciencecenter.octopus.credentials;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 
 /**
  * @author Rob van Nieuwpoort
@@ -13,7 +13,7 @@ import nl.esciencecenter.octopus.files.Path;
 public interface Credentials {
 
     /**
-     * Constructs a certificate Credential out of a {@link Path} pointing to the private key, a {@link Path} pointing to the
+     * Constructs a certificate Credential out of a {@link AbsolutePath} pointing to the private key, a {@link AbsolutePath} pointing to the
      * certificate, a username and a password.
      * 
      * @param keyfile
@@ -26,7 +26,7 @@ public interface Credentials {
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public Credential newCertificateCredential(Path keyfile, Path certfile, String username, String password)
+    public Credential newCertificateCredential(AbsolutePath keyfile, AbsolutePath certfile, String username, String password)
             throws OctopusException;
 
     /**

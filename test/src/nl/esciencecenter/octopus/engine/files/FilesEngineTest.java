@@ -7,16 +7,17 @@ import static org.hamcrest.CoreMatchers.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
-import nl.esciencecenter.octopus.engine.files.PathImplementation;
+import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.junit.Test;
 
@@ -53,9 +54,8 @@ public class FilesEngineTest {
         when(octopus.getAdaptor(adaptor_name)).thenReturn(adaptor);
     }
 
-    public FileSystemImplementation getFileSystem(String adaptor_name) throws URISyntaxException {
+    public FileSystemImplementation getFileSystem(String adaptor_name, URI root_location) throws URISyntaxException {
         String fs_uid = "1";
-        URI root_location = new URI("file:///");
         OctopusProperties oprops = new OctopusProperties();
         FileSystemImplementation filesystem = new FileSystemImplementation(adaptor_name, fs_uid, root_location, oprops);
         return filesystem;
@@ -73,19 +73,19 @@ public class FilesEngineTest {
     @Test
     public void testNewPath_LocalFileSystem_LocalPath() throws URISyntaxException, OctopusException, OctopusIOException {
         String adaptor_name = "Local";
-        FileSystemImplementation filesystem = getFileSystem(adaptor_name);
-        PathImplementation expected_path = new PathImplementation(filesystem, "file:///tmp/bla.txt");
+        FileSystemImplementation filesystem = getFileSystem(adaptor_name, new URI("file:///"));
+        AbsolutePathImplementation expected_path = new AbsolutePathImplementation(filesystem, new RelativePath("tmp/bla.txt"));
         // create stubs, so we don't have to use a real adaptor
         // a real adaptor touches filesystem, uses network, requires credentials
         // etc.
         Files files_adaptor = mock(Files.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, adaptor_name);
-        when(files_adaptor.newPath(filesystem, "file:///tmp/bla.txt")).thenReturn(expected_path);
+        when(files_adaptor.newPath(filesystem, "tmp/bla.txt")).thenReturn(expected_path);
 
         FilesEngine engine = new FilesEngine(octopus);
-        Path newpath = engine.newPath(filesystem, "file:///tmp/bla.txt");
+        AbsolutePath newpath = engine.newPath(filesystem, "file:///tmp/bla.txt");
 
-        assertThat((PathImplementation) newpath, is(expected_path));
+        assertThat((AbsolutePathImplementation) newpath, is(expected_path));
     }
 
     @Test
@@ -118,10 +118,10 @@ public class FilesEngineTest {
         Files files_adaptor = mock(Files.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, "Local");
         FilesEngine engine = new FilesEngine(octopus);
-        FileSystemImplementation source_filesystem = getFileSystem("Local");
-        Path source = new PathImplementation(source_filesystem, "file:///tmp/bla.txt");
-        FileSystemImplementation target_filesystem = getFileSystem("Local");
-        Path target = new PathImplementation(target_filesystem, "file:///tmp/foo.txt");
+        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file://"));
+        AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bla.txt"));
+        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file://"));
+        AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/foo.txt"));
 
         engine.copy(source, target);
 
@@ -135,10 +135,10 @@ public class FilesEngineTest {
         Files target_adaptor = mock(Files.class);
         addAdaptor2Octopus(octopus, target_adaptor, "gridftp");
         FilesEngine engine = new FilesEngine(octopus);
-        FileSystemImplementation source_filesystem = getFileSystem("ssh");
-        Path source = new PathImplementation(source_filesystem, "ssh://localhost/tmp/bar.txt");
-        FileSystemImplementation target_filesystem = getFileSystem("gridftp");
-        Path target = new PathImplementation(target_filesystem, "gridftp://somewhere/tmp/foo.txt");
+        FileSystemImplementation source_filesystem = getFileSystem("ssh", new URI("ssh://localhost"));
+        AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
+        FileSystemImplementation target_filesystem = getFileSystem("gridftp", new URI("gridftp://somewhere"));
+        AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/foo.txt"));
 
         try {
             engine.copy(source, target);
@@ -157,10 +157,11 @@ public class FilesEngineTest {
         Files target_adaptor = mock(Files.class);
         addAdaptor2Octopus(octopus, target_adaptor, "gridftp");
         FilesEngine engine = new FilesEngine(octopus);
-        FileSystemImplementation source_filesystem = getFileSystem("Local");
-        Path source = new PathImplementation(source_filesystem, "file:///tmp/bar.txt");
-        FileSystemImplementation target_filesystem = getFileSystem("gridftp");
-        Path target = new PathImplementation(target_filesystem, "gridftp://somewhere/tmp/foo.txt");
+
+        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file://"));
+        AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
+        FileSystemImplementation target_filesystem = getFileSystem("gridftp", new URI("gridftp://somewhere"));
+        AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/foo.txt"));
 
         engine.copy(source, target);
 
@@ -175,10 +176,10 @@ public class FilesEngineTest {
         Files target_adaptor = mock(Files.class);
         addAdaptor2Octopus(octopus, target_adaptor, "Local");
         FilesEngine engine = new FilesEngine(octopus);
-        FileSystemImplementation source_filesystem = getFileSystem("ssh");
-        Path source = new PathImplementation(source_filesystem, "ssh://localhost/tmp/bar.txt");
-        FileSystemImplementation target_filesystem = getFileSystem("Local");
-        Path target = new PathImplementation(target_filesystem, "file:///tmp/bar.txt");
+        FileSystemImplementation source_filesystem = getFileSystem("ssh", new URI("ssh://localhost"));
+        AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
+        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file://"));
+        AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/bar.txt"));
 
         engine.copy(source, target);
 
@@ -272,8 +273,8 @@ public class FilesEngineTest {
 
     @Test
     public void testSetOwner_MockedFiles_FilesSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
-        FileSystemImplementation filesystem = getFileSystem("Local");
-        PathImplementation path = new PathImplementation(filesystem, "file:///tmp/bla.txt");
+        FileSystemImplementation filesystem = getFileSystem("Local", new URI("file://"));
+        AbsolutePathImplementation path = new AbsolutePathImplementation(filesystem, new RelativePath("tmp/bla.txt"));
         // create stubs, so we don't have to use a real adaptor
         // a real adaptor touches filesystem, uses network, requires credentials
         // etc.

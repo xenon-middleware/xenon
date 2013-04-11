@@ -7,18 +7,24 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class OctopusFactory {
 
+    /**
+     * Private constructor as OctopusFactory should never be created. 
+     */
     private OctopusFactory() {
         //DO NOT USE
     }
 
     /**
-     * Constructs a Octopus instance.
+     * Constructs a Octopus instance. 
      * 
-     * @param credentials
-     *            the credentials to use. Will NOT be copied, may be null.
+     * Properties may be provided that will be passed to the engine and the adaptors. Note that an {@link OctopusException} will 
+     * be thrown if properties contains unknown keys.    
+     * 
      * @param properties
-     *            the properties to use. Will NOT be copied, may be null.
+     *            the properties to use. 
+
      * @return a new Octopus instance.
+     * 
      * @throws OctopusException
      *             in case the engine fails to initialize.
      */
@@ -26,6 +32,9 @@ public class OctopusFactory {
         return OctopusEngine.newEngine(properties);
     }
 
+    /**
+     * 
+     */
     public static void end() {
         OctopusEngine.endEngines();
     }

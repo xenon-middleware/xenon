@@ -1,17 +1,17 @@
 package nl.esciencecenter.octopus.engine.files;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Implementation of Path. Will create new Paths directly, using either an adaptor identical to the original in case of an
  * absolute path, or the local adaptor in case of a relative path.
  */
-public final class PathImplementation implements Path {
+public final class AbsolutePathImplementation implements AbsolutePath {
 
 //    private static final class PathIterator implements Iterator<Path> {
 //
@@ -73,18 +73,14 @@ public final class PathImplementation implements Path {
 //        }
 //    }
 
-    private final String [] elements;
     private final FileSystem filesystem;
+    private final RelativePath relativePath;
     
-    public PathImplementation(FileSystem filesystem, String path) {
+    public AbsolutePathImplementation(FileSystem filesystem, RelativePath relativePath) {
        
         this.filesystem = filesystem;
+        this.relativePath = relativePath;
         
-        if (path == null) {
-            elements = new String[0];
-        } else { 
-            this.elements = path.split("/+");    
-        }
         
 //        String pathString = location.getPath();
 //
@@ -110,151 +106,96 @@ public final class PathImplementation implements Path {
 //        }
 
     }
-
-    public PathImplementation(FileSystem filesystem, String [] elements) {
-        
-        this.filesystem = filesystem;
-        
-        if (elements == null) {
-            this.elements = new String[0];
-        } else { 
-            this.elements = elements.clone();    
-        }
+    
+    @Override
+    public FileSystem getFileSystem() {
+        return filesystem;
     }
-
+    
+    @Override
+    public RelativePath getRelativePath() {
+        return relativePath;
+    }
+    
+    @Override
+    public boolean isLocal() {
+        return filesystem.getAdaptorName().equals("local");
+    }
+    
     @Override
     public String getFileName() {
-        if (elements.length == 0) {
-            return null;
-        }
-        return elements[elements.length - 1];
+        return relativePath.getFileName();
     }
 
     @Override
-    public Path getParent() {
-        if (elements.length == 0) {
-            return null;
-        }
-
-        String[] parentElements = Arrays.copyOfRange(elements, 0, elements.length - 1);
-
-        return new PathImplementation(filesystem, parentElements);
+    public AbsolutePath getParent() {
+        return new AbsolutePathImplementation(filesystem, relativePath.getParent());
     }
 
     @Override
     public int getNameCount() {
-        return elements.length;
+        return relativePath.getNameCount();
     }
 
     @Override
     public String [] getNames() {
-        return elements.clone();
+        return relativePath.getNames();
     }
     
     @Override
     public String getName(int index) {
-        if (index >= elements.length) {
-            throw new IllegalArgumentException("index " + index + " not present in path " + this);
-        }
-        return elements[index];
+        return relativePath.getName(index);
     }
     
     @Override
-    public String subpath(int beginIndex, int endIndex) {
-        
-        if (beginIndex < 0 || beginIndex >= elements.length) {
-            throw new IllegalArgumentException("beginIndex " + beginIndex + " not present in path " + this);
-        }
-        
-        if (endIndex < 0 || endIndex >= elements.length) {
-            throw new IllegalArgumentException("endIndex " + beginIndex + " not present in path " + this);
-        }
-        
-        if (beginIndex > endIndex) {
-            throw new IllegalArgumentException("beginIndex " + beginIndex + " larger than endIndex " + endIndex);
-        }
-        
-        StringBuilder tmp = new StringBuilder();
-       
-        for (int i=beginIndex;i<endIndex;i++) {
-            tmp.append("/");
-            tmp.append(elements[i]);
-        }
-        
-        return tmp.toString();
+    public AbsolutePath subpath(int beginIndex, int endIndex) {
+        return new AbsolutePathImplementation(filesystem, relativePath.subpath(beginIndex, endIndex));
     }
 
     @Override
-    public boolean startsWith(String other) {
-        // TODO: implement;
-        return false;
+    public AbsolutePath normalize() {
+        return new AbsolutePathImplementation(filesystem, relativePath.normalize());
+    }
+
+    
+    @Override
+    public boolean startsWith(RelativePath other) {
+        return relativePath.startsWith(other);
     }
 
     @Override
-    public boolean endsWith(String other) {
-        // TODO: implement;
-        return false;
+    public boolean endsWith(RelativePath other) {
+        return relativePath.endsWith(other);
     }
 
     @Override
-    public Path resolve(String other) {
-        // TODO: implement;
-        return null;
+    public AbsolutePath resolve(RelativePath other) {
+        return new AbsolutePathImplementation(filesystem, relativePath.resolve(other));
     }
 
     @Override
-    public Path resolveSibling(String other) throws OctopusException {
-        // TODO: implement;
-        return null;
+    public AbsolutePath resolveSibling(RelativePath other) throws OctopusException {
+        return new AbsolutePathImplementation(filesystem, relativePath.resolveSibling(other));
     }
 
     @Override
-    public String relativize(Path other) throws OctopusException {
-        // TODO: implement;
-        return null;
+    public AbsolutePath relativize(RelativePath other) throws OctopusException {
+        return new AbsolutePathImplementation(filesystem, relativePath.relativize(other));
     }
 
     @Override
-    public Iterator<Path> iterator() {
+    public Iterator<AbsolutePath> iterator() {
         // TODO: implement;
         return null;
     }
     
     @Override
     public String getPath() {
-
-        if (elements.length == 0) {
-            return null;
-        }
-        
-        StringBuilder tmp = new StringBuilder();
-        
-        for (int i = 0; i < elements.length; i++) {
-            tmp.append("/");
-            tmp.append(elements[i]);
-        }
-
-        return tmp.toString();
+        return filesystem.toString() + relativePath.toString();
     }
-
+    
     public String toString() {
-        return filesystem.toString() + getPath();
-    }
-
-    @Override
-    public FileSystem getFileSystem() {
-        return filesystem;
-    }
-
-    @Override
-    public Path normalize() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isLocal() {
-        return filesystem.getAdaptorName().equals("local");
+        return filesystem.toString() + relativePath.toString();
     }
 
 }

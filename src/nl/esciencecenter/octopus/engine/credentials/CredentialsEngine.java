@@ -8,7 +8,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 
 public class CredentialsEngine implements Credentials {
     private final OctopusEngine octopusEngine;
@@ -18,7 +18,7 @@ public class CredentialsEngine implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(Path keyfile, Path certfile, String username, String password)
+    public Credential newCertificateCredential(AbsolutePath keyfile, AbsolutePath certfile, String username, String password)
             throws OctopusException {
         // TODO Auto-generated method stub
         return null;
