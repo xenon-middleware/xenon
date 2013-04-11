@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+
+import sun.util.locale.StringTokenIterator;
 
 public class RelativePath {
 
@@ -88,7 +91,13 @@ public class RelativePath {
         if (path == null) {
             elements = new String[0];
         } else {
-            this.elements = path.split(this.seperator + "+");
+            StringTokenizer tok = new StringTokenizer(path, this.seperator);
+
+            elements = new String[tok.countTokens()];
+            
+            for (int i=0;i<elements.length;i++) { 
+                elements[i] = tok.nextToken();
+            }
         }
 
         //      String pathString = location.getPath();

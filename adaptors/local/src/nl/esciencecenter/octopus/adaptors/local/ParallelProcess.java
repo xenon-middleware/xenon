@@ -47,10 +47,18 @@ class ParallelProcess {
         stdinForwarders = new StreamForwarder[count];
         stdoutForwarders = new StreamForwarder[count];
         stderrForwarders = new StreamForwarder[count];
+        
         for (int i = 0; i < count; i++) {
             processes[i] = builder.start();
-            stdinForwarders[i] = new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin), 
-                    processes[i].getOutputStream());
+            
+            if (stdin == null) { 
+                stdinForwarders[i] = null;
+                processes[i].getOutputStream().close();
+            } else { 
+                stdinForwarders[i] = new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin), 
+                        processes[i].getOutputStream());
+            }
+        
             stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), stdoutStream);
             stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
         }
@@ -59,7 +67,11 @@ class ParallelProcess {
     void kill() {
         for (int i = 0; i < processes.length; i++) {
             processes[i].destroy();
-            stdinForwarders[i].close();
+            
+            if (stdinForwarders[i] != null) { 
+                stdinForwarders[i].close();
+            }
+            
             stdoutForwarders[i].close();
             stderrForwarders[i].close();
         }
