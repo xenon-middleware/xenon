@@ -31,6 +31,8 @@ public class LocalJobs implements Jobs {
 
     private final LocalAdaptor localAdaptor;
 
+    private final OctopusProperties properties;
+    
     private static int jobID = 0;
 
     private static synchronized int getNextSchedulerID() {
@@ -41,6 +43,7 @@ public class LocalJobs implements Jobs {
             throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
+        this.properties = properties;
     }
       
     @Override
@@ -57,7 +60,7 @@ public class LocalJobs implements Jobs {
 
         int id = getNextSchedulerID();
         
-        OctopusProperties p = new OctopusProperties(properties);
+        OctopusProperties p = new OctopusProperties(this.properties, properties);
         
         Scheduler scheduler = new SchedulerImplementation("LocalScheduler" + id, LocalAdaptor.ADAPTOR_NAME, location, p);
         
