@@ -3,13 +3,13 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredential;
+import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
@@ -167,8 +167,9 @@ public class SshAdaptor extends Adaptor {
     // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
     // TODO cache van sessions / channels
 
-    protected Session getSession(URI uri) throws OctopusException {
+    protected Session getSession(FileSystemImplementation fs) throws OctopusException {
 
+        URI uri = fs.getUri();
         String user = uri.getUserInfo();
         String host = uri.getHost();
         int port = uri.getPort();
@@ -180,7 +181,7 @@ public class SshAdaptor extends Adaptor {
             host = "localhost";
         }
 
-        CertificateCredential credential = (CertificateCredential) credentialsAdaptor.getCredentialFor(uri);
+        CertificateCredential credential = (CertificateCredential) fs.getCredential();
         if (credential == null) {
             throw new OctopusException("ssh", "Could not find any valid credential.");
         }
@@ -219,8 +220,8 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected ChannelSftp getSftpChannel(URI uri) throws OctopusException {
-        Session session = getSession(uri);
+    protected ChannelSftp getSftpChannel(FileSystemImplementation fs) throws OctopusException {
+        Session session = getSession(fs);
         return getSftpChannel(session);
     }
 

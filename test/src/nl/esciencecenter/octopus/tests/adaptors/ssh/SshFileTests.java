@@ -10,8 +10,9 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 public class SshFileTests {
 
@@ -25,13 +26,9 @@ public class SshFileTests {
 
         Credential credential = c.newCertificateCredential("/home/" + username + "/.ssh/id_rsa", ".ssh/id_rsa.pub", username, "");
 
-        URI location = new URI("ssh://" + username + "@localhost" + System.getProperty("java.io.tmpdir"));
+        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
-        System.err.println("tmpdir = " + location);
-
-        FileSystem fileSystem = octopus.files().newFileSystem(new URI("/"), credential, null); 
-
-        Path path = octopus.files().newPath(fileSystem, location.getPath());
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
 
         Assert.assertTrue(octopus.files().exists(path));
 
@@ -44,9 +41,10 @@ public class SshFileTests {
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
         Credential credential = c.newCertificateCredential("/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
+       
+        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
-        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost/home/rob"), credential, null); 
-        Path path = octopus.files().newPath(fileSystem, ".bashrc");
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(".bashrc"));
 
         InputStream in = octopus.files().newInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));

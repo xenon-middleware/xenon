@@ -27,6 +27,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,27 +55,10 @@ public class SshFiles implements Files {
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
-    protected static PathAttributes convertAttributes(LsEntry lsEntry) {
-        return null;  //TODO
+    protected static PathAttributes convertAttributes(LsEntry entry) {
+        return null; // TODO
     }
-
-    protected void end() {
-    }
-
-
-
-
-
-
-
-
+    
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
@@ -82,25 +66,17 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
-    public AbsolutePath newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException {
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-
-
-
-
-
-
+    @Override
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     @Override
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
@@ -108,25 +84,11 @@ public class SshFiles implements Files {
         
     }
 
-
-
-
-
-
-
-
     @Override
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return false;
     }
-
-
-
-
-
-
-
 
     @Override
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
@@ -134,25 +96,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException {
@@ -160,25 +108,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
@@ -186,25 +120,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public void delete(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
         
     }
-
-
-
-
-
-
-
 
     @Override
     public boolean exists(AbsolutePath path) throws OctopusIOException {
@@ -212,25 +132,11 @@ public class SshFiles implements Files {
         return false;
     }
 
-
-
-
-
-
-
-
     @Override
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return false;
     }
-
-
-
-
-
-
-
 
     @Override
     public AbsolutePath move(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
@@ -238,25 +144,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
@@ -264,25 +156,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, Filter filter)
@@ -291,38 +169,17 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
@@ -331,25 +188,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {
@@ -357,25 +200,11 @@ public class SshFiles implements Files {
         return null;
     }
 
-
-
-
-
-
-
-
     @Override
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
-
-
-
-
-
-
-
 
     @Override
     public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException {
@@ -383,25 +212,11 @@ public class SshFiles implements Files {
         
     }
 
-
-
-
-
-
-
-
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         // TODO Auto-generated method stub
         
     }
-
-
-
-
-
-
-
 
     @Override
     public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
@@ -409,7 +224,11 @@ public class SshFiles implements Files {
         // TODO Auto-generated method stub
         
     }
-    
+
+    public void end() {
+        
+    }
+        
     /*
     
     // TODO close channels

@@ -5,24 +5,24 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Vector;
 
-import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 class SshDirectoryAttributeStream implements DirectoryStream<PathAttributes>, Iterator<PathAttributes> {
     private final DirectoryStream.Filter filter;
-    private final Path dir;
+    private final AbsolutePath dir;
     private Vector<LsEntry> listing;
 
     private int current = 0;
 
-    SshDirectoryAttributeStream(Path dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
@@ -42,24 +42,15 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributes>, It
     public synchronized boolean hasNext() {
         return current < listing.size();
     }
-
-    @Override
+    
     public synchronized PathAttributes next() {
         while (current < listing.size()) {
-            try {
-                LsEntry nextEntry = listing.get(current);
-                current++;
-                Path nextPath = new PathImplementation(null, new URI(nextEntry.getLongname()), "ssh", null);
+            LsEntry nextEntry = listing.get(current);
+            current++;
+            AbsolutePath nextPath = dir.resolve(new RelativePath(listing.get(current).getLongname()));
+            if (filter.accept(nextPath)) {
                 PathAttributes next = SshFiles.convertAttributes(nextEntry);
-
-                if (filter.accept(nextPath)) {
-                    return next;
-                }
-            } catch (OctopusIOException e) {
-                // TODO exception will be removed
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                throw new OctopusRuntimeException("ssh", e.getMessage(), e);
+                return next;
             }
         }
         return null;
