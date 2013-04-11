@@ -178,7 +178,7 @@ public class LocalScheduler {
 
         if (job.getScheduler() != this) {
             throw new OctopusException("Cannot cancel jobs descriptions from other scheduler!", 
-                    scheduler.getAdaptorName() + "/" + scheduler.getUniqueID());
+                    scheduler.getAdaptorName());
         }
 
         // FIXME: What if job is already gone?
@@ -190,7 +190,7 @@ public class LocalScheduler {
         
         if (job.getScheduler() != this) {
             throw new OctopusException("Cannot cancel jobs descriptions from other scheduler!", 
-                    scheduler.getAdaptorName() + "/" + scheduler.getUniqueID());
+                    scheduler.getAdaptorName());
         }
         
         LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());

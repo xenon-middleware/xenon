@@ -360,11 +360,17 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     
     @Override
-    public AbsolutePath newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException {
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
     @Override
     public void close(FileSystem filesystem) throws OctopusIOException {
         // TODO Auto-generated method stub

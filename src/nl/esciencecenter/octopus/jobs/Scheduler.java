@@ -7,8 +7,6 @@ public interface Scheduler {
 
     public String getAdaptorName();
     
-    public String getUniqueID();
-
     public URI getUri();
 
     public Properties getProperties();

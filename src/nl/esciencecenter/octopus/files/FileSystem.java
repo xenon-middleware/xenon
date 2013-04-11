@@ -6,8 +6,6 @@ import java.util.Properties;
 public interface FileSystem {
     
     public String getAdaptorName();
-
-    public String getUniqueID();
     
     public URI getUri();
 

@@ -35,8 +35,10 @@ public interface Files {
     // FIXME add getCWDFileSystem()
     // FIXME add getHomeFileSystem()
     
-    public AbsolutePath newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException;
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException;
     
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException;
+
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException;
     
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException;
