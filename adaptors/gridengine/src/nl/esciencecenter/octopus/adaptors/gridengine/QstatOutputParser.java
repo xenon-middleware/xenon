@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
@@ -46,12 +46,12 @@ public class QstatOutputParser {
 
             if (ignoreVersion) {
                 logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
-                        + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
+                        + GridengineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
 
-                throw new IncompatibleServerException(GridEngineAdaptor.ADAPTOR_NAME,
+                throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME,
                         "cannot determine version, version attribute not found. Use the "
-                                + GridEngineAdaptor.IGNORE_VERSION_PROPERTY + " property to ignore this error");
+                                + GridengineAdaptor.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
         }
 
@@ -63,17 +63,21 @@ public class QstatOutputParser {
         if (!SGE62_SCHEMA_VALUE.equals(schemaValue)) {
             if (ignoreVersion) {
                 logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
-                        + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
+                        + GridengineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
 
-                throw new IncompatibleServerException(GridEngineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
-                        + schemaValue + ") incompatible with adaptor. Use the " + GridEngineAdaptor.IGNORE_VERSION_PROPERTY
+                throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
+                        + schemaValue + ") incompatible with adaptor. Use the " + GridengineAdaptor.IGNORE_VERSION_PROPERTY
                         + " property to ignore this error");
             }
         }
 
     }
 
+    QstatOutputParser(OctopusProperties properties) throws OctopusIOException {
+        this(properties.getBooleanProperty(GridengineAdaptor.IGNORE_VERSION_PROPERTY));
+    }
+    
     QstatOutputParser(boolean ignoreVersion) throws OctopusIOException {
         this.ignoreVersion = ignoreVersion;
 
@@ -81,7 +85,7 @@ public class QstatOutputParser {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for qstat xml files", e);
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not create parser for qstat xml files", e);
         }
     }
 
@@ -94,7 +98,20 @@ public class QstatOutputParser {
 
             return result;
         } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+        }
+    }
+    
+    Document getDocument(InputStream in) throws OctopusException, OctopusIOException {
+        try {
+            Document result = documentBuilder.parse(in);
+            result.normalize();
+
+            checkVersion(result);
+
+            return result;
+        } catch (SAXException | IOException e) {
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         }
     }
 
@@ -108,7 +125,7 @@ public class QstatOutputParser {
 
             return result;
         } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file: " + file, e);
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file: " + file, e);
         }
     }
 
@@ -156,7 +173,7 @@ public class QstatOutputParser {
 
                 if (queueName == null || queueName.length() == 0) {
 
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
 
                 result.put(queueName, queueInfo);
@@ -167,7 +184,7 @@ public class QstatOutputParser {
             //                NodeList nameElements = element.getElementsByTagName("name");
             //
             //                if (nameElements.getLength() == 0 || nameElements.item(0).getChildNodes().getLength() == 0) {
-            //                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+            //                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
             //                }
             //
             //                Node nameNode = nameElements.item(0).getChildNodes().item(0);
@@ -175,16 +192,16 @@ public class QstatOutputParser {
             //                result[i] = node.getNodeValue();
             //
             //                if (result[i] == null || result[i].length() == 0) {
-            //                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+            //                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
             //                }
             //            } else {
-            //                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "illegal xml file for queue information");
+            //                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "illegal xml file for queue information");
             //            }
 
         }
 
         if (result.size() == 0) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
         return result;

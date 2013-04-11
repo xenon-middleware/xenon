@@ -11,7 +11,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
-public class GridEngineAdaptor extends Adaptor {
+public class GridengineAdaptor extends Adaptor {
 
     public static final String ADAPTOR_NAME = "gridengine";
 
@@ -19,7 +19,7 @@ public class GridEngineAdaptor extends Adaptor {
             "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
                     + "or the ssh adaptor to gain access to the scheduler machine.";
 
-    private static final String[] ADAPTOR_SCHEME = new String[] { "ge" };
+    private static final String[] ADAPTOR_SCHEME = new String[] { "ge", "sge" };
 
     public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + ADAPTOR_NAME + ".";
 
@@ -32,7 +32,7 @@ public class GridEngineAdaptor extends Adaptor {
 
     private final GridEngineJobs jobsAdaptor;
 
-    public GridEngineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+    public GridengineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
 
         this.jobsAdaptor = new GridEngineJobs(properties, octopusEngine);
@@ -46,7 +46,7 @@ public class GridEngineAdaptor extends Adaptor {
 
     @Override
     public String getName() {
-        return "local";
+        return ADAPTOR_NAME;
     }
 
     @Override

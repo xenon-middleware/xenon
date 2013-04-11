@@ -84,12 +84,12 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatus(scheduler, queueName);
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatuses(scheduler, queueNames);
     }
 
