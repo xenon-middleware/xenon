@@ -377,6 +377,16 @@ public class SshFiles implements Files {
 
     }
 
+    @Override
+    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException {
+        throw new OctopusException(getClass().getName(), "getCWDFileSystem not supported!");
+    }
+
+    @Override
+    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
+        throw new OctopusException(getClass().getName(), "getLocalHomeFileSystem not supported!");
+    }
+
     /*
     
     // TODO close channels

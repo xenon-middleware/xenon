@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
@@ -28,6 +28,7 @@ import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -494,6 +495,48 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException {
+        
+        String path = System.getProperty("user.dir");
+        
+        if (!LocalUtils.exists(path)) { 
+            throw new OctopusException("local", "Cannot create FileSystem with non-existing CWD (" + path + ")");
+        }
+        
+        URI uri = null;
+        
+        try {
+            uri = new URI("file:///");
+        } catch (URISyntaxException e) {
+            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
+        }
+        
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, 
+                new RelativePath(path), null, new OctopusProperties(properties));
+    }
+
+    @Override
+    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
+        
+        String path = System.getProperty("user.home");
+        
+        if (!LocalUtils.exists(path)) { 
+            throw new OctopusException("local", "Cannot create FileSystem with non-existing CWD (" + path + ")");
+        }
+        
+        URI uri = null;
+        
+        try {
+            uri = new URI("file:///");
+        } catch (URISyntaxException e) {
+            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
+        }
+            
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, 
+                new RelativePath(path), null, new OctopusProperties(properties));
     }
  
  }

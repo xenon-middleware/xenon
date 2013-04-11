@@ -30,8 +30,8 @@ public interface Files {
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) 
             throws OctopusException, OctopusIOException;
 
-    // FIXME add getCWDFileSystem()
-    // FIXME add getHomeFileSystem()
+    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException;
+    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException;
     
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException;
     
