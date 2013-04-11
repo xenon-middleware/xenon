@@ -5,6 +5,7 @@ import java.net.URI;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 public class FileSystemImplementation implements FileSystem {
 
@@ -14,11 +15,15 @@ public class FileSystemImplementation implements FileSystem {
     private final URI uri;
     private final Credential credential;
     private final OctopusProperties properties;
-    
-    public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, Credential credential, OctopusProperties properties) {
+    private final RelativePath entryPath;
+        
+    public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, RelativePath entryPath, Credential credential, 
+            OctopusProperties properties) {
+        
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
+        this.entryPath = entryPath;
         this.credential = credential;
         this.properties = properties;
     }
@@ -29,6 +34,11 @@ public class FileSystemImplementation implements FileSystem {
     
     public String getUniqueID() {
         return uniqueID;
+    }
+    
+    @Override
+    public RelativePath getEntryPath() {
+        return entryPath;
     }
     
     @Override
@@ -76,5 +86,6 @@ public class FileSystemImplementation implements FileSystem {
             return false;
         return true;
     }
+
     
 }

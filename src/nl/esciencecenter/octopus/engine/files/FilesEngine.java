@@ -45,21 +45,6 @@ public class FilesEngine implements Files {
     public FilesEngine(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
     }
-    
-//    private Adaptor getAdaptor(FileSystem filesystem) throws OctopusIOException {
-//        
-//        try { 
-//            return octopusEngine.getAdaptor(filesystem.getAdaptorName());
-//
-//        } catch (OctopusException e) { 
-//            throw new OctopusIOException("Failed to locate adaptor for FileSystem!",  
-//                    filesystem.getAdaptorName());
-//        }
-//    }
-    
-//    private Adaptor getAdaptor(AbsolutePath path) throws OctopusIOException {
-//        return getAdaptor(path.getFileSystem());
-//    }
 
     private Files getFilesAdaptor(FileSystem filesystem) throws OctopusIOException {
         
@@ -125,9 +110,9 @@ public class FilesEngine implements Files {
         
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).copy(source, target, options);
-        } else if (sourcefs.getAdaptorName().equals("local")) {
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).copy(source, target, options);
-        } else if (targetfs.getAdaptorName().equals("local")) {
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).copy(source, target, options);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
@@ -177,9 +162,9 @@ public class FilesEngine implements Files {
         
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).move(source, target, options);
-        } else if (sourcefs.getAdaptorName().equals("local")) {
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).move(source, target, options);
-        } else if (targetfs.getAdaptorName().equals("local")) {
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).move(source, target, options);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party move (yet)", null, null);

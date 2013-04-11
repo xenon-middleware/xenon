@@ -1,12 +1,12 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.nio.file.LinkOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.OpenOption;
@@ -16,6 +16,17 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
 class LocalUtils {
 
     //TODO: test this function
+    static boolean exists(String path) {
+
+        if (path.startsWith("/~")) {
+            path = System.getProperty("user.home") + "/" + path.substring(2);
+        }
+    
+        java.nio.file.Path tmp = java.nio.file.FileSystems.getDefault().getPath(path);
+        
+        return java.nio.file.Files.exists(tmp, LinkOption.NOFOLLOW_LINKS);
+    }
+    
     static java.nio.file.Path javaPath(AbsolutePath path) {
         String string = path.getPath();
         if (string.startsWith("/~")) {
@@ -108,4 +119,7 @@ class LocalUtils {
         }
         return result;
     }
+    
+    
+    
 }

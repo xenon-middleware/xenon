@@ -81,7 +81,7 @@ public interface Files {
      * Creates a new directory.
      * 
      * @throws UnsupportedOperationException
-     *             if the given Permissions cannot be set when the file is created
+     *             if the given Permissions cannot be set when tsourcefs.getAdaptorName().equals("local")he file is created
      * @throws FileAlreadyExistsException
      *             if a directory could not otherwise be created because a file of that name already exists <i>(optional specific
      *             exception)</i>
