@@ -53,7 +53,7 @@ public class LocalScheduler {
         int processors = Runtime.getRuntime().availableProcessors();
         
         OctopusProperties properties = new OctopusProperties(scheduler.getProperties());
-        
+       
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         multiExecutor = Executors.newFixedThreadPool(multiQThreads);
 
