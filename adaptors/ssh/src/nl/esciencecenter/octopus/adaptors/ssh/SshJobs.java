@@ -98,4 +98,16 @@ public class SshJobs implements Jobs {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

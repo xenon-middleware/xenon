@@ -17,6 +17,10 @@ public interface Jobs {
             throws OctopusException, OctopusIOException;
 
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
+
+    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException;
+    
+    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
     
     public JobDescription newJobDescription();
     

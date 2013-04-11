@@ -29,6 +29,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -49,7 +50,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
     private final LocalAdaptor localAdaptor;
-
+    
     private static int fsID = 0;
 
     private static synchronized int getNextFsID() {
@@ -314,13 +315,11 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
-        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local FileSystem cannot be closed!");
     }
-
 
     @Override
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException {
-        // TODO Auto-generated method stub
         return true;
     }
 

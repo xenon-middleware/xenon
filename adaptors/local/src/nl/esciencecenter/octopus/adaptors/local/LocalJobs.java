@@ -13,11 +13,13 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
+import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -281,13 +283,40 @@ public class LocalJobs implements Jobs {
 
     @Override
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        if (queueName == null || queueName.equals("single")) {
+            return new QueueStatusImplementation(scheduler, queueName, null, null);
+        } else if (queueName.equals("multi")) {
+            return new QueueStatusImplementation(scheduler, queueName, null, null);
+        } else if (queueName.equals("unlimited")) {
+            return new QueueStatusImplementation(scheduler, queueName, null, null);
+        } else {
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "No such queue: " + queueName);
+        }
     }
 
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        
+        QueueStatus[] result = new QueueStatus[queueNames.length];
+        
+        for (int i=0;i<queueNames.length;i++) {
+            try { 
+                result[i] = getQueueStatus(scheduler, queueNames[i]);
+            } catch (OctopusException e) { 
+                result[i] = new QueueStatusImplementation(null, queueNames[i], e, null);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local Scheduler cannot be closed!");
+    }
+
+    @Override
+    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        return true;
     }    
 }
