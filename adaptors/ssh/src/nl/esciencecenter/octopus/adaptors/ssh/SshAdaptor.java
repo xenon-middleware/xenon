@@ -5,14 +5,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
+import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
+import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
@@ -167,10 +171,32 @@ public class SshAdaptor extends Adaptor {
 
     // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
     // TODO cache van sessions / channels
+    // session.setConfig("StrictHostKeyChecking", "no");
 
-    protected Session getSession(FileSystemImplementation fs) throws OctopusException {
+    private CredentialImplementation getDefaultCredential() throws OctopusException {
+        throw new OctopusException("ssh", "Please specify a valid credential, credential is 'null'");
+    }
 
-        URI uri = fs.getUri();
+    private void setCredential(CredentialImplementation credential, Session session) throws OctopusException {
+        logger.debug("using credential: " + credential);
+
+        if (credential instanceof CertificateCredentialImplementation) {
+            CertificateCredentialImplementation certificate = (CertificateCredentialImplementation) credential;
+            try {
+                jsch.addIdentity(certificate.getKeyfile(), Arrays.toString(certificate.getPassword()));
+            } catch (JSchException e) {
+                throw new OctopusException("ssh", "Could not read private key file.", e);
+            }
+        } else if (credential instanceof PasswordCredentialImplementation) {
+            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential; 
+            // session.setPassword("password");
+        } else {
+            throw new OctopusException("ssh", "Unknown credential type.");
+        }
+    }
+
+    protected Session createNewSession(String uniqueID, URI location, Credential credential) throws OctopusException {
+        URI uri = location;
         String user = uri.getUserInfo();
         String host = uri.getHost();
         int port = uri.getPort();
@@ -183,34 +209,33 @@ public class SshAdaptor extends Adaptor {
         }
 
         logger.debug("creating new session to " + user + "@" + host + ":" + port);
-        
-        CertificateCredentialImplementation credential = (CertificateCredentialImplementation) fs.getCredential();
-        if (credential == null) {
-            throw new OctopusException("ssh", "Please specify a valid credential, credential is 'null'");
-        }
-
-        logger.debug("using credential: " + credential);
-        
-        try {
-            jsch.addIdentity(credential.getKeyfile(), Arrays.toString(credential.getPassword()));
-        } catch (JSchException e) {
-            throw new OctopusException("ssh", "Could not read private key file.", e);
-        }
-
-        setKnownHostsFile(System.getProperty("user.home") + "/.ssh/known_hosts");
 
         Session session;
         try {
             session = jsch.getSession(user, host, port);
-            // session.setPassword("password");
-            // session.setConfig("StrictHostKeyChecking", "no");
-
-            session.connect();
-            return session;
         } catch (JSchException e) {
             e.printStackTrace();
             return null;
         }
+
+        if (credential == null) {
+            credential = getDefaultCredential();
+        }
+
+        setCredential((CredentialImplementation)credential, session);
+        
+        String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
+        logger.debug("setting ssh known hosts file to: " + knownHosts);
+
+        setKnownHostsFile(knownHosts);
+
+        try {
+            session.connect();
+        } catch (JSchException e) {
+            throw new OctopusException(getName(), e.getMessage(), e);
+        }
+
+        return session;
     }
 
     protected ChannelSftp getSftpChannel(Session session) throws OctopusException {
@@ -224,15 +249,16 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected ChannelSftp getSftpChannel(FileSystemImplementation fs) throws OctopusException {
-        Session session = getSession(fs);
+    protected ChannelSftp getSftpChannel(FileSystem fileSystem) throws OctopusException {
+        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
+        Session session = createNewSession(fs.getUniqueID(), fs.getUri(), fs.getCredential());
         return getSftpChannel(session);
     }
 
     protected void putSftpChannel(URI uri, ChannelSftp channel) {
-        
+
     }
-    
+
     private void closeSession(Session session) {
         session.disconnect();
     }

@@ -46,8 +46,10 @@ public class SshFileTests {
        
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(".bashrc"));
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/rob/.bashrc"));
 
+        System.err.println("absolute path = " + path);
+        
         InputStream in = octopus.files().newInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
