@@ -71,7 +71,7 @@ public class FilesEngineTest {
     }
 
     @Test
-    public void testNewPathURI() throws URISyntaxException, OctopusException, OctopusIOException {
+    public void testNewPath_LocalFileSystem_LocalPath() throws URISyntaxException, OctopusException, OctopusIOException {
         String adaptor_name = "Local";
         FileSystemImplementation filesystem = getFileSystem(adaptor_name);
         PathImplementation expected_path = new PathImplementation(filesystem, "file:///tmp/bla.txt");
