@@ -366,8 +366,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
       
         String path = location.getPath();
 
-        System.out.println("PATH: " + path);
-        
         if (path != null && !path.equals("/")) {
             throw new OctopusException("local", "Cannot create local file system with path!");
         }
