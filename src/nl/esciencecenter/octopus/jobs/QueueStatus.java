@@ -7,6 +7,10 @@ public interface QueueStatus {
     public Scheduler getScheduler();
     
     public String getQueueName();
-        
+    
+    public boolean hasException();
+    
+    public Exception getException();
+    
     public Map<String, String> getSchedulerSpecficInformation();    
 }

@@ -181,7 +181,7 @@ public class RelativePath {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " not present in path " + this);
         }
 
-        if (endIndex < 0 || endIndex >= elements.length) {
+        if (endIndex < 0 || endIndex > elements.length) {
             throw new IllegalArgumentException("endIndex " + beginIndex + " not present in path " + this);
         }
 
@@ -199,10 +199,12 @@ public class RelativePath {
     }
 
     public boolean startsWith(RelativePath other) {
+        // TODO: Implement!
         return false;
     }
 
     public boolean endsWith(RelativePath other) {
+        // TODO: Implement!
         return false;
     }
 

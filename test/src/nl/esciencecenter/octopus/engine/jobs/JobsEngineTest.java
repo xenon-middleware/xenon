@@ -12,6 +12,7 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class JobsEngineTest {
     @Test
     public void testSubmitJob_StubbedLocalAdaptor_LocalJob() throws OctopusIOException, OctopusException, URISyntaxException {
         URI sheduler_location = new URI("local:///");
-        JobDescriptionImplementation job_description = new JobDescriptionImplementation();
+        JobDescription job_description = new JobDescription();
         SchedulerImplementation scheduler = new SchedulerImplementation("local", "1", sheduler_location, 
                 new String [] { "single" }, null);
         // stub adaptor

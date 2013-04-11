@@ -47,12 +47,6 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public JobDescription newJobDescription() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return null;
@@ -97,5 +91,17 @@ public class SshJobs implements Jobs {
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
