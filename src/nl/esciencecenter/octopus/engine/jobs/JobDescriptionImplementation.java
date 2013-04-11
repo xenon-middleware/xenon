@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.Scheduler;
 
 public final class JobDescriptionImplementation implements JobDescription {
 
@@ -15,7 +14,7 @@ public final class JobDescriptionImplementation implements JobDescription {
 
     private String executable = null;
 
-    private String stdin = "stdin.txt";
+    private String stdin = null;
 
     private String stdout = "stdout.txt";
 
