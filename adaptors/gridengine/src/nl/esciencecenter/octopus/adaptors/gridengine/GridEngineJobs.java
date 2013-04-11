@@ -76,7 +76,7 @@ public class GridEngineJobs implements Jobs {
             throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue from server");
         }
         
-        return new QueueStatusImplementation(scheduler, queueName, result.get(queueName));
+        return new QueueStatusImplementation(scheduler, queueName, null, result.get(queueName));
         
     }
 
@@ -93,7 +93,7 @@ public class GridEngineJobs implements Jobs {
                 throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueNames[i] + " from server");
             }
             
-            result[i] = new QueueStatusImplementation(scheduler, queueNames[i], status.get(queueNames[i])); 
+            result[i] = new QueueStatusImplementation(scheduler, queueNames[i], null, status.get(queueNames[i])); 
         }
         
         return result;
@@ -135,9 +135,14 @@ public class GridEngineJobs implements Jobs {
     }
 
     @Override
-    public JobDescription newJobDescription() {
-        throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME,
-                "Error in engine: newJobDescription() should not be called on this adaptor");
+    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        
     }
 
+    @Override
+    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }
