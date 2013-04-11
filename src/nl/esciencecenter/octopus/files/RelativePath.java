@@ -37,12 +37,40 @@ public class RelativePath {
         } 
     }
     
+    public RelativePath() {
+        this(new String[0], "" + DEFAULT_SEPERATOR);
+    }
+    
     public RelativePath(String path) {
         this(path, "" + DEFAULT_SEPERATOR);
     }
 
     public RelativePath(String [] elements) {
         this(elements, "" + DEFAULT_SEPERATOR);
+    }
+    
+    public RelativePath(RelativePath... paths) {
+        
+        if (paths.length == 0) {
+            elements = new String[0];
+            seperator = "" + DEFAULT_SEPERATOR;
+            return;
+        }
+
+        if (paths.length == 1) {
+            elements = paths[0].elements;
+            seperator = paths[0].seperator;
+            return;
+        }
+        
+        String [] tmp = merge(paths[0].elements, paths[1].elements);
+        
+        for (int i=2;i<paths.length;i++) { 
+            tmp = merge(tmp, paths[i].elements);
+        }
+     
+        elements = tmp;
+        seperator = paths[0].seperator;
     }
     
     public RelativePath(String path, String separator) {
@@ -171,20 +199,25 @@ public class RelativePath {
         return false;
     }
 
+    private String [] merge(String [] a, String [] b) {
+        
+        int count = a.length + b.length;
+        
+        String [] tmp = new String[count];
+        
+        System.arraycopy(a, 0, tmp, 0, a.length);
+        System.arraycopy(b, 0, tmp, a.length, b.length);
+        
+        return tmp;
+    }
+    
     public RelativePath resolve(RelativePath other) {
         
         if (other == null || other.isEmpty()) { 
             return this;
         }
-        
-        int count = elements.length + other.elements.length;
-        
-        String [] tmp = new String[count];
-        
-        System.arraycopy(elements, 0, tmp, 0, elements.length);
-        System.arraycopy(other.elements, 0, tmp, elements.length, other.elements.length);
-        
-        return new RelativePath(tmp, seperator);
+
+        return new RelativePath(merge(elements, other.elements), seperator);
     }
 
     private boolean isEmpty() {
