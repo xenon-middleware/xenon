@@ -1,8 +1,8 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CredentialSet;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 

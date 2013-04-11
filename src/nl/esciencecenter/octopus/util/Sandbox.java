@@ -8,13 +8,14 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.CopyOption;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 public class Sandbox {
 
     private final Octopus octopus;
 
-    private final Path path;
+    private final AbsolutePath path;
 
     private List<Pair> uploadFiles = new LinkedList<Pair>();
 
@@ -22,22 +23,22 @@ public class Sandbox {
 
     public class Pair {
 
-        final Path source;
-        final Path destination;
+        final AbsolutePath source;
+        final AbsolutePath destination;
 
-        public Pair(Path source, Path destination) {
+        public Pair(AbsolutePath source, AbsolutePath destination) {
             this.source = source;
             this.destination = destination;
         }
     }
 
-    public Sandbox(Octopus octopus, Path root, String sandboxName) throws OctopusException {
+    public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException {
         this.octopus = octopus;
 
         if (sandboxName == null) {
-            path = root.resolve("octopus_sandbox_" + UUID.randomUUID());
+            path = root.resolve(new RelativePath("octopus_sandbox_" + UUID.randomUUID()));
         } else {
-            path = root.resolve(sandboxName);
+            path = root.resolve(new RelativePath(sandboxName));
         }
     }
 
@@ -45,23 +46,23 @@ public class Sandbox {
         return uploadFiles;
     }
 
-    public void setUploadFiles(Path... files) {
+    public void setUploadFiles(AbsolutePath... files) {
         uploadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
             addUploadFile(files[i]);
         }
     }
 
-    public void addUploadFile(Path src) {
+    public void addUploadFile(AbsolutePath src) {
         addUploadFile(src, null);
     }
 
-    public void addUploadFile(Path src, String dest) {
+    public void addUploadFile(AbsolutePath src, String dest) {
         if (src == null) {
             throw new NullPointerException("the source file cannot be null when adding a preStaged file");
         }
 
-        uploadFiles.add(new Pair(src, path.resolve(dest)));
+        uploadFiles.add(new Pair(src, path.resolve(new RelativePath(dest))));
     }
 
     public List<Pair> getDownloadFiles() {
@@ -79,12 +80,12 @@ public class Sandbox {
         addDownloadFile(src, null);
     }
 
-    public void addDownloadFile(String src, Path dest) {
+    public void addDownloadFile(String src, AbsolutePath dest) {
         if (src == null) {
             throw new NullPointerException("the source file cannot be null when adding a postStaged file");
         }
 
-        downloadFiles.add(new Pair(path.resolve(src), dest));
+        downloadFiles.add(new Pair(path.resolve(new RelativePath(src)), dest));
     }
 
     private void copy(List<Pair> pairs) throws OctopusIOException {

@@ -4,7 +4,6 @@ import java.util.Properties;
 import java.util.Vector;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsEngine;

@@ -11,7 +11,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import nl.esciencecenter.octopus.OctopusProperties;
 import nl.esciencecenter.octopus.engine.loader.JarFileSystem;
 import nl.esciencecenter.octopus.engine.loader.JarFsClassLoader;
 import nl.esciencecenter.octopus.exceptions.OctopusException;

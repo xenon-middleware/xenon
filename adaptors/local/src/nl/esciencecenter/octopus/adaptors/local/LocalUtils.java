@@ -10,13 +10,13 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 class LocalUtils {
 
     //TODO: test this function
-    static java.nio.file.Path javaPath(Path path) {
+    static java.nio.file.Path javaPath(AbsolutePath path) {
         String string = path.getPath();
         if (string.startsWith("/~")) {
             string = System.getProperty("user.home") + "/" + string.substring(2);

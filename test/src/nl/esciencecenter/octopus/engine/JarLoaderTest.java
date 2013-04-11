@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.tests.engine;
+package nl.esciencecenter.octopus.engine;
 
 import java.io.File;
 import java.io.InputStream;
