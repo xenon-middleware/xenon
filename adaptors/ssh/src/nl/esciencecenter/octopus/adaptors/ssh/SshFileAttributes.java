@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
-import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.SftpATTRS;
 
 public class SshFileAttributes implements FileAttributes {
@@ -27,12 +27,12 @@ public class SshFileAttributes implements FileAttributes {
     static final int WRITE_OTHERS = 00002; // write by others
     static final int EXEC_OTHERS  = 00001; // execute/search by others
 
-    LsEntry entry;
     SftpATTRS attributes;
+    AbsolutePath path;
     
-    public SshFileAttributes(LsEntry entry) {
-        this.entry = entry;
-        attributes = entry.getAttrs();
+    public SshFileAttributes(SftpATTRS attributes, AbsolutePath path) {
+        this.attributes = attributes; 
+        this.path = path;
     }
     
     @Override
@@ -127,7 +127,7 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean isHidden() throws AttributeNotSupportedException {
-        return entry.getFilename().startsWith(".");
+        return path.getFileName().startsWith(".");
     }
 
     @Override

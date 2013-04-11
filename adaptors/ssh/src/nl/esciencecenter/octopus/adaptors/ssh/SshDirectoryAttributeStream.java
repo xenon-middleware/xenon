@@ -47,7 +47,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributes>, It
             current++;
             AbsolutePath nextPath = dir.resolve(new RelativePath(listing.get(current).getLongname()));
             if (filter.accept(nextPath)) {
-                SshFileAttributes attributes = new SshFileAttributes(nextEntry);
+                SshFileAttributes attributes = new SshFileAttributes(nextEntry.getAttrs(), nextPath);
                 PathAttributes next = new AbstractPathAttributes(nextPath, attributes);
                 return next;
             }

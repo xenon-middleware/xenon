@@ -266,7 +266,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         } catch (IOException e) {
             throw new OctopusIOException(getClass().getName(), "Could not output stream", e);
         }
-
     }
 
     @Override
