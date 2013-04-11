@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 class Index {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(Index.class);
 
     private final Map<JarEntry, HashSet<String>> entries;

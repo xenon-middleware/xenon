@@ -30,8 +30,9 @@ public interface Files {
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) 
             throws OctopusException, OctopusIOException;
 
-    // FIXME add getCWDFileSystem()
-    // FIXME add getHomeFileSystem()
+    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException;
+    
+    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException;
     
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException;
     
@@ -65,31 +66,8 @@ public interface Files {
      * @throws FileAlreadyExistsException
      *             if {@code dir} exists but is not a directory <i>(optional specific exception)</i>
      */
-    //public Path createDirectories(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
-
-    /**
-     * Creates a directory by creating all nonexistent parent directories first.
-     * 
-     * @throws UnsupportedOperationException
-     *             if the given Permissions cannot be set when the file is created
-     * @throws FileAlreadyExistsException
-     *             if {@code dir} exists but is not a directory <i>(optional specific exception)</i>
-     */
     public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException;
-
-    /**
-     * Creates a new directory.
-     * 
-     * @throws UnsupportedOperationException
-     *             if the given Permissions cannot be set when tsourcefs.getAdaptorName().equals("local")he file is created
-     * @throws FileAlreadyExistsException
-     *             if a directory could not otherwise be created because a file of that name already exists <i>(optional specific
-     *             exception)</i>
-     * @throws OctopusIOException
-     *             if an I/O error occurs or the parent directory does not exist
-     */
-   // public Path createDirectory(Path dir, Set<PosixFilePermission> permissions) throws OctopusIOException;
-
+    
     /**
      * Creates a new directory.
      * 
@@ -113,8 +91,6 @@ public interface Files {
      * @throws OctopusIOException
      *             if an I/O error occurs or the parent directory does not exist
      */
-    //public Path createFile(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
-
     public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
 
     
@@ -174,13 +150,13 @@ public interface Files {
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the PathAttributes of all entries in the directory.
      */
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory. Extra functionality in RAL to
      * efficiently fetch all attributes for a directory.
      */
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
     /** Opens a file, returning an input stream to read from the file. */
@@ -227,9 +203,4 @@ public interface Files {
      * Updates a file's last modified, last access, and create time attribute. Use -1 to not set a certain attribute
      */
     public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException;
-
-    /**
-     * Updates (replace) the access control list.
-     */
-    // public void setAcl(Path path, List<AclEntry> acl) throws OctopusIOException;
 }

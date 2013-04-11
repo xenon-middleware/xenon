@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import sun.util.locale.StringTokenIterator;
-
 public class RelativePath {
 
     public static final char DEFAULT_SEPERATOR = '/';
@@ -183,7 +181,7 @@ public class RelativePath {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " not present in path " + this);
         }
 
-        if (endIndex < 0 || endIndex >= elements.length) {
+        if (endIndex < 0 || endIndex > elements.length) {
             throw new IllegalArgumentException("endIndex " + beginIndex + " not present in path " + this);
         }
 
@@ -201,10 +199,12 @@ public class RelativePath {
     }
 
     public boolean startsWith(RelativePath other) {
+        // TODO: Implement!
         return false;
     }
 
     public boolean endsWith(RelativePath other) {
+        // TODO: Implement!
         return false;
     }
 
@@ -355,6 +355,34 @@ public class RelativePath {
         return new RelativePath(tmp, seperator);
     }
     
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(elements);
+        result = prime * result + ((seperator == null) ? 0 : seperator.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RelativePath other = (RelativePath) obj;
+        if (!Arrays.equals(elements, other.elements))
+            return false;
+        if (seperator == null) {
+            if (other.seperator != null)
+                return false;
+        } else if (!seperator.equals(other.seperator))
+            return false;
+        return true;
+    }
+
     public String toString() {
         return getPath();
     }

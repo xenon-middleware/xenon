@@ -2,14 +2,14 @@ package nl.esciencecenter.octopus.engine.files;
 
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 
-public class AbstractPathAttributes implements PathAttributes {
+public class PathAttributesPairImplementation implements PathAttributesPair {
 
     private final AbsolutePath path;
     private final FileAttributes attributes;
 
-    public AbstractPathAttributes(AbsolutePath path, FileAttributes attributes) {
+    public PathAttributesPairImplementation(AbsolutePath path, FileAttributes attributes) {
         this.path = path;
         this.attributes = attributes;
     }
@@ -23,5 +23,4 @@ public class AbstractPathAttributes implements PathAttributes {
     public FileAttributes attributes() {
         return attributes;
     }
-
 }

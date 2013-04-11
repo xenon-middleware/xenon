@@ -22,7 +22,7 @@ import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 
 /**
  * Some additional functionality build on top of the standard API
@@ -217,7 +217,7 @@ public class FileUtils {
                 visitResult = visitor.preVisitDirectory(path, attributes, octopus);
                 if (visitResult == FileVisitResult.CONTINUE) {
                     try {
-                        for (PathAttributes attributesEntry : octopus.files().newAttributesDirectoryStream(path)) {
+                        for (PathAttributesPair attributesEntry : octopus.files().newAttributesDirectoryStream(path)) {
                             // recursion step
                             FileVisitResult result =
                                     walk(octopus, attributesEntry.path(), attributesEntry.attributes(), followLinks,

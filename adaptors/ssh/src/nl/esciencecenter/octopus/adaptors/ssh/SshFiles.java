@@ -28,7 +28,7 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -267,14 +267,13 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath path, Filter filter)
-            throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath path, Filter filter) throws OctopusIOException {
         if (!isDirectory(path)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create directorystream, file is not a directory");
         }
@@ -402,5 +401,15 @@ public class SshFiles implements Files {
 
     public void end() {
         // TODO close all filesystems
+    }
+
+    @Override
+    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException {
+        throw new OctopusException(getClass().getName(), "getCWDFileSystem not supported!");
+    }
+
+    @Override
+    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
+        throw new OctopusException(getClass().getName(), "getLocalHomeFileSystem not supported!");
     }
 }

@@ -10,4 +10,6 @@ public interface Scheduler {
     public URI getUri();
 
     public Properties getProperties();
+    
+    public String[] getQueueNames();
 }
