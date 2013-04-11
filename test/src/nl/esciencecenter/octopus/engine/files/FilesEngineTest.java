@@ -80,10 +80,10 @@ public class FilesEngineTest {
         // etc.
         Files files_adaptor = mock(Files.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, adaptor_name);
-        when(files_adaptor.newPath(filesystem, "tmp/bla.txt")).thenReturn(expected_path);
+        when(files_adaptor.newPath(filesystem, new RelativePath("tmp/bla.txt"))).thenReturn(expected_path);
 
         FilesEngine engine = new FilesEngine(octopus);
-        AbsolutePath newpath = engine.newPath(filesystem, "file:///tmp/bla.txt");
+        AbsolutePath newpath = engine.newPath(filesystem, new RelativePath("tmp/bla.txt"));
 
         assertThat((AbsolutePathImplementation) newpath, is(expected_path));
     }

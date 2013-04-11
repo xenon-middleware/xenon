@@ -22,6 +22,7 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PathAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
@@ -77,8 +78,13 @@ public class FilesEngine implements Files {
     }
     
     @Override
-    public AbsolutePath newPath(FileSystem filesystem, String location) throws OctopusException, OctopusIOException {
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
         return getAdaptor(filesystem).filesAdaptor().newPath(filesystem, location);
+    }
+    
+    @Override
+    public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException {
+        return getAdaptor(filesystem).filesAdaptor().newPath(filesystem, locations);
     }
 
     @Override
