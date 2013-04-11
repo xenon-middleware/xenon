@@ -285,7 +285,7 @@ public class RelativePath {
     public String getPath() {
 
         if (elements.length == 0) {
-            return null;
+            return "";
         }
 
         StringBuilder tmp = new StringBuilder();
