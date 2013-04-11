@@ -174,13 +174,13 @@ public interface Files {
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the PathAttributes of all entries in the directory.
      */
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Opens a directory, returning a DirectoryStream to iterate over the entries in the directory. Extra functionality in RAL to
      * efficiently fetch all attributes for a directory.
      */
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
     /** Opens a file, returning an input stream to read from the file. */

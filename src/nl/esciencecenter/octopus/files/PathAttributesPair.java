@@ -6,7 +6,7 @@ package nl.esciencecenter.octopus.files;
  * @author Niels Drost
  * 
  */
-public interface PathAttributes {
+public interface PathAttributesPair {
 
     public AbsolutePath path();
 

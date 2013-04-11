@@ -34,7 +34,7 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -241,7 +241,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException {
         if (!isDirectory(dir)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create DirectoryAttributeStream, file is not a directory");
@@ -484,7 +484,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
     }

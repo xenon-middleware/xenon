@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.PathAttributes;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -177,7 +177,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir);
     }
     
@@ -187,7 +187,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributes> newAttributesDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir, filter);
     }
     
