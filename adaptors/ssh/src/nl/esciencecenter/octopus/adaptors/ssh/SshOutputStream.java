@@ -21,30 +21,37 @@ public class SshOutputStream extends OutputStream {
         this.channel = channel;
     }
 
+    @Override
     public void write(int b) throws IOException {
         out.write(b);
     }
 
+    @Override
     public int hashCode() {
         return out.hashCode();
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
         out.write(b);
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return out.equals(obj);
     }
 
+    @Override
     public void flush() throws IOException {
         out.flush();
     }
 
+    @Override
     public void close() throws IOException {
         try {
             out.close();
@@ -53,6 +60,7 @@ public class SshOutputStream extends OutputStream {
         }
     }
 
+    @Override
     public String toString() {
         return out.toString();
     }

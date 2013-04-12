@@ -21,38 +21,47 @@ public class SshInputStream extends InputStream {
         this.channel = channel;
     }
 
+    @Override
     public int read() throws IOException {
         return in.read();
     }
 
+    @Override
     public int hashCode() {
         return in.hashCode();
     }
 
+    @Override
     public int read(byte[] b) throws IOException {
         return in.read(b);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return in.equals(obj);
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         return in.read(b, off, len);
     }
 
+    @Override
     public long skip(long n) throws IOException {
         return in.skip(n);
     }
 
+    @Override
     public String toString() {
         return in.toString();
     }
 
+    @Override
     public int available() throws IOException {
         return in.available();
     }
 
+    @Override
     public void close() throws IOException {
         try {
             in.close();
@@ -61,14 +70,17 @@ public class SshInputStream extends InputStream {
         }
     }
 
+    @Override
     public void mark(int readlimit) {
         in.mark(readlimit);
     }
 
+    @Override
     public void reset() throws IOException {
         in.reset();
     }
 
+    @Override
     public boolean markSupported() {
         return in.markSupported();
     }

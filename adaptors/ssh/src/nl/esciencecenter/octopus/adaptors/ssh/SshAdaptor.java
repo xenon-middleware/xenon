@@ -13,17 +13,14 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
@@ -160,8 +157,7 @@ public class SshAdaptor extends Adaptor {
             HostKey[] hks = hkr.getHostKey();
             if (hks != null) {
                 logger.debug("Host keys in " + hkr.getKnownHostsRepositoryID());
-                for (int i = 0; i < hks.length; i++) {
-                    HostKey hk = hks[i];
+                for (HostKey hk : hks) {
                     logger.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
                 }
                 logger.debug("");
@@ -169,10 +165,9 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
- // TODO more specific exception, octopus really is couldnotinitcredential
-    // idee: adaptor handelt alle sessions en channels af, er zitten nl beperkingen op het aantal channels per session, etc.
+    // TODO more specific exception, octopus really is couldnotinitcredential
     // TODO cache van sessions / channels
-    // session.setConfig("StrictHostKeyChecking", "no");
+    // TODO property session.setConfig("StrictHostKeyChecking", "no");
 
     private CredentialImplementation getDefaultCredential() throws OctopusException {
         throw new OctopusException("ssh", "Please specify a valid credential, credential is 'null'");
@@ -189,7 +184,7 @@ public class SshAdaptor extends Adaptor {
                 throw new OctopusException("ssh", "Could not read private key file.", e);
             }
         } else if (credential instanceof PasswordCredentialImplementation) {
-            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential; 
+            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
             // session.setPassword("password");
         } else {
             throw new OctopusException("ssh", "Unknown credential type.");
@@ -223,8 +218,8 @@ public class SshAdaptor extends Adaptor {
             credential = getDefaultCredential();
         }
 
-        setCredential((CredentialImplementation)credential, session);
-        
+        setCredential((CredentialImplementation) credential, session);
+
         String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
         logger.debug("setting ssh known hosts file to: " + knownHosts);
 
