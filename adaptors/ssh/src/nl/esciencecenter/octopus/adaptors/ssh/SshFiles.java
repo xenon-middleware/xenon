@@ -646,12 +646,6 @@ public class SshFiles implements Files {
         }
     }
 
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
