@@ -6,6 +6,7 @@ import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -15,11 +16,14 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
+import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.DirectoryStream.Filter;
@@ -50,9 +54,36 @@ public class SshFiles implements Files {
         return res;
     }
 
+    /**
+     * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
+     * 
+     */
+    class FileSystemInfo {
+        FileSystemImplementation impl;
+        Session session;
+
+        public FileSystemInfo(FileSystemImplementation impl, Session session) {
+            super();
+            this.impl = impl;
+            this.session = session;
+        }
+
+        public FileSystemImplementation getImpl() {
+            return impl;
+        }
+
+        public Session getSession() {
+            return session;
+        }
+    }
+
     private final OctopusEngine octopusEngine;
     private final SshAdaptor adaptor;
+    @SuppressWarnings("unused")
+    // no properties yet
     private final Properties properties;
+
+    private HashMap<String, FileSystemInfo> fileSystems = new HashMap<String, FileSystemInfo>();
 
     public SshFiles(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
@@ -64,10 +95,6 @@ public class SshFiles implements Files {
 
             logger.debug(Arrays.toString(attributeViews.toArray()));
         }
-    }
-
-    private SshFileSystem getFileSystem(AbsolutePath path) {
-        return (SshFileSystem) path.getFileSystem();
     }
 
     @Override
@@ -85,7 +112,7 @@ public class SshFiles implements Files {
         Session session = adaptor.createNewSession(uniqueID, location, credential);
 
         ChannelSftp channel;
-        channel = SshFileSystem.getSftpChannel(session);
+        channel = adaptor.getSftpChannel(session);
 
         String wd = null;
         try {
@@ -101,8 +128,37 @@ public class SshFiles implements Files {
 
         logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
-        return new SshFileSystem(adaptor.getName(), uniqueID, location, entryPath, credential, new OctopusProperties(properties),
-                adaptor, session);
+        FileSystemImplementation result =
+                new FileSystemImplementation(adaptor.getName(), uniqueID, location, entryPath, credential, new OctopusProperties(
+                        properties));
+        fileSystems.put(uniqueID, new FileSystemInfo(result, session));
+        return result;
+    }
+
+    protected ChannelSftp getChannel(AbsolutePath path) throws OctopusIOException {
+        return getChannel(path.getFileSystem());
+    }
+
+    protected ChannelSftp getChannel(FileSystem fileSystem) throws OctopusIOException {
+        if (!fileSystem.getAdaptorName().equals(adaptor.getName())) {
+            throw new OctopusRuntimeException(adaptor.getName(), "Illegal Filesystem type: " + fileSystem.getAdaptorName());
+        }
+        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
+
+        FileSystemInfo info;
+        synchronized (this) {
+            info = fileSystems.get(fs.getUniqueID());
+        }
+        if (info == null) {
+            throw new OctopusIOException(adaptor.getName(), "file system is already closed");
+        }
+
+        Session session = info.getSession();
+        return adaptor.getSftpChannel(session);
+    }
+
+    void putChannel(ChannelSftp channel) {
+        adaptor.putSftpChannel(channel);
     }
 
     @Override
@@ -112,20 +168,117 @@ public class SshFiles implements Files {
 
     @Override
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
-        SshFileSystem fs = (SshFileSystem) filesystem;
-        fs.close();
+        FileSystemImplementation fs = (FileSystemImplementation) filesystem;
+
+        FileSystemInfo info;
+        synchronized (this) {
+            info = fileSystems.remove(fs.getUniqueID());
+        }
+        if (info == null) {
+            throw new OctopusIOException(adaptor.getName(), "file system is already closed");
+        }
+
+        info.getSession().disconnect();
     }
 
     @Override
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException {
-        SshFileSystem fs = (SshFileSystem) filesystem;
-        return fs.isOpen();
+        FileSystemImplementation fs = (FileSystemImplementation) filesystem;
+
+        synchronized (this) {
+            FileSystemInfo info = fileSystems.get(fs.getUniqueID());
+            if (info == null) {
+                return false;
+            }
+            return true;
+        }
     }
 
     @Override
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+
+        logger.debug("ssh copy");
+        // two cases: remote -> local and local -> remote
+
+        FileSystem sourcefs = source.getFileSystem();
+        FileSystem targetfs = target.getFileSystem();
+
+        if (source.isLocal()) {
+            if (target.isLocal()) {
+                throw new OctopusIOException(adaptor.getName(), "Cannot copy local files.");
+            }
+
+            if (!targetfs.getAdaptorName().equals("ssh")) {
+                throw new OctopusIOException(adaptor.getName(),
+                        "Can only copy between local and an ssh locations (or vice-versa).");
+            }
+
+            // Ok, here, source is local, target is ssh.
+
+            if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
+                if (exists(target) && isDirectory(target)) {
+                    if (newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
+                        throw new DirectoryNotEmptyException(adaptor.getName(), "cannot replace dir " + target
+                                + " as it is not empty");
+                    } else {
+                        delete(target);
+                    }
+                }
+            } else if (exists(target)) {
+                throw new FileAlreadyExistsException(adaptor.getName(), "cannot copy to " + target + " as it already exists");
+            }
+
+            ChannelSftp channel = getChannel(target);
+
+            try {
+                logger.debug("copy from " + source.getPath() + " to " + target.getPath());
+                channel.put(source.getPath(), target.getPath());
+            } catch (SftpException e) {
+                throw adaptor.sftpExceptionToOctopusException(e);
+            } finally {
+                putChannel(channel);
+            }
+        } else if (target.isLocal()) {
+            if (source.isLocal()) {
+                throw new OctopusIOException(adaptor.getName(), "Cannot copy local files.");
+            }
+
+            if (!sourcefs.getAdaptorName().equals("ssh")) {
+                throw new OctopusIOException(adaptor.getName(),
+                        "Can only copy between local and an ssh locations (or vice-versa).");
+            }
+
+            // Ok, here, target is local, source is ssh.
+
+            if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
+                if (octopusEngine.files().exists(target) && octopusEngine.files().isDirectory(target)) {
+                    if (octopusEngine.files().newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
+                        throw new DirectoryNotEmptyException(adaptor.getName(), "cannot replace dir " + target
+                                + " as it is not empty");
+                    } else {
+                        octopusEngine.files().delete(target);
+                    }
+                }
+            } else if (octopusEngine.files().exists(target)) {
+                throw new FileAlreadyExistsException(adaptor.getName(), "cannot copy to " + target + " as it already exists");
+            }
+
+            ChannelSftp channel = getChannel(source);
+
+            try {
+                logger.debug("copy from " + source.getPath() + " to " + target.getPath());
+                channel.get(source.getPath(), target.getPath());
+            } catch (SftpException e) {
+                throw adaptor.sftpExceptionToOctopusException(e);
+            } finally {
+                putChannel(channel);
+            }
+        } else {
+            // both remote
+            throw new OctopusIOException(adaptor.getName(), "Cannot copy files between two different remote filesystems!");
+        }
+
+        return target;
     }
 
     @Override
@@ -134,14 +287,14 @@ public class SshFiles implements Files {
             throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
         }
 
-        ChannelSftp channel = getFileSystem(dir).getSftpChannel();
+        ChannelSftp channel = getChannel(dir);
 
         try {
             channel.mkdir(dir.getPath());
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(dir).putSftpChannel(channel);
+            putChannel(channel);
         }
 
         return dir;
@@ -180,10 +333,14 @@ public class SshFiles implements Files {
             throw new NoSuchFileException(getClass().getName(), "cannot delete file, as it does not exist");
         }
 
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         try {
             if (isDirectory(path)) {
+                if (newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
+                    throw new DirectoryNotEmptyException(adaptor.getName(), "cannot delete dir " + path + " as it is not empty");
+                }
+
                 channel.rmdir(path.getPath());
             } else {
                 channel.rm(path.getPath());
@@ -191,13 +348,13 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(path).putSftpChannel(channel);
+            putChannel(channel);
         }
     }
 
     @Override
     public boolean exists(AbsolutePath path) throws OctopusIOException {
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         try {
             channel.lstat(path.getPath());
@@ -208,7 +365,7 @@ public class SshFiles implements Files {
 
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(path).putSftpChannel(channel);
+            putChannel(channel);
         }
 
         return true;
@@ -216,7 +373,7 @@ public class SshFiles implements Files {
 
     @Override
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         try {
             SftpATTRS attributes = channel.lstat(path.getPath());
@@ -224,7 +381,7 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(path).putSftpChannel(channel);
+            putChannel(channel);
         }
     }
 
@@ -232,6 +389,52 @@ public class SshFiles implements Files {
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
         // TODO Auto-generated method stub
         return null;
+        
+        /*
+        logger.debug("ssh move");
+
+        FileSystem sourcefs = source.getFileSystem();
+        FileSystem targetfs = target.getFileSystem();
+
+        if (source.isLocal() || target.isLocal()) {
+            throw new OctopusIOException(adaptor.getName(), "Cannot move local files.");
+        }
+
+        if (!sourcefs.getAdaptorName().equals("ssh") || !targetfs.getAdaptorName().equals("ssh")) {
+            throw new OctopusIOException(adaptor.getName(),
+                    "Can only copy between local and an ssh locations (or vice-versa).");
+        }
+
+        if(!sourcefs.getUri().getHost().equals(targetfs.getUri().getHost())) {
+            throw new OctopusIOException(adaptor.getName(), "Cannot copy between different sites: " + sourcefs.getUri().getHost() + " and " +targetfs.getUri().getHost());
+        }
+        
+        // Ok, here, we just have a local move
+
+            if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
+                if (exists(target) && isDirectory(target)) {
+                    if (newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
+                        throw new DirectoryNotEmptyException(adaptor.getName(), "cannot replace dir " + target
+                                + " as it is not empty");
+                    } else {
+                        delete(target);
+                    }
+                }
+            } else if (exists(target)) {
+                throw new FileAlreadyExistsException(adaptor.getName(), "cannot copy to " + target + " as it already exists");
+            }
+
+            ChannelSftp channel = getChannel(target);
+
+            try {
+                logger.debug("copy from " + source.getPath() + " to " + target.getPath());
+                channel.put(source.getPath(), target.getPath());
+            } catch (SftpException e) {
+                throw adaptor.sftpExceptionToOctopusException(e);
+            } finally {
+                putChannel(channel);
+            }
+         */
     }
 
     @SuppressWarnings("unchecked")
@@ -241,7 +444,7 @@ public class SshFiles implements Files {
             throw new OctopusIOException(getClass().getName(), "Cannot create directorystream, file is not a directory");
         }
 
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         Vector<LsEntry> listing = null;
         try {
@@ -249,7 +452,7 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(path).putSftpChannel(channel);
+            putChannel(channel);
         }
 
         return new SshDirectoryStream(path, filter, listing);
@@ -267,12 +470,13 @@ public class SshFiles implements Files {
 
     @SuppressWarnings("unchecked")
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath path, Filter filter) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath path, Filter filter)
+            throws OctopusIOException {
         if (!isDirectory(path)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create directorystream, file is not a directory");
         }
 
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         Vector<LsEntry> listing = null;
         try {
@@ -280,7 +484,7 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(path).putSftpChannel(channel);
+            putChannel(channel);
         }
 
         return new SshDirectoryAttributeStream(path, filter, listing);
@@ -292,7 +496,7 @@ public class SshFiles implements Files {
             throw new OctopusIOException(getClass().getName(), "Cannot create input stream, path is a directory");
         }
 
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         try {
             InputStream in = channel.get(path.getPath());
@@ -302,39 +506,41 @@ public class SshFiles implements Files {
         }
     }
 
+    // FIXME move to OpenOption
     private boolean contains(OpenOption toFind, OpenOption... options) {
-        for(OpenOption curr : options) {
-            if(curr == toFind) {
+        for (OpenOption curr : options) {
+            if (curr == toFind) {
                 return true;
             }
         }
         return false;
     }
-    
+
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         if (isDirectory(path)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create input stream, path is a directory");
         }
 
-        if(contains(OpenOption.READ, options)) {
+        if (contains(OpenOption.READ, options)) {
             throw new IllegalArgumentException("Cannot open an output stream for reading");
         }
 
-        if(contains(OpenOption.CREATE_NEW, options) && exists(path)) {
-            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create file, as it already exists, and you specified the CREATE_NEW option.");
+        if (contains(OpenOption.CREATE_NEW, options) && exists(path)) {
+            throw new FileAlreadyExistsException(getClass().getName(),
+                    "Cannot create file, as it already exists, and you specified the CREATE_NEW option.");
         }
 
-        boolean append = false;
-        
-        if(contains(OpenOption.APPEND, options)) {
-            append = true;
+        int mode = ChannelSftp.OVERWRITE;
+
+        if (contains(OpenOption.APPEND, options)) {
+            mode = ChannelSftp.APPEND;
         }
-        
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+
+        ChannelSftp channel = getChannel(path);
 
         try {
-            OutputStream out = channel.put(path.getPath());
+            OutputStream out = channel.put(path.getPath(), mode);
             return new SshOutputStream(out, channel);
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -356,7 +562,7 @@ public class SshFiles implements Files {
 
     @Override
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {
-        ChannelSftp channel = getFileSystem(path).getSftpChannel();
+        ChannelSftp channel = getChannel(path);
 
         try {
             SftpATTRS a = channel.lstat(path.getPath());
@@ -364,14 +570,22 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
-            getFileSystem(path).putSftpChannel(channel);
+            putChannel(channel);
         }
     }
 
     @Override
-    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+    public AbsolutePath readSymbolicLink(AbsolutePath path) throws OctopusIOException {
+        ChannelSftp channel = getChannel(path);
+
+        try {
+            String target = channel.readlink(path.getPath());
+            return new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
+        } catch (SftpException e) {
+            throw adaptor.sftpExceptionToOctopusException(e);
+        } finally {
+            putChannel(channel);
+        }
     }
 
     @Override
@@ -394,7 +608,18 @@ public class SshFiles implements Files {
     }
 
     public void end() {
-        // TODO close all filesystems
+        logger.debug("end called, closing all file systems");
+        while (fileSystems.size() > 0) {
+            Set<String> keys = fileSystems.keySet();
+            String first = keys.iterator().next();
+            FileSystem fs = fileSystems.get(first).getImpl();
+
+            try {
+                close(fs);
+            } catch (OctopusIOException | OctopusException e) {
+                // ignore for now
+            }
+        }
     }
 
     @Override

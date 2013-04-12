@@ -20,7 +20,8 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     private int current = 0;
 
-    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing)
+            throws OctopusIOException {
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
@@ -40,7 +41,8 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
     public synchronized boolean hasNext() {
         return current < listing.size();
     }
-    
+
+    @Override
     public synchronized PathAttributesPair next() {
         while (current < listing.size()) {
             LsEntry nextEntry = listing.get(current);

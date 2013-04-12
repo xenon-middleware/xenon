@@ -6,7 +6,6 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 public class QueueStatusImplementation implements QueueStatus {
-
     private final Scheduler scheduler;
     private final String queueName;
     private final Exception exception;

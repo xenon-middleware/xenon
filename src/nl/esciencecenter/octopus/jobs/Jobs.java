@@ -24,9 +24,9 @@ public interface Jobs {
     
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
 
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException;
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
     
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException;
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException;
     
     /**
      * Submit a job. 

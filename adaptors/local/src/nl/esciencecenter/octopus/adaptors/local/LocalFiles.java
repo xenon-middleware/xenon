@@ -155,7 +155,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         if (source.normalize().equals(target.normalize())) {
             return target;
         }
-        
+
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target)); 
         } catch (IOException e) {
