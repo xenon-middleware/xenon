@@ -1,7 +1,6 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -53,7 +52,7 @@ public class SshJobs implements Jobs {
     class SchedulerInfo {
         SchedulerImplementation impl;
         Session session;
-        
+
         public SchedulerInfo(SchedulerImplementation impl, Session session) {
             this.impl = impl;
             this.session = session;
@@ -68,9 +67,8 @@ public class SshJobs implements Jobs {
         }
     }
 
-    private HashMap<String, FileSystemInfo> fileSystems = new HashMap<String, FileSystemInfo>();
-    
-    
+    private HashMap<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
+
     @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
@@ -95,14 +93,6 @@ public class SshJobs implements Jobs {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
-
-        URI uri = null;
-
-        try {
-            uri = new URI("ssh:///");
-        } catch (URISyntaxException e) {
-            throw new OctopusRuntimeException(adaptor.getName(), "Failed to create URI", e);
-        }
 
         singleQ = new LinkedList<SshJobExecutor>();
 
@@ -131,10 +121,16 @@ public class SshJobs implements Jobs {
             throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with additional properties!");
         }
 
-        String uniqueID = getNewUniqueID(); 
-        SchedulerImplementation sshScheduler = new SchedulerImplementation(adaptor.getName(), uniqueID, location, new String[] { "single" }, new OctopusProperties(
-                properties));
-            
+        String uniqueID = getNewUniqueID();
+        
+        Session session = adaptor.createNewSession(uniqueID, location, credential);
+        
+        SchedulerImplementation sshScheduler =
+                new SchedulerImplementation(adaptor.getName(), uniqueID, location, new String[] { "single" }, credential,
+                        new OctopusProperties(properties));
+
+        schedulers.put(uniqueID, new SchedulerInfo(sshScheduler, session));
+
         return sshScheduler;
     }
 
@@ -166,7 +162,7 @@ public class SshJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
-        if(!(scheduler instanceof SchedulerImplementation)) {
+        if (!(scheduler instanceof SchedulerImplementation)) {
             throw new OctopusRuntimeException(adaptor.getName(), "Illegal scheduler type.");
         }
 
@@ -291,7 +287,7 @@ public class SshJobs implements Jobs {
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
