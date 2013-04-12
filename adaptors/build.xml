@@ -1,10 +1,11 @@
 <project name="Adaptors" default="build" basedir=".">
 	<description>
-	Build file for Adaptors.
-    </description>
+		Build file for Adaptors.
+    	</description>
 
 	<target name="build" description="build local, ssh adaptors">
 		<ant dir="local" />
+		<ant dir="gridengine" />
 		<ant dir="ssh" />
 	</target>
 
