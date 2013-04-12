@@ -1,5 +1,6 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
@@ -164,14 +165,21 @@ public class GridEngineJobsTest {
 
         Job job = octopus.jobs().submitJob(scheduler, jobDescription);
 
-        for (int i = 0; i < 300; i++) {
-            JobStatus status = octopus.jobs().getJobStatus(job);
+        for (int i = 0; i < 100; i++) {
+            try {
+                JobStatus status = octopus.jobs().getJobStatus(job);
 
-            System.out.println(job.getIdentifier() + " has state " + status.getState());
+                System.out.println(job.getIdentifier() + " has state " + status.getState());
 
-            if (status.getState() == null) {
-                return;
+                if (status.isDone()) {
+                    System.out.println("job exit status code was: " + status.getExitCode());
+                    System.out.println("job detailed status: " + status.getSchedulerSpecficInformation());
+                    return;
+                }
+            } catch (Exception e) {
+                //IGNORE
             }
+            Thread.sleep(1000);
         }
     }
 
