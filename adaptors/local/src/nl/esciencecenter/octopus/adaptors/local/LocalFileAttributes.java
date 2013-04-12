@@ -13,10 +13,19 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 public class LocalFileAttributes implements FileAttributes {
 
+    /** The file attributes from the underlying java.nio implementation */
     private final PosixFileAttributes attributes;
+    
+    /** Is the file executable ? */
     private final boolean executable;
+    
+    /** Is the file readable ? */
     private final boolean readable;
+
+    /** Is the file writable ? */
     private final boolean writable;
+    
+    /** Is the file hidden ? */
     private final boolean hidden;
 
     public LocalFileAttributes(AbsolutePath path) throws OctopusIOException {
@@ -31,7 +40,7 @@ public class LocalFileAttributes implements FileAttributes {
             hidden = Files.isHidden(javaPath);
 
         } catch (IOException e) {
-            throw new OctopusIOException(getClass().getName(), "Cannot read attributes", e);
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Cannot read attributes.", e);
         }
     }
 

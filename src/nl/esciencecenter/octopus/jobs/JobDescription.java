@@ -6,30 +6,49 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * JobDescription contains a description of a job that can be submitted to a {@link} Scheduler.
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class JobDescription {
 
+    /** The queue to submit to. */
     private String queueName = null;
 
+    /** The exectuable to run. */
     private String executable = null;
 
-    private String stdin = null;
-
-    private String stdout = "stdout.txt";
-
-    private String stderr = "stderr.txt";
-
-    private String workingDirectory = null;
-
+    /** The arguments to pass to the executable.*/
     private List<String> arguments = new ArrayList<String>();
 
+    /** The location file from which to redirect stdin. (optional) */
+    private String stdin = null;
+
+    /** The location file which to redirect stdout to. (default: stdout.txt) */
+    private String stdout = "stdout.txt";
+
+    /** The location file which to redirect stderr to. (default: stderr.txt) */
+    private String stderr = "stderr.txt";
+
+    /** The working directory for the job. */
+    private String workingDirectory = null;
+
+    /** The environmet variables and their values */ 
     private Map<String, String> environment = new HashMap<String, String>();
 
+    /** The number of nodes to run the job on. */
     private int nodeCount = 1;
 
+    /** The number of presesses to start per node. */
     private int processesPerNode = 1;
 
-    private int maxTime = 30; // minutes
+    /** The maximum run time in minutes. */
+    private int maxTime = 30; 
     
+    /** Should the job be run offline? */
     private boolean offlineMode = false;
     
     public JobDescription() { 

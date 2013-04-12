@@ -1,7 +1,7 @@
 package nl.esciencecenter.octopus.engine;
 
+import java.util.ArrayList;
 import java.util.Properties;
-import java.util.Vector;
 
 import nl.esciencecenter.octopus.AdaptorInfo;
 import nl.esciencecenter.octopus.Octopus;
@@ -10,6 +10,8 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementat
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
@@ -17,9 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of Octopus Interface class. Redirects calls to adaptors, and the FilesEngine
+ * OctopusEngine implements the Octopus Interface class by redirecting all calls to {@link Adaptor}s.
  * 
- * @author Niels Drost
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
  */
 public class OctopusEngine implements Octopus {
 
@@ -41,23 +45,58 @@ public class OctopusEngine implements Octopus {
     
     private static final Logger logger = LoggerFactory.getLogger(OctopusEngine.class);
 
-    // list of all octopusEngines, so we can end them all in one go.
-    private static final Vector<OctopusEngine> octopusEngines = new Vector<OctopusEngine>();
+    /** All OctopusEngines created so far */
+    private static final ArrayList<OctopusEngine> octopusEngines = new ArrayList<OctopusEngine>();
 
-    public static Octopus newEngine(Properties properties) throws OctopusException {
+    /** 
+     * Create a new Octopus using the given properties.
+     * 
+     * @param properties the properties used to create the Octopus. 
+     * @return the newly created Octopus created. 
+     * 
+     * @throws UnknownPropertyException If an unknown property was passed.
+     * @throws IllegalPropertyException If a known property was passed with an illegal value.
+     * @throws OctopusException If the Octopus failed initialize.
+     */
+    public static Octopus newOctopus(Properties properties) throws OctopusException {
+
         OctopusEngine result = new OctopusEngine(properties);
 
-        octopusEngines.add(result);
+        synchronized (octopusEngines)  {
+            octopusEngines.add(result);
+        }
 
         return result;
     }
+    
+    public static void closeOctopus(Octopus engine) throws OctopusException {
 
-    public static void endEngines() {
-        for (OctopusEngine octopusEngine : octopusEngines) {
-            octopusEngine.end();
+        OctopusEngine result = null;
+        
+        synchronized (octopusEngines)  {           
+            for (int i=0;i<octopusEngines.size();i++) { 
+                if (octopusEngines.get(i) == engine) {
+                    result = octopusEngines.remove(i);
+                    break;
+                }
+            }
         }
+
+        if (result == null) { 
+            throw new OctopusException("engine", "No such OctopusEngine");
+        } 
+        
+        result.end();
     }
 
+    public static void endAll() {
+        synchronized (octopusEngines)  {                       
+            for (OctopusEngine octopusEngine : octopusEngines) {
+                octopusEngine.end();
+            }
+        }
+    }
+    
     private boolean ended = false;
 
     private OctopusProperties octopusProperties;
@@ -71,13 +110,13 @@ public class OctopusEngine implements Octopus {
     private final Adaptor[] adaptors;
 
     /**
-     * Constructs a OctopusEngine instance.
+     * Constructs a OctopusEngine.
      * 
-     * @param credentials
-     *            the credentials to use. Will NOT be copied.
-     * @param properties
-     *            the properties to use. Will NOT be copied.
-     * @throws OctopusException
+     * @param properties the properties to use. Will NOT be copied.
+     *            
+     * @throws UnknownPropertyException If an unknown property was passed.
+     * @throws IllegalPropertyException If a known property was passed with an illegal value.
+     * @throws OctopusException If the Octopus failed initialize.
      */
     private OctopusEngine(Properties properties) throws OctopusException {
       
@@ -93,12 +132,6 @@ public class OctopusEngine implements Octopus {
 
         logger.info("Octopus engine initialized with adaptors: " + adaptors);
     }
-    
-//    public synchronized OctopusProperties getCombinedProperties(Properties properties) {
-//       OctopusProperties result = new OctopusProperties(octopusProperties, properties);
-//
-//        return result;
-//    }
 
     // ************** Octopus Interface Implementation ***************\\
 

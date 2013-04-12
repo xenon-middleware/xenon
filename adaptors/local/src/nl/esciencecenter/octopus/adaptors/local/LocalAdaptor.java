@@ -14,26 +14,29 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 
 public class LocalAdaptor extends Adaptor {
 
+    /** Name of the local adaptor is defined in the engine. */
     public static final String ADAPTOR_NAME = OctopusEngine.LOCAL_ADAPTOR_NAME;
 
+    /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
             + " standard java classes such as java.lang.Process and java.nio.file.Files.";
 
+    /** The schemes supported by the adaptor */
     public static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
 
-    /** All our own properties start with this prefix. */
+    /** Local properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "local.";
 
-    /** All our own queue properties start with this prefix. */
+    /** Local queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
 
-    /** Maximum history length for finished jobs */
+    /** Property for maximum history length for finished jobs */
     public static final String MAX_HISTORY = QUEUE + "historySize";
 
-    /** All our multi queue properties start with this prefix. */
+    /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
-
-    /** Maximum number of concurrent jobs in the multiq */
+   
+    /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
@@ -41,13 +44,16 @@ public class LocalAdaptor extends Adaptor {
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
 
+    /** Local implementation for Files */
     private final LocalFiles localFiles;
+    
+    /** Local implementation for Jobs */
     private final LocalJobs localJobs;
 
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
-        localFiles = new LocalFiles(getProperties(), this, octopusEngine);
+        localFiles = new LocalFiles(getProperties(), this);
         localJobs = new LocalJobs(getProperties(), this, octopusEngine);
     }
 
@@ -60,14 +66,14 @@ public class LocalAdaptor extends Adaptor {
         String scheme = location.getScheme();
 
         if (scheme != null && !supports(scheme)) {
-            throw new OctopusException(getClass().getName(), "Local adaptor does not support scheme " + scheme);
+            throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support scheme " + scheme);
         }
 
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
-            throw new OctopusException(getClass().getName(), "Local adaptor only supports url with empty host or \"localhost\", not \""
-                    + location.getHost() + "\"");
+            throw new OctopusException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \"" + 
+                    location.getHost() + "\"");
         }
     }
     

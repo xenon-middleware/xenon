@@ -5,8 +5,15 @@ import java.util.Properties;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
+/**
+ * OctopusFactory is used to create and end Octopus instances. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0 
+ */
 public class OctopusFactory {
-
+    
     /**
      * Private constructor as OctopusFactory should never be created. 
      */
@@ -15,27 +22,44 @@ public class OctopusFactory {
     }
 
     /**
-     * Constructs a Octopus instance. 
+     * Create a new Octopus using the given properties. 
      * 
-     * Properties may be provided that will be passed to the engine and the adaptors. Note that an {@link OctopusException} will 
-     * be thrown if properties contains unknown keys.    
+     * The properties provided will be passed to the octopus and its adaptors on creation time. 
+     * Note that an {@link OctopusException} will be thrown if properties contains any unknown keys.    
      * 
-     * @param properties
-     *            the properties to use. 
+     * @param properties the properties to use. 
 
      * @return a new Octopus instance.
      * 
-     * @throws OctopusException
-     *             in case the engine fails to initialize.
+     * @throws UnknownPropertyException If an unknown property was passed.
+     * @throws IllegalPropertyException If a known property was passed with an illegal value.
+     * @throws OctopusException If the Octopus failed initialize.
      */
     public static Octopus newOctopus(Properties properties) throws OctopusException {
-        return OctopusEngine.newEngine(properties);
+        return OctopusEngine.newOctopus(properties);
     }
 
     /**
+     * Ends an Octopus.
      * 
+     * When an Octopus ended all non off line Jobs it has creates will be killed.   
+     * 
+     * @param properties the properties to use. 
+     * @return a new Octopus instance.
+     * 
+     * @throws NoSuchOctopusException If the Octopus was not found 
+     * @throws OctopusException If the Octopus failed to end.
      */
-    public static void end() {
-        OctopusEngine.endEngines();
+    public static void endOctopus(Octopus octopus) throws OctopusException {
+        OctopusEngine.closeOctopus(octopus);
+    }
+    
+    /**
+     * End all Octopus created by this factory. 
+     * 
+     * All exceptions throw during endAll are ignored.  
+     */
+    public static void endAll() {
+        OctopusEngine.endAll();
     }
 }
