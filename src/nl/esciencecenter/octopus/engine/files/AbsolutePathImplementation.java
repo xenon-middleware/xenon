@@ -207,5 +207,4 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     public String toString() {
         return filesystem.toString() + relativePath.toString();
     }
-
 }
