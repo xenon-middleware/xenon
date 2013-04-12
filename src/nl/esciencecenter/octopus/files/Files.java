@@ -107,7 +107,7 @@ public interface Files {
     public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException;
 
     /**
-     * Deletes a file.
+     * Deletes a file. // FIXME and what about directories? And non-empty dirs?
      */
     public void delete(AbsolutePath path) throws OctopusIOException;
     

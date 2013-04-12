@@ -1,13 +1,11 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Vector;
 
+import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
@@ -22,7 +20,8 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     private int current = 0;
 
-    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing)
+            throws OctopusIOException {
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
@@ -42,14 +41,16 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
     public synchronized boolean hasNext() {
         return current < listing.size();
     }
-    
+
+    @Override
     public synchronized PathAttributesPair next() {
         while (current < listing.size()) {
             LsEntry nextEntry = listing.get(current);
             current++;
             AbsolutePath nextPath = dir.resolve(new RelativePath(listing.get(current).getLongname()));
             if (filter.accept(nextPath)) {
-                PathAttributesPair next = SshFiles.convertAttributes(nextEntry);
+                SshFileAttributes attributes = new SshFileAttributes(nextEntry.getAttrs(), nextPath);
+                PathAttributesPair next = new PathAttributesPairImplementation(nextPath, attributes);
                 return next;
             }
         }
