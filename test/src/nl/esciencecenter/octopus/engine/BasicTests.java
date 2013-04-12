@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-import nl.esciencecenter.octopus.AdaptorInfo;
+import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 
@@ -39,7 +39,7 @@ public class BasicTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         //test if the local adaptor exists
-        AdaptorInfo localInfo = octopus.getAdaptorInfo("local");
+        AdaptorStatus localInfo = octopus.getAdaptorInfo("local");
 
         System.out.println(localInfo.getName());
         System.out.println(localInfo.getDescription());

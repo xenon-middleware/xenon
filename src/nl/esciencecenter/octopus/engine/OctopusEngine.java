@@ -3,7 +3,7 @@ package nl.esciencecenter.octopus.engine;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.AdaptorInfo;
+import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementation;
@@ -136,13 +136,20 @@ public class OctopusEngine implements Octopus {
     // ************** Octopus Interface Implementation ***************\\
 
     @Override
-    public AdaptorInfo[] getAdaptorInfos() {
-        return adaptors.clone();
+    public AdaptorStatus[] getAdaptorInfos() {
+        
+        AdaptorStatus [] status = new AdaptorStatus[adaptors.length];
+        
+        for (int i=0;i<adaptors.length;i++) { 
+            status[i] = adaptors[i].getAdaptorStatus();
+        }
+        
+        return status;
     }
 
     @Override
-    public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException {
-        return getAdaptor(adaptorName);
+    public AdaptorStatus getAdaptorInfo(String adaptorName) throws OctopusException {
+        return getAdaptor(adaptorName).getAdaptorStatus();
     }
 
     /**

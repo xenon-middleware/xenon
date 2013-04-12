@@ -87,8 +87,6 @@ public class LocalAdaptor extends Adaptor {
         return super.supports(scheme);
     }
     
-
-    @Override
     public Map<String, String> getSupportedProperties() {
         return new HashMap<String, String>();
     }
@@ -118,5 +116,11 @@ public class LocalAdaptor extends Adaptor {
     @Override
     public Credentials credentialsAdaptor() throws OctopusException {
         throw new OctopusException(ADAPTOR_NAME, "Adaptor does not need or understand credentials.");
+    }
+
+    @Override
+    public Map<String, String> getAdaptorSpecificInformation() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

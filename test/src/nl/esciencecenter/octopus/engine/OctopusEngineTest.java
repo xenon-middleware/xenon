@@ -5,7 +5,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.AdaptorInfo;
+import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -40,7 +40,7 @@ public class OctopusEngineTest {
     @Test
     public void testGetAdaptorInfo() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
-        AdaptorInfo adaptorInfo = octopus.getAdaptorInfo("local");
+        AdaptorStatus adaptorInfo = octopus.getAdaptorInfo("local");
         assertThat(adaptorInfo.getName(), is("local"));
     }
 
