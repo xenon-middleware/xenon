@@ -22,12 +22,13 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Some additional functionality build on top of the standard API
- * 
+ *
  * @author Niels Drost
- * 
+ *
  */
 public class FileUtils {
 
@@ -35,7 +36,7 @@ public class FileUtils {
 
     /**
      * Copies all bytes from an input stream to a file.
-     * 
+     *
      * @throws OctopusException
      *             if an I/O error occurs when reading or writing
      * @throws FileAlreadyExistsException
@@ -78,10 +79,10 @@ public class FileUtils {
 
     /**
      * Copies all bytes from a file to an output stream.
-     * 
+     *
      * @throws OctopusException
      *             if and I/O error occurs while reading or writing
-     * 
+     *
      */
     public static long copy(Octopus octopus, AbsolutePath source, OutputStream out) throws OctopusException {
         byte[] buffer = new byte[BUFFER_SIZE];
@@ -105,7 +106,8 @@ public class FileUtils {
 
     /**
      * Opens a file for reading, returning a BufferedReader that may be used to read text from the file in an efficient manner.
-     * @throws OctopusIOException 
+     *
+     * @throws OctopusIOException
      */
     public static BufferedReader newBufferedReader(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
         InputStream in = octopus.files().newInputStream(path);
@@ -160,7 +162,8 @@ public class FileUtils {
     /**
      * Writes bytes to a file.
      */
-    public static AbsolutePath write(Octopus octopus, AbsolutePath path, byte[] bytes, OpenOption... options) throws OctopusIOException {
+    public static AbsolutePath write(Octopus octopus, AbsolutePath path, byte[] bytes, OpenOption... options)
+            throws OctopusIOException {
         try (OutputStream out = octopus.files().newOutputStream(path, options)) {
             out.write(bytes);
         } catch (IOException e) {
@@ -171,7 +174,7 @@ public class FileUtils {
 
     /**
      * Write lines of text to a file.
-     * 
+     *
      */
     public static AbsolutePath write(Octopus octopus, AbsolutePath path, Iterable<? extends CharSequence> lines, Charset cs,
             OpenOption... options) throws OctopusIOException {
@@ -196,8 +199,8 @@ public class FileUtils {
     /**
      * Walks a file tree.
      */
-    public static AbsolutePath walkFileTree(Octopus octopus, AbsolutePath start, boolean followLinks, int maxDepth, FileVisitor visitor)
-            throws OctopusIOException {
+    public static AbsolutePath walkFileTree(Octopus octopus, AbsolutePath start, boolean followLinks, int maxDepth,
+            FileVisitor visitor) throws OctopusIOException {
         FileAttributes attributes = octopus.files().getAttributes(start);
 
         walk(octopus, start, attributes, followLinks, maxDepth, visitor);
@@ -206,8 +209,8 @@ public class FileUtils {
     }
 
     // Walk a file tree.
-    private static FileVisitResult walk(Octopus octopus, AbsolutePath path, FileAttributes attributes, boolean followLinks, int maxDepth,
-            FileVisitor visitor) throws OctopusIOException {
+    private static FileVisitResult walk(Octopus octopus, AbsolutePath path, FileAttributes attributes, boolean followLinks,
+            int maxDepth, FileVisitor visitor) throws OctopusIOException {
         FileVisitResult visitResult;
         OctopusIOException exception = null;
 
@@ -260,14 +263,68 @@ public class FileUtils {
         }
     }
 
-    public static AbsolutePath recursiveCopy(Octopus octopus, AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
-        // MUST ALSO HANDLE DIRECT FILE COPIES!    	
-        // FIXME!!!
-        throw new OctopusIOException("FileUtils", "NOT IMPLEMENTED!");
+    /**
+     * Recursively copies directories, files and symbolic links from source to target.
+     *
+     * @param octopus
+     * @param source
+     * @param target
+     * @param options
+     * @throws OctopusIOException
+     */
+    public static void recursiveCopy(Octopus octopus, AbsolutePath source, AbsolutePath target, CopyOption... options)
+            throws OctopusIOException {
+        if (CopyOption.contains(options, CopyOption.COPY_ATTRIBUTES)) {
+            throw new OctopusIOException("FileUtils", "recursiveCopy with attributes NOT IMPLEMENTED!");
+        }
+        boolean exist = octopus.files().exists(target);
+        boolean replace = CopyOption.contains(options, CopyOption.REPLACE_EXISTING);
+
+        if (octopus.files().isDirectory(source) && octopus.files().isDirectory(target)) {
+            if (exist == false) {
+                octopus.files().createDirectories(target);
+            } else {
+                if (replace == false) {
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath() + " already exists!");
+                } else {
+                    // keep existing directory
+                    // Can not replace directory, to replace have to do recursive delete and createDirectories
+                    // because recursive delete can delete unwanted files
+                }
+            }
+            for (AbsolutePath f : octopus.files().newDirectoryStream(source)) {
+                AbsolutePath fsource = f;
+                AbsolutePath ftarget = target.resolve(new RelativePath(f.getFileName()));
+                recursiveCopy(octopus, fsource, ftarget, options);
+            }
+        } else {
+            if (exist == false) {
+                octopus.files().copy(source, target);
+            } else {
+                if (replace == false) {
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath() + " already exists!");
+                } else {
+                    octopus.files().delete(target);
+                    octopus.files().copy(source, target);
+                }
+            }
+        }
     }
 
-    public static void recursiveDelete(Octopus octopus, AbsolutePath path) {
-        // TODO Auto-generated method stub
+    /**
+     * Recursively removes all directories, files and symbolic links in path.
+     *
+     * @param octopus
+     * @param path
+     * @throws OctopusIOException
+     */
+    public static void recursiveDelete(Octopus octopus, AbsolutePath path) throws OctopusIOException {
+        if (octopus.files().isDirectory(path)) {
+            for (AbsolutePath f : octopus.files().newDirectoryStream(path)) {
+                FileUtils.recursiveDelete(octopus, f);
+            }
+        }
+        octopus.files().delete(path);
     }
 
     public static void recursiveWipe(Octopus octopus, AbsolutePath path) {
