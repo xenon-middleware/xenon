@@ -1,5 +1,6 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -20,6 +21,7 @@ import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
+import nl.esciencecenter.octopus.exceptions.IllegalSourcePathException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -103,7 +105,7 @@ public class SshFiles implements Files {
 
         if (!location.getPath().equals("")) {
             throw new OctopusException(adaptor.getName(),
-                    "Adaptor does not support a specific entry point. The location URI should not contain a path. URI = "
+                    "Adaptor does not support a specific entry point. The location URI should not contain a path, or only '/'. URI = "
                             + location);
         }
 
@@ -194,8 +196,53 @@ public class SshFiles implements Files {
         }
     }
 
+    /**
+     * Copy an existing source file or link to a non-existing target path.
+     * 
+     * The source must NOT be a directory.
+     * 
+     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
+     * 
+     * If the source is a link, the link itself will be copied, not the path to which it refers.
+     * 
+     * @param source
+     *            the existing source file or link.
+     * @param target
+     *            the non existing target path.
+     * @return the target path.
+     * 
+     * @throws NoSuchFileException
+     *             If the source file does not exist or the target parent directory does not exist.
+     * @throws FileAlreadyExistsException
+     *             If the target file already exists.
+     * @throws IllegalSourcePathException
+     *             If the source is a directory.
+     * @throws OctopusIOException
+     *             If the copy failed.
+     */
     @Override
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+
+        if (!octopusEngine.files().exists(source)) {
+            throw new NoSuchFileException(adaptor.getName(), "Source " + source.getPath() + " does not exist!");
+        }
+
+        if (octopusEngine.files().isDirectory(source)) {
+            throw new IllegalSourcePathException(adaptor.getName(), "Source " + source.getPath() + " is a directory");
+        }
+
+        if (octopusEngine.files().exists(target)) {
+            throw new FileAlreadyExistsException(adaptor.getName(), "Target " + target.getPath() + " already exists!");
+        }
+
+        if (!octopusEngine.files().exists(target.getParent())) {
+            throw new NoSuchFileException(adaptor.getName(), "Target directory " + target.getParent().getPath()
+                    + " does not exist!");
+        }
+
+        if (source.normalize().equals(target.normalize())) {
+            return target;
+        }
 
         logger.debug("ssh copy");
         // two cases: remote -> local and local -> remote
@@ -214,19 +261,6 @@ public class SshFiles implements Files {
             }
 
             // Ok, here, source is local, target is ssh.
-
-            if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
-                if (exists(target) && isDirectory(target)) {
-                    if (newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
-                        throw new DirectoryNotEmptyException(adaptor.getName(), "cannot replace dir " + target
-                                + " as it is not empty");
-                    } else {
-                        delete(target);
-                    }
-                }
-            } else if (exists(target)) {
-                throw new FileAlreadyExistsException(adaptor.getName(), "cannot copy to " + target + " as it already exists");
-            }
 
             ChannelSftp channel = getChannel(target);
 
@@ -249,19 +283,6 @@ public class SshFiles implements Files {
             }
 
             // Ok, here, target is local, source is ssh.
-
-            if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
-                if (octopusEngine.files().exists(target) && octopusEngine.files().isDirectory(target)) {
-                    if (octopusEngine.files().newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
-                        throw new DirectoryNotEmptyException(adaptor.getName(), "cannot replace dir " + target
-                                + " as it is not empty");
-                    } else {
-                        octopusEngine.files().delete(target);
-                    }
-                }
-            } else if (octopusEngine.files().exists(target)) {
-                throw new FileAlreadyExistsException(adaptor.getName(), "cannot copy to " + target + " as it already exists");
-            }
 
             ChannelSftp channel = getChannel(source);
 
@@ -317,8 +338,19 @@ public class SshFiles implements Files {
 
     @Override
     public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
+        OutputStream out = null;
+        try {
+            out = newOutputStream(path);
+        } finally {
+            try {
+                if(out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        return path;
     }
 
     @Override
@@ -385,56 +417,123 @@ public class SshFiles implements Files {
         }
     }
 
+    /**
+     * Move or rename an existing source path to a non-existing target path.
+     * 
+     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
+     * 
+     * If the source is a link, the link itself will be moved, not the path to which it refers. If the source is a directory, it
+     * will be renamed to the target. This implies that a moving a directory between physical locations may fail.
+     * 
+     * @param source
+     *            the existing source path.
+     * @param target
+     *            the non existing target path.
+     * @return the target path.
+     * 
+     * @throws NoSuchFileException
+     *             If the source file does not exist or the target parent directory does not exist.
+     * @throws FileAlreadyExistsException
+     *             If the target file already exists.
+     * @throws OctopusIOException
+     *             If the move failed.
+     */
+    /*    @Override
+        public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+
+            if (!exists(source)) { 
+                throw new NoSuchFileException(adaptor.getName(), "Source " + source.getPath() + " does not exist!");
+            }
+            
+            if (exists(target)) { 
+                throw new FileAlreadyExistsException(adaptor.getName(), "Target " + target.getPath() + " already exists!");
+            }
+            
+            if (!exists(target.getParent())) { 
+                throw new NoSuchFileException(adaptor.getName(), "Target directory " + target.getParent().getPath() + 
+                        " does not exist!");
+            }
+            
+            if (source.normalize().equals(target.normalize())) {
+                return target;
+            }
+
+            try {
+                Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target)); 
+            } catch (IOException e) {
+                throw new OctopusIOException(adaptor.getName(), "Failed to move " + source.getPath() + " to " + 
+                        target.getPath(), e);
+            }
+
+            return target;
+        }
+         */
+
+    /**
+     * Move or rename an existing source path to a non-existing target path.
+     * 
+     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
+     * 
+     * If the source is a link, the link itself will be moved, not the path to which it refers. If the source is a directory, it
+     * will be renamed to the target. This implies that a moving a directory between physical locations may fail.
+     * 
+     * @param source
+     *            the existing source path.
+     * @param target
+     *            the non existing target path.
+     * @return the target path.
+     * 
+     * @throws NoSuchFileException
+     *             If the source file does not exist or the target parent directory does not exist.
+     * @throws FileAlreadyExistsException
+     *             If the target file already exists.
+     * @throws OctopusIOException
+     *             If the move failed.
+     */
     @Override
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-        
-        /*
-        logger.debug("ssh move");
-
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
-        if (source.isLocal() || target.isLocal()) {
-            throw new OctopusIOException(adaptor.getName(), "Cannot move local files.");
-        }
-
         if (!sourcefs.getAdaptorName().equals("ssh") || !targetfs.getAdaptorName().equals("ssh")) {
-            throw new OctopusIOException(adaptor.getName(),
-                    "Can only copy between local and an ssh locations (or vice-versa).");
+            throw new OctopusIOException(adaptor.getName(), "Can only move within one remote ssh location.");
         }
 
-        if(!sourcefs.getUri().getHost().equals(targetfs.getUri().getHost())) {
-            throw new OctopusIOException(adaptor.getName(), "Cannot copy between different sites: " + sourcefs.getUri().getHost() + " and " +targetfs.getUri().getHost());
+        if (!sourcefs.getUri().getHost().equals(targetfs.getUri().getHost())) {
+            throw new OctopusIOException(adaptor.getName(), "Cannot move between different sites: " + sourcefs.getUri().getHost()
+                    + " and " + targetfs.getUri().getHost());
         }
-        
+
+        if (!exists(source)) {
+            throw new NoSuchFileException(adaptor.getName(), "Source " + source.getPath() + " does not exist!");
+        }
+
+        if (exists(target)) {
+            throw new FileAlreadyExistsException(adaptor.getName(), "Target " + target.getPath() + " already exists!");
+        }
+
+        if (!exists(target.getParent())) {
+            throw new NoSuchFileException(adaptor.getName(), "Target directory " + target.getParent().getPath()
+                    + " does not exist!");
+        }
+
+        if (source.normalize().equals(target.normalize())) {
+            return target;
+        }
+
         // Ok, here, we just have a local move
 
-            if (CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
-                if (exists(target) && isDirectory(target)) {
-                    if (newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
-                        throw new DirectoryNotEmptyException(adaptor.getName(), "cannot replace dir " + target
-                                + " as it is not empty");
-                    } else {
-                        delete(target);
-                    }
-                }
-            } else if (exists(target)) {
-                throw new FileAlreadyExistsException(adaptor.getName(), "cannot copy to " + target + " as it already exists");
-            }
+        ChannelSftp channel = getChannel(target);
 
-            ChannelSftp channel = getChannel(target);
-
-            try {
-                logger.debug("copy from " + source.getPath() + " to " + target.getPath());
-                channel.put(source.getPath(), target.getPath());
-            } catch (SftpException e) {
-                throw adaptor.sftpExceptionToOctopusException(e);
-            } finally {
-                putChannel(channel);
-            }
-         */
+        try {
+            logger.debug("move from " + source.getPath() + " to " + target.getPath());
+            channel.rename(source.getPath(), target.getPath());
+        } catch (SftpException e) {
+            throw adaptor.sftpExceptionToOctopusException(e);
+        } finally {
+            putChannel(channel);
+        }
+        return target;
     }
 
     @SuppressWarnings("unchecked")
@@ -518,7 +617,7 @@ public class SshFiles implements Files {
 
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        if (isDirectory(path)) {
+        if (exists(path) && isDirectory(path)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create input stream, path is a directory");
         }
 
@@ -547,12 +646,6 @@ public class SshFiles implements Files {
         }
     }
 
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
