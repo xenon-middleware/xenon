@@ -51,6 +51,9 @@ public class JobDescription {
     /** Should the job be run offline? */
     private boolean offlineMode = false;
     
+    /** 
+     * Create a JobDescription.
+     */
     public JobDescription() { 
         // nothing
     }
@@ -58,61 +61,78 @@ public class JobDescription {
     /**
      * Get the number of nodes.
      * 
-     * @return the number of resources
+     * @return the number of nodes.
      */
     public int getNodeCount() {
         return nodeCount;
     }
 
     /**
-     * Set the number of resources, which is the total number of resources where the number of processes should be distributed on.
+     * Set the number of nodes.
      * 
-     * @param resourceCount
-     *            the number of resources
+     * @param nodesCount the number of nodes;
      */
-    public void setNodeCount(int resourceCount) {
-        this.nodeCount = resourceCount;
+    public void setNodeCount(int nodeCount) {
+        this.nodeCount = nodeCount;
     }
 
     /**
-     * Get the number of processes started on each node. The total number of processes started is getProcessesPerNode() *
-     * getNodeCount()
+     * Get the number of processes to start on each node. 
      * 
-     * @return the number of processes
+     * @return the number of processesPerNode.
      */
     public int getProcessesPerNode() {
         return processesPerNode;
     }
 
     /**
-     * Get the number of processes started on each node.
+     * Set the number of processes started on each node.
      * 
-     * @param ppn
-     *            the number of processes
+     * @param processesPerNode the number of processes started on each node.
      */
-    public void setProcessesPerNode(int ppn) {
-        this.processesPerNode = ppn;
+    public void setProcessesPerNode(int processesPerNode) {
+        this.processesPerNode = processesPerNode;
     }
 
+    /** 
+     * Get the queue name;
+     * 
+     * @return the queue name;
+     */
     public String getQueueName() {
         return queueName;
     }
 
+    
+    /** 
+     * Set the queue name;
+     * 
+     * @param queueName the queue name;
+     */
     public void setQueueName(String queueName) {
         this.queueName = queueName;
     }
 
+    /** 
+     * Get the maximum job time (in minutes). 
+     * 
+     * @return the queue name;
+     */
     public int getMaxTime() {
         return maxTime;
     }
-
+    
+    /** 
+     * Set the maximum job time (in minutes).
+     * 
+     * @param maxTime the maximum job time (in minutes).
+     */
     public void setMaxTime(int maxTime) {
         this.maxTime = maxTime;
     }
 
     /**
-     * Returns the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will return
-     * a {@link String} "/bin/cat".
+     * Get the path to the executable. 
      * 
      * @return the path to the executable.
      */
@@ -121,32 +141,27 @@ public class JobDescription {
     }
 
     /**
-     * Sets the path to the executable. For the following commandline <code>"/bin/cat hello world > out"</code> the {@link String}
-     * "/bin/cat" should be provided.
-     * 
-     * @param executable
-     *            The path to the executable.
+     * Sets the path to the executable.
+     *  
+     * @param executable the path to the executable.
      */
     public void setExecutable(String executable) {
         this.executable = executable;
     }
 
     /**
-     * Returns the arguments of the executable. For the following commandline <code>"/bin/cat hello world > out"</code> it will
-     * return a {@link String} []{"hello", "world", ">", "out"}
+     * Get the command line arguments of the executable. 
      * 
-     * @return Returns the commandline arguments.
+     * @return Returns the arguments of the executable.
      */
     public List<String> getArguments() {
         return arguments;
     }
 
     /**
-     * Sets the arguments of the executable. For the following commandline <code>"/bin/cat hello world"</code> the {@link String}
-     * []{"hello", "world"} contains the arguments.
+     * Sets the command line arguments of the executable. 
      * 
-     * @param arguments
-     *            The commandline arguments to set.
+     * @param arguments the command line arguments of the executable. 
      */
     public void setArguments(String... arguments) {
         this.arguments.clear();
@@ -154,65 +169,122 @@ public class JobDescription {
     }
 
     /**
-     * Returns the environment of the executable. The environment of the executable consists of a {@link Map} of environment
-     * variables with their values (for instance the key, value pair "JAVA_HOME", "/path/to/java").
+     * Get the environment of the executable.
      * 
-     * @return the environment
+     * The environment of the executable consists of a {@link Map} of environment variables with their values 
+     * (for example: "JAVA_HOME", "/path/to/java").
+     * 
+     * @return the environment of the executable.
      */
     public Map<String, String> getEnvironment() {
         return environment;
     }
 
     /**
-     * Sets the environment of the executable. The environment of the executable consists of a {@link Map} of environment
-     * variables with their values (for instance the key, value pair "JAVA_HOME", "/path/to/java").
+     * Sets the environment of the executable. 
      * 
-     * @param environment
-     *            The environment to set.
+     * The environment of the executable consists of a {@link Map} of environment variables with their values 
+     * (for example: "JAVA_HOME", "/path/to/java").
+     * 
+     * @param environment environment of the executable.
      */
     public void setEnvironment(Map<String, String> environment) {
         this.environment = new HashMap<String, String>(environment);
     }
 
+    /** 
+     * Should the job run in offline mode ? 
+     * 
+     * Offline mode allows jobs to keep running after the Scheduler that created then is closed.  
+     * 
+     * @return if the job will run in offline mode.
+     */
     public boolean offlineMode() {
         return offlineMode;
     }
 
+    /** 
+     * Set the off line mode for the job. 
+     * 
+     * @param offlineMode the off line mode for the job.
+     */
     public void setOfflineMode(boolean offlineMode) {
         this.offlineMode = offlineMode;
     }
+    
+    /** 
+     * Sets the path to the file from which the executable must redirect stdin. 
+     * 
+     * @param stdin the path.
+     */
     public void setStdin(String stdin) {
         this.stdin = stdin;
     }
 
+    /** 
+     * Sets the path to the file to which the executable must redirect stdout. 
+     * 
+     * @param stdout the path.
+     */
     public void setStdout(String stdout) {
         this.stdout = stdout;
     }
 
+    /** 
+     * Sets the path to the file to which the executable must redirect stderr. 
+     * 
+     * @param stderr the path.
+     */
     public void setStderr(String stderr) {
         this.stderr = stderr;
     }
-
+    
+    /** 
+     * Sets the path of the working directory for the executable. 
+     * 
+     * @param workingDirectory path of the working directory.
+     */
     public void setWorkingDirectory(String workingDirectory) {
         this.workingDirectory = workingDirectory;
     }
 
+    /** 
+     * Gets the path to the file from which the executable must redirect stdin.
+     *  
+     * @return the path.
+     */
     public String getStdin() {
         return stdin;
     }
 
+    /** 
+     * Gets the path to the file to which the executable must redirect stdout.
+     *  
+     * @return the path.
+     */
     public String getStdout() {
         return stdout;
     }
 
+    /** 
+     * Gets the path to the file to which the executable must redirect stderr.
+     *  
+     * @return the path.
+     */
     public String getStderr() {
         return stderr;
     }
-
+    
+    /** 
+     * Gets the path of the working directory for the executable. 
+     * 
+     * @return workingDirectory path of the working directory.
+     */
     public String getWorkingDirectory() {
         return workingDirectory;
     }
-    
+
+    @Override
     public String toString() {
         String res = "JobDescription(";
         res += "node count: " + nodeCount;

@@ -1,10 +1,12 @@
 package nl.esciencecenter.octopus.engine;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.AdaptorInfo;
+import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
@@ -17,7 +19,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
  * @author Jason Maassen
  * 
  */
-public abstract class Adaptor implements AdaptorInfo {
+public abstract class Adaptor {
 
     private final String name;
     private final String description;
@@ -26,6 +28,9 @@ public abstract class Adaptor implements AdaptorInfo {
     protected final OctopusEngine octopusEngine;
 
     private final String[][] defaultProperties;
+    
+    private final Map<String,String> supportedProperties;
+
     private final OctopusProperties properties;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
@@ -40,6 +45,16 @@ public abstract class Adaptor implements AdaptorInfo {
         this.supportedSchemes = supportedSchemes;
 
         this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
+        
+        Map<String,String> tmp = new HashMap<String,String>();
+        
+        if (defaultProperties != null) { 
+            for (int i = 0; i < defaultProperties.length; i++) {
+                tmp.put(defaultProperties[i][0], defaultProperties[i][2]);
+            }  
+        }
+
+        this.supportedProperties = Collections.unmodifiableMap(tmp);
         this.properties = processProperties(properties);
     }
 
@@ -58,26 +73,18 @@ public abstract class Adaptor implements AdaptorInfo {
                 throw new OctopusException(getName(), "Unknown property " + entry);
             }
         }
-        
+
         return new OctopusProperties(defaultProperties, p);
     }
 
-    public OctopusProperties getProperties() { 
+    public OctopusProperties getProperties() {
         return properties;
     }
-    
+
     public String getName() {
         return name;
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String[] getSupportedSchemes() {
-        return supportedSchemes.clone();
-    }
-
+    
     public boolean supports(String scheme) {
 
         for (String s : supportedSchemes) {
@@ -89,6 +96,21 @@ public abstract class Adaptor implements AdaptorInfo {
         return false;
     }
 
+    public Map<String, String> getSupportedProperties() {
+        return supportedProperties;
+    }
+    
+    public AdaptorStatus getAdaptorStatus() {
+        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedProperties, 
+                getAdaptorSpecificInformation());
+    }
+
+    public String [] getSupportedSchemes() { 
+        return supportedSchemes;
+    }
+
+    public abstract Map<String, String> getAdaptorSpecificInformation();
+    
     public abstract Files filesAdaptor() throws OctopusException;
 
     public abstract Jobs jobsAdaptor() throws OctopusException;

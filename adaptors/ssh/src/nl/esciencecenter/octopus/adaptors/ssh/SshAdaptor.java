@@ -261,4 +261,10 @@ public class SshAdaptor extends Adaptor {
         channel.disconnect();
     }
 
+    @Override
+    public Map<String, String> getAdaptorSpecificInformation() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

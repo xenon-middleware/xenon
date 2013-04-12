@@ -51,7 +51,7 @@ public class JobsEngine implements Jobs {
     }
     
     @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException {
+    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
     }
 
@@ -65,7 +65,7 @@ public class JobsEngine implements Jobs {
         for (int i = 0; i < jobs.length; i++) {
             try { 
                 result[i] = getJobStatus(jobs[i]);
-            } catch (OctopusException e) { 
+            } catch (OctopusException | OctopusIOException e) { 
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
             }
         }
@@ -74,7 +74,7 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
+    public void cancelJob(Job job) throws OctopusException, OctopusIOException {
         getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }
 
@@ -84,7 +84,7 @@ public class JobsEngine implements Jobs {
     }
     
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException  {
         return getAdaptor(scheduler).jobsAdaptor().submitJob(scheduler, description);
     }
 
