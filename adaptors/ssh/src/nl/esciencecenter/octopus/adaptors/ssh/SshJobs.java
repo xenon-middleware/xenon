@@ -96,7 +96,7 @@ public class SshJobs implements Jobs {
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

@@ -113,6 +113,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         if (exists(target) && isDirectory(target)
                 && newDirectoryStream(target, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()
                 && !CopyOption.contains(options, CopyOption.REPLACE_EXISTING)) {
+// FIXME exception is not corrent: first string is adaptor name!
             throw new OctopusIOException("cannot move file, target already exists", null, null);
         }
 
