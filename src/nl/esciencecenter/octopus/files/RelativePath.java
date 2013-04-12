@@ -26,7 +26,7 @@ public class RelativePath {
     
     class RelativePathIterator implements Iterator<RelativePath> {
 
-        private int index = 0;
+        private int index = 1;
         
         @Override
         public boolean hasNext() {
