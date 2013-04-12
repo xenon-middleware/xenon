@@ -16,13 +16,20 @@ public class SchedulerImplementation implements Scheduler {
     private final String [] queueNames;
     private final Credential credential;
     
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, Credential credential, OctopusProperties properties) {
+    private final boolean localStandardStreams;
+    private final boolean hasDetachedJobs;
+    
+    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, Credential credential, 
+            OctopusProperties properties, boolean localStandardStreams, boolean hasDetachedJobs) {
+        
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
         this.queueNames = queueNames;
         this.properties = properties;
         this.credential = credential;
+        this.localStandardStreams = localStandardStreams;
+        this.hasDetachedJobs = hasDetachedJobs;
     }
 
     public Credential getCredential() {
@@ -46,6 +53,21 @@ public class SchedulerImplementation implements Scheduler {
     @Override
     public String getAdaptorName() {
         return adaptorName;
+    }
+    
+    @Override
+    public String[] getQueueNames() {
+        return queueNames.clone();
+    }
+
+    @Override
+    public boolean hasLocalStandardStreams() {
+        return localStandardStreams;
+    }
+
+    @Override
+    public boolean hasDetachedJobs() {
+        return hasDetachedJobs;
     }
     
     @Override
@@ -77,10 +99,5 @@ public class SchedulerImplementation implements Scheduler {
         } else if (!uniqueID.equals(other.uniqueID))
             return false;
         return true;
-    }
-
-    @Override
-    public String[] getQueueNames() {
-        return queueNames.clone();
     }
 }

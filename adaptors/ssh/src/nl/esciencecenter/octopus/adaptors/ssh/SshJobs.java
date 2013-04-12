@@ -126,7 +126,7 @@ public class SshJobs implements Jobs {
         
         SchedulerImplementation sshScheduler =
                 new SchedulerImplementation(adaptor.getName(), uniqueID, location, new String[] { "single" }, credential,
-                        new OctopusProperties(properties));
+                        new OctopusProperties(properties), true, false);
 
         schedulers.put(uniqueID, new SchedulerInfo(sshScheduler, session));
 
