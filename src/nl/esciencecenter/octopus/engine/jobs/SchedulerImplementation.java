@@ -2,6 +2,7 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -13,15 +14,23 @@ public class SchedulerImplementation implements Scheduler {
     private final URI uri;
     private final OctopusProperties properties;
     private final String [] queueNames;
+    private final Credential credential;
     
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, OctopusProperties properties) {
+    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, Credential credential, 
+            OctopusProperties properties) {
+        
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
         this.queueNames = queueNames;
         this.properties = properties;
+        this.credential = credential;
     }
 
+    public Credential getCredential() {
+        return credential;
+    }
+    
     public String getUniqueID() {
         return uniqueID;
     }

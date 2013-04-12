@@ -60,11 +60,17 @@ public class SshAdaptor extends Adaptor {
     /** Load the known_hosts file by default. */
     public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
 
+    /** All our own queue properties start with this prefix. */
+    public static final String QUEUE = PREFIX + "queue.";
+
+    /** Maximum history length for finished jobs */
+    public static final String MAX_HISTORY = QUEUE + "historySize";
+
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
-            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." } };
-
+            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." }, 
+            { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." } };
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;
@@ -80,9 +86,9 @@ public class SshAdaptor extends Adaptor {
     public SshAdaptor(OctopusProperties properties, OctopusEngine octopusEngine, JSch jsch) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
-        this.filesAdaptor = new SshFiles(properties, this, octopusEngine);
-        this.jobsAdaptor = new SshJobs(properties, this, octopusEngine);
-        this.credentialsAdaptor = new SshCredentials(properties, this, octopusEngine);
+        this.filesAdaptor = new SshFiles(getProperties(), this, octopusEngine);
+        this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
+        this.credentialsAdaptor = new SshCredentials(getProperties(), this, octopusEngine);
         this.jsch = jsch;
     }
 
