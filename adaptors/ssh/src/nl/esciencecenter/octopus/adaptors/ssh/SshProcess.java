@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.adaptors.local.LocalJobs;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -24,7 +23,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 public class SshProcess {
-    private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
+    private static final Logger logger = LoggerFactory.getLogger(SshProcess.class);
 
     private SshAdaptor adaptor;
     @SuppressWarnings("unused")
