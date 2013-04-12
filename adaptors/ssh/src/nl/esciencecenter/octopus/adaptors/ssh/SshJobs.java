@@ -170,6 +170,16 @@ public class SshJobs implements Jobs {
         Job result = new JobImplementation(description, scheduler, "sshjob-" + getNextJobID());
 
         SchedulerInfo info = schedulers.get(impl.getUniqueID());
+
+        if(info == null) {
+            throw new OctopusException(adaptor.getName(), "cannot find job with id: " + impl.getUniqueID());
+        }
+        
+        logger.debug("found scheduler " + impl.getUniqueID());
+        
+        if(info.getSession() == null) {
+            logger.debug("EEEK");
+        }
         
         SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, info.getSession(), result);
 

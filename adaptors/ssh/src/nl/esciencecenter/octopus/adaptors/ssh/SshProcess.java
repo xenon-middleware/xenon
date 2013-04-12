@@ -6,18 +6,26 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.local.LocalJobs;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 public class SshProcess {
+    private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
+
     private SshAdaptor adaptor;
     @SuppressWarnings("unused")
     private SchedulerImplementation scheduler;
@@ -29,31 +37,46 @@ public class SshProcess {
     private String stdout;
     private String stderr;
 
-    public SshProcess(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session,
-            String executable, List<String> arguments, Map<String, String> environment, String stdin,
-            String stdout, String stderr) {
+    private FileOutputStream fosStdOut;
+    private FileOutputStream fosStderr;
+    private FileInputStream fis;
+    private ChannelExec channel;
+
+    public SshProcess(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, String executable,
+            List<String> arguments, Map<String, String> environment, String stdin, String stdout, String stderr) {
         super();
         this.adaptor = adaptor;
         this.scheduler = scheduler;
+        this.session = session;
         this.executable = executable;
         this.arguments = arguments;
         this.environment = environment;
         this.stdin = stdin;
         this.stdout = stdout;
         this.stderr = stderr;
+
+        try {
+            run();
+        } catch (OctopusIOException | OctopusException e) {
+            // FIXME !!!!
+            throw new OctopusRuntimeException(adaptor.getName(), e.getMessage(), e);
+        }
     }
 
     void run() throws OctopusException, OctopusIOException {
+        logger.debug("ssh process");
 
-        ChannelExec channel = adaptor.getExecChannel(session);
+        channel = adaptor.getExecChannel(session);
 
         String command = executable;
 
-        for(String s : arguments) {
+        for (String s : arguments) {
             command += " " + s;
         }
-        
+
         channel.setCommand(command);
+
+        logger.debug("command = " + command);
 
         // TODO make property for X Forwarding
         // channel.setXForwarding(true);
@@ -61,7 +84,7 @@ public class SshProcess {
         // set the streams first, then connect the channel.
 
         if (stdin != null && stdin.length() != 0) {
-            FileInputStream fis;
+
             try {
                 fis = new FileInputStream(stdin);
             } catch (FileNotFoundException e) {
@@ -72,51 +95,86 @@ public class SshProcess {
             channel.setInputStream(null);
         }
 
+        fosStdOut = null;
         if (stdout != null && stdout.length() != 0) {
-            FileOutputStream fos;
             try {
-                fos = new FileOutputStream(stdout);
+                fosStdOut = new FileOutputStream(stdout);
             } catch (FileNotFoundException e) {
                 throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
             }
-            channel.setOutputStream(fos);
+            channel.setOutputStream(fosStdOut);
         } else {
             channel.setOutputStream(null);
         }
 
+        fosStderr = null;
         if (stderr != null && stderr.length() != 0) {
-            FileOutputStream fos;
             try {
-                fos = new FileOutputStream(stderr);
+                fosStderr = new FileOutputStream(stderr);
             } catch (FileNotFoundException e) {
                 throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
             }
-            channel.setErrStream(fos);
+            channel.setErrStream(fosStderr);
         } else {
             channel.setErrStream(null);
         }
-        
-        for (Map.Entry<String,String> entry : environment.entrySet()) {
+
+        logger.debug("stdin = " + stdin + ", stdout = " + stdout + ", stderr = " + stderr);
+
+        for (Map.Entry<String, String> entry : environment.entrySet()) {
             channel.setEnv(entry.getKey(), entry.getValue());
         }
-        
+
+        logger.debug("connecting channel");
         try {
             channel.connect();
         } catch (JSchException e) {
             throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
         }
-        
-        try {
-            channel.start();
-        } catch (JSchException e) {
-            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
-        }
+        logger.debug("connecting channel done");
+
     }
 
     int waitFor() throws InterruptedException {
-        return -1;
+        while (true) {
+            if (channel.isClosed()) {
+                logger.debug("exit-status: " + channel.getExitStatus());
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (Exception ee) {
+            }
+        }
+
+        channel.disconnect();
+
+        if (fosStderr != null) {
+            try {
+                fosStderr.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        if (fosStdOut != null) {
+            try {
+                fosStdOut.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        if (fis != null) {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+        
+        return channel.getExitStatus();
     }
 
     void destroy() {
+        // TODO
     }
 }
