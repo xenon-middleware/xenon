@@ -46,7 +46,7 @@ public class SshFileTests {
        
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/rob/.bashrc"));
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/" + username + "/.bashrc"));
 
         System.err.println("absolute path = " + path);
         
@@ -71,13 +71,17 @@ public class SshFileTests {
         Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
        
         FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
-        AbsolutePath src = octopus.files().newPath(sshFileSystem, new RelativePath("/home/rob/.bashrc"));
+        AbsolutePath src = octopus.files().newPath(sshFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
         System.err.println("absolute src path = " + src.getPath());
         
         FileSystem localFileSystem = octopus.files().newFileSystem(new URI("file:///"), null, null);
         AbsolutePath target = octopus.files().newPath(localFileSystem, new RelativePath("/tmp/aap"));
         System.err.println("absolute target path = " + target.getPath());
-
+        
+        if(octopus.files().exists(target)) {
+            octopus.files().delete(target);
+        }
+        
         octopus.files().copy(src, target);
         
         octopus.end();
@@ -91,12 +95,16 @@ public class SshFileTests {
         Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
        
         FileSystem localFileSystem = octopus.files().newFileSystem(new URI("file:///"), null, null);
-        AbsolutePath src = octopus.files().newPath(localFileSystem, new RelativePath("/home/rob/.bashrc"));
+        AbsolutePath src = octopus.files().newPath(localFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
         System.err.println("absolute src path = " + src.getPath());
         
         FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
         AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/tmp/aap"));
         System.err.println("absolute target path = " + target.getPath());
+
+        if(octopus.files().exists(target)) {
+            octopus.files().delete(target);
+        }
 
         octopus.files().copy(src, target);
         
