@@ -164,14 +164,17 @@ public class GridEngineJobsTest {
 
         Job job = octopus.jobs().submitJob(scheduler, jobDescription);
 
-        for (int i = 0; i < 300; i++) {
+        for (int i = 0; i < 100; i++) {
             JobStatus status = octopus.jobs().getJobStatus(job);
 
             System.out.println(job.getIdentifier() + " has state " + status.getState());
 
-            if (status.getState() == null) {
+            if (status.isDone()) {
+                System.out.println("job exit status code was: " + status.getExitCode());
+                System.out.println("job detailed status: " + status.getSchedulerSpecficInformation());
                 return;
             }
+            Thread.sleep(20000);
         }
     }
 

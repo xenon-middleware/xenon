@@ -124,6 +124,16 @@ public class SchedulerConnection {
             throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of jobs from server", e);
         }
     }
+    
+    public Map<String, String> getJobAccountingInfo(String jobIdentifier) throws OctopusIOException, OctopusException {
+        Process process = runCommandAtServer("qacct -j " + jobIdentifier, null);
+        
+        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream()) {
+            return TxtOutputParser.getJobAccountingInfo(stdout, stderr);
+        } catch (IOException e) {
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of jobs from server", e);
+        }
+    }
 
     /**
      * Submit a job to a GridEngine machine. Mostly involves parsing output
@@ -174,5 +184,7 @@ public class SchedulerConnection {
         //FIXME: close ssh connection to server here
 
     }
+
+ 
 
 };

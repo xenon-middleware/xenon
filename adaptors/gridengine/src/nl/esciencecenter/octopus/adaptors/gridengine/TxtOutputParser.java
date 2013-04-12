@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +85,34 @@ public class TxtOutputParser {
                     + serverMessages + "\". Returned job id " + jobID + " does not seem to be a number", e);
         }
         return jobID;
+    }
+
+    public static Map<String, String> getJobAccountingInfo(InputStream stdout, InputStream stderr) throws IOException {
+        Map<String, String> result = new HashMap<String, String>();
+
+        String[] stdoutLines = getStrings(stdout);
+        String[] errorLines = getStrings(stderr);
+
+        String serverMessages = "output: " + Arrays.toString(stdoutLines) + " error: " + Arrays.toString(errorLines);
+
+        if (errorLines.length != 0) {
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Error lines in qacct output: " + serverMessages);
+        }
+
+        for (String line : stdoutLines) {
+            String[] elements = line.split(" ", 2);
+
+            if (elements.length == 2) {
+                result.put(elements[0].trim(), elements[1].trim());
+            } else if (line.startsWith("================")) {
+                //IGNORE first line
+            } else {
+                logger.debug("found line " + line + " in output");
+            }
+        }
+
+        return result;
+
     }
 
 }
