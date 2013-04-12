@@ -31,14 +31,14 @@ public interface Octopus {
      * @return an AdaptorInfo containing information about the specified adaptor.
      * @throws OctopusException when the adaptor does not exist, or no information could be retrieved.
      */
-    public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
+    public AdaptorStatus getAdaptorInfo(String adaptorName) throws OctopusException;
     
     /**
      * Returns information on all adaptors available to this Octopus.
      * 
      * @return information on all adaptors.
      */
-    public AdaptorInfo[] getAdaptorInfos();
+    public AdaptorStatus[] getAdaptorInfos();
 
     /**
      * Get a reference to the Files package interface.
