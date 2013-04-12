@@ -26,7 +26,7 @@ public class RelativePath {
     
     class RelativePathIterator implements Iterator<RelativePath> {
 
-        private int index = 0;
+        private int index = 1;
         
         @Override
         public boolean hasNext() {
@@ -211,6 +211,17 @@ public class RelativePath {
         }
         return elements[elements.length - 1];
     }
+    
+    /**
+     * Get the separator. 
+     * 
+     * @return the separator.
+     */
+    public String getSeparator() {
+        return seperator;
+    }
+    
+    
 
     /**
      * Get the parent path, or <code>null</code> if this path does not have a parent. 

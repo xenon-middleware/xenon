@@ -3,7 +3,7 @@ package nl.esciencecenter.octopus.files;
 /**
  * OpenOption is an enumeration containing all possible options for opening a stream or channel to a file. 
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

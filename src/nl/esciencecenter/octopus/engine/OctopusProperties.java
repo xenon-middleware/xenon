@@ -1,7 +1,5 @@
 package nl.esciencecenter.octopus.engine;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -12,8 +10,6 @@ import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
-
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
@@ -74,40 +70,40 @@ public class OctopusProperties extends Properties {
      * @param resourceName
      *            the name of the resource to load properties from.
      */
-    public static Properties loadFromClassPath(String resourceName) throws OctopusException {
-        Properties result = new Properties();
-
-        ClassLoader classLoader = result.getClass().getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream(resourceName)) {
-            if (inputStream == null) {
-                throw new OctopusException("cannot find resource " + resourceName, null, null);
-            }
-
-            result.load(inputStream);
-        } catch (IOException e) {
-            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
-        }
-
-        return new Properties(result);
-    }
-
+//    public static Properties loadFromClassPath(String resourceName) throws OctopusException {
+//        Properties result = new Properties();
+//
+//        ClassLoader classLoader = result.getClass().getClassLoader();
+//        try (InputStream inputStream = classLoader.getResourceAsStream(resourceName)) {
+//            if (inputStream == null) {
+//                throw new OctopusException("cannot find resource " + resourceName, null, null);
+//            }
+//
+//            result.load(inputStream);
+//        } catch (IOException e) {
+//            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
+//        }
+//
+//        return new Properties(result);
+//    }
+//
     /**
      * Loads ImmutableTypedProperties from a file.
      *
      * @param fileName
      *            name of file to load from.
      */
-    public static Properties loadFromFile(String fileName) throws OctopusException {
-        Properties result = new Properties();
-
-        try (FileInputStream inputStream = new FileInputStream(fileName)) {
-            result.load(inputStream);
-        } catch (IOException e) {
-            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
-        }
-
-        return new Properties(result);
-    }
+//    public static Properties loadFromFile(String fileName) throws OctopusException {
+//        Properties result = new Properties();
+//
+//        try (FileInputStream inputStream = new FileInputStream(fileName)) {
+//            result.load(inputStream);
+//        } catch (IOException e) {
+//            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
+//        }
+//
+//        return new Properties(result);
+//    }
 
     /**
      * Tries to load properties from a file, which is located relative to the users home directory. Does not throw any exceptions
@@ -116,9 +112,9 @@ public class OctopusProperties extends Properties {
      * @param fileName
      *            name of file to load from.
      */
-    public static void loadFromHomeFile(String fileName) throws OctopusException {
-        loadFromFile(System.getProperty("user.home") + File.separator + fileName);
-    }
+//    public static void loadFromHomeFile(String fileName) throws OctopusException {
+//        loadFromFile(System.getProperty("user.home") + File.separator + fileName);
+//    }
 
     /**
      * Returns true if property <code>name</code> is defined and has a value that is conventionally associated with 'true' (as in

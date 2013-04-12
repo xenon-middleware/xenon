@@ -2,7 +2,6 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
@@ -13,6 +12,8 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jcraft.jsch.Session;
 
 public class SshJobExecutor implements Runnable {
 
@@ -31,24 +32,31 @@ public class SshJobExecutor implements Runnable {
     private String state = "INITIAL";
 
     private Exception error;
-    
+
     private SshAdaptor adaptor;
     private SchedulerImplementation scheduler;
-    
-    
-    public SshJobExecutor(SshAdaptor adaptor, SchedulerImplementation scheduler, Job job) throws BadParameterException {
+    private Session session;
+
+    public SshJobExecutor(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, Job job)
+            throws BadParameterException {
         this.job = job;
         this.adaptor = adaptor;
         this.scheduler = scheduler;
-        
-        if (job.getJobDescription().getProcessesPerNode() <= 0) {
-            throw new BadParameterException("number of processes cannot be negative or 0", adaptor.getName(), null);
+        this.session = session;
+
+        if (job.getJobDescription().getProcessesPerNode() != 1) {
+            throw new BadParameterException(adaptor.getName(), "number of processes can only be 1");
         }
 
         if (job.getJobDescription().getNodeCount() != 1) {
-            throw new BadParameterException("number of nodes must be 1", adaptor.getName(), null);
+            throw new BadParameterException(adaptor.getName(), "number of nodes must be 1");
         }
 
+        if(job.getJobDescription().getWorkingDirectory() != null && !job.getJobDescription().getWorkingDirectory().equals("")) {
+            throw new BadParameterException(adaptor.getName(), "cannot set working directory");
+        }
+            
+        
         // thread will be started by local scheduler
     }
 
@@ -92,7 +100,7 @@ public class SshJobExecutor implements Runnable {
     public synchronized JobStatus getStatus() {
         return new JobStatusImplementation(job, state, exitCode, error, done, null);
     }
-    
+
     public synchronized String getState() {
         return state;
     }
@@ -122,8 +130,8 @@ public class SshJobExecutor implements Runnable {
             JobDescription description = job.getJobDescription();
 
             SshProcess sshProcess =
-                    new SshProcess(adaptor, scheduler, description.getProcessesPerNode(), description.getExecutable(),
-                            description.getArguments(), description.getEnvironment(), description.getWorkingDirectory(),
+                    new SshProcess(adaptor, scheduler, session, description.getExecutable(),
+                            description.getArguments(), description.getEnvironment(), 
                             description.getStdin(), description.getStdout(), description.getStderr());
 
             updateState("RUNNING");

@@ -103,7 +103,7 @@ public class SshFiles implements Files {
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
 
-        if (!location.getPath().equals("")) {
+        if (!location.getPath().equals("") && !location.getPath().equals("/")) {
             throw new OctopusException(adaptor.getName(),
                     "Adaptor does not support a specific entry point. The location URI should not contain a path, or only '/'. URI = "
                             + location);

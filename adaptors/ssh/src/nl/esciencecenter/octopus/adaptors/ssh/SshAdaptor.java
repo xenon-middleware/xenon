@@ -13,6 +13,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
+import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
@@ -129,6 +131,42 @@ public class SshAdaptor extends Adaptor {
         return getName();
     }
 
+    /*
+    SSH_FX_OK
+       Indicates successful completion of the operation.
+    SSH_FX_EOF
+      indicates end-of-file condition; for SSH_FX_READ it means that no
+        more data is available in the file, and for SSH_FX_READDIR it
+       indicates that no more files are contained in the directory.
+    SSH_FX_NO_SUCH_FILE
+       is returned when a reference is made to a file which should exist
+       but doesn't.
+    SSH_FX_PERMISSION_DENIED
+       is returned when the authenticated user does not have sufficient
+       permissions to perform the operation.
+    SSH_FX_FAILURE
+       is a generic catch-all error message; it should be returned if an
+       error occurs for which there is no more specific error code
+       defined.
+    SSH_FX_BAD_MESSAGE
+       may be returned if a badly formatted packet or protocol
+       incompatibility is detected.
+    SSH_FX_NO_CONNECTION
+       is a pseudo-error which indicates that the client has no
+       connection to the server (it can only be generated locally by the
+       client, and MUST NOT be returned by servers).
+    SSH_FX_CONNECTION_LOST
+       is a pseudo-error which indicates that the connection to the
+       server has been lost (it can only be generated locally by the
+       client, and MUST NOT be returned by servers).
+    SSH_FX_OP_UNSUPPORTED
+       indicates that an attempt was made to perform an operation which
+       is not supported for the server (it may be generated locally by
+       the client if e.g.  the version number exchange indicates that a
+       required feature is not supported by the server, or it may be
+       returned by the server if the server does not implement an
+       operation).
+ */
     OctopusIOException sftpExceptionToOctopusException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
@@ -175,6 +213,7 @@ public class SshAdaptor extends Adaptor {
     }
 
     private CredentialImplementation getDefaultCredential() throws OctopusException {
+        // FIXME implement
         throw new InvalidCredentialException(getName(), "Please specify a valid credential, credential is 'null'");
     }
 
@@ -202,13 +241,30 @@ public class SshAdaptor extends Adaptor {
         String host = uri.getHost();
         int port = uri.getPort();
 
+        if (credential == null) {
+            credential = getDefaultCredential();
+        }
+
         if (port < 0) {
             port = DEFAULT_PORT;
         }
         if (host == null) {
             host = "localhost";
         }
+        
+        String credentialUserName = ((CredentialImplementation)credential).getUsername();
+        if(user != null && credentialUserName != null && !user.equals(credentialUserName)) {
+            throw new BadParameterException(getName(), "If a user name is given in the URI, it must match the one in the credential");
+        }
+        
+        if(user == null) {
+            user = credentialUserName;
+        }
 
+        if(user == null) {
+            throw new BadParameterException(getName(), "no user name given. Specify it in URI or credential.");
+        }
+        
         logger.debug("creating new session to " + user + "@" + host + ":" + port);
 
         Session session;
@@ -219,9 +275,6 @@ public class SshAdaptor extends Adaptor {
             return null;
         }
 
-        if (credential == null) {
-            credential = getDefaultCredential();
-        }
 
         setCredential((CredentialImplementation) credential, session);
 
@@ -246,6 +299,12 @@ public class SshAdaptor extends Adaptor {
         return session;
     }
 
+    /**
+     * Get a connected channel for doing sftp operations.
+     * @param session The authenticated session.
+     * @return the channel
+     * @throws OctopusIOException
+     */
     protected ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
         Channel channel;
         try {
@@ -258,6 +317,27 @@ public class SshAdaptor extends Adaptor {
     }
 
     protected void putSftpChannel(ChannelSftp channel) {
+        channel.disconnect();
+    }
+
+    /**
+     * Get a new exec channel. The channel is not connected yet, because the input and outp[ut streams should be set before connecting.
+     * @param session The authenticated session.
+     * @return the channel
+     * @throws OctopusIOException
+     */
+    protected ChannelExec getExecChannel(Session session) throws OctopusIOException {
+        ChannelExec channel;
+        
+        try {
+            channel = (ChannelExec) session.openChannel("exec");
+            return channel;
+        } catch (JSchException e) {
+            throw new OctopusIOException(getName(), e.getMessage(), e);
+        }
+    }
+
+    protected void putExecChannel(ChannelExec channel) {
         channel.disconnect();
     }
 

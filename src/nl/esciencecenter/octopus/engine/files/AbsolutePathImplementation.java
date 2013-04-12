@@ -12,65 +12,29 @@ import nl.esciencecenter.octopus.files.RelativePath;
  */
 public final class AbsolutePathImplementation implements AbsolutePath {
 
-//    private static final class PathIterator implements Iterator<Path> {
-//
-//        private OctopusProperties properties;
-//        private URI location;
-//        private String[] elements;
-//
-//        private int next = 0;
-//
-//        PathIterator(OctopusProperties properties, URI location, String[] elements) {
-//            this.properties = properties;
-//            this.location = location;
-//            this.elements = elements;
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return next < elements.length;
-//        }
-//
-//        @Override
-//        public Path next() {
-//            if (!hasNext()) {
-//                throw new NoSuchElementException("no more elements in path");
-//            }
-//            return new PathImplementation(properties, location, "local", null, elements[next++]);
-//        }
-//
-//        @Override
-//        public void remove() {
-//            throw new UnsupportedOperationException("cannot remove elements from path");
-//        }
-//
-//    }
-    
-//
-//    private static URI createURIFor(URI location, String root, String... elements) {
-//        String path = root;
-//        if (path == null) {
-//            path = "";
-//        }
-//        if (elements.length > 0) {
-//            for (int i = 0; i < elements.length - 1; i++) {
-//                path = path + elements[i] + "/";
-//            }
-//            path = path + elements[elements.length - 1];
-//        }
-//
-//        if (location.getScheme() == null || root == null) {
-//            return URI.create(path);
-//        }
-//
-//        else {
-//            try {
-//                return new URI(location.getScheme(), location.getAuthority(), path, null, null);
-//            } catch (URISyntaxException e) {
-//                throw new OctopusRuntimeException("PathImplementation", "Could not create URI", e);
-//            }
-//        }
-//    }
+    class AbsolutePathIterator implements Iterator<AbsolutePath> {
+        
+        private final Iterator<RelativePath> iterator;
+        
+        AbsolutePathIterator(Iterator<RelativePath> iterator) { 
+            this.iterator = iterator;
+        }
+        
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        @Override
+        public AbsolutePath next() {
+            return new AbsolutePathImplementation(filesystem, iterator.next());
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("PathIterator does not support remove!");
+        }
+    }
 
     private final FileSystem filesystem;
     private final RelativePath relativePath;
@@ -195,12 +159,16 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     @Override
     public Iterator<AbsolutePath> iterator() {
-        // TODO: implement;
-        return null;
+        return new AbsolutePathIterator(relativePath.iterator());
     }
     
     @Override
     public String getPath() {
+        
+        if (relativePath.isEmpty()) { 
+            return relativePath.getSeparator();
+        }
+        
         return relativePath.getPath();
     }
     

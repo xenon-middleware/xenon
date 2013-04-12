@@ -39,4 +39,19 @@ public interface Scheduler {
      * @return the queue names supported by this Scheduler.
      */
     public String[] getQueueNames();
+    
+    /** 
+     * Are the standard streams (stdin, stdout, stderr) local ?
+     *  
+     * @return If the standard streams are local.
+     */
+    public boolean hasLocalStandardStreams();
+    
+    /** 
+     * Are the jobs of this scheduler detached ?
+     *  
+     * @return if the jobs of this scheduler are detached.
+     */
+    public boolean hasDetachedJobs();
+    
 }
