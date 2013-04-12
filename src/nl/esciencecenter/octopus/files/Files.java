@@ -15,6 +15,16 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 
+/**
+ * Files represents the Files interface of an adaptor. 
+ * 
+ * This interface creates various methods for creating and closing FileSystems, creating AbsolutePaths and RelativePaths, and
+ * operations on these Paths.
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public interface Files {
     
     /**
