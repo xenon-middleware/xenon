@@ -20,9 +20,9 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.util.FileUtils;
 import nl.esciencecenter.octopus.util.Sandbox;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 public class SandboxedLocalJobIT {
@@ -70,8 +70,7 @@ public class SandboxedLocalJobIT {
         AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(sandboxFn));
         Sandbox sandbox = new Sandbox(octopus, sandboxPath, sandbox_id);
         sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn+"/lorem_ipsum.txt")), "lorem_ipsum.txt");
-        sandbox.addDownloadFile("stdout.txt");
-        sandbox.addDownloadFile("stderr.txt");
+        sandbox.setDownloadFiles("stdout.txt", "stderr.txt");
 
         // upload lorem_ipsum.txt to sandbox
         sandbox.upload();
@@ -102,10 +101,8 @@ public class SandboxedLocalJobIT {
         }
 
         File stdout = new File(workdir.getPath() + "/stdout.txt");
-        assertThat(FileUtils.readFileToString(stdout), is("   9  525 3581 " + input_file + "\n"));
+        assertThat(org.apache.commons.io.FileUtils.readFileToString(stdout), is("   9  525 3581 " + input_file + "\n"));
 
-        octopus.files().delete(workdir.resolve(new RelativePath("stdout.txt")));
-        octopus.files().delete(workdir.resolve(new RelativePath("stderr.txt")));
-        octopus.files().delete(workdir);
+        FileUtils.recursiveDelete(octopus, workdir);
     }
 }
