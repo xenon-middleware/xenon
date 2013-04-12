@@ -94,7 +94,8 @@ public class LocalJobs implements Jobs {
         maxQSize = properties.getIntProperty(LocalAdaptor.MAX_HISTORY);
 
         if (maxQSize < 0 && maxQSize != -1) {
-            throw new BadParameterException("max q size cannot be negative (excluding -1 for unlimited)", "local", null);
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Max queue size cannot be negative (excluding -1 " +
+            		"for unlimited)");
         }    
     }
       
@@ -149,7 +150,7 @@ public class LocalJobs implements Jobs {
         } else if (queueName.equals("unlimited")) {
             return getJobs(unlimitedQ.toArray(new LocalJobExecutor[0]));
         } else {
-            throw new BadParameterException("queue \"" + queueName + "\" does not exist", "local", null);
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Queue \"" + queueName + "\" does not exist");
         }
     }
 

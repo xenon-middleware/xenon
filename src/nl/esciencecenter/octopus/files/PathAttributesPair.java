@@ -3,7 +3,7 @@ package nl.esciencecenter.octopus.files;
 /**
  * Path with its associated Attributes.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

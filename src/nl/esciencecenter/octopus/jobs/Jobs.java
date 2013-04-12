@@ -9,7 +9,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 /**
- * Jobs represents the Jobs interface of an adaptor. 
+ * Jobs represents the Jobs interface of Octopus. 
  * 
  * This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about
  * schedulers and jobs.  
