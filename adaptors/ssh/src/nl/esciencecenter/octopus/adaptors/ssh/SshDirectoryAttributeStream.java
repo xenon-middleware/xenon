@@ -25,6 +25,8 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
+        
+        SshDirectoryStream.filterSpecials(listing);
     }
 
     @Override
