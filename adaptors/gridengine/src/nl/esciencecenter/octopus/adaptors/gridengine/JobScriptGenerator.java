@@ -12,6 +12,7 @@ public class JobScriptGenerator {
         Formatter script = new Formatter(stringBuilder, Locale.US);
         
         script.format("#!/bin/sh\n");
+        script.format("#$ -N octopus\n"); 
         script.format("\n");
 
         script.format("%s", description.getExecutable());
