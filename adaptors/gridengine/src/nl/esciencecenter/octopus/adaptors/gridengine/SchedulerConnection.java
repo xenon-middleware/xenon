@@ -64,8 +64,6 @@ public class SchedulerConnection {
         }
     }
 
-  
-
     public SchedulerConnection(URI location, Credential credential, Properties properties) throws OctopusIOException,
             OctopusException {
         this.properties = new OctopusProperties(properties);
@@ -76,14 +74,11 @@ public class SchedulerConnection {
         }
 
         GridengineAdaptor.checkLocation(location);
-
         try {
 
             id = GridengineAdaptor.ADAPTOR_NAME + "-" + getNextSchedulerID();
 
-            parser = new
-
-            XmlOutputParser(this.properties);
+            parser = new XmlOutputParser(this.properties);
 
             if (location.getHost() == null || location.getHost().length() == 0) {
                 //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
@@ -130,21 +125,6 @@ public class SchedulerConnection {
         }
     }
 
-    private static String[] getStrings(InputStream stream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-
-        ArrayList<String> lines = new ArrayList<String>();
-        while (true) {
-            String line = reader.readLine();
-
-            if (line == null) {
-                return lines.toArray(new String[0]);
-            }
-
-            lines.add(line);
-        }
-    }
-
     /**
      * Submit a job to a GridEngine machine. Mostly involves parsing output
      * 
@@ -159,31 +139,7 @@ public class SchedulerConnection {
     public String submitJob(String jobScript) throws OctopusException, OctopusIOException {
         Process process = runCommandAtServer("qsub", jobScript);
         try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream()) {
-
-            String[] stdoutLines = getStrings(stdout);
-            String[] errorLines = getStrings(stderr);
-
-            String serverMessages = "output: " + Arrays.toString(stdoutLines) + " error: " + Arrays.toString(errorLines);
-
-            logger.debug("Submitted script. Got back " + serverMessages);
-
-            if (stdoutLines.length == 0 || !stdoutLines[0].startsWith("Your job ") | stdoutLines[0].split(" ").length < 3) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: "
-                        + serverMessages);
-            }
-
-            String jobID = stdoutLines[0].split(" ")[2];
-
-            try {
-                int jobIDInt = Integer.parseInt(jobID);
-
-                logger.debug("found job id: " + jobIDInt);
-            } catch (NumberFormatException e) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: \""
-                        + serverMessages + "\". Returned job id " + jobID + " does not seem to be a number", e);
-            }
-            return jobID;
-
+            return TxtOutputParser.checkSubmitJobResult(stdout, stderr);
         } catch (OctopusIOException e) {
             throw e;
         } catch (IOException e) {
@@ -205,31 +161,7 @@ public class SchedulerConnection {
         Process process = runCommandAtServer("qdel " + job.getIdentifier(), null);
 
         try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream()) {
-
-            String[] stdoutLines = getStrings(stdout);
-            String[] errorLines = getStrings(stderr);
-
-            String serverMessages = "output: " + Arrays.toString(stdoutLines) + " error: " + Arrays.toString(errorLines);
-
-            logger.debug("Deleted job. Got back " + serverMessages);
-
-            if (stdoutLines.length == 0 || stdoutLines[0].isEmpty()) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: "
-                        + serverMessages);
-            }
-
-            String[] elements = stdoutLines[0].split(" ");
-            String[] withoutUser = Arrays.copyOfRange(elements, 1, elements.length);
-
-            //two cases, 1 for running and one for pending jobs
-            String[] expected1 = { "has", "registered", "the", "job", job.getIdentifier(), "for", "deletion" };
-            String[] expected2 = { "has", "deleted", "job", job.getIdentifier() };
-
-            if (!(Arrays.equals(withoutUser, expected1) || Arrays.equals(withoutUser, expected2))) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: \""
-                        + serverMessages + "\"");
-            }
-
+            TxtOutputParser.checkCancelJobResult(job.getIdentifier(), stdout, stderr);
         } catch (OctopusIOException e) {
             throw e;
         } catch (IOException e) {
