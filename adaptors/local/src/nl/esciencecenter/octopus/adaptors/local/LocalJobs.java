@@ -77,7 +77,7 @@ public class LocalJobs implements Jobs {
         }
         
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
-                new String[] { "single", "multi", "unlimited" }, null, properties);
+                new String[] { "single", "multi", "unlimited" }, null, properties, true, false);
 
         singleQ = new LinkedList<LocalJobExecutor>();
         multiQ = new LinkedList<LocalJobExecutor>();
