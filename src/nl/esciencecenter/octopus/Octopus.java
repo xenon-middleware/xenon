@@ -15,14 +15,29 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 public interface Octopus {
 
     /**
+     * Returns the properties that where used to create this Octopus.
      * 
-     * 
-     * @return
+     * @return the properties used to create this Octopus.
      */
     public Properties getProperties();
 
+    
+    /**
+     * Returns information about the specified adaptor.
+     * 
+     * TODO: better exceptions ?
+     * 
+     * @param adaptorName the adaptor for which to return the information.
+     * @return an AdaptorInfo containing information about the specified adaptor.
+     * @throws OctopusException when the adaptor does not exist, or no information could be retrieved.
+     */
     public AdaptorInfo getAdaptorInfo(String adaptorName) throws OctopusException;
-
+    
+    /**
+     * Returns information on all adaptors available to this Octopus.
+     * 
+     * @return information on all adaptors.
+     */
     public AdaptorInfo[] getAdaptorInfos();
 
     /**
@@ -54,6 +69,7 @@ public interface Octopus {
 
     //public ??
 
+    
     public void end() throws Exception;
 
 }

@@ -36,14 +36,14 @@ public interface Jobs {
      * @return Job representing the running job. 
      * @throws OctopusException if the Job failed to submit. 
      */
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException;
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException;
 
     /**
      * This method returns the state of the Job.
      * 
      * @return This method returns the state of the associated Job
      */
-    public JobStatus getJobStatus(Job job) throws OctopusException;
+    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
 
     /**
      * This method returns the state of a set of Jobs.
@@ -57,5 +57,5 @@ public interface Jobs {
     /**
      * Will forcibly stop a job.
      */
-    public void cancelJob(Job job) throws OctopusException;
+    public void cancelJob(Job job) throws OctopusException, OctopusIOException;
 }

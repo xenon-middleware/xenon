@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
@@ -36,9 +35,9 @@ public class OctopusProperties extends Properties {
         super();
 
         for (String[] element : defaults) {
-            
+
             if (element[1] != null) {
-            //    System.out.println("Adding property: " + element[0]  + " " + element[1]);
+                //    System.out.println("Adding property: " + element[0]  + " " + element[1]);
                 super.put(element[0], element[1]);
             }
         }
@@ -50,7 +49,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Adds the specified properties to the current ones.
-     * 
+     *
      * @param properties
      *            the properties to add.
      */
@@ -58,20 +57,20 @@ public class OctopusProperties extends Properties {
         if (properties == null) {
             return;
         }
-        
+
         for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
             String key = (String) e.nextElement();
             String value = properties.getProperty(key);
-        
-           // System.out.println("** Adding property: " + key  + " " + value);
-            
+
+            // System.out.println("** Adding property: " + key  + " " + value);
+
             super.put(key, value);
         }
     }
 
     /**
      * Loads properties from a properties file on the classpath.
-     * 
+     *
      * @param resourceName
      *            the name of the resource to load properties from.
      */
@@ -94,7 +93,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Loads ImmutableTypedProperties from a file.
-     * 
+     *
      * @param fileName
      *            name of file to load from.
      */
@@ -113,7 +112,7 @@ public class OctopusProperties extends Properties {
     /**
      * Tries to load properties from a file, which is located relative to the users home directory. Does not throw any exceptions
      * if unsuccessful.
-     * 
+     *
      * @param fileName
      *            name of file to load from.
      */
@@ -124,7 +123,7 @@ public class OctopusProperties extends Properties {
     /**
      * Returns true if property <code>name</code> is defined and has a value that is conventionally associated with 'true' (as in
      * Ant): any of 1, on, true, yes, or nothing.
-     * 
+     *
      * @return true if property is defined and set
      * @param name
      *            property name
@@ -136,7 +135,7 @@ public class OctopusProperties extends Properties {
     /**
      * Returns true if property <code>name</code> has a value that is conventionally associated with 'true' (as in Ant): any of 1,
      * on, true, yes, or nothing. If the property is not defined, return the specified default value.
-     * 
+     *
      * @return true if property is defined and set
      * @param key
      *            property name
@@ -147,7 +146,8 @@ public class OctopusProperties extends Properties {
         String value = getProperty(key);
 
         if (value != null) {
-            return value.equals("1") || value.equals("on") || value.equals("") || value.equals("true") || value.equals("yes");
+            return value.equals("1") || value.equalsIgnoreCase("on") || value.equalsIgnoreCase("true")
+                    || value.equalsIgnoreCase("yes");
         }
 
         return defaultValue;
@@ -155,7 +155,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the integer value of property.
-     * 
+     *
      * @return the integer value of property
      * @param key
      *            property name
@@ -178,7 +178,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the integer value of property.
-     * 
+     *
      * @return the integer value of property
      * @param key
      *            property name
@@ -188,11 +188,11 @@ public class OctopusProperties extends Properties {
      *             if the property defined and not an integer
      */
     public int getIntProperty(String key, int defaultValue) {
-        
-        if (!containsKey(key)) { 
+
+        if (!containsKey(key)) {
             return defaultValue;
         }
-        
+
         String value = getProperty(key);
 
         if (value == null) {
@@ -208,7 +208,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the long value of property.
-     * 
+     *
      * @return the long value of property
      * @param key
      *            property name
@@ -231,7 +231,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the long value of property.
-     * 
+     *
      * @return the long value of property
      * @param key
      *            property name
@@ -256,7 +256,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the short value of property.
-     * 
+     *
      * @return the short value of property
      * @param key
      *            property name
@@ -279,7 +279,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the short value of property.
-     * 
+     *
      * @return the short value of property
      * @param key
      *            property name
@@ -304,7 +304,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the double value of property.
-     * 
+     *
      * @return the double value of property
      * @param key
      *            property name
@@ -327,7 +327,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the double value of property.
-     * 
+     *
      * @return the double value of property
      * @param key
      *            property name
@@ -352,7 +352,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the float value of property.
-     * 
+     *
      * @return the float value of property
      * @param key
      *            property name
@@ -375,7 +375,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns the float value of property.
-     * 
+     *
      * @return the float value of property
      * @param key
      *            property name
@@ -401,7 +401,7 @@ public class OctopusProperties extends Properties {
     /**
      * Returns the long value of a size property. Valid values for the property are a long, a long followed by K, a long followed
      * by M or a long followed by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3 respectively.
-     * 
+     *
      * @return the size value of property
      * @param key
      *            property name
@@ -422,7 +422,7 @@ public class OctopusProperties extends Properties {
      * Returns the long value of a size property. Valid values for the property are a long, a long followed by K, a long followed
      * by M or a long followed by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3 respectively. Returns the
      * default value if the property is undefined.
-     * 
+     *
      * @return the size value of property
      * @param key
      *            property name
@@ -463,7 +463,7 @@ public class OctopusProperties extends Properties {
      * Returns the split-up value of a string property. The value is supposed to be a comma-separated string, with each comma
      * preceded and followed by any amount of whitespace. See {@link java.lang.String#split(String)} for details of the splitting.
      * If the property is not defined, an empty array of strings is returned.
-     * 
+     *
      * @param key
      *            the property name
      * @return the split-up property value.
@@ -476,7 +476,7 @@ public class OctopusProperties extends Properties {
      * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
      * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, an empty array of
      * strings is returned.
-     * 
+     *
      * @param key
      *            the property name
      * @param delim
@@ -491,7 +491,7 @@ public class OctopusProperties extends Properties {
      * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
      * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, the specified default
      * value is returned.
-     * 
+     *
      * @param key
      *            the property name
      * @param delim
@@ -512,49 +512,49 @@ public class OctopusProperties extends Properties {
 
     /**
      * Returns true if the given element is a member of the given list.
-     * 
+     *
      * @param list
      *            the given list.
      * @param element
      *            the given element.
      * @return true if the given element is a member of the given list.
      */
-//    private static boolean contains(String[] list, String element) {
-//        if (list == null) {
-//            return false;
-//        }
-//        for (int i = 0; i < list.length; i++) {
-//            if (element.equalsIgnoreCase(list[i])) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    //    private static boolean contains(String[] list, String element) {
+    //        if (list == null) {
+    //            return false;
+    //        }
+    //        for (int i = 0; i < list.length; i++) {
+    //            if (element.equalsIgnoreCase(list[i])) {
+    //                return true;
+    //            }
+    //        }
+    //        return false;
+    //    }
 
     /**
      * Returns true if the given string starts with one of the given prefixes.
-     * 
+     *
      * @param string
      *            the given string.
      * @param prefixes
      *            the given prefixes.
      * @return true if the given string starts with one of the given prefixes.
      */
-//    private static boolean startsWith(String string, String[] prefixes) {
-//        if (prefixes == null) {
-//            return false;
-//        }
-//        for (int i = 0; i < prefixes.length; i++) {
-//            if (string.startsWith(prefixes[i])) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    //    private static boolean startsWith(String string, String[] prefixes) {
+    //        if (prefixes == null) {
+    //            return false;
+    //        }
+    //        for (int i = 0; i < prefixes.length; i++) {
+    //            if (string.startsWith(prefixes[i])) {
+    //                return true;
+    //            }
+    //        }
+    //        return false;
+    //    }
 
     /**
      * Checks all properties with the given prefix for validity.
-     * 
+     *
      * @return a Property object containing all unrecognized properties.
      * @param prefix
      *            the prefix that should be checked
@@ -565,43 +565,39 @@ public class OctopusProperties extends Properties {
      * @param printWarning
      *            if true, a warning is printed to standard error for each unknown property
      */
-//    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes, boolean printWarning) {
-//
-//        Properties result = new Properties();
-//
-//        if (prefix == null) {
-//            prefix = "";
-//        }
-//
-//        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-//            String key = (String) e.nextElement();
-//
-//            if (key.startsWith(prefix)) {
-//                String suffix = key.substring(prefix.length());
-//                String value = getProperty(key);
-//
-//                if (!startsWith(suffix, validSubPrefixes) && !contains(validKeys, key)) {
-//                    if (printWarning) {
-//                        System.err.println("Warning, unknown property: " + key + " with value: " + value);
-//                    }
-//                    result.put(key, value);
-//                }
-//            }
-//        }
-//
-//        return result;
-//    }
+    //    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes, boolean printWarning) {
+    //
+    //        Properties result = new Properties();
+    //
+    //        if (prefix == null) {
+    //            prefix = "";
+    //        }
+    //
+    //        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
+    //            String key = (String) e.nextElement();
+    //
+    //            if (key.startsWith(prefix)) {
+    //                String suffix = key.substring(prefix.length());
+    //                String value = getProperty(key);
+    //
+    //                if (!startsWith(suffix, validSubPrefixes) && !contains(validKeys, key)) {
+    //                    if (printWarning) {
+    //                        System.err.println("Warning, unknown property: " + key + " with value: " + value);
+    //                    }
+    //                    result.put(key, value);
+    //                }
+    //            }
+    //        }
+    //
+    //        return result;
+    //    }
 
     /**
      * Returns all properties who's key start with a certain prefix.
-     * 
+     *
      * @return a Property object containing all matching properties.
      * @param prefix
      *            the desired prefix
-     * @param removePrefix
-     *            should the prefix be removed from the property name?
-     * @param removeProperties
-     *            should the returned properties be removed from the current properties?
      */
     public OctopusProperties filter(String prefix) {
 
@@ -624,7 +620,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Prints properties (including default properties) to a stream.
-     * 
+     *
      * @param out
      *            The stream to write output to.
      * @param prefix
@@ -647,7 +643,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Creates a string representation of this properties object.
-     * 
+     *
      * @return the string representation.
      */
     public String toString() {
@@ -663,6 +659,9 @@ public class OctopusProperties extends Properties {
         return result;
     }
 
+    /**
+     * @return Sorted list of property names.
+     */
     String[] getPropertyNames() {
         ArrayList<String> list = new ArrayList<String>();
         for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
@@ -676,7 +675,7 @@ public class OctopusProperties extends Properties {
 
     /**
      * Compares this object to the specified object. They are equal if they have the same property names and values.
-     * 
+     *
      * @param object
      *            object to compare to.
      * @return <code>true</code> if equal.
@@ -712,41 +711,41 @@ public class OctopusProperties extends Properties {
 
     @Override
     public Object setProperty(String key, String value) {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public Object put(Object key, Object value) {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public Object remove(Object key) {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public void putAll(Map<? extends Object, ? extends Object> t) {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public void clear() {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public void load(Reader reader) throws IOException {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public void load(InputStream inStream) throws IOException {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 
     @Override
     public void loadFromXML(InputStream in) throws IOException, InvalidPropertiesFormatException {
-        throw new OctopusRuntimeException("setting properties unsupported in ImmutableTypedProperties", null, null);
+        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
 }
