@@ -338,13 +338,13 @@ public class SshFiles implements Files {
 
     @Override
     public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException {
-        InputStream in = null;
+        OutputStream out = null;
         try {
-            in = newInputStream(path);
+            out = newOutputStream(path);
         } finally {
             try {
-                if(in != null) {
-                    in.close();
+                if(out != null) {
+                    out.close();
                 }
             } catch (IOException e) {
                 // ignore
@@ -617,7 +617,7 @@ public class SshFiles implements Files {
 
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        if (isDirectory(path)) {
+        if (exists(path) && isDirectory(path)) {
             throw new OctopusIOException(getClass().getName(), "Cannot create input stream, path is a directory");
         }
 

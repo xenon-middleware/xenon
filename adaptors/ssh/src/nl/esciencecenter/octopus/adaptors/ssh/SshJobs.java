@@ -2,12 +2,14 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.esciencecenter.octopus.adaptors.ssh.SshFiles.FileSystemInfo;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -29,11 +31,46 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jcraft.jsch.Session;
+
 public class SshJobs implements Jobs {
 
     @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
 
+    private static int currentID = 1;
+
+    private static synchronized String getNewUniqueID() {
+        String res = "ssh" + currentID;
+        currentID++;
+        return res;
+    }
+
+    /**
+     * Used to store all state attached to a scheduler. This way, SchedulerImplementation is immutable.
+     * 
+     */
+    class SchedulerInfo {
+        SchedulerImplementation impl;
+        Session session;
+        
+        public SchedulerInfo(SchedulerImplementation impl, Session session) {
+            this.impl = impl;
+            this.session = session;
+        }
+
+        public SchedulerImplementation getImpl() {
+            return impl;
+        }
+
+        public Session getSession() {
+            return session;
+        }
+    }
+
+    private HashMap<String, FileSystemInfo> fileSystems = new HashMap<String, FileSystemInfo>();
+    
+    
     @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
@@ -41,8 +78,6 @@ public class SshJobs implements Jobs {
 
     @SuppressWarnings("unused")
     private final OctopusProperties properties;
-
-    private final Scheduler sshScheduler;
 
     private final LinkedList<SshJobExecutor> singleQ;
 
@@ -68,8 +103,6 @@ public class SshJobs implements Jobs {
         } catch (URISyntaxException e) {
             throw new OctopusRuntimeException(adaptor.getName(), "Failed to create URI", e);
         }
-
-        sshScheduler = new SchedulerImplementation(adaptor.getName(), "SshScheduler", uri, new String[] { "single" }, properties);
 
         singleQ = new LinkedList<SshJobExecutor>();
 
@@ -98,6 +131,10 @@ public class SshJobs implements Jobs {
             throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with additional properties!");
         }
 
+        String uniqueID = getNewUniqueID(); 
+        SchedulerImplementation sshScheduler = new SchedulerImplementation(adaptor.getName(), uniqueID, location, new String[] { "single" }, new OctopusProperties(
+                properties));
+            
         return sshScheduler;
     }
 
@@ -129,9 +166,13 @@ public class SshJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
+        if(!(scheduler instanceof SchedulerImplementation)) {
+            throw new OctopusRuntimeException(adaptor.getName(), "Illegal scheduler type.");
+        }
+
         Job result = new JobImplementation(description, scheduler, "sshjob-" + getNextJobID());
 
-        SshJobExecutor executor = new SshJobExecutor(adaptor, result);
+        SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, result);
 
         String queueName = description.getQueueName();
 
@@ -150,10 +191,6 @@ public class SshJobs implements Jobs {
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException {
-        if (job.getScheduler() != sshScheduler) {
-            throw new OctopusException(adaptor.getName(), "Cannot retrieve job status from other scheduler!");
-        }
-
         LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
         SshJobExecutor executor = findJob(tmp, job);
         return executor.getStatus();
@@ -217,11 +254,6 @@ public class SshJobs implements Jobs {
 
     @Override
     public void cancelJob(Job job) throws OctopusException {
-
-        if (job.getScheduler() != sshScheduler) {
-            throw new OctopusException(adaptor.getName(), "Cannot cancel jobs descriptions from other scheduler!");
-        }
-
         // FIXME: What if job is already gone?
         LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
         findJob(tmp, job).kill();

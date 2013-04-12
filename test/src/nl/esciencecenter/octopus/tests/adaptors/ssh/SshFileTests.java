@@ -65,7 +65,7 @@ public class SshFileTests {
     }
 
     @org.junit.Test
-    public void testcopyDownload() throws Exception {
+    public void testCopyDownload() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
@@ -89,7 +89,7 @@ public class SshFileTests {
     }
     
     @org.junit.Test
-    public void testcopyUpload() throws Exception {
+    public void testCopyUpload() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
@@ -131,6 +131,7 @@ public class SshFileTests {
             AbsolutePath path = stream.iterator().next(); 
             System.err.println(path.getPath());
         }
+        stream.close();
         
         octopus.end();
     }

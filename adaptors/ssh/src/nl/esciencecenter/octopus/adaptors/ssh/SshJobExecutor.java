@@ -2,7 +2,9 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.IOException;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
+import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -31,10 +33,13 @@ public class SshJobExecutor implements Runnable {
     private Exception error;
     
     private SshAdaptor adaptor;
+    private SchedulerImplementation scheduler;
     
-    public SshJobExecutor(SshAdaptor adaptor, Job job) throws BadParameterException {
+    
+    public SshJobExecutor(SshAdaptor adaptor, SchedulerImplementation scheduler, Job job) throws BadParameterException {
         this.job = job;
         this.adaptor = adaptor;
+        this.scheduler = scheduler;
         
         if (job.getJobDescription().getProcessesPerNode() <= 0) {
             throw new BadParameterException("number of processes cannot be negative or 0", adaptor.getName(), null);
@@ -117,7 +122,7 @@ public class SshJobExecutor implements Runnable {
             JobDescription description = job.getJobDescription();
 
             SshProcess sshProcess =
-                    new SshProcess(description.getProcessesPerNode(), description.getExecutable(),
+                    new SshProcess(adaptor, scheduler, description.getProcessesPerNode(), description.getExecutable(),
                             description.getArguments(), description.getEnvironment(), description.getWorkingDirectory(),
                             description.getStdin(), description.getStdout(), description.getStderr());
 
