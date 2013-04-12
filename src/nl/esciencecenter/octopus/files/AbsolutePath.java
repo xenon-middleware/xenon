@@ -56,12 +56,12 @@ public interface AbsolutePath {
     /**
      * Get the number of name elements in the path.
      * 
-     * @return the number of elements in the path, or 0 if this path only represents a root component.
+     * @return the number of elements in the path, or 0 if this path is empty.
      */
     public String [] getNames();
     
     /**
-     * Get a name element of this path as a AbsolutePath. 
+     * Get a name element of this path. 
      * 
      * @param index the index of the element
      * 
