@@ -1,7 +1,7 @@
 package nl.esciencecenter.octopus.jobs;
 
 /**
- * Job represents a of a {@link Scheduler}.
+ * Job represents a Job belonging to a {@link Scheduler}.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

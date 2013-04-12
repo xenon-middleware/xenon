@@ -9,8 +9,14 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 /**
- * Main interface to the jobs package
+ * Jobs represents the Jobs interface of an adaptor. 
  * 
+ * This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about
+ * schedulers and jobs.  
+ *  
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0 
+ * @since 1.0 
  */
 public interface Jobs {
 
