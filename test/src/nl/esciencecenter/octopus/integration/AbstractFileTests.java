@@ -37,7 +37,7 @@ abstract public class AbstractFileTests {
     }
     
     public static void errorPrintf(String format,Object... args) {
-        System.out.printf(format,args); 
+        System.err.printf(format,args); 
     }
     // ========
     // Instance 
@@ -102,8 +102,9 @@ abstract public class AbstractFileTests {
         AbsolutePath path = getTestDir();
         Assert.assertNotNull("TestPath returned NULL",path);
         Assert.assertNotNull("Actual path element of AbsolutePath may not be NULL",path.getPath());
-        
-        outPrintf("Test location path          =%s\n",path.getPath() ); 
+
+        outPrintf("Test location path URI      =%s\n",path.getFileSystem().getUri()); 
+        outPrintf("Test location path          =%s\n",path.getPath()); 
         outPrintf("Test location toString()    =%s\n",path.toString()); 
         outPrintf("Test location getFileName() =%s\n",path.getFileName()); 
 
@@ -128,8 +129,7 @@ abstract public class AbstractFileTests {
             try {
                 // try to delete first ! 
                 files.delete(filePath);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 
             }
             Assert.assertFalse("exists(): Can't test createFile is previous test file already exists. File should now be deleted, please run test again.",preExisting); 
@@ -180,7 +180,9 @@ abstract public class AbstractFileTests {
 
         while(iterator.hasNext()) { 
             AbsolutePath pathEl = iterator.next();
-            outPrintf(" -(AbsolutePath)path='%s'\n",pathEl.getPath());
+            URI fsUri=pathEl.getFileSystem().getUri(); 
+            outPrintf(" -(AbsolutePath)Path     =%s:'%s'\n",fsUri,pathEl);
+            outPrintf(" -(AbsolutePath)getPath()=%s:'%s'\n",fsUri,pathEl.getPath());
         }
     }
     
@@ -221,5 +223,6 @@ abstract public class AbstractFileTests {
         Assert.assertEquals("Absolute path of resolved path '/' must equal to '/'.","/",rootPath.getPath()); 
     
     }
+    
 
 }
