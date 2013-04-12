@@ -236,20 +236,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
     }
 
-    
-    // FIXME two of these??
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusIOException {
-        
-        try {
-            return Files.newByteChannel(LocalUtils.javaPath(path), LocalUtils.javaOpenOptionsSet(options),
-                    LocalUtils.javaPermissionAttribute(permissions));
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create SeekableByteChannel.", e);
-        }
-    }
-
     @Override
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {
         return new LocalFileAttributes(path);
