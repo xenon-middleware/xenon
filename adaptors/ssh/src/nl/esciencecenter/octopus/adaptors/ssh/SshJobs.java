@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.esciencecenter.octopus.adaptors.ssh.SshFiles.FileSystemInfo;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -50,8 +49,8 @@ public class SshJobs implements Jobs {
      * 
      */
     class SchedulerInfo {
-        SchedulerImplementation impl;
-        Session session;
+        private SchedulerImplementation impl;
+        private Session session;
 
         public SchedulerInfo(SchedulerImplementation impl, Session session) {
             this.impl = impl;
@@ -166,9 +165,13 @@ public class SshJobs implements Jobs {
             throw new OctopusRuntimeException(adaptor.getName(), "Illegal scheduler type.");
         }
 
+        SchedulerImplementation impl = (SchedulerImplementation) scheduler;
+        
         Job result = new JobImplementation(description, scheduler, "sshjob-" + getNextJobID());
 
-        SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, result);
+        SchedulerInfo info = schedulers.get(impl.getUniqueID());
+        
+        SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, info.getSession(), result);
 
         String queueName = description.getQueueName();
 
