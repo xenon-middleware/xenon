@@ -112,8 +112,8 @@ public class SshJobs implements Jobs {
 
         String path = location.getPath();
 
-        if (path != null && !path.equals("/")) {
-            throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with path!");
+        if (path != null && !path.equals("") && !path.equals("/")) {
+            throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with path! (path = " + path + ")");
         }
 
         if (properties != null && properties.size() > 0) {

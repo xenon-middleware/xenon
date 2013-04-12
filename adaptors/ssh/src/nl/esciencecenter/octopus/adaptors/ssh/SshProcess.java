@@ -19,6 +19,7 @@ import com.jcraft.jsch.Session;
 
 public class SshProcess {
     private SshAdaptor adaptor;
+    @SuppressWarnings("unused")
     private SchedulerImplementation scheduler;
     private Session session;
     private String executable;
@@ -104,8 +105,12 @@ public class SshProcess {
         } catch (JSchException e) {
             throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
         }
-
-        // TODO cannot support working dir?!
+        
+        try {
+            channel.start();
+        } catch (JSchException e) {
+            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+        }
     }
 
     int waitFor() throws InterruptedException {

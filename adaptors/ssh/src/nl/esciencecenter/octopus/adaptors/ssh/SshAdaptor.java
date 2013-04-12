@@ -13,6 +13,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
+import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
@@ -212,6 +213,7 @@ public class SshAdaptor extends Adaptor {
     }
 
     private CredentialImplementation getDefaultCredential() throws OctopusException {
+        // FIXME implement
         throw new InvalidCredentialException(getName(), "Please specify a valid credential, credential is 'null'");
     }
 
@@ -239,13 +241,30 @@ public class SshAdaptor extends Adaptor {
         String host = uri.getHost();
         int port = uri.getPort();
 
+        if (credential == null) {
+            credential = getDefaultCredential();
+        }
+
         if (port < 0) {
             port = DEFAULT_PORT;
         }
         if (host == null) {
             host = "localhost";
         }
+        
+        String credentialUserName = ((CredentialImplementation)credential).getUsername();
+        if(user != null && credentialUserName != null && !user.equals(credentialUserName)) {
+            throw new BadParameterException(getName(), "If a user name is given in the URI, it must match the one in the credential");
+        }
+        
+        if(user == null) {
+            user = credentialUserName;
+        }
 
+        if(user == null) {
+            throw new BadParameterException(getName(), "no user name given. Specify it in URI or credential.");
+        }
+        
         logger.debug("creating new session to " + user + "@" + host + ":" + port);
 
         Session session;
@@ -256,9 +275,6 @@ public class SshAdaptor extends Adaptor {
             return null;
         }
 
-        if (credential == null) {
-            credential = getDefaultCredential();
-        }
 
         setCredential((CredentialImplementation) credential, session);
 
