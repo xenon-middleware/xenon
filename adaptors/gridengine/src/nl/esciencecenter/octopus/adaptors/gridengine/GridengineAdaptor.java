@@ -1,7 +1,6 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credentials;
@@ -50,17 +49,6 @@ public class GridengineAdaptor extends Adaptor {
     }
 
     @Override
-    public String getDescription() {
-        return "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
-                + "or the ssh adaptor to gain access to the scheduler machine.";
-    }
-
-    @Override
-    public Map<String, String> getSupportedProperties() {
-        return new HashMap<String, String>();
-    }
-
-    @Override
     public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;
     }
@@ -83,6 +71,12 @@ public class GridengineAdaptor extends Adaptor {
     @Override
     public Credentials credentialsAdaptor() throws OctopusException {
         throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support credentials.");
+    }
+
+    @Override
+    public Map<String, String> getAdaptorSpecificInformation() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

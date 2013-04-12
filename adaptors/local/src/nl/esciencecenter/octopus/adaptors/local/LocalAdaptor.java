@@ -94,8 +94,6 @@ public class LocalAdaptor extends Adaptor {
     @Override
     public void end() {
         // TODO: implement!
-        
-        // localJobs.end();
     }
 
     @Override
@@ -120,7 +118,7 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        // TODO Auto-generated method stub
+        // TODO: supply some info.
         return null;
     }
 }
