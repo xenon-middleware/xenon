@@ -60,11 +60,17 @@ public class SshAdaptor extends Adaptor {
     /** Load the known_hosts file by default. */
     public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
 
+    /** All our own queue properties start with this prefix. */
+    public static final String QUEUE = PREFIX + "queue.";
+
+    /** Maximum history length for finished jobs */
+    public static final String MAX_HISTORY = QUEUE + "historySize";
+
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
-            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." } };
-
+            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." }, 
+            { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." } };
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;

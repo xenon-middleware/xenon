@@ -1,13 +1,25 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import nl.esciencecenter.octopus.adaptors.local.LocalJobExecutor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
+import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
+import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
+import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -20,60 +32,74 @@ import org.slf4j.LoggerFactory;
 
 public class SshJobs implements Jobs {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
 
+    @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
-    private final SshAdaptor sshAdaptor;
+    private final SshAdaptor adaptor;
 
+    @SuppressWarnings("unused")
     private final OctopusProperties properties;
 
-    public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
+    private final Scheduler sshScheduler;
 
-        this.octopusEngine = octopusEngine;
-        this.sshAdaptor = sshAdaptor;
-        this.properties = properties;
+    private final LinkedList<LocalJobExecutor> singleQ;
+
+    private final ExecutorService singleExecutor;
+
+    private final int maxQSize;
+
+    private static int jobID = 0;
+
+    private static synchronized int getNextJobID() {
+        return jobID++;
     }
 
-    protected void end() {
+    public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
+        this.octopusEngine = octopusEngine;
+        this.adaptor = sshAdaptor;
+        this.properties = properties;
 
+        URI uri = null;
+
+        try {
+            uri = new URI("ssh:///");
+        } catch (URISyntaxException e) {
+            throw new OctopusRuntimeException(adaptor.getName(), "Failed to create URI", e);
+        }
+
+        sshScheduler = new SchedulerImplementation(adaptor.getName(), "SshScheduler", uri, new String[] { "single" }, properties);
+
+        singleQ = new LinkedList<LocalJobExecutor>();
+
+        singleExecutor = Executors.newSingleThreadExecutor();
+
+        maxQSize = properties.getIntProperty(SshAdaptor.MAX_HISTORY);
+
+        if (maxQSize < 0) {
+            throw new BadParameterException("max q size cannot be negative", "local", null);
+        }
     }
 
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
-    @Override
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        adaptor.checkURI(location);
 
-    @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        String path = location.getPath();
 
-    @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        if (path != null && !path.equals("/")) {
+            throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with path!");
+        }
 
-    @Override
-    public JobStatus[] getJobStatuses(Job... jobs) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+        if (properties != null && properties.size() > 0) {
+            throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with additional properties!");
+        }
 
-    @Override
-    public void cancelJob(Job job) throws OctopusException {
-        // TODO Auto-generated method stub
-
+        return sshScheduler;
     }
 
     @Override
@@ -81,22 +107,163 @@ public class SshJobs implements Jobs {
         throw new OctopusException(getClass().getName(), "getLocalScheduler not supported!");
     }
 
+    private Job[] getJobs(LocalJobExecutor[] executors) {
+
+        LocalJobExecutor[] tmp = singleQ.toArray(new LocalJobExecutor[0]);
+
+        Job[] result = new Job[tmp.length];
+
+        for (int i = 0; i < tmp.length; i++) {
+            result[i] = tmp[i].getJob();
+        }
+
+        return result;
+    }
+
+    @Override
+    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
+        if (queueName == null || queueName.equals("single")) {
+            return getJobs(singleQ.toArray(new LocalJobExecutor[0]));
+        } else {
+            throw new BadParameterException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
+        }
+    }
+
+    @Override
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
+
+        Job result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID());
+
+        LocalJobExecutor executor = new LocalJobExecutor(result);
+
+        String queueName = description.getQueueName();
+
+        if (queueName == null || queueName.equals("single")) {
+            singleQ.add(executor);
+            singleExecutor.execute(executor);
+        } else {
+            throw new BadParameterException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
+        }
+
+        //purge jobs from q if needed (will not actually cancel execution of jobs)
+        purgeQ(singleQ);
+
+        return result;
+    }
+
+    @Override
+    public JobStatus getJobStatus(Job job) throws OctopusException {
+        if (job.getScheduler() != sshScheduler) {
+            throw new OctopusException(adaptor.getName(), "Cannot retrieve job status from other scheduler!");
+        }
+
+        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        LocalJobExecutor executor = findJob(tmp, job);
+        return executor.getStatus();
+    }
+
+    @Override
+    public JobStatus[] getJobStatuses(Job... jobs) {
+        JobStatus[] result = new JobStatus[jobs.length];
+
+        for (int i = 0; i < jobs.length; i++) {
+            try {
+                result[i] = getJobStatus(jobs[i]);
+            } catch (OctopusException e) {
+                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
+            }
+        }
+
+        return result;
+    }
+
+    private synchronized void purgeQ(LinkedList<LocalJobExecutor> q) {
+        if (maxQSize == -1) {
+            return;
+        }
+
+        //how many jobs do we need to remove
+        int purgeCount = q.size() - maxQSize;
+
+        if (purgeCount <= 0) {
+            return;
+        }
+
+        Iterator<LocalJobExecutor> iterator = q.iterator();
+
+        while (iterator.hasNext() && purgeCount > 0) {
+            if (iterator.next().isDone()) {
+                iterator.remove();
+                purgeCount--;
+            }
+        }
+    }
+
+    private LinkedList<LocalJobExecutor> findQueue(String queueName) throws OctopusException {
+
+        if (queueName == null || queueName.equals("single")) {
+            return singleQ;
+        } else {
+            throw new OctopusException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
+        }
+    }
+
+    private LocalJobExecutor findJob(LinkedList<LocalJobExecutor> queue, Job job) throws OctopusException {
+
+        for (LocalJobExecutor e : queue) {
+            if (e.getJob().equals(job)) {
+                return e;
+            }
+        }
+
+        throw new OctopusException(adaptor.getName(), "Job not found: " + job.getIdentifier());
+    }
+
+    @Override
+    public void cancelJob(Job job) throws OctopusException {
+
+        if (job.getScheduler() != sshScheduler) {
+            throw new OctopusException(adaptor.getName(), "Cannot cancel jobs descriptions from other scheduler!");
+        }
+
+        // FIXME: What if job is already gone?
+        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        findJob(tmp, job).kill();
+    }
+
+    public void end() {
+        singleExecutor.shutdownNow();
+    }
+
     @Override
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        if (queueName == null || queueName.equals("single")) {
+            return new QueueStatusImplementation(scheduler, queueName, null, null);
+        } else {
+            throw new OctopusException(adaptor.getName(), "No such queue: " + queueName);
+        }
     }
 
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+
+        QueueStatus[] result = new QueueStatus[queueNames.length];
+
+        for (int i = 0; i < queueNames.length; i++) {
+            try {
+                result[i] = getQueueStatus(scheduler, queueNames[i]);
+            } catch (OctopusException e) {
+                result[i] = new QueueStatusImplementation(null, queueNames[i], e, null);
+            }
+        }
+
+        return result;
     }
 
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
-
+        
     }
 
     @Override
