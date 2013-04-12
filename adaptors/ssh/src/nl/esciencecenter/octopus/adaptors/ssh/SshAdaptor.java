@@ -21,6 +21,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
@@ -233,4 +234,20 @@ public class SshAdaptor extends Adaptor {
 
         return session;
     }
+    
+    protected ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
+        Channel channel;
+        try {
+            channel = session.openChannel("sftp");
+            channel.connect();
+            return (ChannelSftp) channel;
+        } catch (JSchException e) {
+            throw new OctopusIOException("ssh", e.getMessage(), e);
+        }
+    }
+
+    protected void putSftpChannel(ChannelSftp channel) {
+        channel.disconnect();
+    }
+
 }
