@@ -285,8 +285,7 @@ public class FileUtils {
                 octopus.files().createDirectories(target);
             } else {
                 if (replace == false) {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "File already exists:"
-                            + target.getPath());
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath() + " already exists!");
                 } else {
                     // keep existing directory
                     // Can not replace directory, to replace have to do recursive delete and createDirectories
@@ -303,8 +302,7 @@ public class FileUtils {
                 octopus.files().copy(source, target);
             } else {
                 if (replace == false) {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "File already exists:"
-                            + target.getPath());
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath() + " already exists!");
                 } else {
                     octopus.files().delete(target);
                     octopus.files().copy(source, target);

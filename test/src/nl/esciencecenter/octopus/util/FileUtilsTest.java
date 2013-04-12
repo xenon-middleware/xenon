@@ -10,6 +10,7 @@ import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -139,6 +140,97 @@ public class FileUtilsTest {
 
         verify(files).createDirectories(dstDir);
         verify(files).copy(srcFile, dstFile);
+    }
+
+    @Test
+    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws OctopusIOException {
+        Files files = mock(Files.class);
+        Octopus octopus = mock(Octopus.class);
+        when(octopus.files()).thenReturn(files);
+        AbsolutePath srcFile = mock(AbsolutePath.class);
+        AbsolutePath dstFile = mock(AbsolutePath.class);
+        when(files.isDirectory(srcFile)).thenReturn(false);
+        when(files.isDirectory(dstFile)).thenReturn(false);
+        when(files.exists(srcFile)).thenReturn(true);
+        when(files.exists(dstFile)).thenReturn(true);
+        when(dstFile.getPath()).thenReturn("foo");
+        FileSystem dstFs =  mock(FileSystem.class);
+        when(dstFile.getFileSystem()).thenReturn(dstFs);
+        when(dstFs.getAdaptorName()).thenReturn("ssh");
+
+        try {
+            FileUtils.recursiveCopy(octopus, srcFile, dstFile);
+            fail("FileAlreadyExistsException not thrown");
+        } catch (FileAlreadyExistsException e) {
+            assertThat(e.getMessage(), is("ssh adaptor: Target foo already exists!"));
+        }
+    }
+
+    @Test
+    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws OctopusIOException {
+        Files files = mock(Files.class);
+        Octopus octopus = mock(Octopus.class);
+        when(octopus.files()).thenReturn(files);
+        AbsolutePath srcDir = mock(AbsolutePath.class);
+        AbsolutePath dstDir = mock(AbsolutePath.class);
+        when(files.isDirectory(srcDir)).thenReturn(true);
+        when(files.isDirectory(dstDir)).thenReturn(true);
+        when(files.exists(srcDir)).thenReturn(true);
+        when(files.exists(dstDir)).thenReturn(true);
+        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        when(listing.iterator()).thenReturn(iterator);
+        when(iterator.hasNext()).thenReturn(false);
+        when(files.newDirectoryStream(srcDir)).thenReturn(listing);
+        when(dstDir.getPath()).thenReturn("foo");
+        FileSystem dstFs =  mock(FileSystem.class);
+        when(dstDir.getFileSystem()).thenReturn(dstFs);
+        when(dstFs.getAdaptorName()).thenReturn("ssh");
+
+        try {
+            FileUtils.recursiveCopy(octopus, srcDir, dstDir);
+            fail("FileAlreadyExistsException not thrown");
+        } catch (FileAlreadyExistsException e) {
+            assertThat(e.getMessage(), is("ssh adaptor: Target foo already exists!"));
+        }
+    }
+
+    @Test
+    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws OctopusIOException {
+        Files files = mock(Files.class);
+        Octopus octopus = mock(Octopus.class);
+        when(octopus.files()).thenReturn(files);
+        AbsolutePath srcDir = mock(AbsolutePath.class); // foo
+        AbsolutePath srcFile = mock(AbsolutePath.class); // foo/myfile
+        when(srcFile.getFileName()).thenReturn("myfile");
+        AbsolutePath dstDir = mock(AbsolutePath.class); // bar
+        AbsolutePath dstFile = mock(AbsolutePath.class); // bar/myfile
+        RelativePath relSrcFile = new RelativePath("myfile");
+        when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
+        when(files.isDirectory(srcDir)).thenReturn(true);
+        when(files.isDirectory(dstDir)).thenReturn(true);
+        when(files.exists(srcDir)).thenReturn(true);
+        when(files.exists(dstDir)).thenReturn(false);
+        when(files.exists(srcFile)).thenReturn(true);
+        when(files.exists(dstFile)).thenReturn(true);
+        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        when(listing.iterator()).thenReturn(iterator);
+        when(iterator.hasNext()).thenReturn(true, false);
+        when(iterator.next()).thenReturn(srcFile);
+        when(files.newDirectoryStream(srcDir)).thenReturn(listing);
+        when(dstFile.getPath()).thenReturn("myfile");
+        FileSystem dstFs =  mock(FileSystem.class);
+        when(dstFile.getFileSystem()).thenReturn(dstFs);
+        when(dstFs.getAdaptorName()).thenReturn("ssh");
+
+        try {
+            FileUtils.recursiveCopy(octopus, srcDir, dstDir);
+            verify(files).createDirectories(dstDir);
+            fail("FileAlreadyExistsException not thrown");
+        } catch (FileAlreadyExistsException e) {
+            assertThat(e.getMessage(), is("ssh adaptor: Target myfile already exists!"));
+        }
     }
 
     @Test
