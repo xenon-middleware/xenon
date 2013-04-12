@@ -1,7 +1,5 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import static org.junit.Assert.*;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -37,6 +35,10 @@ public class GridEngineJobsTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Scheduler scheduler = octopus.jobs().newScheduler(location, null, null);
+        
+        octopus.jobs().close(scheduler);
+        
+        OctopusFactory.endOctopus(octopus);
     }
 
     @Test
@@ -89,8 +91,10 @@ public class GridEngineJobsTest {
 
         JobDescription jobDescription = new JobDescription();
 
-        jobDescription.setExecutable("/bin/hostname");
-
+        jobDescription.setExecutable("/bin/sleep");
+        
+         jobDescription.setArguments("60");
+        
         //jobDescription.setArguments("this", "and", "that");
 
         Job job = octopus.jobs().submitJob(scheduler, jobDescription);

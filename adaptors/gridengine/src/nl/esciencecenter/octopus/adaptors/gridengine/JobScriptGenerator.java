@@ -22,6 +22,7 @@ public class JobScriptGenerator {
         
         script.format("exit 22\n");
         
+        script.close();
         return stringBuilder.toString();
     }
 }

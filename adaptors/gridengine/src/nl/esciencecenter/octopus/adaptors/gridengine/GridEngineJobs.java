@@ -1,13 +1,9 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -25,6 +21,9 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GridEngineJobs implements Jobs {
 
@@ -162,7 +161,7 @@ public class GridEngineJobs implements Jobs {
         return result;
     }
 
-    private JobStatus getJobStatusFromMap(Map<String, Map<String, String>> allMap, Job job) {
+    private JobStatus getJobStatusFromMap(Map<String, Map<String, String>> allMap, Job job, boolean throwExceptions) {
         if (allMap == null || allMap.isEmpty()) {
             Exception exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of jobs on server");
@@ -182,7 +181,7 @@ public class GridEngineJobs implements Jobs {
 
         if (state == null || state.length() == 0) {
             Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for ob " + job.getIdentifier()
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
                             + " not found on server");
             return new JobStatusImplementation(job, null, null, exception, false, map);
         }
@@ -195,25 +194,53 @@ public class GridEngineJobs implements Jobs {
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
-        Map<String, Map<String, String>> allJobsStatus = connection.getJobStatus();
+        Map<String, Map<String, String>> allMap = connection.getJobStatus();
 
-        return getJobStatusFromMap(allJobsStatus, job);
+        Map<String, String> map = allMap.get(job.getIdentifier());
+
+        if (map == null || map.isEmpty()) {
+            Exception exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
+            return new JobStatusImplementation(job, null, null, exception, false, null);
+        }
+
+        String state = map.get("state");
+
+        if (state == null || state.length() == 0) {
+            Exception exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
+                            + " not found on server");
+            return new JobStatusImplementation(job, null, null, exception, false, map);
+        }
+
+        //FIXME: add isDone and exitcode for job
+        return new JobStatusImplementation(job, state, null, null, false, map);        
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException {
+    public JobStatus[] getJobStatuses(Job... jobs) {
         if (jobs.length == 0) {
             return new JobStatus[0];
         }
 
         SchedulerConnection connection = getConnection(jobs[0].getScheduler());
+        
+        Map<String, Map<String, String>> allJobsStatus;
+        try {
+            allJobsStatus = connection.getJobStatus();
+        } catch (OctopusIOException | OctopusException e) {
+            JobStatus[] result = new JobStatus[jobs.length];
 
-        Map<String, Map<String, String>> allJobsStatus = connection.getJobStatus();
+            for (int i = 0; i < jobs.length; i++) {
+                result[i] =  new JobStatusImplementation(jobs[i], null, null, e, false, null);
+            }
+            return result;
+        }
 
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < jobs.length; i++) {
-            result[i] = getJobStatusFromMap(allJobsStatus, jobs[i]);
+            result[i] = getJobStatusFromMap(allJobsStatus, jobs[i], false);
         }
 
         return result;
@@ -231,9 +258,10 @@ public class GridEngineJobs implements Jobs {
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
-        // TODO Auto-generated method stub
+    public void cancelJob(Job job) throws OctopusException, OctopusIOException {
+        SchedulerConnection connection = getConnection(job.getScheduler());
 
+        connection.cancelJob(job);
     }
 
     public void end() {
