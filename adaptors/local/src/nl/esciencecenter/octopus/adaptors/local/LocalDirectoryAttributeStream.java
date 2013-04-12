@@ -2,8 +2,8 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
@@ -15,31 +15,38 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
+// FIXME: use localdistream ? 
 class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
 
+    /** LocalFiles to retrieve the attributes of a file */
     private final LocalFiles localFiles;
 
+    /** The DirectoryStream from the underlying java.nio implementation */
     private final java.nio.file.DirectoryStream<java.nio.file.Path> stream;
 
+    /** The Iterator from the underlying java.nio implementation. */
     private final Iterator<java.nio.file.Path> iterator;
 
+    /** The filter to use. */
     private final DirectoryStream.Filter filter;
 
-    private final ArrayList<AbsolutePath> readAhead;
+    /** A buffer to read ahead. */
+    private final LinkedList<AbsolutePath> readAhead;
 
+    /** The directory to produce a stream for. */
     private final AbsolutePath dir;
 
     LocalDirectoryAttributeStream(LocalFiles localFiles, AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
         this.localFiles = localFiles;
         this.dir = dir;
         this.filter = filter;
-        this.readAhead = new ArrayList<AbsolutePath>();
+        this.readAhead = new LinkedList<AbsolutePath>();
 
         try {
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
         } catch (IOException e) {
-            throw new OctopusIOException(getClass().getName(), "could not create directory stream", e);
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream.", e);
         }
     }
 
@@ -57,7 +64,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
         try {
             stream.close();
         } catch (IOException e) {
-            throw new OctopusIOException(getClass().getName(), "Cannot close stream", e);
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Cannot close stream.", e);
         }
     }
 
@@ -70,13 +77,13 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
             while (iterator.hasNext()) {
                 AbsolutePath next = gatPath(iterator.next());
                 if (filter.accept(next)) {
-                    readAhead.add(next);
+                    readAhead.addLast(next);
                     return true;
                 }
             }
             return false;
         } catch (OctopusIOException e) {
-            throw new DirectoryIteratorException(getClass().getName(), "error on getting next element", e);
+            throw new DirectoryIteratorException(LocalAdaptor.ADAPTOR_NAME, "Failed to get next element.", e);
         }
     }
 
@@ -84,26 +91,26 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     public synchronized PathAttributesPair next() {
         try {
             if (!readAhead.isEmpty()) {
-                AbsolutePath path = readAhead.remove(0);
-                FileAttributes attributes = this.localFiles.getAttributes(path);
+                AbsolutePath path = readAhead.removeFirst();
+                FileAttributes attributes = localFiles.getAttributes(path);
                 return new PathAttributesPairImplementation(path, attributes);
             }
 
             while (iterator.hasNext()) {
                 AbsolutePath next = gatPath(iterator.next());
                 if (filter.accept(next)) {
-                    FileAttributes attributes = this.localFiles.getAttributes(next);
+                    FileAttributes attributes = localFiles.getAttributes(next);
                     return new PathAttributesPairImplementation(next, attributes);
                 }
             }
-            throw new NoSuchElementException("no more files in directory");
+            throw new NoSuchElementException("No more files in directory.");
         } catch (OctopusIOException e) {
-            throw new DirectoryIteratorException(getClass().getName(), "error on getting next element", e);
+            throw new DirectoryIteratorException(LocalAdaptor.ADAPTOR_NAME, "Failed to get next element.", e);
         }
     }
 
     @Override
-    public synchronized void remove() {
-        throw new DirectoryIteratorException(getClass().getName(), "DirectoryStream iterator does not support remove");
+    public void remove() {
+        throw new UnsupportedOperationException("DirectoryStream iterator does not support remove.");
     }
 }

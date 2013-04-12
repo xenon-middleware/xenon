@@ -1,4 +1,4 @@
-package nl.esciencecenter.octopus.files;
+package nl.esciencecenter.octopus.util;
 
 public enum CopyOption {
 

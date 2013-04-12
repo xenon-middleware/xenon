@@ -25,7 +25,6 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.DirectoryStream.Filter;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -168,11 +167,6 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException {
-        return new AbsolutePathImplementation(filesystem, locations);
-    }
-
-    @Override
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
 
@@ -201,7 +195,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public AbsolutePath copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
+    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
 
         logger.debug("ssh copy");
         // two cases: remote -> local and local -> remote
@@ -392,8 +386,8 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public AbsolutePath move(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
-        // TODO implement
+    public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+        // TODO Auto-generated method stub
         return null;
         
         /*

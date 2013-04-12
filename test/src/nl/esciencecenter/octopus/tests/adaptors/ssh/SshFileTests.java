@@ -11,7 +11,6 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -79,7 +78,7 @@ public class SshFileTests {
         AbsolutePath target = octopus.files().newPath(localFileSystem, new RelativePath("/tmp/aap"));
         System.err.println("absolute target path = " + target.getPath());
 
-        octopus.files().copy(src, target, CopyOption.REPLACE_EXISTING);
+        octopus.files().copy(src, target);
         
         octopus.end();
     }
@@ -99,7 +98,7 @@ public class SshFileTests {
         AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/tmp/aap"));
         System.err.println("absolute target path = " + target.getPath());
 
-        octopus.files().copy(src, target, CopyOption.REPLACE_EXISTING);
+        octopus.files().copy(src, target);
         
         // FIXME diff files
         

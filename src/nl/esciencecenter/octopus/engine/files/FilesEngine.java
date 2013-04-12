@@ -13,7 +13,6 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
-import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.DirectoryStream.Filter;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -86,11 +85,6 @@ public class FilesEngine implements Files {
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
         return getFilesAdaptor(filesystem).newPath(filesystem, location);
     }
-    
-    @Override
-    public AbsolutePath newPath(FileSystem filesystem, RelativePath... locations) throws OctopusException, OctopusIOException {
-        return getFilesAdaptor(filesystem).newPath(filesystem, locations);
-    }
 
     @Override
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
@@ -103,17 +97,17 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public AbsolutePath copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
+    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
         
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
         
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).copy(source, target, options);
+            return getFilesAdaptor(source).copy(source, target);
         } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).copy(source, target, options);
+            return getFilesAdaptor(target).copy(source, target);
         } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).copy(source, target, options);
+            return getFilesAdaptor(source).copy(source, target);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
         }
@@ -155,17 +149,17 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public AbsolutePath move(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException {
+    public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
         
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
         
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).move(source, target, options);
+            return getFilesAdaptor(source).move(source, target);
         } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).move(source, target, options);
+            return getFilesAdaptor(target).move(source, target);
         } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).move(source, target, options);
+            return getFilesAdaptor(source).move(source, target);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party move (yet)", null, null);
         }
