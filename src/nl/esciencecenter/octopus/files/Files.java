@@ -18,8 +18,8 @@ import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 public interface Files {
     
     /**
-     * Create a new FileSystem that represents a (possibly remote) data store at the <code>location</code> by using the  
-     * <code>credentials</code>.  
+     * Create a new FileSystem that represents a (possibly remote) data store at the <code>location</code>, using the  
+     * <code>credentials</code> to get access.  
      * 
      * @param location the location of the FileSystem.
      * @param credential the Credentials to use to get access to the FileSystem. 
