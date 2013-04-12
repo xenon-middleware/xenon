@@ -64,7 +64,7 @@ public class JobsEngineTest {
         URI sheduler_location = new URI("local:///");
         JobDescription job_description = new JobDescription();
         SchedulerImplementation scheduler = new SchedulerImplementation("local", "1", sheduler_location, 
-                new String [] { "single" }, null);
+                new String [] { "single" }, null, null);
         // stub adaptor
         OctopusEngine octopus = mock(OctopusEngine.class);
         Adaptor adaptor = mock(Adaptor.class);
