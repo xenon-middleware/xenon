@@ -70,7 +70,6 @@ public class GridengineAdaptor extends Adaptor {
         return new HashMap<String, String>();
     }
 
-    @Override
     public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;
     }

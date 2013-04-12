@@ -19,7 +19,6 @@ import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -77,7 +76,7 @@ public class LocalJobs implements Jobs {
         }
         
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
-                new String[] { "single", "multi", "unlimited" }, properties);
+                new String[] { "single", "multi", "unlimited" }, null, properties, true, false);
 
         singleQ = new LinkedList<LocalJobExecutor>();
         multiQ = new LinkedList<LocalJobExecutor>();
@@ -94,7 +93,8 @@ public class LocalJobs implements Jobs {
         maxQSize = properties.getIntProperty(LocalAdaptor.MAX_HISTORY);
 
         if (maxQSize < 0 && maxQSize != -1) {
-            throw new BadParameterException("max q size cannot be negative (excluding -1 for unlimited)", "local", null);
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Max queue size cannot be negative (excluding -1 " +
+            		"for unlimited)");
         }    
     }
       
@@ -149,7 +149,7 @@ public class LocalJobs implements Jobs {
         } else if (queueName.equals("unlimited")) {
             return getJobs(unlimitedQ.toArray(new LocalJobExecutor[0]));
         } else {
-            throw new BadParameterException("queue \"" + queueName + "\" does not exist", "local", null);
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Queue \"" + queueName + "\" does not exist");
         }
     }
 
@@ -306,7 +306,8 @@ public class LocalJobs implements Jobs {
 
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
-        throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local Scheduler cannot be closed!");
+        // ignored
+        // throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local Scheduler cannot be closed!");
     }
 
     @Override

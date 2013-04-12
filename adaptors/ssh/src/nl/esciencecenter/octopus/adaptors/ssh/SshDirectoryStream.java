@@ -11,7 +11,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
-class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
+public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
     private final DirectoryStream.Filter filter;
     private final AbsolutePath dir;
     private Vector<LsEntry> listing;
@@ -22,8 +22,23 @@ class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Abso
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
+        
+        filterSpecials(listing);
     }
 
+    public static void filterSpecials(Vector<LsEntry> listing) {
+        // filter out the "." and ".."
+        int index = 0;
+        while(index < listing.size()) {
+            LsEntry e = listing.get(index);
+            if(e.getFilename().equals(".") || e.getFilename().equals("..")) {
+                listing.remove(index);
+            } else {
+                index++;
+            }
+        }        
+    }
+    
     @Override
     public Iterator<AbsolutePath> iterator() {
         return this;
@@ -41,9 +56,9 @@ class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Abso
 
     @Override
     public synchronized AbsolutePath next() {
-        while (current < listing.size()) {
+        while (hasNext()) {
             AbsolutePath next;
-            next = dir.resolve(new RelativePath(listing.get(current).getLongname()));
+            next = dir.resolve(new RelativePath(listing.get(current).getFilename()));
             current++;
             if (filter.accept(next)) {
                 return next;

@@ -2,6 +2,7 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -13,15 +14,28 @@ public class SchedulerImplementation implements Scheduler {
     private final URI uri;
     private final OctopusProperties properties;
     private final String [] queueNames;
+    private final Credential credential;
     
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, OctopusProperties properties) {
+    private final boolean localStandardStreams;
+    private final boolean hasDetachedJobs;
+    
+    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, Credential credential, 
+            OctopusProperties properties, boolean localStandardStreams, boolean hasDetachedJobs) {
+        
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
         this.queueNames = queueNames;
         this.properties = properties;
+        this.credential = credential;
+        this.localStandardStreams = localStandardStreams;
+        this.hasDetachedJobs = hasDetachedJobs;
     }
 
+    public Credential getCredential() {
+        return credential;
+    }
+    
     public String getUniqueID() {
         return uniqueID;
     }
@@ -39,6 +53,21 @@ public class SchedulerImplementation implements Scheduler {
     @Override
     public String getAdaptorName() {
         return adaptorName;
+    }
+    
+    @Override
+    public String[] getQueueNames() {
+        return queueNames.clone();
+    }
+
+    @Override
+    public boolean hasLocalStandardStreams() {
+        return localStandardStreams;
+    }
+
+    @Override
+    public boolean hasDetachedJobs() {
+        return hasDetachedJobs;
     }
     
     @Override
@@ -70,10 +99,5 @@ public class SchedulerImplementation implements Scheduler {
         } else if (!uniqueID.equals(other.uniqueID))
             return false;
         return true;
-    }
-
-    @Override
-    public String[] getQueueNames() {
-        return queueNames.clone();
     }
 }
