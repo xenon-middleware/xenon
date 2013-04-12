@@ -19,7 +19,6 @@ import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -307,7 +306,8 @@ public class LocalJobs implements Jobs {
 
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
-        throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local Scheduler cannot be closed!");
+        // ignored
+        // throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local Scheduler cannot be closed!");
     }
 
     @Override
