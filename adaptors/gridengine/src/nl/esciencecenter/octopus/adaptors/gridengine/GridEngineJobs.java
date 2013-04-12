@@ -12,6 +12,8 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
+import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
+import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
@@ -43,7 +45,8 @@ public class GridEngineJobs implements Jobs {
 
     }
 
-    private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws OctopusRuntimeException {
+    private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws OctopusRuntimeException,
+            NoSuchSchedulerException {
         if (!(scheduler instanceof SchedulerImplementation)) {
             throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME, "scheduler " + scheduler.toString()
                     + " not created by this adaptor");
@@ -52,7 +55,7 @@ public class GridEngineJobs implements Jobs {
         String schedulerID = ((SchedulerImplementation) scheduler).getUniqueID();
 
         if (!connections.containsKey(schedulerID)) {
-            throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME, "cannot find scheduler " + scheduler.toString()
+            throw new NoSuchSchedulerException(GridengineAdaptor.ADAPTOR_NAME, "cannot find scheduler " + scheduler.toString()
                     + " did you close it already?");
         }
 
@@ -113,7 +116,8 @@ public class GridEngineJobs implements Jobs {
 
         if (map == null || map.isEmpty()) {
             Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue from server");
+                    new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queue
+                            + " from server");
             return new QueueStatusImplementation(scheduler, queue, exception, null);
         }
 
@@ -161,7 +165,7 @@ public class GridEngineJobs implements Jobs {
         return result;
     }
 
-    private JobStatus getJobStatusFromMap(Map<String, Map<String, String>> allMap, Job job, boolean throwExceptions) {
+    private JobStatus getJobStatusFromMap(Map<String, Map<String, String>> allMap, Job job) {
         if (allMap == null || allMap.isEmpty()) {
             Exception exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of jobs on server");
@@ -189,6 +193,22 @@ public class GridEngineJobs implements Jobs {
         //FIXME: add isDone and exitcode for job
         return new JobStatusImplementation(job, state, null, null, false, map);
     }
+    
+    @Override
+    public JobStatus[] getJobStatuses(Job... jobs) {
+        JobStatus[] result = new JobStatus[jobs.length];
+
+        //FIXME: perhaps we should do this collectively per scheduler
+        for (int i = 0; i < jobs.length; i++) {
+            try {
+                result[i] = getJobStatus(jobs[i]);
+            } catch (OctopusIOException | OctopusException e) {
+                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
+            }
+        }
+        
+        return result;
+    }
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
@@ -214,46 +234,19 @@ public class GridEngineJobs implements Jobs {
         }
 
         //FIXME: add isDone and exitcode for job
-        return new JobStatusImplementation(job, state, null, null, false, map);        
+        return new JobStatusImplementation(job, state, null, null, false, map);
     }
 
-    @Override
-    public JobStatus[] getJobStatuses(Job... jobs) {
-        if (jobs.length == 0) {
-            return new JobStatus[0];
-        }
-
-        SchedulerConnection connection = getConnection(jobs[0].getScheduler());
-        
-        Map<String, Map<String, String>> allJobsStatus;
-        try {
-            allJobsStatus = connection.getJobStatus();
-        } catch (OctopusIOException | OctopusException e) {
-            JobStatus[] result = new JobStatus[jobs.length];
-
-            for (int i = 0; i < jobs.length; i++) {
-                result[i] =  new JobStatusImplementation(jobs[i], null, null, e, false, null);
-            }
-            return result;
-        }
-
-        JobStatus[] result = new JobStatus[jobs.length];
-
-        for (int i = 0; i < jobs.length; i++) {
-            result[i] = getJobStatusFromMap(allJobsStatus, jobs[i], false);
-        }
-
-        return result;
-    }
+   
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
         SchedulerConnection connection = getConnection(scheduler);
 
         String jobScript = JobScriptGenerator.generate(description);
-        
+
         String identifier = connection.submitJob(jobScript);
-        
+
         return new JobImplementation(description, scheduler, identifier);
     }
 

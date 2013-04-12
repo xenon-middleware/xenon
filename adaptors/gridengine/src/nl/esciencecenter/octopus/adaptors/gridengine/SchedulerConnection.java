@@ -15,8 +15,10 @@ import java.util.Properties;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.util.StreamForwarder;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.jobs.Job;
 
 import org.slf4j.Logger;
@@ -62,15 +64,26 @@ public class SchedulerConnection {
         }
     }
 
+  
+
     public SchedulerConnection(URI location, Credential credential, Properties properties) throws OctopusIOException,
             OctopusException {
         this.properties = new OctopusProperties(properties);
+
+        if (properties != null && properties.size() > 0) {
+            throw new UnknownPropertyException(GridengineAdaptor.ADAPTOR_NAME,
+                    "grid engine scheduler does not support any property");
+        }
+
+        GridengineAdaptor.checkLocation(location);
 
         try {
 
             id = GridengineAdaptor.ADAPTOR_NAME + "-" + getNextSchedulerID();
 
-            parser = new XmlOutputParser(this.properties);
+            parser = new
+
+            XmlOutputParser(this.properties);
 
             if (location.getHost() == null || location.getHost().length() == 0) {
                 //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
@@ -105,7 +118,7 @@ public class SchedulerConnection {
         try (InputStream in = runCommandAtServer("qstat -xml -g c", null).getInputStream()) {
             return parser.parseQueueInfos(in);
         } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get queue status from server", e);
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of queues from server", e);
         }
     }
 
@@ -113,7 +126,7 @@ public class SchedulerConnection {
         try (InputStream in = runCommandAtServer("qstat -xml", null).getInputStream()) {
             return parser.parseJobInfos(in);
         } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get job status from server", e);
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of jobs from server", e);
         }
     }
 
@@ -210,7 +223,7 @@ public class SchedulerConnection {
 
             //two cases, 1 for running and one for pending jobs
             String[] expected1 = { "has", "registered", "the", "job", job.getIdentifier(), "for", "deletion" };
-            String[] expected2 = { "has", "deleted", "job", job.getIdentifier()};
+            String[] expected2 = { "has", "deleted", "job", job.getIdentifier() };
 
             if (!(Arrays.equals(withoutUser, expected1) || Arrays.equals(withoutUser, expected2))) {
                 throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: \""

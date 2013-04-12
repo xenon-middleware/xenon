@@ -2,32 +2,28 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class GridEngineJobsTest {
 
-    private URI location;
+    private final URI location;
 
-    @Before
-    public void setUp() throws Exception {
-        location = new URI("ge://fs1.das4.liacs.nl/");
-    }
-
-    @After
-    public void tearDown() throws Exception {
+    public GridEngineJobsTest() throws URISyntaxException {
+        location = new URI("ge://fs1.das4.liacs.nl");
     }
 
     @Test
@@ -35,9 +31,78 @@ public class GridEngineJobsTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Scheduler scheduler = octopus.jobs().newScheduler(location, null, null);
-        
+
         octopus.jobs().close(scheduler);
-        
+
+        OctopusFactory.endOctopus(octopus);
+    }
+
+    @Test
+    public void testNewScheduler_emptyPath() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        URI withoutSlashLocation = new URI("ge://fs1.das4.liacs.nl");
+
+        Scheduler scheduler = octopus.jobs().newScheduler(withoutSlashLocation, null, null);
+
+        octopus.jobs().close(scheduler);
+
+        OctopusFactory.endOctopus(octopus);
+    }
+
+    @Test
+    public void testNewScheduler_singleSlashPath() throws Exception {
+
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        //path consisting of a single slash (tolerated, ignored)
+        URI slashLocation = new URI("ge://fs1.das4.liacs.nl/");
+
+        Scheduler scheduler = octopus.jobs().newScheduler(slashLocation, null, null);
+
+        octopus.jobs().close(scheduler);
+
+        OctopusFactory.endOctopus(octopus);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void testNewScheduler_invalidPath_InvalidLocationException() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        URI brokenLocation = new URI("ge://host/some/path");
+
+        Scheduler scheduler = octopus.jobs().newScheduler(brokenLocation, null, null);
+
+        octopus.jobs().close(scheduler);
+
+        OctopusFactory.endOctopus(octopus);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void testNewScheduler_uriWithFragment_InvalidLocationException() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        URI brokenLocation = new URI("ge://host#the-fragment");
+
+        Scheduler scheduler = octopus.jobs().newScheduler(brokenLocation, null, null);
+
+        octopus.jobs().close(scheduler);
+
+        OctopusFactory.endOctopus(octopus);
+    }
+
+    @Test(expected = UnknownPropertyException.class)
+    public void testNewScheduler_someProperty_UnknownPropertyException() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        Properties properties = new Properties();
+
+        properties.put("some.property", "some.value");
+
+        Scheduler scheduler = octopus.jobs().newScheduler(location, null, properties);
+
+        octopus.jobs().close(scheduler);
+
         OctopusFactory.endOctopus(octopus);
     }
 
@@ -92,9 +157,9 @@ public class GridEngineJobsTest {
         JobDescription jobDescription = new JobDescription();
 
         jobDescription.setExecutable("/bin/sleep");
-        
-         jobDescription.setArguments("60");
-        
+
+        jobDescription.setArguments("60");
+
         //jobDescription.setArguments("this", "and", "that");
 
         Job job = octopus.jobs().submitJob(scheduler, jobDescription);
@@ -160,7 +225,7 @@ public class GridEngineJobsTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Scheduler scheduler = octopus.jobs().newScheduler(location, null, null);
-        
+
         octopus.jobs().close(scheduler);
     }
 }
