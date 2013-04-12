@@ -51,7 +51,7 @@ public class GridEngineJobs implements Jobs {
         SchedulerConnection connection = new SchedulerConnection(location, credential, properties);
 
         Scheduler result = new SchedulerImplementation(GridengineAdaptor.ADAPTOR_NAME, connection.getUniqueID(), location,
-                connection.getQueueNames(), connection.getProperties());
+                connection.getQueueNames(), credential, connection.getProperties());
         
         synchronized (this) {
             connections.put(result, connection);

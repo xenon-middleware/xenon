@@ -16,7 +16,9 @@ public class SchedulerImplementation implements Scheduler {
     private final String [] queueNames;
     private final Credential credential;
     
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, Credential credential, OctopusProperties properties) {
+    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String [] queueNames, Credential credential, 
+            OctopusProperties properties) {
+        
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
