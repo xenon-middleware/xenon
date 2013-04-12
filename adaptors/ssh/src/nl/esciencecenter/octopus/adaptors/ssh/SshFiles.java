@@ -12,7 +12,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import nl.esciencecenter.octopus.adaptors.ssh.SshFiles.FileSystemInfo;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
