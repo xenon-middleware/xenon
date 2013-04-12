@@ -51,7 +51,7 @@ public class OctopusEngineTest {
             octopus.getAdaptorInfo("hupsefluts");
             fail();
         } catch (OctopusException e) {
-            assertThat(e.getMessage(), is("could not find adaptor named hupsefluts"));
+            assertThat(e.getMessage(), is("engine adaptor: Could not find adaptor named hupsefluts"));
         }
     }
 
@@ -69,7 +69,7 @@ public class OctopusEngineTest {
             octopus.getAdaptorFor("hupsefluts");
             fail();
         } catch (OctopusException e) {
-            assertThat(e.getMessage(), is("cannot find adaptor for scheme hupsefluts"));
+            assertThat(e.getMessage(), is("engine adaptor: Could not find adaptor for scheme hupsefluts"));
         }
     }
 
@@ -87,7 +87,7 @@ public class OctopusEngineTest {
             octopus.getAdaptor("hupsefluts");
             fail();
         } catch (OctopusException e) {
-            assertThat(e.getMessage(), is("could not find adaptor named hupsefluts"));
+            assertThat(e.getMessage(), is("engine adaptor: Could not find adaptor named hupsefluts"));
         }
     }
 

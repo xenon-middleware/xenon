@@ -166,7 +166,7 @@ public class OctopusEngine implements Octopus {
                 return adaptor;
             }
         }
-        throw new OctopusException("cannot find adaptor for scheme " + scheme, null, null);
+        throw new OctopusException("engine", "Could not find adaptor for scheme " + scheme);
     }
 
     public Adaptor getAdaptor(String name) throws OctopusException {
@@ -176,7 +176,7 @@ public class OctopusEngine implements Octopus {
             }
         }
 
-        throw new OctopusException("could not find adaptor named " + name, null, null);
+        throw new OctopusException("engine", "Could not find adaptor named " + name);
     }
 
     public Adaptor[] getAdaptors() {
