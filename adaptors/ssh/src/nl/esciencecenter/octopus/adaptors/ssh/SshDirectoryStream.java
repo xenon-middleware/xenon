@@ -41,7 +41,7 @@ class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Abso
 
     @Override
     public synchronized AbsolutePath next() {
-        while (current < listing.size()) {
+        while (hasNext()) {
             AbsolutePath next;
             next = dir.resolve(new RelativePath(listing.get(current).getLongname()));
             current++;
