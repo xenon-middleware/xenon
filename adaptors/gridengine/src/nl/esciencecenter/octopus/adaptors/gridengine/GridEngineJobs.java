@@ -80,7 +80,7 @@ public class GridEngineJobs implements Jobs {
                         connection.getQueueNames(), credential, connection.getProperties(), false, true);
 
         addConnection(connection);
-        
+
         return result;
     }
 
@@ -193,7 +193,7 @@ public class GridEngineJobs implements Jobs {
         //FIXME: add isDone and exitcode for job
         return new JobStatusImplementation(job, state, null, null, false, map);
     }
-    
+
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
         JobStatus[] result = new JobStatus[jobs.length];
@@ -206,7 +206,7 @@ public class GridEngineJobs implements Jobs {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
             }
         }
-        
+
         return result;
     }
 
@@ -219,9 +219,32 @@ public class GridEngineJobs implements Jobs {
         Map<String, String> map = allMap.get(job.getIdentifier());
 
         if (map == null || map.isEmpty()) {
-            Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, null);
+            //perhaps the job is already finished?
+            Map<String, String> accountingInfo = connection.getJobAccountingInfo(job.getIdentifier());
+
+            if (accountingInfo != null) {
+                Integer exitCode = null;
+
+                String exitCodeString = accountingInfo.get("exit_status");
+
+                try {
+                    if (exitCodeString != null) {
+                        exitCode = Integer.parseInt(exitCodeString);
+                    }
+                } catch (NumberFormatException e) {
+                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier() + " from string "
+                            + exitCodeString, e);
+
+                }
+
+                return new JobStatusImplementation(job, "done", exitCode, null, true, accountingInfo);
+
+            } else {
+                Exception exception =
+                        new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                                + " not found on server");
+                return new JobStatusImplementation(job, null, null, exception, false, null);
+            }
         }
 
         String state = map.get("state");
@@ -236,8 +259,6 @@ public class GridEngineJobs implements Jobs {
         //FIXME: add isDone and exitcode for job
         return new JobStatusImplementation(job, state, null, null, false, map);
     }
-
-   
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
