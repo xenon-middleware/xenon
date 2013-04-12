@@ -192,23 +192,12 @@ public class FilesEngine implements Files {
     
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        // TODO: set default options for all functions, not just this one
-        if (options == null || options.length == 0) {
-            options = new OpenOption[] { OpenOption.CREATE, OpenOption.TRUNCATE_EXISTING, OpenOption.WRITE };
-        }
-
         return getFilesAdaptor(path).newOutputStream(path, options);
     }
     
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         return getFilesAdaptor(path).newByteChannel(path, options);
-    }
-
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusIOException {
-        return getFilesAdaptor(path).newByteChannel(path, permissions, options);
     }
 
     @Override

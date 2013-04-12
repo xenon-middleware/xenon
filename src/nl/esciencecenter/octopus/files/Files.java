@@ -287,8 +287,6 @@ public interface Files {
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
-    /** Opens a file, returning an input stream to read from the file. */
-
     /** 
      * Open an existing file and return an {@link InputStream} to read from this file.
      * 
@@ -298,61 +296,62 @@ public interface Files {
      * 
      * @throws NoSuchFileException If a file does not exists.
      * @throws IllegalSourcePathException If path not file.
-     * @throws OctopusIOException If an I/O error occured.
+     * @throws OctopusIOException If an I/O error occurred.
      */    
     public InputStream newInputStream(AbsolutePath path) throws OctopusIOException;
 
     /**
-     * Opens or creates a file, returning an output stream that may be used to write bytes to the file. If no options are present
-     * then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
-     */
-    
-    /**
-     * TODO: fix options!
-     *  
      * Open an file and return an {@link OutputStream} to write to this file.
      * 
-     * If the file does not exist, it is created first. If the file does exists, the OpenOptions determines how data is appended 
-     * to the file. If no options are present then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
+     * If no options are present then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
      * 
-     * @param path the existing file to read.
+     * If options are set, the <code>WRITE</code> option must be set.  
+     * 
+     * If the file does not exist, it will be created first if the <code>CREATE</code> option is specified. 
+     * 
+     * If the <code>CREATE_NEW</code> option is specified, a new file will be created and an exception is thrown if the file 
+     * already exists. 
+     * 
+     * If the <code>APPEND</code> option is specified, data will be appended to the file.
+     * 
+     * If the <code>TRUNCATE_EXISTING</code> option is specified, an existing file will be truncated before data is appended.
+     * 
+     * @param path the target file for the OutputStream.
+     * @param options the options to use for opening this file.  
      *  
-     * @return the {@link InputStream} to read from the file.
+     * @return the {@link OutputStream} to write to the file.
      * 
-     * @throws NoSuchFileException If a file does not exists.
-     * @throws IllegalSourcePathException If path not file.
-     * @throws OctopusIOException If an I/O error occured.
+     * @throws IllegalSourcePathException If path is not a file.
+     * @throws OctopusIOException If an I/O error occurred.
      */    
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     /**
-     * Opens or creates a file, returning a seekable byte channel to access the file.
-     */
-    
-    /**
-     * TODO: fix options.
-     * 
      * Open an file and return an {@link SeekableByteChannel} to read from or write to this file.
+     *
+     * Options may not be empty.
+     * 
+     * If the file does not exist, it will be created first if the <code>CREATE</code> option is specified. 
+     * 
+     * If the <code>CREATE_NEW</code> option is specified, a new file will be created and an exception is thrown if the file 
+     * already exists. 
+     * 
+     * If the <code>APPEND</code> option is specified, data will be appended to the file.
+     * 
+     * If the <code>TRUNCATE_EXISTING</code> option is specified, an existing file will be truncated before data is appended.
+     * 
+     * The <code>READ</code> and <code>WRITE</code> determine if the file is opened for reading or writing.  
+     * 
+     * @param path the target file for the SeekableByteChannel.
+     * @param options the options to use for opening this file.  
      *  
-     * @param path
-     * @param permissions
-     * @param options
-     * @return
-     * @throws OctopusIOException
-     */
-    public SeekableByteChannel newByteChannel(AbsolutePath path, Set<PosixFilePermission> permissions, OpenOption... options)
-            throws OctopusIOException;
-
-    /**
-     * Opens or creates a file, returning a seekable byte channel to access the file.
-     */
+     * @return the {@link SeekableByteChannel} to access the file.
+     * 
+     * @throws IllegalSourcePathException If path is not a file.
+     * @throws OctopusIOException If an I/O error occurred.
+     */    
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
-    /**
-     * Reads a file's attributes.
-     */
-    
-    
     /**
      * Get the {@link FileAttributes} of an existing path. 
      * 
