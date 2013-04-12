@@ -2,7 +2,6 @@ package nl.esciencecenter.octopus.engine.files;
 
 import java.util.Iterator;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -168,7 +167,6 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     public AbsolutePath normalize() {
         return new AbsolutePathImplementation(filesystem, relativePath.normalize());
     }
-
     
     @Override
     public boolean startsWith(RelativePath other) {
@@ -186,12 +184,12 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     }
 
     @Override
-    public AbsolutePath resolveSibling(RelativePath other) throws OctopusException {
+    public AbsolutePath resolveSibling(RelativePath other) {
         return new AbsolutePathImplementation(filesystem, relativePath.resolveSibling(other));
     }
 
     @Override
-    public AbsolutePath relativize(RelativePath other) throws OctopusException {
+    public AbsolutePath relativize(RelativePath other) {
         return new AbsolutePathImplementation(filesystem, relativePath.relativize(other));
     }
 
