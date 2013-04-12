@@ -1,12 +1,14 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
@@ -18,7 +20,7 @@ public class GridengineAdaptor extends Adaptor {
             "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
                     + "or the ssh adaptor to gain access to the scheduler machine.";
 
-    private static final String[] ADAPTOR_SCHEME = new String[] { "ge", "sge" };
+    private static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
 
     public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + ADAPTOR_NAME + ".";
 
@@ -32,15 +34,30 @@ public class GridengineAdaptor extends Adaptor {
     private final GridEngineJobs jobsAdaptor;
 
     public GridengineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, validPropertiesList, properties);
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, validPropertiesList, properties);
 
         this.jobsAdaptor = new GridEngineJobs(properties, octopusEngine);
     }
 
-    void checkURI(URI location) throws OctopusException {
-        if (!supports(location.getScheme())) {
-            throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support scheme" + location.getScheme());
+    static void checkLocation(URI location) throws InvalidLocationException {
+        //only null or "/" are allowed as paths
+        if (!(location.getPath() == null || location.getPath().length() == 0 || location.getPath().equals("/"))) {
+            throw new InvalidLocationException(GridengineAdaptor.ADAPTOR_NAME,
+                    "Paths are not allowed in a uri for this scheduler, uri given: " + location);
         }
+
+        if (location.getFragment() != null && location.getFragment().length() > 0) {
+            throw new InvalidLocationException(GridengineAdaptor.ADAPTOR_NAME,
+                    "Fragments are not allowed in a uri for this scheduler, uri given: " + location);
+        }
+        
+        for(String scheme: ADAPTOR_SCHEMES) {
+            if (scheme.equals(location.getScheme())) {
+                //alls-well
+                return;
+            }
+        }
+        throw new InvalidLocationException(ADAPTOR_NAME, "Adaptor does not support scheme: " + location.getScheme());
     }
 
     @Override
@@ -49,6 +66,10 @@ public class GridengineAdaptor extends Adaptor {
     }
 
     @Override
+    public Map<String, String> getSupportedProperties() {
+        return new HashMap<String, String>();
+    }
+
     public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;
     }
@@ -75,8 +96,7 @@ public class GridengineAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        // TODO Auto-generated method stub
-        return null;
+        return new HashMap<String, String>();
     }
 
 }
