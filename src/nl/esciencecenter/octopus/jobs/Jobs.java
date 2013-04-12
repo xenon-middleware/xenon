@@ -24,7 +24,6 @@ public interface Jobs {
      * 
      * @return the new Scheduler.
      *
-     * @throws NoSchedulerException If no matching scheduler could be created.
      * @throws UnknownPropertyException If a unknown property was provided.
      * @throws InvalidPropertyException If a known property was provided with an invalid value.
      * @throws InvalidLocationException If the location was invalid.
