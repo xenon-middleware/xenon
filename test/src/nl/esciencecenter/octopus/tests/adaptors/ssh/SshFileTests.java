@@ -11,6 +11,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -112,6 +113,30 @@ public class SshFileTests {
         
         octopus.end();
     }
+
+    @org.junit.Test
+    public void testLs() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        Credentials c = octopus.credentials();
+        String username = System.getProperty("user.name");
+        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
+       
+        FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
+        AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/bin"));
+        System.err.println("absolute target path = " + target.getPath());
+
+        DirectoryStream<AbsolutePath> stream = octopus.files().newDirectoryStream(target);
+
+        while(stream.iterator().hasNext()) {
+            AbsolutePath path = stream.iterator().next(); 
+            System.err.println(path.getPath());
+        }
+        
+        octopus.end();
+    }
+
+    
+    
     // test connection refused
     // test com.jcraft.jsch.JSchException: UnknownHostKey: 
 }

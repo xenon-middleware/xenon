@@ -98,7 +98,6 @@ public class SshJobExecutor implements Runnable {
 
     @Override
     public void run() {
-
         try {
             synchronized (this) {
                 if (killed) {

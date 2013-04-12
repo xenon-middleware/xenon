@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.esciencecenter.octopus.adaptors.local.LocalJobExecutor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -45,7 +44,7 @@ public class SshJobs implements Jobs {
 
     private final Scheduler sshScheduler;
 
-    private final LinkedList<LocalJobExecutor> singleQ;
+    private final LinkedList<SshJobExecutor> singleQ;
 
     private final ExecutorService singleExecutor;
 
@@ -72,14 +71,14 @@ public class SshJobs implements Jobs {
 
         sshScheduler = new SchedulerImplementation(adaptor.getName(), "SshScheduler", uri, new String[] { "single" }, properties);
 
-        singleQ = new LinkedList<LocalJobExecutor>();
+        singleQ = new LinkedList<SshJobExecutor>();
 
         singleExecutor = Executors.newSingleThreadExecutor();
 
         maxQSize = properties.getIntProperty(SshAdaptor.MAX_HISTORY);
 
         if (maxQSize < 0) {
-            throw new BadParameterException("max q size cannot be negative", "local", null);
+            throw new BadParameterException(adaptor.getName(), "max q size cannot be negative");
         }
     }
 
@@ -107,9 +106,8 @@ public class SshJobs implements Jobs {
         throw new OctopusException(getClass().getName(), "getLocalScheduler not supported!");
     }
 
-    private Job[] getJobs(LocalJobExecutor[] executors) {
-
-        LocalJobExecutor[] tmp = singleQ.toArray(new LocalJobExecutor[0]);
+    private Job[] getJobs(SshJobExecutor[] executors) {
+        SshJobExecutor[] tmp = singleQ.toArray(new SshJobExecutor[0]);
 
         Job[] result = new Job[tmp.length];
 
@@ -123,7 +121,7 @@ public class SshJobs implements Jobs {
     @Override
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         if (queueName == null || queueName.equals("single")) {
-            return getJobs(singleQ.toArray(new LocalJobExecutor[0]));
+            return getJobs(singleQ.toArray(new SshJobExecutor[0]));
         } else {
             throw new BadParameterException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
         }
@@ -131,10 +129,9 @@ public class SshJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
+        Job result = new JobImplementation(description, scheduler, "sshjob-" + getNextJobID());
 
-        Job result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID());
-
-        LocalJobExecutor executor = new LocalJobExecutor(result);
+        SshJobExecutor executor = new SshJobExecutor(adaptor, result);
 
         String queueName = description.getQueueName();
 
@@ -157,8 +154,8 @@ public class SshJobs implements Jobs {
             throw new OctopusException(adaptor.getName(), "Cannot retrieve job status from other scheduler!");
         }
 
-        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
-        LocalJobExecutor executor = findJob(tmp, job);
+        LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        SshJobExecutor executor = findJob(tmp, job);
         return executor.getStatus();
     }
 
@@ -177,7 +174,7 @@ public class SshJobs implements Jobs {
         return result;
     }
 
-    private synchronized void purgeQ(LinkedList<LocalJobExecutor> q) {
+    private synchronized void purgeQ(LinkedList<SshJobExecutor> q) {
         if (maxQSize == -1) {
             return;
         }
@@ -189,7 +186,7 @@ public class SshJobs implements Jobs {
             return;
         }
 
-        Iterator<LocalJobExecutor> iterator = q.iterator();
+        Iterator<SshJobExecutor> iterator = q.iterator();
 
         while (iterator.hasNext() && purgeCount > 0) {
             if (iterator.next().isDone()) {
@@ -199,7 +196,7 @@ public class SshJobs implements Jobs {
         }
     }
 
-    private LinkedList<LocalJobExecutor> findQueue(String queueName) throws OctopusException {
+    private LinkedList<SshJobExecutor> findQueue(String queueName) throws OctopusException {
 
         if (queueName == null || queueName.equals("single")) {
             return singleQ;
@@ -208,9 +205,8 @@ public class SshJobs implements Jobs {
         }
     }
 
-    private LocalJobExecutor findJob(LinkedList<LocalJobExecutor> queue, Job job) throws OctopusException {
-
-        for (LocalJobExecutor e : queue) {
+    private SshJobExecutor findJob(LinkedList<SshJobExecutor> queue, Job job) throws OctopusException {
+        for (SshJobExecutor e : queue) {
             if (e.getJob().equals(job)) {
                 return e;
             }
@@ -227,7 +223,7 @@ public class SshJobs implements Jobs {
         }
 
         // FIXME: What if job is already gone?
-        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
         findJob(tmp, job).kill();
     }
 
