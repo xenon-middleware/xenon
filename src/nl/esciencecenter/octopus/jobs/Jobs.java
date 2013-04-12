@@ -75,9 +75,9 @@ public interface Jobs {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
 
     /** 
-     * TODO: semantics??
+     * Get all jobs currently in the <code>queue</code> of <code>scheduler</code>.
      * 
-     * Get all jobs submitted to the <code>queue</code> of <code>scheduler</code>.
+     * Note that jobs submitted by other users or other schedulers may also be returned.   
      * 
      * @param scheduler the Scheduler.
      * @param queueName the name of the queue.
@@ -90,7 +90,7 @@ public interface Jobs {
      * @throws OctopusIOException If an I/O error occurred.
      */
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
-
+    
     /** 
      * Get the status of the <code>queue</code> of <code>scheduler</code>.
      * 
