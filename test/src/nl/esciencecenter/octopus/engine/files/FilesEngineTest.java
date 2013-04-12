@@ -118,9 +118,9 @@ public class FilesEngineTest {
         Files files_adaptor = mock(Files.class);
         OctopusEngine octopus = fakeOctopus(files_adaptor, "Local");
         FilesEngine engine = new FilesEngine(octopus);
-        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file://"));
+        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file:///"));
         AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bla.txt"));
-        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file://"));
+        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file:///"));
         AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/foo.txt"));
 
         engine.copy(source, target);
@@ -158,7 +158,7 @@ public class FilesEngineTest {
         addAdaptor2Octopus(octopus, target_adaptor, "gridftp");
         FilesEngine engine = new FilesEngine(octopus);
 
-        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file://"));
+        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file:///"));
         AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
         FileSystemImplementation target_filesystem = getFileSystem("gridftp", new URI("gridftp://somewhere"));
         AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/foo.txt"));
@@ -178,7 +178,7 @@ public class FilesEngineTest {
         FilesEngine engine = new FilesEngine(octopus);
         FileSystemImplementation source_filesystem = getFileSystem("ssh", new URI("ssh://localhost"));
         AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
-        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file://"));
+        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file:///"));
         AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/bar.txt"));
 
         engine.copy(source, target);
@@ -273,7 +273,7 @@ public class FilesEngineTest {
 
     @Test
     public void testSetOwner_MockedFiles_FilesSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
-        FileSystemImplementation filesystem = getFileSystem("Local", new URI("file://"));
+        FileSystemImplementation filesystem = getFileSystem("Local", new URI("file:///"));
         AbsolutePathImplementation path = new AbsolutePathImplementation(filesystem, new RelativePath("tmp/bla.txt"));
         // create stubs, so we don't have to use a real adaptor
         // a real adaptor touches filesystem, uses network, requires credentials

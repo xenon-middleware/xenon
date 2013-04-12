@@ -291,7 +291,7 @@ public class RelativePath {
         }
 
         if (endIndex < 0 || endIndex > elements.length) {
-            throw new IllegalArgumentException("endIndex " + beginIndex + " not present in path " + this);
+            throw new IllegalArgumentException("endIndex " + endIndex + " not present in path " + this);
         }
 
         if (beginIndex >= endIndex) {
@@ -315,8 +315,26 @@ public class RelativePath {
      * @return If this paths start with the other path. 
      */
     public boolean startsWith(RelativePath other) {
-        // TODO: Implement!
-        return false;
+        
+        if (other.isEmpty()) {
+            return true;
+        }
+        
+        if (isEmpty()) { 
+            return false;
+        }
+
+        if (other.elements.length > elements.length) { 
+            return false;
+        }
+        
+        for (int i=0;i<other.elements.length;i++) { 
+            if (!other.elements[i].equals(elements[i])) { 
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**
@@ -327,8 +345,28 @@ public class RelativePath {
      * @return If this paths ends with the other path. 
      */
     public boolean endsWith(RelativePath other) {
-        // TODO: Implement!
-        return false;
+        
+        if (other.isEmpty()) { 
+            return true;
+        }
+        
+        if (isEmpty()) { 
+            return false;
+        }
+        
+        if (other.elements.length > elements.length) { 
+            return false;
+        }
+        
+        int offset = elements.length-other.elements.length; 
+        
+        for (int i=0;i<other.elements.length;i++) { 
+            if (!other.elements[i].equals(elements[offset+i])) { 
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /** 

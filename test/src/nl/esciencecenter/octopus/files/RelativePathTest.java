@@ -146,13 +146,12 @@ public class RelativePathTest {
         assertEquals(expected_path, npath);
     }
 
-    public void doSubPathWithException(int beginIndex, int endIndex, String input_path) {
+    public void doSubPathWithException(int beginIndex, int endIndex, String input_path, String expected_message) {
         RelativePath path = new RelativePath(input_path);
         try {
             path.subpath(beginIndex, endIndex);
             fail("IllegalArgumentException not thrown");
         } catch (IllegalArgumentException e) {
-            String expected_message = "beginIndex " + beginIndex + " not present in path /a/b/c";
             assertEquals(expected_message, e.getMessage());
         }
     }
@@ -184,17 +183,17 @@ public class RelativePathTest {
 
     @Test
     public void testSubpath_EndAfterLast() {
-        doSubPathWithException(1, 5, "a/b/c");
+        doSubPathWithException(1, 5, "a/b/c", "endIndex 5 not present in path /a/b/c");
     }
 
     @Test
     public void testSubpath_BeginBeforeFirst() {
-        doSubPathWithException(-1, 1, "a/b/c");
+        doSubPathWithException(-1, 1, "a/b/c", "beginIndex -1 not present in path /a/b/c");
     }
 
     @Test
     public void testSubpath_BeginGreaterThanEnd() {
-        doSubPathWithException(2, 1, "a/b/c");
+        doSubPathWithException(2, 1, "a/b/c", "beginIndex 2 larger than endIndex 1");
     }
 
     @Test
@@ -214,7 +213,8 @@ public class RelativePathTest {
     public void testEndsWith_False() {
         RelativePath path = new RelativePath("mydir/myfile");
         RelativePath path2 = new RelativePath("mydir");
-        assertFalse(path.startsWith(path2));
+        
+        assertFalse(path.endsWith(path2));
     }
 
     @Test
@@ -225,17 +225,31 @@ public class RelativePathTest {
 
     @Test
     public void testResolve() {
-        fail("Not yet implemented");
+        
+        RelativePath path = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("file");
+        RelativePath path3 = new RelativePath("mydir/file");
+        RelativePath path4 = path.resolve(path2);
+        assertEquals(path3, path4);
     }
 
     @Test
     public void testResolveSibling() {
-        fail("Not yet implemented");
+        
+        RelativePath path = new RelativePath("mydir/aap");
+        RelativePath path2 = new RelativePath("noot");
+        RelativePath path3 = new RelativePath("mydir/noot");
+        RelativePath path4 = path.resolveSibling(path2);
+        assertEquals(path3, path4);
     }
 
     @Test
     public void testRelativize() {
-        fail("Not yet implemented");
+        RelativePath path = new RelativePath("a/b/c/d");
+        RelativePath path2 = new RelativePath("/a/b");
+        RelativePath path3 = new RelativePath("/c/d");
+        RelativePath path4 = path.relativize(path2);    
+        assertEquals(path3, path4);
     }
 
     @Test
