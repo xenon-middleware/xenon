@@ -106,5 +106,5 @@ public class SshFileTests {
         octopus.end();
     }
     // test connection refused
-    // test com.jcraft.jsch.JSchException: UnknownHostKey: localhost. RSA key fingerprint is a7:08:d3:10:af:df:94:85:d6:65:74:3c:a4:6d:80:48
+    // test com.jcraft.jsch.JSchException: UnknownHostKey: 
 }
