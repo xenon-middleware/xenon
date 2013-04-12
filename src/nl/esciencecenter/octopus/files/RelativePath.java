@@ -211,6 +211,17 @@ public class RelativePath {
         }
         return elements[elements.length - 1];
     }
+    
+    /**
+     * Get the separator. 
+     * 
+     * @return the separator.
+     */
+    public String getSeparator() {
+        return seperator;
+    }
+    
+    
 
     /**
      * Get the parent path, or <code>null</code> if this path does not have a parent. 
