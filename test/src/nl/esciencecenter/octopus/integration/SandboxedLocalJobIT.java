@@ -120,7 +120,7 @@ public class SandboxedLocalJobIT {
         }
 
         File stdout = new File(workdir.getPath() + "/stdout.txt");
-        assertThat(org.apache.commons.io.FileUtils.readFileToString(stdout), is("   9  525 3581 " + input_file + "\n"));
+        assertThat(org.apache.commons.io.FileUtils.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
 
         FileUtils.recursiveDelete(octopus, workdir);
     }
