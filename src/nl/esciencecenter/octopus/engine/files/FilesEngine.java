@@ -250,6 +250,6 @@ public class FilesEngine implements Files {
     @Override
     public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalCWDFileSystem(properties);
+        return adaptor.filesAdaptor().getLocalHomeFileSystem(properties);
     }
 }
