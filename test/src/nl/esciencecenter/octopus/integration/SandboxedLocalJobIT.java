@@ -70,7 +70,7 @@ public class SandboxedLocalJobIT {
         FileSystem localrootfs = octopus.files().newFileSystem(new URI("file:///"), credential, null);
 
         // create workdir
-        String workFn = tmpdir + "/" + work_id;
+        String workFn = tmpdir + "/AAP" + work_id;
         AbsolutePath workdir = octopus.files().newPath(localrootfs, new RelativePath(workFn));
         octopus.files().createDirectory(workdir);
 
@@ -80,23 +80,26 @@ public class SandboxedLocalJobIT {
                 octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
         // create sandbox
-        String sandbox_id = UUID.randomUUID().toString();
-        String sandboxFn = tmpdir + "/" + sandbox_id;
-        AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(sandboxFn));
+        String sandbox_id = "MIES" + UUID.randomUUID().toString();
+        AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(tmpdir));
         Sandbox sandbox = new Sandbox(octopus, sandboxPath, sandbox_id);
+        
         sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
                 "lorem_ipsum.txt");
-        sandbox.setDownloadFiles("stdout.txt", "stderr.txt");
-
+        
+        sandbox.addDownloadFile("stdout.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
+        sandbox.addDownloadFile("stderr.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
+        
         // upload lorem_ipsum.txt to sandbox
         sandbox.upload();
 
         JobDescription description = new JobDescription();
         description.setArguments("lorem_ipsum.txt");
         description.setExecutable("/usr/bin/wc");
+        description.setQueueName("single");
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        description.setWorkingDirectory(sandboxPath.getPath());
+        description.setWorkingDirectory(sandbox.getPath().getRelativePath().getPath());
 
         URI sh_location = new URI("local:///");
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, null, null);

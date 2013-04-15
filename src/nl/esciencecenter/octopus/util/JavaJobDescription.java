@@ -296,7 +296,7 @@ public class JavaJobDescription extends JobDescription {
     }
 
     @Override
-    public boolean offlineMode() {
+    public boolean getOfflineMode() {
         // TODO Auto-generated method stub
         return false;
     }

@@ -31,9 +31,12 @@ import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
+import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -70,6 +73,8 @@ public class LocalJobs implements Jobs {
 
     private final int maxQSize;
 
+    private final int pollingDelay;
+
     private static int jobID = 0;
 
     private static synchronized int getNextJobID() {
@@ -90,9 +95,8 @@ public class LocalJobs implements Jobs {
             throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
         }
 
-        localScheduler =
-                new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, new String[] { "single", "multi",
-                        "unlimited" }, null, properties, true, false);
+        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
+                new String[] { "single", "multi", "unlimited" }, null, properties, true, false);
 
         singleQ = new LinkedList<LocalJobExecutor>();
         multiQ = new LinkedList<LocalJobExecutor>();
@@ -102,7 +106,7 @@ public class LocalJobs implements Jobs {
         singleExecutor = Executors.newSingleThreadExecutor();
 
         int processors = Runtime.getRuntime().availableProcessors();
-
+        
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         multiExecutor = Executors.newFixedThreadPool(multiQThreads);
 
@@ -111,6 +115,12 @@ public class LocalJobs implements Jobs {
         if (maxQSize < 0 && maxQSize != -1) {
             throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Max queue size cannot be negative (excluding -1 "
                     + "for unlimited)");
+        }
+        
+        pollingDelay = properties.getIntProperty(LocalAdaptor.POLLING_DELAY);
+        
+        if (pollingDelay < 100 ||  pollingDelay > 60000) {
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Polling delay must be between 100 and 60000!");
         }
     }
 
@@ -169,16 +179,70 @@ public class LocalJobs implements Jobs {
         }
     }
 
+    private void verifyJobDescription(JobDescription description) throws OctopusException { 
+        
+        String queue = description.getQueueName();
+        
+        if (queue == null) { 
+            throw new IncompleteJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Queue name missing in JobDescription!");
+        }
+        
+        if (!(queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
+            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Queue " + queue + " not available locally!");
+        }
+
+        String executable = description.getExecutable(); 
+        
+        if (executable == null) { 
+            throw new IncompleteJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Executable missing in JobDescription!");
+        }
+        
+        String workingDirectory = description.getWorkingDirectory(); 
+        
+        if (workingDirectory == null) { 
+            throw new IncompleteJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                    "Working directory missing in JobDescription!");
+        }
+
+        int nodeCount = description.getNodeCount();
+        
+        if (nodeCount != 1) { 
+            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal node count: " + nodeCount);
+        }
+        
+        int processesPerNode = description.getProcessesPerNode();
+        
+        if (processesPerNode <= 0) { 
+            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal processes per node count: " + 
+                    processesPerNode);
+        }
+
+        int maxTime = description.getMaxTime();
+        
+        if (maxTime <= 0) { 
+            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal maximum runtime: " + maxTime);
+        }
+
+        boolean offline = description.getOfflineMode();
+        
+        if (offline) { 
+            throw new UnsupportedJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                    "Local adaptor does not support offline jobs!");
+        }
+    }
+    
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
 
+        verifyJobDescription(description);
+               
         Job result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID());
 
-        LocalJobExecutor executor = new LocalJobExecutor(result);
+        LocalJobExecutor executor = new LocalJobExecutor(result, pollingDelay);
 
         String queueName = description.getQueueName();
 
-        if (queueName == null || queueName.equals("single")) {
+        if (queueName.equals("single")) {
             singleQ.add(executor);
             singleExecutor.execute(executor);
         } else if (queueName.equals("multi")) {
@@ -188,7 +252,7 @@ public class LocalJobs implements Jobs {
             unlimitedQ.add(executor);
             unlimitedExecutor.execute(executor);
         } else {
-            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "queue \"" + queueName + "\" does not exist");
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "INTERNAL ERROR: failed to submit job!");
         }
 
         //purge jobs from q if needed (will not actually cancel execution of jobs)
@@ -228,6 +292,7 @@ public class LocalJobs implements Jobs {
     }
 
     private synchronized void purgeQ(LinkedList<LocalJobExecutor> q) {
+        
         if (maxQSize == -1) {
             return;
         }
@@ -323,7 +388,6 @@ public class LocalJobs implements Jobs {
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         // ignored
-        // throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Local Scheduler cannot be closed!");
     }
 
     @Override

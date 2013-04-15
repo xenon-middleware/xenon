@@ -104,8 +104,7 @@ class LocalUtils {
             try {
                 result.add(PosixFilePermission.valueOf(permission.toString()));
             } catch (IllegalArgumentException e) {
-                throw new OctopusRuntimeException("Posix permission " + permission + " not recognized by Local adaptor", "local",
-                        null);
+                throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
             }
         }
 

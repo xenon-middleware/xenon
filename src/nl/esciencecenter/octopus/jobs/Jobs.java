@@ -194,10 +194,10 @@ public interface Jobs {
      *             If the scheduler is not known.
      * @throws IncompleteJobDescriptionException
      *             If the description did not contain the required information.
-     * @throws IllegalJobDescriptionException
-     *             If the description is not legal for this scheduler.
      * @throws InvalidJobDescriptionException
-     *             If the description contains conflicting options.
+     *             If the description contains illegal or conflicting values.
+     * @throws UnsupportedJobDescriptionException
+     *             If the description is not legal for this scheduler.
      * @throws OctopusException
      *             If the Scheduler failed to get submit the job.
      * @throws OctopusIOException

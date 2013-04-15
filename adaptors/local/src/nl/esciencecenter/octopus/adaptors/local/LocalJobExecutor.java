@@ -21,7 +21,6 @@ import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 
 import org.slf4j.Logger;
@@ -29,13 +28,13 @@ import org.slf4j.LoggerFactory;
 
 public class LocalJobExecutor implements Runnable {
 
-    protected static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
-
+    private static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
+    
     private final Job job;
+    
+    private final int pollingDelay;
 
-    private Integer exitCode;
-
-    private Thread thread = null;
+    private int [] exitStatus;
 
     private boolean killed = false;
 
@@ -45,48 +44,22 @@ public class LocalJobExecutor implements Runnable {
 
     private Exception error;
 
-    public LocalJobExecutor(Job job) throws BadParameterException {
-
+    public LocalJobExecutor(Job job, int pollingDelay) throws BadParameterException {
         this.job = job;
-
-        if (job.getJobDescription().getProcessesPerNode() <= 0) {
-            throw new BadParameterException("number of processes cannot be negative or 0", LocalAdaptor.ADAPTOR_NAME, null);
-        }
-
-        if (job.getJobDescription().getNodeCount() != 1) {
-            throw new BadParameterException("number of nodes must be 1", LocalAdaptor.ADAPTOR_NAME, null);
-        }
-
-        // thread will be started by local scheduler
+        this.pollingDelay = pollingDelay;
     }
 
-    public synchronized int getExitStatus() throws OctopusException {
+    public synchronized int [] getExitStatus() throws OctopusException {
+        
         if (!isDone()) {
-            throw new OctopusException("Cannot get state, job not done yet", LocalAdaptor.ADAPTOR_NAME, null);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job not done!");
         }
-        return exitCode;
-    }
 
-    private synchronized void setExitStatus(int exitStatus) {
-        this.exitCode = exitStatus;
-        done = true;
+        return exitStatus;
     }
 
     public synchronized void kill() throws OctopusException {
         killed = true;
-
-        if (thread != null) {
-            thread.interrupt();
-        }
-    }
-
-    private synchronized void updateState(String state) {
-        this.state = state;
-    }
-
-    private synchronized void setError(Exception e) {
-        error = e;
-        done = true;
     }
 
     public synchronized boolean isDone() {
@@ -98,6 +71,23 @@ public class LocalJobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
+        
+        Integer exitCode = null;
+        
+        if (exitStatus != null) { 
+            
+            int tmp = 0;
+            
+            for (int i=0;i<exitStatus.length;i++) { 
+                if (exitStatus[i] != 0) { 
+                    tmp = exitStatus[i];
+                    break;
+                }
+            }
+            
+            exitCode = tmp;
+        }
+        
         return new JobStatusImplementation(job, state, exitCode, error, done, null);
     }
 
@@ -109,45 +99,83 @@ public class LocalJobExecutor implements Runnable {
         return error;
     }
 
+    private synchronized void updateState(String state) {
+        this.state = state;
+    }
+    
+    private synchronized void setError(Exception e) {
+        state = "ERROR";
+        error = e;
+        done = true;
+    }
+
+    private synchronized boolean getKilled() { 
+        return killed;
+    }
+
+    private synchronized void setDone(int [] exitStatus) {
+        state = "DONE";
+        this.exitStatus = exitStatus; 
+        done = true;
+    }
+
+    private synchronized void setKilled(Exception e) {
+        state = "KILLED";
+        error = e;
+        done = true;
+    }
+    
     @Override
     public void run() {
 
-        try {
-            synchronized (this) {
-                if (killed) {
-                    updateState("KILLED");
-                    throw new IOException("Job killed");
-                }
-                this.thread = Thread.currentThread();
-            }
+        ParallelProcess parallelProcess = null;
+        long endTime = 0;
+        int maxTime = job.getJobDescription().getMaxTime();
+        
+        if (getKilled()) {
+            setKilled(new IOException("Process cancelled by user."));
+            return;
+        }
 
-            updateState("INITIAL");
+        updateState("INITIAL");
 
-            if (Thread.currentThread().isInterrupted()) {
-                updateState("KILLED");
-                throw new IOException("Job killed");
-            }
-
-            JobDescription description = job.getJobDescription();
-
-            ParallelProcess parallelProcess =
-                    new ParallelProcess(description.getProcessesPerNode(), description.getExecutable(),
-                            description.getArguments(), description.getEnvironment(), description.getWorkingDirectory(),
-                            description.getStdin(), description.getStdout(), description.getStderr());
-
-            updateState("RUNNING");
-
-            try {
-                setExitStatus(parallelProcess.waitFor());
-            } catch (InterruptedException e) {
-                parallelProcess.destroy();
-            }
-
-            updateState("DONE");
-
+        if (maxTime > 0) { 
+            endTime = System.currentTimeMillis() + maxTime * 60 * 1000;
+        }
+        
+        try {             
+            parallelProcess = new ParallelProcess(job.getJobDescription());
         } catch (IOException e) {
             setError(e);
-            updateState("ERROR");
+            return;
+        }
+
+        updateState("RUNNING");
+            
+        while (true) { 
+
+            if (parallelProcess.isDone()) {
+                setDone(parallelProcess.getExitStatus());
+                return;
+            }
+
+            if (getKilled()) {
+                setKilled(new IOException("Process cancelled by user."));
+                parallelProcess.destroy();
+                return;
+            }
+               
+            if (maxTime > 0 && System.currentTimeMillis() > endTime) {
+                setKilled(new IOException("Process timed out."));
+                parallelProcess.destroy();
+                return;
+            }
+                
+            try { 
+                Thread.sleep(pollingDelay);
+            } catch (InterruptedException e) { 
+                // ignored
+            }
         }
     }
 }

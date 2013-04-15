@@ -23,6 +23,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 public class Sandbox {
@@ -46,7 +47,7 @@ public class Sandbox {
         }
     }
 
-    public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException {
+    public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
         this.octopus = octopus;
 
         if (sandboxName == null) {
@@ -54,8 +55,18 @@ public class Sandbox {
         } else {
             path = root.resolve(new RelativePath(sandboxName));
         }
+        
+        Files files = octopus.files();
+        
+        if (!files.exists(path)) { 
+            files.createDirectory(path);
+        }
     }
 
+    public AbsolutePath getPath() { 
+        return path;
+    }
+    
     public List<Pair> getUploadFiles() {
         return uploadFiles;
     }
@@ -83,16 +94,19 @@ public class Sandbox {
         return downloadFiles;
     }
 
-    public void setDownloadFiles(String... files) {
-        downloadFiles = new LinkedList<Pair>();
-        for (int i = 0; i < files.length; i++) {
-            addDownloadFile(files[i]);
-        }
-    }
-
-    public void addDownloadFile(String src) {
-        addDownloadFile(src, null);
-    }
+// FIXME!
+//    
+//    public void setDownloadFiles(String... files) {
+//        downloadFiles = new LinkedList<Pair>();
+//        
+//        for (int i = 0; i < files.length; i++) {
+//            addDownloadFile(files[i]);
+//        }
+//    }
+//
+//    public void addDownloadFile(String src) {
+//        addDownloadFile(src, src);
+//    }
 
     public void addDownloadFile(String src, AbsolutePath dest) {
         if (src == null) {
@@ -103,9 +117,8 @@ public class Sandbox {
     }
 
     private void copy(List<Pair> pairs) throws OctopusIOException {
-
         for (Pair pair : pairs) {
-            FileUtils.recursiveCopy(octopus, pair.source, pair.destination, CopyOption.COPY_ATTRIBUTES);
+            FileUtils.recursiveCopy(octopus, pair.source, pair.destination);
         }
     }
 

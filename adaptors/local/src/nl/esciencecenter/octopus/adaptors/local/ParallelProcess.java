@@ -20,8 +20,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +28,7 @@ import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.engine.util.MergingOutputStream;
 import nl.esciencecenter.octopus.engine.util.StreamForwarder;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.jobs.JobDescription;
 
 class ParallelProcess {
 
@@ -44,19 +43,36 @@ class ParallelProcess {
     private final MergingOutputStream stdoutStream;
     private final MergingOutputStream stderrStream;
 
-    ParallelProcess(int count, String executable, List<String> arguments, Map<String, String> environment,
-            String workingDirectory, String stdin, String stdout, String stderr) throws IOException {
+    private final int [] exitCodes;
+    private final boolean [] done;
+    
+    ParallelProcess(JobDescription description) throws IOException { 
+
+        int count = description.getProcessesPerNode();
+
+        exitCodes = new int[count];
+        done = new boolean[count];
+
         ProcessBuilder builder = new ProcessBuilder();
+            
+        String workingDirectory = description.getWorkingDirectory();
+        String stdout = description.getStdout();
+        String stderr = description.getStderr();
+        String stdin = description.getStdin();
+        
+        builder.command().add(description.getExecutable());
+        builder.command().addAll(description.getArguments());
+        builder.environment().putAll(description.getEnvironment());
+        builder.directory(new java.io.File(description.getWorkingDirectory()));
 
-        builder.command().add(executable);
-        builder.command().addAll(arguments);
-
-        builder.environment().putAll(environment);
-        builder.directory(new java.io.File(workingDirectory));
-
-        // buffered streams, will also synchronize
-        stdoutStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stdout));
-        stderrStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stderr));
+        // Merge stdout and stderr into a single stream
+        if (description.getMergeOutputStreams()) {             
+            stdoutStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stdout));
+            stderrStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stderr));
+        } else { 
+            stdoutStream = null;
+            stderrStream = null;
+        }
 
         processes = new Process[count];
         stdinForwarders = new StreamForwarder[count];
@@ -70,13 +86,20 @@ class ParallelProcess {
                 stdinForwarders[i] = null;
                 processes[i].getOutputStream().close();
             } else {
-                stdinForwarders[i] =
-                        new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin),
+                stdinForwarders[i] = new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin),
                                 processes[i].getOutputStream());
             }
 
-            stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), stdoutStream);
-            stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
+            if (description.getMergeOutputStreams()) { 
+                stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), stdoutStream);
+                stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
+            } else { 
+                stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), 
+                        new FileOutputStream(workingDirectory + File.separator + stdout + "." + i));
+                 
+                stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(),
+                        new FileOutputStream(workingDirectory + File.separator + stderr  + "." + i));
+            }
         }
     }
 
@@ -91,19 +114,26 @@ class ParallelProcess {
             stdoutForwarders[i].close();
             stderrForwarders[i].close();
         }
+        
         try {
-            stdoutStream.close();
+            if (stdoutStream != null) { 
+                stdoutStream.close();
+            }
         } catch (IOException e) {
             // IGNORE
         }
+        
         try {
-            stderrStream.close();
+            if (stderrStream != null) { 
+                stderrStream.close();
+            }
         } catch (IOException e) {
             // IGNORE
         }
     }
 
     public int waitFor() throws InterruptedException {
+        
         int[] results = new int[processes.length];
 
         for (int i = 0; i < processes.length; i++) {
@@ -113,6 +143,24 @@ class ParallelProcess {
         return results[0];
     }
 
+    public boolean isDone() {
+        
+        for (int i=0;i<processes.length;i++) {
+            
+            if (!done[i]) {
+                try { 
+                    exitCodes[i] = processes[i].exitValue();
+                    done[i] = true;
+                } catch (IllegalThreadStateException e) { 
+                    // ignored
+                    return false;
+                }
+            }
+        } 
+        
+        return true;
+    }
+    
     private void unixDestroy(Process process) throws Throwable {
         Field pidField = process.getClass().getDeclaredField("pid");
 
@@ -127,12 +175,16 @@ class ParallelProcess {
         CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
 
         if (killRunner.getExitCode() != 0) {
-            throw new OctopusException("Failed to kill process, exit code was " + killRunner.getExitCode() + " output: "
-                    + killRunner.getStdout() + " error: " + killRunner.getStderr(), "local", null);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was " + 
+                    killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
         }
 
     }
 
+    public int[] getExitStatus() {
+        return exitCodes;
+    }
+    
     public void destroy() {
         for (int i = 0; i < processes.length; i++) {
             try {
@@ -143,5 +195,6 @@ class ParallelProcess {
             }
         }
     }
+
 
 }

@@ -66,6 +66,9 @@ public class JobDescription {
 
     /** Should the job be run offline? */
     private boolean offlineMode = false;
+    
+    /** Should the output streams be merged? */
+    private boolean mergeOutput = true;
 
     /**
      * Create a JobDescription.
@@ -221,7 +224,7 @@ public class JobDescription {
      * 
      * @return if the job will run in offline mode.
      */
-    public boolean offlineMode() {
+    public boolean getOfflineMode() {
         return offlineMode;
     }
 
@@ -309,6 +312,24 @@ public class JobDescription {
      */
     public String getWorkingDirectory() {
         return workingDirectory;
+    }
+    
+    /**
+     * Set if the the output streams of a parallel job should be merged.
+     * 
+     * @param value if the the output streams of a parallel job should be merged.
+     */
+    public void setMergeOutputStreams(boolean value) { 
+        mergeOutput = value;
+    }
+    
+    /**
+     * Get if the the output streams of a parallel job should be merged.
+     * 
+     * @return if the the output streams of a parallel job should be merged.
+     */    
+    public boolean getMergeOutputStreams() { 
+        return mergeOutput;
     }
 
     @Override

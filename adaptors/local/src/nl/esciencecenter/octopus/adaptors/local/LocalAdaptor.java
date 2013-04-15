@@ -48,6 +48,9 @@ public class LocalAdaptor extends Adaptor {
     /** Property for maximum history length for finished jobs */
     public static final String MAX_HISTORY = QUEUE + "historySize";
 
+    /** Property for maximum history length for finished jobs */
+    public static final String POLLING_DELAY = QUEUE + "pollingDelay";
+    
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
 
@@ -57,6 +60,7 @@ public class LocalAdaptor extends Adaptor {
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
+            { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
             { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
 
     /** Local implementation for Files */
