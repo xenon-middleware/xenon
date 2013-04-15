@@ -50,8 +50,8 @@ public class GridengineAdaptor extends Adaptor {
             throw new InvalidLocationException(GridengineAdaptor.ADAPTOR_NAME,
                     "Fragments are not allowed in a uri for this scheduler, uri given: " + location);
         }
-        
-        for(String scheme: ADAPTOR_SCHEMES) {
+
+        for (String scheme : ADAPTOR_SCHEMES) {
             if (scheme.equals(location.getScheme())) {
                 //alls-well
                 return;

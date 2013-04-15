@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine.files;
 
 import java.io.InputStream;
@@ -38,7 +53,7 @@ public class FilesEngine implements Files {
             return true;
         }
     };
-    
+
     private final OctopusEngine octopusEngine;
 
     public FilesEngine(OctopusEngine octopusEngine) {
@@ -46,31 +61,30 @@ public class FilesEngine implements Files {
     }
 
     private Files getFilesAdaptor(FileSystem filesystem) throws OctopusIOException {
-        
-        try { 
+
+        try {
             Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
-            return adaptor.filesAdaptor();        
+            return adaptor.filesAdaptor();
         } catch (OctopusException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException(getClass().getName(), "could not find adaptor named " + 
-                    filesystem.getAdaptorName(), e);
+            throw new OctopusRuntimeException(getClass().getName(),
+                    "could not find adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
 
-    
     private Files getFilesAdaptor(AbsolutePath path) throws OctopusIOException {
-        
+
         FileSystem filesystem = path.getFileSystem();
-        
-        try { 
+
+        try {
             Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
-            return adaptor.filesAdaptor();        
+            return adaptor.filesAdaptor();
         } catch (OctopusException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException(getClass().getName(), "could not find adaptor named " + 
-                    path.getFileSystem().getAdaptorName(), e);
+            throw new OctopusRuntimeException(getClass().getName(), "could not find adaptor named "
+                    + path.getFileSystem().getAdaptorName(), e);
         }
     }
 
@@ -80,7 +94,7 @@ public class FilesEngine implements Files {
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
         return adaptor.filesAdaptor().newFileSystem(location, credential, properties);
     }
-    
+
     @Override
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
         return getFilesAdaptor(filesystem).newPath(filesystem, location);
@@ -98,10 +112,10 @@ public class FilesEngine implements Files {
 
     @Override
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        
+
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
-        
+
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).copy(source, target);
         } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
@@ -124,10 +138,10 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException { 
+    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException {
         return getFilesAdaptor(path).createFile(path);
     }
-    
+
     @Override
     public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
         return getFilesAdaptor(link).createSymbolicLink(link, target);
@@ -137,7 +151,7 @@ public class FilesEngine implements Files {
     public void delete(AbsolutePath path) throws OctopusIOException {
         getFilesAdaptor(path).delete(path);
     }
-   
+
     @Override
     public boolean exists(AbsolutePath path) throws OctopusIOException {
         return getFilesAdaptor(path).exists(path);
@@ -150,10 +164,10 @@ public class FilesEngine implements Files {
 
     @Override
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        
+
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
-        
+
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).move(source, target);
         } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
@@ -174,27 +188,28 @@ public class FilesEngine implements Files {
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir);
     }
-    
+
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
         return getFilesAdaptor(dir).newDirectoryStream(dir, filter);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, Filter filter) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, Filter filter)
+            throws OctopusIOException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir, filter);
     }
-    
+
     @Override
     public InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
         return getFilesAdaptor(path).newInputStream(path);
     }
-    
+
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         return getFilesAdaptor(path).newOutputStream(path, options);
     }
-    
+
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         return getFilesAdaptor(path).newByteChannel(path, options);
@@ -221,7 +236,8 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime) throws OctopusIOException {
+    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
+            throws OctopusIOException {
         getFilesAdaptor(path).setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
     }
 

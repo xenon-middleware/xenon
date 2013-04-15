@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine;
 
 import java.util.ArrayList;
@@ -29,7 +44,7 @@ public class OctopusEngine implements Octopus {
 
     /** The local adaptor is a special case, therefore we publish its name here. */
     public static final String LOCAL_ADAPTOR_NAME = "local";
-    
+
     /** All our own properties start with this prefix. */
     public static final String PREFIX = "octopus.";
 
@@ -40,41 +55,45 @@ public class OctopusEngine implements Octopus {
     public static final String LOAD = ADAPTORS + "load";
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] VALID_PROPERTIES = new String[][] {
-            { LOAD, null, "List: comma separated list of the adaptors to load." }};
-    
+    private static final String[][] VALID_PROPERTIES = new String[][] { { LOAD, null,
+            "List: comma separated list of the adaptors to load." } };
+
     private static final Logger logger = LoggerFactory.getLogger(OctopusEngine.class);
 
     /** All OctopusEngines created so far */
     private static final ArrayList<OctopusEngine> octopusEngines = new ArrayList<OctopusEngine>();
 
-    /** 
+    /**
      * Create a new Octopus using the given properties.
      * 
-     * @param properties the properties used to create the Octopus. 
-     * @return the newly created Octopus created. 
+     * @param properties
+     *            the properties used to create the Octopus.
+     * @return the newly created Octopus created.
      * 
-     * @throws UnknownPropertyException If an unknown property was passed.
-     * @throws IllegalPropertyException If a known property was passed with an illegal value.
-     * @throws OctopusException If the Octopus failed initialize.
+     * @throws UnknownPropertyException
+     *             If an unknown property was passed.
+     * @throws IllegalPropertyException
+     *             If a known property was passed with an illegal value.
+     * @throws OctopusException
+     *             If the Octopus failed initialize.
      */
     public static Octopus newOctopus(Properties properties) throws OctopusException {
 
         OctopusEngine result = new OctopusEngine(properties);
 
-        synchronized (octopusEngines)  {
+        synchronized (octopusEngines) {
             octopusEngines.add(result);
         }
 
         return result;
     }
-    
+
     public static void closeOctopus(Octopus engine) throws OctopusException {
 
         OctopusEngine result = null;
-        
-        synchronized (octopusEngines)  {           
-            for (int i=0;i<octopusEngines.size();i++) { 
+
+        synchronized (octopusEngines) {
+            for (int i = 0; i < octopusEngines.size(); i++) {
                 if (octopusEngines.get(i) == engine) {
                     result = octopusEngines.remove(i);
                     break;
@@ -82,21 +101,21 @@ public class OctopusEngine implements Octopus {
             }
         }
 
-        if (result == null) { 
+        if (result == null) {
             throw new OctopusException("engine", "No such OctopusEngine");
-        } 
-        
+        }
+
         result.end();
     }
 
     public static void endAll() {
-        synchronized (octopusEngines)  {                       
+        synchronized (octopusEngines) {
             for (OctopusEngine octopusEngine : octopusEngines) {
                 octopusEngine.end();
             }
         }
     }
-    
+
     private boolean ended = false;
 
     private OctopusProperties octopusProperties;
@@ -112,16 +131,20 @@ public class OctopusEngine implements Octopus {
     /**
      * Constructs a OctopusEngine.
      * 
-     * @param properties the properties to use. Will NOT be copied.
-     *            
-     * @throws UnknownPropertyException If an unknown property was passed.
-     * @throws IllegalPropertyException If a known property was passed with an illegal value.
-     * @throws OctopusException If the Octopus failed initialize.
+     * @param properties
+     *            the properties to use. Will NOT be copied.
+     * 
+     * @throws UnknownPropertyException
+     *             If an unknown property was passed.
+     * @throws IllegalPropertyException
+     *             If a known property was passed with an illegal value.
+     * @throws OctopusException
+     *             If the Octopus failed initialize.
      */
     private OctopusEngine(Properties properties) throws OctopusException {
-      
+
         octopusProperties = new OctopusProperties(VALID_PROPERTIES, properties);
-        
+
         adaptors = AdaptorLoader.loadAdaptors(octopusProperties, this);
 
         filesEngine = new FilesEngine(this);
@@ -137,13 +160,13 @@ public class OctopusEngine implements Octopus {
 
     @Override
     public AdaptorStatus[] getAdaptorInfos() {
-        
-        AdaptorStatus [] status = new AdaptorStatus[adaptors.length];
-        
-        for (int i=0;i<adaptors.length;i++) { 
+
+        AdaptorStatus[] status = new AdaptorStatus[adaptors.length];
+
+        for (int i = 0; i < adaptors.length; i++) {
             status[i] = adaptors[i].getAdaptorStatus();
         }
-        
+
         return status;
     }
 
@@ -160,7 +183,7 @@ public class OctopusEngine implements Octopus {
      * @return the adaptor
      */
     public Adaptor getAdaptorFor(String scheme) throws OctopusException {
-        
+
         for (Adaptor adaptor : adaptors) {
             if (adaptor.supports(scheme)) {
                 return adaptor;

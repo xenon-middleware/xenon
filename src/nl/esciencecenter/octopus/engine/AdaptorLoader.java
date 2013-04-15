@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine;
 
 import java.io.File;
@@ -120,12 +135,12 @@ class AdaptorLoader {
 
         return result;
     }
-    
+
     private static String fixName(String name) {
-        if (name.length() == 1) { 
+        if (name.length() == 1) {
             return name.substring(0, 1).toUpperCase();
         }
-        
+
         return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }
 
@@ -133,8 +148,7 @@ class AdaptorLoader {
             throws OctopusException {
         try {
             Thread.currentThread().setContextClassLoader(loader);
-            Class<?> clazz =
-                    loader.loadClass("nl.esciencecenter.octopus.adaptors." + name + "." + fixName(name) + "Adaptor");
+            Class<?> clazz = loader.loadClass("nl.esciencecenter.octopus.adaptors." + name + "." + fixName(name) + "Adaptor");
 
             Constructor<?> constructor = clazz.getConstructor(new Class[] { OctopusProperties.class, OctopusEngine.class });
 
@@ -155,7 +169,7 @@ class AdaptorLoader {
     private static final Logger logger = LoggerFactory.getLogger(AdaptorLoader.class);
 
     static Adaptor[] loadAdaptors(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-                
+
         ArrayList<File> candidateFiles = new ArrayList<File>();
 
         // find jar files that potentially contain adaptors
@@ -165,8 +179,8 @@ class AdaptorLoader {
             String classPath = System.getProperty("java.class.path");
 
             if (classPath == null) {
-                throw new OctopusException("AdaptorLoader", "Failed to load adaptors. Cannot get classpath, and " + ADAPTOR_DIR_PROPERTY
-                        + " not set");
+                throw new OctopusException("AdaptorLoader", "Failed to load adaptors. Cannot get classpath, and "
+                        + ADAPTOR_DIR_PROPERTY + " not set");
             }
 
             String[] pathElements = classPath.split(java.io.File.pathSeparator);
@@ -250,11 +264,11 @@ class AdaptorLoader {
         // load and initialize all adaptors
         ArrayList<Adaptor> adaptors = new ArrayList<Adaptor>();
 
-        String [] adaptorsToLoad = properties.getStringList(OctopusEngine.LOAD);
-        
+        String[] adaptorsToLoad = properties.getStringList(OctopusEngine.LOAD);
+
         for (String adaptorName : adaptorNames) {
-            
-            if (checkAdaptorName(adaptorName, adaptorsToLoad)) { 
+
+            if (checkAdaptorName(adaptorName, adaptorsToLoad)) {
                 ClassLoader adaptorClassLoader = new JarFsClassLoader(fileSystems, adaptorName, sharedLoader);
                 Adaptor adaptor = newAdaptor(adaptorClassLoader, adaptorName, properties, octopusEngine);
 
@@ -270,27 +284,29 @@ class AdaptorLoader {
 
         return adaptors.toArray(new Adaptor[adaptors.size()]);
     }
-    
-    /** 
-     * Check if the adaptor name is present in the list. 
+
+    /**
+     * Check if the adaptor name is present in the list.
      * 
-     * @param adaptorName adaptor name to check for. 
-     * @param adaptorsToLoad list of adaptor names. 
+     * @param adaptorName
+     *            adaptor name to check for.
+     * @param adaptorsToLoad
+     *            list of adaptor names.
      * 
      * @return if the adaptor name is present in the list.
      */
-    private static boolean checkAdaptorName(String adaptorName, String [] adaptorsToLoad) { 
-        
-        if (adaptorsToLoad == null || adaptorsToLoad.length == 0) { 
+    private static boolean checkAdaptorName(String adaptorName, String[] adaptorsToLoad) {
+
+        if (adaptorsToLoad == null || adaptorsToLoad.length == 0) {
             return true;
         }
-        
-        for (int i=0;i<adaptorsToLoad.length;i++) { 
-            if (adaptorName.equals(adaptorsToLoad[i])) { 
+
+        for (int i = 0; i < adaptorsToLoad.length; i++) {
+            if (adaptorName.equals(adaptorsToLoad[i])) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }

@@ -71,7 +71,7 @@ public class SshAdaptor extends Adaptor {
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
-            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." }, 
+            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." } };
     private final SshFiles filesAdaptor;
 
@@ -166,7 +166,7 @@ public class SshAdaptor extends Adaptor {
        required feature is not supported by the server, or it may be
        returned by the server if the server does not implement an
        operation).
- */
+    */
     OctopusIOException sftpExceptionToOctopusException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
@@ -251,20 +251,21 @@ public class SshAdaptor extends Adaptor {
         if (host == null) {
             host = "localhost";
         }
-        
-        String credentialUserName = ((CredentialImplementation)credential).getUsername();
-        if(user != null && credentialUserName != null && !user.equals(credentialUserName)) {
-            throw new BadParameterException(getName(), "If a user name is given in the URI, it must match the one in the credential");
+
+        String credentialUserName = ((CredentialImplementation) credential).getUsername();
+        if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
+            throw new BadParameterException(getName(),
+                    "If a user name is given in the URI, it must match the one in the credential");
         }
-        
-        if(user == null) {
+
+        if (user == null) {
             user = credentialUserName;
         }
 
-        if(user == null) {
+        if (user == null) {
             throw new BadParameterException(getName(), "no user name given. Specify it in URI or credential.");
         }
-        
+
         logger.debug("creating new session to " + user + "@" + host + ":" + port);
 
         Session session;
@@ -275,16 +276,15 @@ public class SshAdaptor extends Adaptor {
             return null;
         }
 
-
         setCredential((CredentialImplementation) credential, session);
 
-        if(getProperties().getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
+        if (getProperties().getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
             session.setConfig("StrictHostKeyChecking", "yes");
         } else {
             session.setConfig("StrictHostKeyChecking", "no");
         }
-        
-        if(getProperties().getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
+
+        if (getProperties().getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
             String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
             logger.debug("setting ssh known hosts file to: " + knownHosts);
             setKnownHostsFile(knownHosts);
@@ -301,7 +301,9 @@ public class SshAdaptor extends Adaptor {
 
     /**
      * Get a connected channel for doing sftp operations.
-     * @param session The authenticated session.
+     * 
+     * @param session
+     *            The authenticated session.
      * @return the channel
      * @throws OctopusIOException
      */
@@ -321,14 +323,17 @@ public class SshAdaptor extends Adaptor {
     }
 
     /**
-     * Get a new exec channel. The channel is not connected yet, because the input and outp[ut streams should be set before connecting.
-     * @param session The authenticated session.
+     * Get a new exec channel. The channel is not connected yet, because the input and outp[ut streams should be set before
+     * connecting.
+     * 
+     * @param session
+     *            The authenticated session.
      * @return the channel
      * @throws OctopusIOException
      */
     protected ChannelExec getExecChannel(Session session) throws OctopusIOException {
         ChannelExec channel;
-        
+
         try {
             channel = (ChannelExec) session.openChannel("exec");
             return channel;

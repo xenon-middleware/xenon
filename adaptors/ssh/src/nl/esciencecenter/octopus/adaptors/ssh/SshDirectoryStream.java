@@ -22,23 +22,23 @@ public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterat
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
-        
+
         filterSpecials(listing);
     }
 
     public static void filterSpecials(Vector<LsEntry> listing) {
         // filter out the "." and ".."
         int index = 0;
-        while(index < listing.size()) {
+        while (index < listing.size()) {
             LsEntry e = listing.get(index);
-            if(e.getFilename().equals(".") || e.getFilename().equals("..")) {
+            if (e.getFilename().equals(".") || e.getFilename().equals("..")) {
                 listing.remove(index);
             } else {
                 index++;
             }
-        }        
+        }
     }
-    
+
     @Override
     public Iterator<AbsolutePath> iterator() {
         return this;

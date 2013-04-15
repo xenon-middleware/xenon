@@ -25,7 +25,7 @@ public class FilesEngineTest {
 
     /**
      * Create fake Octopus with one file adaptor.
-     *
+     * 
      * @param files_adaptor
      * @param adaptor_name
      * @param scheme_name
@@ -40,7 +40,7 @@ public class FilesEngineTest {
 
     /**
      * Add a fake file adaptor to Octopus instance.
-     *
+     * 
      * @param octopus
      * @param files_adaptor
      * @param adaptor_name
@@ -57,7 +57,8 @@ public class FilesEngineTest {
     public FileSystemImplementation getFileSystem(String adaptor_name, URI root_location) throws URISyntaxException {
         String fs_uid = "1";
         OctopusProperties oprops = new OctopusProperties();
-        FileSystemImplementation filesystem = new FileSystemImplementation(adaptor_name, fs_uid, root_location, null, null, oprops);
+        FileSystemImplementation filesystem =
+                new FileSystemImplementation(adaptor_name, fs_uid, root_location, null, null, oprops);
         return filesystem;
     }
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine.credentials;
 
 import java.util.Properties;
@@ -16,20 +31,22 @@ public class CredentialsEngineImplementation implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile, String username, String password)
-            throws OctopusException {
+    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
+            String username, String password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, properties, keyfile, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password) throws OctopusException {
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password)
+            throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, properties, username, password);
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username, String password) throws OctopusException {
+    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
+            String password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newProxyCredential(scheme, properties, host, port, username, password);
     }

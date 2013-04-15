@@ -232,8 +232,8 @@ public class GridEngineJobs implements Jobs {
                         exitCode = Integer.parseInt(exitCodeString);
                     }
                 } catch (NumberFormatException e) {
-                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier() + " from string "
-                            + exitCodeString, e);
+                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
+                            + job.getIdentifier() + " from string " + exitCodeString, e);
 
                 }
 

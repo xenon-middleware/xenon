@@ -35,7 +35,7 @@ public class XmlOutputParser {
     private final DocumentBuilder documentBuilder;
 
     private final boolean ignoreVersion;
-    
+
     XmlOutputParser(OctopusProperties properties) throws OctopusIOException {
         this(properties.getBooleanProperty(GridengineAdaptor.IGNORE_VERSION_PROPERTY));
     }
@@ -89,9 +89,13 @@ public class XmlOutputParser {
 
     /**
      * Debugging version of checkVersion function
-     * @param file the file to check
-     * @throws OctopusException if the version is incorrect
-     * @throws OctopusIOException if the file cannot be read or parsed
+     * 
+     * @param file
+     *            the file to check
+     * @throws OctopusException
+     *             if the version is incorrect
+     * @throws OctopusIOException
+     *             if the file cannot be read or parsed
      */
     void checkVersion(File file) throws OctopusException, OctopusIOException {
         try {
@@ -179,7 +183,7 @@ public class XmlOutputParser {
 
         return result;
     }
-    
+
     /**
      * Parses job info from "qstat -xml"
      * 
@@ -224,7 +228,7 @@ public class XmlOutputParser {
                         }
                     }
                 }
-                
+
                 String state = element.getAttribute("state");
 
                 if (state != null && state.length() > 0) {

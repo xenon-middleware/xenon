@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine;
 
 import java.util.Collections;
@@ -28,8 +43,8 @@ public abstract class Adaptor {
     protected final OctopusEngine octopusEngine;
 
     private final String[][] defaultProperties;
-    
-    private final Map<String,String> supportedProperties;
+
+    private final Map<String, String> supportedProperties;
 
     private final OctopusProperties properties;
 
@@ -45,13 +60,13 @@ public abstract class Adaptor {
         this.supportedSchemes = supportedSchemes;
 
         this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
-        
-        Map<String,String> tmp = new HashMap<String,String>();
-        
-        if (defaultProperties != null) { 
+
+        Map<String, String> tmp = new HashMap<String, String>();
+
+        if (defaultProperties != null) {
             for (int i = 0; i < defaultProperties.length; i++) {
                 tmp.put(defaultProperties[i][0], defaultProperties[i][2]);
-            }  
+            }
         }
 
         this.supportedProperties = Collections.unmodifiableMap(tmp);
@@ -84,7 +99,7 @@ public abstract class Adaptor {
     public String getName() {
         return name;
     }
-    
+
     public boolean supports(String scheme) {
 
         for (String s : supportedSchemes) {
@@ -99,18 +114,18 @@ public abstract class Adaptor {
     public Map<String, String> getSupportedProperties() {
         return supportedProperties;
     }
-    
+
     public AdaptorStatus getAdaptorStatus() {
-        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedProperties, 
+        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedProperties,
                 getAdaptorSpecificInformation());
     }
 
-    public String [] getSupportedSchemes() { 
+    public String[] getSupportedSchemes() {
         return supportedSchemes;
     }
 
     public abstract Map<String, String> getAdaptorSpecificInformation();
-    
+
     public abstract Files filesAdaptor() throws OctopusException;
 
     public abstract Jobs jobsAdaptor() throws OctopusException;

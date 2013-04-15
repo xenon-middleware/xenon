@@ -121,9 +121,9 @@ public class SshJobs implements Jobs {
         }
 
         String uniqueID = getNewUniqueID();
-        
+
         Session session = adaptor.createNewSession(uniqueID, location, credential);
-        
+
         SchedulerImplementation sshScheduler =
                 new SchedulerImplementation(adaptor.getName(), uniqueID, location, new String[] { "single" }, credential,
                         new OctopusProperties(properties), true, false);
@@ -166,21 +166,21 @@ public class SshJobs implements Jobs {
         }
 
         SchedulerImplementation impl = (SchedulerImplementation) scheduler;
-        
+
         Job result = new JobImplementation(description, scheduler, "sshjob-" + getNextJobID());
 
         SchedulerInfo info = schedulers.get(impl.getUniqueID());
 
-        if(info == null) {
+        if (info == null) {
             throw new OctopusException(adaptor.getName(), "cannot find job with id: " + impl.getUniqueID());
         }
-        
+
         logger.debug("found scheduler " + impl.getUniqueID());
-        
-        if(info.getSession() == null) {
+
+        if (info.getSession() == null) {
             logger.debug("EEEK");
         }
-        
+
         SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, info.getSession(), result);
 
         String queueName = description.getQueueName();

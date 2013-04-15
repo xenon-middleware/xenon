@@ -19,11 +19,11 @@ public class LocalFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         String tmpdir = System.getProperty("java.io.tmpdir");
-        
+
         System.err.println("tmpdir = " + tmpdir);
 
         FileSystem fs = octopus.files().newFileSystem(new URI("file:///"), null, null);
-        
+
         AbsolutePath path = octopus.files().newPath(fs, new RelativePath(tmpdir));
 
         Assert.assertTrue(octopus.files().exists(path));
@@ -37,7 +37,7 @@ public class LocalFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         FileSystem fs = octopus.files().newFileSystem(new URI("file:///"), null, null);
-        
+
         AbsolutePath tmpDir = octopus.files().newPath(fs, new RelativePath(System.getProperty("java.io.tmpdir")));
 
         System.err.println("tmpdir = " + tmpDir);
@@ -46,7 +46,8 @@ public class LocalFileTests {
 
         assertTrue(octopus.files().isDirectory(tmpDir));
 
-        AbsolutePath sandboxDir = octopus.files().newPath(fs, new RelativePath(System.getProperty("java.io.tmpdir") + "/test-sandbox"));
+        AbsolutePath sandboxDir =
+                octopus.files().newPath(fs, new RelativePath(System.getProperty("java.io.tmpdir") + "/test-sandbox"));
 
         if (octopus.files().exists(sandboxDir)) {
             System.err.println("deleting " + sandboxDir);

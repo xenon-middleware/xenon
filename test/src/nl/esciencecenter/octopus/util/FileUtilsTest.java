@@ -154,7 +154,7 @@ public class FileUtilsTest {
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(true);
         when(dstFile.getPath()).thenReturn("foo");
-        FileSystem dstFs =  mock(FileSystem.class);
+        FileSystem dstFs = mock(FileSystem.class);
         when(dstFile.getFileSystem()).thenReturn(dstFs);
         when(dstFs.getAdaptorName()).thenReturn("ssh");
 
@@ -183,7 +183,7 @@ public class FileUtilsTest {
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
         when(dstDir.getPath()).thenReturn("foo");
-        FileSystem dstFs =  mock(FileSystem.class);
+        FileSystem dstFs = mock(FileSystem.class);
         when(dstDir.getFileSystem()).thenReturn(dstFs);
         when(dstFs.getAdaptorName()).thenReturn("ssh");
 
@@ -220,7 +220,7 @@ public class FileUtilsTest {
         when(iterator.next()).thenReturn(srcFile);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
         when(dstFile.getPath()).thenReturn("myfile");
-        FileSystem dstFs =  mock(FileSystem.class);
+        FileSystem dstFs = mock(FileSystem.class);
         when(dstFile.getFileSystem()).thenReturn(dstFs);
         when(dstFs.getAdaptorName()).thenReturn("ssh");
 

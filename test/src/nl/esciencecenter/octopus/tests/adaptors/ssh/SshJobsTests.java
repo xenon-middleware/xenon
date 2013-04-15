@@ -33,7 +33,6 @@ public class SshJobsTests {
         octopus.files().createDirectory(root);
         String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
 
-
         JobDescription description = new JobDescription();
         description.setArguments(input_file);
         description.setExecutable("/usr/bin/wc");
@@ -44,7 +43,9 @@ public class SshJobsTests {
         String username = System.getProperty("user.name");
         URI sh_location = new URI("ssh://" + username + "@localhost");
         Credentials c = octopus.credentials();
-        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, credential, null);
 
         Job job = octopus.jobs().submitJob(scheduler, description);

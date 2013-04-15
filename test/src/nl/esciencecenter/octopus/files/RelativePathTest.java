@@ -138,7 +138,6 @@ public class RelativePathTest {
         }
     }
 
-
     public void doSubPath(String input_path, int beginIndex, int endIndex, String epath) {
         RelativePath path = new RelativePath(input_path);
         RelativePath expected_path = new RelativePath(epath);
@@ -213,7 +212,7 @@ public class RelativePathTest {
     public void testEndsWith_False() {
         RelativePath path = new RelativePath("mydir/myfile");
         RelativePath path2 = new RelativePath("mydir");
-        
+
         assertFalse(path.endsWith(path2));
     }
 
@@ -225,7 +224,7 @@ public class RelativePathTest {
 
     @Test
     public void testResolve() {
-        
+
         RelativePath path = new RelativePath("mydir");
         RelativePath path2 = new RelativePath("file");
         RelativePath path3 = new RelativePath("mydir/file");
@@ -235,7 +234,7 @@ public class RelativePathTest {
 
     @Test
     public void testResolveSibling() {
-        
+
         RelativePath path = new RelativePath("mydir/aap");
         RelativePath path2 = new RelativePath("noot");
         RelativePath path3 = new RelativePath("mydir/noot");
@@ -248,7 +247,7 @@ public class RelativePathTest {
         RelativePath path = new RelativePath("a/b/c/d");
         RelativePath path2 = new RelativePath("/a/b");
         RelativePath path3 = new RelativePath("/c/d");
-        RelativePath path4 = path.relativize(path2);    
+        RelativePath path4 = path.relativize(path2);
         assertEquals(path3, path4);
     }
 

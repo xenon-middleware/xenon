@@ -25,7 +25,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
         this.dir = dir;
         this.filter = filter;
         this.listing = listing;
-        
+
         SshDirectoryStream.filterSpecials(listing);
     }
 
@@ -41,7 +41,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     @Override
     public synchronized boolean hasNext() {
-        return current < listing.size()-1;
+        return current < listing.size() - 1;
     }
 
     @Override

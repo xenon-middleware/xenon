@@ -169,7 +169,7 @@ public class SshProcess {
                 // ignore
             }
         }
-        
+
         return channel.getExitStatus();
     }
 

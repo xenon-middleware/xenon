@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.nio.file.LinkOption;
@@ -18,23 +33,23 @@ class LocalUtils {
     //TODO: test this function
     static boolean exists(String path) {
 
-        if (path == null) { 
+        if (path == null) {
             return false;
         }
-        
+
         if (path.startsWith("/~")) {
             path = System.getProperty("user.home") + "/" + path.substring(2);
         }
-    
+
         java.nio.file.Path tmp = java.nio.file.FileSystems.getDefault().getPath(path);
-        
+
         return java.nio.file.Files.exists(tmp, LinkOption.NOFOLLOW_LINKS);
     }
-    
+
     static java.nio.file.Path javaPath(AbsolutePath path) {
-        
+
         String string = path.getPath();
-        
+
         if (string.startsWith("/~")) {
             string = System.getProperty("user.home") + "/" + string.substring(2);
         }
@@ -60,8 +75,7 @@ class LocalUtils {
         return PosixFilePermissions.asFileAttribute(javaPermissions(permissions));
     }
 
-    static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions)
-             {
+    static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
         Set<java.nio.file.attribute.PosixFilePermission> result = new HashSet<java.nio.file.attribute.PosixFilePermission>();
 
         if (permissions == null) {
@@ -125,7 +139,5 @@ class LocalUtils {
         }
         return result;
     }
-    
-    
-    
+
 }

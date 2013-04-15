@@ -343,7 +343,7 @@ public class SshFiles implements Files {
             out = newOutputStream(path);
         } finally {
             try {
-                if(out != null) {
+                if (out != null) {
                     out.close();
                 }
             } catch (IOException e) {
@@ -645,7 +645,6 @@ public class SshFiles implements Files {
             throw adaptor.sftpExceptionToOctopusException(e);
         }
     }
-
 
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {

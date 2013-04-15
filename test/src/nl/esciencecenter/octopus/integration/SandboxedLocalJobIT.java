@@ -38,9 +38,9 @@ public class SandboxedLocalJobIT {
      * <li>Download stdout from sandbox</li>
      * <li>Verify stdout</li>
      * <li>Clean up sandbox</li>
-     *
+     * 
      * </ol>
-     *
+     * 
      * @throws OctopusException
      * @throws URISyntaxException
      * @throws InterruptedException
@@ -62,14 +62,15 @@ public class SandboxedLocalJobIT {
         // fill workdir
         String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
         octopus.files().copy(octopus.files().newPath(localrootfs, new RelativePath(input_file)),
-                octopus.files().newPath(localrootfs, new RelativePath(workFn+"/lorem_ipsum.txt")));
+                octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
         // create sandbox
         String sandbox_id = UUID.randomUUID().toString();
         String sandboxFn = tmpdir + "/" + sandbox_id;
         AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(sandboxFn));
         Sandbox sandbox = new Sandbox(octopus, sandboxPath, sandbox_id);
-        sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn+"/lorem_ipsum.txt")), "lorem_ipsum.txt");
+        sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
+                "lorem_ipsum.txt");
         sandbox.setDownloadFiles("stdout.txt", "stderr.txt");
 
         // upload lorem_ipsum.txt to sandbox

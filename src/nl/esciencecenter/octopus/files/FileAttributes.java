@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.files;
 
 import java.util.Set;
@@ -17,81 +32,90 @@ public interface FileAttributes {
     /**
      * Does the path refer to a directory ?
      * 
-     * @return If the path refers to a directory. 
+     * @return If the path refers to a directory.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isDirectory() throws AttributeNotSupportedException;
 
     /**
      * Is the path not a file, link or directory ?
      * 
-     * @return If the file is a directory. 
+     * @return If the file is a directory.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isOther() throws AttributeNotSupportedException;
-    
+
     /**
      * Does the path refer to a regular file ?
      * 
-     * @return If the path refers to a regular file. 
+     * @return If the path refers to a regular file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isRegularFile() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to a symbolic link ?
      * 
-     * @return If the path refers to a symbolic link.  
+     * @return If the path refers to a symbolic link.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isSymbolicLink() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to an executable file ?
      * 
-     * @return If the path refers an executable file ?  
+     * @return If the path refers an executable file ?
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isExecutable() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to an hidden file ?
      * 
-     * @return If the path refers an hidden file ?  
+     * @return If the path refers an hidden file ?
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isHidden() throws AttributeNotSupportedException;
-    
+
     /**
      * Does the path refer to an readable file ?
      * 
-     * @return If the path refers an readable file ?  
+     * @return If the path refers an readable file ?
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isReadable() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to a writable file ?
      * 
-     * @return If the path refers a writable file ?  
+     * @return If the path refers a writable file ?
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public boolean isWritable() throws AttributeNotSupportedException;
-    
+
     /**
      * Get the creation time for this file.
      * 
      * @return The creation time for this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public long creationTime() throws AttributeNotSupportedException;
 
@@ -100,17 +124,18 @@ public interface FileAttributes {
      * 
      * @return The last access time for this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public long lastAccessTime() throws AttributeNotSupportedException;
 
-    
     /**
      * Get the last modified time for this file.
      * 
      * @return The last modified time for this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public long lastModifiedTime() throws AttributeNotSupportedException;
 
@@ -119,7 +144,8 @@ public interface FileAttributes {
      * 
      * @return The size of this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public long size() throws AttributeNotSupportedException;
 
@@ -128,7 +154,8 @@ public interface FileAttributes {
      * 
      * @return The group of this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public String group() throws AttributeNotSupportedException;
 
@@ -137,7 +164,8 @@ public interface FileAttributes {
      * 
      * @return The owner of this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public String owner() throws AttributeNotSupportedException;
 
@@ -146,7 +174,8 @@ public interface FileAttributes {
      * 
      * @return The permissions of this file.
      * 
-     * @throws AttributeNotSupportedException If the attribute is not supported by the adaptor.
+     * @throws AttributeNotSupportedException
+     *             If the attribute is not supported by the adaptor.
      */
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException;
 }

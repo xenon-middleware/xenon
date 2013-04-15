@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.util;
 
 import java.util.ArrayList;
@@ -11,7 +26,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 public class JavaJobDescription extends JobDescription {
 
     // FIXME: BROKEN BROKEN BROKEN!!! Implement!!! Changed to facade, but hav not changed implementation!!!
-    
+
     private List<String> javaOptions = new ArrayList<String>();
 
     private Map<String, String> javaSystemProperties = new HashMap<String, String>();
@@ -23,7 +38,7 @@ public class JavaJobDescription extends JobDescription {
     private String javaClassPath;
 
     private final JobDescription destination;
-    
+
     /**
      * Create a {@link JavaJobDescription}, which describes the java application.
      */
@@ -189,20 +204,14 @@ public class JavaJobDescription extends JobDescription {
         }
     }
 
-    /**    
-    @Override
-    public void setWorkingDirectory(Path workingDirectory) throws OctopusException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Path getWorkingDirectory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-     * Returns the java class path.
+    /**
+     * @Override public void setWorkingDirectory(Path workingDirectory) throws OctopusException { // TODO Auto-generated method
+     *           stub
+     * 
+     *           }
+     * @Override public Path getWorkingDirectory() { // TODO Auto-generated method stub return null; }
+     * 
+     *           Returns the java class path.
      * 
      * @return the java class path.
      */
@@ -229,7 +238,7 @@ public class JavaJobDescription extends JobDescription {
     @Override
     public void setNodeCount(int resourceCount) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -241,7 +250,7 @@ public class JavaJobDescription extends JobDescription {
     @Override
     public void setProcessesPerNode(int ppn) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -253,25 +262,25 @@ public class JavaJobDescription extends JobDescription {
     @Override
     public void setQueueName(String queueName) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public int getMaxTime() {
         // TODO Auto-generated method stub
-        return 0;    
+        return 0;
     }
 
     @Override
     public void setMaxTime(int maxTime) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void setExecutable(String executable) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -283,7 +292,7 @@ public class JavaJobDescription extends JobDescription {
     @Override
     public void setEnvironment(Map<String, String> environment) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -295,31 +304,31 @@ public class JavaJobDescription extends JobDescription {
     @Override
     public void setOfflineMode(boolean offlineMode) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void setStdin(String stdin) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void setStdout(String stdout) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void setStderr(String stderr) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void setWorkingDirectory(String workingDirectory) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

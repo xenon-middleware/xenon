@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
@@ -38,9 +53,9 @@ public class LocalJobs implements Jobs {
     private final OctopusEngine octopusEngine;
 
     private final LocalAdaptor localAdaptor;
-    
+
     private final Scheduler localScheduler;
-    
+
     private final LinkedList<LocalJobExecutor> singleQ;
 
     private final LinkedList<LocalJobExecutor> multiQ;
@@ -60,23 +75,24 @@ public class LocalJobs implements Jobs {
     private static synchronized int getNextJobID() {
         return jobID++;
     }
-    
+
     public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine)
             throws OctopusException {
 
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
-        
+
         URI uri = null;
-        
+
         try {
             uri = new URI("local:///");
         } catch (URISyntaxException e) {
             throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
         }
-        
-        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
-                new String[] { "single", "multi", "unlimited" }, null, properties, true, false);
+
+        localScheduler =
+                new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, new String[] { "single", "multi",
+                        "unlimited" }, null, properties, true, false);
 
         singleQ = new LinkedList<LocalJobExecutor>();
         multiQ = new LinkedList<LocalJobExecutor>();
@@ -86,18 +102,18 @@ public class LocalJobs implements Jobs {
         singleExecutor = Executors.newSingleThreadExecutor();
 
         int processors = Runtime.getRuntime().availableProcessors();
-       
+
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         multiExecutor = Executors.newFixedThreadPool(multiQThreads);
 
         maxQSize = properties.getIntProperty(LocalAdaptor.MAX_HISTORY);
 
         if (maxQSize < 0 && maxQSize != -1) {
-            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Max queue size cannot be negative (excluding -1 " +
-            		"for unlimited)");
-        }    
+            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Max queue size cannot be negative (excluding -1 "
+                    + "for unlimited)");
+        }
     }
-      
+
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
@@ -110,14 +126,14 @@ public class LocalJobs implements Jobs {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with path!");
         }
 
-        if (credential != null) { 
+        if (credential != null) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with credentials!");
         }
-        
-        if (properties != null && properties.size() > 0) { 
+
+        if (properties != null && properties.size() > 0) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
         }
-        
+
         return localScheduler;
     }
 
@@ -125,7 +141,7 @@ public class LocalJobs implements Jobs {
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
         return localScheduler;
     }
-    
+
     private Job[] getJobs(LocalJobExecutor[] executors) {
 
         LocalJobExecutor[] tmp = singleQ.toArray(new LocalJobExecutor[0]);
@@ -138,10 +154,10 @@ public class LocalJobs implements Jobs {
 
         return result;
     }
-    
+
     @Override
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
-       
+
         if (queueName == null || queueName.equals("single")) {
             return getJobs(singleQ.toArray(new LocalJobExecutor[0]));
         } else if (queueName.equals("multi")) {
@@ -155,7 +171,7 @@ public class LocalJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
-        
+
         Job result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID());
 
         LocalJobExecutor executor = new LocalJobExecutor(result);
@@ -189,7 +205,7 @@ public class LocalJobs implements Jobs {
         if (job.getScheduler() != localScheduler) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot retrieve job status from other scheduler!");
         }
-        
+
         LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
         LocalJobExecutor executor = findJob(tmp, job);
         return executor.getStatus();
@@ -197,17 +213,17 @@ public class LocalJobs implements Jobs {
 
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
-        
+
         JobStatus[] result = new JobStatus[jobs.length];
 
-        for (int i=0;i<jobs.length;i++) { 
+        for (int i = 0; i < jobs.length; i++) {
             try {
                 result[i] = getJobStatus(jobs[i]);
             } catch (OctopusException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
             }
         }
-        
+
         return result;
     }
 
@@ -232,7 +248,7 @@ public class LocalJobs implements Jobs {
             }
         }
     }
-    
+
     private LinkedList<LocalJobExecutor> findQueue(String queueName) throws OctopusException {
 
         if (queueName == null || queueName.equals("single")) {
@@ -259,16 +275,16 @@ public class LocalJobs implements Jobs {
 
     @Override
     public void cancelJob(Job job) throws OctopusException {
-        
+
         if (job.getScheduler() != localScheduler) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot cancel jobs descriptions from other scheduler!"); 
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot cancel jobs descriptions from other scheduler!");
         }
 
         // FIXME: What if job is already gone?
         LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
         findJob(tmp, job).kill();
     }
-    
+
     public void end() {
         singleExecutor.shutdownNow();
         multiExecutor.shutdownNow();
@@ -290,17 +306,17 @@ public class LocalJobs implements Jobs {
 
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
-        
+
         QueueStatus[] result = new QueueStatus[queueNames.length];
-        
-        for (int i=0;i<queueNames.length;i++) {
-            try { 
+
+        for (int i = 0; i < queueNames.length; i++) {
+            try {
                 result[i] = getQueueStatus(scheduler, queueNames[i]);
-            } catch (OctopusException e) { 
+            } catch (OctopusException e) {
                 result[i] = new QueueStatusImplementation(null, queueNames[i], e, null);
             }
         }
-        
+
         return result;
     }
 
@@ -313,5 +329,5 @@ public class LocalJobs implements Jobs {
     @Override
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return true;
-    }    
+    }
 }

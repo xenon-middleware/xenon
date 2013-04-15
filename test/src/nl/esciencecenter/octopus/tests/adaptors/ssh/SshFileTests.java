@@ -25,14 +25,16 @@ public class SshFileTests {
 
         String username = System.getProperty("user.name");
 
-        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
 
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
         AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
 
         System.err.println("path = " + path.getPath());
-        
+
         Assert.assertTrue(octopus.files().exists(path));
 
         octopus.end();
@@ -43,14 +45,16 @@ public class SshFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
-        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
-       
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
+
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
         AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/" + username + "/.bashrc"));
 
         System.err.println("absolute path = " + path);
-        
+
         InputStream in = octopus.files().newInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
@@ -69,48 +73,52 @@ public class SshFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
-        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
-       
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
+
         FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
         AbsolutePath src = octopus.files().newPath(sshFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
         System.err.println("absolute src path = " + src.getPath());
-        
+
         FileSystem localFileSystem = octopus.files().newFileSystem(new URI("file:///"), null, null);
         AbsolutePath target = octopus.files().newPath(localFileSystem, new RelativePath("/tmp/aap"));
         System.err.println("absolute target path = " + target.getPath());
-        
-        if(octopus.files().exists(target)) {
+
+        if (octopus.files().exists(target)) {
             octopus.files().delete(target);
         }
-        
+
         octopus.files().copy(src, target);
-        
+
         octopus.end();
     }
-    
+
     @org.junit.Test
     public void testCopyUpload() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
-        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
-       
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
+
         FileSystem localFileSystem = octopus.files().newFileSystem(new URI("file:///"), null, null);
         AbsolutePath src = octopus.files().newPath(localFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
         System.err.println("absolute src path = " + src.getPath());
-        
+
         FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
         AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/tmp/aap"));
         System.err.println("absolute target path = " + target.getPath());
 
-        if(octopus.files().exists(target)) {
+        if (octopus.files().exists(target)) {
             octopus.files().delete(target);
         }
 
         octopus.files().copy(src, target);
-        
+
         // FIXME diff files
-        
+
         octopus.end();
     }
 
@@ -119,25 +127,25 @@ public class SshFileTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
-        Credential credential = c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username + "/.ssh/id_rsa.pub", username, "");
-       
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
+
         FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
         AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/bin"));
         System.err.println("absolute target path = " + target.getPath());
 
         DirectoryStream<AbsolutePath> stream = octopus.files().newDirectoryStream(target);
 
-        while(stream.iterator().hasNext()) {
-            AbsolutePath path = stream.iterator().next(); 
+        while (stream.iterator().hasNext()) {
+            AbsolutePath path = stream.iterator().next();
             System.err.println(path.getPath());
         }
         stream.close();
-        
+
         octopus.end();
     }
 
-    
-    
     // test connection refused
     // test com.jcraft.jsch.JSchException: UnknownHostKey: 
 }

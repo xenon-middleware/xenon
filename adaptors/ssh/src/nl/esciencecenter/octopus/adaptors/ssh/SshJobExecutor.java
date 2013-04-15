@@ -52,11 +52,10 @@ public class SshJobExecutor implements Runnable {
             throw new BadParameterException(adaptor.getName(), "number of nodes must be 1");
         }
 
-        if(job.getJobDescription().getWorkingDirectory() != null && !job.getJobDescription().getWorkingDirectory().equals("")) {
+        if (job.getJobDescription().getWorkingDirectory() != null && !job.getJobDescription().getWorkingDirectory().equals("")) {
             throw new BadParameterException(adaptor.getName(), "cannot set working directory");
         }
-            
-        
+
         // thread will be started by local scheduler
     }
 
@@ -130,9 +129,9 @@ public class SshJobExecutor implements Runnable {
             JobDescription description = job.getJobDescription();
 
             SshProcess sshProcess =
-                    new SshProcess(adaptor, scheduler, session, description.getExecutable(),
-                            description.getArguments(), description.getEnvironment(), 
-                            description.getStdin(), description.getStdout(), description.getStderr());
+                    new SshProcess(adaptor, scheduler, session, description.getExecutable(), description.getArguments(),
+                            description.getEnvironment(), description.getStdin(), description.getStdout(),
+                            description.getStderr());
 
             updateState("RUNNING");
 

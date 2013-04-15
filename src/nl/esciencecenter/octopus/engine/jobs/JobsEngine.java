@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
@@ -27,9 +42,9 @@ public class JobsEngine implements Jobs {
         return octopusEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
-    public Scheduler newScheduler(URI location, Credential credential, Properties properties) 
-            throws OctopusException, OctopusIOException { 
-        
+    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+            OctopusIOException {
+
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
         return adaptor.jobsAdaptor().newScheduler(location, credential, properties);
     }
@@ -49,7 +64,7 @@ public class JobsEngine implements Jobs {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().isOpen(scheduler);
     }
-    
+
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
@@ -61,11 +76,11 @@ public class JobsEngine implements Jobs {
         // FIXME: Optimize!
 
         JobStatus[] result = new JobStatus[jobs.length];
-        
+
         for (int i = 0; i < jobs.length; i++) {
-            try { 
+            try {
                 result[i] = getJobStatus(jobs[i]);
-            } catch (OctopusException | OctopusIOException e) { 
+            } catch (OctopusException | OctopusIOException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
             }
         }
@@ -82,9 +97,9 @@ public class JobsEngine implements Jobs {
     public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().getJobs(scheduler, queueName);
     }
-    
+
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException  {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().submitJob(scheduler, description);
     }
 

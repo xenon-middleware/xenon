@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.util;
 
 import java.io.BufferedReader;
@@ -26,9 +41,9 @@ import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Some additional functionality build on top of the standard API
- *
+ * 
  * @author Niels Drost
- *
+ * 
  */
 public class FileUtils {
 
@@ -36,7 +51,7 @@ public class FileUtils {
 
     /**
      * Copies all bytes from an input stream to a file.
-     *
+     * 
      * @throws OctopusException
      *             if an I/O error occurs when reading or writing
      * @throws FileAlreadyExistsException
@@ -79,10 +94,10 @@ public class FileUtils {
 
     /**
      * Copies all bytes from a file to an output stream.
-     *
+     * 
      * @throws OctopusException
      *             if and I/O error occurs while reading or writing
-     *
+     * 
      */
     public static long copy(Octopus octopus, AbsolutePath source, OutputStream out) throws OctopusException {
         byte[] buffer = new byte[BUFFER_SIZE];
@@ -106,7 +121,7 @@ public class FileUtils {
 
     /**
      * Opens a file for reading, returning a BufferedReader that may be used to read text from the file in an efficient manner.
-     *
+     * 
      * @throws OctopusIOException
      */
     public static BufferedReader newBufferedReader(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
@@ -174,7 +189,7 @@ public class FileUtils {
 
     /**
      * Write lines of text to a file.
-     *
+     * 
      */
     public static AbsolutePath write(Octopus octopus, AbsolutePath path, Iterable<? extends CharSequence> lines, Charset cs,
             OpenOption... options) throws OctopusIOException {
@@ -265,7 +280,7 @@ public class FileUtils {
 
     /**
      * Recursively copies directories, files and symbolic links from source to target.
-     *
+     * 
      * @param octopus
      * @param source
      * @param target
@@ -285,7 +300,8 @@ public class FileUtils {
                 octopus.files().createDirectories(target);
             } else {
                 if (replace == false) {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath() + " already exists!");
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
+                            + " already exists!");
                 } else {
                     // keep existing directory
                     // Can not replace directory, to replace have to do recursive delete and createDirectories
@@ -302,7 +318,8 @@ public class FileUtils {
                 octopus.files().copy(source, target);
             } else {
                 if (replace == false) {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath() + " already exists!");
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
+                            + " already exists!");
                 } else {
                     octopus.files().delete(target);
                     octopus.files().copy(source, target);
@@ -313,7 +330,7 @@ public class FileUtils {
 
     /**
      * Recursively removes all directories, files and symbolic links in path.
-     *
+     * 
      * @param octopus
      * @param path
      * @throws OctopusIOException

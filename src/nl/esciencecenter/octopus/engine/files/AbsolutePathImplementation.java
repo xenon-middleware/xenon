@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.engine.files;
 
 import java.util.Iterator;
@@ -13,13 +28,13 @@ import nl.esciencecenter.octopus.files.RelativePath;
 public final class AbsolutePathImplementation implements AbsolutePath {
 
     class AbsolutePathIterator implements Iterator<AbsolutePath> {
-        
+
         private final Iterator<RelativePath> iterator;
-        
-        AbsolutePathIterator(Iterator<RelativePath> iterator) { 
+
+        AbsolutePathIterator(Iterator<RelativePath> iterator) {
             this.iterator = iterator;
         }
-        
+
         @Override
         public boolean hasNext() {
             return iterator.hasNext();
@@ -38,65 +53,63 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     private final FileSystem filesystem;
     private final RelativePath relativePath;
-    
+
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath relativePath) {
-       
+
         this.filesystem = filesystem;
         this.relativePath = relativePath;
-        
-        
-//        String pathString = location.getPath();
-//
-//        if (pathString == null) {
-//            root = null;
-//            elements = new String[0];
-//        } else if (isLocal() && OSUtils.isWindows()) {
-//            if (location.getPath().matches("^/[a-zA-Z]:/")) {
-//                root = pathString.substring(0, 4);
-//                pathString = pathString.substring(4);
-//            } else {
-//                root = null;
-//            }
-//            this.elements = pathString.split("/+");
-//        } else {
-//            if (pathString.startsWith("/")) {
-//                root = "/";
-//                pathString = pathString.substring(1);
-//            } else {
-//                root = null;
-//            }
-//            this.elements = pathString.split("/+");
-//        }
+
+        //        String pathString = location.getPath();
+        //
+        //        if (pathString == null) {
+        //            root = null;
+        //            elements = new String[0];
+        //        } else if (isLocal() && OSUtils.isWindows()) {
+        //            if (location.getPath().matches("^/[a-zA-Z]:/")) {
+        //                root = pathString.substring(0, 4);
+        //                pathString = pathString.substring(4);
+        //            } else {
+        //                root = null;
+        //            }
+        //            this.elements = pathString.split("/+");
+        //        } else {
+        //            if (pathString.startsWith("/")) {
+        //                root = "/";
+        //                pathString = pathString.substring(1);
+        //            } else {
+        //                root = null;
+        //            }
+        //            this.elements = pathString.split("/+");
+        //        }
 
     }
 
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath... relativePaths) {
-        
+
         this.filesystem = filesystem;
-        
-        if (relativePaths.length == 0) { 
+
+        if (relativePaths.length == 0) {
             throw new IllegalArgumentException("AbsolutePathImplementation requires at least one RelativePath");
         }
-        
+
         this.relativePath = new RelativePath(relativePaths);
     }
-    
-    
+
     @Override
     public FileSystem getFileSystem() {
         return filesystem;
     }
-    
+
     @Override
     public RelativePath getRelativePath() {
         return relativePath;
     }
-    
+
     @Override
     public boolean isLocal() {
         return filesystem.getAdaptorName().equals("local");
     }
-    
+
     @Override
     public String getFileName() {
         return relativePath.getFileName();
@@ -113,15 +126,15 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     }
 
     @Override
-    public String [] getNames() {
+    public String[] getNames() {
         return relativePath.getNames();
     }
-    
+
     @Override
     public String getName(int index) {
         return relativePath.getName(index);
     }
-    
+
     @Override
     public AbsolutePath subpath(int beginIndex, int endIndex) {
         return new AbsolutePathImplementation(filesystem, relativePath.subpath(beginIndex, endIndex));
@@ -131,7 +144,7 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     public AbsolutePath normalize() {
         return new AbsolutePathImplementation(filesystem, relativePath.normalize());
     }
-    
+
     @Override
     public boolean startsWith(RelativePath other) {
         return relativePath.startsWith(other);
@@ -161,17 +174,17 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     public Iterator<AbsolutePath> iterator() {
         return new AbsolutePathIterator(relativePath.iterator());
     }
-    
+
     @Override
     public String getPath() {
-        
-        if (relativePath.isEmpty()) { 
+
+        if (relativePath.isEmpty()) {
             return relativePath.getSeparator();
         }
-        
+
         return relativePath.getPath();
     }
-    
+
     public String toString() {
         return filesystem.toString() + relativePath.toString();
     }

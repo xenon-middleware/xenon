@@ -64,8 +64,7 @@ public class OctopusPropertiesTest {
 
     @Test
     public void testOctopusProperties_fromDefaultsAndProperties_noOverlap() {
-        String[][] defaults = new String[][] {
-                { "key", "value" } };
+        String[][] defaults = new String[][] { { "key", "value" } };
         Properties props = new Properties();
         props.setProperty("key2", "value2");
 
@@ -76,8 +75,7 @@ public class OctopusPropertiesTest {
 
     @Test
     public void testOctopusProperties_fromDefaultsAndProperties_withOverlap() {
-        String[][] defaults = new String[][] {
-                { "key", "value" } };
+        String[][] defaults = new String[][] { { "key", "value" } };
         Properties props = new Properties();
         props.setProperty("key", "value2");
 
@@ -86,20 +84,20 @@ public class OctopusPropertiesTest {
         assertEquals(octprop.toString(), "key = value2\n");
     }
 
-//    @Test
-//    public void testLoadFromClassPath() {
-//        fail("Not yet implemented");
-//    }
-//
-//    @Test
-//    public void testLoadFromFile() {
-//        fail("Not yet implemented");
-//    }
-//
-//    @Test
-//    public void testLoadFromHomeFile() {
-//        fail("Not yet implemented");
-//    }
+    //    @Test
+    //    public void testLoadFromClassPath() {
+    //        fail("Not yet implemented");
+    //    }
+    //
+    //    @Test
+    //    public void testLoadFromFile() {
+    //        fail("Not yet implemented");
+    //    }
+    //
+    //    @Test
+    //    public void testLoadFromHomeFile() {
+    //        fail("Not yet implemented");
+    //    }
 
     @Test
     public void testGetBooleanProperty_1_True() {
@@ -477,46 +475,46 @@ public class OctopusPropertiesTest {
 
     @Test
     public void testGetSizeProperty() {
-        
+
         Properties props = new Properties();
         props.setProperty("B", "100");
         props.setProperty("K", "100K");
         props.setProperty("M", "100M");
         props.setProperty("G", "100G");
-        
+
         OctopusProperties octprop = new OctopusProperties(props);
-        
+
         long result = octprop.getSizeProperty("B");
-        
+
         assertThat(result, is(100L));
-        
+
         result = octprop.getSizeProperty("K");
-        
-        assertThat(result, is(100L*1024L));
-        
+
+        assertThat(result, is(100L * 1024L));
+
         result = octprop.getSizeProperty("M");
-        
-        assertThat(result, is(100L*1024L*1024L));
-        
+
+        assertThat(result, is(100L * 1024L * 1024L));
+
         result = octprop.getSizeProperty("G");
-        
-        assertThat(result, is(100L*1024L*1024L*1024L));
+
+        assertThat(result, is(100L * 1024L * 1024L * 1024L));
     }
 
     @Test
     public void testGetSizePropertyStringLong() {
-        
+
         Properties props = new Properties();
         props.setProperty("B", "100");
 
         OctopusProperties octprop = new OctopusProperties(props);
-        
+
         long result = octprop.getSizeProperty("B", 999);
-        
+
         assertThat(result, is(100L));
-        
+
         result = octprop.getSizeProperty("X", 999);
-        
+
         assertThat(result, is(999L));
     }
 
@@ -526,7 +524,7 @@ public class OctopusPropertiesTest {
 
         String[] result = octprop.getStringList("key");
 
-        String[] expected = new String[] { };
+        String[] expected = new String[] {};
         assertThat(result, is(expected));
     }
 
@@ -584,31 +582,31 @@ public class OctopusPropertiesTest {
 
     @Test
     public void testPrintProperties() {
-        
+
         Properties props = new Properties();
         props.setProperty("key", "value");
         props.setProperty("item", "value2");
         OctopusProperties octprop = new OctopusProperties(props);
-        
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         octprop.printProperties(new PrintStream(out), "");
 
         String s = out.toString();
-        
+
         assertThat(s, is("key = value\nitem = value2\n"));
 
         out = new ByteArrayOutputStream();
         octprop.printProperties(new PrintStream(out), "NOOT");
 
         s = out.toString();
-        
+
         assertThat(s, is(""));
 
         out = new ByteArrayOutputStream();
         octprop.printProperties(new PrintStream(out), "key");
 
         s = out.toString();
-        
+
         assertThat(s, is("key = value\n"));
     }
 
@@ -637,26 +635,26 @@ public class OctopusPropertiesTest {
 
     @Test
     public void testEqualsObject() {
-        
+
         OctopusProperties octprop1 = getSample();
-        
+
         boolean b = octprop1.equals(octprop1);
-        
-        assertThat(b , is(true));
-        
+
+        assertThat(b, is(true));
+
         OctopusProperties octprop2 = getSample();
-       
+
         b = octprop1.equals(octprop2);
-        
-        assertThat(b , is(true));
-        
+
+        assertThat(b, is(true));
+
         Properties props = new Properties();
         props.setProperty("key", "value");
-        
+
         OctopusProperties octprop3 = new OctopusProperties(props);
         b = octprop1.equals(octprop3);
-        
-        assertThat(b , is(false));
+
+        assertThat(b, is(false));
     }
 
     @Test
@@ -691,12 +689,12 @@ public class OctopusPropertiesTest {
 
     @Test
     public void testPutAllMapOfQextendsObjectQextendsObject() {
-        
+
         OctopusProperties octprop = new OctopusProperties();
-        
+
         Map<String, String> tmp = new HashMap<String, String>();
         tmp.put("key", "value");
-        
+
         try {
             octprop.putAll(tmp);
         } catch (UnsupportedOperationException e) {

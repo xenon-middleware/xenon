@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
@@ -35,7 +50,7 @@ public class LocalAdaptor extends Adaptor {
 
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
-   
+
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
@@ -46,7 +61,7 @@ public class LocalAdaptor extends Adaptor {
 
     /** Local implementation for Files */
     private final LocalFiles localFiles;
-    
+
     /** Local implementation for Jobs */
     private final LocalJobs localJobs;
 
@@ -58,11 +73,11 @@ public class LocalAdaptor extends Adaptor {
     }
 
     void checkURI(URI location) throws OctopusException {
-        
-        if (location == null) { 
+
+        if (location == null) {
             return;
         }
-        
+
         String scheme = location.getScheme();
 
         if (scheme != null && !supports(scheme)) {
@@ -72,21 +87,21 @@ public class LocalAdaptor extends Adaptor {
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
-            throw new OctopusException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \"" + 
-                    location.getHost() + "\"");
+            throw new OctopusException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \""
+                    + location.getHost() + "\"");
         }
     }
-    
+
     @Override
     public boolean supports(String scheme) {
 
-        if (scheme == null) { 
+        if (scheme == null) {
             return true;
         }
-        
+
         return super.supports(scheme);
     }
-    
+
     public Map<String, String> getSupportedProperties() {
         return new HashMap<String, String>();
     }
