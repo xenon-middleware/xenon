@@ -373,7 +373,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
-        throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Cannot close local FileSystem!");
+        // ignored!
     }
 
     @Override
@@ -479,7 +479,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         String path = System.getProperty("user.dir");
 
         if (!LocalUtils.exists(path)) {
-            throw new OctopusException("local", "Cannot create FileSystem with non-existing CWD (" + path + ")");
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, 
+                    "Cannot create FileSystem with non-existing CWD (" + path + ")");
         }
 
         URI uri = null;
