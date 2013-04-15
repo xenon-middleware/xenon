@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Date;
+import java.util.Properties;
 
 import junit.framework.Assert;
 import nl.esciencecenter.octopus.Octopus;
@@ -27,7 +29,9 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 public class SshFileTests {
@@ -146,7 +150,10 @@ public class SshFileTests {
                 c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
                         + "/.ssh/id_rsa.pub", username, "");
 
-        FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
+        Properties props = new Properties();
+        props.put(" octopus.adaptors.ssh.strictHostKeyChecking", "false");
+        
+        FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, props);
         AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/bin"));
         System.err.println("absolute target path = " + target.getPath());
 
@@ -161,6 +168,34 @@ public class SshFileTests {
         octopus.end();
     }
 
+    @org.junit.Test
+    public void testLslong() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        Credentials c = octopus.credentials();
+        String username = System.getProperty("user.name");
+        Credential credential =
+                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
+                        + "/.ssh/id_rsa.pub", username, "");
+
+        Properties props = new Properties();
+        props.put(" octopus.adaptors.ssh.strictHostKeyChecking", "false");
+        
+        FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, props);
+        AbsolutePath target = octopus.files().newPath(sshFileSystem, new RelativePath("/bin"));
+        System.err.println("absolute target path = " + target.getPath());
+
+        DirectoryStream<PathAttributesPair> stream = octopus.files().newAttributesDirectoryStream(target);
+
+        while (stream.iterator().hasNext()) {
+            PathAttributesPair pair =stream.iterator().next(); 
+            AbsolutePath path = pair.path();
+            FileAttributes attrs = pair.attributes();
+            System.err.println(path + " " + attrs + ", mtime = " + new Date(attrs.lastModifiedTime()) + ", atime = " + new Date(attrs.lastAccessTime()));
+        }
+        stream.close();
+
+        octopus.end();
+    }
     // test connection refused
     // test com.jcraft.jsch.JSchException: UnknownHostKey: 
 }

@@ -126,7 +126,10 @@ public class SshFiles implements Files {
 
         String uniqueID = getNewUniqueID();
 
-        Session session = adaptor.createNewSession(uniqueID, location, credential);
+        OctopusProperties octopusProperties = new OctopusProperties(
+                properties);
+        
+        Session session = adaptor.createNewSession(uniqueID, location, credential, octopusProperties);
 
         ChannelSftp channel;
         channel = adaptor.getSftpChannel(session);
@@ -146,8 +149,7 @@ public class SshFiles implements Files {
         logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
         FileSystemImplementation result =
-                new FileSystemImplementation(adaptor.getName(), uniqueID, location, entryPath, credential, new OctopusProperties(
-                        properties));
+                new FileSystemImplementation(adaptor.getName(), uniqueID, location, entryPath, credential, octopusProperties);
         fileSystems.put(uniqueID, new FileSystemInfo(result, session));
         return result;
     }

@@ -131,13 +131,13 @@ public class SshJobs implements Jobs {
             throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with path! (path = " + path + ")");
         }
 
-        if (properties != null && properties.size() > 0) {
+        if (properties != null && properties.size() > 0) { // TODO why not?
             throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with additional properties!");
         }
 
         String uniqueID = getNewUniqueID();
 
-        Session session = adaptor.createNewSession(uniqueID, location, credential);
+        Session session = adaptor.createNewSession(uniqueID, location, credential, this.properties);
 
         SchedulerImplementation sshScheduler =
                 new SchedulerImplementation(adaptor.getName(), uniqueID, location, new String[] { "single" }, credential,

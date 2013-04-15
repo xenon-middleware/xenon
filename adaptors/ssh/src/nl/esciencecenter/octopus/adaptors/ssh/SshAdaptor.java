@@ -250,7 +250,7 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected Session createNewSession(String uniqueID, URI location, Credential credential) throws OctopusException {
+    protected Session createNewSession(String uniqueID, URI location, Credential credential, OctopusProperties localProperties) throws OctopusException {
         URI uri = location;
         String user = uri.getUserInfo();
         String host = uri.getHost();
@@ -293,13 +293,15 @@ public class SshAdaptor extends Adaptor {
 
         setCredential((CredentialImplementation) credential, session);
 
-        if (getProperties().getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
+        if (localProperties.getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
+            logger.debug("strict host key checking enabled");
             session.setConfig("StrictHostKeyChecking", "yes");
         } else {
+            logger.debug("strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
         }
 
-        if (getProperties().getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
+        if (localProperties.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
             String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
             logger.debug("setting ssh known hosts file to: " + knownHosts);
             setKnownHostsFile(knownHosts);
