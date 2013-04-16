@@ -78,12 +78,12 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public long lastAccessTime() throws AttributeNotSupportedException {
-        return attributes.getATime();
+        return (long) attributes.getATime() * 1000;
     }
 
     @Override
     public long lastModifiedTime() throws AttributeNotSupportedException {
-        return attributes.getMTime();
+        return (long) attributes.getMTime() * 1000;
     }
 
     @Override
@@ -154,5 +154,10 @@ public class SshFileAttributes implements FileAttributes {
     @Override
     public boolean isWritable() throws AttributeNotSupportedException {
         return (attributes.getPermissions() & WRITE) != 0;
+    }
+
+    @Override
+    public String toString() {
+        return "" + attributes;
     }
 }
