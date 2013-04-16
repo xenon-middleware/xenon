@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
@@ -153,7 +154,7 @@ public class OctopusEngine implements Octopus {
 
         credentialsEngine = new CredentialsEngineImplementation(this);
 
-        logger.info("Octopus engine initialized with adaptors: " + adaptors);
+        logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
     // ************** Octopus Interface Implementation ***************\\

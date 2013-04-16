@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
@@ -38,7 +39,7 @@ import org.junit.Test;
 public class FileUtilsTest {
 
     @Test
-    public void testCopyOctopusInputStreamAbsolutePathCopyOptionArray() {
+    public void testCopyOctopusInputStreamAbsolutePathCopyOptionArray() throws OctopusException {
         fail("Not yet implemented");
     }
 

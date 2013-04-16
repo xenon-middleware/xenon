@@ -141,11 +141,6 @@ public class SshAdaptor extends Adaptor {
         filesAdaptor.end();
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
-
     /*
     SSH_FX_OK
        Indicates successful completion of the operation.

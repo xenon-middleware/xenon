@@ -116,11 +116,6 @@ public class LocalAdaptor extends Adaptor {
     }
 
     @Override
-    public String toString() {
-        return getName();
-    }
-
-    @Override
     public Files filesAdaptor() {
         return localFiles;
     }

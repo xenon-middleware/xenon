@@ -124,6 +124,11 @@ public abstract class Adaptor {
         return supportedSchemes;
     }
 
+    @Override
+    public String toString() { 
+        return name;
+    }
+
     public abstract Map<String, String> getAdaptorSpecificInformation();
 
     public abstract Files filesAdaptor() throws OctopusException;
@@ -132,5 +137,5 @@ public abstract class Adaptor {
 
     public abstract Credentials credentialsAdaptor() throws OctopusException;
 
-    public abstract void end();
+    public abstract void end();    
 }

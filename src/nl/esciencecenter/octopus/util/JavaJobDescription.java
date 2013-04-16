@@ -25,7 +25,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 
 public class JavaJobDescription extends JobDescription {
 
-    // FIXME: BROKEN BROKEN BROKEN!!! Implement!!! Changed to facade, but hav not changed implementation!!!
+    // FIXME: BROKEN BROKEN BROKEN!!! Implement!!! Changed to facade, but have not changed implementation!!!
 
     private List<String> javaOptions = new ArrayList<String>();
 

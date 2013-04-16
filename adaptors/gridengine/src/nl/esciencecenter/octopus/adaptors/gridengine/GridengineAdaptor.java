@@ -76,11 +76,6 @@ public class GridengineAdaptor extends Adaptor {
     }
 
     @Override
-    public String getName() {
-        return ADAPTOR_NAME;
-    }
-
-    @Override
     public Map<String, String> getSupportedProperties() {
         return new HashMap<String, String>();
     }
