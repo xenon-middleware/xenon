@@ -50,7 +50,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties octprop = new OctopusProperties(props);
 
-        assertEquals(octprop.toString(), "key = value\n");
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value}]");
     }
 
     @Test
@@ -62,7 +62,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties octprop = new OctopusProperties(props, props2);
 
-        assertEquals(octprop.toString(), "key = value\nkey2 = value2\n");
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, key2=value2}]");
     }
 
     @Test
@@ -74,7 +74,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties octprop = new OctopusProperties(props, props2);
 
-        assertEquals(octprop.toString(), "key = value2\n");
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value2}]");
     }
 
     @Test
@@ -85,7 +85,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties octprop = new OctopusProperties(defaults, props);
 
-        assertEquals(octprop.toString(), "key = value\nkey2 = value2\n");
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, key2=value2}]");
     }
 
     @Test
@@ -96,7 +96,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties octprop = new OctopusProperties(defaults, props);
 
-        assertEquals(octprop.toString(), "key = value2\n");
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value2}]");
     }
 
     //    @Test
@@ -583,7 +583,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties noctprop = octprop.filter("k");
 
-        assertEquals(noctprop.toString(), "key = value\n");
+        assertEquals(noctprop.toString(), "OctopusProperties [properties={key=value}]");
     }
 
     @Test
@@ -629,7 +629,7 @@ public class OctopusPropertiesTest {
     public void testToString() {
         OctopusProperties octprop = getSample();
 
-        assertEquals(octprop.toString(), "key = value\nitem = value2\n");
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
     }
 
     public OctopusProperties getSample() {

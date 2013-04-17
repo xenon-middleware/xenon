@@ -24,7 +24,9 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
@@ -750,7 +752,23 @@ public class OctopusProperties extends Properties {
     
     @Override
     public String toString() {
-        return "OctopusProperties [properties=" + super.toString() + "]";
+        
+        StringBuilder sb = new StringBuilder("OctopusProperties [properties={");
+        
+        Set<Entry<Object, Object>> tmp = entrySet();
+        
+        String comma = "";
+        
+        for (Entry<Object, Object> e : tmp) {
+            sb.append(comma);
+            sb.append(e.getKey().toString());
+            sb.append("=");
+            sb.append(e.getValue().toString());
+            comma = ", ";
+        }
+        
+        sb.append("}]");
+        return sb.toString();
     }
     
     
