@@ -47,4 +47,11 @@ public class JobImplementation implements Job {
     public String getIdentifier() {
         return identifier;
     }
+
+    @Override
+    public String toString() {
+        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description + "]";
+    }
+    
+    
 }

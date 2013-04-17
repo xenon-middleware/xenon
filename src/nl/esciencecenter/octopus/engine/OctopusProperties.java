@@ -651,25 +651,7 @@ public class OctopusProperties extends Properties {
             }
         }
     }
-
-    /**
-     * Creates a string representation of this properties object.
-     * 
-     * @return the string representation.
-     */
-    public String toString() {
-        String result = "";
-
-        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-            String value = getProperty(key);
-
-            result += key + " = " + value + "\n";
-        }
-
-        return result;
-    }
-
+    
     /**
      * @return Sorted list of property names.
      */
@@ -691,33 +673,39 @@ public class OctopusProperties extends Properties {
      *            object to compare to.
      * @return <code>true</code> if equal.
      */
-    public boolean equals(Object object) {
-        if (!(object instanceof Properties)) {
-            return false;
-        }
+//
+//    public boolean equals(Object object) {
+//        if (!(object instanceof Properties)) {
+//            return false;
+//        }
+//
+//        Properties other = (Properties) object;
+//
+//        if (other.size() != size()) {
+//            return false;
+//        }
+//
+//        for (Map.Entry<Object, Object> entry : entrySet()) {
+//            if (!other.containsKey(entry.getKey())) {
+//                return false;
+//            }
+//
+//            Object value = entry.getValue();
+//            Object otherValue = other.get(entry.getKey());
+//
+//            if (value == null && otherValue != null | value != null && otherValue == null || value != null
+//                    && !value.equals(otherValue)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
+    
+    
+    
 
-        Properties other = (Properties) object;
-
-        if (other.size() != size()) {
-            return false;
-        }
-
-        for (Map.Entry<Object, Object> entry : entrySet()) {
-            if (!other.containsKey(entry.getKey())) {
-                return false;
-            }
-
-            Object value = entry.getValue();
-            Object otherValue = other.get(entry.getKey());
-
-            if (value == null && otherValue != null | value != null && otherValue == null || value != null
-                    && !value.equals(otherValue)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    
+    
     // Override all functions that change the content of this object.
 
     @Override
@@ -759,4 +747,11 @@ public class OctopusProperties extends Properties {
     public void loadFromXML(InputStream in) throws IOException, InvalidPropertiesFormatException {
         throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
     }
+    
+    @Override
+    public String toString() {
+        return "OctopusProperties [properties=" + super.toString() + "]";
+    }
+    
+    
 }

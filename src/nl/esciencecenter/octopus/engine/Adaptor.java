@@ -125,8 +125,8 @@ public abstract class Adaptor {
     }
 
     @Override
-    public String toString() { 
-        return name;
+    public String toString() {
+        return "Adaptor [name=" + name + "]";
     }
 
     public abstract Map<String, String> getAdaptorSpecificInformation();

@@ -649,6 +649,6 @@ public class RelativePath {
 
     @Override
     public String toString() {
-        return getPath();
+        return "RelativePath [element=" + Arrays.toString(elements) + ", seperator=" + seperator + "]";
     }
 }

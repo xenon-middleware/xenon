@@ -38,4 +38,9 @@ public class PathAttributesPairImplementation implements PathAttributesPair {
     public FileAttributes attributes() {
         return attributes;
     }
+
+    @Override
+    public String toString() {
+        return "PathAttributesPairImplementation [path=" + path + ", attributes=" + attributes + "]";
+    }
 }

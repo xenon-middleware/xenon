@@ -71,6 +71,12 @@ public class FileSystemImplementation implements FileSystem {
     }
 
     @Override
+    public String toString() {
+        return "FileSystemImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
+                + ", entryPath=" + entryPath + ", properties=" + properties + "]";
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

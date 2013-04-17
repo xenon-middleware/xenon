@@ -241,4 +241,10 @@ public class OctopusEngine implements Octopus {
             adaptor.end();
         }
     }
+
+    @Override
+    public String toString() {
+        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " octopusProperties=" + octopusProperties + 
+                    ",  + ended=" + ended + "]";
+    }
 }

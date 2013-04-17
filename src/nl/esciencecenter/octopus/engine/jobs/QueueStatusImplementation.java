@@ -61,4 +61,10 @@ public class QueueStatusImplementation implements QueueStatus {
     public Map<String, String> getSchedulerSpecficInformation() {
         return schedulerSpecificInformation;
     }
+
+    @Override
+    public String toString() {
+        return "QueueStatusImplementation [scheduler=" + scheduler + ", queueName=" + queueName + ", exception=" + exception
+                + ", schedulerSpecificInformation=" + schedulerSpecificInformation + "]";
+    }
 }

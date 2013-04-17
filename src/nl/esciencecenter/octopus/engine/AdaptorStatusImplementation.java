@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.engine;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
@@ -61,5 +62,12 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         return adaptorSpecificInformation;
+    }
+
+    @Override
+    public String toString() {
+        return "AdaptorStatusImplementation [name=" + name + ", description=" + description + ", supportedSchemes="
+                + Arrays.toString(supportedSchemes) + ", supportedProperties=" + supportedProperties
+                + ", adaptorSpecificInformation=" + adaptorSpecificInformation + "]";
     }
 }

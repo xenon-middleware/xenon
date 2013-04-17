@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
+import java.util.Arrays;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -83,6 +84,13 @@ public class SchedulerImplementation implements Scheduler {
     @Override
     public boolean hasDetachedJobs() {
         return hasDetachedJobs;
+    }
+
+    @Override
+    public String toString() {
+        return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
+                + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames)  
+                + ", localStandardStreams=" + localStandardStreams + ", hasDetachedJobs=" + hasDetachedJobs + "]";
     }
 
     @Override

@@ -252,4 +252,9 @@ public class FilesEngine implements Files {
         Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
         return adaptor.filesAdaptor().getLocalHomeFileSystem(properties);
     }
+
+    @Override
+    public String toString() {
+        return "FilesEngine [octopusEngine=" + octopusEngine + "]";
+    }
 }
