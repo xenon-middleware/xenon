@@ -45,6 +45,14 @@ public class Sandbox {
             this.source = source;
             this.destination = destination;
         }
+
+        public AbsolutePath getSource() {
+            return source;
+        }
+
+        public AbsolutePath getDestination() {
+            return destination;
+        }
     }
 
     public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
@@ -55,18 +63,18 @@ public class Sandbox {
         } else {
             path = root.resolve(new RelativePath(sandboxName));
         }
-        
+
         Files files = octopus.files();
-        
-        if (!files.exists(path)) { 
+
+        if (!files.exists(path)) {
             files.createDirectory(path);
         }
     }
 
-    public AbsolutePath getPath() { 
+    public AbsolutePath getPath() {
         return path;
     }
-    
+
     public List<Pair> getUploadFiles() {
         return uploadFiles;
     }
@@ -95,10 +103,10 @@ public class Sandbox {
     }
 
 // FIXME!
-//    
+//
 //    public void setDownloadFiles(String... files) {
 //        downloadFiles = new LinkedList<Pair>();
-//        
+//
 //        for (int i = 0; i < files.length; i++) {
 //            addDownloadFile(files[i]);
 //        }

@@ -117,7 +117,11 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     @Override
     public AbsolutePath getParent() {
-        return new AbsolutePathImplementation(filesystem, relativePath.getParent());
+        RelativePath path = relativePath.getParent();
+        if (path == null) {
+            return null;
+        }
+        return new AbsolutePathImplementation(filesystem, path);
     }
 
     @Override
