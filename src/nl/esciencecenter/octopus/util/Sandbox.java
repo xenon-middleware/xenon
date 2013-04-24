@@ -63,12 +63,6 @@ public class Sandbox {
         } else {
             path = root.resolve(new RelativePath(sandboxName));
         }
-
-        Files files = octopus.files();
-
-        if (!files.exists(path)) {
-            files.createDirectory(path);
-        }
     }
 
     public AbsolutePath getPath() {
@@ -124,18 +118,36 @@ public class Sandbox {
         downloadFiles.add(new Pair(path.resolve(new RelativePath(src)), dest));
     }
 
-    private void copy(List<Pair> pairs) throws OctopusIOException {
+    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException {
         for (Pair pair : pairs) {
-            FileUtils.recursiveCopy(octopus, pair.source, pair.destination);
+            FileUtils.recursiveCopy(octopus, pair.source, pair.destination, options);
         }
     }
 
-    public void upload() throws OctopusIOException {
-        copy(uploadFiles);
+    /**
+     * Copy uploaded files to sandbox.
+     *
+     * Creates sandbox directory when needed.
+     *
+     * @param options
+     * @throws OctopusIOException
+     */
+    public void upload(CopyOption... options) throws OctopusIOException {
+        Files files = octopus.files();
+        if (!files.exists(path)) {
+            files.createDirectory(path);
+        }
+        copy(uploadFiles, options);
     }
 
-    public void download() throws OctopusIOException {
-        copy(downloadFiles);
+    /**
+     * Copy downloaded files from sandbox.
+     *
+     * @param options
+     * @throws OctopusIOException
+     */
+    public void download(CopyOption... options) throws OctopusIOException {
+        copy(downloadFiles, options);
     }
 
     public void wipe() throws OctopusIOException {
