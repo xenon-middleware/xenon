@@ -36,7 +36,7 @@ public class QstatOutputParserTest {
 
     @Test
     public void testCheckVersion() throws Throwable {
-        File testFile = new File("adaptors/gridengine/test/fixtures/jobs.xml");
+        File testFile = new File("test/fixtures/gridengine/jobs.xml");
 
         XmlOutputParser parser = new XmlOutputParser(false);
 
@@ -45,7 +45,7 @@ public class QstatOutputParserTest {
 
     @Test(expected = IncompatibleServerException.class)
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
-        File testFile = new File("adaptors/gridengine/test/fixtures/jobs-no-schema.xml");
+        File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
         XmlOutputParser parser = new XmlOutputParser(false);
 
@@ -54,7 +54,7 @@ public class QstatOutputParserTest {
 
     @Test(expected = IncompatibleServerException.class)
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
-        File testFile = new File("adaptors/gridengine/test/fixtures/jobs-wrong-schema.xml");
+        File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
         XmlOutputParser parser = new XmlOutputParser(false);
 
@@ -63,7 +63,7 @@ public class QstatOutputParserTest {
 
     @Test(expected = OctopusIOException.class)
     public void testCheckVersion_EmptyFile_Exception() throws Throwable {
-        File testFile = new File("adaptors/gridengine/test/fixtures/jobs-empty.xml");
+        File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
 
         XmlOutputParser parser = new XmlOutputParser(false);
 
@@ -72,7 +72,7 @@ public class QstatOutputParserTest {
 
     @Test
     public void testParseQueueInfo() throws Throwable {
-        try (FileInputStream in = new FileInputStream("adaptors/gridengine/test/fixtures/queues.xml")) {
+        try (FileInputStream in = new FileInputStream("test/fixtures/gridengine/queues.xml")) {
 
             XmlOutputParser parser = new XmlOutputParser(false);
 
@@ -89,7 +89,7 @@ public class QstatOutputParserTest {
     
     @Test
     public void testParseJobInfo() throws Throwable {
-        try (FileInputStream in = new FileInputStream("adaptors/gridengine/test/fixtures/jobs.xml")) {
+        try (FileInputStream in = new FileInputStream("test/fixtures/gridengine/jobs.xml")) {
 
             XmlOutputParser parser = new XmlOutputParser(false);
 

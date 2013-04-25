@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.tests.adaptors.ssh;
+package nl.esciencecenter.octopus.adaptors.ssh;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
