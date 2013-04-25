@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
@@ -27,7 +26,7 @@ import org.junit.Test;
 public class SandboxTest {
 
     @Test
-    public void testSandbox() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithName() throws URISyntaxException, OctopusIOException, OctopusException {
         Octopus octopus = mock(Octopus.class);
         FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
         AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
@@ -41,13 +40,15 @@ public class SandboxTest {
     }
 
     @Test
-    public void testSetUploadFiles() {
-        fail("Not yet implemented");
-    }
+    public void testSandbox_WithoutName() throws URISyntaxException, OctopusIOException, OctopusException {
+        Octopus octopus = mock(Octopus.class);
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
+        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
 
-    @Test
-    public void testAddUploadFileAbsolutePath() {
-        fail("Not yet implemented");
+        Sandbox sandbox = new Sandbox(octopus, path, null);
+
+        String sandboxPath = sandbox.getPath().getPath();
+        assertTrue(sandboxPath.startsWith("/tmp/octopus_sandbox_"));
     }
 
     @Test
@@ -68,16 +69,6 @@ public class SandboxTest {
     }
 
     @Test
-    public void testGetDownloadFiles() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testAddDownloadFile() {
-        fail("Not yet implemented");
-    }
-
-    @Test
     public void testUpload() throws OctopusIOException, OctopusException, URISyntaxException {
         Octopus octopus = mock(Octopus.class);
         Files files = mock(Files.class);
@@ -95,20 +86,4 @@ public class SandboxTest {
         AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input"));
         verify(files).copy(src, dst);
     }
-
-    @Test
-    public void testDownload() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testWipe() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testDelete() {
-        fail("Not yet implemented");
-    }
-
 }

@@ -22,6 +22,7 @@ import java.util.UUID;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -118,7 +119,7 @@ public class Sandbox {
         downloadFiles.add(new Pair(path.resolve(new RelativePath(src)), dest));
     }
 
-    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException {
+    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         for (Pair pair : pairs) {
             FileUtils.recursiveCopy(octopus, pair.source, pair.destination, options);
         }
@@ -131,8 +132,9 @@ public class Sandbox {
      *
      * @param options
      * @throws OctopusIOException
+     * @throws UnsupportedOperationException
      */
-    public void upload(CopyOption... options) throws OctopusIOException {
+    public void upload(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         Files files = octopus.files();
         if (!files.exists(path)) {
             files.createDirectory(path);
@@ -145,8 +147,9 @@ public class Sandbox {
      *
      * @param options
      * @throws OctopusIOException
+     * @throws UnsupportedOperationException
      */
-    public void download(CopyOption... options) throws OctopusIOException {
+    public void download(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         copy(downloadFiles, options);
     }
 
