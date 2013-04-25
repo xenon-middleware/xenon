@@ -21,6 +21,9 @@ import java.util.Properties;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.adaptors.gridengine.GridengineAdaptor;
+import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
+import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
@@ -146,8 +149,10 @@ public class OctopusEngine implements Octopus {
 
         octopusProperties = new OctopusProperties(VALID_PROPERTIES, properties);
 
-        adaptors = AdaptorLoader.loadAdaptors(octopusProperties, this);
+        // adaptors = AdaptorLoader.loadAdaptors(octopusProperties, this);
 
+        adaptors = loadAdaptors();
+        
         filesEngine = new FilesEngine(this);
 
         jobsEngine = new JobsEngine(this);
@@ -157,6 +162,18 @@ public class OctopusEngine implements Octopus {
         logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
+    private Adaptor[] loadAdaptors() throws OctopusException { 
+        
+        Adaptor [] result = new Adaptor[3];
+        
+        result[0] = new LocalAdaptor(octopusProperties, this);
+        result[1] = new SshAdaptor(octopusProperties, this);
+        result[2] = new GridengineAdaptor(octopusProperties, this);
+        
+        // TODO: Add properties to extend list later.  
+        return result;
+    }
+    
     // ************** Octopus Interface Implementation ***************\\
 
     @Override

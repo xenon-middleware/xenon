@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
@@ -34,11 +33,11 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.junit.Test;
 
-public class GridEngineJobsTest {
+public class GridEngineJobsTestIT {
 
     private final URI location;
 
-    public GridEngineJobsTest() throws URISyntaxException {
+    public GridEngineJobsTestIT() throws URISyntaxException {
         location = new URI("ge://fs1.das4.liacs.nl");
     }
 

@@ -13,26 +13,24 @@
 		</fileset>
 	</path>
 
-	<target name="build" depends="clean, compile, adaptors" description="build everything" />
+	<target name="build" depends="clean, compile" description="build everything" />
 
-	<target name="build-all" depends="clean, compile, all-adaptors" description="build everything, including unstable adaptors" />
-
-	<target name="adaptors" description="build the adaptors">
-		<ant dir="adaptors" />
-	</target>
-
-	<target name="all-adaptors" description="build the adaptors">
-		<ant dir="adaptors" target="build-all" />
-	</target>
-
-	<target name="test" description="run the tests">
+	<target name="test" description="run the unit tests">
 		<ant dir="test" target="test" />
 	</target>
 
-	<target name="xml-test" description="run the tests, output to xml reports">
+	<target name="xml-test" description="run the unit tests, output to xml reports">
 		<ant dir="test" target="xml-test" />
 	</target>
+	
+	<target name="test-integration" description="run the integration tests">
+		<ant dir="test" target="test-integration" />
+	</target>
 
+	<target name="xml-test-integration" description="run the integration tests, output to xml reports">
+		<ant dir="test" target="xml-test-integration" />
+	</target>
+	
 	<target name="coverage" description="run the tests with JaCoCo coverage">
 		<ant dir="test" target="coverage" />
 	</target>
@@ -75,8 +73,6 @@
 	<target name="clean" description="clean up">
 		<delete dir="build" />
 		<delete dir="dist" />
-
-		<ant dir="adaptors" target="clean" />
 
 		<ant dir="test" target="clean" />
 	</target>

@@ -36,34 +36,42 @@
 
 	<target name="build" description="build everything" depends="clean,compile" />
 
-	<target name="xml-test" description="run tests" depends="build">
-		<mkdir dir="reports" />
-		<junit>
-			<classpath refid="default.classpath" />
-
-			<batchtest fork="yes" todir="reports">
-				<formatter type="xml" />
-				<fileset dir="src">
-					<include name="**/*.java" />
-				</fileset>
-			</batchtest>
-		</junit>
-	</target>
-
-	<target name="test" description="run tests" depends="build">
+	<target name="test" description="run unit tests" depends="build">
 		<mkdir dir="reports" />
 		<junit printsummary="yes">
 			<classpath refid="default.classpath" />
 
 			<batchtest fork="yes" todir="reports">
+				<formatter type="xml" />
 				<formatter type="plain" />
 				<fileset dir="src">
-					<include name="**/*.java" />
+					<include name="**/Test*.java" />
+					<include name="**/*Test.java" />
+					<include name="**/*TestCase.java" />
+					<exclude name="**/integration/*.java" />					
 				</fileset>
 			</batchtest>
 		</junit>
 	</target>
 
+	<target name="test-integration" description="run integration tests" depends="build">
+		<mkdir dir="reports" />
+		<junit printsummary="yes">
+			<classpath refid="default.classpath" />
+
+			<batchtest fork="yes" todir="reports">
+				<formatter type="xml" />
+				<formatter type="plain" />
+				<fileset dir="src">
+					<include name="**/IT*.java" />
+					<include name="**/*IT.java" />
+					<include name="**/*ITCase.java" />
+					<include name="**/integration/*.java" />					
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 		<classpath path="lib/jacocoant.jar" />
 	</taskdef>
@@ -79,7 +87,10 @@
 				<batchtest fork="yes" todir="reports">
 					<formatter type="xml" />
 					<fileset dir="src">
-						<include name="**/*.java" />
+						<include name="**/Test*.java" />
+						<include name="**/*Test.java" />
+						<include name="**/*TestCase.java" />
+						<exclude name="**/integration/*.java" />					
 					</fileset>
 				</batchtest>
 			</junit>
