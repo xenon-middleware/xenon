@@ -263,7 +263,7 @@ public class LocalJobs implements Jobs {
         verifyJobDescription(description);
         
         JobImplementation result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID(), 
-                description.isInteractive());
+                description.isInteractive(), true);
 
         LocalJobExecutor executor = new LocalJobExecutor(result, pollingDelay);
 

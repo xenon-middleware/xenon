@@ -85,7 +85,7 @@ public class JobsEngineTest {
         OctopusEngine octopus = mock(OctopusEngine.class);
         Adaptor adaptor = mock(Adaptor.class);
         Jobs job_adaptor = mock(Jobs.class);
-        Job expected_job = new JobImplementation(job_description, scheduler, "1", false);
+        Job expected_job = new JobImplementation(job_description, scheduler, "1", false, true);
         when(octopus.getAdaptorFor("local")).thenReturn(adaptor);
         when(octopus.getAdaptor("local")).thenReturn(adaptor);
         when(adaptor.jobsAdaptor()).thenReturn(job_adaptor);

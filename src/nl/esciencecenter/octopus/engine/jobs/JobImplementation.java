@@ -31,7 +31,9 @@ public class JobImplementation implements Job {
 
     private final String identifier;
 
-    private final boolean isInteractive; 
+    private final boolean interactive; 
+    
+    private final boolean online; 
     
     private InputStream stdout;
 
@@ -39,11 +41,13 @@ public class JobImplementation implements Job {
 
     private OutputStream stdin;
     
-    public JobImplementation(JobDescription description, Scheduler scheduler, String identifier, boolean isInteractive) {  
+    public JobImplementation(JobDescription description, Scheduler scheduler, String identifier, boolean interactive, 
+            boolean online) {  
         this.description = description;
         this.scheduler = scheduler;
         this.identifier = identifier;
-        this.isInteractive = isInteractive;
+        this.interactive = interactive;
+        this.online = online;
     }
 
     @Override
@@ -71,16 +75,24 @@ public class JobImplementation implements Job {
      */
     @Override
     public boolean isInteractive() {
-        return isInteractive;
+        return interactive;
     }
 
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Job#isOnline()
+     */
+    @Override
+    public boolean isOnline() {
+        return online;
+    }
+    
     /* (non-Javadoc)
      * @see nl.esciencecenter.octopus.jobs.Job#getStdout()
      */
     @Override
     public InputStream getStdout() throws OctopusException {
         
-        if (!isInteractive) { 
+        if (!interactive) { 
             throw new OctopusException("Engine", "Cannot retrieve the stdout of a batch job!");
         }
         
@@ -95,7 +107,7 @@ public class JobImplementation implements Job {
     @Override
     public InputStream getStderr() throws OctopusException {
 
-        if (!isInteractive) { 
+        if (!interactive) { 
             throw new OctopusException("Engine", "Cannot retrieve the stderr of a batch job!");
         }
         
@@ -110,7 +122,7 @@ public class JobImplementation implements Job {
     @Override
     public OutputStream getStdin() throws OctopusException {
         
-        if (!isInteractive) { 
+        if (!interactive) { 
             throw new OctopusException("Engine", "Cannot retrieve the stdin of a batch job!");
         }
         

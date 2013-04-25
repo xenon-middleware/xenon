@@ -174,7 +174,7 @@ public class GridEngineJobs implements Jobs {
         Job[] result = new Job[jobIDs.length];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = new JobImplementation(null, scheduler, jobIDs[i], false);
+            result[i] = new JobImplementation(null, scheduler, jobIDs[i], false, false);
         }
 
         return result;
@@ -283,7 +283,7 @@ public class GridEngineJobs implements Jobs {
 
         String identifier = connection.submitJob(jobScript);
 
-        return new JobImplementation(description, scheduler, identifier, false);
+        return new JobImplementation(description, scheduler, identifier, false, false);
     }
 
     @Override

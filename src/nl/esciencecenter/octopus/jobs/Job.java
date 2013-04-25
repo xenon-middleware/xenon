@@ -57,6 +57,18 @@ public interface Job {
      * @return if this is an interactive job.
      */    
     public boolean isInteractive();
+
+    /** 
+     * Returns if this is an online job. 
+     * 
+     * Online jobs will disappear when the application that submitted is exist, while offlines jobs will keep running. 
+     * 
+     * Interactive jobs are by definition online. Batch jobs will be online if the scheduler to which they were submitted is 
+     * online.  
+      * 
+     * @return if this is an online job.
+     */    
+    public boolean isOnline();
     
     /** 
      * Returns the standard output stream of this job.
