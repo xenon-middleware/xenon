@@ -192,4 +192,35 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     public String toString() {
         return filesystem.toString() + relativePath.toString();
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((filesystem == null) ? 0 : filesystem.hashCode());
+        result = prime * result + ((relativePath == null) ? 0 : relativePath.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof AbsolutePathImplementation))
+            return false;
+        AbsolutePathImplementation other = (AbsolutePathImplementation) obj;
+        if (filesystem == null) {
+            if (other.filesystem != null)
+                return false;
+        } else if (!filesystem.equals(other.filesystem))
+            return false;
+        if (relativePath == null) {
+            if (other.relativePath != null)
+                return false;
+        } else if (!relativePath.equals(other.relativePath))
+            return false;
+        return true;
+    }
 }

@@ -22,6 +22,7 @@ import java.util.UUID;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -62,12 +63,6 @@ public class Sandbox {
             path = root.resolve(new RelativePath("octopus_sandbox_" + UUID.randomUUID()));
         } else {
             path = root.resolve(new RelativePath(sandboxName));
-        }
-
-        Files files = octopus.files();
-
-        if (!files.exists(path)) {
-            files.createDirectory(path);
         }
     }
 
@@ -124,18 +119,38 @@ public class Sandbox {
         downloadFiles.add(new Pair(path.resolve(new RelativePath(src)), dest));
     }
 
-    private void copy(List<Pair> pairs) throws OctopusIOException {
+    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         for (Pair pair : pairs) {
-            FileUtils.recursiveCopy(octopus, pair.source, pair.destination);
+            FileUtils.recursiveCopy(octopus, pair.source, pair.destination, options);
         }
     }
 
-    public void upload() throws OctopusIOException {
-        copy(uploadFiles);
+    /**
+     * Copy uploaded files to sandbox.
+     *
+     * Creates sandbox directory when needed.
+     *
+     * @param options
+     * @throws OctopusIOException
+     * @throws UnsupportedOperationException
+     */
+    public void upload(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+        Files files = octopus.files();
+        if (!files.exists(path)) {
+            files.createDirectory(path);
+        }
+        copy(uploadFiles, options);
     }
 
-    public void download() throws OctopusIOException {
-        copy(downloadFiles);
+    /**
+     * Copy downloaded files from sandbox.
+     *
+     * @param options
+     * @throws OctopusIOException
+     * @throws UnsupportedOperationException
+     */
+    public void download(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+        copy(downloadFiles, options);
     }
 
     public void wipe() throws OctopusIOException {
