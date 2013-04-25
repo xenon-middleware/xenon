@@ -32,11 +32,15 @@ public class SchedulerImplementation implements Scheduler {
     private final String[] queueNames;
     private final Credential credential;
 
-    private final boolean localStandardStreams;
-    private final boolean hasDetachedJobs;
+//    private final boolean localStandardStreams;
+//    private final boolean hasDetachedJobs;
+
+    private final boolean isOnline;
+    private final boolean supportsInteractive;
+    private final boolean supportsBatch;
 
     public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String[] queueNames, Credential credential,
-            OctopusProperties properties, boolean localStandardStreams, boolean hasDetachedJobs) {
+            OctopusProperties properties, boolean isOnline, boolean supportsInteractive, boolean supportsBatch) {
 
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
@@ -44,8 +48,12 @@ public class SchedulerImplementation implements Scheduler {
         this.queueNames = queueNames;
         this.properties = properties;
         this.credential = credential;
-        this.localStandardStreams = localStandardStreams;
-        this.hasDetachedJobs = hasDetachedJobs;
+//        this.localStandardStreams = localStandardStreams;
+//        this.hasDetachedJobs = hasDetachedJobs;
+        
+        this.isOnline = isOnline;
+        this.supportsInteractive = supportsInteractive;
+        this.supportsBatch = supportsBatch;
     }
 
     public Credential getCredential() {
@@ -75,22 +83,51 @@ public class SchedulerImplementation implements Scheduler {
     public String[] getQueueNames() {
         return queueNames.clone();
     }
+    
+//    
+//    
+//
+//    @Override
+//    public boolean hasLocalStandardStreams() {
+//        return localStandardStreams;
+//    }
+//
+//    @Override
+//    public boolean hasDetachedJobs() {
+//        return hasDetachedJobs;
+//    }
 
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Scheduler#supportsInteractive()
+     */
     @Override
-    public boolean hasLocalStandardStreams() {
-        return localStandardStreams;
+    public boolean supportsInteractive() {
+        return supportsInteractive;
     }
 
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Scheduler#supportsBatch()
+     */
     @Override
-    public boolean hasDetachedJobs() {
-        return hasDetachedJobs;
+    public boolean supportsBatch() {
+        return supportsBatch;
     }
 
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Scheduler#isOnline()
+     */
+    @Override
+    public boolean isOnline() {
+        return isOnline;
+    }
+    
     @Override
     public String toString() {
         return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
-                + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames)  
-                + ", localStandardStreams=" + localStandardStreams + ", hasDetachedJobs=" + hasDetachedJobs + "]";
+                + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames)
+                + ", isOnline=" + isOnline + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" 
+                + supportsBatch + "]";
+                // + ", localStandardStreams=" + localStandardStreams + ", hasDetachedJobs=" + hasDetachedJobs + "]";
     }
 
     @Override
@@ -123,4 +160,5 @@ public class SchedulerImplementation implements Scheduler {
             return false;
         return true;
     }
+
 }

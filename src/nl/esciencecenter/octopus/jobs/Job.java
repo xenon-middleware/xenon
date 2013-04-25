@@ -15,6 +15,11 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+
 /**
  * Job represents a Job belonging to a {@link Scheduler}.
  * 
@@ -45,4 +50,44 @@ public interface Job {
      * @return the identifier that was assigned to this job by the scheduler.
      */
     public String getIdentifier();
+    
+    /** 
+     * Returns if this is an interactive job.
+      * 
+     * @return if this is an interactive job.
+     */    
+    public boolean isInteractive();
+    
+    /** 
+     * Returns the standard output stream of this job.
+     * 
+     * The standard streams can only be retrieved if this is an interactive job.  
+     * 
+     * @return the standard output stream of this job.
+     *
+     * @throws OctopusException if this job is not interactive.
+     */
+    public InputStream getStdout() throws OctopusException;
+    
+    /** 
+     * Returns the standard error stream of this job.
+     * 
+     * The standard streams can only be retrieved if this is an interactive job.  
+     * 
+     * @return the standard error stream of this job.
+     *
+     * @throws OctopusException if this job is not interactive.
+     */
+    public InputStream getStderr() throws OctopusException;
+
+    /** 
+     * Returns the standard input stream of this job.
+     * 
+     * The standard streams can only be retrieved if this is an interactive job.  
+     * 
+     * @return the standard input stream of this job.
+     *
+     * @throws OctopusException if this job is not interactive.
+     */
+    public OutputStream getStdin() throws OctopusException;    
 }

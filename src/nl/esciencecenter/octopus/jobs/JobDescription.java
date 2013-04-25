@@ -65,11 +65,14 @@ public class JobDescription {
     private int maxTime = 30;
 
     /** Should the job be run offline? */
-    private boolean offlineMode = false;
+    // private boolean offlineMode = false;
     
     /** Should the output streams be merged? */
     private boolean mergeOutput = true;
-
+    
+    /** Is this an interactive job ? */
+    private boolean interactive = false;
+        
     /**
      * Create a JobDescription.
      */
@@ -224,9 +227,9 @@ public class JobDescription {
      * 
      * @return if the job will run in offline mode.
      */
-    public boolean getOfflineMode() {
-        return offlineMode;
-    }
+//    public boolean getOfflineMode() {
+//        return offlineMode;
+//    }
 
     /**
      * Set the off line mode for the job.
@@ -234,9 +237,9 @@ public class JobDescription {
      * @param offlineMode
      *            the off line mode for the job.
      */
-    public void setOfflineMode(boolean offlineMode) {
-        this.offlineMode = offlineMode;
-    }
+//    public void setOfflineMode(boolean offlineMode) {
+//        this.offlineMode = offlineMode;
+//    }
 
     /**
      * Sets the path to the file from which the executable must redirect stdin.
@@ -326,12 +329,30 @@ public class JobDescription {
     /**
      * Get if the the output streams of a parallel job should be merged.
      * 
-     * @return if the the output streams of a parallel job should be merged.
+     * @return if the output streams of a parallel job should be merged.
      */    
     public boolean getMergeOutputStreams() { 
         return mergeOutput;
     }
 
+    /** 
+     * Is this an interactive job ?
+     * 
+     * @return if this an interactive job. 
+     */
+    public boolean isInteractive() {
+        return interactive;
+    }
+    
+    /**
+     * Set if this is an interactive job. 
+     * 
+     * @param interactive if this is an interactive job.
+     */
+    public void setInteractive(boolean interactive) {
+        this.interactive = interactive;
+    }
+    
     @Override
     public String toString() {
         String res = "JobDescription(";
@@ -347,7 +368,7 @@ public class JobDescription {
         res += ", stdout: " + stdout;
         res += ", stderr: " + stderr;
 
-        res += ", offlineMode: " + offlineMode;
+        res += ", interactive " + interactive;
 
         res += ")";
 

@@ -82,6 +82,4 @@ public final class JobStatusImplementation implements JobStatus {
         return "JobStatusImplementation [job=" + job + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
                 + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation + "]";
     }
-    
-    
 }

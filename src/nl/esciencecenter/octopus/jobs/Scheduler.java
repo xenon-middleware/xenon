@@ -56,17 +56,46 @@ public interface Scheduler {
     public String[] getQueueNames();
 
     /**
+     * Does this Scheduler supports the submission of interactive jobs ?   
+     * 
+     * @return if this scheduler supports the submission of interactive jobs ? 
+     */    
+    public boolean supportsInteractive();
+        
+    /**
+     * Does this Scheduler supports the submission of batch jobs ?   
+     * 
+     * @return if this scheduler supports the submission of batch jobs ? 
+     */    
+    public boolean supportsBatch();
+    
+    
+    /**
+     * Is this an online scheduler ? 
+     * 
+     * Online schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that were 
+     * submitted to it. 
+     * 
+     * Offline schedulers do not need to remains active for their jobs to run. A submitted job will typically be handed over to 
+     * some external server that will manage the job for the rest of its lifetime.
+     * 
+     * @return if this scheduler is online. 
+     */    
+    public boolean isOnline();
+
+    
+    /**
      * Are the standard streams (stdin, stdout, stderr) local ?
      * 
      * @return If the standard streams are local.
      */
-    public boolean hasLocalStandardStreams();
+//    public boolean hasLocalStandardStreams();
 
     /**
      * Are the jobs of this scheduler detached ?
      * 
      * @return if the jobs of this scheduler are detached.
      */
-    public boolean hasDetachedJobs();
+    //public boolean hasDetachedJobs();
 
 }

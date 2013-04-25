@@ -15,6 +15,10 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Scheduler;
@@ -27,10 +31,19 @@ public class JobImplementation implements Job {
 
     private final String identifier;
 
-    public JobImplementation(JobDescription description, Scheduler scheduler, String identifier) {
+    private final boolean isInteractive; 
+    
+    private InputStream stdout;
+
+    private InputStream stderr;
+
+    private OutputStream stdin;
+    
+    public JobImplementation(JobDescription description, Scheduler scheduler, String identifier, boolean isInteractive) {  
         this.description = description;
         this.scheduler = scheduler;
         this.identifier = identifier;
+        this.isInteractive = isInteractive;
     }
 
     @Override
@@ -52,6 +65,84 @@ public class JobImplementation implements Job {
     public String toString() {
         return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description + "]";
     }
-    
-    
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Job#isInteractive()
+     */
+    @Override
+    public boolean isInteractive() {
+        return isInteractive;
+    }
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Job#getStdout()
+     */
+    @Override
+    public InputStream getStdout() throws OctopusException {
+        
+        if (!isInteractive) { 
+            throw new OctopusException("Engine", "Cannot retrieve the stdout of a batch job!");
+        }
+        
+        synchronized (this) {
+            return stdout;
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Job#getStderr()
+     */
+    @Override
+    public InputStream getStderr() throws OctopusException {
+
+        if (!isInteractive) { 
+            throw new OctopusException("Engine", "Cannot retrieve the stderr of a batch job!");
+        }
+        
+        synchronized (this) {
+            return stderr;
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Job#getStdin()
+     */
+    @Override
+    public OutputStream getStdin() throws OctopusException {
+        
+        if (!isInteractive) { 
+            throw new OctopusException("Engine", "Cannot retrieve the stdin of a batch job!");
+        }
+        
+        synchronized (this) {
+            return stdin;
+        }
+    }
+
+    /**
+     * Set the stdin of this job. 
+     * 
+     * @param outputStream
+     */
+    public synchronized void setStdin(OutputStream stdin) {
+        this.stdin = stdin;
+    }
+
+    /**
+     * Set the stdout of this job. 
+     * 
+     * @param inputStream
+     */
+    public void setStdout(InputStream stdout) {
+        this.stdout = stdout;
+    }
+
+    /**
+     * Set the stderr of this job. 
+     * 
+     * @param errorStream
+     */
+    public void setStderr(InputStream stderr) {
+        this.stderr = stderr;
+    }
 }

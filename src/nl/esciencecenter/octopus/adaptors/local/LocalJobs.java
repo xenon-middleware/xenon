@@ -36,7 +36,6 @@ import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -96,7 +95,7 @@ public class LocalJobs implements Jobs {
         }
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
-                new String[] { "single", "multi", "unlimited" }, null, properties, true, false);
+                new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
 
         singleQ = new LinkedList<LocalJobExecutor>();
         multiQ = new LinkedList<LocalJobExecutor>();
@@ -223,11 +222,38 @@ public class LocalJobs implements Jobs {
             throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal maximum runtime: " + maxTime);
         }
 
-        boolean offline = description.getOfflineMode();
-        
-        if (offline) { 
-            throw new UnsupportedJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
-                    "Local adaptor does not support offline jobs!");
+        if (description.isInteractive()) { 
+
+            if (description.getStdin() != null) { 
+                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                        "Illegal stdin redirect for interactive job!");            
+            }
+            
+            if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) { 
+                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                        "Illegal stdout redirect for interactive job!");            
+            }
+            
+            if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) { 
+                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                        "Illegal stderr redirect for interactive job!");            
+            }
+        } else {             
+
+            if (description.getStdin() == null) { 
+                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                        "Missing stdin redirect for batch job!");            
+            }
+            
+            if (description.getStdout() == null) { 
+                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                        "Missing stdout redirect for interactive job!");            
+            }
+            
+            if (description.getStderr() == null) { 
+                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                        "Missing stderr redirect for interactive job!");            
+            }            
         }
     }
     
@@ -235,8 +261,9 @@ public class LocalJobs implements Jobs {
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
 
         verifyJobDescription(description);
-               
-        Job result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID());
+        
+        JobImplementation result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID(), 
+                description.isInteractive());
 
         LocalJobExecutor executor = new LocalJobExecutor(result, pollingDelay);
 

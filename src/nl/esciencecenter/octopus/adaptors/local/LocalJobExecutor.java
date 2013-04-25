@@ -17,10 +17,12 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
 
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 
 import org.slf4j.Logger;
@@ -30,11 +32,11 @@ public class LocalJobExecutor implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
     
-    private final Job job;
+    private final JobImplementation job;
     
     private final int pollingDelay;
 
-    private int [] exitStatus;
+    private Integer exitStatus;
 
     private boolean killed = false;
 
@@ -44,18 +46,9 @@ public class LocalJobExecutor implements Runnable {
 
     private Exception error;
 
-    public LocalJobExecutor(Job job, int pollingDelay) throws BadParameterException {
+    public LocalJobExecutor(JobImplementation job, int pollingDelay) throws BadParameterException {
         this.job = job;
         this.pollingDelay = pollingDelay;
-    }
-
-    public synchronized int [] getExitStatus() throws OctopusException {
-        
-        if (!isDone()) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job not done!");
-        }
-
-        return exitStatus;
     }
 
     public synchronized void kill() throws OctopusException {
@@ -71,24 +64,7 @@ public class LocalJobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
-        
-        Integer exitCode = null;
-        
-        if (exitStatus != null) { 
-            
-            int tmp = 0;
-            
-            for (int i=0;i<exitStatus.length;i++) { 
-                if (exitStatus[i] != 0) { 
-                    tmp = exitStatus[i];
-                    break;
-                }
-            }
-            
-            exitCode = tmp;
-        }
-        
-        return new JobStatusImplementation(job, state, exitCode, error, done, null);
+        return new JobStatusImplementation(job, state, exitStatus, error, done, null);
     }
 
     public synchronized String getState() {
@@ -113,12 +89,12 @@ public class LocalJobExecutor implements Runnable {
         return killed;
     }
 
-    private synchronized void setDone(int [] exitStatus) {
+    private synchronized void setDone(int exitStatus) {
         state = "DONE";
         this.exitStatus = exitStatus; 
         done = true;
     }
-
+    
     private synchronized void setKilled(Exception e) {
         state = "KILLED";
         error = e;
@@ -128,9 +104,12 @@ public class LocalJobExecutor implements Runnable {
     @Override
     public void run() {
 
-        ParallelProcess parallelProcess = null;
+        LocalProcess process = null;
+
+        JobDescription description = job.getJobDescription();
+        
         long endTime = 0;
-        int maxTime = job.getJobDescription().getMaxTime();
+        int maxTime = description.getMaxTime();
         
         if (getKilled()) {
             setKilled(new IOException("Process cancelled by user."));
@@ -143,31 +122,41 @@ public class LocalJobExecutor implements Runnable {
             endTime = System.currentTimeMillis() + maxTime * 60 * 1000;
         }
         
-        try {             
-            parallelProcess = new ParallelProcess(job.getJobDescription());
-        } catch (IOException e) {
-            setError(e);
-            return;
-        }
+        if (description.isInteractive()) { 
+            try {             
+                process = new InteractiveProcess(job);
+            } catch (IOException e) {
+                setError(e);
+                return;
+            }
 
+        } else { 
+            try {             
+                process = new BatchProcess(job.getJobDescription());
+            } catch (IOException e) {
+                setError(e);
+                return;
+            }
+        }
+        
         updateState("RUNNING");
             
         while (true) { 
 
-            if (parallelProcess.isDone()) {
-                setDone(parallelProcess.getExitStatus());
+            if (process.isDone()) {
+                setDone(process.getExitStatus());
                 return;
             }
 
             if (getKilled()) {
                 setKilled(new IOException("Process cancelled by user."));
-                parallelProcess.destroy();
+                process.destroy();
                 return;
             }
                
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
                 setKilled(new IOException("Process timed out."));
-                parallelProcess.destroy();
+                process.destroy();
                 return;
             }
                 

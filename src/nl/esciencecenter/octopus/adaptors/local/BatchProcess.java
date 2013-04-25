@@ -30,9 +30,9 @@ import nl.esciencecenter.octopus.engine.util.StreamForwarder;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
-class ParallelProcess {
+class BatchProcess implements LocalProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(ParallelProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(BatchProcess.class);
 
     private final Process[] processes;
 
@@ -46,7 +46,7 @@ class ParallelProcess {
     private final int [] exitCodes;
     private final boolean [] done;
     
-    ParallelProcess(JobDescription description) throws IOException { 
+    BatchProcess(JobDescription description) throws IOException { 
 
         int count = description.getProcessesPerNode();
 
@@ -103,7 +103,7 @@ class ParallelProcess {
         }
     }
 
-    void kill() {
+    private void kill() {
         for (int i = 0; i < processes.length; i++) {
             processes[i].destroy();
 
@@ -181,8 +181,15 @@ class ParallelProcess {
 
     }
 
-    public int[] getExitStatus() {
-        return exitCodes;
+    public int getExitStatus() {
+        
+        for (int i=0;i<exitCodes.length;i++) { 
+            if (exitCodes[i] != 0) { 
+                return exitCodes[i];
+            }
+        }
+        
+        return 0;
     }
     
     public void destroy() {

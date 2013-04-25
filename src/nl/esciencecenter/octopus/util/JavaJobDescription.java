@@ -296,18 +296,6 @@ public class JavaJobDescription extends JobDescription {
     }
 
     @Override
-    public boolean getOfflineMode() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void setOfflineMode(boolean offlineMode) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void setStdin(String stdin) {
         // TODO Auto-generated method stub
 
