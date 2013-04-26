@@ -7,6 +7,10 @@
 
 	<property name="build.sysclasspath" value="ignore" />
 
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="lib/jacocoant.jar" />
+	</taskdef>
+
 	<path id="default.classpath">
 		<fileset dir="lib">
 			<include name="*.jar" />
@@ -36,96 +40,68 @@
 
 	<target name="build" description="build everything" depends="clean,compile" />
 
-	<target name="test" description="run unit tests" depends="build">
-		<mkdir dir="reports" />
-		<junit printsummary="yes">
-			<classpath refid="default.classpath" />
+	<target name="test" description="Run unit tests with coverage" depends="build">
+		<delete file="reports/jacoco/jacoco.exec" />
+        <mkdir dir="reports/jacoco" />
 
-			<batchtest fork="yes" todir="reports">
-				<formatter type="xml" />
-				<formatter type="plain" />
-				<fileset dir="src">
-					<include name="**/Test*.java" />
-					<include name="**/*Test.java" />
-					<include name="**/*TestCase.java" />
-					<exclude name="**/integration/*.java" />					
-				</fileset>
-			</batchtest>
-		</junit>
+		<jacoco:coverage destfile="reports/jacoco/jacoco.exec">
+			<junit printsummary="yes" fork="yes">
+				<classpath refid="default.classpath" />
+
+				<batchtest fork="yes" todir="reports">
+					<formatter type="xml" />
+					<formatter type="plain" />
+					<fileset dir="src">
+						<include name="**/Test*.java" />
+						<include name="**/*Test.java" />
+						<include name="**/*TestCase.java" />
+						<exclude name="**/integration/*.java" />
+					</fileset>
+				</batchtest>
+			</junit>
+		</jacoco:coverage>
+
+        <jacoco:report>
+            <executiondata>
+                <file file="reports/jacoco/jacoco.exec" />
+            </executiondata>
+
+            <structure name="octopus">
+                <sourcefiles>
+                    <fileset dir="../src" />
+                </sourcefiles>
+                <classfiles>
+                    <fileset dir="../build/classes" />
+                </classfiles>
+            </structure>
+
+            <html destdir="reports/jacoco" />
+            <xml destfile="reports/jacoco/coverage.xml" />
+        </jacoco:report>
 	</target>
 
 	<target name="test-integration" description="run integration tests" depends="build">
-		<mkdir dir="reports" />
+		<mkdir dir="it-reports" />
 		<junit printsummary="yes">
 			<classpath refid="default.classpath" />
 
-			<batchtest fork="yes" todir="reports">
+			<batchtest fork="yes" todir="it-reports">
 				<formatter type="xml" />
 				<formatter type="plain" />
 				<fileset dir="src">
 					<include name="**/IT*.java" />
 					<include name="**/*IT.java" />
 					<include name="**/*ITCase.java" />
-					<include name="**/integration/*.java" />					
+					<include name="**/integration/*.java" />
 				</fileset>
 			</batchtest>
 		</junit>
-	</target>
-	
-	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-		<classpath path="lib/jacocoant.jar" />
-	</taskdef>
-
-	<target name="coverage" description="analyze test code coverage" depends="build">
-		<delete file="reports/jacoco/jacoco.exec" />
-		<mkdir dir="reports/jacoco" />
-
-		<jacoco:coverage destfile="reports/jacoco/jacoco.exec">
-			<junit fork="yes">
-				<classpath refid="default.classpath" />
-
-				<batchtest fork="yes" todir="reports">
-					<formatter type="xml" />
-					<fileset dir="src">
-						<include name="**/Test*.java" />
-						<include name="**/*Test.java" />
-						<include name="**/*TestCase.java" />
-						<exclude name="**/integration/*.java" />					
-					</fileset>
-				</batchtest>
-			</junit>
-		</jacoco:coverage>
-
-		<jacoco:report>
-			<executiondata>
-				<file file="reports/jacoco/jacoco.exec" />
-			</executiondata>
-
-			<structure name="octopus">
-				<sourcefiles>
-					<fileset dir="../src" />
-					<!-- Include src java files from all adaptors -->
-					<fileset dir="../adaptors/">
-						<include name="*/src/**/*.java" />
-					</fileset>
-				</sourcefiles>
-				<classfiles>
-					<fileset dir="../build/classes" />
-					<!-- Include class files from all adaptors -->
-					<fileset dir="../adaptors/">
-						<include name="*/build/classes/**/*.class" />
-					</fileset>
-				</classfiles>
-			</structure>
-
-			<html destdir="reports/jacoco" />
-			<xml destfile="reports/jacoco/coverage.xml" />
-		</jacoco:report>
 	</target>
 
 	<target name="clean" description="clean up">
 		<delete dir="build" />
 		<delete dir="dist" />
 		<delete dir="reports" />
+		<delete dir="it-reports" />
 	</target>
 </project>
