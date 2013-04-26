@@ -302,8 +302,7 @@ public class FileUtils {
         }
 
         boolean srcIsDir = octopus.files().isDirectory(source);
-        boolean targetIsDir = octopus.files().isDirectory(target);
-        if (srcIsDir && targetIsDir) {
+        if (srcIsDir) {
             if (exist) {
                 if (ignore) {
                     // do nothing as requested
