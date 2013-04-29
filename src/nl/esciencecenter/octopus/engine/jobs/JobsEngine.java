@@ -94,8 +94,8 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
-        return getAdaptor(scheduler).jobsAdaptor().getJobs(scheduler, queueName);
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+        return getAdaptor(scheduler).jobsAdaptor().getJobs(scheduler, queueNames);
     }
 
     @Override

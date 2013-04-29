@@ -164,7 +164,7 @@ public class GridEngineJobs implements Jobs {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(Scheduler scheduler, String... queueName) throws OctopusException, OctopusIOException {
         //FIXME: returns all jobs in the queue, not just those from the current user.
         SchedulerConnection connection = getConnection(scheduler);
         Map<String, Map<String, String>> status = connection.getJobStatus();

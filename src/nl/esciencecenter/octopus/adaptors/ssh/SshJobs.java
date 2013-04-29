@@ -48,7 +48,6 @@ import com.jcraft.jsch.Session;
 
 public class SshJobs implements Jobs {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
 
     private static int currentID = 1;
@@ -88,7 +87,6 @@ public class SshJobs implements Jobs {
 
     private final SshAdaptor adaptor;
 
-    @SuppressWarnings("unused")
     private final OctopusProperties properties;
 
     private final LinkedList<SshJobExecutor> singleQ;
@@ -152,26 +150,36 @@ public class SshJobs implements Jobs {
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
         throw new OctopusException(getClass().getName(), "getLocalScheduler not supported!");
     }
-
-    private Job[] getJobs(SshJobExecutor[] executors) {
-        SshJobExecutor[] tmp = singleQ.toArray(new SshJobExecutor[0]);
-
-        Job[] result = new Job[tmp.length];
-
-        for (int i = 0; i < tmp.length; i++) {
-            result[i] = tmp[i].getJob();
+    
+    private void getJobs(LinkedList<SshJobExecutor> list, LinkedList<Job> out) {
+        
+        if (list == null) { 
+            return;
         }
-
-        return result;
+        
+        for (SshJobExecutor e : list) {
+            out.add(e.getJob());
+        }
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
-        if (queueName == null || queueName.equals("single")) {
-            return getJobs(singleQ.toArray(new SshJobExecutor[0]));
-        } else {
-            throw new BadParameterException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+
+        LinkedList<Job> out = new LinkedList<Job>();
+        
+        if (queueNames == null) {
+            getJobs(singleQ, out);
+        } else {              
+            for (String name : queueNames) { 
+                if (name.equals("single")) { 
+                    getJobs(singleQ, out);
+                } else { 
+                    throw new BadParameterException(adaptor.getName(), "Queue \"" + name + "\" does not exist");                    
+                }
+            }
         }
+        
+        return out.toArray(new Job[out.size()]);
     }
 
     @Override

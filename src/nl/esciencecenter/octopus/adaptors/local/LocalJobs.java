@@ -151,31 +151,41 @@ public class LocalJobs implements Jobs {
         return localScheduler;
     }
 
-    private Job[] getJobs(LocalJobExecutor[] executors) {
-
-        LocalJobExecutor[] tmp = singleQ.toArray(new LocalJobExecutor[0]);
-
-        Job[] result = new Job[tmp.length];
-
-        for (int i = 0; i < tmp.length; i++) {
-            result[i] = tmp[i].getJob();
+    private void getJobs(LinkedList<LocalJobExecutor> list, LinkedList<Job> out) {
+        
+        if (list == null) { 
+            return;
         }
-
-        return result;
+        
+        for (LocalJobExecutor e : list) {
+            out.add(e.getJob());
+        }
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
 
-        if (queueName == null || queueName.equals("single")) {
-            return getJobs(singleQ.toArray(new LocalJobExecutor[0]));
-        } else if (queueName.equals("multi")) {
-            return getJobs(multiQ.toArray(new LocalJobExecutor[0]));
-        } else if (queueName.equals("unlimited")) {
-            return getJobs(unlimitedQ.toArray(new LocalJobExecutor[0]));
-        } else {
-            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Queue \"" + queueName + "\" does not exist");
+        LinkedList<Job> out = new LinkedList<Job>();
+        
+        if (queueNames == null) {
+            getJobs(singleQ, out);
+            getJobs(multiQ, out);
+            getJobs(unlimitedQ, out);
+        } else {              
+            for (String name : queueNames) { 
+                if (name.equals("single")) { 
+                    getJobs(singleQ, out);
+                } else if (name.equals("multi")) { 
+                    getJobs(multiQ, out);
+                } else if (name.equals("unlimited")) {
+                    getJobs(unlimitedQ, out);
+                } else { 
+                    throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Queue \"" + name + "\" does not exist");                    
+                }
+            }
         }
+        
+        return out.toArray(new Job[out.size()]);
     }
 
     private void verifyJobDescription(JobDescription description) throws OctopusException { 
