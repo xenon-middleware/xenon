@@ -240,10 +240,10 @@ public class LocalJobs implements Jobs {
             }
         } else {             
 
-            if (description.getStdin() == null) { 
-                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
-                        "Missing stdin redirect for batch job!");            
-            }
+//            if (description.getStdin() == null) { 
+//                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+//                        "Missing stdin redirect for batch job!");            
+//            }
             
             if (description.getStdout() == null) { 
                 throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
