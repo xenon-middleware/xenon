@@ -25,7 +25,12 @@ public enum CopyOption {
     /**
      * Replace an existing file if it exists.
      */
-    REPLACE_EXISTING, ;
+    REPLACE_EXISTING,
+
+    /**
+     * Ignore an existing file if it exists.
+     */
+    IGNORE_EXISTING, ;
 
     public static boolean contains(CopyOption[] options, CopyOption option) {
         for (CopyOption oneOption : options) {

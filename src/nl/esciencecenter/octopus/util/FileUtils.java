@@ -41,9 +41,9 @@ import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Some additional functionality build on top of the standard API
- * 
+ *
  * @author Niels Drost
- * 
+ *
  */
 public class FileUtils {
 
@@ -51,7 +51,7 @@ public class FileUtils {
 
     /**
      * Copies all bytes from an input stream to a file.
-     * 
+     *
      * @throws OctopusException
      *             if an I/O error occurs when reading or writing
      * @throws FileAlreadyExistsException
@@ -94,10 +94,10 @@ public class FileUtils {
 
     /**
      * Copies all bytes from a file to an output stream.
-     * 
+     *
      * @throws OctopusException
      *             if and I/O error occurs while reading or writing
-     * 
+     *
      */
     public static long copy(Octopus octopus, AbsolutePath source, OutputStream out) throws OctopusException {
         byte[] buffer = new byte[BUFFER_SIZE];
@@ -121,7 +121,7 @@ public class FileUtils {
 
     /**
      * Opens a file for reading, returning a BufferedReader that may be used to read text from the file in an efficient manner.
-     * 
+     *
      * @throws OctopusIOException
      */
     public static BufferedReader newBufferedReader(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
@@ -189,7 +189,7 @@ public class FileUtils {
 
     /**
      * Write lines of text to a file.
-     * 
+     *
      */
     public static AbsolutePath write(Octopus octopus, AbsolutePath path, Iterable<? extends CharSequence> lines, Charset cs,
             OpenOption... options) throws OctopusIOException {
@@ -280,33 +280,42 @@ public class FileUtils {
 
     /**
      * Recursively copies directories, files and symbolic links from source to target.
-     * 
+     *
      * @param octopus
      * @param source
      * @param target
      * @param options
+     *
      * @throws OctopusIOException
+     * @throws UnsupportedOperationException Thrown when CopyOption.REPLACE_EXISTING and CopyOption.IGNORE_EXISTING are used together.
      */
     public static void recursiveCopy(Octopus octopus, AbsolutePath source, AbsolutePath target, CopyOption... options)
-            throws OctopusIOException {
+            throws OctopusIOException, UnsupportedOperationException {
         if (CopyOption.contains(options, CopyOption.COPY_ATTRIBUTES)) {
             throw new OctopusIOException("FileUtils", "recursiveCopy with attributes NOT IMPLEMENTED!");
         }
         boolean exist = octopus.files().exists(target);
         boolean replace = CopyOption.contains(options, CopyOption.REPLACE_EXISTING);
+        boolean ignore = CopyOption.contains(options, CopyOption.IGNORE_EXISTING);
+        if (replace && ignore) {
+            throw new UnsupportedOperationException("FileUtils", "Can not replace and ignore existing files at the same time");
+        }
 
-        if (octopus.files().isDirectory(source) && octopus.files().isDirectory(target)) {
-            if (exist == false) {
-                octopus.files().createDirectories(target);
-            } else {
-                if (replace == false) {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
-                            + " already exists!");
-                } else {
+        boolean srcIsDir = octopus.files().isDirectory(source);
+        if (srcIsDir) {
+            if (exist) {
+                if (ignore) {
+                    // do nothing as requested
+                } else if (replace) {
                     // keep existing directory
                     // Can not replace directory, to replace have to do recursive delete and createDirectories
                     // because recursive delete can delete unwanted files
+                } else {
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
+                            + " already exists!");
                 }
+            } else {
+                octopus.files().createDirectories(target);
             }
             for (AbsolutePath f : octopus.files().newDirectoryStream(source)) {
                 AbsolutePath fsource = f;
@@ -314,23 +323,25 @@ public class FileUtils {
                 recursiveCopy(octopus, fsource, ftarget, options);
             }
         } else {
-            if (exist == false) {
-                octopus.files().copy(source, target);
-            } else {
-                if (replace == false) {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
-                            + " already exists!");
-                } else {
+            if (exist) {
+                if (ignore) {
+                    // do nothing as requested
+                } else if (replace) {
                     octopus.files().delete(target);
                     octopus.files().copy(source, target);
+                } else {
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
+                            + " already exists!");
                 }
+            } else {
+                octopus.files().copy(source, target);
             }
         }
     }
 
     /**
      * Recursively removes all directories, files and symbolic links in path.
-     * 
+     *
      * @param octopus
      * @param path
      * @throws OctopusIOException

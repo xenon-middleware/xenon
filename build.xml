@@ -10,29 +10,19 @@
 	<path id="lib.jars">
 		<fileset dir="lib">
 			<include name="*.jar" />
+			<!-- Exclude library used to generate graphs in javadoc -->
+			<exclude name="apiviz-*.jar" />
 		</fileset>
 	</path>
 
 	<target name="build" depends="clean, compile" description="build everything" />
 
-	<target name="test" description="run the unit tests">
+	<target name="test" description="run the unit tests with coverage" depends="build">
 		<ant dir="test" target="test" />
 	</target>
 
-	<target name="xml-test" description="run the unit tests, output to xml reports">
-		<ant dir="test" target="xml-test" />
-	</target>
-	
-	<target name="test-integration" description="run the integration tests">
+	<target name="test-integration" description="run the integration tests" depends="build">
 		<ant dir="test" target="test-integration" />
-	</target>
-
-	<target name="xml-test-integration" description="run the integration tests, output to xml reports">
-		<ant dir="test" target="xml-test-integration" />
-	</target>
-	
-	<target name="coverage" description="run the tests with JaCoCo coverage">
-		<ant dir="test" target="coverage" />
 	</target>
 
 	<target name="compile" description="compile the source ">
