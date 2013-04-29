@@ -437,7 +437,33 @@ public class RelativePath {
             return this;
         }
 
+        if (isEmpty()) { 
+            return other;
+        }
+        
         return new RelativePath(merge(elements, other.elements), seperator);
+    }
+
+    /**
+     * Resolve a String containing a RelativePath against this path.
+     * 
+     * If <code>other</code> represents an empty path, this path is returned.
+     * 
+     * If this path is empty, a RelativePath representing the <code>other</code> path is returned.
+     * 
+     * Otherwise, a new RelativePath is returned that contains the concatenation of the path elements this path and the
+     * <code>other</code> path.
+     * 
+     * @param other
+     *            the RelativePath.
+     */
+    public RelativePath resolve(String other) {
+
+        if (other == null || other.length() == 0) {
+            return this;
+        }
+
+        return resolve(new RelativePath(other));
     }
 
     /**
