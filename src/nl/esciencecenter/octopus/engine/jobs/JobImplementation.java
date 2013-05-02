@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -31,6 +32,8 @@ public class JobImplementation implements Job {
 
     private final String identifier;
 
+    private final UUID uuid;
+    
     private final boolean interactive; 
     
     private final boolean online; 
@@ -41,10 +44,28 @@ public class JobImplementation implements Job {
 
     private OutputStream stdin;
     
-    public JobImplementation(JobDescription description, Scheduler scheduler, String identifier, boolean interactive, 
+    public JobImplementation(JobDescription description, Scheduler scheduler, UUID uuid, String identifier, boolean interactive, 
             boolean online) {  
+        
+        if (description == null) { 
+            throw new IllegalArgumentException("JobDescription may not be null!");
+        }
+        
+        if (scheduler == null) { 
+            throw new IllegalArgumentException("Scheduler may not be null!");
+        }
+        
+        if (uuid == null) { 
+            throw new IllegalArgumentException("UUID may not be null!");
+        }
+        
+        if (identifier == null) { 
+            throw new IllegalArgumentException("Identifier may not be null!");
+        }
+        
         this.description = description;
         this.scheduler = scheduler;
+        this.uuid = uuid;
         this.identifier = identifier;
         this.interactive = interactive;
         this.online = online;
@@ -63,11 +84,6 @@ public class JobImplementation implements Job {
     @Override
     public String getIdentifier() {
         return identifier;
-    }
-
-    @Override
-    public String toString() {
-        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description + "]";
     }
 
     /* (non-Javadoc)
@@ -131,6 +147,14 @@ public class JobImplementation implements Job {
         }
     }
 
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.jobs.Job#getUUID()
+     */
+    @Override
+    public UUID getUUID() {
+        return uuid;
+    }
+
     /**
      * Set the stdin of this job. 
      * 
@@ -157,4 +181,35 @@ public class JobImplementation implements Job {
     public void setStderr(InputStream stderr) {
         this.stderr = stderr;
     }
+
+    @Override
+    public String toString() {
+        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        JobImplementation other = (JobImplementation) obj;
+        
+        return uuid.equals(other.uuid);
+    }
+    
+    
 }

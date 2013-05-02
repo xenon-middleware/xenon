@@ -32,9 +32,6 @@ public class SchedulerImplementation implements Scheduler {
     private final String[] queueNames;
     private final Credential credential;
 
-//    private final boolean localStandardStreams;
-//    private final boolean hasDetachedJobs;
-
     private final boolean isOnline;
     private final boolean supportsInteractive;
     private final boolean supportsBatch;
@@ -42,15 +39,20 @@ public class SchedulerImplementation implements Scheduler {
     public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String[] queueNames, Credential credential,
             OctopusProperties properties, boolean isOnline, boolean supportsInteractive, boolean supportsBatch) {
 
+        if (adaptorName == null) { 
+            throw new IllegalArgumentException("AdaptorName may not be null!");
+        }
+        
+        if (uniqueID == null) { 
+            throw new IllegalArgumentException("uniqueID may not be null!");
+        }
+
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
         this.queueNames = queueNames;
         this.properties = properties;
         this.credential = credential;
-//        this.localStandardStreams = localStandardStreams;
-//        this.hasDetachedJobs = hasDetachedJobs;
-        
         this.isOnline = isOnline;
         this.supportsInteractive = supportsInteractive;
         this.supportsBatch = supportsBatch;
@@ -83,19 +85,6 @@ public class SchedulerImplementation implements Scheduler {
     public String[] getQueueNames() {
         return queueNames.clone();
     }
-    
-//    
-//    
-//
-//    @Override
-//    public boolean hasLocalStandardStreams() {
-//        return localStandardStreams;
-//    }
-//
-//    @Override
-//    public boolean hasDetachedJobs() {
-//        return hasDetachedJobs;
-//    }
 
     /* (non-Javadoc)
      * @see nl.esciencecenter.octopus.jobs.Scheduler#supportsInteractive()
@@ -120,6 +109,9 @@ public class SchedulerImplementation implements Scheduler {
     public boolean isOnline() {
         return isOnline;
     }
+
+
+    
     
     @Override
     public String toString() {
@@ -132,33 +124,25 @@ public class SchedulerImplementation implements Scheduler {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((adaptorName == null) ? 0 : adaptorName.hashCode());
-        result = prime * result + ((uniqueID == null) ? 0 : uniqueID.hashCode());
-        return result;
+        int result = 31 + adaptorName.hashCode();
+        return 31 * result + uniqueID.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) { 
             return true;
-        if (obj == null)
+        }
+        
+        if (obj == null) { 
             return false;
-        if (getClass() != obj.getClass())
+        }
+        
+        if (getClass() != obj.getClass()) { 
             return false;
+        }
+        
         SchedulerImplementation other = (SchedulerImplementation) obj;
-        if (adaptorName == null) {
-            if (other.adaptorName != null)
-                return false;
-        } else if (!adaptorName.equals(other.adaptorName))
-            return false;
-        if (uniqueID == null) {
-            if (other.uniqueID != null)
-                return false;
-        } else if (!uniqueID.equals(other.uniqueID))
-            return false;
-        return true;
+        return adaptorName.equals(other.adaptorName) && uniqueID.equals(other.uniqueID);
     }
-
 }

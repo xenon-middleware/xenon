@@ -645,6 +645,7 @@ public class RelativePath {
         return new RelativePath(tmp, seperator);
     }
 
+    /* Generated */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -653,24 +654,32 @@ public class RelativePath {
         result = prime * result + ((seperator == null) ? 0 : seperator.hashCode());
         return result;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) { 
             return true;
-        if (obj == null)
+        } 
+        
+        if (obj == null) { 
             return false;
-        if (getClass() != obj.getClass())
+        }
+        
+        if (getClass() != obj.getClass()) { 
             return false;
+        }
+        
         RelativePath other = (RelativePath) obj;
-        if (!Arrays.equals(elements, other.elements))
-            return false;
+        
         if (seperator == null) {
-            if (other.seperator != null)
+            if (other.seperator != null) { 
                 return false;
-        } else if (!seperator.equals(other.seperator))
+            } 
+        } else if (!seperator.equals(other.seperator)) { 
             return false;
-        return true;
+        }
+        
+        return Arrays.equals(elements, other.elements);
     }
 
     @Override

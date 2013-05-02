@@ -27,6 +27,15 @@ import nl.esciencecenter.octopus.engine.credentials.ProxyCredentialImplementatio
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class SshCredentials implements Credentials {
+
+    private static int currentID = 1;
+
+    private static synchronized String getNewUniqueID() {
+        String res = "ssh" + currentID;
+        currentID++;
+        return res;
+    }
+
     OctopusProperties properties;
     SshAdaptor adaptor;
     OctopusEngine octopusEngine;
@@ -40,20 +49,29 @@ public class SshCredentials implements Credentials {
     @Override
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
             String username, String password) throws OctopusException {
-        return new CertificateCredentialImplementation(adaptor.getName(), new OctopusProperties(properties), keyfile, certfile,
-                username, password);
+        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
+                new OctopusProperties(properties), keyfile, certfile, username, password);
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, Properties properties, String username, String password)
             throws OctopusException {
-        return new PasswordCredentialImplementation(adaptor.getName(), new OctopusProperties(properties), username, password);
+        return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(),
+                new OctopusProperties(properties), username, password);
     }
 
     @Override
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
             String password) throws OctopusException {
-        return new ProxyCredentialImplementation(adaptor.getName(), new OctopusProperties(properties), host, port, username,
-                password);
+        return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(),
+                new OctopusProperties(properties), host, port, username, password);
     }
+
+    @Override
+    public Credential getDefaultCredential(String scheme) throws OctopusException {
+        // Do something special here!!!
+        throw new RuntimeException("Not implemented!");
+    }
+
+
 }

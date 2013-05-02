@@ -76,4 +76,19 @@ public interface Credentials {
      */
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
             String password) throws OctopusException;
+    
+    
+    /**
+     * Creates a proxy credential.
+     * 
+     * @param host
+     *            the hostname of the proxy server
+     * @param port
+     *            the port where the proxy server runs, -1 for the default port
+     * @param username
+     *            the username to use to connect to the proxy server
+     * @param password
+     *            the password to use to connect to the proxy server
+     */
+    public Credential getDefaultCredential(String scheme) throws OctopusException;
 }

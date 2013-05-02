@@ -32,10 +32,27 @@ public class FileSystemImplementation implements FileSystem {
     private final OctopusProperties properties;
     private final RelativePath entryPath;
 
-    public FileSystemImplementation(String adaptorName, String uniqueID, URI uri, RelativePath entryPath, Credential credential,
+    public FileSystemImplementation(String adaptorName, String identifier, URI uri, RelativePath entryPath, Credential credential,
             OctopusProperties properties) {
+        
+        if (adaptorName == null) { 
+            throw new IllegalArgumentException("AdaptorName may not be null!");
+        }
+
+        if (identifier == null) { 
+            throw new IllegalArgumentException("Identifier may not be null!");
+        }
+        
+        if (uri == null) { 
+            throw new IllegalArgumentException("URI may not be null!");
+        }
+        
+        if (entryPath == null) { 
+            throw new IllegalArgumentException("EntryPath may not be null!");
+        }
+        
         this.adaptorName = adaptorName;
-        this.uniqueID = uniqueID;
+        this.uniqueID = identifier;
         this.uri = uri;
         this.entryPath = entryPath;
         this.credential = credential;
@@ -49,12 +66,12 @@ public class FileSystemImplementation implements FileSystem {
     public String getUniqueID() {
         return uniqueID;
     }
-
+    
     @Override
     public RelativePath getEntryPath() {
         return entryPath;
     }
-
+    
     @Override
     public URI getUri() {
         return uri;
@@ -72,39 +89,32 @@ public class FileSystemImplementation implements FileSystem {
 
     @Override
     public String toString() {
-        return "FileSystemImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
+        return "FileSystemImplementation [adaptorName=" + adaptorName + ", uri=" + uri
                 + ", entryPath=" + entryPath + ", properties=" + properties + "]";
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((adaptorName == null) ? 0 : adaptorName.hashCode());
-        result = prime * result + ((uniqueID == null) ? 0 : uniqueID.hashCode());
-        return result;
+        int result = 31 + adaptorName.hashCode();
+        return 31 * result + uniqueID.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) { 
             return true;
-        if (obj == null)
+        }
+        
+        if (obj == null) { 
             return false;
-        if (getClass() != obj.getClass())
+        }
+        
+        if (getClass() != obj.getClass()) {
             return false;
+        }
+        
         FileSystemImplementation other = (FileSystemImplementation) obj;
-        if (adaptorName == null) {
-            if (other.adaptorName != null)
-                return false;
-        } else if (!adaptorName.equals(other.adaptorName))
-            return false;
-        if (uniqueID == null) {
-            if (other.uniqueID != null)
-                return false;
-        } else if (!uniqueID.equals(other.uniqueID))
-            return false;
-        return true;
+        return adaptorName.equals(other.adaptorName) && uniqueID.equals(other.uniqueID);
     }
 
 }

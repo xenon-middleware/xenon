@@ -242,15 +242,15 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException {
+    public FileSystem getLocalCWDFileSystem() throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalCWDFileSystem(properties);
+        return adaptor.filesAdaptor().getLocalCWDFileSystem();
     }
 
     @Override
-    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
+    public FileSystem getLocalHomeFileSystem() throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalHomeFileSystem(properties);
+        return adaptor.filesAdaptor().getLocalHomeFileSystem();
     }
 
     @Override

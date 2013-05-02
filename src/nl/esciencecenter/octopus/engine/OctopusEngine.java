@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.engine;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.UUID;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
@@ -112,6 +113,10 @@ public class OctopusEngine implements Octopus {
         result.end();
     }
 
+    public static UUID getNextUUID() { 
+        return UUID.randomUUID();
+    }
+    
     public static void endAll() {
         synchronized (octopusEngines) {
             for (OctopusEngine octopusEngine : octopusEngines) {

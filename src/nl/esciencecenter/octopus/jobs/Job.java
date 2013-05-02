@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.jobs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
@@ -50,6 +51,13 @@ public interface Job {
      * @return the identifier that was assigned to this job by the scheduler.
      */
     public String getIdentifier();
+    
+    /**
+     * Returns a universally unique identifier for this job.
+     * 
+     * @return the universally unique identifier for this job. 
+     */
+    public UUID getUUID();
     
     /** 
      * Returns if this is an interactive job.

@@ -29,7 +29,6 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      * This member variables holds the URI of the keyfile of the SecurityContext
      */
     private String keyfile = null;
-
     private String certfile = null;
 
     /**
@@ -45,9 +44,10 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredentialImplementation(String adaptorName, OctopusProperties properties, String keyfile, String certfile,
-            String username, String password) {
-        super(adaptorName, properties, username, password);
+    public CertificateCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, 
+            String keyfile, String certfile, String username, String password) {
+        
+        super(adaptorName, uniqueID, properties, username, password);
         this.keyfile = keyfile;
         this.certfile = certfile;
     }
@@ -61,11 +61,6 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
         return keyfile;
     }
 
-    public String toString() {
-        return "CertificateSecurityContext(keyfile = " + keyfile + " certfile = " + certfile
-                + ((username == null) ? "" : (" username = " + username));
-    }
-
     /**
      * Returns the {@link URI} of the certificate file.
      * 
@@ -73,5 +68,11 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      */
     public String getCertfile() {
         return certfile;
+    }
+
+    @Override
+    public String toString() {
+        return "CertificateCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", keyfile="
+                + keyfile + ", certfile=" + certfile + "]";
     }
 }

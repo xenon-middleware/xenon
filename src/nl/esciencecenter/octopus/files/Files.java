@@ -90,7 +90,7 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException;
+    public FileSystem getLocalCWDFileSystem() throws OctopusException;
 
     /**
      * Get a FileSystem that represents the local home directory of the current user.
@@ -110,7 +110,7 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException;
+    public FileSystem getLocalHomeFileSystem() throws OctopusException;
 
     /**
      * Create a new AbsolutePath that represents a (possibly non existing) location on <code>filesystem.</code>

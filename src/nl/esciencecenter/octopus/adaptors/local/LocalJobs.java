@@ -272,8 +272,8 @@ public class LocalJobs implements Jobs {
 
         verifyJobDescription(description);
         
-        JobImplementation result = new JobImplementation(description, scheduler, "localjob-" + getNextJobID(), 
-                description.isInteractive(), true);
+        JobImplementation result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
+                "localjob-" + getNextJobID(), description.isInteractive(), true);
 
         LocalJobExecutor executor = new LocalJobExecutor(result, pollingDelay);
 

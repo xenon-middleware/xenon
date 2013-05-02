@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.engine.credentials;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 
 /**
- * This context is used if you have a credential stored in a myproxy server. You need to specify a host, port, username and
+ * Represents a {@link Credential} stored in a myproxy server. You need to specify a host, port, username and
  * password to the myproxy server.
  * 
  * @author rob
@@ -47,9 +47,9 @@ public class ProxyCredentialImplementation extends CredentialImplementation {
      * @param password
      *            the password to use to connect to the myproxy server
      */
-    public ProxyCredentialImplementation(String adaptorName, OctopusProperties properties, String host, int port,
+    public ProxyCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String host, int port,
             String username, String password) {
-        super(adaptorName, properties, username, password);
+        super(adaptorName, uniqueID, properties, username, password);
         this.host = host;
         this.port = port;
     }
@@ -72,8 +72,9 @@ public class ProxyCredentialImplementation extends CredentialImplementation {
         return port;
     }
 
+    @Override
     public String toString() {
-        return "MyProxyServerCredentialSecurityContext(host = " + host + " port = " + port
-                + ((username == null) ? "" : (" username = " + username));
+        return "ProxyCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", host=" + host
+                + ", port=" + port + "]";
     }
 }

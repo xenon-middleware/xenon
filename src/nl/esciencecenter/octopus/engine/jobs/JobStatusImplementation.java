@@ -32,8 +32,10 @@ public final class JobStatusImplementation implements JobStatus {
     public JobStatusImplementation(Job job, String state, Integer exitCode, Exception error, boolean done,
             Map<String, String> schedulerSpecificInformation) {
 
-        super();
-
+        if (job == null) { 
+            throw new IllegalArgumentException("Job may not be null!");
+        }
+     
         this.job = job;
         this.state = state;
         this.exitCode = exitCode;

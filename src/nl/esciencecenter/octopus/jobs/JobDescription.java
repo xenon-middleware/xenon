@@ -352,26 +352,87 @@ public class JobDescription {
     public void setInteractive(boolean interactive) {
         this.interactive = interactive;
     }
-    
+
+    /* Generated */
     @Override
     public String toString() {
-        String res = "JobDescription(";
-        res += "node count: " + nodeCount;
-        res += "ppn: " + processesPerNode;
-        res += "queue: " + queueName;
-        res += "maxTime: " + maxTime;
-        res += "executable: " + executable;
-        res += ", arguments: " + arguments;
-        res += ", environment: " + environment;
+        return "JobDescription [queueName=" + queueName + ", " +
+        		"executable=" + executable + ", arguments=" + arguments +
+        		", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + 
+                        ", maxTime=" + maxTime + ", mergeOutput=" + mergeOutput + ", interactive=" + interactive +        		
+        		", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + 
+        		", workingDirectory=" + workingDirectory + ", environment=" + environment + "]";
+    }
 
-        res += ", stdin: " + stdin;
-        res += ", stdout: " + stdout;
-        res += ", stderr: " + stderr;
+    /* Generated */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
+        result = prime * result + ((environment == null) ? 0 : environment.hashCode());
+        result = prime * result + ((executable == null) ? 0 : executable.hashCode());
+        result = prime * result + (interactive ? 1231 : 1237);
+        result = prime * result + maxTime;
+        result = prime * result + (mergeOutput ? 1231 : 1237);
+        result = prime * result + nodeCount;
+        result = prime * result + processesPerNode;
+        result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
+        result = prime * result + ((stderr == null) ? 0 : stderr.hashCode());
+        result = prime * result + ((stdin == null) ? 0 : stdin.hashCode());
+        result = prime * result + ((stdout == null) ? 0 : stdout.hashCode());
+        result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
+        return result;
+    }
+    
+    private boolean compare(Object a, Object b) { 
+        
+        if (a == null) { 
+            if (b == null) { 
+                return false;
+            } else { 
+                return true;
+            }
+        }
+        
+        if (b == null) { 
+            return false;
+        }
+        
+        return a.equals(b);
+    }
 
-        res += ", interactive " + interactive;
-
-        res += ")";
-
-        return res;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj == null) { 
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) { 
+            return false;
+        }
+        
+        JobDescription other = (JobDescription) obj;
+        
+        if (interactive != other.interactive || 
+            maxTime != other.maxTime || 
+            mergeOutput != other.mergeOutput || 
+            nodeCount != other.nodeCount || 
+            processesPerNode != other.processesPerNode) { 
+            return false;
+        }
+        
+        return compare(executable, other.executable) && 
+                compare(workingDirectory, other.workingDirectory) && 
+                compare(queueName, other.queueName) && 
+                compare(stdin, other.stdin) && 
+                compare(stdout, other.stdout) && 
+                compare(stderr, other.stderr) && 
+                compare(arguments, other.arguments) && 
+                compare(environment, other.environment);
     }
 }

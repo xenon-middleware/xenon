@@ -362,8 +362,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                     + path + ")");
         }
 
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, new RelativePath(
-                path), credential, new OctopusProperties(properties));
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, 
+                new RelativePath(path), credential, new OctopusProperties(properties));
     }
 
     @Override
@@ -474,7 +474,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public FileSystem getLocalCWDFileSystem(Properties properties) throws OctopusException {
+    public FileSystem getLocalCWDFileSystem() throws OctopusException {
 
         String path = System.getProperty("user.dir");
 
@@ -491,12 +491,12 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
         }
 
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, new RelativePath(path),
-                null, new OctopusProperties(properties));
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, 
+                new RelativePath(path), null, null);
     }
 
     @Override
-    public FileSystem getLocalHomeFileSystem(Properties properties) throws OctopusException {
+    public FileSystem getLocalHomeFileSystem() throws OctopusException {
 
         String path = System.getProperty("user.home");
 
@@ -514,7 +514,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
 
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, new RelativePath(path),
-                null, new OctopusProperties(properties));
+                null, null);
     }
 
 }

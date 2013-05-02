@@ -50,4 +50,10 @@ public class CredentialsEngineImplementation implements Credentials {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newProxyCredential(scheme, properties, host, port, username, password);
     }
+
+    @Override
+    public Credential getDefaultCredential(String scheme) throws OctopusException {
+        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        return adaptor.credentialsAdaptor().getDefaultCredential(scheme);
+    }
 }

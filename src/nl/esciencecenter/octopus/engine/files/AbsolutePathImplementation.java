@@ -56,6 +56,14 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath relativePath) {
 
+        if (filesystem == null) { 
+            throw new IllegalArgumentException("FileSystem may not be null!");
+        }
+        
+        if (relativePath == null) { 
+            throw new IllegalArgumentException("RelativePath may not be null!");
+        }
+        
         this.filesystem = filesystem;
         this.relativePath = relativePath;
 
@@ -86,6 +94,10 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath... relativePaths) {
 
+        if (filesystem == null) { 
+            throw new IllegalArgumentException("FileSystem may not be null!");
+        }
+        
         this.filesystem = filesystem;
 
         if (relativePaths.length == 0) {
@@ -195,32 +207,35 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((filesystem == null) ? 0 : filesystem.hashCode());
-        result = prime * result + ((relativePath == null) ? 0 : relativePath.hashCode());
-        return result;
+        int result = 31 + filesystem.getAdaptorName().hashCode();
+        result = 31 * result + filesystem.getUri().hashCode();
+        return 31 * result + relativePath.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) { 
             return true;
-        if (obj == null)
+        }
+        
+        if (obj == null) { 
             return false;
-        if (!(obj instanceof AbsolutePathImplementation))
+        }
+        
+        if (!(obj instanceof AbsolutePathImplementation)) { 
             return false;
+        }
+        
         AbsolutePathImplementation other = (AbsolutePathImplementation) obj;
-        if (filesystem == null) {
-            if (other.filesystem != null)
-                return false;
-        } else if (!filesystem.equals(other.filesystem))
+        
+        if (!filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())) { 
             return false;
-        if (relativePath == null) {
-            if (other.relativePath != null)
-                return false;
-        } else if (!relativePath.equals(other.relativePath))
+        }
+        
+        if (!filesystem.getUri().equals(other.filesystem.getUri())) { 
             return false;
-        return true;
+        }
+
+        return relativePath.equals(other.relativePath);
     }
 }

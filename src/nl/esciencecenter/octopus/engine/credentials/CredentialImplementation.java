@@ -15,21 +15,14 @@
  */
 package nl.esciencecenter.octopus.engine.credentials;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 
 /**
  * A container for security Information.
  * 
  */
-public abstract class CredentialImplementation implements nl.esciencecenter.octopus.credentials.Credential {
-
-    private static int currentID = 1;
-
-    private static synchronized String getNewUniqueID() {
-        String res = "ssh" + currentID;
-        currentID++;
-        return res;
-    }
+public abstract class CredentialImplementation implements Credential {
 
     private final String uniqueID;
 
@@ -37,24 +30,23 @@ public abstract class CredentialImplementation implements nl.esciencecenter.octo
     protected final String username;
 
     /**
-     * This member variables holds the passphrase of the SecurityContext
-     */
-
-    /**
      * Must be char array for security!! (String end up in the constant pool, etc.)
      */
-    protected final char[] password;
-
+    private final char[] password;
+    
     protected final String adaptorName;
 
     protected final OctopusProperties properties;
 
-    protected CredentialImplementation(String adaptorName, OctopusProperties properties, String username, String password) {
+    protected CredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String username, 
+            String password) {
+        
         this.adaptorName = adaptorName;
         this.properties = properties;
         this.username = username;
+        this.uniqueID = uniqueID;
+        
         this.password = password.toCharArray();
-        uniqueID = getNewUniqueID();
     }
 
     public String getUniqueID() {

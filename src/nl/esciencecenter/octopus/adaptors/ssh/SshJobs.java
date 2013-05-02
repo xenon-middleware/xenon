@@ -191,7 +191,8 @@ public class SshJobs implements Jobs {
         SchedulerImplementation impl = (SchedulerImplementation) scheduler;
 
         // FIXME: get the std streams correct here! Now assumes batch job 
-        Job result = new JobImplementation(description, scheduler, "sshjob-" + getNextJobID(), false, true);
+        Job result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
+                "sshjob-" + getNextJobID(), false, true);
 
         SchedulerInfo info = schedulers.get(impl.getUniqueID());
 
