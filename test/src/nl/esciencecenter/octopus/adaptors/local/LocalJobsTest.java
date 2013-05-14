@@ -6,12 +6,17 @@ import static org.mockito.Mockito.mock;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class LocalJobsTest {
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void submitJob_WithoutStdin_NoException() throws OctopusException {
@@ -26,12 +31,20 @@ public class LocalJobsTest {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("30");
-        description.setWorkingDirectory("/tmp");
+        String workdir = folder.getRoot().getPath();
+        description.setWorkingDirectory(workdir);
         description.setStderr("stderr.txt");
         description.setStdout("stdout.txt");
         description.setQueueName("multi");
 
-        lj.submitJob(scheduler, description);
+        Job job = lj.submitJob(scheduler, description);
+
+        String id = job.getUUID().toString();
+        assertFalse("Job has UUID", id.isEmpty());
+        assertEquals(scheduler, job.getScheduler());
+        assertTrue("Identifier starts with localjob-", job.getIdentifier().startsWith("localjob-"));
+
+        lj.end();
     }
 
 }
