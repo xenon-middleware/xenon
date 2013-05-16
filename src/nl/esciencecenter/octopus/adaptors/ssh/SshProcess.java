@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -41,6 +42,7 @@ public class SshProcess {
     @SuppressWarnings("unused")
     private SchedulerImplementation scheduler;
     private Session session;
+    private JobImplementation job;
     private String executable;
     private List<String> arguments;
     private Map<String, String> environment;
@@ -53,12 +55,14 @@ public class SshProcess {
     private FileInputStream fis;
     private ChannelExec channel;
 
-    public SshProcess(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, String executable,
-            List<String> arguments, Map<String, String> environment, String stdin, String stdout, String stderr) {
+    public SshProcess(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, JobImplementation job,
+            String executable, List<String> arguments, Map<String, String> environment, String stdin, String stdout,
+            String stderr, boolean isInteractive) {
         super();
         this.adaptor = adaptor;
         this.scheduler = scheduler;
         this.session = session;
+        this.job = job;
         this.executable = executable;
         this.arguments = arguments;
         this.environment = environment;
@@ -93,44 +97,52 @@ public class SshProcess {
         // channel.setXForwarding(true);
 
         // set the streams first, then connect the channel.
-
-        if (stdin != null && stdin.length() != 0) {
-
+        if (job.isInteractive()) {
             try {
-                fis = new FileInputStream(stdin);
-            } catch (FileNotFoundException e) {
+                job.setStdout(channel.getInputStream());
+                job.setStderr(channel.getErrStream());
+                job.setStdin(channel.getOutputStream());
+            } catch (IOException e) {
                 throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
             }
-            channel.setInputStream(fis);
         } else {
-            channel.setInputStream(null);
-        }
-
-        fosStdOut = null;
-        if (stdout != null && stdout.length() != 0) {
-            try {
-                fosStdOut = new FileOutputStream(stdout);
-            } catch (FileNotFoundException e) {
-                throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+            if (stdin != null && stdin.length() != 0) {
+                try {
+                    fis = new FileInputStream(stdin);
+                } catch (FileNotFoundException e) {
+                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                }
+                channel.setInputStream(fis);
+            } else {
+                channel.setInputStream(null);
             }
-            channel.setOutputStream(fosStdOut);
-        } else {
-            channel.setOutputStream(null);
-        }
 
-        fosStderr = null;
-        if (stderr != null && stderr.length() != 0) {
-            try {
-                fosStderr = new FileOutputStream(stderr);
-            } catch (FileNotFoundException e) {
-                throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+            fosStdOut = null;
+            if (stdout != null && stdout.length() != 0) {
+                try {
+                    fosStdOut = new FileOutputStream(stdout);
+                } catch (FileNotFoundException e) {
+                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                }
+                channel.setOutputStream(fosStdOut);
+            } else {
+                channel.setOutputStream(null);
             }
-            channel.setErrStream(fosStderr);
-        } else {
-            channel.setErrStream(null);
-        }
 
-        logger.debug("stdin = " + stdin + ", stdout = " + stdout + ", stderr = " + stderr);
+            fosStderr = null;
+            if (stderr != null && stderr.length() != 0) {
+                try {
+                    fosStderr = new FileOutputStream(stderr);
+                } catch (FileNotFoundException e) {
+                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                }
+                channel.setErrStream(fosStderr);
+            } else {
+                channel.setErrStream(null);
+            }
+
+            logger.debug("stdin = " + stdin + ", stdout = " + stdout + ", stderr = " + stderr);
+        }
 
         for (Map.Entry<String, String> entry : environment.entrySet()) {
             channel.setEnv(entry.getKey(), entry.getValue());
@@ -143,7 +155,6 @@ public class SshProcess {
             throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
         }
         logger.debug("connecting channel done");
-
     }
 
     int waitFor() throws InterruptedException {
