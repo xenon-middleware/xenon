@@ -169,7 +169,7 @@ public class JobImplementation implements Job {
      * 
      * @param inputStream
      */
-    public void setStdout(InputStream stdout) {
+    public synchronized void setStdout(InputStream stdout) {
         this.stdout = stdout;
     }
 
@@ -178,7 +178,7 @@ public class JobImplementation implements Job {
      * 
      * @param errorStream
      */
-    public void setStderr(InputStream stderr) {
+    public synchronized void setStderr(InputStream stderr) {
         this.stderr = stderr;
     }
 
@@ -210,6 +210,4 @@ public class JobImplementation implements Job {
         
         return uuid.equals(other.uuid);
     }
-    
-    
 }

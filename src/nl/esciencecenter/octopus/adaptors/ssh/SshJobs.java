@@ -137,9 +137,8 @@ public class SshJobs implements Jobs {
 
         Session session = adaptor.createNewSession(uniqueID, location, credential, this.properties);
 
-        // FIXME: supportsInteractive is set to false here.
         SchedulerImplementation sshScheduler = new SchedulerImplementation(adaptor.getName(), uniqueID, location, 
-                new String[] { "single" }, credential, new OctopusProperties(properties), true, false, true);
+                new String[] { "single" }, credential, new OctopusProperties(properties), true, true, true);
 
         schedulers.put(uniqueID, new SchedulerInfo(sshScheduler, session));
 
@@ -190,9 +189,8 @@ public class SshJobs implements Jobs {
 
         SchedulerImplementation impl = (SchedulerImplementation) scheduler;
 
-        // FIXME: get the std streams correct here! Now assumes batch job 
-        Job result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
-                "sshjob-" + getNextJobID(), false, true);
+        JobImplementation result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
+                "sshjob-" + getNextJobID(), description.isInteractive(), true /* online */);
 
         SchedulerInfo info = schedulers.get(impl.getUniqueID());
 

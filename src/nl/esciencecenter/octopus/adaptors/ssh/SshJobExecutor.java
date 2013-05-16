@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.IOException;
 
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
@@ -34,7 +35,7 @@ public class SshJobExecutor implements Runnable {
 
     protected static Logger logger = LoggerFactory.getLogger(SshJobExecutor.class);
 
-    private final Job job;
+    private final JobImplementation job;
 
     private Integer exitCode;
 
@@ -52,7 +53,7 @@ public class SshJobExecutor implements Runnable {
     private SchedulerImplementation scheduler;
     private Session session;
 
-    public SshJobExecutor(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, Job job)
+    public SshJobExecutor(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, JobImplementation job)
             throws BadParameterException {
         this.job = job;
         this.adaptor = adaptor;
@@ -144,9 +145,9 @@ public class SshJobExecutor implements Runnable {
             JobDescription description = job.getJobDescription();
 
             SshProcess sshProcess =
-                    new SshProcess(adaptor, scheduler, session, description.getExecutable(), description.getArguments(),
+                    new SshProcess(adaptor, scheduler, session, job, description.getExecutable(), description.getArguments(),
                             description.getEnvironment(), description.getStdin(), description.getStdout(),
-                            description.getStderr());
+                            description.getStderr(), description.isInteractive());
 
             updateState("RUNNING");
 

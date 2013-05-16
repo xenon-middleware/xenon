@@ -63,7 +63,7 @@ public interface Scheduler {
     public boolean supportsInteractive();
         
     /**
-     * Does this Scheduler supports the submission of batch jobs ?   
+     * Does this Scheduler support the submission of batch jobs ?   
      * 
      * @return if this scheduler supports the submission of batch jobs ? 
      */    
