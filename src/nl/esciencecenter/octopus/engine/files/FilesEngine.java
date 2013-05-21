@@ -109,24 +109,7 @@ public class FilesEngine implements Files {
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException {
         return getFilesAdaptor(filesystem).isOpen(filesystem);
     }
-
-    @Override
-    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-
-        FileSystem sourcefs = source.getFileSystem();
-        FileSystem targetfs = target.getFileSystem();
-
-        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).copy(source, target);
-        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).copy(source, target);
-        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).copy(source, target);
-        } else {
-            throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
-        }
-    }
-
+  
     @Override
     public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).createDirectories(dir);
@@ -163,6 +146,28 @@ public class FilesEngine implements Files {
     }
 
     @Override
+    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
+        return getAttributes(path).isSymbolicLink();
+    }
+    
+    @Override
+    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+
+        FileSystem sourcefs = source.getFileSystem();
+        FileSystem targetfs = target.getFileSystem();
+
+        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
+            return getFilesAdaptor(source).copy(source, target);
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
+            return getFilesAdaptor(target).copy(source, target);
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
+            return getFilesAdaptor(source).copy(source, target);
+        } else {
+            throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
+        }
+    }
+    
+    @Override
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
 
         FileSystem sourcefs = source.getFileSystem();
@@ -179,6 +184,46 @@ public class FilesEngine implements Files {
         }
     }
 
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.files.Files#resumeCopy(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath, boolean)
+     */
+    @Override
+    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException {
+
+        FileSystem sourcefs = source.getFileSystem();
+        FileSystem targetfs = target.getFileSystem();
+
+        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
+            return getFilesAdaptor(source).resumeCopy(source, target, check);
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
+            return getFilesAdaptor(target).resumeCopy(source, target, check);
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
+            return getFilesAdaptor(source).resumeCopy(source, target, check);
+        } else {
+            throw new OctopusIOException("cannot do inter-scheme third party resumeCopy (yet)", null, null);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.files.Files#append(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath)
+     */
+    @Override
+    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+        
+        FileSystem sourcefs = source.getFileSystem();
+        FileSystem targetfs = target.getFileSystem();
+
+        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
+            return getFilesAdaptor(source).append(source, target);
+        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
+            return getFilesAdaptor(target).append(source, target);
+        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
+            return getFilesAdaptor(source).append(source, target);
+        } else {
+            throw new OctopusIOException("cannot do inter-scheme third party append (yet)", null, null);
+        }
+    }
+    
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).newDirectoryStream(dir);
@@ -256,5 +301,10 @@ public class FilesEngine implements Files {
     @Override
     public String toString() {
         return "FilesEngine [octopusEngine=" + octopusEngine + "]";
+    }
+
+    @Override
+    public long size(AbsolutePath path) throws OctopusIOException {
+        return getFilesAdaptor(path).size(path);
     }
 }

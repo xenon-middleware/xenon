@@ -15,14 +15,18 @@
  */
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
@@ -137,6 +141,41 @@ class LocalUtils {
 
         }
         return result;
+    }
+
+    /**
+     * @param javaPath
+     * @param javaPath2
+     * @throws IOException 
+     */
+    public static boolean isHead(Path head, Path file) throws IOException {
+        
+        byte [] buf1 = new byte[4*1024];
+        byte [] buf2 = new byte[4*1024];
+        
+        try (InputStream in1 = Files.newInputStream(head, StandardOpenOption.READ);
+             InputStream in2 = Files.newInputStream(head, StandardOpenOption.READ)) { 
+            
+            while (true) { 
+
+                int size1 = in1.read(buf1);
+                int size2 = in2.read(buf2);
+
+                if (size1 != size2) { 
+                    return false;
+                }
+
+                if (size1 < 0) { 
+                    return true;
+                }
+
+                for (int i=0;i<size1;i++) { 
+                    if (buf1[i] != buf2[i]) { 
+                        return false;
+                    }
+                }
+            }           
+        }        
     }
 
 }

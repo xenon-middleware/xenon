@@ -187,6 +187,66 @@ public interface Files {
      */
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
 
+
+    /**
+     * Resume the copy of an existing source file to an existing target file. 
+     * 
+     * The size of the target is used as the start position in the source. All data from the source after this start position is 
+     * append to the target. For example, if the target contains 100 bytes (0-99) and the source 200 bytes (0-199), the data at 
+     * bytes 100-199 will be copied appended from source and append to target.   
+     * 
+     * If the <code>check</code> is set to true, the existing data in the target is compared to the head of the source. If any 
+     * difference are found an exception is thrown.    
+     * 
+     * Both the source and target must NOT be a directory or link.
+     * 
+     * If the target is equal to the source this method has no effect.
+     * 
+     * @param source
+     *            the existing source file.
+     * @param target
+     *            the existing target file.
+     * @return the target path.
+     * 
+     * @throws NoSuchFileException
+     *             If the source or target file does not exist.
+     * @throws IllegalSourcePathException
+     *             If the source is a directory or link.
+     * @throws IllegalTargetPathException
+     *             If the target is a directory or link.
+     * @throws InvalidDataException
+     *             If the target file is larger than the source file, or the existing data in target differs from source.  
+     * @throws OctopusIOException
+     *             If the move failed.
+     */
+    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException;
+    
+    /**
+     * Append the existing source file or link to an existing target file or link.
+     * 
+     * The source or target must NOT be a directory.
+     * 
+     * If the target is equal to the source an exception will be thrown.
+     * 
+     * If the source is a link, the path to which it refers will be appended to the target.
+     * 
+     * @param source
+     *            the existing source file or link.
+     * @param target
+     *            the existing target file or link.
+     * @return the target path.
+     * 
+     * @throws NoSuchFileException
+     *             If the source or target does not exist.
+     * @throws IllegalSourcePathException
+     *             If the source is a directory.
+     * @throws IllegalTargetPathException
+     *             If the target is a directory or target equals source.
+     * @throws OctopusIOException
+     *             If the move failed.
+     */
+    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+
     /**
      * Move or rename an existing source path to a non-existing target path.
      * 
@@ -213,7 +273,7 @@ public interface Files {
      *             If the move failed.
      */
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
-
+    
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
      * 
@@ -319,6 +379,34 @@ public interface Files {
      */
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException;
 
+    /**
+     * Test if a path represents a symbolic link.
+     * 
+     * @param path
+     *            the path to test.
+     * 
+     * @return If the path represents a symbolic link.
+     * 
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
+    
+    /**
+     * Return the size of a file in bytes.
+     * 
+     * @param path
+     *            the path to the file.
+     * 
+     * @return  the size of a file in bytes, or 0 if the file is a directory or symbolic link.
+     * 
+     * @throws NoSuchFileException
+     *             If the path does not exists.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public long size(AbsolutePath path) throws OctopusIOException;
+    
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
      * 

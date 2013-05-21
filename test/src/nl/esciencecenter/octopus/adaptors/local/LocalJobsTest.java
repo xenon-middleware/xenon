@@ -24,7 +24,9 @@ public class LocalJobsTest {
         OctopusEngine octopus = mock(OctopusEngine.class);
         Scheduler scheduler = mock(Scheduler.class);
 
-        String[][] defaults = new String[][] { { LocalAdaptor.MULTIQ_MAX_CONCURRENT, "1"}, { LocalAdaptor.MAX_HISTORY, "10"}, {LocalAdaptor.POLLING_DELAY, "5000"}};
+        String[][] defaults = new String[][] { { LocalAdaptor.MULTIQ_MAX_CONCURRENT, "1"}, { LocalAdaptor.MAX_HISTORY, "10"}, 
+                {LocalAdaptor.POLLING_DELAY, "5000"}};
+        
         OctopusProperties props = new OctopusProperties(defaults);
         LocalJobs lj = new LocalJobs(props, adaptor, octopus);
 

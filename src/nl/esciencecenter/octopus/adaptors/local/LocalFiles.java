@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
@@ -45,6 +46,8 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
+import nl.esciencecenter.octopus.exceptions.IllegalTargetPathException;
+import nl.esciencecenter.octopus.exceptions.InvalidDataException;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -139,6 +142,126 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         return target;
     }
+
+    private void append(AbsolutePath source, long fromOffset, AbsolutePath target) throws OctopusIOException { 
+
+        // We need to append some bytes from source to target. 
+        try (InputStream in = Files.newInputStream(LocalUtils.javaPath(source), StandardOpenOption.READ);
+             OutputStream out = Files.newOutputStream(LocalUtils.javaPath(target), StandardOpenOption.APPEND)) {
+            
+            in.skip(fromOffset);
+            
+            byte [] buffer = new byte[4*1024];
+            
+            int size = in.read(buffer);
+            
+            while (size > 0) { 
+                out.write(buffer, 0, size);
+                size = in.read(buffer);                
+            }
+            
+        } catch (IOException e) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to copy " + source.getPath() + ":" + fromOffset + 
+                    " to target " + target.getPath(), e);
+        }          
+    }
+    
+    @Override
+    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException {
+        
+        if (!exists(source)) {
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
+        }
+        
+        if (isDirectory(source)) {
+            throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " is a directory");
+        }
+
+        if (isSymbolicLink(source)) {
+            throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " is a link");
+        }
+        
+        if (!exists(target)) {
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " does not exist!");
+        }
+
+        if (isDirectory(target)) {
+            throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " is a directory");
+        }
+
+        if (isSymbolicLink(source)) {
+            throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " is a link");
+        }
+
+        if (source.normalize().equals(target.normalize())) {
+            return target;
+        }
+        
+        long targetSize = size(target); 
+        long sourceSize = size(source);
+
+        // If target is larger than source, they cannot be the same file.
+        if (targetSize > sourceSize) {
+            throw new InvalidDataException(LocalAdaptor.ADAPTOR_NAME, "Data in target " + target.getPath() + 
+                    " does not match " + source + " " + source.getPath());
+        }
+            
+        if (check) {
+            // check if the data in target corresponds to the head of source.
+            try { 
+                if (!LocalUtils.isHead(LocalUtils.javaPath(target), LocalUtils.javaPath(source))) { 
+                    throw new InvalidDataException(LocalAdaptor.ADAPTOR_NAME, "Data in target " + target.getPath() + 
+                            " does not match source " + source.getPath());
+                }
+            } catch (IOException e) {
+                throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to compare " + source.getPath() + " to "
+                        + target.getPath(), e);
+            }
+        }
+
+        // If target is the same size as source we are done.
+        if (targetSize == sourceSize) { 
+            return target;
+        }
+        
+        // Now append source (from index targetSize) to target.
+        append(source, targetSize, target);
+        
+        return target;
+    }
+    
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.files.Files#append(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath)
+     */
+    @Override
+    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+        
+        if (!exists(source)) {
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
+        }
+        
+        if (isDirectory(source)) {
+            throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " is a directory");
+        }
+
+        if (!exists(target)) {
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " does not exist!");
+        }
+
+        if (isDirectory(target)) {
+            throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " is a directory");
+        }
+
+        if (source.normalize().equals(target.normalize())) {
+            throw new IllegalTargetPathException(LocalAdaptor.ADAPTOR_NAME, "Can not append a file to itself (source " + 
+                    source.getPath() + " equals target " + target.getPath() + ")");
+        }
+
+        append(source, 0, target);
+        
+        return target;
+    }
+
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -515,6 +638,36 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, new RelativePath(path),
                 null, null);
+    }
+
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.files.Files#isSymbolicLink(nl.esciencecenter.octopus.files.AbsolutePath)
+     */
+    @Override
+    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
+        return Files.isSymbolicLink(LocalUtils.javaPath(path));
+    }
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.files.Files#size(nl.esciencecenter.octopus.files.AbsolutePath)
+     */
+    @Override
+    public long size(AbsolutePath path) throws OctopusIOException {
+        
+        if (!exists(path)) {
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.toString() + " does not exist!");
+        }
+        
+        if (isDirectory(path) || isSymbolicLink(path)) { 
+            return 0;
+        }
+        
+        try { 
+            return Files.size(LocalUtils.javaPath(path));
+        } catch (IOException e) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to retrieve size of " + path.toString(), e);
+        }
     }
 
 }

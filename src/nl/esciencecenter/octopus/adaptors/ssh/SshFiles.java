@@ -740,4 +740,24 @@ public class SshFiles implements Files {
     public FileSystem getLocalHomeFileSystem() throws OctopusException {
         throw new OctopusException(getClass().getName(), "getLocalHomeFileSystem not supported!");
     }
+
+    @Override
+    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "resumeCopy not implemented!");
+    }
+
+    @Override
+    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "append not implemented!");
+    }
+
+    @Override
+    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "isSymbolicLink not implemented!");
+    }
+
+    @Override
+    public long size(AbsolutePath path) throws OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "size not implemented!");
+    }
 }
