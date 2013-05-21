@@ -52,9 +52,12 @@ public class JobDescription {
     /** The working directory for the job. */
     private String workingDirectory = null;
 
-    /** The environmet variables and their values */
+    /** The environment variables and their values */
     private Map<String, String> environment = new HashMap<String, String>();
 
+    /** The job options of this job */
+    private Map<String, String> jobOptions = new HashMap<String, String>();
+    
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
 
@@ -220,6 +223,29 @@ public class JobDescription {
         this.environment = new HashMap<String, String>(environment);
     }
 
+    /**
+     * Get the job options of this job.
+     * 
+     * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
+     * 
+     * @return the job options of the job.
+     */
+    public Map<String, String> getJobOptions() {
+        return jobOptions;
+    }
+
+    /**
+     * Sets the job options of the job.
+     * 
+     * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
+     * 
+     * @param options
+     *            job options of the job.
+     */
+    public void setJobOptions(Map<String, String> options) {
+        this.jobOptions = new HashMap<String, String>(options);
+    }
+    
     /**
      * Should the job run in offline mode ?
      * 
