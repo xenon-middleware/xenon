@@ -113,7 +113,7 @@ public class SshJobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
-        return new JobStatusImplementation(job, state, exitCode, error, done, null);
+        return new JobStatusImplementation(job, state, exitCode, error, state.equals("RUNNING"), done, null);
     }
 
     public synchronized String getState() {

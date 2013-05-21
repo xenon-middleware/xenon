@@ -55,6 +55,13 @@ public interface JobStatus {
     public Exception getException();
 
     /**
+     * Is the Job running.
+     * 
+     * @return if the Job is running.
+     */
+    public boolean isRunning();
+    
+    /**
      * Is the Job done.
      * 
      * @return if the Job is done.

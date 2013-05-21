@@ -64,7 +64,7 @@ public class LocalJobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
-        return new JobStatusImplementation(job, state, exitStatus, error, done, null);
+        return new JobStatusImplementation(job, state, exitStatus, error, state.equals("RUNNING"), done, null);
     }
 
     public synchronized String getState() {

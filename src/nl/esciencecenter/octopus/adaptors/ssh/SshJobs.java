@@ -236,7 +236,7 @@ public class SshJobs implements Jobs {
             try {
                 result[i] = getJobStatus(jobs[i]);
             } catch (OctopusException e) {
-                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
+                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }
         }
 

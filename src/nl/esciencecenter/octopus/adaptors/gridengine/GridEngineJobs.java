@@ -184,7 +184,7 @@ public class GridEngineJobs implements Jobs {
         if (allMap == null || allMap.isEmpty()) {
             Exception exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of jobs on server");
-            return new JobStatusImplementation(job, null, null, exception, false, null);
+            return new JobStatusImplementation(job, null, null, exception, false, false, null);
         }
 
         //state for only the requested job
@@ -193,7 +193,7 @@ public class GridEngineJobs implements Jobs {
         if (map == null || map.isEmpty()) {
             Exception exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, null);
+            return new JobStatusImplementation(job, null, null, exception, false, false, null);
         }
 
         String state = map.get("state");
@@ -202,11 +202,11 @@ public class GridEngineJobs implements Jobs {
             Exception exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
                             + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, map);
+            return new JobStatusImplementation(job, null, null, exception, false, false, map);
         }
 
         //FIXME: add isDone and exitcode for job
-        return new JobStatusImplementation(job, state, null, null, false, map);
+        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, map);
     }
 
     @Override
@@ -218,7 +218,7 @@ public class GridEngineJobs implements Jobs {
             try {
                 result[i] = getJobStatus(jobs[i]);
             } catch (OctopusIOException | OctopusException e) {
-                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, null);
+                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }
         }
 
@@ -252,13 +252,13 @@ public class GridEngineJobs implements Jobs {
 
                 }
 
-                return new JobStatusImplementation(job, "done", exitCode, null, true, accountingInfo);
+                return new JobStatusImplementation(job, "done", exitCode, null, false, true, accountingInfo);
 
             } else {
                 Exception exception =
                         new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
                                 + " not found on server");
-                return new JobStatusImplementation(job, null, null, exception, false, null);
+                return new JobStatusImplementation(job, null, null, exception, false, false, null);
             }
         }
 
@@ -268,11 +268,11 @@ public class GridEngineJobs implements Jobs {
             Exception exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
                             + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, map);
+            return new JobStatusImplementation(job, null, null, exception, false, false, map);
         }
 
         //FIXME: add isDone and exitcode for job
-        return new JobStatusImplementation(job, state, null, null, false, map);
+        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, map);
     }
 
     @Override

@@ -26,10 +26,13 @@ public final class JobStatusImplementation implements JobStatus {
     private final String state;
     private final Integer exitCode;
     private final Exception exception;
+
+    private final boolean running;
     private final boolean done;
+
     private final Map<String, String> schedulerSpecificInformation;
 
-    public JobStatusImplementation(Job job, String state, Integer exitCode, Exception error, boolean done,
+    public JobStatusImplementation(Job job, String state, Integer exitCode, Exception error, boolean running, boolean done,
             Map<String, String> schedulerSpecificInformation) {
 
         if (job == null) { 
@@ -40,6 +43,7 @@ public final class JobStatusImplementation implements JobStatus {
         this.state = state;
         this.exitCode = exitCode;
         this.exception = error;
+        this.running = running; 
         this.done = done;
         this.schedulerSpecificInformation = schedulerSpecificInformation;
     }
@@ -59,6 +63,11 @@ public final class JobStatusImplementation implements JobStatus {
         return exitCode;
     }
 
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+    
     @Override
     public boolean isDone() {
         return done;
