@@ -21,30 +21,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
+/**
+ * JobDescription for a Java application. Will use the Java specific information provided by the user to build the command line
+ * arguments of the JobDescription.
+ * 
+ * @author Niels Drost
+ * 
+ */
 public class JavaJobDescription extends JobDescription {
 
-    // FIXME: BROKEN BROKEN BROKEN!!! Implement!!! Changed to facade, but have not changed implementation!!!
+    private final List<String> javaOptions = new ArrayList<String>();
 
-    private List<String> javaOptions = new ArrayList<String>();
+    private final Map<String, String> javaSystemProperties = new HashMap<String, String>();
 
-    private Map<String, String> javaSystemProperties = new HashMap<String, String>();
+    private String javaMain = null;
 
-    private String javaMain;
+    private final List<String> javaArguments = new ArrayList<String>();
 
-    private List<String> javaArguments;
-
-    private String javaClassPath;
-
-    private final JobDescription destination;
+    private final List<String> javaClassPath = new ArrayList<String>();
 
     /**
      * Create a {@link JavaJobDescription}, which describes the java application.
      */
-    public JavaJobDescription(JobDescription destination) {
+    public JavaJobDescription() {
         super();
-        this.destination = destination;
     }
 
     /**
@@ -84,7 +87,8 @@ public class JavaJobDescription extends JobDescription {
      *            the system properties.
      */
     public void setJavaSystemProperties(Map<String, String> systemProperties) {
-        this.javaSystemProperties = systemProperties;
+        this.javaSystemProperties.clear();
+        this.javaSystemProperties.putAll(systemProperties);
     }
 
     /**
@@ -96,9 +100,6 @@ public class JavaJobDescription extends JobDescription {
      *            the value belonging to the key of the system property to be added
      */
     public void addJavaSystemProperty(String key, String value) {
-        if (javaSystemProperties == null) {
-            javaSystemProperties = new HashMap<String, String>();
-        }
         javaSystemProperties.put(key, value);
     }
 
@@ -149,6 +150,7 @@ public class JavaJobDescription extends JobDescription {
      * @param arguments
      */
     public void setArguments(String... arguments) {
+        throw new OctopusRuntimeException("Utils", "Setting arguments not supported by the JavaJobDescription");
     }
 
     /**
@@ -164,9 +166,18 @@ public class JavaJobDescription extends JobDescription {
                 result.add(option);
             }
         }
-        if (getJavaClassPath() != null) {
+        if (!getJavaClasspath().isEmpty()) {
             result.add("-classpath");
-            result.add(getJavaClassPath());
+            String classpath = null;
+
+            for (String element : getJavaClasspath()) {
+                if (classpath == null) {
+                    classpath = element;
+                } else {
+                    classpath = classpath + ":" + element;
+                }
+            }
+            result.add(classpath);
         }
 
         if (getJavaSystemProperties() != null) {
@@ -178,11 +189,13 @@ public class JavaJobDescription extends JobDescription {
                 }
             }
         }
+
         if (getJavaMain() != null) {
             result.add(getJavaMain());
         } else {
             return null;
         }
+
         if (getJavaArguments() != null) {
             for (String javaArgument : getJavaArguments()) {
                 result.add(javaArgument);
@@ -197,150 +210,31 @@ public class JavaJobDescription extends JobDescription {
      * @return Returns the executable.
      */
     public String getExecutable() {
-        if (destination.getExecutable() == null) {
+        if (super.getExecutable() == null) {
             return "java";
         } else {
-            return destination.getExecutable();
+            return super.getExecutable();
         }
     }
 
     /**
-     * @Override public void setWorkingDirectory(Path workingDirectory) throws OctopusException { // TODO Auto-generated method
-     *           stub
-     * 
-     *           }
-     * @Override public Path getWorkingDirectory() { // TODO Auto-generated method stub return null; }
-     * 
-     *           Returns the java class path.
+     * Returns the java class path.
      * 
      * @return the java class path.
      */
-    public String getJavaClassPath() {
+    public List<String> getJavaClasspath() {
         return javaClassPath;
     }
 
     /**
-     * Sets the java class path.
+     * Sets the java class path. Will automatically add separators when multiple elements are given.
      * 
      * @param javaClassPath
      *            the class path to be set.
      */
-    public void setJavaClassPath(String javaClassPath) {
-        this.javaClassPath = javaClassPath;
-    }
-
-    @Override
-    public int getNodeCount() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setNodeCount(int resourceCount) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public int getProcessesPerNode() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setProcessesPerNode(int ppn) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public String getQueueName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setQueueName(String queueName) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public int getMaxTime() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setMaxTime(int maxTime) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setExecutable(String executable) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Map<String, String> getEnvironment() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setEnvironment(Map<String, String> environment) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setStdin(String stdin) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setStdout(String stdout) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setStderr(String stderr) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setWorkingDirectory(String workingDirectory) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public String getStdin() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getStdout() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getStderr() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getWorkingDirectory() {
-        // TODO Auto-generated method stub
-        return null;
+    public void setJavaClassPath(String... javaClasspath) {
+        this.javaClassPath.clear();
+        this.javaClassPath.addAll(Arrays.asList(javaClasspath));
     }
 
 }
