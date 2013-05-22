@@ -60,6 +60,44 @@ public class SshFileTests {
     }
 
     @org.junit.Test
+    public void testExistsNoCredential() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        String username = System.getProperty("user.name");
+
+        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), null, null);
+
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
+
+        System.err.println("path = " + path.getPath());
+
+        Assert.assertTrue(octopus.files().exists(path));
+
+        octopus.end();
+    }
+    
+    @org.junit.Test
+    public void testExistsDefaultCredential() throws Exception {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+
+        Credentials c = octopus.credentials();
+
+        String username = System.getProperty("user.name");
+
+        Credential credential = c.getDefaultCredential("ssh");
+
+        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
+
+        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
+
+        System.err.println("path = " + path.getPath());
+
+        Assert.assertTrue(octopus.files().exists(path));
+
+        octopus.end();
+    }
+    
+    @org.junit.Test
     public void testInputStream() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
