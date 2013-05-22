@@ -69,9 +69,6 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
-        // Do something special here!!!
-        throw new RuntimeException("Not implemented!");
+        return adaptor.getDefaultCredential();
     }
-
-
 }

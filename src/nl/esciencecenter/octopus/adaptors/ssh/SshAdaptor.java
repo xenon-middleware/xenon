@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -222,9 +223,38 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    private CredentialImplementation getDefaultCredential() throws OctopusException {
-        // FIXME implement
-        throw new InvalidCredentialException(getName(), "Please specify a valid credential, credential is 'null'");
+    protected Credential getDefaultCredential() throws OctopusException {
+        // FIXME implement agent forwarding
+
+        String userHome = System.getProperty("user.home");
+        if (userHome == null) {
+            throw new InvalidCredentialException(getName(), "Cannot get user home directory.");
+        }
+
+        String userName = System.getProperty("user.name");
+        if (userName == null) {
+            throw new InvalidCredentialException(getName(), "Cannot get user name.");
+        }
+
+        File keyFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
+        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa.pub");
+
+        if (keyFile.exists() && certFile.exists()) {
+            logger.info("Using default credential: "+ keyFile.getPath());
+            return octopusEngine.credentials().newCertificateCredential("ssh", getProperties(), keyFile.getPath(),
+                    certFile.getPath(), userName, "");
+        }
+
+        File keyFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
+        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa.pub");
+
+        if (keyFile2.exists() && certFile2.exists()) {
+            logger.info("Using default credential: "+ keyFile2.getPath());
+            return octopusEngine.credentials().newCertificateCredential("ssh", getProperties(), keyFile2.getPath(),
+                    certFile2.getPath(), userName, "");
+        }
+
+        throw new InvalidCredentialException(getName(), "Cannot create a default credential for ssh, tried " + keyFile.getPath() + " and " + keyFile2.getPath());
     }
 
     private void setCredential(CredentialImplementation credential, Session session) throws OctopusException {
@@ -245,7 +275,8 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected Session createNewSession(String uniqueID, URI location, Credential credential, OctopusProperties localProperties) throws OctopusException {
+    protected Session createNewSession(String uniqueID, URI location, Credential credential, OctopusProperties localProperties)
+            throws OctopusException {
         URI uri = location;
         String user = uri.getUserInfo();
         String host = uri.getHost();
@@ -363,5 +394,4 @@ public class SshAdaptor extends Adaptor {
         // TODO Auto-generated method stub
         return null;
     }
-
 }
