@@ -30,7 +30,7 @@ public abstract class CredentialImplementation implements Credential {
     protected final String username;
 
     /**
-     * Must be char array for security!! (String end up in the constant pool, etc.)
+     * Must be char array for security!! (Strings end up in the constant pool, etc.)
      */
     private final char[] password;
     
