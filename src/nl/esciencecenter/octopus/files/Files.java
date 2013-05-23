@@ -185,8 +185,76 @@ public interface Files {
      * @throws OctopusIOException
      *             If the move failed.
      */
-    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
-
+    //public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+    
+    /**
+     * Copy an existing source file or symbolic link to a target file.
+     * 
+     * Both source and target must NOT be a directory. 
+     * 
+     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
+     * 
+     * If the target is equal to the source this method has no effect.
+     * 
+     * (FIXME) If the source is a link, the link itself will be copied, not the path to which it refers. (FIXME)
+     * 
+     * The <code>options</code> parameter determines how the copy is performed: 
+     * 
+     * <li><code>CREATE</code> (default): Create a new target file and copy to it. Fail if the target already exists.</li>
+     * 
+     * <li><code>REPLACE</code>: Replace target if it already exists. If the target does not exist it will be created. </li>
+     * 
+     * <li><code>IGNORE</code>: Ignore copy if the target already exists. If the target does not exist it will be created. </li>
+     * 
+     * <li><code>APPEND</code>: The data in source will appended to target. Fails if the target does not exist.</li>
+     * 
+     * <li><code>RESUME</code>: A copy from source to target will be resumed. Fails if the target does not exist. 
+     * To resume a copy, the size of the target is used as the start position in the source. All data from the 
+     * source after this start position is  append to the target. For example, if the target contains 100 bytes (0-99) and the 
+     * source 200 bytes (0-199), the data at bytes 100-199 in the source will be append to target. By default, there is no 
+     * verification that the existing data in target corresponds to the data in source.</li> 
+     *
+     * Note that these four options are exclusive. Only one can be selected at a time. If more than one of these options is 
+     * provided, an exception will be thrown.     
+     *  
+     * The following additional options exist:     
+     *  
+     * <li><code>VERIFY</code> (can only be used in combination with <code>RESUME</code>): When resuming a copy, verify that the 
+     * existing data in target corresponds to the data in source.</li>   
+     * 
+     * <li><code>ASYNCHRONOUS</code>: Perform an asynchronous copy. Instead of blocking until the copy is complete, the call 
+     * returns immediately and the copy is performed in the background.<li>
+     * 
+     * If the <code>ASYNCHRONOUS</code> option is provided, a {@link Copy} is returned that can be used to retrieve the status of 
+     * the copy operation (in a {@link CopyStatus}) or cancel it. Any exceptions produced during the copy operation are also 
+     * stored in the {@link CopyStatus}.
+     * 
+     * If the <code>ASYNCHRONOUS</code> option is not provided, the copy will block until it is completed and <code>null</code> 
+     * will be returned.     
+     * 
+     * 
+     * @param source
+     *            the existing source file or link.
+     * @param target
+     *            the target path.
+     * @return a {@link CopyStatus} if the copy is asynchronous or <code>null</code> if it is blocking. 
+     * 
+     * @throws NoSuchFileException
+     *             If the source file does not exist, the target parent directory does not exist, or the target file does not 
+     *             exist and the <code>APPEND</code> or <code>RESUME</code> option is provided.
+     * @throws FileAlreadyExistsException
+     *             If the target file already exists. 
+     * @throws IllegalSourcePathException
+     *             If the source is a directory.
+     * @throws IllegalTargetPathException
+     *             If the target is a directory.
+     * @throws UnsupportedOperationException
+     *             If a conflicting set of copy options is provided.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException, OctopusIOException;
+    
 
     /**
      * Resume the copy of an existing source file to an existing target file. 
@@ -195,7 +263,7 @@ public interface Files {
      * append to the target. For example, if the target contains 100 bytes (0-99) and the source 200 bytes (0-199), the data at 
      * bytes 100-199 will be copied appended from source and append to target.   
      * 
-     * If the <code>check</code> is set to true, the existing data in the target is compared to the head of the source. If any 
+     * If the <code>verify</code> is set to true, the existing data in the target is compared to the head of the source. If any 
      * difference are found an exception is thrown.    
      * 
      * Both the source and target must NOT be a directory or link.
@@ -206,6 +274,9 @@ public interface Files {
      *            the existing source file.
      * @param target
      *            the existing target file.
+     * @param verify 
+     *            should the existing data in the target is compared to the head of the source?
+     *            
      * @return the target path.
      * 
      * @throws NoSuchFileException
@@ -219,7 +290,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If the move failed.
      */
-    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException;
+    //public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean verify) throws OctopusIOException;
     
     /**
      * Append the existing source file or link to an existing target file or link.
@@ -245,7 +316,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If the move failed.
      */
-    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+    //public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -273,6 +344,61 @@ public interface Files {
      *             If the move failed.
      */
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+    
+    /**
+     * Copy an existing source file or link to a non-existing target path. 
+     * 
+     * This copy is asynchronous. Instead of blocking until the copy is complete, this call returns immediately and the copy is
+     * performed in the background. 
+     * 
+     * A {@link Copy} is returned that can be used to retrieve the status of the copy in a {@link CopyStatus} or cancel it. Any 
+     * exceptions produced during the copy operation are also stored in the {@link CopyStatus}.    
+     * 
+     * The source must NOT be a directory.
+     * 
+     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
+     * 
+     * If the target is equal to the source this method has no effect.
+     * 
+     * If the source is a link, the link itself will be copied, not the path to which it refers.
+     * 
+     * @param source
+     *            the existing source file or link.
+     * @param target
+     *            the non existing target path.
+     * @return the target path.
+     *
+     * @throws OctopusIOException
+     *             If the asynchronous copy failed.
+     */
+    //public Copy asynchronousCopy(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+
+    /**
+     * Retrieve the status of an asynchronous copy. 
+     *  
+     * @param copy the asynchronous copy for which to retrieve the status. 
+     * 
+     * @return a {@link CopyStatus} containing the status of the asynchronous copy.
+     * 
+     * @throws NoSuchCopyException
+     *             If the copy is not known.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException;
+    
+    /**
+     * Cancel a copy operation.  
+     * 
+     * @param copy the asynchronous copy which to cancel. 
+     * @param removeTarget should the (partially copied) remote target file be removed ?
+     *  
+     * @throws NoSuchCopyException
+     *             If the copy is not known.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
     
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
@@ -646,4 +772,9 @@ public interface Files {
      */
     public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
             throws OctopusIOException;
+    
+    
+    
+    
+    
 }

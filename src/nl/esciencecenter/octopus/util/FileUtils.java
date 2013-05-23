@@ -33,6 +33,7 @@ import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
+import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
@@ -70,7 +71,7 @@ public class FileUtils {
         OpenOption openOption = OpenOption.CREATE_NEW;
 
         for (CopyOption copyOption : options) {
-            if (copyOption != CopyOption.REPLACE_EXISTING) {
+            if (copyOption != CopyOption.REPLACE) {
                 throw new UnsupportedOperationException("FileUtils", "unsupported copy option " + copyOption + " for " + target);
             }
             openOption = OpenOption.TRUNCATE_EXISTING;
@@ -291,12 +292,10 @@ public class FileUtils {
      */
     public static void recursiveCopy(Octopus octopus, AbsolutePath source, AbsolutePath target, CopyOption... options)
             throws OctopusIOException, UnsupportedOperationException {
-        if (CopyOption.contains(options, CopyOption.COPY_ATTRIBUTES)) {
-            throw new OctopusIOException("FileUtils", "recursiveCopy with attributes NOT IMPLEMENTED!");
-        }
+
         boolean exist = octopus.files().exists(target);
-        boolean replace = CopyOption.contains(options, CopyOption.REPLACE_EXISTING);
-        boolean ignore = CopyOption.contains(options, CopyOption.IGNORE_EXISTING);
+        boolean replace = CopyOption.contains(options, CopyOption.REPLACE);
+        boolean ignore = CopyOption.contains(options, CopyOption.IGNORE);
         if (replace && ignore) {
             throw new UnsupportedOperationException("FileUtils", "Can not replace and ignore existing files at the same time");
         }
@@ -327,8 +326,7 @@ public class FileUtils {
                 if (ignore) {
                     // do nothing as requested
                 } else if (replace) {
-                    octopus.files().delete(target);
-                    octopus.files().copy(source, target);
+                    octopus.files().copy(source, target, nl.esciencecenter.octopus.files.CopyOption.REPLACE);
                 } else {
                     throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
                             + " already exists!");

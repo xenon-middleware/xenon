@@ -41,7 +41,11 @@ import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Copy;
+import nl.esciencecenter.octopus.files.CopyOption;
+import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.DirectoryStream.Filter;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -237,7 +241,7 @@ public class SshFiles implements Files {
      * @throws OctopusIOException
      *             If the copy failed.
      */
-    @Override
+  //  @Override
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
 
         if (!octopusEngine.files().exists(source)) {
@@ -742,16 +746,6 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException {
-        throw new OctopusIOException(getClass().getName(), "resumeCopy not implemented!");
-    }
-
-    @Override
-    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        throw new OctopusIOException(getClass().getName(), "append not implemented!");
-    }
-
-    @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
         throw new OctopusIOException(getClass().getName(), "isSymbolicLink not implemented!");
     }
@@ -759,5 +753,20 @@ public class SshFiles implements Files {
     @Override
     public long size(AbsolutePath path) throws OctopusIOException {
         throw new OctopusIOException(getClass().getName(), "size not implemented!");
+    }
+
+    @Override
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException, OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "copy not implemented!");
+    }
+
+    @Override
+    public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "getCopyStatus not implemented!");
+    }
+
+    @Override
+    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+        throw new OctopusIOException(getClass().getName(), "cancelCopy not implemented!");
     }
 }

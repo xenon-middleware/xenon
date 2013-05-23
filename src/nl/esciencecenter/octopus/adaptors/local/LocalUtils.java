@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.util.CopyOption;
 
 class LocalUtils {
 

@@ -13,31 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.util;
 
-public enum CopyOption {
+package nl.esciencecenter.octopus.files;
 
+/**
+ * Copy represents a (asynchronous) copy operation.
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
+public interface Copy {
+    
     /**
-     * Copy attributes to the new file.
+     * Retrieve the source path to copy from.
+     *  
+     * @return the source path to copy from.
      */
-    COPY_ATTRIBUTES,
-
+    public AbsolutePath getSource();
+    
     /**
-     * Replace an existing file if it exists.
-     */
-    REPLACE_EXISTING,
-
-    /**
-     * Ignore an existing file if it exists.
-     */
-    IGNORE_EXISTING, ;
-
-    public static boolean contains(CopyOption[] options, CopyOption option) {
-        for (CopyOption oneOption : options) {
-            if (oneOption == option) {
-                return true;
-            }
-        }
-        return false;
-    }
+     * Retrieve the target path to copy to.
+     *  
+     * @return the target path to copy to.
+     */    
+    public AbsolutePath getTarget();
 }

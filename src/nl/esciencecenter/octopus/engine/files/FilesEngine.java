@@ -28,6 +28,10 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
+import nl.esciencecenter.octopus.files.Copy;
+import nl.esciencecenter.octopus.files.CopyOption;
+import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.DirectoryStream.Filter;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -151,17 +155,17 @@ public class FilesEngine implements Files {
     }
     
     @Override
-    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException, OctopusIOException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).copy(source, target);
+            return getFilesAdaptor(source).copy(source, target, options);
         } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).copy(source, target);
+            return getFilesAdaptor(target).copy(source, target, options);
         } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).copy(source, target);
+            return getFilesAdaptor(source).copy(source, target, options);
         } else {
             throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
         }
@@ -184,9 +188,20 @@ public class FilesEngine implements Files {
         }
     }
 
+    @Override
+    public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException {
+        return getFilesAdaptor(copy.getSource()).getCopyStatus(copy);
+    }
+
+    @Override
+    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+        getFilesAdaptor(copy.getSource()).cancelCopy(copy);
+    }
+    
     /* (non-Javadoc)
      * @see nl.esciencecenter.octopus.files.Files#resumeCopy(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath, boolean)
      */
+/*    
     @Override
     public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException {
 
@@ -203,10 +218,11 @@ public class FilesEngine implements Files {
             throw new OctopusIOException("cannot do inter-scheme third party resumeCopy (yet)", null, null);
         }
     }
-
+*/
     /* (non-Javadoc)
      * @see nl.esciencecenter.octopus.files.Files#append(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath)
      */
+/*    
     @Override
     public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
         
@@ -223,7 +239,7 @@ public class FilesEngine implements Files {
             throw new OctopusIOException("cannot do inter-scheme third party append (yet)", null, null);
         }
     }
-    
+*/    
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).newDirectoryStream(dir);

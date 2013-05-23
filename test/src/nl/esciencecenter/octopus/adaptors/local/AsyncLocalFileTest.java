@@ -29,14 +29,16 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
+import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.RelativePath;
 
-public class LocalFileTest {    
+public class AsyncLocalFileTest {    
 
     String tmpDirName = System.getProperty("java.io.tmpdir");
 
@@ -107,9 +109,13 @@ public class LocalFileTest {
         
         assertTrue(files.exists(testFile));
         
-        OutputStream out = files.newOutputStream(testFile, OpenOption.WRITE);
+        OutputStream out = files.newOutputStream(testFile, OpenOption.WRITE, OpenOption.TRUNCATE_EXISTING);
         out.write(data);
-        out.close();        
+        out.close();       
+        
+        long size = files.size(testFile);
+        
+        assertTrue(size == data.length);
     }
     
     private void checkData(AbsolutePath testFile, byte [] data) throws IOException { 
@@ -124,121 +130,113 @@ public class LocalFileTest {
         assertTrue(size == data.length);
         assertTrue(Arrays.equals(data, Arrays.copyOfRange(buffer, 0, data.length)));
     }
+   
+    private CopyStatus waitUntilDone(Copy copy) throws Exception { 
+
+        CopyStatus status = files.getCopyStatus(copy);
+        
+        int count = 0;
+        
+        while (!status.isDone()) { 
+
+            System.out.println("Got status " + count + " " + status.getState());
+            
+            count++;
+            
+            if (count > 10) {
+                throw new Exception("Async copy failed to complete in time!");
+            }
+            
+            try { 
+                Thread.sleep(1000);
+            } catch (Exception e) { 
+                // ignored
+            }
+            
+            status = files.getCopyStatus(copy);
+        }
+
+        System.out.println("Got status " + count + " " + status.getState());
+        
+        if (status.hasException()) { 
+            throw new Exception("Async copy failed!", status.getException());
+        }
+        
+        return status;
+    }
     
     @org.junit.Test
     public void test1() throws Exception {
-        // Tries to create an absolute path for tmpdir.
+        
+        // Tries to create a sandboxdir, creates a new file in this sandboxdir, write some data to the file, copies the file 
+        // asynchronously, reads back the data from the copy, and compares to the expected input.          
+        byte [] buffer = "Hello world".getBytes();
+        
         prepare();
+        
+        AbsolutePath sandboxDir = prepareTestDir("test_sandbox_" + UUID.randomUUID());
+        AbsolutePath testFile1 = prepareTestFile(sandboxDir, "test1");
+        
+        writeData(testFile1, buffer);
+
+        AbsolutePath testFile2 = files.newPath(fs, sandboxDir.getRelativePath().resolve("test2"));
+        
+        assertFalse(files.exists(testFile2));
+
+        long size = files.size(testFile1);
+        
+        Copy copy = files.copy(testFile1, testFile2, CopyOption.ASYNCHRONOUS);
+        
+        CopyStatus status = waitUntilDone(copy);
+        
+        assertTrue(status.bytesCopied() == size);
+        assertTrue(files.exists(testFile2));
+        
+        checkData(testFile2, buffer);
+
+        cleanupTestFile(testFile1);
+        cleanupTestFile(testFile2);
+        cleanupTestDir(sandboxDir);
         cleanup();
     }
 
     @org.junit.Test
     public void test2() throws Exception {
-
-        // Tries to create a test-sandbox dir in tmpdir.
+        
+        // Tries to create a sandboxdir, creates a new file in this sandboxdir, write some data to the file, copies the file, 
+        // reads back the data from the copy, and compares to the expected input.          
+        byte [] buffer = "Hello world".getBytes();
+        
         prepare();
+        
         AbsolutePath sandboxDir = prepareTestDir("test_sandbox_" + UUID.randomUUID());
+        AbsolutePath testFile1 = prepareTestFile(sandboxDir, "test1");
+        
+        writeData(testFile1, buffer);
+
+        AbsolutePath testFile2 = files.newPath(fs, sandboxDir.getRelativePath().resolve("test2"));
+        
+        assertFalse(files.exists(testFile2));
+
+        long size = files.size(testFile1);
+
+        Copy copy = files.copy(testFile1, testFile2, CopyOption.CREATE, CopyOption.ASYNCHRONOUS);
+        
+        CopyStatus status = waitUntilDone(copy);
+        
+        assertTrue(status.bytesCopied() == size);
+        assertTrue(files.exists(testFile2));
+        
+        checkData(testFile2, buffer);
+
+        cleanupTestFile(testFile1);
+        cleanupTestFile(testFile2);
         cleanupTestDir(sandboxDir);
         cleanup();
     }
-
+    
     @org.junit.Test
     public void test3() throws Exception {
-        
-        // Tries to create a sandboxdir and create a new file in this sandboxdir.
-        prepare();
-        
-        AbsolutePath sandboxDir = prepareTestDir("test_sandbox_" + UUID.randomUUID());
-        AbsolutePath testFile = prepareTestFile(sandboxDir, "test1");
-        
-        cleanupTestFile(testFile);
-        cleanupTestDir(sandboxDir);
-        cleanup();
-    }
-    
-    @org.junit.Test
-    public void test4() throws Exception {
-        
-        // Tries to create a sandboxdir, create a new file in this sandboxdir, write some data to the file, reads back the data, 
-        // and compares to the expected input.  
-
-        byte [] buffer = "Hello world".getBytes();
-        
-        prepare();
-        
-        AbsolutePath sandboxDir = prepareTestDir("test_sandbox_" + UUID.randomUUID());
-        AbsolutePath testFile = prepareTestFile(sandboxDir, "test1");
-        
-        writeData(testFile, buffer);
-        checkData(testFile, buffer);
-
-        cleanupTestFile(testFile);
-        cleanupTestDir(sandboxDir);
-        cleanup();
-    }
-
-    @org.junit.Test
-    public void test5() throws Exception {
-        
-        // Tries to create a sandboxdir, creates a new file in this sandboxdir, write some data to the file, copies the file, 
-        // reads back the data from the copy, and compares to the expected input.          
-        byte [] buffer = "Hello world".getBytes();
-        
-        prepare();
-        
-        AbsolutePath sandboxDir = prepareTestDir("test_sandbox_" + UUID.randomUUID());
-        AbsolutePath testFile1 = prepareTestFile(sandboxDir, "test1");
-        
-        writeData(testFile1, buffer);
-
-        AbsolutePath testFile2 = files.newPath(fs, sandboxDir.getRelativePath().resolve("test2"));
-        
-        assertFalse(files.exists(testFile2));
-
-        files.copy(testFile1, testFile2);
-        
-        assertTrue(files.exists(testFile2));
-        
-        checkData(testFile2, buffer);
-
-        cleanupTestFile(testFile1);
-        cleanupTestFile(testFile2);
-        cleanupTestDir(sandboxDir);
-        cleanup();
-    }
-
-    @org.junit.Test
-    public void test6() throws Exception {
-        
-        // Tries to create a sandboxdir, creates a new file in this sandboxdir, write some data to the file, copies the file, 
-        // reads back the data from the copy, and compares to the expected input.          
-        byte [] buffer = "Hello world".getBytes();
-        
-        prepare();
-        
-        AbsolutePath sandboxDir = prepareTestDir("test_sandbox_" + UUID.randomUUID());
-        AbsolutePath testFile1 = prepareTestFile(sandboxDir, "test1");
-        
-        writeData(testFile1, buffer);
-
-        AbsolutePath testFile2 = files.newPath(fs, sandboxDir.getRelativePath().resolve("test2"));
-        
-        assertFalse(files.exists(testFile2));
-
-        files.copy(testFile1, testFile2, CopyOption.CREATE);
-        
-        assertTrue(files.exists(testFile2));
-        
-        checkData(testFile2, buffer);
-
-        cleanupTestFile(testFile1);
-        cleanupTestFile(testFile2);
-        cleanupTestDir(sandboxDir);
-        cleanup();
-    }
-    
-    @org.junit.Test
-    public void test7() throws Exception {
         
         // Tries to create a sandboxdir, creates two files in this sandboxdir, write some data to both files, appends one file to  
         // the other, reads back the data from the files, and compares to the expected input.  
@@ -256,7 +254,15 @@ public class LocalFileTest {
         writeData(testFile1, buffer1);
         writeData(testFile2, buffer2);
         
-        files.copy(testFile1, testFile2, CopyOption.APPEND);
+        long size1 = files.size(testFile1);
+        long size2 = files.size(testFile2);
+        
+        Copy copy = files.copy(testFile1, testFile2, CopyOption.APPEND, CopyOption.ASYNCHRONOUS);
+        
+        CopyStatus status = waitUntilDone(copy);
+        
+        assertTrue(status.bytesCopied() == size1);
+        assertTrue(files.size(testFile2) == (size1+size2));
         
         checkData(testFile2, buffer3);
         
@@ -267,7 +273,7 @@ public class LocalFileTest {
     }
     
     @org.junit.Test
-    public void test8() throws Exception {
+    public void test4() throws Exception {
         
         // Tries to create a sandboxdir, creates two files in this sandboxdir, write data to one file, writes a subset of the data
         // to another file, uses resumeCopy to copy the rest from one file to another, reads back the data from the second file, 
@@ -285,7 +291,14 @@ public class LocalFileTest {
         writeData(testFile1, buffer1);
         writeData(testFile2, buffer2);
         
-        files.copy(testFile1, testFile2, CopyOption.RESUME);
+        long size1 = files.size(testFile1);
+        long size2 = files.size(testFile2);
+        
+        Copy copy = files.copy(testFile1, testFile2, CopyOption.RESUME, CopyOption.ASYNCHRONOUS);
+        
+        CopyStatus status = waitUntilDone(copy);
+        
+        assertTrue(status.bytesCopied() == (size1-size2));
         
         checkData(testFile2, buffer1);
 
@@ -294,4 +307,5 @@ public class LocalFileTest {
         cleanupTestDir(sandboxDir);
         cleanup();
     }
+
 }

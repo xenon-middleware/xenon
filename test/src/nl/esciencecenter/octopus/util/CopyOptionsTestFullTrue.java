@@ -18,6 +18,8 @@ package nl.esciencecenter.octopus.util;
 
 import static org.junit.Assert.*;
 
+import nl.esciencecenter.octopus.files.CopyOption;
+
 import org.junit.Test;
 
 /**
@@ -28,7 +30,7 @@ public class CopyOptionsTestFullTrue {
 
     @Test
     public void test() {
-        assertFalse(CopyOption.contains(new CopyOption[] { CopyOption.REPLACE_EXISTING }, 
-                CopyOption.COPY_ATTRIBUTES));
+        assertFalse(CopyOption.contains(new CopyOption[] { CopyOption.REPLACE }, 
+                CopyOption.CREATE));
     }
 }

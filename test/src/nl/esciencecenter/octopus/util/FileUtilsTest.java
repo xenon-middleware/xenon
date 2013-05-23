@@ -31,6 +31,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -282,7 +283,7 @@ public class FileUtilsTest {
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
 
-        FileUtils.recursiveCopy(octopus, srcDir, dstDir, CopyOption.IGNORE_EXISTING);
+        FileUtils.recursiveCopy(octopus, srcDir, dstDir, CopyOption.IGNORE);
 
         verify(files).exists(dstDir);
         verify(files).isDirectory(srcDir);
@@ -307,7 +308,7 @@ public class FileUtilsTest {
         when(dstFile.getFileSystem()).thenReturn(dstFs);
         when(dstFs.getAdaptorName()).thenReturn("ssh");
 
-        FileUtils.recursiveCopy(octopus, srcFile, dstFile, CopyOption.IGNORE_EXISTING);
+        FileUtils.recursiveCopy(octopus, srcFile, dstFile, CopyOption.IGNORE);
 
         verify(files).exists(dstFile);
         verify(files).isDirectory(srcFile);
@@ -324,7 +325,7 @@ public class FileUtilsTest {
         AbsolutePath dstDir = mock(AbsolutePath.class); // bar
 
         try {
-            FileUtils.recursiveCopy(octopus, srcDir, dstDir, CopyOption.IGNORE_EXISTING, CopyOption.REPLACE_EXISTING);
+            FileUtils.recursiveCopy(octopus, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
             fail("UnsupportedOperationException not thrown");
         } catch (UnsupportedOperationException e) {
             assertThat(e.getMessage(), is("FileUtils adaptor: Can not replace and ignore existing files at the same time"));
