@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +40,7 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,4 +301,9 @@ public class GridEngineJobs implements Jobs {
 
     }
 
+    @Override
+    public Streams getStreams(Job job) throws OctopusException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

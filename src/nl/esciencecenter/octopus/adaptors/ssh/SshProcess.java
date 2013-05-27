@@ -27,6 +27,7 @@ import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,8 @@ public class SshProcess {
     private FileOutputStream fosStderr;
     private FileInputStream fis;
     private ChannelExec channel;
+    
+    private Streams streams; 
 
     public SshProcess(SshAdaptor adaptor, SchedulerImplementation scheduler, Session session, JobImplementation job,
             String executable, List<String> arguments, Map<String, String> environment, String stdin, String stdout,
@@ -78,6 +81,10 @@ public class SshProcess {
         }
     }
 
+    public Streams getStreams() { 
+        return streams;
+    }
+    
     void run() throws OctopusException, OctopusIOException {
         logger.debug("ssh process");
 
@@ -99,9 +106,7 @@ public class SshProcess {
         // set the streams first, then connect the channel.
         if (job.isInteractive()) {
             try {
-                job.setStdout(channel.getInputStream());
-                job.setStderr(channel.getErrStream());
-                job.setStdin(channel.getOutputStream());
+                streams = new Streams(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
             } catch (IOException e) {
                 throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
             }
@@ -198,5 +203,13 @@ public class SshProcess {
 
     void destroy() {
         // TODO
+    }
+
+    boolean isDone() {
+        return channel.isClosed();
+    }
+
+    int getExitStatus() {
+        return channel.getExitStatus();
     }
 }

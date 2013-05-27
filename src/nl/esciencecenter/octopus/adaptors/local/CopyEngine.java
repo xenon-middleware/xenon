@@ -236,6 +236,7 @@ public class CopyEngine {
         AbsolutePath target = ac.copy.getTarget();
         
         boolean replace = (ac.mode == CopyOption.REPLACE);
+        boolean ignore = (ac.mode == CopyOption.IGNORE);
         
         if (!owner.exists(source)) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
@@ -245,8 +246,13 @@ public class CopyEngine {
             throw new IllegalSourcePathException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " is a directory");
         }
 
-        if (!replace && owner.exists(target)) {
-            throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
+        if (owner.exists(target)) { 
+            if (ignore) { 
+                return;
+            } 
+            if (!replace) { 
+                throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
+            }            
         }
 
         if (!owner.exists(target.getParent())) {
@@ -292,7 +298,8 @@ public class CopyEngine {
         try { 
             switch (info.mode) { 
             case CREATE:
-            case REPLACE: 
+            case REPLACE:
+            case IGNORE:
                 doCopy(info);
                 break;
             case APPEND: 

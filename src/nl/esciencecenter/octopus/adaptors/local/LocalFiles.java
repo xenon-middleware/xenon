@@ -905,7 +905,15 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                 }
                 
                 mode = opt;
-                break;                
+                break;     
+            case IGNORE:
+                if (mode != null && mode != opt) { 
+                    throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode 
+                            + " and RESUME");
+                }
+                
+                mode = opt;
+                break;
             case VERIFY:
                 verify = true;
                 break;                

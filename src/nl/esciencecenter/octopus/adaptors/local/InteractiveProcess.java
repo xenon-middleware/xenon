@@ -22,6 +22,7 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ class InteractiveProcess implements LocalProcess {
     private int exitCode;
     private boolean done;
     
+    private Streams streams;
+    
     InteractiveProcess(JobImplementation job) throws IOException { 
 
         JobDescription description = job.getJobDescription();
@@ -46,13 +49,14 @@ class InteractiveProcess implements LocalProcess {
         builder.environment().putAll(description.getEnvironment());
         builder.directory(new java.io.File(description.getWorkingDirectory()));
         
-        process = builder.start();
-        
-        job.setStdin(process.getOutputStream());
-        job.setStdout(process.getInputStream());
-        job.setStderr(process.getErrorStream());
+        process = builder.start();       
+        streams = new Streams(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 
+    public Streams getStreams() { 
+        return streams;
+    }
+    
     public int waitFor() throws InterruptedException {
         exitCode = process.waitFor();
         done = true;

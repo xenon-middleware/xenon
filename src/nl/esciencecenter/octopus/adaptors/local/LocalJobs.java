@@ -42,6 +42,7 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -291,12 +292,21 @@ public class LocalJobs implements Jobs {
         } else {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "INTERNAL ERROR: failed to submit job!");
         }
-
+        
         //purge jobs from q if needed (will not actually cancel execution of jobs)
         purgeQ(singleQ);
         purgeQ(multiQ);
         purgeQ(unlimitedQ);
 
+        if (description.isInteractive()) {
+            executor.waitUntilRunning();
+            
+            if (executor.isDone() && !executor.hasRun()) { 
+                Exception e = executor.getError();
+                throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job failed to start!", e);
+            } 
+        }
+        
         return result;
     }
 
@@ -430,5 +440,17 @@ public class LocalJobs implements Jobs {
     @Override
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return true;
+    }
+
+    @Override
+    public Streams getStreams(Job job) throws OctopusException {
+        
+        if (job.getScheduler() != localScheduler) {
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot cancel jobs descriptions from other scheduler!");
+        }
+
+        // FIXME: What if job is already gone?
+        LinkedList<LocalJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        return findJob(tmp, job).getStreams();
     }
 }

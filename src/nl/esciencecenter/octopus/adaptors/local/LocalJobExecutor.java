@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +37,18 @@ public class LocalJobExecutor implements Runnable {
     
     private final int pollingDelay;
 
+    private Streams streams;
+    
     private Integer exitStatus;
 
+    private Thread thread = null;
+    
     private boolean killed = false;
-
     private boolean done = false;
-
-    private String state = "INITIAL";
-
+    private boolean hasRun = false;
+    
+    private String state = "PENDING";
+    
     private Exception error;
 
     public LocalJobExecutor(JobImplementation job, int pollingDelay) throws BadParameterException {
@@ -51,8 +56,16 @@ public class LocalJobExecutor implements Runnable {
         this.pollingDelay = pollingDelay;
     }
 
+    public synchronized boolean hasRun() {
+        return hasRun;
+    }
+    
     public synchronized void kill() throws OctopusException {
         killed = true;
+        
+        if (thread != null) {
+            thread.interrupt();
+        }
     }
 
     public synchronized boolean isDone() {
@@ -75,30 +88,50 @@ public class LocalJobExecutor implements Runnable {
         return error;
     }
 
-    private synchronized void updateState(String state) {
+    private synchronized void updateState(String state, int exitStatus, Exception e) {
+        
+        if (state.equals("ERROR") || state.equals("KILLED")) { 
+            error = e;
+            done = true;        
+        } else if (state.equals("DONE")) { 
+            this.exitStatus = exitStatus;
+            done = true;
+        } else if (state.equals("RUNNING")) { 
+            hasRun = true;
+        } else { 
+            throw new RuntimeException("INTERNAL ERROR: Illegal state: " + state);
+        }
+        
         this.state = state;
+        notifyAll();
     }
     
-    private synchronized void setError(Exception e) {
-        state = "ERROR";
-        error = e;
-        done = true;
-    }
-
     private synchronized boolean getKilled() { 
         return killed;
     }
 
-    private synchronized void setDone(int exitStatus) {
-        state = "DONE";
-        this.exitStatus = exitStatus; 
-        done = true;
+    private synchronized void setStreams(Streams streams) { 
+        this.streams = streams;
     }
     
-    private synchronized void setKilled(Exception e) {
-        state = "KILLED";
-        error = e;
-        done = true;
+    public synchronized Streams getStreams() throws OctopusException { 
+        
+        if (job.getJobDescription().isInteractive()) { 
+            return streams;
+        } 
+        
+        throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job is not interactive!");
+    }
+
+    public synchronized void waitUntilRunning() {
+
+        while (state.equals("PENDING")) { 
+            try { 
+                wait();
+            } catch (InterruptedException e) { 
+                // ignored
+            }
+        }
     }
     
     @Override
@@ -108,25 +141,29 @@ public class LocalJobExecutor implements Runnable {
 
         JobDescription description = job.getJobDescription();
         
+        
+        if (getKilled()) {
+            updateState("KILLED", -1, new IOException("Process cancelled by user."));
+            return;
+        }
+        
+        
+        this.thread = Thread.currentThread();
+        
         long endTime = 0;
         int maxTime = description.getMaxTime();
         
-        if (getKilled()) {
-            setKilled(new IOException("Process cancelled by user."));
-            return;
-        }
-
-        updateState("INITIAL");
-
         if (maxTime > 0) { 
             endTime = System.currentTimeMillis() + maxTime * 60 * 1000;
         }
         
         if (description.isInteractive()) { 
             try {             
-                process = new InteractiveProcess(job);
+                InteractiveProcess tmp = new InteractiveProcess(job);
+                setStreams(tmp.getStreams());
+                process = tmp; 
             } catch (IOException e) {
-                setError(e);
+                updateState("ERROR", -1, e);
                 return;
             }
 
@@ -134,28 +171,28 @@ public class LocalJobExecutor implements Runnable {
             try {             
                 process = new BatchProcess(job.getJobDescription());
             } catch (IOException e) {
-                setError(e);
+                updateState("ERROR", -1, e);
                 return;
             }
         }
         
-        updateState("RUNNING");
+        updateState("RUNNING", -1, null);
             
         while (true) { 
 
             if (process.isDone()) {
-                setDone(process.getExitStatus());
+                updateState("DONE", process.getExitStatus(), null);
                 return;
             }
 
             if (getKilled()) {
-                setKilled(new IOException("Process cancelled by user."));
+                updateState("KILLED", -1, new IOException("Process cancelled by user."));
                 process.destroy();
                 return;
             }
                
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
-                setKilled(new IOException("Process timed out."));
+                updateState("KILLED", -1, new IOException("Process timed out."));
                 process.destroy();
                 return;
             }
@@ -167,4 +204,6 @@ public class LocalJobExecutor implements Runnable {
             }
         }
     }
+
+    
 }

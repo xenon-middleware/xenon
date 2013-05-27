@@ -71,7 +71,7 @@ public class SshAdaptor extends Adaptor {
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "ssh.";
-
+    
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
 
@@ -83,7 +83,10 @@ public class SshAdaptor extends Adaptor {
 
     /** Maximum history length for finished jobs */
     public static final String MAX_HISTORY = QUEUE + "historySize";
-
+    
+    /** Property for maximum history length for finished jobs */
+    public static final String POLLING_DELAY = QUEUE + "pollingDelay";
+    
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },

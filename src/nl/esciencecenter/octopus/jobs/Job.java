@@ -77,37 +77,4 @@ public interface Job {
      * @return if this is an online job.
      */    
     public boolean isOnline();
-    
-    /** 
-     * Returns the standard output stream of this job.
-     * 
-     * The standard streams can only be retrieved if this is an interactive job.  
-     * 
-     * @return the standard output stream of this job.
-     *
-     * @throws OctopusException if this job is not interactive.
-     */
-    public InputStream getStdout() throws OctopusException;
-    
-    /** 
-     * Returns the standard error stream of this job.
-     * 
-     * The standard streams can only be retrieved if this is an interactive job.  
-     * 
-     * @return the standard error stream of this job.
-     *
-     * @throws OctopusException if this job is not interactive.
-     */
-    public InputStream getStderr() throws OctopusException;
-
-    /** 
-     * Returns the standard input stream of this job.
-     * 
-     * The standard streams can only be retrieved if this is an interactive job.  
-     * 
-     * @return the standard input stream of this job.
-     *
-     * @throws OctopusException if this job is not interactive.
-     */
-    public OutputStream getStdin() throws OctopusException;    
 }

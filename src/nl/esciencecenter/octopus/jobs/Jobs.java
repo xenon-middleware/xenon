@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
 
@@ -238,7 +240,19 @@ public interface Jobs {
      *             If an I/O error occurred.
      */
     public JobStatus[] getJobStatuses(Job... jobs);
-
+    
+    /** 
+     * Returns the standard streams of a job.
+     * 
+     * The standard streams can only be retrieved if it is an interactive job.  
+     * 
+     * @param job the interactive job for which to retrieve the streams.
+     * @return the streams of the job.
+     *
+     * @throws OctopusException if the job is not interactive.
+     */
+    public Streams getStreams(Job job) throws OctopusException;
+        
     /**
      * Cancel a job.
      * 

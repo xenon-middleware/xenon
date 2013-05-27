@@ -40,6 +40,7 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +96,8 @@ public class SshJobs implements Jobs {
 
     private final int maxQSize;
 
+    private final int pollingDelay;
+
     private static int jobID = 0;
 
     private static synchronized int getNextJobID() {
@@ -115,6 +118,12 @@ public class SshJobs implements Jobs {
         if (maxQSize < 0) {
             throw new BadParameterException(adaptor.getName(), "max q size cannot be negative");
         }
+        
+        pollingDelay = properties.getIntProperty(SshAdaptor.POLLING_DELAY);
+        
+        if (pollingDelay < 100 ||  pollingDelay > 60000) {
+            throw new BadParameterException(adaptor.getName(), "Polling delay must be between 100 and 60000!");
+        }        
     }
 
     @Override
@@ -204,7 +213,8 @@ public class SshJobs implements Jobs {
             logger.debug("EEEK");
         }
 
-        SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, info.getSession(), result);
+        SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, info.getSession(), result, 
+                pollingDelay);
 
         String queueName = description.getQueueName();
 
@@ -330,5 +340,11 @@ public class SshJobs implements Jobs {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public Streams getStreams(Job job) throws OctopusException {
+        LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
+        return findJob(tmp, job).getStreams();
     }
 }

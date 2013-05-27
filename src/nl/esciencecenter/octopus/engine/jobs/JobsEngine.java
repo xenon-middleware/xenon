@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
 
@@ -29,6 +31,7 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 public class JobsEngine implements Jobs {
 
@@ -111,6 +114,11 @@ public class JobsEngine implements Jobs {
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatuses(scheduler, queueNames);
+    }
+
+    @Override
+    public Streams getStreams(Job job) throws OctopusException {
+        return getAdaptor(job.getScheduler()).jobsAdaptor().getStreams(job);
     }
 
     @Override
