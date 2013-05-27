@@ -91,7 +91,9 @@ public class SshAdaptor extends Adaptor {
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
             { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
-            { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." } };
+            { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
+            { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." } };
+    
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;
