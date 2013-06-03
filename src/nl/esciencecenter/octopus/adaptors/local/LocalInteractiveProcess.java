@@ -23,13 +23,14 @@ import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class InteractiveProcess implements LocalProcess {
+class LocalInteractiveProcess implements ProcessWrapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(InteractiveProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocalInteractiveProcess.class);
 
     private final java.lang.Process process;
 
@@ -38,7 +39,7 @@ class InteractiveProcess implements LocalProcess {
     
     private Streams streams;
     
-    InteractiveProcess(JobImplementation job) throws IOException { 
+    LocalInteractiveProcess(JobImplementation job) throws IOException { 
 
         JobDescription description = job.getJobDescription();
         
@@ -79,7 +80,7 @@ class InteractiveProcess implements LocalProcess {
         }
     }
     
-    private void unixDestroy(Process process) throws Throwable {
+    private void unixDestroy(java.lang.Process process) throws Throwable {
         Field pidField = process.getClass().getDeclaredField("pid");
 
         pidField.setAccessible(true);

@@ -84,7 +84,7 @@ public class CommandRunner {
         if (workingDir != null) {
             builder.directory(workingDir);
         }
-        Process p = null;
+        java.lang.Process p = null;
         try {
             p = builder.start();
         } catch (IOException e) {

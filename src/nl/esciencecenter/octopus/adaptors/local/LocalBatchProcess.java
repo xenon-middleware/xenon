@@ -24,17 +24,20 @@ import java.lang.reflect.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.engine.util.MergingOutputStream;
 import nl.esciencecenter.octopus.engine.util.StreamForwarder;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 
-class BatchProcess implements LocalProcess {
+class LocalBatchProcess implements ProcessWrapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(BatchProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocalBatchProcess.class);
 
-    private final Process[] processes;
+    private final java.lang.Process[] processes;
 
     private final StreamForwarder[] stdinForwarders;
     private final StreamForwarder[] stdoutForwarders;
@@ -46,8 +49,10 @@ class BatchProcess implements LocalProcess {
     private final int [] exitCodes;
     private final boolean [] done;
     
-    BatchProcess(JobDescription description) throws IOException { 
+    LocalBatchProcess(JobImplementation job) throws IOException { 
 
+        JobDescription description = job.getJobDescription();
+        
         int count = description.getProcessesPerNode();
 
         exitCodes = new int[count];
@@ -74,7 +79,7 @@ class BatchProcess implements LocalProcess {
             stderrStream = null;
         }
 
-        processes = new Process[count];
+        processes = new java.lang.Process[count];
         stdinForwarders = new StreamForwarder[count];
         stdoutForwarders = new StreamForwarder[count];
         stderrForwarders = new StreamForwarder[count];
@@ -161,7 +166,7 @@ class BatchProcess implements LocalProcess {
         return true;
     }
     
-    private void unixDestroy(Process process) throws Throwable {
+    private void unixDestroy(java.lang.Process process) throws Throwable {
         Field pidField = process.getClass().getDeclaredField("pid");
 
         pidField.setAccessible(true);
@@ -203,5 +208,8 @@ class BatchProcess implements LocalProcess {
         }
     }
 
-
+    @Override
+    public Streams getStreams() {
+        return null;
+    }
 }

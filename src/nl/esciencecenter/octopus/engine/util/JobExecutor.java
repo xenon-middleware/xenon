@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.local;
+
+package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
+import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
+import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
@@ -29,14 +32,22 @@ import nl.esciencecenter.octopus.jobs.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocalJobExecutor implements Runnable {
+/**
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ *
+ */
+public class JobExecutor implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(LocalJobExecutor.class);
+    private static Logger logger = LoggerFactory.getLogger(JobExecutor.class);
     
     private final JobImplementation job;
     
-    private final int pollingDelay;
+    private final ProcessWrapperFactory factory;
 
+    private final int pollingDelay;
+    
+    private final Adaptor adaptor; 
+    
     private Streams streams;
     
     private Integer exitStatus;
@@ -51,8 +62,10 @@ public class LocalJobExecutor implements Runnable {
     
     private Exception error;
 
-    public LocalJobExecutor(JobImplementation job, int pollingDelay) throws BadParameterException {
+    public JobExecutor(Adaptor adaptor, JobImplementation job, ProcessWrapperFactory factory, int pollingDelay) throws BadParameterException {
+        this.adaptor = adaptor;
         this.job = job;
+        this.factory = factory;
         this.pollingDelay = pollingDelay;
     }
 
@@ -137,7 +150,7 @@ public class LocalJobExecutor implements Runnable {
     @Override
     public void run() {
 
-        LocalProcess process = null;
+        ProcessWrapper process = null;
 
         JobDescription description = job.getJobDescription();
         
@@ -155,23 +168,15 @@ public class LocalJobExecutor implements Runnable {
             endTime = System.currentTimeMillis() + maxTime * 60 * 1000;
         }
         
-        if (description.isInteractive()) { 
-            try {             
-                InteractiveProcess tmp = new InteractiveProcess(job);
-                setStreams(tmp.getStreams());
-                process = tmp; 
-            } catch (IOException e) {
-                updateState("ERROR", -1, e);
-                return;
-            }
-
-        } else { 
-            try {             
-                process = new BatchProcess(job.getJobDescription());
-            } catch (IOException e) {
-                updateState("ERROR", -1, e);
-                return;
-            }
+        try { 
+            process = factory.createProcessWrapper(adaptor, job);
+        
+            if (description.isInteractive()) { 
+                setStreams(process.getStreams());                   
+            }            
+        } catch (IOException e) {
+            updateState("ERROR", -1, e);
+            return;
         }
         
         updateState("RUNNING", -1, null);
@@ -202,6 +207,4 @@ public class LocalJobExecutor implements Runnable {
             }
         }
     }
-
-    
 }

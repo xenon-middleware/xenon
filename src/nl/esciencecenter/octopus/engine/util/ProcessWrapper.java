@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.adaptors.local;
+package nl.esciencecenter.octopus.engine.util;
+
+import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public interface LocalProcess {
+public interface ProcessWrapper {
     
-    public int waitFor() throws InterruptedException;
+    public Streams getStreams();
     public boolean isDone();
-    
     public int getExitStatus();
     public void destroy();
 }

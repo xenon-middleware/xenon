@@ -37,7 +37,7 @@ public class JobTimeoutTest {
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
-        description.setArguments("70s");
+        description.setArguments("60s");
         description.setQueueName("single");
         description.setMaxTime(1);
         description.setWorkingDirectory(System.getProperty("java.io.tmpdir"));
