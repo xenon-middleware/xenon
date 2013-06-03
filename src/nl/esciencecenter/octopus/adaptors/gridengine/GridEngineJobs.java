@@ -209,7 +209,7 @@ public class GridEngineJobs implements Jobs {
         }
 
         //FIXME: add isDone and exitcode for job
-        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, map);
+        return new JobStatusImplementation(job, state, null, null, state.equals("running"), false, map);
     }
 
     @Override

@@ -35,6 +35,7 @@ public class JobScriptGenerator {
         for (String argument : description.getArguments()) {
             script.format(" %s", argument);
         }
+        script.format("\n");
 
         script.format("exit 22\n");
 
