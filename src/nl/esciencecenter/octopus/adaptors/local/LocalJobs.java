@@ -192,12 +192,8 @@ public class LocalJobs implements Jobs {
     private void verifyJobDescription(JobDescription description) throws OctopusException { 
         
         String queue = description.getQueueName();
-        
-        if (queue == null) { 
-            throw new IncompleteJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Queue name missing in JobDescription!");
-        }
-        
-        if (!(queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
+              
+        if (!(queue == null || queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
             throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Queue " + queue + " not available locally!");
         }
 
@@ -280,7 +276,7 @@ public class LocalJobs implements Jobs {
 
         String queueName = description.getQueueName();
 
-        if (queueName.equals("single")) {
+        if (queueName == null || queueName.equals("single")) {
             singleQ.add(executor);
             singleExecutor.execute(executor);
         } else if (queueName.equals("multi")) {
