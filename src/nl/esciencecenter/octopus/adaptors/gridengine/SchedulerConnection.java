@@ -134,7 +134,7 @@ public class SchedulerConnection {
     }
 
     public Map<String, Map<String, String>> getQueueStatus() throws OctopusException, OctopusIOException {
-        String qstatOutput = runCommandAtServer("qstat", null, "-xml", "-g", "c");
+        String qstatOutput = runCommandAtServer(null, "qstat", "-xml", "-g", "c");
 
         return parser.parseQueueInfos(qstatOutput);
     }

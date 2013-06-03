@@ -96,9 +96,11 @@ public class QstatOutputParserTest {
 
     @Test
     public void testParseJobInfo() throws Throwable {
-        byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/queues.xml"));
+        byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/jobs.xml"));
 
         String content = new String(encoded);
+        
+        System.err.println("parsing queue info from: " + content);
 
         XmlOutputParser parser = new XmlOutputParser(false);
 

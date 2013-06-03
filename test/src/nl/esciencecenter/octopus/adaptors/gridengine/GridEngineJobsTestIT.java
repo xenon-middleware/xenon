@@ -183,7 +183,7 @@ public class GridEngineJobsTestIT {
                     return;
                 }
             } catch (Exception e) {
-                //IGNORE
+                System.err.println("Error while getting job status: " + e.getMessage());
             }
             Thread.sleep(1000);
         }
