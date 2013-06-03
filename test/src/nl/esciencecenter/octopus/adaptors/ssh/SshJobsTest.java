@@ -36,7 +36,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.apache.commons.io.FileUtils;
 
-public class SshJobsTests {
+public class SshJobsTest {
 
     @org.junit.Test
     public void testJobSubmit() throws Exception {

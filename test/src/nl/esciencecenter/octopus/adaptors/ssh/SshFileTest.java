@@ -34,7 +34,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
-public class SshFileTests {
+public class SshFileTest {
 
     @org.junit.Test
     public void testExists() throws Exception {
