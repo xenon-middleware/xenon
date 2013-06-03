@@ -75,6 +75,8 @@ public class LocalJobs implements Jobs {
 
     private final int pollingDelay;
 
+    private final String defaultWorkingDirectory;
+    
     private static int jobID = 0;
 
     private static synchronized int getNextJobID() {
@@ -93,6 +95,12 @@ public class LocalJobs implements Jobs {
             uri = new URI("local:///");
         } catch (URISyntaxException e) {
             throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
+        }
+
+        defaultWorkingDirectory = System.getProperty("user.dir");
+        
+        if (defaultWorkingDirectory == null) { 
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to retrieve current working directory!");
         }
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
@@ -193,7 +201,12 @@ public class LocalJobs implements Jobs {
         
         String queue = description.getQueueName();
               
-        if (!(queue == null || queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
+        if (queue == null) { 
+            queue = "single";
+            description.setQueueName("single");
+        }
+        
+        if (!(queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
             throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Queue " + queue + " not available locally!");
         }
 
@@ -206,8 +219,7 @@ public class LocalJobs implements Jobs {
         String workingDirectory = description.getWorkingDirectory(); 
         
         if (workingDirectory == null) { 
-            throw new IncompleteJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
-                    "Working directory missing in JobDescription!");
+            description.setWorkingDirectory(defaultWorkingDirectory);
         }
 
         int nodeCount = description.getNodeCount();

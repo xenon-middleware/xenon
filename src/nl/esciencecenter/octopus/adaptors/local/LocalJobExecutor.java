@@ -141,15 +141,13 @@ public class LocalJobExecutor implements Runnable {
 
         JobDescription description = job.getJobDescription();
         
-        
         if (getKilled()) {
             updateState("KILLED", -1, new IOException("Process cancelled by user."));
             return;
         }
         
-        
         this.thread = Thread.currentThread();
-        
+       
         long endTime = 0;
         int maxTime = description.getMaxTime();
         
