@@ -21,6 +21,9 @@ import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
@@ -45,6 +48,8 @@ import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
  *
  */
 public class JobQueues {
+    
+    private static final Logger logger = LoggerFactory.getLogger(JobQueues.class);
     
     private final Scheduler myScheduler;
     
@@ -87,7 +92,7 @@ public class JobQueues {
             throw new BadParameterException(adaptor.getName(), "Maximum queue size cannot be negative (excluding -1 for unlimited)");
         }
 
-        if (multiQThreads <= 1) {
+        if (multiQThreads < 1) {
             throw new BadParameterException(adaptor.getName(), "Number of slots for the multi queue cannot be smaller than one!");
         }
         
@@ -106,7 +111,7 @@ public class JobQueues {
     
     private void checkScheduler(Scheduler scheduler) throws OctopusException { 
         if (scheduler != myScheduler) {
-            throw new OctopusException(adaptor.getName(), "Scheduler mismatch!");
+            throw new OctopusException(adaptor.getName(), "Scheduler mismatch! " + scheduler + " != " + myScheduler) ;
         }
     }
     
@@ -317,17 +322,33 @@ public class JobQueues {
     
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
         
+        if (logger.isDebugEnabled()) { 
+            logger.debug(adaptor.getName() + ": Submitting job");
+        }
+        
         checkScheduler(scheduler);
         
         verifyJobDescription(description);
-        
+
+        if (logger.isDebugEnabled()) { 
+            logger.debug(adaptor.getName() + ": JobDescription verified OK");
+        }
+
         JobImplementation result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
                 adaptor.getName() + "-" + getNextJobID(), description.isInteractive(), true);
 
+        if (logger.isDebugEnabled()) { 
+            logger.debug(adaptor.getName() + ": Created Job " + result.getIdentifier());
+        }
+        
         JobExecutor executor = new JobExecutor(adaptor, result, factory, pollingDelay);
         
         String queueName = description.getQueueName();
-        
+       
+        if (logger.isDebugEnabled()) { 
+            logger.debug(adaptor.getName() + ": Submitting job to queue " + queueName);
+        }
+       
         if (queueName == null || queueName.equals("single")) {
             singleQ.add(executor);
             singleExecutor.execute(executor);
@@ -341,7 +362,7 @@ public class JobQueues {
             throw new OctopusException(adaptor.getName(), "INTERNAL ERROR: failed to submit job!");
         }
         
-        //purge jobs from q if needed (will not actually cancel execution of jobs)
+        // Purge jobs from the queue if needed (will not actually cancel execution of jobs)
         purgeQ(singleQ);
         purgeQ(multiQ);
         purgeQ(unlimitedQ);

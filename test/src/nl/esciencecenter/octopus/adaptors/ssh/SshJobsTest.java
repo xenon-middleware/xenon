@@ -46,6 +46,7 @@ public class SshJobsTest {
         RelativePath location = new RelativePath(System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID().toString());
         AbsolutePath root = octopus.files().newPath(filesystem, location);
         octopus.files().createDirectory(root);
+
         String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
 
         JobDescription description = new JobDescription();
@@ -54,12 +55,13 @@ public class SshJobsTest {
         description.setStdin(null);
         description.setStdout(root.resolve(new RelativePath("stdout.txt")).getPath());
         description.setStderr(root.resolve(new RelativePath("stderr.txt")).getPath());
-
-        String username = System.getProperty("user.name");
-        URI sh_location = new URI("ssh://" + username + "@localhost");
+        
         Credentials c = octopus.credentials();
         Credential credential = c.getDefaultCredential("ssh");
-
+        
+        String username = System.getProperty("user.name");
+        URI sh_location = new URI("ssh://" + username + "@localhost");
+        
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, credential, null);
 
         Job job = octopus.jobs().submitJob(scheduler, description);
@@ -74,7 +76,7 @@ public class SshJobsTest {
             throw status.getException();
         }
 
-        File stdout = new File("/tmp/stdout.txt");
+        File stdout = new File(location.getPath() + File.separator + "stdout.txt");
         assertThat(FileUtils.readFileToString(stdout), is("   9  525 3581 " + input_file + "\n"));
 
         octopus.files().delete(root.resolve(new RelativePath("stdout.txt")));

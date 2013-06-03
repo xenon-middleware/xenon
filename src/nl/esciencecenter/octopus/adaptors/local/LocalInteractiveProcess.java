@@ -48,7 +48,14 @@ class LocalInteractiveProcess implements ProcessWrapper {
         builder.command().add(description.getExecutable());
         builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
-        builder.directory(new java.io.File(description.getWorkingDirectory()));
+        
+        String workingDirectory = description.getWorkingDirectory();
+        
+        if (workingDirectory == null) { 
+            workingDirectory = System.getProperty("user.dir");
+        }
+        
+        builder.directory(new java.io.File(workingDirectory));
         
         process = builder.start();       
         streams = new Streams(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());

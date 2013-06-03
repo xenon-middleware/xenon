@@ -34,7 +34,6 @@ public class JobTimeoutTest {
     @Test
     public void test() throws Exception { 
         
-        
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("60s");

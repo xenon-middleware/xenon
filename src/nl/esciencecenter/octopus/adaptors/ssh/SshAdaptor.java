@@ -95,7 +95,7 @@ public class SshAdaptor extends Adaptor {
     
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
-            { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
+            { STRICT_HOST_KEY_CHECKING, "false", "Boolean: enable strict host key checking." },
             { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." }, 
@@ -222,7 +222,7 @@ public class SshAdaptor extends Adaptor {
             throw new OctopusException(getName(), "Could not set known_hosts file", e);
         }
 
-        if (logger.isTraceEnabled()) {
+        if (logger.isDebugEnabled()) {
             HostKeyRepository hkr = jsch.getHostKeyRepository();
             HostKey[] hks = hkr.getHostKey();
             if (hks != null) {
@@ -231,6 +231,8 @@ public class SshAdaptor extends Adaptor {
                     logger.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
                 }
                 logger.debug("");
+            } else { 
+                logger.debug("No keys in " + knownHostsFile);
             }
         }
     }
@@ -289,6 +291,7 @@ public class SshAdaptor extends Adaptor {
 
     protected Session createNewSession(String uniqueID, URI location, Credential credential, OctopusProperties localProperties)
             throws OctopusException {
+        
         URI uri = location;
         String user = uri.getUserInfo();
         String host = uri.getHost();

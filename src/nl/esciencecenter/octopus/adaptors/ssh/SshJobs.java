@@ -84,32 +84,17 @@ public class SshJobs implements Jobs {
     private final SshAdaptor adaptor;
 
     private final OctopusProperties properties;
-
-//    private final LinkedList<SshJobExecutor> singleQ;
-
-//    private final ExecutorService singleExecutor;
     
     private final int maxQSize;
     private final int pollingDelay;
     private final int multiQThreads;
     
-//    private final JobQueues jobQueues; 
-    
     private HashMap<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
     
-    private static int jobID = 0;
-
-    private static synchronized int getNextJobID() {
-        return jobID++;
-    }
-
     public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
-        
-//        singleQ = new LinkedList<SshJobExecutor>();
-//        singleExecutor = Executors.newSingleThreadExecutor();
 
         multiQThreads = properties.getIntProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT, 1);
         
@@ -188,39 +173,9 @@ public class SshJobs implements Jobs {
         return info.jobQueues;
     }
 
-//    
-//    
-//    private void getJobs(LinkedList<SshJobExecutor> list, LinkedList<Job> out) {
-//        
-//        if (list == null) { 
-//            return;
-//        }
-//        
-//        for (SshJobExecutor e : list) {
-//            out.add(e.getJob());
-//        }
-//    }
-
     @Override
     public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
         return getJobQueue(scheduler).getJobs(queueNames);
-//        
-//        
-//        LinkedList<Job> out = new LinkedList<Job>();
-//        
-//        if (queueNames == null) {
-//            getJobs(singleQ, out);
-//        } else {              
-//            for (String name : queueNames) { 
-//                if (name.equals("single")) { 
-//                    getJobs(singleQ, out);
-//                } else { 
-//                    throw new BadParameterException(adaptor.getName(), "Queue \"" + name + "\" does not exist");                    
-//                }
-//            }
-//        }
-//        
-//        return out.toArray(new Job[out.size()]);
     }
 
     @Override
@@ -228,39 +183,10 @@ public class SshJobs implements Jobs {
         return getJobQueue(scheduler).submitJob(scheduler, description);
     }
         
-//        
-//        
-//        
-//        JobImplementation result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
-//                "sshjob-" + getNextJobID(), description.isInteractive(), true /* online */);
-//     
-//        SshJobExecutor executor = new SshJobExecutor(adaptor, (SchedulerImplementation) scheduler, info.getSession(), result, 
-//                pollingDelay);
-//
-//        String queueName = description.getQueueName();
-//
-//        if (queueName == null || queueName.equals("single")) {
-//            singleQ.add(executor);
-//            singleExecutor.execute(executor);
-//        } else {
-//            throw new BadParameterException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
-//        }
-//
-//        //purge jobs from q if needed (will not actually cancel execution of jobs)
-//        purgeQ(singleQ);
-//
-//        return result;
-//    }
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException {        
         return getJobQueue(job.getScheduler()).getJobStatus(job);
-//        
-//        
-//        
-//        LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
-//        SshJobExecutor executor = findJob(tmp, job);
-//        return executor.getStatus();
     }
 
     @Override
@@ -278,64 +204,13 @@ public class SshJobs implements Jobs {
         return result;
     }
 
-//    private synchronized void purgeQ(LinkedList<SshJobExecutor> q) {
-//        if (maxQSize == -1) {
-//            return;
-//        }
-//
-//        //how many jobs do we need to remove
-//        int purgeCount = q.size() - maxQSize;
-//
-//        if (purgeCount <= 0) {
-//            return;
-//        }
-//
-//        Iterator<SshJobExecutor> iterator = q.iterator();
-//
-//        while (iterator.hasNext() && purgeCount > 0) {
-//            if (iterator.next().isDone()) {
-//                iterator.remove();
-//                purgeCount--;
-//            }
-//        }
-//    }
-//
-//    private LinkedList<SshJobExecutor> findQueue(String queueName) throws OctopusException {
-//
-//        if (queueName == null || queueName.equals("single")) {
-//            return singleQ;
-//        } else {
-//            throw new OctopusException(adaptor.getName(), "queue \"" + queueName + "\" does not exist");
-//        }
-//    }
-//
-//    private SshJobExecutor findJob(LinkedList<SshJobExecutor> queue, Job job) throws OctopusException {
-//        for (SshJobExecutor e : queue) {
-//            if (e.getJob().equals(job)) {
-//                return e;
-//            }
-//        }
-//
-//        throw new OctopusException(adaptor.getName(), "Job not found: " + job.getIdentifier());
-//    }
 
     @Override
     public void cancelJob(Job job) throws OctopusException {
         getJobQueue(job.getScheduler()).cancelJob(job);
-//        
-//        
-//        
-//        // FIXME: What if job is already gone?
-//        LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
-//        findJob(tmp, job).kill();
     }
 
     public void end() {
-        
-        
-        
-        
-        
         // FIXME!
         // singleExecutor.shutdownNow();
     }
@@ -343,32 +218,11 @@ public class SshJobs implements Jobs {
     @Override
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
         return getJobQueue(scheduler).getQueueStatus(scheduler, queueName);
-//        
-//        
-//        
-//        
-//        if (queueName == null || queueName.equals("single")) {
-//            return new QueueStatusImplementation(scheduler, queueName, null, null);
-//        } else {
-//            throw new OctopusException(adaptor.getName(), "No such queue: " + queueName);
-//        }
     }
 
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
         return getJobQueue(scheduler).getQueueStatuses(scheduler, queueNames);
-//        
-//        QueueStatus[] result = new QueueStatus[queueNames.length];
-//
-//        for (int i = 0; i < queueNames.length; i++) {
-//            try {
-//                result[i] = getQueueStatus(scheduler, queueNames[i]);
-//            } catch (OctopusException e) {
-//                result[i] = new QueueStatusImplementation(null, queueNames[i], e, null);
-//            }
-//        }
-//
-//        return result;
     }
 
     @Override
@@ -407,9 +261,5 @@ public class SshJobs implements Jobs {
     @Override
     public Streams getStreams(Job job) throws OctopusException {
         return getJobQueue(job.getScheduler()).getStreams(job);
-//        
-//        
-//        LinkedList<SshJobExecutor> tmp = findQueue(job.getJobDescription().getQueueName());
-//        return findJob(tmp, job).getStreams();
     }
 }
