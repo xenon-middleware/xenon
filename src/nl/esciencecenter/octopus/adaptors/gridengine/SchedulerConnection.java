@@ -15,26 +15,30 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.util.InputWriter;
+import nl.esciencecenter.octopus.engine.util.OutputReader;
+import nl.esciencecenter.octopus.engine.util.RemoteCommandRunner;
 import nl.esciencecenter.octopus.engine.util.StreamForwarder;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,29 +62,31 @@ public class SchedulerConnection {
 
     private String id;
 
-    private Process runCommandAtServer(String command, String stdin) throws OctopusException, OctopusIOException {
-        try {
-            if (actualLocation.getHost() != null) {
-                command = "ssh " + actualLocation.getHost() + " " + command;
-            }
-            logger.debug("running command " + command);
-            Process process = Runtime.getRuntime().exec(command);
+    private final OctopusEngine engine;
+    private final Scheduler sshScheduler;
 
-            if (stdin != null) {
-                byte[] bytes = stdin.getBytes();
-                InputStream in = new ByteArrayInputStream(bytes);
+    private String runCommandAtServer(String stdin, String executable, String... arguments) throws OctopusException,
+            OctopusIOException {
+        JobDescription description = new JobDescription();
+        description.setInteractive(true);
+        description.setExecutable(executable);
+        description.setArguments(arguments);
 
-                new StreamForwarder(in, process.getOutputStream());
-            }
+        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, stdin, description);
 
-            return process;
-        } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot execute remote process", e);
+        String stderr = runner.getStderr();
+
+        if (runner.getExitCode() != 0 || !stderr.isEmpty()) {
+            throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable
+                    + "\" at server \"" + actualLocation.getHost() + "\". Error output: " + stderr);
         }
+
+        return runner.getStdout();
     }
 
-    public SchedulerConnection(URI location, Credential credential, Properties properties) throws OctopusIOException,
-            OctopusException {
+    public SchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
+            throws OctopusIOException, OctopusException {
+        this.engine = engine;
         this.properties = new OctopusProperties(properties);
 
         if (properties != null && properties.size() > 0) {
@@ -105,6 +111,9 @@ public class SchedulerConnection {
             throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "cannot create ssh uri from given location", e);
         }
 
+        logger.debug("creating ssh scheduler for GridEngine adaptor at " + actualLocation);
+        sshScheduler = engine.jobs().newScheduler(actualLocation, credential, this.properties);
+
         //get status of all queues, use names to fill queue name list
         this.queueNames = getQueueStatus().keySet().toArray(new String[0]);
 
@@ -125,29 +134,21 @@ public class SchedulerConnection {
     }
 
     public Map<String, Map<String, String>> getQueueStatus() throws OctopusException, OctopusIOException {
-        try (InputStream in = runCommandAtServer("qstat -xml -g c", null).getInputStream()) {
-            return parser.parseQueueInfos(in);
-        } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of queues from server", e);
-        }
+        String qstatOutput = runCommandAtServer("qstat", null, "-xml", "-g", "c");
+
+        return parser.parseQueueInfos(qstatOutput);
     }
 
     public Map<String, Map<String, String>> getJobStatus() throws OctopusException, OctopusIOException {
-        try (InputStream in = runCommandAtServer("qstat -xml", null).getInputStream()) {
-            return parser.parseJobInfos(in);
-        } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of jobs from server", e);
-        }
+        String status = runCommandAtServer(null, "qstat", "-xml");
+
+        return parser.parseJobInfos(status);
     }
 
     public Map<String, String> getJobAccountingInfo(String jobIdentifier) throws OctopusIOException, OctopusException {
-        Process process = runCommandAtServer("qacct -j " + jobIdentifier, null);
+        String output = runCommandAtServer(null, "qacct", "-j", jobIdentifier);
 
-        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream()) {
-            return TxtOutputParser.getJobAccountingInfo(stdout, stderr);
-        } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not get status of jobs from server", e);
-        }
+        return TxtOutputParser.getJobAccountingInfo(output);
     }
 
     /**
@@ -159,17 +160,11 @@ public class SchedulerConnection {
      * @throws OctopusException
      *             if the qsub command could not be run
      * @throws OctopusIOException
-     *             if the qsub command could not be run, or the jobID could not be read from the output
      */
     public String submitJob(String jobScript) throws OctopusException, OctopusIOException {
-        Process process = runCommandAtServer("qsub", jobScript);
-        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream()) {
-            return TxtOutputParser.checkSubmitJobResult(stdout, stderr);
-        } catch (OctopusIOException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not submit job to server", e);
-        }
+        String output = runCommandAtServer(jobScript, "qsub");
+
+        return TxtOutputParser.checkSubmitJobResult(output);
     }
 
     /**
@@ -183,21 +178,13 @@ public class SchedulerConnection {
      *             if the qsub command could not be run, or the jobID could not be read from the output
      */
     public void cancelJob(Job job) throws OctopusIOException, OctopusException {
-        Process process = runCommandAtServer("qdel " + job.getIdentifier(), null);
+        String output = runCommandAtServer(null, "qdel", job.getIdentifier());
 
-        try (InputStream stdout = process.getInputStream(); InputStream stderr = process.getErrorStream()) {
-            TxtOutputParser.checkCancelJobResult(job.getIdentifier(), stdout, stderr);
-        } catch (OctopusIOException e) {
-            throw e;
-        } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not delete job " + job.getIdentifier()
-                    + " at server", e);
-        }
+        TxtOutputParser.checkCancelJobResult(job.getIdentifier(), output);
     }
 
-    public void close() {
-        //FIXME: close ssh connection to server here
-
+    public void close() throws OctopusIOException, OctopusException {
+        engine.jobs().close(sshScheduler);
     }
 
 };

@@ -18,8 +18,13 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -72,33 +77,36 @@ public class QstatOutputParserTest {
 
     @Test
     public void testParseQueueInfo() throws Throwable {
-        try (FileInputStream in = new FileInputStream("test/fixtures/gridengine/queues.xml")) {
 
-            XmlOutputParser parser = new XmlOutputParser(false);
+        byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/queues.xml"));
 
-            Map<String, Map<String, String>> result = parser.parseQueueInfos(in);
+        String content = new String(encoded);
 
-            //FIXME: check equality fully, not only if there are info's at all...
-            
-            String[] queues = result.keySet().toArray(new String[0]);
-            Arrays.sort(queues);
-            
-            assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
-        }
+        XmlOutputParser parser = new XmlOutputParser(false);
+
+        Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
+
+        //FIXME: check equality fully, not only if there are info's at all...
+
+        String[] queues = result.keySet().toArray(new String[0]);
+        Arrays.sort(queues);
+
+        assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
     }
-    
+
     @Test
     public void testParseJobInfo() throws Throwable {
-        try (FileInputStream in = new FileInputStream("test/fixtures/gridengine/jobs.xml")) {
+        byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/queues.xml"));
 
-            XmlOutputParser parser = new XmlOutputParser(false);
+        String content = new String(encoded);
 
-            Map<String, Map<String, String>> result = parser.parseJobInfos(in);
+        XmlOutputParser parser = new XmlOutputParser(false);
 
-            //FIXME: check equality fully, not only if there are info's at all...
-            System.out.println(result);
-            assertEquals(9, result.size());
-        }
+        Map<String, Map<String, String>> result = parser.parseJobInfos(content);
+
+        //FIXME: check equality fully, not only if there are info's at all...
+        System.out.println(result);
+        assertEquals(9, result.size());
+
     }
-
 }

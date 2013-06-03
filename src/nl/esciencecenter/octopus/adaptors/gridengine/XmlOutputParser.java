@@ -15,9 +15,9 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,8 +123,9 @@ public class XmlOutputParser {
         }
     }
 
-    private Document parseDocument(InputStream in) throws OctopusException, OctopusIOException {
+    private Document parseDocument(String data) throws OctopusException, OctopusIOException {
         try {
+            ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes());
             Document result = documentBuilder.parse(in);
             result.normalize();
 
@@ -148,19 +149,19 @@ public class XmlOutputParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseQueueInfos(InputStream in) throws OctopusIOException, OctopusException {
-        Document document = parseDocument(in);
+    Map<String, Map<String, String>> parseQueueInfos(String data) throws OctopusIOException, OctopusException {
+        Document document = parseDocument(data);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         logger.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
-        NodeList nodes = document.getElementsByTagName("cluster_queue_summary");
+        NodeList clusterNodes = document.getElementsByTagName("cluster_queue_summary");
 
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
+        for (int i = 0; i < clusterNodes.getLength(); i++) {
+            Node clusterNode = clusterNodes.item(i);
 
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
+            if (clusterNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) clusterNode;
 
                 NodeList tagNodes = element.getChildNodes();
 
@@ -184,7 +185,6 @@ public class XmlOutputParser {
                 String queueName = queueInfo.get("name");
 
                 if (queueName == null || queueName.length() == 0) {
-
                     throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
 
@@ -211,8 +211,8 @@ public class XmlOutputParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(InputStream in) throws OctopusIOException, OctopusException {
-        Document document = parseDocument(in);
+    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusIOException, OctopusException {
+        Document document = parseDocument(data);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
@@ -258,10 +258,6 @@ public class XmlOutputParser {
 
                 result.put(jobID, jobInfo);
             }
-        }
-
-        if (result.size() == 0) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
         return result;

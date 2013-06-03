@@ -91,7 +91,7 @@ public class GridEngineJobs implements Jobs {
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        SchedulerConnection connection = new SchedulerConnection(location, credential, properties);
+        SchedulerConnection connection = new SchedulerConnection(location, credential, properties, octopusEngine);
 
         Scheduler result =
                 new SchedulerImplementation(GridengineAdaptor.ADAPTOR_NAME, connection.getID(), location,

@@ -35,10 +35,13 @@ import org.junit.Test;
 
 public class GridEngineJobsTestIT {
 
+    //location used to test.
     private final URI location;
+    private final String queue;
 
     public GridEngineJobsTestIT() throws URISyntaxException {
         location = new URI("ge://fs1.das4.liacs.nl");
+        queue = "all.q";
     }
 
     @Test
@@ -46,19 +49,6 @@ public class GridEngineJobsTestIT {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Scheduler scheduler = octopus.jobs().newScheduler(location, null, null);
-
-        octopus.jobs().close(scheduler);
-
-        OctopusFactory.endOctopus(octopus);
-    }
-
-    @Test
-    public void testNewScheduler_emptyPath() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null);
-
-        URI withoutSlashLocation = new URI("ge://fs1.das4.liacs.nl");
-
-        Scheduler scheduler = octopus.jobs().newScheduler(withoutSlashLocation, null, null);
 
         octopus.jobs().close(scheduler);
 
@@ -81,7 +71,7 @@ public class GridEngineJobsTestIT {
     }
 
     @Test(expected = InvalidLocationException.class)
-    public void testNewScheduler_invalidPath_InvalidLocationException() throws Exception {
+    public void testNewScheduler_nonEmptyPath_InvalidLocationException() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         URI brokenLocation = new URI("ge://host/some/path");
@@ -127,7 +117,7 @@ public class GridEngineJobsTestIT {
 
         Scheduler scheduler = octopus.jobs().newScheduler(location, null, null);
 
-        Job[] jobs = octopus.jobs().getJobs(scheduler, "all.q");
+        Job[] jobs = octopus.jobs().getJobs(scheduler, queue);
 
         for (Job job : jobs) {
             System.out.println(job.getIdentifier());
@@ -140,7 +130,7 @@ public class GridEngineJobsTestIT {
 
         Scheduler scheduler = octopus.jobs().newScheduler(location, null, null);
 
-        QueueStatus status = octopus.jobs().getQueueStatus(scheduler, "all.q");
+        QueueStatus status = octopus.jobs().getQueueStatus(scheduler, queue);
 
         System.out.println(status.getSchedulerSpecficInformation());
 
@@ -174,6 +164,8 @@ public class GridEngineJobsTestIT {
         jobDescription.setExecutable("/bin/sleep");
 
         jobDescription.setArguments("60");
+        
+        jobDescription.setQueueName(queue);
 
         //jobDescription.setArguments("this", "and", "that");
 

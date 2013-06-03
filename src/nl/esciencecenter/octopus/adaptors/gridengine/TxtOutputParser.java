@@ -15,15 +15,10 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,26 +29,10 @@ public class TxtOutputParser {
 
     private static final Logger logger = LoggerFactory.getLogger(TxtOutputParser.class);
 
-    private static String[] getStrings(InputStream stream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+    public static void checkCancelJobResult(String identifier, String output) throws OctopusIOException {
+        String[] stdoutLines = output.split("\\r?\\n");
 
-        ArrayList<String> lines = new ArrayList<String>();
-        while (true) {
-            String line = reader.readLine();
-
-            if (line == null) {
-                return lines.toArray(new String[0]);
-            }
-
-            lines.add(line);
-        }
-    }
-
-    public static void checkCancelJobResult(String identifier, InputStream stdout, InputStream stderr) throws IOException {
-        String[] stdoutLines = getStrings(stdout);
-        String[] errorLines = getStrings(stderr);
-
-        String serverMessages = "output: " + Arrays.toString(stdoutLines) + " error: " + Arrays.toString(errorLines);
+        String serverMessages = "output: " + Arrays.toString(stdoutLines);
 
         logger.debug("Deleted job. Got back " + serverMessages);
 
@@ -75,21 +54,15 @@ public class TxtOutputParser {
         }
     }
 
-    public static String checkSubmitJobResult(InputStream stdout, InputStream stderr) throws IOException {
+    public static String checkSubmitJobResult(String output) throws OctopusIOException {
+        String lines[] = output.split("\\r?\\n");
 
-        String[] stdoutLines = getStrings(stdout);
-        String[] errorLines = getStrings(stderr);
-
-        String serverMessages = "output: " + Arrays.toString(stdoutLines) + " error: " + Arrays.toString(errorLines);
-
-        logger.debug("Submitted script. Got back " + serverMessages);
-
-        if (stdoutLines.length == 0 || !stdoutLines[0].startsWith("Your job ") | stdoutLines[0].split(" ").length < 3) {
+        if (lines.length == 0 || !lines[0].startsWith("Your job ") | lines[0].split(" ").length < 3) {
             throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: "
-                    + serverMessages);
+                    + output);
         }
 
-        String jobID = stdoutLines[0].split(" ")[2];
+        String jobID = lines[0].split(" ")[2];
 
         try {
             int jobIDInt = Integer.parseInt(jobID);
@@ -97,24 +70,16 @@ public class TxtOutputParser {
             logger.debug("found job id: " + jobIDInt);
         } catch (NumberFormatException e) {
             throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: \""
-                    + serverMessages + "\". Returned job id " + jobID + " does not seem to be a number", e);
+                    + output + "\". Returned job id " + jobID + " does not seem to be a number", e);
         }
         return jobID;
     }
 
-    public static Map<String, String> getJobAccountingInfo(InputStream stdout, InputStream stderr) throws IOException {
+    public static Map<String, String> getJobAccountingInfo(String output) throws OctopusIOException {
         Map<String, String> result = new HashMap<String, String>();
 
-        String[] stdoutLines = getStrings(stdout);
-        String[] errorLines = getStrings(stderr);
-
-        String serverMessages = "output: " + Arrays.toString(stdoutLines) + " error: " + Arrays.toString(errorLines);
-
-        if (errorLines.length != 0) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Error lines in qacct output: " + serverMessages);
-        }
-
-        for (String line : stdoutLines) {
+        String lines[] = output.split("\\r?\\n");
+        for (String line : lines) {
             String[] elements = line.split(" ", 2);
 
             if (elements.length == 2) {
