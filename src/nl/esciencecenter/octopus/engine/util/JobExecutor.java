@@ -174,7 +174,7 @@ public class JobExecutor implements Runnable {
             if (description.isInteractive()) { 
                 setStreams(process.getStreams());                   
             }            
-        } catch (IOException e) {
+        } catch (Exception e) {
             updateState("ERROR", -1, e);
             return;
         }

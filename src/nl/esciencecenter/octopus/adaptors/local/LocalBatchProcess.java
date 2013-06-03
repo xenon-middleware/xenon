@@ -61,14 +61,19 @@ class LocalBatchProcess implements ProcessWrapper {
         ProcessBuilder builder = new ProcessBuilder();
             
         String workingDirectory = description.getWorkingDirectory();
+        
         String stdout = description.getStdout();
         String stderr = description.getStderr();
         String stdin = description.getStdin();
         
+        if (workingDirectory == null) { 
+            workingDirectory = System.getProperty("user.dir");
+        }
+        
         builder.command().add(description.getExecutable());
         builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
-        builder.directory(new java.io.File(description.getWorkingDirectory()));
+        builder.directory(new java.io.File(workingDirectory));
 
         // Merge stdout and stderr into a single stream
         if (description.getMergeOutputStreams()) {             

@@ -49,8 +49,6 @@ public class LocalJobs implements Jobs {
     private final LocalAdaptor localAdaptor;
 
     private final Scheduler localScheduler;
-
-    // private final LocalProcessFactory factory;
     
     private final JobQueues jobQueues; 
     
@@ -80,12 +78,12 @@ public class LocalJobs implements Jobs {
                 new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
 
         int processors = Runtime.getRuntime().availableProcessors();
-        
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         int maxQSize = properties.getIntProperty(LocalAdaptor.MAX_HISTORY);
         int pollingDelay = properties.getIntProperty(LocalAdaptor.POLLING_DELAY);
         
-        jobQueues = new JobQueues(localAdaptor, localScheduler, new LocalProcessWrapperFactory(), multiQThreads, maxQSize, pollingDelay);        
+        jobQueues = new JobQueues(localAdaptor, localScheduler, new LocalProcessWrapperFactory(), multiQThreads, maxQSize, 
+                pollingDelay);        
     }
 
     @Override
