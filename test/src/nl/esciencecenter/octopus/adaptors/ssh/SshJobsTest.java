@@ -58,9 +58,8 @@ public class SshJobsTest {
         String username = System.getProperty("user.name");
         URI sh_location = new URI("ssh://" + username + "@localhost");
         Credentials c = octopus.credentials();
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
+        Credential credential = c.getDefaultCredential("ssh");
+
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, credential, null);
 
         Job job = octopus.jobs().submitJob(scheduler, description);

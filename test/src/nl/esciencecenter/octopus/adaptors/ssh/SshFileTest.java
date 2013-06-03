@@ -41,13 +41,10 @@ public class SshFileTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Credentials c = octopus.credentials();
-
+        Credential credential = c.getDefaultCredential("ssh");
+        
         String username = System.getProperty("user.name");
-
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
-
+        
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
         AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
@@ -81,10 +78,9 @@ public class SshFileTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Credentials c = octopus.credentials();
+        Credential credential = c.getDefaultCredential("ssh");
 
         String username = System.getProperty("user.name");
-
-        Credential credential = c.getDefaultCredential("ssh");
 
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
@@ -102,10 +98,9 @@ public class SshFileTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
         String username = System.getProperty("user.name");
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
-
+        
+        Credential credential = c.getDefaultCredential("ssh");
+        
         FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
         AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/" + username + "/.bashrc"));
@@ -129,10 +124,9 @@ public class SshFileTest {
     public void testCopyDownload() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
+        Credential credential = c.getDefaultCredential("ssh");
+
         String username = System.getProperty("user.name");
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
 
         FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
         AbsolutePath src = octopus.files().newPath(sshFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
@@ -155,10 +149,9 @@ public class SshFileTest {
     public void testCopyUpload() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
+        Credential credential = c.getDefaultCredential("ssh");
+
         String username = System.getProperty("user.name");
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
 
         FileSystem localFileSystem = octopus.files().newFileSystem(new URI("file:///"), null, null);
         AbsolutePath src = octopus.files().newPath(localFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
@@ -183,10 +176,9 @@ public class SshFileTest {
     public void testLs() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
+        Credential credential = c.getDefaultCredential("ssh");
+
         String username = System.getProperty("user.name");
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
 
         Properties props = new Properties();
         props.put(" octopus.adaptors.ssh.strictHostKeyChecking", "false");
@@ -210,10 +202,9 @@ public class SshFileTest {
     public void testLslong() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Credentials c = octopus.credentials();
+        Credential credential = c.getDefaultCredential("ssh");
+        
         String username = System.getProperty("user.name");
-        Credential credential =
-                c.newCertificateCredential("ssh", null, "/home/" + username + "/.ssh/id_rsa", "/home/" + username
-                        + "/.ssh/id_rsa.pub", username, "");
 
         Properties props = new Properties();
         props.put(" octopus.adaptors.ssh.strictHostKeyChecking", "false");
