@@ -145,6 +145,35 @@ public class JobExecutor implements Runnable {
             }
         }
     }
+
+    /**
+     * @param timeout
+     * @return
+     */
+    public synchronized JobStatus waitUntilDone(long timeout) {
+        
+        long deadline = System.currentTimeMillis() + timeout;
+        long leftover = timeout;
+        
+        while (!done) { 
+            
+            try { 
+                wait(leftover);
+            } catch (InterruptedException e) { 
+                // ignored
+            }
+            
+            long now = System.currentTimeMillis();
+            
+            if (now >= deadline) { 
+                break;
+            } 
+            
+            leftover = deadline-now;            
+        }
+        
+        return getStatus();
+    }
     
     @Override
     public void run() {
@@ -206,4 +235,5 @@ public class JobExecutor implements Runnable {
             }
         }
     }
+
 }

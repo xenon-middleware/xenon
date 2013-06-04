@@ -135,7 +135,7 @@ public class LocalJobsTest {
     }
     
     @org.junit.Test
-    public void testBatchJobSubmit() throws Exception {
+    public void testBatchJobSubmitWithPolling() throws Exception {
         
         String message = "Hello World!";
         
@@ -170,7 +170,7 @@ public class LocalJobsTest {
             }
         }
 
-        JobStatus status = octopus.jobs().getJobStatus(job);
+        JobStatus status = jobs.getJobStatus(job);
         
         if (status.hasException()) {
             throw status.getException();
@@ -190,6 +190,46 @@ public class LocalJobsTest {
         octopus.end();
     }
 
-    
-    
+    @org.junit.Test
+    public void testBatchJobSubmitWithWait() throws Exception {
+        
+        String message = "Hello World!";
+        
+        Octopus octopus = OctopusFactory.newOctopus(null);
+      
+        final String tmpDir = System.getProperty("java.io.tmpdir");
+        
+        System.out.println("tmpdir = " + tmpDir);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/echo");
+        description.setArguments("-n", message);
+        description.setInteractive(false);
+        description.setWorkingDirectory(tmpDir);
+        description.setStdin(null);
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+
+        Jobs jobs = octopus.jobs();
+        Scheduler scheduler = jobs.getLocalScheduler();
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+
+        String out = readFully(new FileInputStream(new File(tmpDir + File.separator + "stdout.txt")));
+        String err = readFully(new FileInputStream(new File(tmpDir + File.separator + "stderr.txt")));
+
+        System.out.println("stdout = \"" + out + "\"");
+        System.out.println("stderr = \"" + err + "\"");
+        
+        assertTrue(out != null);
+        assertTrue(out.length() > 0);
+        assertTrue(out.equals(message));
+        assertTrue(err.length() == 0);
+        
+        octopus.end();
+    }
 }

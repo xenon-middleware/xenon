@@ -130,6 +130,11 @@ public class LocalJobs implements Jobs {
     }
 
     @Override
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+        return jobQueues.waitUntilDone(job, timeout);
+    }
+    
+    @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
         return jobQueues.getJobStatuses(jobs);
     }
@@ -167,4 +172,5 @@ public class LocalJobs implements Jobs {
     public Streams getStreams(Job job) throws OctopusException {
         return jobQueues.getStreams(job);
     }
+
 }

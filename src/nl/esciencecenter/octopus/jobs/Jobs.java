@@ -267,4 +267,28 @@ public interface Jobs {
      *             If an I/O error occurred.
      */
     public void cancelJob(Job job) throws OctopusException, OctopusIOException;
+
+
+    /**
+     * Wait until a job is done or until a timeout expires. 
+     * 
+     * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the  
+     * timeout expires, the job will continue to run normally. 
+     * 
+     * The timeout is in milliseconds and must be >= 0, where 0 means and infinite timeout.      
+     * 
+     * A JobStatus is returned that can be used to determine why the call returned.    
+     * 
+     * @param job the job.
+     * @param timeout the maximum time to wait for the job in milliseconds.   
+     * @returns  the status of the Job.
+     * 
+     * @throws NoSuchJobException
+     *             If the job is not known.
+     * @throws OctopusException
+     *             If the status of the job could not be retrieved.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
 }

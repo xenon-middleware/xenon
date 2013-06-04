@@ -221,6 +221,16 @@ public class JobQueues {
         return result;
     }
     
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+        
+        if (timeout < 0) { 
+            throw new OctopusException(adaptor.getName(), "Illegal timeout " + timeout);
+        }
+        
+        checkScheduler(job.getScheduler());
+        return findJob(job).waitUntilDone(timeout);    
+    }
+    
     private void verifyJobDescription(JobDescription description) throws OctopusException { 
         
         String queue = description.getQueueName();

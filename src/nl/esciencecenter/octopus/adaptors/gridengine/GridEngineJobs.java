@@ -306,4 +306,10 @@ public class GridEngineJobs implements Jobs {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

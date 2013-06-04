@@ -92,6 +92,11 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {      
+        return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilDone(job, timeout);
+    }
+    
+    @Override
     public void cancelJob(Job job) throws OctopusException, OctopusIOException {
         getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }
@@ -116,6 +121,7 @@ public class JobsEngine implements Jobs {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatuses(scheduler, queueNames);
     }
 
+    
     @Override
     public Streams getStreams(Job job) throws OctopusException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getStreams(job);
@@ -125,4 +131,5 @@ public class JobsEngine implements Jobs {
     public String toString() {
         return "JobsEngine [octopusEngine=" + octopusEngine + "]";
     }
+
 }
