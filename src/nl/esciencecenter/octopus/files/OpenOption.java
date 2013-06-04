@@ -52,6 +52,14 @@ public enum OpenOption {
     /**
      * Open for write access.
      */
-    WRITE,
-
+    WRITE;
+    
+    public static boolean contains(OpenOption toFind, OpenOption... options) {
+        for (OpenOption curr : options) {
+            if (curr == toFind) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

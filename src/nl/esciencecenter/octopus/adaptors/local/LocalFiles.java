@@ -33,11 +33,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.engine.util.CopyEngine;
+import nl.esciencecenter.octopus.engine.util.CopyInfo;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
@@ -77,6 +80,9 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     /** The parent adaptor */
     private final LocalAdaptor localAdaptor;
 
+    /** The octopus engine */
+    private final OctopusEngine octopusEngine;
+    
     /** The next ID for a FileSystem */
     private static int fsID = 0;
 
@@ -84,18 +90,15 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return fsID++;
     }
 
-    private CopyEngine copyEngine;
-    
-    public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor) {
+    public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine) {
         this.localAdaptor = localAdaptor;
-
+        this.octopusEngine = octopusEngine;
+        
         if (logger.isDebugEnabled()) {
             Set<String> attributeViews = FileSystems.getDefault().supportedFileAttributeViews();
 
             logger.debug(Arrays.toString(attributeViews.toArray()));
         }
-        
-        this.copyEngine = new CopyEngine(this);        
     }
 
     /**
@@ -568,10 +571,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                             + " and VERIFY");
         }
 
-        String ID = "local_copy_" + getNextFsID();
-        CopyImplementation copy = new CopyImplementation(LocalAdaptor.ADAPTOR_NAME, ID, source, target);
+        CopyEngine ce = octopusEngine.getCopyEngine();
+        CopyImplementation copy = new CopyImplementation(LocalAdaptor.ADAPTOR_NAME, ce.getNextID("LOCAL_COPY_"), source, target);
         CopyInfo info = new CopyInfo(copy, mode, verify);
-        copyEngine.copy(info, async);
+        ce.copy(info, async);
         
         if (async) { 
             return copy;
@@ -582,11 +585,11 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException {
-        return copyEngine.getStatus(copy);
+        return octopusEngine.getCopyEngine().getStatus(copy);
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
-        return copyEngine.cancel(copy);
+        return octopusEngine.getCopyEngine().cancel(copy);
     }
 }

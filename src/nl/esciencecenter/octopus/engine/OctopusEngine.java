@@ -29,6 +29,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
+import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
@@ -136,6 +137,8 @@ public class OctopusEngine implements Octopus {
     private final CredentialsEngineImplementation credentialsEngine;
 
     private final Adaptor[] adaptors;
+    
+    private final CopyEngine copyEngine;
 
     /**
      * Constructs a OctopusEngine.
@@ -164,6 +167,8 @@ public class OctopusEngine implements Octopus {
 
         credentialsEngine = new CredentialsEngineImplementation(this);
 
+        copyEngine = new CopyEngine(filesEngine);
+        
         logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
@@ -249,6 +254,13 @@ public class OctopusEngine implements Octopus {
         return credentialsEngine;
     }
 
+    /**
+     * @return
+     */
+    public CopyEngine getCopyEngine() {
+        return copyEngine;
+    }
+    
     @Override
     public void end() {
         synchronized (this) {

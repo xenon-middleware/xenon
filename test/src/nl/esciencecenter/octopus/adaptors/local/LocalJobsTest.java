@@ -106,19 +106,11 @@ public class LocalJobsTest {
         String err = readFully(streams.getStderr());
 
         // NOTE: Job should already be done here!
-        long deadline = System.currentTimeMillis() + 5000;
-        
-        while (!jobs.getJobStatus(job).isDone()) {
-            Thread.sleep(100);
-            
-            long now = System.currentTimeMillis();
-            
-            if (now > deadline) { 
-                throw new Exception("Job exceeded deadline!");
-            }
-        }
+        JobStatus status = jobs.waitUntilDone(job, 5000);
 
-        JobStatus status = octopus.jobs().getJobStatus(job);
+        if (status.isDone()) { 
+            throw new Exception("Job exceeded dealine!");
+        }
         
         if (status.hasException()) {
             throw status.getException();
@@ -158,7 +150,9 @@ public class LocalJobsTest {
         
         long deadline = System.currentTimeMillis() + 5000;
         
-        while (!jobs.getJobStatus(job).isDone()) {
+        JobStatus status = jobs.getJobStatus(job);
+        
+        while (!status.isDone()) {
             Thread.sleep(100);
             
             long now = System.currentTimeMillis();
@@ -166,10 +160,10 @@ public class LocalJobsTest {
             if (now > deadline) { 
                 throw new Exception("Job exceeded deadline!");
             }
+            
+            status = jobs.getJobStatus(job);
         }
 
-        JobStatus status = jobs.getJobStatus(job);
-        
         if (status.hasException()) {
             throw status.getException();
         }
@@ -214,6 +208,10 @@ public class LocalJobsTest {
         Scheduler scheduler = jobs.getLocalScheduler();
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded dealine!");
+        }
         
         if (status.hasException()) {
             throw status.getException();

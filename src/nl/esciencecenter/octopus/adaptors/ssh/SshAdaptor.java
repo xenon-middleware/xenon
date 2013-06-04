@@ -45,7 +45,6 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
@@ -409,31 +408,9 @@ public class SshAdaptor extends Adaptor {
         return session;
     }
 
+   
     /**
-     * Get a connected channel for doing sftp operations.
-     * 
-     * @param session
-     *            The authenticated session.
-     * @return the channel
-     * @throws OctopusIOException
-     */
-    protected ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
-        Channel channel;
-        try {
-            channel = session.openChannel("sftp");
-            channel.connect();
-            return (ChannelSftp) channel;
-        } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
-    }
-
-    protected void putSftpChannel(ChannelSftp channel) {
-        channel.disconnect();
-    }
-
-    /**
-     * Get a new exec channel. The channel is not connected yet, because the input and outp[ut streams should be set before
+     * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
      * connecting.
      * 
      * @param session
