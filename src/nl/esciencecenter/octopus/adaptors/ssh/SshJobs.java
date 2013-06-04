@@ -190,7 +190,11 @@ public class SshJobs implements Jobs {
 
         for (int i = 0; i < jobs.length; i++) {
             try {
-                result[i] = getJobStatus(jobs[i]);
+                if (jobs[i] != null) { 
+                    result[i] = getJobStatus(jobs[i]);
+                } else { 
+                    result[i] = null;
+                }
             } catch (OctopusException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }

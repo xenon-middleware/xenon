@@ -227,7 +227,11 @@ public interface Jobs {
     /**
      * Get the status of all specified <code>jobs</code>.
      * 
-     * If the retrieval of the JobStatus for a specific job fails the exception will be stored in the associated JobsStatus.
+     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the 
+     * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters.   
+     * If a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be 
+     * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the 
+     * corresponding <code>JobsStatus</code> entry.
      * 
      * @param jobs
      *            the jobs for which to retrieve the status.

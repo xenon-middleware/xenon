@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 
 import nl.esciencecenter.octopus.Octopus;
@@ -54,11 +53,6 @@ public class LocalJobsTest {
 //        lj.end();
 //    }
 
-    private void writeFully(OutputStream in, String text) throws IOException { 
-        in.write(text.getBytes());
-        in.close();
-    } 
-    
     private String readFully(InputStream in) throws IOException { 
     
         byte [] buffer = new byte[1024];
@@ -84,7 +78,9 @@ public class LocalJobsTest {
     
     @org.junit.Test
     public void testInteractiveJobSubmit() throws Exception {
-       
+        
+        System.err.println("START: testInteractiveJobSubmit");
+        
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
@@ -136,6 +132,8 @@ public class LocalJobsTest {
     
     @org.junit.Test
     public void testBatchJobSubmitWithPolling() throws Exception {
+        
+        System.err.println("START: testBatchJobSubmitWithPolling");
         
         String message = "Hello World!";
         
@@ -193,6 +191,8 @@ public class LocalJobsTest {
     @org.junit.Test
     public void testBatchJobSubmitWithWait() throws Exception {
         
+        System.err.println("START: testBatchJobSubmitWithWait");
+        
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
@@ -231,5 +231,87 @@ public class LocalJobsTest {
         assertTrue(err.length() == 0);
         
         octopus.end();
+    }
+
+    private void submitToQueueWithPolling(String queueName, int jobCount) throws Exception {
+    
+        Octopus octopus = OctopusFactory.newOctopus(null);
+      
+        Jobs jobs = octopus.jobs();
+        Scheduler scheduler = jobs.getLocalScheduler();
+        
+        Job [] j = new Job[jobCount];
+
+        for (int i=0;i<j.length;i++) {            
+            JobDescription description = new JobDescription();
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+            description.setQueueName(queueName);
+            description.setInteractive(false);
+            description.setStdin(null);
+            description.setStdout("stdout" + i + ".txt");
+            description.setStderr("stderr" + i + ".txt");
+    
+            j[i] = jobs.submitJob(scheduler, description);
+        }
+        
+        long deadline = System.currentTimeMillis() + ((jobCount * 2) * 1000);
+        
+        boolean done = false;
+        
+        while (!done) { 
+            JobStatus [] status = jobs.getJobStatuses(j);
+
+            int count = 0;
+            
+            for (int i=0;i<j.length;i++) { 
+                if (j[i] != null) {                    
+                    if (status[i].isDone()) {                         
+                        if (status[i].hasException()) { 
+                            System.err.println("Job " + i + " failed!");
+                            throw status[i].getException();
+                        }
+                        
+                        System.err.println("Job " + i + " done.");
+                        j[i] = null;                        
+                    } else {
+                        count++;
+                    }
+                }
+            }
+        
+            if (count == 0) { 
+                done = true;
+            } else { 
+                Thread.sleep(100);
+                
+                long now = System.currentTimeMillis();
+                
+                if (now > deadline) { 
+                    throw new Exception("Job exceeded deadline!");
+                }
+            }
+        }
+        
+        octopus.end();
+    }
+
+    
+    @org.junit.Test
+    public void testMultiBatchJobSubmitToSingleWithPolling() throws Exception {
+        System.err.println("START: testMultiBatchJobSubmitToSingleWithPolling");
+        submitToQueueWithPolling("single", 10);
+    }
+    
+    @org.junit.Test
+    public void testMultiBatchJobSubmitToMultiWithPolling() throws Exception {
+        System.err.println("START: testMultiBatchJobSubmitToMultiWithPolling");
+        submitToQueueWithPolling("multi", 10);
+    }
+
+    @org.junit.Test
+    public void testMultiBatchJobSubmitToUnlimitedWithPolling() throws Exception {
+        System.err.println("START: testMultiBatchJobSubmitToMultiWithPolling");
+        submitToQueueWithPolling("unlimited", 10);
     }
 }
