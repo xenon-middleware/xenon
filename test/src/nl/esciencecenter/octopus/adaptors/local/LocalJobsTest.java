@@ -2,14 +2,18 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
+import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -108,7 +112,7 @@ public class LocalJobsTest {
         // NOTE: Job should already be done here!
         JobStatus status = jobs.waitUntilDone(job, 5000);
 
-        if (status.isDone()) { 
+        if (!status.isDone()) { 
             throw new Exception("Job exceeded dealine!");
         }
         
@@ -130,21 +134,28 @@ public class LocalJobsTest {
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
-      
-        final String tmpDir = System.getProperty("java.io.tmpdir");
+        Jobs jobs = octopus.jobs();
+        Files files = octopus.files();
         
-        System.out.println("tmpdir = " + tmpDir);
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
+        
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + 
+                UUID.randomUUID().toString()));
+        
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        
+        files.createDirectory(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        description.setWorkingDirectory(tmpDir);
+        description.setWorkingDirectory(root.getPath());
         description.setStdin(null);
-        description.setStdout("stdout.txt");
-        description.setStderr("stderr.txt");
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
 
-        Jobs jobs = octopus.jobs();
         Scheduler scheduler = jobs.getLocalScheduler();
         Job job = jobs.submitJob(scheduler, description);
         
@@ -168,16 +179,17 @@ public class LocalJobsTest {
             throw status.getException();
         }
 
-        String out = readFully(new FileInputStream(new File(tmpDir + File.separator + "stdout.txt")));
-        String err = readFully(new FileInputStream(new File(tmpDir + File.separator + "stderr.txt")));
+        String tmpout = readFully(files.newInputStream(out));
+        String tmperr = readFully(files.newInputStream(err));
 
-        System.out.println("stdout = \"" + out + "\"");
-        System.out.println("stderr = \"" + err + "\"");
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
         
-        assertTrue(out != null);
-        assertTrue(out.length() > 0);
-        assertTrue(out.equals(message));
-        assertTrue(err.length() == 0);
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
         
         octopus.end();
     }
@@ -190,21 +202,28 @@ public class LocalJobsTest {
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
-      
-        final String tmpDir = System.getProperty("java.io.tmpdir");
+        Jobs jobs = octopus.jobs();
+        Files files = octopus.files();
+
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
         
-        System.out.println("tmpdir = " + tmpDir);
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + 
+                UUID.randomUUID().toString()));
         
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        
+        files.createDirectory(root);
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        description.setWorkingDirectory(tmpDir);
+        description.setWorkingDirectory(root.getPath());
         description.setStdin(null);
-        description.setStdout("stdout.txt");
-        description.setStderr("stderr.txt");
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
 
-        Jobs jobs = octopus.jobs();
         Scheduler scheduler = jobs.getLocalScheduler();
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -217,16 +236,17 @@ public class LocalJobsTest {
             throw status.getException();
         }
 
-        String out = readFully(new FileInputStream(new File(tmpDir + File.separator + "stdout.txt")));
-        String err = readFully(new FileInputStream(new File(tmpDir + File.separator + "stderr.txt")));
+        String tmpout = readFully(files.newInputStream(out));
+        String tmperr = readFully(files.newInputStream(err));
 
-        System.out.println("stdout = \"" + out + "\"");
-        System.out.println("stderr = \"" + err + "\"");
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
         
-        assertTrue(out != null);
-        assertTrue(out.length() > 0);
-        assertTrue(out.equals(message));
-        assertTrue(err.length() == 0);
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
         
         octopus.end();
     }
@@ -235,20 +255,37 @@ public class LocalJobsTest {
     
         Octopus octopus = OctopusFactory.newOctopus(null);
       
+        Files files = octopus.files();
+
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
+        
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + 
+                UUID.randomUUID().toString()));        
+        
+        AbsolutePath [] out = new AbsolutePath[jobCount]; 
+        AbsolutePath [] err = new AbsolutePath[jobCount]; 
+        
+        files.createDirectory(root);
+        
         Jobs jobs = octopus.jobs();
         Scheduler scheduler = jobs.getLocalScheduler();
         
         Job [] j = new Job[jobCount];
 
         for (int i=0;i<j.length;i++) {            
+            
+            out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
+            err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
+            
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
             description.setArguments("1");
+            description.setWorkingDirectory(root.getPath());
             description.setQueueName(queueName);
             description.setInteractive(false);
             description.setStdin(null);
-            description.setStdout("stdout" + i + ".txt");
-            description.setStderr("stderr" + i + ".txt");
+            description.setStdout(out[i].getPath());
+            description.setStderr(err[i].getPath());
     
             j[i] = jobs.submitJob(scheduler, description);
         }
@@ -290,6 +327,23 @@ public class LocalJobsTest {
                 }
             }
         }
+        
+        for (int i=0;i<j.length;i++) {            
+            
+            String tmpout = readFully(files.newInputStream(out[i]));
+            String tmperr = readFully(files.newInputStream(err[i]));
+
+            assertTrue(tmpout != null);
+            assertTrue(tmpout.length() == 0);
+            
+            assertTrue(tmperr != null);
+            assertTrue(tmperr.length() == 0);
+            
+            files.delete(out[i]);
+            files.delete(err[i]);
+        }
+        
+        files.delete(root);
         
         octopus.end();
     }
