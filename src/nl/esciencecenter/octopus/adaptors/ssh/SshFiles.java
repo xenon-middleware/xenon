@@ -153,7 +153,7 @@ public class SshFiles implements Files {
         logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
         FileSystemImplementation result =
-                new FileSystemImplementation(adaptor.getName(), uniqueID, location, entryPath, credential, octopusProperties);
+                new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath, credential, octopusProperties);
         fileSystems.put(uniqueID, new FileSystemInfo(result, session));
         return result;
     }
@@ -163,7 +163,7 @@ public class SshFiles implements Files {
     }
 
     protected ChannelSftp getChannel(FileSystem fileSystem) throws OctopusIOException {
-        if (!fileSystem.getAdaptorName().equals(adaptor.getName())) {
+        if (!fileSystem.getAdaptorName().equals(SshAdaptor.ADAPTOR_NAME)) {
             throw new OctopusRuntimeException(SshAdaptor.ADAPTOR_NAME, "Illegal Filesystem type: " + fileSystem.getAdaptorName());
         }
         FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
@@ -245,19 +245,19 @@ public class SshFiles implements Files {
     public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
 
         if (!octopusEngine.files().exists(source)) {
-            throw new NoSuchFileException(adaptor.getName(), "Source " + source.getPath() + " does not exist!");
+            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
         }
 
         if (octopusEngine.files().isDirectory(source)) {
-            throw new IllegalSourcePathException(adaptor.getName(), "Source " + source.getPath() + " is a directory");
+            throw new IllegalSourcePathException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " is a directory");
         }
 
         if (octopusEngine.files().exists(target)) {
-            throw new FileAlreadyExistsException(adaptor.getName(), "Target " + target.getPath() + " already exists!");
+            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
         }
 
         if (!octopusEngine.files().exists(target.getParent())) {
-            throw new NoSuchFileException(adaptor.getName(), "Target directory " + target.getParent().getPath()
+            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath()
                     + " does not exist!");
         }
 
@@ -273,11 +273,11 @@ public class SshFiles implements Files {
 
         if (source.isLocal()) {
             if (target.isLocal()) {
-                throw new OctopusIOException(adaptor.getName(), "Cannot copy local files.");
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot copy local files.");
             }
 
             if (!targetfs.getAdaptorName().equals("ssh")) {
-                throw new OctopusIOException(adaptor.getName(),
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME,
                         "Can only copy between local and an ssh locations (or vice-versa).");
             }
 
@@ -295,11 +295,11 @@ public class SshFiles implements Files {
             }
         } else if (target.isLocal()) {
             if (source.isLocal()) {
-                throw new OctopusIOException(adaptor.getName(), "Cannot copy local files.");
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot copy local files.");
             }
 
             if (!sourcefs.getAdaptorName().equals("ssh")) {
-                throw new OctopusIOException(adaptor.getName(),
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME,
                         "Can only copy between local and an ssh locations (or vice-versa).");
             }
 
@@ -317,7 +317,7 @@ public class SshFiles implements Files {
             }
         } else {
             // both remote
-            throw new OctopusIOException(adaptor.getName(), "Cannot copy files between two different remote filesystems!");
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot copy files between two different remote filesystems!");
         }
 
         return target;
@@ -391,7 +391,7 @@ public class SshFiles implements Files {
         try {
             if (isDirectory(path)) {
                 if (newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
-                    throw new DirectoryNotEmptyException(adaptor.getName(), "cannot delete dir " + path + " as it is not empty");
+                    throw new DirectoryNotEmptyException(SshAdaptor.ADAPTOR_NAME, "cannot delete dir " + path + " as it is not empty");
                 }
 
                 channel.rmdir(path.getPath());
@@ -463,15 +463,15 @@ public class SshFiles implements Files {
         public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
 
             if (!exists(source)) { 
-                throw new NoSuchFileException(adaptor.getName(), "Source " + source.getPath() + " does not exist!");
+                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
             }
             
             if (exists(target)) { 
-                throw new FileAlreadyExistsException(adaptor.getName(), "Target " + target.getPath() + " already exists!");
+                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
             }
             
             if (!exists(target.getParent())) { 
-                throw new NoSuchFileException(adaptor.getName(), "Target directory " + target.getParent().getPath() + 
+                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath() + 
                         " does not exist!");
             }
             
@@ -482,7 +482,7 @@ public class SshFiles implements Files {
             try {
                 Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target)); 
             } catch (IOException e) {
-                throw new OctopusIOException(adaptor.getName(), "Failed to move " + source.getPath() + " to " + 
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to move " + source.getPath() + " to " + 
                         target.getPath(), e);
             }
 
@@ -517,24 +517,24 @@ public class SshFiles implements Files {
         FileSystem targetfs = target.getFileSystem();
 
         if (!sourcefs.getAdaptorName().equals("ssh") || !targetfs.getAdaptorName().equals("ssh")) {
-            throw new OctopusIOException(adaptor.getName(), "Can only move within one remote ssh location.");
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Can only move within one remote ssh location.");
         }
 
         if (!sourcefs.getUri().getHost().equals(targetfs.getUri().getHost())) {
-            throw new OctopusIOException(adaptor.getName(), "Cannot move between different sites: " + sourcefs.getUri().getHost()
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different sites: " + sourcefs.getUri().getHost()
                     + " and " + targetfs.getUri().getHost());
         }
 
         if (!exists(source)) {
-            throw new NoSuchFileException(adaptor.getName(), "Source " + source.getPath() + " does not exist!");
+            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
         }
 
         if (exists(target)) {
-            throw new FileAlreadyExistsException(adaptor.getName(), "Target " + target.getPath() + " already exists!");
+            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
         }
 
         if (!exists(target.getParent())) {
-            throw new NoSuchFileException(adaptor.getName(), "Target directory " + target.getParent().getPath()
+            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath()
                     + " does not exist!");
         }
 
