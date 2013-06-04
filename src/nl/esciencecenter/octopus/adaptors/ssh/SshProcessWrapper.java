@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -92,7 +93,9 @@ public class SshProcessWrapper implements ProcessWrapper {
         // set the streams first, then connect the channel.
         if (isInteractive) {
             try {
-                streams = new Streams(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
+                streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), 
+                        channel.getErrStream());
+                
             } catch (IOException e) {
                 throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
             }

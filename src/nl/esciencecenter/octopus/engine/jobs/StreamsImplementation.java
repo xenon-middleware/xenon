@@ -14,42 +14,76 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.jobs;
+package nl.esciencecenter.octopus.engine.jobs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public interface Streams {
+public class StreamsImplementation implements Streams {
     
+    private Job job;
+    
+    private InputStream stdout;
+
+    private InputStream stderr;
+
+    private OutputStream stdin;
+
+    /**
+     * Create a Streams containing the job and its standard streams.  
+     * 
+     * @param job the josb.
+     * @param stdout the standard output stream.
+     * @param stdin the standard input stream.
+     * @param stderr the standard error stream.
+     */
+    public StreamsImplementation(Job job, InputStream stdout, OutputStream stdin, InputStream stderr) {        
+        this.job = job;
+        this.stdout = stdout;
+        this.stdin = stdin;
+        this.stderr = stderr;
+    }
+
     /**
      * Get the job for which this Streams was created.
      * 
      * @return the Job.
      */
-    public Job getJob(); 
+    public Job getJob() { 
+        return job;
+    }
     
     /** 
      * Returns the standard output stream of job.
      * 
      * @return the standard output stream of job.
      */
-    public InputStream getStdout(); 
+    public InputStream getStdout() { 
+        return stdout;
+    }
     
     /** 
      * Returns the standard error stream of job.
      * 
      * @return the standard error stream of job.
      */
-    public InputStream getStderr(); 
+    public InputStream getStderr() { 
+        return stderr;
+    }
 
     /** 
      * Returns the standard input stream of job.
      * 
      * @return the standard input stream of this job.
      */
-    public OutputStream getStdin(); 
+    public OutputStream getStdin() { 
+        return stdin;     
+    }
 }

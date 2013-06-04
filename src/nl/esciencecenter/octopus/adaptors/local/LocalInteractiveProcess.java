@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -58,7 +59,7 @@ class LocalInteractiveProcess implements ProcessWrapper {
         builder.directory(new java.io.File(workingDirectory));
         
         process = builder.start();       
-        streams = new Streams(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
+        streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 
     public Streams getStreams() { 
