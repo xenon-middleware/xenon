@@ -223,12 +223,8 @@ abstract public class AbstractFileTests {
         FileSystem fs = getFileSystem();
 
         // just test whether it works: 
-        RelativePath relEntryPath = fs.getEntryPath();
+        AbsolutePath relEntryPath = fs.getEntryPath();
         Assert.assertNotNull("Relative entry Path may not be null.", relEntryPath);
-
-        // just test whether it works: 
-        AbsolutePath absoluteEntryPath = getFiles().newPath(fs, relEntryPath);
-        Assert.assertNotNull("Absolute entry Path may not be null.", absoluteEntryPath);
     }
 
     @org.junit.Test

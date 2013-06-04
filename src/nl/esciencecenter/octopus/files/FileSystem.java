@@ -55,5 +55,5 @@ public interface FileSystem {
      * 
      * @return the entry path of this file system.
      */
-    public RelativePath getEntryPath();
+    public AbsolutePath getEntryPath();
 }
