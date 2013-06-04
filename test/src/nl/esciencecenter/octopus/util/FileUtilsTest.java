@@ -19,8 +19,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Iterator;
@@ -285,11 +285,7 @@ public class FileUtilsTest {
 
         FileUtils.recursiveCopy(octopus, srcDir, dstDir, CopyOption.IGNORE);
 
-        verify(files).exists(dstDir);
-        verify(files).isDirectory(srcDir);
-        verify(files).isDirectory(dstDir);
-        verify(files).newDirectoryStream(srcDir);
-        verifyNoMoreInteractions(files);
+        verify(files, never()).copy(srcDir, dstDir, CopyOption.IGNORE);
     }
 
     @Test
@@ -310,10 +306,7 @@ public class FileUtilsTest {
 
         FileUtils.recursiveCopy(octopus, srcFile, dstFile, CopyOption.IGNORE);
 
-        verify(files).exists(dstFile);
-        verify(files).isDirectory(srcFile);
-        verify(files).isDirectory(dstFile);
-        verifyNoMoreInteractions(files);
+        verify(files, never()).copy(srcFile, dstFile, CopyOption.IGNORE);
     }
 
     @Test
@@ -330,6 +323,23 @@ public class FileUtilsTest {
         } catch (UnsupportedOperationException e) {
             assertThat(e.getMessage(), is("FileUtils adaptor: Can not replace and ignore existing files at the same time"));
         }
+    }
+
+    @Test
+    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws OctopusIOException, UnsupportedOperationException {
+        Files files = mock(Files.class);
+        Octopus octopus = mock(Octopus.class);
+        when(octopus.files()).thenReturn(files);
+        AbsolutePath srcFile = mock(AbsolutePath.class);
+        AbsolutePath dstFile = mock(AbsolutePath.class);
+        when(files.isDirectory(srcFile)).thenReturn(false);
+        when(files.isDirectory(dstFile)).thenReturn(false);
+        when(files.exists(srcFile)).thenReturn(true);
+        when(files.exists(dstFile)).thenReturn(true);
+
+        FileUtils.recursiveCopy(octopus, srcFile, dstFile, CopyOption.REPLACE);
+
+        verify(files).copy(srcFile, dstFile, CopyOption.REPLACE);
     }
 
     @Test
