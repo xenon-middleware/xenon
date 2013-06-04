@@ -69,8 +69,7 @@ public class SshJobs implements Jobs {
             this.jobQueues = jobQueues;
         }
     }
-
-    
+        
     @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
@@ -120,14 +119,17 @@ public class SshJobs implements Jobs {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with path! (path = " + path + ")");
         }
 
+        
+        
+        
         if (properties != null && properties.size() > 0) { // TODO why not?
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with additional properties!");
         }
 
         String uniqueID = getNewUniqueID();
-
+        
         Session session = adaptor.createNewSession(uniqueID, location, credential, this.properties);
-
+        
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, 
                 new OctopusProperties(properties), true, true, true);
