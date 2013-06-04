@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +48,6 @@ public class GridEngineJobs implements Jobs {
     private static final Logger logger = LoggerFactory.getLogger(GridEngineJobs.class);
 
     private final OctopusProperties properties;
-
     private final OctopusEngine octopusEngine;
 
     private final Map<String, SchedulerConnection> connections;
@@ -290,10 +287,12 @@ public class GridEngineJobs implements Jobs {
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException, OctopusIOException {
+    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
         SchedulerConnection connection = getConnection(job.getScheduler());
-
         connection.cancelJob(job);
+        
+        // FIXME: Need to return a JobStatus here!
+        return null;
     }
 
     public void end() {

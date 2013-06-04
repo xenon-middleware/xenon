@@ -160,8 +160,8 @@ public class JobsEngine implements Jobs {
     }
     
     @Override
-    public void cancelJob(Job job) throws OctopusException, OctopusIOException {
-        getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
+    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
+        return getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }
 
     @Override

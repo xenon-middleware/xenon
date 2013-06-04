@@ -766,7 +766,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
         throw new OctopusIOException(getClass().getName(), "cancelCopy not implemented!");
     }
 }

@@ -194,8 +194,8 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
-        getFilesAdaptor(copy.getSource()).cancelCopy(copy);
+    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+        return getFilesAdaptor(copy.getSource()).cancelCopy(copy);
     }
     
     @Override

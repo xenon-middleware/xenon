@@ -100,7 +100,8 @@ public class CopyEngine {
         
         byte [] buffer = new byte[BUFFER_SIZE];
         
-        if (ac.isCancelled()) { 
+        if (ac.isCancelled()) {
+            ac.setException(new IOException("Copy killed by user"));
             return;
         }
         
@@ -113,6 +114,7 @@ public class CopyEngine {
             ac.setBytesCopied(total);
             
             if (ac.isCancelled()) { 
+                ac.setException(new IOException("Copy killed by user"));
                 return;
             }
                      
@@ -366,7 +368,7 @@ public class CopyEngine {
         return running;
     }
     
-    public synchronized void cancel(Copy copy) throws NoSuchCopyException { 
+    public synchronized CopyStatus cancel(Copy copy) throws NoSuchCopyException { 
 
         if (!(copy instanceof CopyImplementation)) { 
             throw new NoSuchCopyException(LocalAdaptor.ADAPTOR_NAME, "No such copy!");
@@ -378,14 +380,17 @@ public class CopyEngine {
         
         if (ID.equals(running.copy.getUniqueID())) { 
             running.cancel();
-            return;
+            
+            return new CopyStatusImplementation(copy, "KILLED", false, false, running.getBytesToCopy(), running.getBytesCopied(), 
+                    running.getException());
         }
         
         CopyInfo ac = finished.remove(ID);
         
         if (ac != null) { 
             // Already finished
-            return;
+            return new CopyStatusImplementation(copy, "DONE", false, true, ac.getBytesToCopy(), ac.getBytesCopied(), 
+                    ac.getException());
         }
         
         Iterator<CopyInfo> it = pending.iterator();
@@ -396,7 +401,7 @@ public class CopyEngine {
             
             if (c.copy.getUniqueID().equals(ID)) { 
                 it.remove();
-                return;
+                return new CopyStatusImplementation(copy, "PENDING", false, false, ac.getBytesToCopy(), 0, null); 
             }
         }
         

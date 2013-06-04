@@ -119,10 +119,8 @@ public class SshJobs implements Jobs {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with path! (path = " + path + ")");
         }
 
-        
-        
-        
-        if (properties != null && properties.size() > 0) { // TODO why not?
+        // FIXME: Why can't we add scheduler specific properties ?
+        if (properties != null && properties.size() > 0) { 
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with additional properties!");
         }
 
@@ -209,8 +207,8 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
-        getJobQueue(job.getScheduler()).cancelJob(job);
+    public JobStatus cancelJob(Job job) throws OctopusException {
+        return getJobQueue(job.getScheduler()).cancelJob(job);
     }
 
     public void end() {

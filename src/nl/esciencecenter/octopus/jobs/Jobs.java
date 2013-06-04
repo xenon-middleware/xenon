@@ -260,8 +260,11 @@ public interface Jobs {
     /**
      * Cancel a job.
      * 
-     * @param job
-     *            the job.
+     * A status is returned that indicates the state of the job after the cancel.  If the jobs was already done it cannot be 
+     * killed afterwards.   
+     * 
+     * @param job the job to kill.
+     * @return the status of the Job.
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
@@ -270,7 +273,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void cancelJob(Job job) throws OctopusException, OctopusIOException;
+    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
 
 
     /**
