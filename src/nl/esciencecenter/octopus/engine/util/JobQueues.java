@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
@@ -97,7 +96,7 @@ public class JobQueues {
         }
         
         if (pollingDelay < 100 ||  pollingDelay > 60000) {
-            throw new BadParameterException(LocalAdaptor.ADAPTOR_NAME, "Polling delay must be between 100 and 60000!");
+            throw new BadParameterException(adaptor.getName(), "Polling delay must be between 100 and 60000!");
         }
 
         unlimitedExecutor = Executors.newCachedThreadPool();
@@ -232,59 +231,59 @@ public class JobQueues {
         }
         
         if (!(queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
-            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Queue " + queue + " not available locally!");
+            throw new InvalidJobDescriptionException(adaptor.getName(), "Queue " + queue + " not available locally!");
         }
 
         String executable = description.getExecutable(); 
         
         if (executable == null) { 
-            throw new IncompleteJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Executable missing in JobDescription!");
+            throw new IncompleteJobDescriptionException(adaptor.getName(), "Executable missing in JobDescription!");
         }
         
         int nodeCount = description.getNodeCount();
         
         if (nodeCount != 1) { 
-            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal node count: " + nodeCount);
+            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal node count: " + nodeCount);
         }
         
         int processesPerNode = description.getProcessesPerNode();
         
         if (processesPerNode <= 0) { 
-            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal processes per node count: " + 
+            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal processes per node count: " + 
                     processesPerNode);
         }
 
         int maxTime = description.getMaxTime();
         
         if (maxTime <= 0) { 
-            throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, "Illegal maximum runtime: " + maxTime);
+            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal maximum runtime: " + maxTime);
         }
 
         if (description.isInteractive()) { 
 
             if (description.getStdin() != null) { 
-                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                throw new InvalidJobDescriptionException(adaptor.getName(), 
                         "Illegal stdin redirect for interactive job!");            
             }
             
             if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) { 
-                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                throw new InvalidJobDescriptionException(adaptor.getName(), 
                         "Illegal stdout redirect for interactive job!");            
             }
             
             if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) { 
-                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                throw new InvalidJobDescriptionException(adaptor.getName(), 
                         "Illegal stderr redirect for interactive job!");            
             }
         } else {             
             
             if (description.getStdout() == null) { 
-                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                throw new InvalidJobDescriptionException(adaptor.getName(), 
                         "Missing stdout redirect for interactive job!");            
             }
             
             if (description.getStderr() == null) { 
-                throw new InvalidJobDescriptionException(LocalAdaptor.ADAPTOR_NAME, 
+                throw new InvalidJobDescriptionException(adaptor.getName(), 
                         "Missing stderr redirect for interactive job!");            
             }            
         }

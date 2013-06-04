@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
@@ -133,7 +132,7 @@ public class JobExecutor implements Runnable {
             return streams;
         } 
         
-        throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job is not interactive!");
+        throw new OctopusException(adaptor.getName(), "Job is not interactive!");
     }
 
     public synchronized void waitUntilRunning() {
