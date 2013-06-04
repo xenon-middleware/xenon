@@ -123,7 +123,7 @@ public class SshFiles implements Files {
             OctopusIOException {
 
         if (!location.getPath().equals("") && !location.getPath().equals("/")) {
-            throw new OctopusException(adaptor.getName(),
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME,
                     "Adaptor does not support a specific entry point. The location URI should not contain a path, or only '/'. URI = "
                             + location);
         }
@@ -164,7 +164,7 @@ public class SshFiles implements Files {
 
     protected ChannelSftp getChannel(FileSystem fileSystem) throws OctopusIOException {
         if (!fileSystem.getAdaptorName().equals(adaptor.getName())) {
-            throw new OctopusRuntimeException(adaptor.getName(), "Illegal Filesystem type: " + fileSystem.getAdaptorName());
+            throw new OctopusRuntimeException(SshAdaptor.ADAPTOR_NAME, "Illegal Filesystem type: " + fileSystem.getAdaptorName());
         }
         FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
 
@@ -173,7 +173,7 @@ public class SshFiles implements Files {
             info = fileSystems.get(fs.getUniqueID());
         }
         if (info == null) {
-            throw new OctopusIOException(adaptor.getName(), "file system is already closed");
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
         }
 
         Session session = info.getSession();
@@ -198,7 +198,7 @@ public class SshFiles implements Files {
             info = fileSystems.remove(fs.getUniqueID());
         }
         if (info == null) {
-            throw new OctopusIOException(adaptor.getName(), "file system is already closed");
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "file system is already closed");
         }
 
         info.getSession().disconnect();

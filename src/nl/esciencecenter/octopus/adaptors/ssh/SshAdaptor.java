@@ -124,7 +124,7 @@ public class SshAdaptor extends Adaptor {
 
     void checkURI(URI location) throws OctopusException {
         if (!supports(location.getScheme())) {
-            throw new OctopusException(getName(), "Ssh adaptor does not support scheme " + location.getScheme());
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme " + location.getScheme());
         }
     }
 
@@ -193,25 +193,25 @@ public class SshAdaptor extends Adaptor {
     OctopusIOException sftpExceptionToOctopusException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
-            return new OctopusIOException(getName(), e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_EOF:
-            return new EndOfFileException(getName(), e.getMessage(), e);
+            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-            return new NoSuchFileException(getName(), e.getMessage(), e);
+            return new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-            return new PermissionDeniedException(getName(), e.getMessage(), e);
+            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_FAILURE:
-            return new OctopusIOException(getName(), e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_BAD_MESSAGE:
-            return new OctopusIOException(getName(), e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_NO_CONNECTION:
-            return new NotConnectedException(getName(), e.getMessage(), e);
+            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_CONNECTION_LOST:
-            return new ConnectionLostException(getName(), e.getMessage(), e);
+            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
-            return new UnsupportedIOOperationException(getName(), e.getMessage(), e);
+            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         default:
-            return new OctopusIOException(getName(), e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 
@@ -219,7 +219,7 @@ public class SshAdaptor extends Adaptor {
         try {
             jsch.setKnownHosts(knownHostsFile);
         } catch (JSchException e) {
-            throw new OctopusException(getName(), "Could not set known_hosts file", e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
         }
 
         if (logger.isDebugEnabled()) {
@@ -242,12 +242,12 @@ public class SshAdaptor extends Adaptor {
 
         String userHome = System.getProperty("user.home");
         if (userHome == null) {
-            throw new InvalidCredentialException(getName(), "Cannot get user home directory.");
+            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user home directory.");
         }
 
         String userName = System.getProperty("user.name");
         if (userName == null) {
-            throw new InvalidCredentialException(getName(), "Cannot get user name.");
+            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
         }
 
         File keyFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
@@ -268,7 +268,8 @@ public class SshAdaptor extends Adaptor {
                     certFile2.getPath(), userName, "");
         }
 
-        throw new InvalidCredentialException(getName(), "Cannot create a default credential for ssh, tried " + keyFile.getPath() + " and " + keyFile2.getPath());
+        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried " + 
+                keyFile.getPath() + " and " + keyFile2.getPath());
     }
 
     private void setCredential(CredentialImplementation credential, Session session) throws OctopusException {
@@ -279,13 +280,13 @@ public class SshAdaptor extends Adaptor {
             try {
                 jsch.addIdentity(certificate.getKeyfile(), Arrays.toString(certificate.getPassword()));
             } catch (JSchException e) {
-                throw new InvalidCredentialException(getName(), "Could not read private key file.", e);
+                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
             }
         } else if (credential instanceof PasswordCredentialImplementation) {
             PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
             session.setPassword(Arrays.toString(passwordCredential.getPassword()));
         } else {
-            throw new InvalidCredentialException(getName(), "Unknown credential type.");
+            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
         }
     }
 
@@ -310,7 +311,7 @@ public class SshAdaptor extends Adaptor {
 
         String credentialUserName = ((CredentialImplementation) credential).getUsername();
         if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
-            throw new BadParameterException(getName(),
+            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
                     "If a user name is given in the URI, it must match the one in the credential");
         }
 
@@ -319,7 +320,7 @@ public class SshAdaptor extends Adaptor {
         }
 
         if (user == null) {
-            throw new BadParameterException(getName(), "no user name given. Specify it in URI or credential.");
+            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in URI or credential.");
         }
 
         logger.debug("creating new session to " + user + "@" + host + ":" + port);
@@ -341,7 +342,7 @@ public class SshAdaptor extends Adaptor {
             logger.debug("strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
         }
-
+        
         if (localProperties.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
             String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
             logger.debug("setting ssh known hosts file to: " + knownHosts);
@@ -351,7 +352,7 @@ public class SshAdaptor extends Adaptor {
         try {
             session.connect();
         } catch (JSchException e) {
-            throw new OctopusException(getName(), e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         return session;
@@ -372,7 +373,7 @@ public class SshAdaptor extends Adaptor {
             channel.connect();
             return (ChannelSftp) channel;
         } catch (JSchException e) {
-            throw new OctopusIOException(getName(), e.getMessage(), e);
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 
@@ -396,7 +397,7 @@ public class SshAdaptor extends Adaptor {
             channel = (ChannelExec) session.openChannel("exec");
             return channel;
         } catch (JSchException e) {
-            throw new OctopusIOException(getName(), e.getMessage(), e);
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 

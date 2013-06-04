@@ -73,7 +73,7 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public long creationTime() throws AttributeNotSupportedException {
-        throw new AttributeNotSupportedException("ssh", "Attribute create time not supported");
+        throw new AttributeNotSupportedException(SshAdaptor.ADAPTOR_NAME, "Attribute create time not supported");
     }
 
     @Override

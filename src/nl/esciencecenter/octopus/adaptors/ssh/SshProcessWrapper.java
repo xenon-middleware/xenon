@@ -97,7 +97,7 @@ public class SshProcessWrapper implements ProcessWrapper {
                         channel.getErrStream());
                 
             } catch (IOException e) {
-                throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
         } else {
 
@@ -107,7 +107,7 @@ public class SshProcessWrapper implements ProcessWrapper {
                 try {
                     stdin = new FileInputStream(stdinPath);
                 } catch (FileNotFoundException e) {
-                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                    throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
                 }
                 channel.setInputStream(stdin);
             } else {
@@ -120,7 +120,7 @@ public class SshProcessWrapper implements ProcessWrapper {
                 try {
                     stdout = new FileOutputStream(stdoutPath);
                 } catch (FileNotFoundException e) {
-                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                    throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
                 }
                 channel.setOutputStream(stdout);
             } else {
@@ -133,7 +133,7 @@ public class SshProcessWrapper implements ProcessWrapper {
                 try {
                     stderr = new FileOutputStream(stderrPath);
                 } catch (FileNotFoundException e) {
-                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                    throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
                 }
                 channel.setErrStream(stderr);
             } else {
@@ -148,7 +148,7 @@ public class SshProcessWrapper implements ProcessWrapper {
         try {
             channel.connect();
         } catch (JSchException e) {
-            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
         logger.debug("Connecting channel done");
     }
