@@ -60,6 +60,15 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * LocalFiles implements an Octopus <code>Files</code> adaptor for local file operations.  
+ * 
+ * @see nl.esciencecenter.octopus.files.Files
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     /** A logger for this class */

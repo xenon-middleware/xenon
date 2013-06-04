@@ -44,8 +44,11 @@ import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
 
 /**
+ * A CopyEngine is responsible for performing the asynchronous copy operations. 
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * @version 1.0
+ * @since 1.0
  */
 public class CopyEngine {
     

@@ -26,6 +26,13 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
+/**
+ * LocalFileAttributes implements a {@link FileAttributes} for local files. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalFileAttributes implements FileAttributes {
 
     /** The file attributes from the underlying java.nio implementation */

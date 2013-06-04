@@ -29,6 +29,13 @@ import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * LocalInteractiveProcess implements a {@link ProcessWrapper} for local interactive processes. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 class LocalInteractiveProcess implements ProcessWrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalInteractiveProcess.class);

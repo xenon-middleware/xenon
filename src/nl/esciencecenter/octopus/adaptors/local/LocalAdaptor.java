@@ -27,6 +27,13 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
+/**
+ * LocalAdaptor implements an Octopus adaptor for local operations.  
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalAdaptor extends Adaptor {
 
     /** Name of the local adaptor is defined in the engine. */

@@ -26,6 +26,13 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.RelativePath;
 
+/**
+ * LocalDirectoryStream implements a {@link DirectoryStream} for local directories. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
 
     /** The DirectoryStream from the underlying java.nio implementation */

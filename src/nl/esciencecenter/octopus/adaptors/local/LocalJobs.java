@@ -38,6 +38,15 @@ import nl.esciencecenter.octopus.jobs.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * LocalFiles implements an Octopus <code>Jobs</code> adaptor for local job operations.  
+ * 
+ * @see nl.esciencecenter.octopus.jobs.Jobs
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalJobs implements Jobs {
 
     @SuppressWarnings("unused")

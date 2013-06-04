@@ -33,6 +33,13 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 
+/**
+ * LocalBatchProcess implements a {@link ProcessWrapper} for local batch processes. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 class LocalBatchProcess implements ProcessWrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalBatchProcess.class);
@@ -113,34 +120,34 @@ class LocalBatchProcess implements ProcessWrapper {
         }
     }
 
-    private void kill() {
-        for (int i = 0; i < processes.length; i++) {
-            processes[i].destroy();
-
-            if (stdinForwarders[i] != null) {
-                stdinForwarders[i].close();
-            }
-
-            stdoutForwarders[i].close();
-            stderrForwarders[i].close();
-        }
-        
-        try {
-            if (stdoutStream != null) { 
-                stdoutStream.close();
-            }
-        } catch (IOException e) {
-            // IGNORE
-        }
-        
-        try {
-            if (stderrStream != null) { 
-                stderrStream.close();
-            }
-        } catch (IOException e) {
-            // IGNORE
-        }
-    }
+//    private void kill() {
+//        for (int i = 0; i < processes.length; i++) {
+//            processes[i].destroy();
+//
+//            if (stdinForwarders[i] != null) {
+//                stdinForwarders[i].close();
+//            }
+//
+//            stdoutForwarders[i].close();
+//            stderrForwarders[i].close();
+//        }
+//        
+//        try {
+//            if (stdoutStream != null) { 
+//                stdoutStream.close();
+//            }
+//        } catch (IOException e) {
+//            // IGNORE
+//        }
+//        
+//        try {
+//            if (stderrStream != null) { 
+//                stderrStream.close();
+//            }
+//        } catch (IOException e) {
+//            // IGNORE
+//        }
+//    }
 
     public int waitFor() throws InterruptedException {
         
