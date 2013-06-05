@@ -46,7 +46,7 @@ public class ITFileTests_SFTP_testuser_localhost extends AbstractFileTests {
                 userHome + "/.ssh/id_rsa", 
                 userHome + "/.ssh/id_rsa.pub", 
                 testUser,
-                "");
+                null);
 
         return cred;
     }

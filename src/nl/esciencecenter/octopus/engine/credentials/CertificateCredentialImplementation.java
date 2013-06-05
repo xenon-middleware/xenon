@@ -45,7 +45,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      *            the password or passphrase belonging to the key and certificate.
      */
     public CertificateCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, 
-            String keyfile, String certfile, String username, String password) {
+            String keyfile, String certfile, String username, char [] password) {
         
         super(adaptorName, uniqueID, properties, username, password);
         this.keyfile = keyfile;

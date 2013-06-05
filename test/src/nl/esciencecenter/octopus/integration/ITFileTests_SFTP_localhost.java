@@ -41,7 +41,7 @@ public class ITFileTests_SFTP_localhost extends AbstractFileTests {
         String user = getTestUser();
         Credential cred =
                 creds.newCertificateCredential("ssh", null, "/home/" + user + "/.ssh/id_rsa", "/home/" + user
-                        + "/.ssh/id_rsa.pub", user, "");
+                        + "/.ssh/id_rsa.pub", user, null);
         return cred;
     }
 

@@ -47,7 +47,7 @@ public interface Credentials {
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
-            String username, String password) throws OctopusException;
+            String username, char [] password) throws OctopusException;
 
     /**
      * Constructs a password credential.
@@ -59,7 +59,7 @@ public interface Credentials {
      * @param password
      *            the password.
      */
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password)
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, char [] password)
             throws OctopusException;
 
     /**
@@ -75,7 +75,7 @@ public interface Credentials {
      *            the password to use to connect to the proxy server
      */
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
-            String password) throws OctopusException;
+            char [] password) throws OctopusException;
     
     
     /**

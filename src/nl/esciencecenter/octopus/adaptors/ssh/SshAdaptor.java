@@ -299,7 +299,7 @@ public class SshAdaptor extends Adaptor {
         if (keyFile.exists() && certFile.exists()) {
             logger.info("Using default credential: "+ keyFile.getPath());
             return octopusEngine.credentials().newCertificateCredential("ssh", getProperties(), keyFile.getPath(),
-                    certFile.getPath(), userName, "");
+                    certFile.getPath(), userName, null);
         }
 
         File keyFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
@@ -308,7 +308,7 @@ public class SshAdaptor extends Adaptor {
         if (keyFile2.exists() && certFile2.exists()) {
             logger.info("Using default credential: "+ keyFile2.getPath());
             return octopusEngine.credentials().newCertificateCredential("ssh", getProperties(), keyFile2.getPath(),
-                    certFile2.getPath(), userName, "");
+                    certFile2.getPath(), userName, null);
         }
 
         throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried " + 

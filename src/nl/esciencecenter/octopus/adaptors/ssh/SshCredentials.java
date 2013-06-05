@@ -48,13 +48,13 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
-            String username, String password) throws OctopusException {
+            String username, char [] password) throws OctopusException {
         return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
                 new OctopusProperties(properties), keyfile, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password)
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, char [] password)
             throws OctopusException {
         return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(),
                 new OctopusProperties(properties), username, password);
@@ -62,7 +62,7 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
-            String password) throws OctopusException {
+            char [] password) throws OctopusException {
         return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(),
                 new OctopusProperties(properties), host, port, username, password);
     }

@@ -46,7 +46,7 @@ public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
                         userHome + "/.ssh/id_rsa", 
                         userHome + "/.ssh/id_rsa.pub", 
                         user,
-                        "");
+                        null);
         return cred;
     }
 
