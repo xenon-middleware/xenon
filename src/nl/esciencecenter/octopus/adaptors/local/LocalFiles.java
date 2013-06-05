@@ -23,10 +23,7 @@ import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
-import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
-import java.nio.file.attribute.UserPrincipal;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
@@ -35,10 +32,10 @@ import java.util.Set;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
-import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.engine.util.CopyInfo;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
@@ -48,6 +45,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
@@ -55,7 +53,6 @@ import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -152,21 +149,21 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return target;
     }
 
-    @Override
-    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
-
-        if (exists(link)) {
-            throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Target already exists.");
-        }
-
-        try {
-            Files.createSymbolicLink(LocalUtils.javaPath(link), LocalUtils.javaPath(target));
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create symbolic link.", e);
-        }
-
-        return link;
-    }
+//    @Override
+//    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
+//
+//        if (exists(link)) {
+//            throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Target already exists.");
+//        }
+//
+//        try {
+//            Files.createSymbolicLink(LocalUtils.javaPath(link), LocalUtils.javaPath(target));
+//        } catch (IOException e) {
+//            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create symbolic link.", e);
+//        }
+//
+//        return link;
+//    }
 
     @Override
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException {
@@ -238,30 +235,30 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return Files.isDirectory(LocalUtils.javaPath(path));
     }
 
-    @Override
-    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException {
-
-        try {
-            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
-
-            if (user != null) {
-                UserPrincipal userPrincipal =
-                        FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(user);
-
-                view.setOwner(userPrincipal);
-            }
-
-            if (group != null) {
-                GroupPrincipal groupPrincipal =
-                        FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByGroupName(group);
-
-                view.setGroup(groupPrincipal);
-            }
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to set user and group.", e);
-        }
-
-    }
+//    @Override
+//    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException {
+//
+//        try {
+//            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
+//
+//            if (user != null) {
+//                UserPrincipal userPrincipal =
+//                        FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(user);
+//
+//                view.setOwner(userPrincipal);
+//            }
+//
+//            if (group != null) {
+//                GroupPrincipal groupPrincipal =
+//                        FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByGroupName(group);
+//
+//                view.setGroup(groupPrincipal);
+//            }
+//        } catch (IOException e) {
+//            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to set user and group.", e);
+//        }
+//
+//    }
 
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
@@ -274,35 +271,35 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
     }
 
-    @Override
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusIOException {
-
-        try {
-            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
-
-            FileTime lastModifiedFileTime = null;
-            FileTime lastAccessFileTime = null;
-            FileTime createFileTime = null;
-
-            if (lastModifiedTime != -1) {
-                lastModifiedFileTime = FileTime.fromMillis(lastModifiedTime);
-            }
-
-            if (lastAccessTime != -1) {
-                lastAccessFileTime = FileTime.fromMillis(lastAccessTime);
-            }
-
-            if (createTime != -1) {
-                createFileTime = FileTime.fromMillis(createTime);
-            }
-
-            view.setTimes(lastModifiedFileTime, lastAccessFileTime, createFileTime);
-
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to set file times.", e);
-        }
-    }
+//    @Override
+//    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
+//            throws OctopusIOException {
+//
+//        try {
+//            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
+//
+//            FileTime lastModifiedFileTime = null;
+//            FileTime lastAccessFileTime = null;
+//            FileTime createFileTime = null;
+//
+//            if (lastModifiedTime != -1) {
+//                lastModifiedFileTime = FileTime.fromMillis(lastModifiedTime);
+//            }
+//
+//            if (lastAccessTime != -1) {
+//                lastAccessFileTime = FileTime.fromMillis(lastAccessTime);
+//            }
+//
+//            if (createTime != -1) {
+//                createFileTime = FileTime.fromMillis(createTime);
+//            }
+//
+//            view.setTimes(lastModifiedFileTime, lastAccessFileTime, createFileTime);
+//
+//        } catch (IOException e) {
+//            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to set file times.", e);
+//        }
+//    }
 
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,

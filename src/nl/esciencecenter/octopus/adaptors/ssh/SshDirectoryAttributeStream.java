@@ -56,7 +56,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     @Override
     public synchronized boolean hasNext() {
-        return current < listing.size() - 1;
+        return current < listing.size();
     }
 
     @Override

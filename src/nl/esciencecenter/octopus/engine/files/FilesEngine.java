@@ -137,10 +137,10 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(path).createFile(path);
     }
 
-    @Override
-    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
-        return getFilesAdaptor(link).createSymbolicLink(link, target);
-    }
+//    @Override
+//    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
+//        return getFilesAdaptor(link).createSymbolicLink(link, target);
+//    }
 
     @Override
     public void delete(AbsolutePath path) throws OctopusIOException {
@@ -252,21 +252,21 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(link).readSymbolicLink(link);
     }
 
-    @Override
-    public void setOwner(AbsolutePath path, String owner, String group) throws OctopusIOException {
-        getFilesAdaptor(path).setOwner(path, owner, group);
-    }
+//    @Override
+//    public void setOwner(AbsolutePath path, String owner, String group) throws OctopusIOException {
+//        getFilesAdaptor(path).setOwner(path, owner, group);
+//    }
 
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
     }
 
-    @Override
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusIOException {
-        getFilesAdaptor(path).setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
-    }
+//    @Override
+//    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
+//            throws OctopusIOException {
+//        getFilesAdaptor(path).setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
+//    }
 
     @Override
     public FileSystem getLocalCWDFileSystem() throws OctopusException {

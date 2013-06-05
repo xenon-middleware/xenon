@@ -344,7 +344,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException;
+    //public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException;
 
     /**
      * Deletes an existing path.
@@ -617,7 +617,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException;
+    //public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException;
 
     /**
      * Sets the POSIX permissions of a path.
@@ -652,8 +652,8 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusIOException;
+    //public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
+      //      throws OctopusIOException;
     
     
     

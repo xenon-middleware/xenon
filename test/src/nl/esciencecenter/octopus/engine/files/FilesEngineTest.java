@@ -227,10 +227,10 @@ public class FilesEngineTest {
         fail("Not yet implemented");
     }
 
-    @Test
-    public void testCreateSymbolicLink() {
-        fail("Not yet implemented");
-    }
+//    @Test
+//    public void testCreateSymbolicLink() {
+//        fail("Not yet implemented");
+//    }
 
     @Test
     public void testDelete() {
@@ -287,36 +287,36 @@ public class FilesEngineTest {
         fail("Not yet implemented");
     }
 
-    @Test
-    public void testSetOwner_MockedFiles_FilesSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
-        FileSystemImplementation filesystem = getFileSystem("Local", new URI("file:///"));
-        AbsolutePathImplementation path = new AbsolutePathImplementation(filesystem, new RelativePath("tmp/bla.txt"));
-        // create stubs, so we don't have to use a real adaptor
-        // a real adaptor touches filesystem, uses network, requires credentials
-        // etc.
-        Files files_adaptor = mock(Files.class);
-        OctopusEngine octopus = fakeOctopus(files_adaptor, "Local");
-
-        FilesEngine engine = new FilesEngine(octopus);
-
-        engine.setOwner(path, "someone", "somegroup");
-
-        verify(files_adaptor).setOwner(path, "someone", "somegroup");
-    }
+//    @Test
+//    public void testSetOwner_MockedFiles_FilesSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
+//        FileSystemImplementation filesystem = getFileSystem("Local", new URI("file:///"));
+//        AbsolutePathImplementation path = new AbsolutePathImplementation(filesystem, new RelativePath("tmp/bla.txt"));
+//        // create stubs, so we don't have to use a real adaptor
+//        // a real adaptor touches filesystem, uses network, requires credentials
+//        // etc.
+//        Files files_adaptor = mock(Files.class);
+//        OctopusEngine octopus = fakeOctopus(files_adaptor, "Local");
+//
+//        FilesEngine engine = new FilesEngine(octopus);
+//
+//        engine.setOwner(path, "someone", "somegroup");
+//
+//        verify(files_adaptor).setOwner(path, "someone", "somegroup");
+//    }
 
     @Test
     public void testSetPosixFilePermissions() {
         fail("Not yet implemented");
     }
 
-    @Test
-    public void testSetFileTimes() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testSetAcl() {
-        fail("Not yet implemented");
-    }
+//    @Test
+//    public void testSetFileTimes() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testSetAcl() {
+//        fail("Not yet implemented");
+//    }
 
 }

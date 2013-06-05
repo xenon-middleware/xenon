@@ -681,16 +681,6 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
-        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "createSymbolicLink not implemented!");
-    }
-    
-    @Override
-    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException {
-        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "setOwner not implemented!");
-    }
-
-    @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "setPosixFilePermissions not implemented!");
     }
@@ -700,12 +690,6 @@ public class SshFiles implements Files {
         throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "newByteChannel not implemented!");
     }
     
-    @Override
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusIOException {        
-        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "setFileTimes not implemented!");
-    }
-
     private SftpATTRS stat(AbsolutePath path) throws OctopusIOException {
         
         ChannelSftp channel = getChannel(path);
