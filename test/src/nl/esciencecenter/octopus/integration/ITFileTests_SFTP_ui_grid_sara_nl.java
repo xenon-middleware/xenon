@@ -20,44 +20,34 @@ import java.net.URI;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.FileSystem;
 
-public class SftpFileTests_SARA_UI extends AbstractFileTests {
+public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
+
     public String getTestUser() {
-        // actual test user 
+        // actual test user: use current user name. 
         return System.getProperty("user.name");
     }
 
     public java.net.URI getTestLocation() throws Exception {
 
         String user = getTestUser();
-        return new URI("sftp://" + user + "@ui.grid.sara.nl/tmp/");
+        return new URI("sftp://" + user + "@ui.grid.sara.nl/tmp/"+user);
     }
 
-    public Credential getSSHCredentials() throws OctopusException {
+    public Credential getCredentials() throws OctopusException {
+
+        // use home of user which runs the test which can be different then remote test user: 
+        String userHome = System.getProperty("user.home");
 
         Credentials creds = octopus.credentials();
         String user = getTestUser();
-        Credential cred =
-                creds.newCertificateCredential("ssh", null, "/home/" + user + "/.ssh/id_rsa", "/home/" + user
-                        + "/.ssh/id_rsa.pub", user, "");
+        Credential cred =  creds.newCertificateCredential("ssh", 
+                        null, 
+                        userHome + "/.ssh/id_rsa", 
+                        userHome + "/.ssh/id_rsa.pub", 
+                        user,
+                        "");
         return cred;
-    }
-
-    /**
-     * Get actual FileSystem implementation to run test on. Test this before other tests:
-     */
-    protected FileSystem getFileSystem() throws Exception {
-
-        synchronized (this) {
-            if (fileSystem == null) {
-                URI uri = getTestLocation();
-                URI fsURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), null, null, null);
-                fileSystem = getFiles().newFileSystem(fsURI, getSSHCredentials(), null);
-            }
-
-            return fileSystem;
-        }
     }
 
     // ===
