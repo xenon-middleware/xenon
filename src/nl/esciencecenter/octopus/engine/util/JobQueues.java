@@ -249,6 +249,10 @@ public class JobQueues {
     
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
         
+        if (logger.isDebugEnabled()) { 
+            logger.debug("Waiting for " + job.getIdentifier() + " for " + timeout + " ms.");
+        }
+        
         if (timeout < 0) { 
             throw new OctopusException(adaptor.getName(), "Illegal timeout " + timeout);
         }
@@ -259,7 +263,16 @@ public class JobQueues {
         JobStatus status = findJob(queue, job).waitUntilDone(timeout);
         
         if (status.isDone()) { 
+        
+            if (logger.isDebugEnabled()) { 
+                logger.debug("Job " + job.getIdentifier() + " is done after " + timeout + " ms.");
+            }
+            
             cleanupJob(queue, job);
+        } else { 
+            if (logger.isDebugEnabled()) { 
+                logger.debug("Job " + job.getIdentifier() + " is NOT done after " + timeout + " ms.");
+            }
         }
         
         return status;    

@@ -229,7 +229,7 @@ public class LocalJobsTest {
         JobStatus status = jobs.waitUntilDone(job, 5000);
         
         if (!status.isDone()) { 
-            throw new Exception("Job exceeded dealine!");
+            throw new Exception("Job exceeded deadline!");
         }
         
         if (status.hasException()) {
