@@ -28,10 +28,12 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.apache.commons.io.FileUtils;
@@ -40,47 +42,56 @@ public class SshJobsTest {
 
     @org.junit.Test
     public void testJobSubmit() throws Exception {
+        
+        // Initialize Octopus and retrieve the various APIs
         Octopus octopus = OctopusFactory.newOctopus(null);
-        URI fs_location = new URI("file:///");
-        FileSystem filesystem = octopus.files().newFileSystem(fs_location, null, null);
-        RelativePath location = new RelativePath(System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID().toString());
-        AbsolutePath root = octopus.files().newPath(filesystem, location);
-        octopus.files().createDirectory(root);
-
-        String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
-
-        JobDescription description = new JobDescription();
-        description.setArguments(input_file);
-        description.setExecutable("/usr/bin/wc");
-        description.setStdin(null);
-        description.setStdout(root.resolve(new RelativePath("stdout.txt")).getPath());
-        description.setStderr(root.resolve(new RelativePath("stderr.txt")).getPath());
-        
+        Files files = octopus.files();
+        Jobs jobs = octopus.jobs();
         Credentials c = octopus.credentials();
+        
+        // Create a temporary directory
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
+        
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID().toString()));        
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        
+        files.createDirectory(root);
+        
+        // Create a JobDescription
+        String inputFile = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/usr/bin/wc");
+        description.setArguments(inputFile);
+        description.setStdin(null);
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
+
+        // Create a scheduler
         Credential credential = c.getDefaultCredential("ssh");
-        
         String username = System.getProperty("user.name");
-        URI sh_location = new URI("ssh://" + username + "@localhost");
         
-        Scheduler scheduler = octopus.jobs().newScheduler(sh_location, credential, null);
+        Scheduler scheduler = jobs.newScheduler(new URI("ssh://" + username + "@localhost"), credential, null);
 
-        Job job = octopus.jobs().submitJob(scheduler, description);
-
-        // TODO add timeout
-        while (!octopus.jobs().getJobStatus(job).isDone()) {
-            Thread.sleep(500);
+        // Submit the Job and wait for it to finish.
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 10000);
+        
+        // Check the state and output.
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
         }
-
-        JobStatus status = octopus.jobs().getJobStatus(job);
+        
         if (status.hasException()) {
             throw status.getException();
         }
 
-        File stdout = new File(location.getPath() + File.separator + "stdout.txt");
-        assertThat(FileUtils.readFileToString(stdout), is("   9  525 3581 " + input_file + "\n"));
+        assertThat(FileUtils.readFileToString(new File(out.getPath())), is("   9  525 3581 " + inputFile + "\n"));
 
-        octopus.files().delete(root.resolve(new RelativePath("stdout.txt")));
-        octopus.files().delete(root.resolve(new RelativePath("stderr.txt")));
+        octopus.files().delete(out);
+        octopus.files().delete(err);
         octopus.files().delete(root);
+        octopus.end();
     }
 }

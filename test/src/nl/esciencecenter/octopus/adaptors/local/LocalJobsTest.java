@@ -2,15 +2,18 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URI;
 import java.util.Arrays;
+import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -54,11 +57,6 @@ public class LocalJobsTest {
 //        lj.end();
 //    }
 
-    private void writeFully(OutputStream in, String text) throws IOException { 
-        in.write(text.getBytes());
-        in.close();
-    } 
-    
     private String readFully(InputStream in) throws IOException { 
     
         byte [] buffer = new byte[1024];
@@ -84,7 +82,9 @@ public class LocalJobsTest {
     
     @org.junit.Test
     public void testInteractiveJobSubmit() throws Exception {
-       
+        
+        System.err.println("START: testInteractiveJobSubmit");
+        
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
@@ -110,19 +110,11 @@ public class LocalJobsTest {
         String err = readFully(streams.getStderr());
 
         // NOTE: Job should already be done here!
-        long deadline = System.currentTimeMillis() + 5000;
-        
-        while (!jobs.getJobStatus(job).isDone()) {
-            Thread.sleep(100);
-            
-            long now = System.currentTimeMillis();
-            
-            if (now > deadline) { 
-                throw new Exception("Job exceeded deadline!");
-            }
-        }
+        JobStatus status = jobs.waitUntilDone(job, 5000);
 
-        JobStatus status = octopus.jobs().getJobStatus(job);
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded dealine!");
+        }
         
         if (status.hasException()) {
             throw status.getException();
@@ -137,30 +129,41 @@ public class LocalJobsTest {
     @org.junit.Test
     public void testBatchJobSubmitWithPolling() throws Exception {
         
+        System.err.println("START: testBatchJobSubmitWithPolling");
+        
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
-      
-        final String tmpDir = System.getProperty("java.io.tmpdir");
+        Jobs jobs = octopus.jobs();
+        Files files = octopus.files();
         
-        System.out.println("tmpdir = " + tmpDir);
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
+        
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + 
+                UUID.randomUUID().toString()));
+        
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        
+        files.createDirectory(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        description.setWorkingDirectory(tmpDir);
+        description.setWorkingDirectory(root.getPath());
         description.setStdin(null);
-        description.setStdout("stdout.txt");
-        description.setStderr("stderr.txt");
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
 
-        Jobs jobs = octopus.jobs();
         Scheduler scheduler = jobs.getLocalScheduler();
         Job job = jobs.submitJob(scheduler, description);
         
         long deadline = System.currentTimeMillis() + 5000;
         
-        while (!jobs.getJobStatus(job).isDone()) {
+        JobStatus status = jobs.getJobStatus(job);
+        
+        while (!status.isDone()) {
             Thread.sleep(100);
             
             long now = System.currentTimeMillis();
@@ -168,24 +171,25 @@ public class LocalJobsTest {
             if (now > deadline) { 
                 throw new Exception("Job exceeded deadline!");
             }
+            
+            status = jobs.getJobStatus(job);
         }
 
-        JobStatus status = jobs.getJobStatus(job);
-        
         if (status.hasException()) {
             throw status.getException();
         }
 
-        String out = readFully(new FileInputStream(new File(tmpDir + File.separator + "stdout.txt")));
-        String err = readFully(new FileInputStream(new File(tmpDir + File.separator + "stderr.txt")));
+        String tmpout = readFully(files.newInputStream(out));
+        String tmperr = readFully(files.newInputStream(err));
 
-        System.out.println("stdout = \"" + out + "\"");
-        System.out.println("stderr = \"" + err + "\"");
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
         
-        assertTrue(out != null);
-        assertTrue(out.length() > 0);
-        assertTrue(out.equals(message));
-        assertTrue(err.length() == 0);
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
         
         octopus.end();
     }
@@ -193,43 +197,176 @@ public class LocalJobsTest {
     @org.junit.Test
     public void testBatchJobSubmitWithWait() throws Exception {
         
+        System.err.println("START: testBatchJobSubmitWithWait");
+        
         String message = "Hello World!";
         
         Octopus octopus = OctopusFactory.newOctopus(null);
-      
-        final String tmpDir = System.getProperty("java.io.tmpdir");
+        Jobs jobs = octopus.jobs();
+        Files files = octopus.files();
+
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
         
-        System.out.println("tmpdir = " + tmpDir);
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + 
+                UUID.randomUUID().toString()));
         
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        
+        files.createDirectory(root);
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        description.setWorkingDirectory(tmpDir);
+        description.setWorkingDirectory(root.getPath());
         description.setStdin(null);
-        description.setStdout("stdout.txt");
-        description.setStderr("stderr.txt");
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
 
-        Jobs jobs = octopus.jobs();
         Scheduler scheduler = jobs.getLocalScheduler();
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded dealine!");
+        }
         
         if (status.hasException()) {
             throw status.getException();
         }
 
-        String out = readFully(new FileInputStream(new File(tmpDir + File.separator + "stdout.txt")));
-        String err = readFully(new FileInputStream(new File(tmpDir + File.separator + "stderr.txt")));
+        String tmpout = readFully(files.newInputStream(out));
+        String tmperr = readFully(files.newInputStream(err));
 
-        System.out.println("stdout = \"" + out + "\"");
-        System.out.println("stderr = \"" + err + "\"");
+        System.err.println("STDOUT: " + tmpout);
+        System.err.println("STDERR: " + tmperr);
         
-        assertTrue(out != null);
-        assertTrue(out.length() > 0);
-        assertTrue(out.equals(message));
-        assertTrue(err.length() == 0);
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
+        
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
         
         octopus.end();
+    }
+
+    private void submitToQueueWithPolling(String queueName, int jobCount) throws Exception {
+    
+        Octopus octopus = OctopusFactory.newOctopus(null);
+      
+        Files files = octopus.files();
+
+        FileSystem filesystem = files.newFileSystem(new URI("file:///"), null, null);
+        
+        AbsolutePath root = files.newPath(filesystem, new RelativePath(System.getProperty("java.io.tmpdir") + "/" + 
+                UUID.randomUUID().toString()));        
+        
+        AbsolutePath [] out = new AbsolutePath[jobCount]; 
+        AbsolutePath [] err = new AbsolutePath[jobCount]; 
+        
+        files.createDirectory(root);
+        
+        Jobs jobs = octopus.jobs();
+        Scheduler scheduler = jobs.getLocalScheduler();
+        
+        Job [] j = new Job[jobCount];
+
+        for (int i=0;i<j.length;i++) {            
+            
+            out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
+            err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
+            
+            JobDescription description = new JobDescription();
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+            description.setWorkingDirectory(root.getPath());
+            description.setQueueName(queueName);
+            description.setInteractive(false);
+            description.setStdin(null);
+            description.setStdout(out[i].getPath());
+            description.setStderr(err[i].getPath());
+    
+            j[i] = jobs.submitJob(scheduler, description);
+        }
+        
+        long deadline = System.currentTimeMillis() + ((jobCount * 2) * 1000);
+        
+        boolean done = false;
+        
+        while (!done) { 
+            JobStatus [] status = jobs.getJobStatuses(j);
+
+            int count = 0;
+            
+            for (int i=0;i<j.length;i++) { 
+                if (j[i] != null) {                    
+                    if (status[i].isDone()) {                         
+                        if (status[i].hasException()) { 
+                            System.err.println("Job " + i + " failed!");
+                            throw status[i].getException();
+                        }
+                        
+                        System.err.println("Job " + i + " done.");
+                        j[i] = null;                        
+                    } else {
+                        count++;
+                    }
+                }
+            }
+        
+            if (count == 0) { 
+                done = true;
+            } else { 
+                Thread.sleep(100);
+                
+                long now = System.currentTimeMillis();
+                
+                if (now > deadline) { 
+                    throw new Exception("Job exceeded deadline!");
+                }
+            }
+        }
+        
+        for (int i=0;i<j.length;i++) {            
+            
+            String tmpout = readFully(files.newInputStream(out[i]));
+            String tmperr = readFully(files.newInputStream(err[i]));
+
+            assertTrue(tmpout != null);
+            assertTrue(tmpout.length() == 0);
+            
+            assertTrue(tmperr != null);
+            assertTrue(tmperr.length() == 0);
+            
+            files.delete(out[i]);
+            files.delete(err[i]);
+        }
+        
+        files.delete(root);
+        
+        octopus.end();
+    }
+
+    
+    @org.junit.Test
+    public void testMultiBatchJobSubmitToSingleWithPolling() throws Exception {
+        System.err.println("START: testMultiBatchJobSubmitToSingleWithPolling");
+        submitToQueueWithPolling("single", 10);
+    }
+    
+    @org.junit.Test
+    public void testMultiBatchJobSubmitToMultiWithPolling() throws Exception {
+        System.err.println("START: testMultiBatchJobSubmitToMultiWithPolling");
+        submitToQueueWithPolling("multi", 10);
+    }
+
+    @org.junit.Test
+    public void testMultiBatchJobSubmitToUnlimitedWithPolling() throws Exception {
+        System.err.println("START: testMultiBatchJobSubmitToMultiWithPolling");
+        submitToQueueWithPolling("unlimited", 10);
     }
 }

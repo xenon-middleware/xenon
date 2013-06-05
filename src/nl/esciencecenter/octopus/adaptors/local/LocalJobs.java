@@ -149,8 +149,8 @@ public class LocalJobs implements Jobs {
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
-        jobQueues.cancelJob(job);
+    public JobStatus cancelJob(Job job) throws OctopusException {
+        return jobQueues.cancelJob(job);
     }
 
     public void end() {

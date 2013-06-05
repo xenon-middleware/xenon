@@ -17,24 +17,17 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
-import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -76,8 +69,7 @@ public class SshJobs implements Jobs {
             this.jobQueues = jobQueues;
         }
     }
-
-    
+        
     @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
@@ -103,15 +95,15 @@ public class SshJobs implements Jobs {
         pollingDelay = properties.getIntProperty(SshAdaptor.POLLING_DELAY);
         
         if (maxQSize < 0 && maxQSize != -1) {
-            throw new BadParameterException(adaptor.getName(), "Maximum queue size cannot be negative (excluding -1 for unlimited)");
+            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Maximum queue size cannot be negative (excluding -1 for unlimited)");
         }
 
         if (multiQThreads <= 1) {
-            throw new BadParameterException(adaptor.getName(), "Number of slots for the multi queue cannot be smaller than one!");
+            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Number of slots for the multi queue cannot be smaller than one!");
         }
         
         if (pollingDelay < 100 ||  pollingDelay > 60000) {
-            throw new BadParameterException(adaptor.getName(), "Polling delay must be between 100 and 60000!");
+            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Polling delay must be between 100 and 60000!");
         }
     }
 
@@ -124,18 +116,19 @@ public class SshJobs implements Jobs {
         String path = location.getPath();
 
         if (path != null && !path.equals("") && !path.equals("/")) {
-            throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with path! (path = " + path + ")");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with path! (path = " + path + ")");
         }
 
-        if (properties != null && properties.size() > 0) { // TODO why not?
-            throw new OctopusException(adaptor.getName(), "Cannot create ssh scheduler with additional properties!");
+        // FIXME: Why can't we add scheduler specific properties ?
+        if (properties != null && properties.size() > 0) { 
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with additional properties!");
         }
 
         String uniqueID = getNewUniqueID();
-
+        
         Session session = adaptor.createNewSession(uniqueID, location, credential, this.properties);
-
-        SchedulerImplementation scheduler = new SchedulerImplementation(adaptor.getName(), uniqueID, location, 
+        
+        SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, 
                 new OctopusProperties(properties), true, true, true);
 
@@ -159,7 +152,7 @@ public class SshJobs implements Jobs {
     private JobQueues getJobQueue(Scheduler scheduler) throws OctopusException { 
         
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new OctopusException(adaptor.getName(), "Illegal scheduler type.");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
         }
 
         SchedulerImplementation s = (SchedulerImplementation) scheduler;
@@ -167,7 +160,7 @@ public class SshJobs implements Jobs {
         SchedulerInfo info = schedulers.get(s.getUniqueID());
 
         if (info == null) {
-            throw new OctopusException(adaptor.getName(), "Cannot find scheduler: " + s.getUniqueID());
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
         }
 
         return info.jobQueues;
@@ -195,7 +188,11 @@ public class SshJobs implements Jobs {
 
         for (int i = 0; i < jobs.length; i++) {
             try {
-                result[i] = getJobStatus(jobs[i]);
+                if (jobs[i] != null) { 
+                    result[i] = getJobStatus(jobs[i]);
+                } else { 
+                    result[i] = null;
+                }
             } catch (OctopusException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }
@@ -210,8 +207,8 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
-        getJobQueue(job.getScheduler()).cancelJob(job);
+    public JobStatus cancelJob(Job job) throws OctopusException {
+        return getJobQueue(job.getScheduler()).cancelJob(job);
     }
 
     public void end() {
@@ -233,7 +230,7 @@ public class SshJobs implements Jobs {
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new OctopusException(adaptor.getName(), "Illegal scheduler type.");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
         }
 
         SchedulerImplementation s = (SchedulerImplementation) scheduler;
@@ -244,7 +241,7 @@ public class SshJobs implements Jobs {
             info = schedulers.remove(s.getUniqueID());
 
             if (info == null) {
-                throw new OctopusException(adaptor.getName(), "Cannot find scheduler: " + s.getUniqueID());
+                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
             }
         } 
             
@@ -256,7 +253,7 @@ public class SshJobs implements Jobs {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new OctopusException(adaptor.getName(), "Illegal scheduler type.");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
         }
 
         return schedulers.containsKey(((SchedulerImplementation) scheduler).getUniqueID());

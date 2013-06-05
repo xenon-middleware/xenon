@@ -162,7 +162,7 @@ class LocalUtils {
         byte [] buf2 = new byte[4*1024];
         
         try (InputStream in1 = Files.newInputStream(head, StandardOpenOption.READ);
-             InputStream in2 = Files.newInputStream(head, StandardOpenOption.READ)) { 
+             InputStream in2 = Files.newInputStream(file, StandardOpenOption.READ)) { 
             
             while (true) { 
 

@@ -45,7 +45,6 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
@@ -54,6 +53,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.UserInfo;
 
 // TODO cache van sessions / channels
 
@@ -65,7 +65,7 @@ public class SshAdaptor extends Adaptor {
     
     private static final int DEFAULT_PORT = 22; // The default ssh port.
 
-    private static final String ADAPTOR_DESCRIPTION = "The Ssh adaptor implements all functionality with remove ssh servers.";
+    private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
 
     private static final String[] ADAPTOR_SCHEME = new String[] { "ssh", "sftp" };
 
@@ -78,6 +78,9 @@ public class SshAdaptor extends Adaptor {
     /** Load the known_hosts file by default. */
     public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
 
+    /** Enable strict host key checking. */
+    public static final String AUTOMATICALLY_ADD_HOST_KEY = PREFIX + "autoAddHostKey";
+    
     /** All our own queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
         
@@ -95,12 +98,52 @@ public class SshAdaptor extends Adaptor {
     
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
-            { STRICT_HOST_KEY_CHECKING, "false", "Boolean: enable strict host key checking." },
+            { AUTOMATICALLY_ADD_HOST_KEY, "true", "Boolean: automatically add unknown host keys to known_hosts." },
+            { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
             { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." }, 
             { MULTIQ_MAX_CONCURRENT, "4", "Int: the maximum number of concurrent jobs in the multiq." } };
-    
+        
+    class Robot implements UserInfo {
+
+        private final boolean yesNo;
+        
+        Robot(boolean yesyNo) { 
+            this.yesNo = yesyNo;
+        }
+        
+        @Override
+        public String getPassphrase() {
+            return null;
+        }
+
+        @Override
+        public String getPassword() {
+            return null;
+        }
+
+        @Override
+        public boolean promptPassphrase(String message) {
+            return false;
+        }
+
+        @Override
+        public boolean promptPassword(String message) {
+            return false;
+        }
+
+        @Override
+        public boolean promptYesNo(String message) {
+            return yesNo;
+        }
+
+        @Override
+        public void showMessage(String message) {
+            // ignored
+        } 
+    }
+
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;
@@ -337,7 +380,14 @@ public class SshAdaptor extends Adaptor {
 
         if (localProperties.getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
             logger.debug("strict host key checking enabled");
-            session.setConfig("StrictHostKeyChecking", "yes");
+       
+            if (localProperties.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY)) { 
+                logger.debug("automatically add host key to known_hosts");
+                session.setConfig("StrictHostKeyChecking", "ask");
+                session.setUserInfo(new Robot(true));
+            } else { 
+                session.setConfig("StrictHostKeyChecking", "yes");
+            }
         } else {
             logger.debug("strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
@@ -358,31 +408,9 @@ public class SshAdaptor extends Adaptor {
         return session;
     }
 
+   
     /**
-     * Get a connected channel for doing sftp operations.
-     * 
-     * @param session
-     *            The authenticated session.
-     * @return the channel
-     * @throws OctopusIOException
-     */
-    protected ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
-        Channel channel;
-        try {
-            channel = session.openChannel("sftp");
-            channel.connect();
-            return (ChannelSftp) channel;
-        } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
-    }
-
-    protected void putSftpChannel(ChannelSftp channel) {
-        channel.disconnect();
-    }
-
-    /**
-     * Get a new exec channel. The channel is not connected yet, because the input and outp[ut streams should be set before
+     * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
      * connecting.
      * 
      * @param session

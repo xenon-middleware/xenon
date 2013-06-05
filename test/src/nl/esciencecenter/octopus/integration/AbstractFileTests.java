@@ -36,8 +36,8 @@ import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
- * Abstract FileSystem tests. This class runs a set of test scenarios on the (remote) filesystem. 
- * This is one abstract test class which can be used for all FileSystem adaptors.
+ * Abstract FileSystem tests. This class runs a set of test scenarios on the (remote) filesystem. This is one abstract test class
+ * which can be used for all FileSystem adaptors.
  * 
  * @author Piter T. de Boer
  */
@@ -52,7 +52,7 @@ abstract public class AbstractFileTests {
 
         // class synchronization:
         synchronized (AbstractFileTests.class) {
-            
+
             // init octopus singleton instance: 
             if (octopus == null) {
                 octopus = OctopusFactory.newOctopus(null);
@@ -319,12 +319,8 @@ abstract public class AbstractFileTests {
         FileSystem fs = getFileSystem();
 
         // just test whether it works: 
-        RelativePath relEntryPath = fs.getEntryPath();
-        Assert.assertNotNull("Relative entry Path may not be null.", relEntryPath);
-
-        // just test whether it works: 
-        AbsolutePath absoluteEntryPath = getFiles().newPath(fs, relEntryPath);
-        Assert.assertNotNull("Absolute entry Path may not be null.", absoluteEntryPath);
+        AbsolutePath relEntryPath = fs.getEntryPath();
+        Assert.assertNotNull("Entry Path may not be null.", relEntryPath);
     }
 
     @org.junit.Test
@@ -398,6 +394,7 @@ abstract public class AbstractFileTests {
 
         // POST: 
         deletePaths(new AbsolutePath[] { dir1, dir2, dir3, testDirPath }, true);
+
     }
 
     @org.junit.Test

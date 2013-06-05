@@ -17,7 +17,7 @@ package nl.esciencecenter.octopus.files;
 
 /**
  * CopyOption is an enumeration containing all possible options for copying a file.
- * 
+ *
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
@@ -27,8 +27,8 @@ public enum CopyOption {
     /**
      * Copy to a new destination file, failing if the file already exists.
      */
-    CREATE, 
-    
+    CREATE,
+
     /**
      * Replace the destination file if it already exists.
      */
@@ -38,7 +38,7 @@ public enum CopyOption {
      * Skip the copy if the destination file if it already exists.
      */
     IGNORE,
-    
+
     /**
      * Append to destination file, failing if the file does not exists.
      */
@@ -49,39 +49,39 @@ public enum CopyOption {
      */
     RESUME,
 
-    /** 
-     * When resuming a copy, verify that the destination file is a head of the source file.  
+    /**
+     * When resuming a copy, verify that the destination file is a head of the source file.
      */
     VERIFY,
-    
+
     /**
-     * Perform the copy asynchronously. 
+     * Perform the copy asynchronously.
      */
     ASYNCHRONOUS,;
 
     /**
      * Check if an array of <code>CopyOption</code> contains a specific option.
-     * 
-     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.  
-     * 
-     * @param options the array to check.  
-     * @param option the option to check for. 
-     * 
-     * @return if <code>options</code> contains <code>option<code>.  
+     *
+     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     *
+     * @param options the array to check.
+     * @param option the option to check for.
+     *
+     * @return if <code>options</code> contains <code>option<code>.
      */
     public static boolean contains(CopyOption[] options, CopyOption option) {
-        
-        if (option == null || options == null || options.length == 0) { 
+
+        if (option == null || options == null || options.length == 0) {
             return false;
         }
 
         for (int i=0;i<options.length;i++) {
-            
-            if (options[i] != null || options[i] == option) {
+
+            if (options[i] != null && options[i] == option) {
                 return true;
-            }   
+            }
         }
-        
+
         return false;
     }
 }

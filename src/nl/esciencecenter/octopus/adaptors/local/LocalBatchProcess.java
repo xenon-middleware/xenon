@@ -77,6 +77,18 @@ class LocalBatchProcess implements ProcessWrapper {
             workingDirectory = System.getProperty("user.dir");
         }
         
+        if (!stdout.startsWith(File.separator)) { 
+            stdout = workingDirectory + File.separator + stdout;
+        }
+        
+        if (!stderr.startsWith(File.separator)) { 
+            stderr = workingDirectory + File.separator + stderr;
+        }
+
+        if (stdin != null && !stdin.startsWith(File.separator)) { 
+            stdin = workingDirectory + File.separator + stdin;
+        }
+        
         builder.command().add(description.getExecutable());
         builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
@@ -84,8 +96,8 @@ class LocalBatchProcess implements ProcessWrapper {
 
         // Merge stdout and stderr into a single stream
         if (description.getMergeOutputStreams()) {             
-            stdoutStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stdout));
-            stderrStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stderr));
+            stdoutStream = new MergingOutputStream(new FileOutputStream(stdout));
+            stderrStream = new MergingOutputStream(new FileOutputStream(stderr));
         } else { 
             stdoutStream = null;
             stderrStream = null;
@@ -103,7 +115,7 @@ class LocalBatchProcess implements ProcessWrapper {
                 stdinForwarders[i] = null;
                 processes[i].getOutputStream().close();
             } else {
-                stdinForwarders[i] = new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin),
+                stdinForwarders[i] = new StreamForwarder(new FileInputStream(stdin),
                                 processes[i].getOutputStream());
             }
 

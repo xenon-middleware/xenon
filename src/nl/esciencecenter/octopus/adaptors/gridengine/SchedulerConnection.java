@@ -190,7 +190,7 @@ public class SchedulerConnection {
         } catch (OctopusIOException e) {
             throw e;
         } catch (IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not delete job " + job.getIdentifier()
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Could not delete job " + job.getIdentifier()
                     + " at server", e);
         }
     }

@@ -201,9 +201,31 @@ public class JobQueues {
         return findJob(findQueue(job.getJobDescription().getQueueName()), job);
     }
     
+    private void cleanupJob(LinkedList<JobExecutor> queue, Job job) { 
+        
+        Iterator<JobExecutor> itt = queue.iterator();
+        
+        while (itt.hasNext()) {
+            JobExecutor e = itt.next();
+            
+            if (e.getJob().equals(job)) {
+                itt.remove();
+                return;
+            }
+        }
+    }
+    
     public JobStatus getJobStatus(Job job) throws OctopusException {
         checkScheduler(job.getScheduler());
-        return findJob(job).getStatus();
+        
+        LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
+        JobStatus status = findJob(queue, job).getStatus();
+        
+        if (status.isDone()) { 
+            cleanupJob(queue, job);
+        }
+        
+        return status;
     }
     
     public JobStatus[] getJobStatuses(Job... jobs) {
@@ -212,7 +234,11 @@ public class JobQueues {
 
         for (int i = 0; i < jobs.length; i++) {
             try {
-                result[i] = getJobStatus(jobs[i]);
+                if (jobs[i] != null) { 
+                    result[i] = getJobStatus(jobs[i]);
+                } else { 
+                    result[i] = null;
+                }
             } catch (OctopusException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }
@@ -228,7 +254,15 @@ public class JobQueues {
         }
         
         checkScheduler(job.getScheduler());
-        return findJob(job).waitUntilDone(timeout);    
+        
+        LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
+        JobStatus status = findJob(queue, job).waitUntilDone(timeout);
+        
+        if (status.isDone()) { 
+            cleanupJob(queue, job);
+        }
+        
+        return status;    
     }
     
     private void verifyJobDescription(JobDescription description) throws OctopusException { 
@@ -299,36 +333,6 @@ public class JobQueues {
         }
     }
     
-    public void submitJob(JobExecutor executor, String queueName, boolean isInteractive) throws OctopusException {
-        
-        if (queueName == null || queueName.equals("single")) {
-            singleQ.add(executor);
-            singleExecutor.execute(executor);
-        } else if (queueName.equals("multi")) {
-            multiQ.add(executor);
-            multiExecutor.execute(executor);
-        } else if (queueName.equals("unlimited")) {
-            unlimitedQ.add(executor);
-            unlimitedExecutor.execute(executor);
-        } else {
-            throw new OctopusException(adaptor.getName(), "INTERNAL ERROR: failed to submit job!");
-        }
-        
-        //purge jobs from q if needed (will not actually cancel execution of jobs)
-        purgeQ(singleQ);
-        purgeQ(multiQ);
-        purgeQ(unlimitedQ);
-
-        if (isInteractive) {
-            executor.waitUntilRunning();
-            
-            if (executor.isDone() && !executor.hasRun()) { 
-                Exception e = executor.getError();
-                throw new OctopusException(adaptor.getName(), "Job failed to start!", e);
-            } 
-        }
-    }
-    
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
         
         if (logger.isDebugEnabled()) { 
@@ -372,9 +376,9 @@ public class JobQueues {
         }
         
         // Purge jobs from the queue if needed (will not actually cancel execution of jobs)
-        purgeQ(singleQ);
-        purgeQ(multiQ);
-        purgeQ(unlimitedQ);
+//        purgeQ(singleQ);
+//        purgeQ(multiQ);
+//        purgeQ(unlimitedQ);
 
         if (description.isInteractive()) {
             executor.waitUntilRunning();
@@ -388,9 +392,21 @@ public class JobQueues {
         return result;
     }
     
-    public void cancelJob(Job job) throws OctopusException {
+    public JobStatus cancelJob(Job job) throws OctopusException {
         checkScheduler(job.getScheduler());
-        findJob(job).kill();
+        
+        LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
+        
+        JobExecutor e = findJob(queue, job);
+        e.kill();
+        JobStatus status = e.waitUntilDone(pollingDelay);
+        
+        if (status.isDone()) { 
+            cleanupJob(queue, job);
+        }        
+        
+        // FIXME: Should throw exception if the cancel fails ??
+        return status;
     }
 
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {

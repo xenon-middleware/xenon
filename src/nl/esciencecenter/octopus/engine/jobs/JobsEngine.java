@@ -15,9 +15,8 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -73,21 +72,85 @@ public class JobsEngine implements Jobs {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
     }
 
+    private String [] getAdaptors(Job [] in) {
+        
+        HashSet<String> result = new HashSet<String>(); 
+        
+        for (int i=0;i<in.length;i++) { 
+            if (in[i] != null) { 
+                result.add(in[i].getScheduler().getAdaptorName());
+            }
+        }
+        
+        return result.toArray(new String[result.size()]);        
+    }
+    
+    private void selectJobs(String adaptorName, Job [] in, Job [] out) { 
+        for (int i=0;i<in.length;i++) { 
+            if (in[i] != null && adaptorName.equals(in[i].getScheduler().getAdaptorName())) { 
+                out[i] = in[i];
+            } else { 
+                out[i] = null;
+            }
+        }
+    }
+
+    private void getJobStatus(String adaptor, Job [] in, JobStatus [] out) { 
+     
+        JobStatus [] result = null;
+        OctopusException exception = null;
+        
+        try { 
+            result = octopusEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in); 
+        } catch (OctopusException e) { 
+            exception = e;
+        }
+        
+        for (int i=0;i<in.length;i++) {
+            if (in[i] != null) {
+                if (result != null) { 
+                    out[i] = result[i];
+                } else { 
+                    out[i] = new JobStatusImplementation(in[i], null, null, exception, false, false, null);    
+                }
+            }
+        }
+    }
+    
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
 
-        // FIXME: Optimize!
-
-        JobStatus[] result = new JobStatus[jobs.length];
-
-        for (int i = 0; i < jobs.length; i++) {
-            try {
-                result[i] = getJobStatus(jobs[i]);
-            } catch (OctopusException | OctopusIOException e) {
-                result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
+        // First check for the two simple cases; no jobs or 1 job.
+        if (jobs.length == 0) { 
+            return new JobStatus[0];
+        }
+        
+        if (jobs.length == 1) {
+            
+            if (jobs[0] == null) { 
+                return new JobStatus[1];
+            }
+            
+            try { 
+                return new JobStatus[] { getJobStatus(jobs[0]) };
+            } catch (Exception e) { 
+                return new JobStatus[] { new JobStatusImplementation(jobs[0], null, null, e, false, false, null) };
             }
         }
-
+        
+        // If we have more than one job, we first collect all adaptor names. 
+        String [] adaptors = getAdaptors(jobs);
+   
+        // Next we traverse over the names, and get the JobStatus for each adaptor individually, merging the result into the 
+        // overall result on the fly.
+        JobStatus [] result = new JobStatus[jobs.length];
+        Job [] tmp = new Job[jobs.length];
+        
+        for (int i=0;i<adaptors.length;i++) { 
+            selectJobs(adaptors[i], jobs, tmp);
+            getJobStatus(adaptors[i], tmp, result);
+        }
+        
         return result;
     }
 
@@ -97,8 +160,8 @@ public class JobsEngine implements Jobs {
     }
     
     @Override
-    public void cancelJob(Job job) throws OctopusException, OctopusIOException {
-        getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
+    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
+        return getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }
 
     @Override

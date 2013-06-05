@@ -76,6 +76,6 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     @Override
     public synchronized void remove() {
-        throw new DirectoryIteratorException("SshDirectoryStream", "DirectoryStream iterator does not support remove");
+        throw new DirectoryIteratorException(SshAdaptor.ADAPTOR_NAME, "DirectoryStream iterator does not support remove");
     }
 }

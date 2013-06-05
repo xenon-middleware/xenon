@@ -25,6 +25,7 @@ import java.util.Set;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
@@ -60,10 +61,17 @@ public class FilesEngine implements Files {
 
     private final OctopusEngine octopusEngine;
 
+    private final CopyEngine copyEngine;
+    
     public FilesEngine(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
+        this.copyEngine = new CopyEngine(this);
     }
 
+    public CopyEngine getCopyEngine() { 
+        return copyEngine;
+    }
+    
     private Files getFilesAdaptor(FileSystem filesystem) throws OctopusIOException {
 
         try {
@@ -194,8 +202,8 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
-        getFilesAdaptor(copy.getSource()).cancelCopy(copy);
+    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+        return getFilesAdaptor(copy.getSource()).cancelCopy(copy);
     }
     
     @Override
