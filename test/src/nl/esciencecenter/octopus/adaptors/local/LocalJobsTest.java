@@ -239,6 +239,9 @@ public class LocalJobsTest {
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
+        System.err.println("STDOUT: " + tmpout);
+        System.err.println("STDERR: " + tmperr);
+        
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
