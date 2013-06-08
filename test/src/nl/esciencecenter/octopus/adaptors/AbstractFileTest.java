@@ -16,8 +16,11 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
+import java.io.Closeable;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -89,6 +92,18 @@ public abstract class AbstractFileTest {
         throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);        
     }
 
+    private void close(Closeable c) { 
+
+        if (c == null) { 
+            return;
+        }
+        try {
+            c.close();
+        } catch (Exception e)  {
+            // ignore
+        }
+    }
+    
     // Depends on: AbsolutePath.resolve, RelativePath, exists
     private AbsolutePath createNewTestDirName(AbsolutePath root) throws Exception { 
         
@@ -102,11 +117,11 @@ public abstract class AbstractFileTest {
         
         return dir;
     }
-    
-    // Depends on: [createNewTestDirName], FileSystem.getEntryPath, createDirectory, exists
-    private AbsolutePath createTestDir(FileSystem fs) throws Exception { 
+
+    // Depends on: [createNewTestDirName], createDirectory, exists
+    private AbsolutePath createTestDir(AbsolutePath root) throws Exception { 
         
-        AbsolutePath dir = createNewTestDirName(fs.getEntryPath());
+        AbsolutePath dir = createNewTestDirName(root);
         
         files.createDirectory(dir);
         
@@ -115,6 +130,11 @@ public abstract class AbstractFileTest {
         }
         
         return dir;
+    }
+    
+    // Depends on: [createTestDir]
+    private AbsolutePath createTestDir(FileSystem fs) throws Exception { 
+        return createTestDir(fs.getEntryPath());
     }
 
     // Depends on: AbsolutePath.resolve, RelativePath, exists 
@@ -179,7 +199,26 @@ public abstract class AbstractFileTest {
         files.delete(dir);
     }
 
-    
+    private byte [] readFully(InputStream in) throws Exception { 
+        
+        byte [] buffer = new byte[1024];
+        
+        int offset = 0;
+        int read = in.read(buffer, offset, buffer.length-offset);
+        
+        while (read != -1) { 
+            
+            offset += read;
+
+            if (offset == buffer.length) { 
+                buffer = Arrays.copyOf(buffer, buffer.length*2);
+            }
+            
+            read = in.read(buffer, offset, buffer.length-offset);
+        }
+        
+        return Arrays.copyOf(buffer, offset);
+    }
     
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST newFileSystem 
@@ -709,19 +748,329 @@ public abstract class AbstractFileTest {
         
         cleanup();
     }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: delete
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing file / existing file / existing empty dir / existing non-empty dir / closed filesystem    
+    // 
+    // Total combinations : 6
+    // 
+    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], delete, [deleteTestFile], [deleteTestDir] 
+    //             [closeTestFileSystem]
+        
+    private void test_delete(AbsolutePath path, boolean mustFail) throws Exception { 
+        
+        try { 
+            files.delete(path);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("delete", e);
+        }
+        
+        if (mustFail) { 
+            throwExpected("delete");
+        }
+    }
     
+    @org.junit.Test
+    public void test_delete() throws Exception { 
+
+        prepare();
+
+        // test with null
+        test_delete(null, true);
+        
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createTestDir(fs);
+
+        // test with non-existing file
+        AbsolutePath file0 = createNewTestFileName(root);        
+        test_delete(file0, true);
+
+        // test with existing file
+        AbsolutePath file1 = createTestFile(root, null);        
+        test_delete(file1, false);
+
+        // test with existing empty dir 
+        AbsolutePath dir0 = createTestDir(root);        
+        test_delete(dir0, false);
+
+        // test with existing non-empty dir
+        AbsolutePath dir1 = createTestDir(root);
+        AbsolutePath file2 = createTestFile(dir1, null);                
+        test_delete(dir1, true);
+
+        // cleanup
+        deleteTestFile(file2);
+        deleteTestDir(dir1);
+        deleteTestDir(root);
+        
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_delete(root, true);
+        }
+
+        cleanup();
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: createDirectory
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing dir / existing dir / existing file / closed filesystem    
+    // 
+    // Total combinations : 5
+    // 
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], [createTestFile], 
+    //             createDirectory, [deleteTestDir], [deleteTestFile], [closeTestFileSystem]
+
+    private void test_createDirectory(AbsolutePath path, boolean mustFail) throws Exception { 
+        
+        try { 
+            files.createDirectory(path);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("createDirectory", e);
+        }
+        
+        if (mustFail) { 
+            throwExpected("createDirectory");
+        }
+    }
+    
+    @org.junit.Test
+    public void test_createDirectory() throws Exception { 
+
+        prepare();
+
+        // test with null
+        test_createDirectory(null, true);
+        
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createNewTestDirName(fs.getEntryPath());
+
+        // test with non-existing dir
+        test_createDirectory(root, false);
+
+        // test with existing dir
+        test_createDirectory(root, true);
+
+        // test with existing file 
+        AbsolutePath file0 = createTestFile(root, null);
+        test_createDirectory(file0, true);
+        deleteTestFile(file0);
+        
+        // cleanup 
+        deleteTestDir(root);
+        
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_createDirectory(root, true);
+        }
+
+        cleanup();
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: createDirectories
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing dir / existing dir / dir with existing parents / dir with non existing parents / 
+    //               dir where last parent is file / closed filesystem    
+    // 
+    // Total combinations : 7
+    // 
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
+    //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
+
+    private void test_createDirectories(AbsolutePath path, boolean mustFail) throws Exception { 
+        
+        try { 
+            files.createDirectories(path);
+            
+            assert(files.exists(path));
+            assert(files.isDirectory(path));
+            
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("createDirectory", e);
+        }
+        
+        if (mustFail) { 
+            throwExpected("createDirectory");
+        }
+    }
+    
+    @org.junit.Test
+    public void test_createDirectories() throws Exception { 
+
+        prepare();
+
+        // test with null
+        test_createDirectories(null, true);
+        
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createNewTestDirName(fs.getEntryPath());
+
+        // test with non-existing dir
+        test_createDirectories(root, false);
+
+        // test with existing dir
+        test_createDirectories(root, true);
+
+        // dir with existing parents 
+        AbsolutePath dir0 = createNewTestDirName(root);
+        test_createDirectories(dir0, false);
+        deleteTestDir(dir0);
+        
+        // dir with non-existing parents 
+        AbsolutePath dir1 = createNewTestDirName(dir0);
+        test_createDirectories(dir1, false);
+        
+        // dir where last parent is file 
+        AbsolutePath file0 = createTestFile(dir0, null);
+        AbsolutePath dir2 = createNewTestDirName(file0);
+        test_createDirectories(dir2, true);
+
+        // cleanup 
+        deleteTestDir(dir1);
+        deleteTestFile(file0);        
+        deleteTestDir(dir0);
+        deleteTestDir(root);
+
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_createDirectory(root, true);
+        }
+
+        cleanup();
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: newInputStream 
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem    
+    // 
+    // Total combinations : 6
+    // 
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
+    //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
+    
+    
+    public void test_newInputStream(AbsolutePath file, byte [] expected, boolean mustFail) throws Exception { 
+        
+        InputStream in = null;
+        
+        try { 
+            in = files.newInputStream(file);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("newInputStream", e);
+        }
+        
+        if (mustFail) {             
+            close(in);            
+            throwExpected("newInputStream");
+        }
+        
+        byte [] data = readFully(in);
+        
+        if (expected == null) { 
+            if (data.length != 0) {
+                throwWrong("newInputStream", "zero bytes", data.length + " bytes");
+            }  
+            return;
+        }
+        
+        if (expected.length != data.length) { 
+            throwWrong("newInputStream", expected.length + " bytes", data.length + " bytes");            
+        }
+        
+        if (!Arrays.equals(expected, data)) { 
+            throwWrong("newInputStream", Arrays.toString(expected), Arrays.toString(data));
+        }
+    }
+     
+    @org.junit.Test
+    public void test_newInputStream() throws Exception { 
+
+        byte [] data = "Hello World".getBytes();
+        
+        prepare();
+
+        // test with null
+        test_newInputStream(null, null, true);
+        
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createTestDir(fs.getEntryPath());
+
+        // test with non-existing file
+        AbsolutePath file0 = createNewTestFileName(root);
+        test_newInputStream(file0, null, true);
+        
+        // test with existing empty file
+        AbsolutePath file1 = createTestFile(root, null);
+        test_newInputStream(file1, null, false);
+        
+        // test with existing non-empty file
+        AbsolutePath file2 = createTestFile(root, data);
+        test_newInputStream(file2, data, false);
+
+        // test with existing dir 
+        AbsolutePath dir0 = createTestDir(root);
+        test_newInputStream(dir0, null, true);
+
+        // cleanup
+        deleteTestFile(file1);
+        deleteTestFile(file2);
+        deleteTestDir(dir0);
+        deleteTestDir(root);
+        
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_newInputStream(file2, data, true);
+        }
+
+        cleanup();
+    }
+
     
     /*    
 
-    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
+    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
-
-    public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException;
-
-    public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException;
-
-    public void delete(AbsolutePath path) throws OctopusIOException;
-
+    
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException;
 
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
@@ -743,10 +1092,6 @@ public abstract class AbstractFileTest {
             throws OctopusIOException;
 
 
-
-    public InputStream newInputStream(AbsolutePath path) throws OctopusIOException;
-
-    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 

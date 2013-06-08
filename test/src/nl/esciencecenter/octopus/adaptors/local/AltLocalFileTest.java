@@ -97,7 +97,7 @@ public class AltLocalFileTest extends AbstractFileTest {
 
     @Override
     public FileSystem getTestFileSystem() throws Exception {
-        return files.getLocalHomeFileSystem();
+        return files.getLocalCWDFileSystem();
     }
 
     @Override

@@ -187,6 +187,14 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
 
+        if (!exists(path)) {
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
+        }
+
+        if (isDirectory(path)) {
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
+        }
+        
         try {
             return Files.newInputStream(LocalUtils.javaPath(path));
         } catch (IOException e) {
@@ -271,6 +279,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException {
 
+        if (exists(dir)) {
+            throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
+        }
+        
         Iterator<AbsolutePath> itt = dir.iterator();
 
         while (itt.hasNext()) {
