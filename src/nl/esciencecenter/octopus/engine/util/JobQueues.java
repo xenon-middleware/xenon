@@ -263,7 +263,6 @@ public class JobQueues {
         JobStatus status = findJob(queue, job).waitUntilDone(timeout);
         
         if (status.isDone()) { 
-        
             if (logger.isDebugEnabled()) { 
                 logger.debug("Job " + job.getIdentifier() + " is done after " + timeout + " ms.");
             }

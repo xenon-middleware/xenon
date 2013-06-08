@@ -235,7 +235,7 @@ public class LocalJobsTest {
         if (status.hasException()) {
             throw status.getException();
         }
-
+       
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 

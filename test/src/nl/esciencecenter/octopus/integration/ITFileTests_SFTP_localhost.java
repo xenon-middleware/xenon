@@ -20,7 +20,6 @@ import java.net.URI;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.FileSystem;
 
 public class ITFileTests_SFTP_localhost extends AbstractFileTests {
 

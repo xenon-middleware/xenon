@@ -16,98 +16,95 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Properties;
+import java.util.UUID;
 
 import junit.framework.Assert;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 public class SshFileTest {
+    
+    Octopus octopus;
+    Credentials credentials;
+    Credential credential;
+    
+    Files files;
+    FileSystem fileSystem;
+    
+    AbsolutePath root;
+    
+    private void prepare(String username, boolean useCredential) throws Exception { 
+        
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        files = octopus.files();
+        credentials = octopus.credentials();
+    
+        if (useCredential) { 
+            credential = credentials.getDefaultCredential("ssh");
+        }
+        
+        FileSystem fileSystem = files.newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
 
+        root = fileSystem.getEntryPath();
+    }
+    
+    private AbsolutePath createLocalTmpDir() throws Exception {
+
+        AbsolutePath tmpDir = files.newPath(files.getLocalHomeFileSystem(), 
+                new RelativePath(System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID().toString()));
+        
+        Assert.assertFalse(files.exists(tmpDir));
+        
+        files.createDirectory(tmpDir);
+        
+        return tmpDir;
+    }
+    
+    private void cleanup() throws Exception { 
+        octopus.end();
+    }
+    
+    
     @org.junit.Test
     public void testExists() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null);
-
-        Credentials c = octopus.credentials();
-        Credential credential = c.getDefaultCredential("ssh");
         
-        String username = System.getProperty("user.name");
+        prepare(System.getProperty("user.name"), true);
         
-        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
-
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
-
-        System.err.println("path = " + path.getPath());
-
-        Assert.assertTrue(octopus.files().exists(path));
-
-        octopus.end();
+        Assert.assertTrue(files.exists(root));
+        
+        cleanup();
     }
 
     @org.junit.Test
     public void testExistsNoCredential() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null);
-
-        String username = System.getProperty("user.name");
-
-        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), null, null);
-
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
-
-        System.err.println("path = " + path.getPath());
-
-        Assert.assertTrue(octopus.files().exists(path));
-
-        octopus.end();
-    }
-    
-    @org.junit.Test
-    public void testExistsDefaultCredential() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null);
-
-        Credentials c = octopus.credentials();
-        Credential credential = c.getDefaultCredential("ssh");
-
-        String username = System.getProperty("user.name");
-
-        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
-
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath(System.getProperty("java.io.tmpdir")));
-
-        System.err.println("path = " + path.getPath());
-
-        Assert.assertTrue(octopus.files().exists(path));
-
-        octopus.end();
-    }
-    
-    @org.junit.Test
-    public void testInputStream() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null);
-        Credentials c = octopus.credentials();
-        String username = System.getProperty("user.name");
         
-        Credential credential = c.getDefaultCredential("ssh");
+        prepare(System.getProperty("user.name"), false);
         
-        FileSystem fileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
+        Assert.assertTrue(files.exists(root));
+        
+        cleanup();
+    }
 
-        AbsolutePath path = octopus.files().newPath(fileSystem, new RelativePath("/home/" + username + "/.bashrc"));
-
-        System.err.println("absolute path = " + path);
-
-        InputStream in = octopus.files().newInputStream(path);
+    private void readFully(InputStream in) throws IOException { 
+        
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
         while (true) {
@@ -116,32 +113,49 @@ public class SshFileTest {
                 break;
             System.err.println(line);
         }
-
-        octopus.end();
     }
+    
+    
+    @org.junit.Test
+    public void testInputStream() throws Exception {
 
+        prepare(System.getProperty("user.name"), true);
+
+        AbsolutePath path = root.resolve(new RelativePath(".bashrc"));
+
+        Assert.assertTrue(files.exists(path));
+
+        readFully(files.newInputStream(path));
+        
+        cleanup();
+    }
+    
+    
     @org.junit.Test
     public void testCopyDownload() throws Exception {
-        Octopus octopus = OctopusFactory.newOctopus(null);
-        Credentials c = octopus.credentials();
-        Credential credential = c.getDefaultCredential("ssh");
+        
+        prepare(System.getProperty("user.name"), true);
 
-        String username = System.getProperty("user.name");
+        AbsolutePath source = root.resolve(new RelativePath(".bashrc"));
 
-        FileSystem sshFileSystem = octopus.files().newFileSystem(new URI("ssh://" + username + "@localhost"), credential, null);
-        AbsolutePath src = octopus.files().newPath(sshFileSystem, new RelativePath("/home/" + username + "/.bashrc"));
-        System.err.println("absolute src path = " + src.getPath());
+        Assert.assertTrue(files.exists(source));
 
-        FileSystem localFileSystem = octopus.files().newFileSystem(new URI("file:///"), null, null);
-        AbsolutePath target = octopus.files().newPath(localFileSystem, new RelativePath("/tmp/aap"));
-        System.err.println("absolute target path = " + target.getPath());
+        AbsolutePath tmpDir = createLocalTmpDir();
+        AbsolutePath target = tmpDir.resolve(new RelativePath("test"));
+        
+        Assert.assertFalse(files.exists(target));
+        
+        System.err.println("Absolute src path = " + source.getPath());
+        System.err.println("Absolute target path = " + target.getPath());
 
-        if (octopus.files().exists(target)) {
-            octopus.files().delete(target);
-        }
+        octopus.files().copy(source, target);
+        
+        Assert.assertTrue(files.exists(target));
+        Assert.assertTrue(files.size(source) == files.size(target));
 
-        octopus.files().copy(src, target);
-
+        files.delete(target);
+        files.delete(tmpDir);
+        
         octopus.end();
     }
 

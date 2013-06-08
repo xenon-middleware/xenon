@@ -328,25 +328,6 @@ public interface Files {
     public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
 
     /**
-     * Creates a symbolic link to a target, failing if the <code>link</code> already exists (optional operation).
-     * 
-     * @param link
-     *            the link to create.
-     * @param target
-     *            the target to link to.
-     * 
-     * @return an AbsolutePath representing the created link.
-     * 
-     * @throws FileAlreadyExistsException
-     *             If the <code>link</code> already exists.
-     * @throws UnsupportedOperationException
-     *             If the adaptor used does not support symbolic links.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException;
-
-    /**
      * Deletes an existing path.
      * 
      * If path is a symbolic link the symbolic link is removed and the symbolic link's target is not deleted.
@@ -599,27 +580,6 @@ public interface Files {
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
 
     /**
-     * Updates the file owner and group. Use null for either to keep current owner/group
-     */
-
-    /**
-     * Set the owner an group of a path.
-     * 
-     * @param path
-     *            the target path.
-     * @param user
-     *            the new user, or <code>null</code> if unused.
-     * @param group
-     *            the new group, or <code>null</code> if unused.
-     * 
-     * @throws NoSuchFileException
-     *             If the target path does not exists.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException;
-
-    /**
      * Sets the POSIX permissions of a path.
      * 
      * @param path
@@ -634,29 +594,4 @@ public interface Files {
      */
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
-    /**
-     * Sets the last modified, last access and create time attributes of a path.
-     * 
-     * @param path
-     *            the target path.
-     * 
-     * @param lastModifiedTime
-     *            the new last modified time, or <code>-1</code> if unused.
-     * @param lastAccessTime
-     *            the new last access time, or <code>-1</code> if unused.
-     * @param createTime
-     *            the new create time, or <code>-1</code> if unused.
-     * 
-     * @throws NoSuchFileException
-     *             If the target path does not exists.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-      //      throws OctopusIOException;
-    
-    
-    
-    
-    
 }

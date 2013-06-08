@@ -126,8 +126,10 @@ public class SshFiles implements Files {
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
+        
+        String path = location.getPath();
 
-        if (!location.getPath().equals("") && !location.getPath().equals("/")) {
+        if (path != null && !path.equals("/")) {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME,
                     "Adaptor does not support a specific entry point. The location URI should not contain a path, or only '/'. URI = "
                             + location);
@@ -135,8 +137,7 @@ public class SshFiles implements Files {
 
         String uniqueID = getNewUniqueID();
 
-        OctopusProperties octopusProperties = new OctopusProperties(
-                properties);
+        OctopusProperties octopusProperties = new OctopusProperties(properties);
         
         Session session = adaptor.createNewSession(uniqueID, location, credential, octopusProperties);
 

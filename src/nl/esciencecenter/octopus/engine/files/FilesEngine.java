@@ -48,8 +48,8 @@ import nl.esciencecenter.octopus.files.RelativePath;
  * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
  * object.
  * 
- * @author Niels Drost
- * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  */
 public class FilesEngine implements Files {
 
@@ -252,21 +252,10 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(link).readSymbolicLink(link);
     }
 
-//    @Override
-//    public void setOwner(AbsolutePath path, String owner, String group) throws OctopusIOException {
-//        getFilesAdaptor(path).setOwner(path, owner, group);
-//    }
-
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
     }
-
-//    @Override
-//    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-//            throws OctopusIOException {
-//        getFilesAdaptor(path).setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
-//    }
 
     @Override
     public FileSystem getLocalCWDFileSystem() throws OctopusException {
