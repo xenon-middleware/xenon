@@ -1193,7 +1193,7 @@ public abstract class AbstractFileTest {
         if (supportsClose()) { 
             // test with closed fs
             closeTestFileSystem(fs);
-            test_newDirectoryStream(root, null, false);
+            test_newDirectoryStream(root, null, true);
         }
 
         cleanup();
@@ -1353,7 +1353,7 @@ public abstract class AbstractFileTest {
         if (supportsClose()) { 
             // test with closed fs
             closeTestFileSystem(fs);
-            test_newDirectoryStream(root, new AllTrue(), null, false);
+            test_newDirectoryStream(root, new AllTrue(), null, true);
         }
 
         cleanup();
@@ -1364,14 +1364,15 @@ public abstract class AbstractFileTest {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file / existing dir / existing link (!) / closed filesystem    
+    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / existing link (!) 
+    //              closed filesystem    
     // 
-    // Total combinations : 6
+    // Total combinations : 7
     // 
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
     
-    private void test_getAttributes(AbsolutePath path, boolean mustFail) throws Exception { 
+    private void test_getAttributes(AbsolutePath path, boolean isDirectory, long size, boolean mustFail) throws Exception { 
 
         FileAttributes result = null;
         
@@ -1390,13 +1391,55 @@ public abstract class AbstractFileTest {
         if (mustFail) {             
             throwExpected("getFileAttributes");
         }
+        
+        if (result.isDirectory() && !isDirectory) { 
+            throwWrong("getfileAttributes", "<not directory>", "<directory>");
+        }
+        
+        if (result.size() != size) { 
+            throwWrong("getfileAttributes", "size=" + size, "size=" + result.size());
+        }        
     }
     
+    @org.junit.Test
     public void test_getAttributes() throws Exception { 
    
-        // HIERO
+        prepare();
         
+        // test with null
+        test_getAttributes(null, false, -1, true);
         
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createTestDir(fs.getEntryPath());
+        
+        // test with non-existing file
+        AbsolutePath file0 = createNewTestFileName(root);
+        test_getAttributes(file0, false, -1, true);
+        
+        // test with existing empty file
+        AbsolutePath file1 = createTestFile(root, null);
+        test_getAttributes(file1, false, 0, false);
+        
+        // test with existing non-empty file
+        AbsolutePath file2 = createTestFile(root, new byte [] { 1, 2, 3 });
+        test_getAttributes(file2, false, 3, false);
+        
+        // test with existing dir 
+        AbsolutePath dir0 = createTestDir(root);
+        test_getAttributes(dir0, true, 0, false);
+        
+        // TODO: test with link!
+
+        deleteTestDir(dir0);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestDir(root);
+        
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_getAttributes(root, false, -1, true);
+        }
     }
     
     /*    
