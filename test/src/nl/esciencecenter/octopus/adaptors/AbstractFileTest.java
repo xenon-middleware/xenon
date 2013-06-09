@@ -1396,7 +1396,7 @@ public abstract class AbstractFileTest {
             throwWrong("getfileAttributes", "<not directory>", "<directory>");
         }
         
-        if (result.size() != size) { 
+        if (size >= 0 && result.size() != size) { 
             throwWrong("getfileAttributes", "size=" + size, "size=" + result.size());
         }        
     }
@@ -1426,7 +1426,7 @@ public abstract class AbstractFileTest {
         
         // test with existing dir 
         AbsolutePath dir0 = createTestDir(root);
-        test_getAttributes(dir0, true, 0, false);
+        test_getAttributes(dir0, true, -1, false);
         
         // TODO: test with link!
 
