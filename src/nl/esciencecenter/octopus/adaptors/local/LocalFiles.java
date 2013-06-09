@@ -170,6 +170,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
+        if (filter == null) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Filter is null.");
+        }
+        
         return new LocalDirectoryStream(dir, filter);
     }
 

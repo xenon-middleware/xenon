@@ -21,13 +21,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
@@ -92,6 +97,18 @@ public abstract class AbstractFileTest {
         throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);        
     }
 
+    private void throwUnexpectedElement(String name, String element) throws Exception { 
+        throw new Exception(name + " produced unexpected element: " + element);        
+    }
+    
+    private void throwMissingElement(String name, String element) throws Exception { 
+        throw new Exception(name + " did NOT produce element: " + element);        
+    }
+    
+    private void throwMissingElements(String name, Collection elements) throws Exception { 
+        throw new Exception(name + " did NOT produce elements: " + elements);        
+    }
+    
     private void close(Closeable c) { 
 
         if (c == null) { 
@@ -1065,35 +1082,350 @@ public abstract class AbstractFileTest {
         cleanup();
     }
 
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: newDirectoryStream 
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
+    //              existing file / closed filesystem    
+    // 
+    // Total combinations : 7
+    // 
+    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestDirName], [createTestFile], newDirectoryStream,   
+    //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
+
+    public void test_newDirectoryStream(AbsolutePath root, Set<AbsolutePath> expected, boolean mustFail) throws Exception { 
+        
+        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        
+        if (expected != null) { 
+            tmp.addAll(expected);
+        }
+        
+        DirectoryStream<AbsolutePath> in = null;
+        
+        try { 
+            in = files.newDirectoryStream(root);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("newDirectoryStream", e);
+        }
+        
+        if (mustFail) {             
+            close(in);            
+            throwExpected("newDirectoryStream");
+        }
+        
+        for (AbsolutePath p : in) { 
+            
+            if (tmp.contains(p)) { 
+                tmp.remove(p);
+            } else { 
+                close(in);
+                throwUnexpectedElement("newDirectoryStream", p.getPath());
+            }
+        }
+        
+        close(in);
+        
+        if (tmp.size() > 0) { 
+            throwMissingElements("newDirectoryStream", tmp);
+        }
+    }
+
+    @org.junit.Test
+    public void test_newDirectoryStream() throws Exception { 
+    
+        prepare();
+
+        // test with null
+        test_newDirectoryStream(null, null, true);
+       
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createTestDir(fs.getEntryPath());
+               
+        // test with empty dir 
+        test_newDirectoryStream(root, null, false);
+         
+        // test with non-existing dir
+        AbsolutePath dir0 = createNewTestDirName(root);
+        test_newDirectoryStream(dir0, null, true);
+        
+        // test with exising file
+        AbsolutePath file0 = createTestFile(root, null);
+        test_newDirectoryStream(file0, null, true);
+        
+        // test with non-empty dir
+        AbsolutePath file1 = createTestFile(root, null);
+        AbsolutePath file2 = createTestFile(root, null);
+        AbsolutePath file3 = createTestFile(root, null);
+        
+        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        tmp.add(file0);
+        tmp.add(file1);
+        tmp.add(file2);
+        tmp.add(file3);
+        
+        test_newDirectoryStream(root, tmp, false);
+        
+        // test with subdirs 
+        AbsolutePath dir1 = createTestDir(root);
+        AbsolutePath file4 = createTestFile(dir1, null);
+         
+        tmp.add(dir1);
+        
+        test_newDirectoryStream(root, tmp, false);
+        
+        deleteTestFile(file4);
+        deleteTestDir(dir1);
+        deleteTestFile(file3);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(root);
+        
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_newDirectoryStream(root, null, false);
+        }
+
+        cleanup();
+    }
+ 
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: newDirectoryStream with filter 
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
+    //              existing file / closed filesystem    
+    // 
+    // directoryStreams.Filter null / filter returns all / filter returns none / filter selects one. 
+    
+    // Total combinations : 7 + 8
+    // 
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
+    //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
+
+    public void test_newDirectoryStream(AbsolutePath root, DirectoryStream.Filter filter, Set<AbsolutePath> expected, 
+            boolean mustFail) throws Exception { 
+        
+        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        
+        if (expected != null) { 
+            tmp.addAll(expected);
+        }
+        
+        DirectoryStream<AbsolutePath> in = null;
+        
+        try { 
+            in = files.newDirectoryStream(root, filter);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("newDirectoryStream_with_filter", e);
+        }
+        
+        if (mustFail) {             
+            close(in);            
+            throwExpected("newDirectoryStream_with_filter");
+        }
+        
+        for (AbsolutePath p : in) { 
+            
+            if (tmp.contains(p)) { 
+                tmp.remove(p);
+            } else { 
+                close(in);
+                throwUnexpectedElement("newDirectoryStream_with_filter", p.getPath());
+            }
+        }
+        
+        close(in);
+        
+        if (tmp.size() > 0) { 
+            throwMissingElements("newDirectoryStream_with_filter", tmp);
+        }
+    }
+
+    class AllTrue implements DirectoryStream.Filter { 
+        @Override
+        public boolean accept(AbsolutePath entry) {
+            return true;
+        }
+    }
+    
+    class AllFalse implements DirectoryStream.Filter { 
+        @Override
+        public boolean accept(AbsolutePath entry) {
+            return false;
+        }
+    }
+    
+    class Select implements DirectoryStream.Filter { 
+        
+        private Set<AbsolutePath> set; 
+        
+        public Select(Set<AbsolutePath> set) { 
+            this.set = set;
+        }
+        
+        @Override
+        public boolean accept(AbsolutePath entry) {
+            return set.contains(entry);
+        }
+    }
+    
+    @org.junit.Test
+    public void test_newDirectoryStream_with_filter() throws Exception { 
+        
+        prepare();
+        
+        // test with null 
+        test_newDirectoryStream(null, null, null, true);
+       
+        FileSystem fs = getTestFileSystem();
+        AbsolutePath root = createTestDir(fs.getEntryPath());
+               
+        // test with empty dir + null filter 
+        test_newDirectoryStream(root, null, null, true);
+        
+        // test with empty dir + true filter 
+        test_newDirectoryStream(root, new AllTrue(), null, false);
+        
+        // test with empty dir + false filter 
+        test_newDirectoryStream(root, new AllTrue(), null, false);
+        
+        // test with non-existing dir
+        AbsolutePath dir0 = createNewTestDirName(root);
+        test_newDirectoryStream(dir0, new AllTrue(), null, true);
+        
+        // test with existing file
+        AbsolutePath file0 = createTestFile(root, null);
+        test_newDirectoryStream(file0, new AllTrue(), null, true);
+        
+        // test with non-empty dir and allTrue
+        AbsolutePath file1 = createTestFile(root, null);
+        AbsolutePath file2 = createTestFile(root, null);
+        AbsolutePath file3 = createTestFile(root, null);
+        
+        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        tmp.add(file0);
+        tmp.add(file1);
+        tmp.add(file2);
+        tmp.add(file3);
+        
+        test_newDirectoryStream(root, new AllTrue(), tmp, false);
+ 
+        // test with non-empty dir and allFalse
+        test_newDirectoryStream(root, new AllFalse(), null, false);
+        
+        tmp.remove(file3);
+        
+        // test with non-empty dir and select        
+        test_newDirectoryStream(root, new Select(tmp), tmp, false);
+        
+        // test with subdirs 
+        AbsolutePath dir1 = createTestDir(root);
+        AbsolutePath file4 = createTestFile(dir1, null);
+        
+        test_newDirectoryStream(root, new Select(tmp), tmp, false);
+        
+        deleteTestFile(file4);
+        deleteTestDir(dir1);
+        deleteTestFile(file3);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(root);
+        
+        if (supportsClose()) { 
+            // test with closed fs
+            closeTestFileSystem(fs);
+            test_newDirectoryStream(root, new AllTrue(), null, false);
+        }
+
+        cleanup();
+    }
+    
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: getAttributes 
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing file / existing file / existing dir / existing link (!) / closed filesystem    
+    // 
+    // Total combinations : 6
+    // 
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
+    //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
+    
+    private void test_getAttributes(AbsolutePath path, boolean mustFail) throws Exception { 
+
+        FileAttributes result = null;
+        
+        try { 
+            result = files.getAttributes(path);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("getFileAttributes", e);
+        }
+        
+        if (mustFail) {             
+            throwExpected("getFileAttributes");
+        }
+    }
+    
+    public void test_getAttributes() throws Exception { 
+   
+        // HIERO
+        
+        
+    }
     
     /*    
 
-    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
-
-    
+ 
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException;
-
-    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
-
-    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
 
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
-
-    
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException;
-
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
-            throws OctopusIOException;
-
+ 
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
 
-
+    
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
+    
+    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
+
+
+    
+    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
+
+    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
+
+
+    
 
 
 
