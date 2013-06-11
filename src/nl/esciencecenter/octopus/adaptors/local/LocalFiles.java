@@ -234,6 +234,14 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
 
+        if (!exists(path)) { 
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
+        }
+
+        if (permissions == null) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Permissions is null!");
+        }
+        
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));

@@ -140,9 +140,72 @@ public class LocalFileAttributes implements FileAttributes {
     public boolean isWritable() throws AttributeNotSupportedException {
         return writable;
     }
+    
+    @Override
+    public String toString() {
+        return "LocalFileAttributes [executable=" + executable + ", readable=" + readable
+                + ", writable=" + writable + ", hidden=" + hidden + ", attributes=" + attributes + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        result = prime * result + (executable ? 1231 : 1237);
+        result = prime * result + (hidden ? 1231 : 1237);
+        result = prime * result + (readable ? 1231 : 1237);
+        result = prime * result + (writable ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        LocalFileAttributes other = (LocalFileAttributes) obj;
+                
+        if (executable != other.executable) { 
+            return false;
+        }
+        
+        if (hidden != other.hidden) { 
+            return false;
+        }
+        
+        if (readable != other.readable) { 
+            return false;
+        }
+        
+        if (writable != other.writable) { 
+            return false;
+        }
+        
+        if (attributes == null) { 
+            if (other.attributes != null) { 
+                return false;
+            }
+        } else if (!attributes.equals(other.attributes)) { 
+            return false;
+        }
+        
+        return true;
+    }
 
     //    @Override
     //    public List<AclEntry> getAcl() throws AttributeNotSupportedException {
     //        throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
     //    }
+    
+    
 }
