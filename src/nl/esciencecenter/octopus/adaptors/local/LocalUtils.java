@@ -124,19 +124,36 @@ class LocalUtils {
     }
 
     static java.nio.file.OpenOption[] javaOpenOptions(OpenOption[] options) {
+
         ArrayList<java.nio.file.OpenOption> result = new ArrayList<java.nio.file.OpenOption>();
 
-        for (int i = 0; i < options.length; i++) {
-            try {
-                result.add(java.nio.file.StandardOpenOption.valueOf(options[i].toString()));
-            } catch (IllegalArgumentException e) {
-                throw new UnsupportedOperationException("Option " + options[i] + " not recognized by Local adaptor");
+        for (OpenOption opt : options) {            
+            switch (opt) { 
+            case CREATE:
+                result.add(StandardOpenOption.CREATE_NEW);
+                break;
+            case OPEN:
+            case OPEN_OR_CREATE:
+                result.add(StandardOpenOption.CREATE);
+                break;
+            case APPEND:
+                result.add(StandardOpenOption.APPEND);
+                break; 
+            case TRUNCATE:
+                result.add(StandardOpenOption.TRUNCATE_EXISTING);
+                break; 
+            case WRITE:
+                result.add(StandardOpenOption.WRITE);
+                break;     
+            case READ:
+                result.add(StandardOpenOption.READ);
+                break;
             }
-
         }
-        return result.toArray(new java.nio.file.OpenOption[0]);
+            
+        return result.toArray(new java.nio.file.OpenOption[result.size()]);
     }
-
+    
     static Set<? extends java.nio.file.OpenOption> javaOpenOptionsSet(OpenOption[] options) {
         HashSet<java.nio.file.OpenOption> result = new HashSet<java.nio.file.OpenOption>();
 

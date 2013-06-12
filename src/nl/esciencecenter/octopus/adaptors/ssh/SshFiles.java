@@ -621,9 +621,9 @@ public class SshFiles implements Files {
             throw new IllegalArgumentException("Cannot open an output stream for reading");
         }
 
-        if (OpenOption.contains(OpenOption.CREATE_NEW, options) && exists(path)) {
+        if (OpenOption.contains(OpenOption.CREATE, options) && exists(path)) {
             throw new FileAlreadyExistsException(getClass().getName(),
-                    "Cannot create file, as it already exists, and you specified the CREATE_NEW option.");
+                    "Cannot create file, as it already exists, and you specified the CREATE option.");
         }
 
         int mode = ChannelSftp.OVERWRITE;

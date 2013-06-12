@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
@@ -144,7 +145,8 @@ public class LocalFileAttributes implements FileAttributes {
     @Override
     public String toString() {
         return "LocalFileAttributes [executable=" + executable + ", readable=" + readable
-                + ", writable=" + writable + ", hidden=" + hidden + ", attributes=" + attributes + "]";
+                + ", writable=" + writable + ", hidden=" + hidden + ", attributes=" 
+                + PosixFilePermissions.toString(attributes.permissions()) + "]";
     }
 
     @Override

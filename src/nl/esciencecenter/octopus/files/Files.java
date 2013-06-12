@@ -490,18 +490,33 @@ public interface Files {
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
      * 
-     * If no options are present then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
+     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and 
+     * if the file should be written or read. 
      * 
-     * If options are set, the <code>WRITE</code> option must be set.
-     * 
-     * If the file does not exist, it will be created first if the <code>CREATE</code> option is specified.
-     * 
-     * If the <code>CREATE_NEW</code> option is specified, a new file will be created and an exception is thrown if the file
+     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file
      * already exists.
      * 
-     * If the <code>APPEND</code> option is specified, data will be appended to the file.
+     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the 
+     * file does not exist. 
      * 
-     * If the <code>TRUNCATE_EXISTING</code> option is specified, an existing file will be truncated before data is appended.
+     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not 
+     * exist a new file will be created.  
+     * 
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more 
+     * than one will result in an exception.
+     * 
+     * If the <code>APPEND</code> option is specified, data will be added to the end of the file. No existing data will be 
+     * overwritten. 
+     * 
+     * If the <code>TRUNCATE</code> option is specified, any existing data in the file will be deleted (resulting in a file of 
+     * size 0). The data will then be appended from the beginning of the file.
+     * 
+     * Either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both will result in an exception. 
+     * 
+     * The <code>READ</code> option must not be set. If it is set, an exception will be thrown.
+     *
+     * If the <code>WRITE</code> option is specified, the file is opened for writing. As this is the default behavior, the 
+     * <code>WRITE</code> option may be omitted.  
      * 
      * @param path
      *            the target file for the OutputStream.
@@ -520,18 +535,36 @@ public interface Files {
     /**
      * Open an file and return an {@link SeekableByteChannel} to read from or write to this file.
      * 
-     * Options may not be empty.
+     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and 
+     * if the file should be written or read. 
      * 
-     * If the file does not exist, it will be created first if the <code>CREATE</code> option is specified.
-     * 
-     * If the <code>CREATE_NEW</code> option is specified, a new file will be created and an exception is thrown if the file
+     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file
      * already exists.
      * 
-     * If the <code>APPEND</code> option is specified, data will be appended to the file.
+     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the 
+     * file does not exist. 
      * 
-     * If the <code>TRUNCATE_EXISTING</code> option is specified, an existing file will be truncated before data is appended.
+     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not 
+     * exist a new file will be created.  
      * 
-     * The <code>READ</code> and <code>WRITE</code> determine if the file is opened for reading or writing.
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more 
+     * than one will result in an exception.
+     * 
+     * If the <code>READ</code> option is set the file is opened for reading. 
+     *
+     * If the <code>WRITE</code> option is specified, the file is opened for writing. 
+     * 
+     * At least one of <code>READ</code> and <code>WRITE</code> must be set. These options may also be combined.
+     * 
+     * If the <code>APPEND</code> option is specified, and the <code>WRITE</code> option is set, data will be added to the end of
+     * the file. No existing data will be overwritten. If the <code>WRITE</code> is not set, an exception will be thrown. 
+     * 
+     * If the <code>TRUNCATE</code> option is specified, and the <code>WRITE</code> option is set, any existing data in the file 
+     * will be deleted (resulting in a file of size 0). The data will then be appended from the beginning of the file.  
+     * If the <code>WRITE</code> is not set, an exception will be thrown.
+     * 
+     * When <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both 
+     * will result in an exception. 
      * 
      * @param path
      *            the target file for the SeekableByteChannel.

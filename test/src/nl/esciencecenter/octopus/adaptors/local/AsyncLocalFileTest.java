@@ -109,7 +109,7 @@ public class AsyncLocalFileTest {
         
         assertTrue(files.exists(testFile));
         
-        OutputStream out = files.newOutputStream(testFile, OpenOption.WRITE, OpenOption.TRUNCATE_EXISTING);
+        OutputStream out = files.newOutputStream(testFile, OpenOption.WRITE, OpenOption.TRUNCATE);
         out.write(data);
         out.close();       
         

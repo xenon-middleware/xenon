@@ -40,6 +40,7 @@ import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.engine.util.CopyInfo;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
+import nl.esciencecenter.octopus.exceptions.InvalidOpenOptionsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -85,6 +86,59 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     private static synchronized int getNextFsID() {
         return fsID++;
+    }
+    
+    class OpenOptions { 
+
+        public OpenOption openMode;
+        public OpenOption appendMode;
+        public OpenOption readMode;
+        public OpenOption writeMode;
+        
+        public OpenOption getOpenMode() {
+            return openMode;
+        }
+
+        public void setOpenMode(OpenOption openMode) throws InvalidOpenOptionsException {
+                        
+            if (this.openMode != null && openMode != this.openMode) { 
+                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Conflicting open options: " + openMode 
+                        + " and " + this.openMode);
+            }
+            
+            this.openMode = openMode;
+        }
+        
+        public OpenOption getAppendMode() {
+            return appendMode;
+        }
+        
+        public void setAppendMode(OpenOption appendMode) throws InvalidOpenOptionsException {
+            
+            if (this.appendMode != null && appendMode != this.appendMode) { 
+                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Conflicting append options: " + appendMode 
+                        + " and " + this.appendMode);
+            }
+            
+            
+            this.appendMode = appendMode;
+        }
+        
+        public OpenOption getReadMode() {
+            return readMode;
+        }
+        
+        public void setReadMode(OpenOption readMode) {
+            this.readMode = readMode;
+        }
+        
+        public OpenOption getWriteMode() {
+            return writeMode;
+        }
+        
+        public void setWriteMode(OpenOption writeMode) {
+            this.writeMode = writeMode;
+        }
     }
 
     public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine) {
@@ -205,10 +259,72 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
         }
     }
-
+    
+    private OpenOptions processOptions(OpenOption... options) throws InvalidOpenOptionsException { 
+        
+        if (options == null || options.length == 0) { 
+            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Missing open options!");
+        }
+        
+        OpenOptions result = new OpenOptions();
+        
+        for (OpenOption opt : options) {             
+            switch (opt) { 
+            case CREATE:
+            case OPEN:
+            case OPEN_OR_CREATE:
+                result.setOpenMode(opt);
+                break;
+                
+            case APPEND:
+            case TRUNCATE:
+                result.setAppendMode(opt);
+                break;
+                
+            case WRITE:
+                result.setWriteMode(opt);
+                break;     
+            case READ:
+                result.setReadMode(opt);
+                break;
+            }
+        }
+        
+        if (result.getOpenMode() == null) { 
+            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "No open mode provided!");
+        }
+        
+        if (result.getAppendMode() == null) { 
+            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "No append mode provided!");
+        }
+        
+        return result;
+    }
+    
+    
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
 
+        OpenOptions tmp = processOptions(options);
+
+        if (tmp.readMode != null) { 
+            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Disallowed open option: READ");
+        }
+        
+        if (tmp.writeMode == null) { 
+            tmp.setWriteMode(OpenOption.WRITE);
+        }        
+        
+        if (tmp.openMode == OpenOption.CREATE) { 
+            if (exists(path)) { 
+                throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+            }
+        } else if (tmp.openMode == OpenOption.OPEN) { 
+            if (!exists(path)) { 
+                throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
+            }
+        }
+        
         try {
             return Files.newOutputStream(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
         } catch (IOException e) {
@@ -359,7 +475,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         } catch (java.nio.file.DirectoryNotEmptyException e2) {
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path.getPath() + " not empty!");
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path.getPath(), e);
         }
     }
@@ -374,9 +490,19 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
+    
+    
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
 
+        OpenOptions tmp = processOptions(options);
+        
+        if (tmp.openMode == OpenOption.CREATE) { 
+            if (exists(path)) { 
+                throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+            }
+        }
+        
         try {
             return java.nio.file.Files.newByteChannel(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
         } catch (Exception e) {

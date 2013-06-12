@@ -310,11 +310,11 @@ public class CopyEngine {
             in = owner.newInputStream(source);
         
             if (replace) {
-                out = owner.newOutputStream(target, OpenOption.WRITE, OpenOption.TRUNCATE_EXISTING);
+                out = owner.newOutputStream(target, OpenOption.OPEN_OR_CREATE, OpenOption.TRUNCATE);
                 //out = Files.newOutputStream(LocalUtils.javaPath(target), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
             } else {
                 // out = Files.newOutputStream(LocalUtils.javaPath(target), StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW);
-                out = owner.newOutputStream(target, OpenOption.WRITE, OpenOption.CREATE_NEW);
+                out = owner.newOutputStream(target, OpenOption.CREATE, OpenOption.APPEND);
             }
   
             streamCopy(in, out, ac);
