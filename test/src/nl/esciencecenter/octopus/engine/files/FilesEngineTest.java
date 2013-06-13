@@ -40,7 +40,7 @@ public class FilesEngineTest {
 
     /**
      * Create fake Octopus with one file adaptor.
-     * 
+     *
      * @param files_adaptor
      * @param adaptor_name
      * @param scheme_name
@@ -55,7 +55,7 @@ public class FilesEngineTest {
 
     /**
      * Add a fake file adaptor to Octopus instance.
-     * 
+     *
      * @param octopus
      * @param files_adaptor
      * @param adaptor_name
@@ -72,8 +72,9 @@ public class FilesEngineTest {
     public FileSystemImplementation getFileSystem(String adaptor_name, URI root_location) throws URISyntaxException {
         String fs_uid = "1";
         OctopusProperties oprops = new OctopusProperties();
+        RelativePath entry = new RelativePath();
         FileSystemImplementation filesystem =
-                new FileSystemImplementation(adaptor_name, fs_uid, root_location, null, null, oprops);
+                new FileSystemImplementation(adaptor_name, fs_uid, root_location, entry, null, oprops);
         return filesystem;
     }
 
@@ -161,7 +162,7 @@ public class FilesEngineTest {
             fail("No exception thrown");
         } catch (OctopusIOException e) {
             // TODO should throw exception with no adaptor, but with paths
-            assertThat(e.getMessage(), is("cannot do inter-scheme third party copy (yet) adaptor: null"));
+            assertThat(e.getMessage(), is("FilesEngine adaptor: Cannot do inter-scheme third party copy!"));
         }
     }
 
@@ -174,7 +175,7 @@ public class FilesEngineTest {
         addAdaptor2Octopus(octopus, target_adaptor, "gridftp");
         FilesEngine engine = new FilesEngine(octopus);
 
-        FileSystemImplementation source_filesystem = getFileSystem("Local", new URI("file:///"));
+        FileSystemImplementation source_filesystem = getFileSystem(OctopusEngine.LOCAL_ADAPTOR_NAME, new URI("file:///"));
         AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
         FileSystemImplementation target_filesystem = getFileSystem("gridftp", new URI("gridftp://somewhere"));
         AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/foo.txt"));
@@ -194,7 +195,7 @@ public class FilesEngineTest {
         FilesEngine engine = new FilesEngine(octopus);
         FileSystemImplementation source_filesystem = getFileSystem("ssh", new URI("ssh://localhost"));
         AbsolutePath source = new AbsolutePathImplementation(source_filesystem, new RelativePath("tmp/bar.txt"));
-        FileSystemImplementation target_filesystem = getFileSystem("Local", new URI("file:///"));
+        FileSystemImplementation target_filesystem = getFileSystem(OctopusEngine.LOCAL_ADAPTOR_NAME, new URI("file:///"));
         AbsolutePath target = new AbsolutePathImplementation(target_filesystem, new RelativePath("tmp/bar.txt"));
 
         engine.copy(source, target);
