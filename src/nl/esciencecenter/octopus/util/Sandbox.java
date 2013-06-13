@@ -28,6 +28,30 @@ import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 
+/**
+ * Sandbox is a place where files/directories can be uploaded to or downloaded from.
+ *
+ * Example to submit a job with input and output files:
+ *
+ * <blockquote>
+ * <pre class="code">
+ * {@code
+ * Sandbox sandbox = new Sandbox(octopus, sandboxBase);
+ * sandbox.addUploadFile(inputfile);
+ * sandbox.addDownloadFile(outputfile);
+ *
+ * sandbox.upload();
+ *
+ * Job job = octopus.jobs().submitJob(description);
+ *
+ * JobStatus = octopus.jobs().waitUntilDone(job, 60000);
+ *
+ * sandbox.download();
+ * }
+ * </pre>
+ * </blockquote>
+ *
+ */
 public class Sandbox {
 
     private final Octopus octopus;
@@ -96,6 +120,7 @@ public class Sandbox {
 
     /**
      * Creates a sandbox.
+     * Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
      *
      * @param octopus
      *            An Octopus instance
