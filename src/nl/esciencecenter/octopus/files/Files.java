@@ -563,8 +563,14 @@ public interface Files {
      * will be deleted (resulting in a file of size 0). The data will then be appended from the beginning of the file.  
      * If the <code>WRITE</code> is not set, an exception will be thrown.
      * 
-     * When <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both 
+     * When only <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both 
      * will result in an exception. 
+     * 
+     * When only <code>READ</code> is set, neither <code>APPEND</code> nor <code>TRUNCATE</code> may be specified, or an exception 
+     * will be thrown. 
+     * 
+     * When both <code>WRITE</code> and <code>READ</code> are set, only <code>TRUNCATE</code> may be used. If the 
+     * <code>APPEND</code> option is specified, an exception will be thrown.
      * 
      * @param path
      *            the target file for the SeekableByteChannel.

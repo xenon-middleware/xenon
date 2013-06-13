@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.AbsolutePath;
@@ -42,6 +43,18 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
  */
 class LocalUtils {
 
+    static String getHome() throws OctopusException { 
+        
+        String path = System.getProperty("user.home");
+
+        if (!LocalUtils.exists(path)) {
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Home directory does not exist: " + path);
+        }
+
+        return path;
+    }
+    
+    
     //TODO: test this function
     static boolean exists(String path) {
 

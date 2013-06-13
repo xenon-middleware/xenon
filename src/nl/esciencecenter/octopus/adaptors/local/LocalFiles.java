@@ -294,10 +294,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "No open mode provided!");
         }
         
-        if (result.getAppendMode() == null) { 
-            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "No append mode provided!");
-        }
-        
         return result;
     }
     
@@ -307,11 +303,15 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         OpenOptions tmp = processOptions(options);
 
-        if (tmp.readMode != null) { 
+        if (tmp.getReadMode() != null) { 
             throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Disallowed open option: READ");
         }
+
+        if (tmp.getAppendMode() == null) { 
+            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "No append mode provided!");
+        }
         
-        if (tmp.writeMode == null) { 
+        if (tmp.getWriteMode() == null) { 
             tmp.setWriteMode(OpenOption.WRITE);
         }        
         
@@ -373,20 +373,13 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         localAdaptor.checkURI(location);
 
         String path = location.getPath();
-
+        
         if (path != null && !path.equals("/")) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local file system with path!");
         }
 
-        path = System.getProperty("user.home");
-
-        if (!LocalUtils.exists(path)) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create FileSystem with non-existing entry path ("
-                    + path + ")");
-        }
-
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, 
-                new RelativePath(path), credential, new OctopusProperties(properties));
+                new RelativePath(LocalUtils.getHome()), credential, new OctopusProperties(properties));
     }
 
     @Override
@@ -496,10 +489,28 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
 
         OpenOptions tmp = processOptions(options);
+
+        if (tmp.getReadMode() != null && tmp.getAppendMode() == OpenOption.APPEND) { 
+            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Cannot set append mode when reading a file!");
+        }
         
-        if (tmp.openMode == OpenOption.CREATE) { 
+        if (tmp.getWriteMode() == null) { 
+            if (tmp.getReadMode() == null) { 
+                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");        
+            } 
+        } else { 
+            if (tmp.getAppendMode() == null) {
+                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
+            }
+        }
+        
+        if (tmp.getOpenMode() == OpenOption.CREATE) { 
             if (exists(path)) { 
                 throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+            }
+        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
+            if (!exists(path)) { 
+                throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
             }
         }
         

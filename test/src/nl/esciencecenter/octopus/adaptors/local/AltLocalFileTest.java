@@ -46,9 +46,14 @@ public class AltLocalFileTest extends AbstractFileTest {
 
     @Override
     public URI getURIWrongPath() throws Exception {
-        return new URI("file://aap/noot");
+        return new URI("file:///aap/noot");
     }
 
+    @Override
+    public URI getCorrectURIWithPath() throws Exception {
+        return new URI("file:///");
+    }
+    
     @Override
     public boolean supportURIUser() {
         return false;
