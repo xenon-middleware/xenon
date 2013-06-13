@@ -26,13 +26,13 @@ public class RelativePathTest {
     @Test
     public void testRelativePath() {
         RelativePath path = new RelativePath();
-        assertEquals(path.toString(), "");
+        assertEquals(path.getPath(), "");
     }
 
     @Test
     public void testRelativePathString() {
         RelativePath path = new RelativePath("mydir/myfile");
-        assertEquals(path.toString(), "/mydir/myfile");
+        assertEquals(path.getPath(), "/mydir/myfile");
     }
 
     @Test
@@ -41,7 +41,7 @@ public class RelativePathTest {
         strings[0] = "mydir";
         strings[1] = "myfile";
         RelativePath path = new RelativePath(strings);
-        assertEquals(path.toString(), "/mydir/myfile");
+        assertEquals(path.getPath(), "/mydir/myfile");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class RelativePathTest {
         paths[0] = new RelativePath("mydir");
         paths[1] = new RelativePath("myfile");
         RelativePath path = new RelativePath(paths);
-        assertEquals(path.toString(), "/mydir/myfile");
+        assertEquals(path.getPath(), "/mydir/myfile");
     }
 
     @Test
@@ -58,20 +58,20 @@ public class RelativePathTest {
         RelativePath path1 = new RelativePath("mydir");
         RelativePath path2 = new RelativePath("myfile");
         RelativePath path = new RelativePath(path1, path2);
-        assertEquals(path.toString(), "/mydir/myfile");
+        assertEquals(path.getPath(), "/mydir/myfile");
     }
 
     @Test
     public void testRelativePathRelativePath() {
         RelativePath path1 = new RelativePath("mydir/myfile");
         RelativePath path = new RelativePath(path1);
-        assertEquals(path.toString(), "/mydir/myfile");
+        assertEquals(path.getPath(), "/mydir/myfile");
     }
 
     @Test
     public void testRelativePathPathSeperator() {
         RelativePath path = new RelativePath("mydir@myfile", "@");
-        assertEquals(path.toString(), "@mydir@myfile");
+        assertEquals(path.getPath(), "@mydir@myfile");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class RelativePathTest {
         strings[0] = "mydir";
         strings[1] = "myfile";
         RelativePath path = new RelativePath(strings, "@");
-        assertEquals(path.toString(), "@mydir@myfile");
+        assertEquals(path.getPath(), "@mydir@myfile");
     }
 
     @Test
@@ -149,7 +149,7 @@ public class RelativePathTest {
             path.getName(3);
             fail("Able to fetch index out of bounds");
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "index 3 not present in path /mydir/myfile");
+            assertEquals(e.getMessage(), "index 3 not present in path RelativePath [element=[mydir, myfile], seperator=/]");
         }
     }
 
@@ -197,12 +197,12 @@ public class RelativePathTest {
 
     @Test
     public void testSubpath_EndAfterLast() {
-        doSubPathWithException(1, 5, "a/b/c", "endIndex 5 not present in path /a/b/c");
+        doSubPathWithException(1, 5, "a/b/c", "endIndex 5 not present in path RelativePath [element=[a, b, c], seperator=/]");
     }
 
     @Test
     public void testSubpath_BeginBeforeFirst() {
-        doSubPathWithException(-1, 1, "a/b/c", "beginIndex -1 not present in path /a/b/c");
+        doSubPathWithException(-1, 1, "a/b/c", "beginIndex -1 not present in path RelativePath [element=[a, b, c], seperator=/]");
     }
 
     @Test
@@ -326,7 +326,7 @@ public class RelativePathTest {
     public void testToString() {
         RelativePath path = new RelativePath("mydir/myfile");
         String path_as_string = path.toString();
-        assertEquals(path_as_string, "/mydir/myfile");
+        assertEquals(path_as_string, "RelativePath [element=[mydir, myfile], seperator=/]");
     }
 
 }
