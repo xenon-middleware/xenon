@@ -651,7 +651,7 @@ public class RelativePath {
         final int prime = 31;
         int result = 1;
         result = prime * result + Arrays.hashCode(elements);
-        result = prime * result + ((seperator == null) ? 0 : seperator.hashCode());
+        result = prime * result + seperator.hashCode();
         return result;
     }
     
@@ -671,11 +671,7 @@ public class RelativePath {
         
         RelativePath other = (RelativePath) obj;
         
-        if (seperator == null) {
-            if (other.seperator != null) { 
-                return false;
-            } 
-        } else if (!seperator.equals(other.seperator)) { 
+        if (!seperator.equals(other.seperator)) { 
             return false;
         }
         

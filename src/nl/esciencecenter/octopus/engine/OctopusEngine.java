@@ -83,30 +83,23 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public static Octopus newOctopus(Properties properties) throws OctopusException {
-
+    public static synchronized Octopus newOctopus(Properties properties) throws OctopusException {
         OctopusEngine result = new OctopusEngine(properties);
-
-        synchronized (octopusEngines) {
-            octopusEngines.add(result);
-        }
-
+        octopusEngines.add(result);
         return result;
     }
 
-    public static void closeOctopus(Octopus engine) throws OctopusException {
+    public static synchronized void closeOctopus(Octopus engine) throws OctopusException {
 
         OctopusEngine result = null;
 
-        synchronized (octopusEngines) {
-            for (int i = 0; i < octopusEngines.size(); i++) {
-                if (octopusEngines.get(i) == engine) {
-                    result = octopusEngines.remove(i);
-                    break;
-                }
+        for (int i = 0; i < octopusEngines.size(); i++) {
+            if (octopusEngines.get(i) == engine) {
+                result = octopusEngines.remove(i);
+                break;
             }
         }
-
+        
         if (result == null) {
             throw new OctopusException("engine", "No such OctopusEngine");
         }
@@ -118,11 +111,9 @@ public class OctopusEngine implements Octopus {
         return UUID.randomUUID();
     }
     
-    public static void endAll() {
-        synchronized (octopusEngines) {
-            for (OctopusEngine octopusEngine : octopusEngines) {
-                octopusEngine.end();
-            }
+    public static synchronized void endAll() {
+        for (OctopusEngine octopusEngine : octopusEngines) {
+            octopusEngine.end();
         }
     }
 
@@ -261,18 +252,21 @@ public class OctopusEngine implements Octopus {
         return copyEngine;
     }
     
-    @Override
-    public void end() {
-        synchronized (this) {
-            if (ended) {
-                return;
-            }
-
-            ended = true;
+    private synchronized boolean setEnd() { 
+        if (ended) {
+            return false;
         }
 
-        for (Adaptor adaptor : adaptors) {
-            adaptor.end();
+        ended = true;
+        return true;
+    }
+        
+    @Override
+    public void end() {
+        if (setEnd()) { 
+            for (Adaptor adaptor : adaptors) {
+                adaptor.end();
+            }
         }
     }
 

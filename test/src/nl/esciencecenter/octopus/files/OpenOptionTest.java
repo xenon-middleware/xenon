@@ -13,58 +13,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package nl.esciencecenter.octopus.files;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class CopyOptionTest {
+/**
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ *
+ */
+public class OpenOptionTest {
 
     @Test
     public void testContains_empty_doesNotContainIt() {
-        CopyOption[] options = new CopyOption[0];
-        assertFalse(CopyOption.contains(options, CopyOption.CREATE));
+        OpenOption[] options = new OpenOption[0];
+        assertFalse(OpenOption.contains(OpenOption.CREATE, options));
     }
 
     @Test
     public void testContains_filled_doesContainIt() {
-        CopyOption[] options = new CopyOption[] { CopyOption.ASYNCHRONOUS, CopyOption.CREATE };
-        assertTrue(CopyOption.contains(options, CopyOption.CREATE));
+        OpenOption[] options = new OpenOption[] { OpenOption.APPEND, OpenOption.CREATE };
+        assertTrue(OpenOption.contains(OpenOption.CREATE, options));
     }
 
     @Test
     public void testContains_filled_doesNotContainIt() {
-        CopyOption[] options = new CopyOption[] { CopyOption.REPLACE };
-        assertFalse(CopyOption.contains(options, CopyOption.CREATE));
+        OpenOption[] options = new OpenOption[] { OpenOption.OPEN };
+        assertFalse(OpenOption.contains(OpenOption.CREATE, options));
     }
 
     @Test
     public void testContains_optionsNull_doesNotContainIt() {
-        assertFalse(CopyOption.contains(null, CopyOption.CREATE));
+        assertFalse(OpenOption.contains(null, OpenOption.CREATE));
     }
 
     @Test
     public void testContains_optionNull_doesNotContainIt() {
-        CopyOption[] options = new CopyOption[] { CopyOption.ASYNCHRONOUS, CopyOption.CREATE };
-        assertFalse(CopyOption.contains(options, null));
+        OpenOption[] options = new OpenOption[] { OpenOption.TRUNCATE, OpenOption.CREATE };
+        assertFalse(OpenOption.contains(null, options));
     }
 
     @Test
     public void testContains_optionsFilledNull_doesNotContainIt() {
-        CopyOption[] options = new CopyOption[] { null };
-        assertFalse(CopyOption.contains(options, CopyOption.CREATE));
+        OpenOption[] options = new OpenOption[] { null };
+        assertFalse(OpenOption.contains(OpenOption.CREATE, options));
     }
     
     @Test
     public void testContains_valueOf() {
-        CopyOption option = CopyOption.valueOf("CREATE");
-        assertTrue(option.equals(CopyOption.CREATE));
+        OpenOption option = OpenOption.valueOf("CREATE");
+        assertTrue(option.equals(OpenOption.CREATE));
     }
     
     @Test(expected = IllegalArgumentException.class)
     public void testContains_valueOf_fails() {
-        CopyOption.valueOf("AAP");
+        OpenOption.valueOf("AAP");
     }
 
+    
 }

@@ -16,9 +16,6 @@
 
 package nl.esciencecenter.octopus.engine;
 
-import static org.junit.Assert.*;
-
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;

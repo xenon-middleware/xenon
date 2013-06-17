@@ -32,7 +32,6 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
@@ -46,10 +45,14 @@ import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class AbstractFileTest {
 
     protected static final String ROOT = "octopus_test_" + System.currentTimeMillis();
