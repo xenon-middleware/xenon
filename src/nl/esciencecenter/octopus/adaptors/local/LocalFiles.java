@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.attribute.PosixFileAttributeView;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
@@ -38,13 +36,11 @@ import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.engine.util.CopyInfo;
-import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.InvalidOpenOptionsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Copy;
@@ -180,6 +176,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
         }
 
+        if (source.normalize().equals(target.normalize())) {
+            return target;
+        }
+        
         if (exists(target)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
         }
@@ -189,17 +189,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                     + " does not exist!");
         }
 
-        if (source.normalize().equals(target.normalize())) {
-            return target;
-        }
-
-        try {
-            Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source.getPath() + " to "
-                    + target.getPath(), e);
-        }
-
+        LocalUtils.move(source, target);
+    
         return target;
     }
 
@@ -234,12 +225,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException {
-
-        if (!isDirectory(dir)) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
-        }
-
-        return new LocalDirectoryAttributeStream(this, dir, filter);
+        return new LocalDirectoryAttributeStream(this, new LocalDirectoryStream(dir, filter));
     }
 
     @Override
@@ -253,11 +239,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }
         
-        try {
-            return Files.newInputStream(LocalUtils.javaPath(path));
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
-        }
+        return LocalUtils.newInputStream(path);
     }
     
     private OpenOptions processOptions(OpenOption... options) throws InvalidOpenOptionsException { 
@@ -357,13 +339,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         if (permissions == null) { 
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Permissions is null!");
         }
-        
-        try {
-            PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
-            view.setPermissions(LocalUtils.javaPermissions(permissions));
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to set permissions", e);
-        }
+
+        LocalUtils.setPosixFilePermissions(path, permissions);
     }
 
     @Override
@@ -448,29 +425,14 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + path.getParent() + " does not exist!");
         }
 
-        try {
-            java.nio.file.Files.createFile(LocalUtils.javaPath(path));
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path.getPath(), e);
-        }
-
+        LocalUtils.createFile(path);
+        
         return path;
     }
 
     @Override
     public void delete(AbsolutePath path) throws OctopusIOException {
-
-        try {
-            java.nio.file.Files.delete(LocalUtils.javaPath(path));
-        } catch (java.nio.file.NoSuchFileException e1) {
-            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
-
-        } catch (java.nio.file.DirectoryNotEmptyException e2) {
-            throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path.getPath() + " not empty!");
-
-        } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path.getPath(), e);
-        }
+        LocalUtils.delete(path);
     }
 
     @Override
@@ -513,56 +475,20 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                 throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
             }
         }
-        
-        try {
-            return java.nio.file.Files.newByteChannel(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
-        } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create byte channel " + path.getPath(), e);
-        }
+ 
+        return LocalUtils.newByteChannel(path, options);
     }
 
     @Override
     public FileSystem getLocalCWDFileSystem() throws OctopusException {
-
-        String path = System.getProperty("user.dir");
-
-        if (!LocalUtils.exists(path)) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, 
-                    "Cannot create FileSystem with non-existing CWD (" + path + ")");
-        }
-
-        URI uri = null;
-
-        try {
-            uri = new URI("file:///");
-        } catch (URISyntaxException e) {
-            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
-        }
-
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, 
-                new RelativePath(path), null, null);
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(), 
+                new RelativePath(LocalUtils.getCWD()), null, null);
     }
 
     @Override
     public FileSystem getLocalHomeFileSystem() throws OctopusException {
-
-        String path = System.getProperty("user.home");
-
-        if (!LocalUtils.exists(path)) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create FileSystem with non-existing home directory ("
-                    + path + ")");
-        }
-
-        URI uri = null;
-
-        try {
-            uri = new URI("file:///");
-        } catch (URISyntaxException e) {
-            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
-        }
-
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), uri, new RelativePath(path),
-                null, null);
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(), 
+                new RelativePath(LocalUtils.getHome()), null, null);
     }
 
 
@@ -573,6 +499,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public long size(AbsolutePath path) throws OctopusIOException {
+    
+        
         
         if (!exists(path)) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.toString() + " does not exist!");
@@ -582,11 +510,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             return 0;
         }
         
-        try { 
-            return Files.size(LocalUtils.javaPath(path));
-        } catch (IOException e) { 
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to retrieve size of " + path.toString(), e);
-        }
+        return LocalUtils.size(path);
     }
     
     @Override
@@ -666,8 +590,16 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         if (async) { 
             return copy;
         } else { 
+        
+            Exception e = info.getException();
+            
+            if (e != null) { 
+                throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Copy failed!", e);
+            }
+            
             return null;
         }
+        
     }
 
     @Override

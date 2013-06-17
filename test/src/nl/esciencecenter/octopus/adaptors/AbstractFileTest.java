@@ -27,12 +27,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
@@ -52,8 +52,8 @@ import nl.esciencecenter.octopus.files.RelativePath;
  */
 public abstract class AbstractFileTest {
 
-    protected static final String ROOT = "octopus_test";
-    protected static String TEST_ID = UUID.randomUUID().toString();
+    protected static final String ROOT = "octopus_test_" + System.currentTimeMillis();
+    //protected static String TEST_ID = UUID.randomUUID().toString();
     
     protected Octopus octopus;
     protected Files files;
@@ -100,6 +100,9 @@ public abstract class AbstractFileTest {
     
     public abstract boolean supportsClose();
     
+    public abstract boolean supportsLocalCWDFileSystem();
+    public abstract boolean supportsLocalHomeFileSystem();
+    
     // Various util functions ------------------------------------------------------------
 
     class AllTrue implements DirectoryStream.Filter { 
@@ -131,26 +134,32 @@ public abstract class AbstractFileTest {
     }
 
     private void throwUnexpected(String name, Exception e) throws Exception { 
+        cleanup();
         throw new Exception(name + " throws unexpected Exception!", e);        
     }
     
     private void throwExpected(String name) throws Exception { 
+        cleanup();
         throw new Exception(name + " did NOT throw Exception which was expected!");        
     }
     
     private void throwWrong(String name, String expected, String result) throws Exception { 
+        cleanup();
         throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);        
     }
 
     private void throwUnexpectedElement(String name, String element) throws Exception { 
+        cleanup();
         throw new Exception(name + " produced unexpected element: " + element);        
     }
     
     private void throwMissingElement(String name, String element) throws Exception { 
+        cleanup();
         throw new Exception(name + " did NOT produce element: " + element);        
     }
     
     private void throwMissingElements(String name, Collection elements) throws Exception { 
+        cleanup();
         throw new Exception(name + " did NOT produce elements: " + elements);        
     }
     
@@ -201,7 +210,7 @@ public abstract class AbstractFileTest {
         }
 
         AbsolutePath entry = fs.getEntryPath();
-        testDir = entry.resolve(new RelativePath(new String [] { ROOT, TEST_ID, testName }));
+        testDir = entry.resolve(new RelativePath(new String [] { ROOT, testName }));
         
         if (!files.exists(testDir)) { 
             files.createDirectories(testDir);
@@ -449,7 +458,7 @@ public abstract class AbstractFileTest {
     }
     
     @org.junit.Test
-    public void test_isOpen() throws Exception { 
+    public void test01_isOpen() throws Exception { 
 
         prepare();
         
@@ -500,7 +509,7 @@ public abstract class AbstractFileTest {
     }
     
     @org.junit.Test
-    public void test_close() throws Exception { 
+    public void test02_close() throws Exception { 
 
         prepare();
         
@@ -702,7 +711,7 @@ public abstract class AbstractFileTest {
         FileSystem fs = getTestFileSystem();
         
         AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(new String [] { ROOT, TEST_ID, "test05_createDirectories" }));
+        AbsolutePath root = entry.resolve(new RelativePath(new String [] { ROOT, "test05_createDirectories" }));
                
         // test with non-existing dir
         test05_createDirectories(root, false);
@@ -1099,6 +1108,11 @@ public abstract class AbstractFileTest {
         test10_size(file3, 13, false);
         deleteTestFile(file3);        
 
+        // test with dir
+        AbsolutePath dir0 = createTestDir(testDir);        
+        test10_size(dir0, 0, false);
+        deleteTestDir(dir0);        
+        
         // test with closed filesystem
         if (supportsClose()) { 
             closeTestFileSystem(fs);
@@ -1285,6 +1299,8 @@ public abstract class AbstractFileTest {
         if (tmp.size() > 0) { 
             throwMissingElements("test12_newDirectoryStream_with_filter", tmp);
         }
+        
+        close(in);// double close should result in exception
     }
 
     @org.junit.Test
@@ -1399,6 +1415,22 @@ public abstract class AbstractFileTest {
         if (size >= 0 && result.size() != size) { 
             throwWrong("test13_getfileAttributes", "size=" + size, "size=" + result.size());
         }        
+       
+        System.err.println("File " + path.getPath() + " has attributes: " + 
+                result.isReadable() + " " + 
+                result.isWritable() + " " + 
+                result.isExecutable() + " " + 
+                result.isSymbolicLink() + " " + 
+                result.isDirectory() + " " + 
+                result.isRegularFile() + " " + 
+                result.isHidden() + " " + 
+                result.isOther() + " " + 
+                result.creationTime() + " " + 
+                result.lastAccessTime() + " " +
+                result.lastModifiedTime() + " " +
+                result.group() + " " +
+                result.owner() + " " +
+                result.permissions());
     }
     
     @org.junit.Test
@@ -1583,17 +1615,17 @@ public abstract class AbstractFileTest {
             throwExpected("test15_newAttributesDirectoryStream");
         }
         
-        System.err.println("Comparing PathAttributesPairs!");
+        System.err.println("Comparing PathAttributesPairs:");
         
         for (PathAttributesPair p : in) { 
             
-            System.err.println("Got " + p.path().getPath());
+            System.err.println("Got input " + p.path().getPath() + " " + p.attributes());
                 
             PathAttributesPair found = null;
             
             for (PathAttributesPair x : tmp) { 
                 
-                System.err.println("Comparing " + x.path().getPath() + " " + x.attributes());
+                System.err.println("  Comparing to " + x.path().getPath() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) { 
                     System.err.println("Found!");
@@ -1602,6 +1634,8 @@ public abstract class AbstractFileTest {
                 }
             }
 
+            System.err.println("  Found = " + found);
+            
             if (found != null) { 
                 tmp.remove(found);
             } else { 
@@ -1731,17 +1765,46 @@ public abstract class AbstractFileTest {
             close(in);            
             throwExpected("test16_newAttributesDirectoryDirectoryStream_with_filter");
         }
-        
+
         for (PathAttributesPair p : in) { 
             
-            if (tmp.contains(p)) { 
-                tmp.remove(p);
-            } else { 
-                close(in);
-                throwUnexpectedElement("test16_newAttributesDirectoryDirectoryStream_with_filter", p.path().getPath());
+            System.err.println("Got input " + p.path().getPath() + " " + p.attributes());
+                
+            PathAttributesPair found = null;
+            
+            for (PathAttributesPair x : tmp) { 
+                
+                System.err.println("  Comparing to " + x.path().getPath() + " " + x.attributes());
+
+                if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) { 
+                    System.err.println("Found!");
+                    found = x;
+                    break;
+                }
             }
+
+            System.err.println("  Found = " + found);
+            
+            if (found != null) { 
+                tmp.remove(found);
+            } else { 
+                System.err.println("NOT Found!");
+                close(in);
+                throwUnexpectedElement("test16_newAttributesDirectoryStream_with_filter", p.path().getPath());
+            
+            }
+                        
+//            if (tmp.contains(p)) {
+//                System.err.println("Found!");
+//                tmp.remove(p);
+//            } else {
+//                System.err.println("NOT Found!");
+//                
+//                close(in);
+//                throwUnexpectedElement("newAttributesDirectoryStream", p.path().getPath());
+//            }
         }
-        
+
         close(in);
         
         if (tmp.size() > 0) { 
@@ -2083,8 +2146,8 @@ public abstract class AbstractFileTest {
  
         // test with non-existing and CREATE option
         AbsolutePath file5 = createNewTestFileName(testDir);
-        test21_newOutputStream(file5, new OpenOption [] { OpenOption.CREATE }, null, null, false);
-        
+        test21_newOutputStream(file5, new OpenOption [] { OpenOption.CREATE, OpenOption.APPEND }, data, data, false);
+        deleteTestFile(file5);
         
         deleteTestDir(testDir);
         
@@ -2238,6 +2301,7 @@ public abstract class AbstractFileTest {
                 null, false);
         test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, }, null, data2, false);
         
+        deleteTestFile(file0);
         deleteTestFile(file4);
         
         deleteTestDir(testDir);
@@ -2253,7 +2317,7 @@ public abstract class AbstractFileTest {
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: newByteChannel 
+    // TEST: copy (synchronous) 
     // 
     // Possible parameters:
     //
@@ -2284,7 +2348,7 @@ public abstract class AbstractFileTest {
             throwExpected("test23_copy");
         }
         
-        // TODO: check files!                
+        // TODO: check if the copy actually succeeded!                
     }
     
     @org.junit.Test
@@ -2309,18 +2373,103 @@ public abstract class AbstractFileTest {
         test23_copy(null, file0, new CopyOption [] { CopyOption.CREATE }, true);
 
         AbsolutePath file1 = createNewTestFileName(testDir);
+        AbsolutePath file2 = createNewTestFileName(testDir);
 
+        // test with non-existing source
+        test23_copy(file1, file2, new CopyOption [0], true);
+        
+        // test with non-existing target
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE, CopyOption.CREATE }, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.IGNORE }, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.REPLACE }, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.RESUME }, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.APPEND }, true);
+         
         // test with non-existing target
         test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE }, false);
+        test23_copy(file0, file2, new CopyOption [] { CopyOption.CREATE, CopyOption.CREATE }, false);
         
         // test with existing target 
+        test23_copy(file0, file1, new CopyOption [0], true);
         test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE }, true);
         
         // test with existing target 
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE }, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE, CopyOption.IGNORE }, false);
+       
+        // test with existing target 
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.RESUME }, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.RESUME }, false);
+       
+        // test with existing target 
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.APPEND }, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.APPEND, CopyOption.APPEND }, false);
+        
+        // test with existing target 
         test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE }, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.REPLACE }, false);
 
         // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE }, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, false);
+        
+        // test with existing target 
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.VERIFY }, true);
+        
+        deleteTestFile(file2);        
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(testDir);
+        
+        cleanup();
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: copy (asynchronous) 
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // CopyOptions  null / CREATE / REPLACE / IGNORE / APPEND / RESUME / VERIFY / ASYNCHRONOUS 
+    // 
+    // Total combinations : N
+    // 
+    // Depends on: 
+
+    private void test24_copy_async(AbsolutePath source, AbsolutePath target, CopyOption [] options, boolean mustFail) throws Exception {
+        
+           
+        // TODO: check if the copy actually succeeded!                
+    }
+    
+    @org.junit.Test
+    public void test24_copy_async() throws Exception { 
+        
+        byte [] data = "Hello World!".getBytes();
+            
+        prepare();
+
+        FileSystem fs = getTestFileSystem();
+        prepareTestDir(fs, "test24_copy_async");
+        AbsolutePath file0 = createTestFile(testDir, data);
+
+        AbsolutePath file1 = createNewTestFileName(testDir);
+
+        Copy copy = files.copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.ASYNCHRONOUS});
+      
+        CopyStatus status = files.getCopyStatus(copy);
+        
+        while (!status.isDone()) { 
+            try { 
+                Thread.sleep(1000);
+            } catch (InterruptedException e) { 
+                // ignored
+            }
+            
+            status = files.getCopyStatus(copy);
+        }
+        
+        copy = files.copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.ASYNCHRONOUS });
+        status = files.cancelCopy(copy);
         
         deleteTestFile(file1);
         deleteTestFile(file0);
@@ -2328,27 +2477,240 @@ public abstract class AbstractFileTest {
         
         cleanup();
     }
-    
-    
-    
-    /*    
 
-        public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) 
-            throws UnsupportedOperationException, OctopusIOException;
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: copy (synchronous) 
+    // 
+    // Possible parameters:
+    //
+    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // CopyOptions  null / CREATE / REPLACE / IGNORE / APPEND / RESUME / VERIFY / ASYNCHRONOUS 
+    // 
+    // Total combinations : N
+    // 
+    // Depends on: 
 
+    @org.junit.Test
+    public void test25_getLocalCWDFileSystem() throws Exception { 
     
+        prepare();
+        
+        try { 
+            files.getLocalCWDFileSystem();
+        } catch (Exception e) { 
+         
+            if (!supportsLocalCWDFileSystem()) { 
+                // expected the exception
+                return;
+            }  
+           
+            throwUnexpected("test25_getLocalCWDFileSystem", e);
+        }
+   
+        if (!supportsLocalCWDFileSystem()) { 
+            // expected an exception
+            throwExpected("test25_getLocalCWDFileSystem");
+        }  
+        
+        cleanup();
+    }
+    
+    @org.junit.Test
+    public void test26_getLocalHomeFileSystem() throws Exception { 
+    
+        prepare();
+        
+        try { 
+            files.getLocalHomeFileSystem();
+        } catch (Exception e) { 
+         
+            if (!supportsLocalHomeFileSystem()) { 
+                // expected the exception
+                return;
+            }  
+           
+            throwUnexpected("test26_getLocalHomeFileSystem", e);
+        }
+   
+        if (!supportsLocalHomeFileSystem()) { 
+            // expected an exception
+            throwExpected("test26_getLocalHomeFileSystem");
+        }  
+        
+        cleanup();
+    }
+   
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: move 
+    // 
+    // Possible parameters:
+    //
+    // source null / non-existing file / existing file / existing dir
+    // target null / non-existing file / existing file / non-existing parent dir / existing dir 
+    // +  closed filesystem
+    // 
+    // Total combinations : 
+    // 
+    // Depends on: 
+    
+    private void test27_move(AbsolutePath source, AbsolutePath target, boolean mustFail) throws Exception { 
+
+        try { 
+            files.move(source, target);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("test27_move", e);
+        }
+        
+        if (mustFail) {             
+            throwExpected("test27_move");
+        }
+   
+        // make sure the source no longer exists, and the target does exist
+        if (files.exists(source)) { 
+            throwWrong("test27_move", "no source file", "source file");
+        }
+       
+        if (!files.exists(target)) { 
+            throwWrong("test27_move", "target file", "no target file");
+        }
+    }
+    
+    @org.junit.Test
+    public void test27_move() throws Exception { 
+
+        prepare();
+    
+        test27_move(null, null, true);
+        
+        FileSystem fs = getTestFileSystem();
+        prepareTestDir(fs, "test27_move");
+        
+        // test with non-existing source
+        AbsolutePath file0 = createNewTestFileName(testDir);
+        AbsolutePath file1 = createNewTestFileName(testDir);
+        test27_move(file0, file1, true);
+        
+        // test with existing source, non-existing target
+        AbsolutePath file2 = createTestFile(testDir, null);
+        test27_move(file2, file0, false);
+        
+        // test with existing source and target
+        AbsolutePath file3 = createTestFile(testDir, null);
+        test27_move(file3, file0, true);
+
+        // test file existing source, and target with non-existing parent
+        AbsolutePath dir0 = createNewTestDirName(testDir);
+        AbsolutePath file4 = createNewTestFileName(dir0);
+        
+        test27_move(file0, file4, true);
+
+        // test with source equals target
+        test27_move(file0, file0, false);
+        
+        deleteTestFile(file0);
+        deleteTestFile(file3);
+        
+        // test with existing dir
+        AbsolutePath dir1 = createTestDir(testDir);
+        test27_move(dir1, file1, true);
+        
+        deleteTestDir(file1);
+        deleteTestDir(testDir);
+        
+        cleanup();
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------
+    // TEST: readSymbolicLink 
+    // 
+    // Possible parameters:
+    //
+    // link null / non-existing file / existing file / existing dir / existing link / broken link / closed filesystem
+    // 
+    // Total combinations : 7
+    // 
+    // Depends on: 
+    
+    private void test28_readSymbolicLink(AbsolutePath link, AbsolutePath expected, boolean mustFail) throws Exception { 
+
+        AbsolutePath target = null;
+        
+        try { 
+            target = files.readSymbolicLink(link);
+        } catch (Exception e) { 
+
+            if (mustFail) { 
+                // expected
+                return;
+            } 
+            
+            throwUnexpected("test28_readSymboliclink", e);
+        }
+        
+        if (mustFail) {             
+            throwExpected("test28_readSymbolicLink");
+        }
+   
+        // make sure the target is what was expected 
+        if (expected != null && !target.equals(expected)) { 
+            throwWrong("test28_readSymbolicLink", target.getPath(), expected.getPath());
+        }      
+    }
+    
+    @org.junit.Test
+    public void test28_readSymbolicLink() throws Exception { 
+
+        prepare();
+        
+        // test with null
+        test28_readSymbolicLink(null, null, true);
+        
+        FileSystem fs = getTestFileSystem();
+        prepareTestDir(fs, "test28_readSybmolicLink");
+        
+        // test with non-exising file
+        AbsolutePath file0 = createNewTestFileName(testDir);
+        test28_readSymbolicLink(file0, null, true);
+        
+        // test with existing file
+        AbsolutePath file1 = createTestFile(testDir, null);
+        test28_readSymbolicLink(file1, null, true);
+        deleteTestFile(file1);
+        
+        // test with existing dir
+        AbsolutePath dir0 = createTestDir(testDir);
+        test28_readSymbolicLink(dir0, null, true);
+        deleteTestFile(dir0);
+        
+        // test with existing link
+        // TODO
+        
+        // test with broken link
+        // TODO
+        
+        if (supportsClose()) { 
+            files.close(fs);
+            
+            // TODO
+        }
+        
+        deleteTestDir(testDir);
+        
+        cleanup();
+    }
+    
+    /*        
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
 
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
-
-
-    public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
     
-    public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException;
-    
-    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
-
-    
+     
 */
     
     

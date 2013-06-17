@@ -115,4 +115,13 @@ public class AltLocalFileTest extends AbstractFileTest {
         return false;
     }
 
+    @Override
+    public boolean supportsLocalCWDFileSystem() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsLocalHomeFileSystem() {
+        return true;
+    }
 }

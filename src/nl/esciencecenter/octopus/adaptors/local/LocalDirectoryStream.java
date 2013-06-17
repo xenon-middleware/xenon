@@ -44,11 +44,11 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
     /** The filter to use. */
     private final DirectoryStream.Filter filter;
 
-    /** A buffer to read ahead. */
-    private final LinkedList<AbsolutePath> readAhead;
-
     /** The directory to produce a stream for. */
     private final AbsolutePath dir;
+
+    /** A buffer to read ahead. */
+    private AbsolutePath readAhead;
 
     LocalDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
         try {
@@ -56,7 +56,7 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
             this.filter = filter;
-            this.readAhead = new LinkedList<AbsolutePath>();
+            //this.readAhead = new LinkedList<AbsolutePath>();
 
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir.getPath(), e);
@@ -74,42 +74,51 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
 
     @Override
     public void close() throws OctopusIOException {
+        
         try {
             stream.close();
         } catch (IOException e) {
+            // NOTE: No unit test possible here, as this does not occur for local file system.
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to close stream.", e);
         }
     }
 
     @Override
     public synchronized boolean hasNext() {
-        if (!readAhead.isEmpty()) {
+        
+        if (readAhead != null) {
             return true;
         }
+        
         while (iterator.hasNext()) {
             AbsolutePath next = getPath(iterator.next());
             if (filter.accept(next)) {
-                readAhead.addLast(next);
+                readAhead = next;
                 return true;
             }
         }
+        
         return false;
     }
 
     @Override
     public synchronized AbsolutePath next() {
-        if (!readAhead.isEmpty()) {
-            return readAhead.removeFirst();
+    
+        if (readAhead != null) {
+            AbsolutePath tmp = readAhead;
+            readAhead = null;
+            return tmp;
         }
 
         while (iterator.hasNext()) {
             AbsolutePath next = getPath(iterator.next());
+            
             if (filter.accept(next)) {
                 return next;
             }
         }
+        
         throw new NoSuchElementException("No more files in directory");
-
     }
 
     @Override

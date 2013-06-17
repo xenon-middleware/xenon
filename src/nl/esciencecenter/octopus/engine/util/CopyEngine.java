@@ -128,7 +128,7 @@ public class CopyEngine {
 
         // We need to append some bytes from source to target. 
         try (InputStream in = owner.newInputStream(source); 
-             OutputStream out = owner.newOutputStream(target, OpenOption.APPEND)) {
+             OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND)) {
 
             in.skip(fromOffset);
             
@@ -275,6 +275,9 @@ public class CopyEngine {
         boolean replace = (ac.mode == CopyOption.REPLACE);
         boolean ignore = (ac.mode == CopyOption.IGNORE);
                 
+        System.err.println("COPY " + source.getPath() + " " + owner.exists(source) + " -> " + 
+                target.getPath() + " " + owner.exists(target) + " " + ac.mode);
+       
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
         }
@@ -411,8 +414,8 @@ public class CopyEngine {
         CopyImplementation tmp = (CopyImplementation) copy;
         
         String ID = tmp.getUniqueID(); 
-        
-        if (ID.equals(running.copy.getUniqueID())) { 
+       
+        if (running != null && ID.equals(running.copy.getUniqueID())) { 
             running.cancel();
             
             return new CopyStatusImplementation(copy, "KILLED", false, false, running.getBytesToCopy(), running.getBytesCopied(), 

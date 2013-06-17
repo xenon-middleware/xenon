@@ -153,7 +153,7 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    private OctopusEngine(Properties properties) throws OctopusException {
+    public OctopusEngine(Properties properties) throws OctopusException {
 
         octopusProperties = new OctopusProperties(VALID_PROPERTIES, properties);
 

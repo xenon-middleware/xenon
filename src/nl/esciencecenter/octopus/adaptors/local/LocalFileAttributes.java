@@ -193,14 +193,15 @@ public class LocalFileAttributes implements FileAttributes {
             return false;
         }
         
-        if (attributes == null) { 
-            if (other.attributes != null) { 
-                return false;
-            }
-        } else if (!attributes.equals(other.attributes)) { 
-            return false;
-        }
-        
+// FIXME: Always fails ?         
+//        if (attributes == null) { 
+//            if (other.attributes != null) { 
+//                return false;
+//            }
+//        } else if (!attributes.equals(other.attributes)) { 
+//            return false;
+//        }
+//        
         return true;
     }
 
