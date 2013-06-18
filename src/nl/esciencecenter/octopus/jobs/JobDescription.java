@@ -220,7 +220,12 @@ public class JobDescription {
      *            environment of the executable.
      */
     public void setEnvironment(Map<String, String> environment) {
-        this.environment = new HashMap<String, String>(environment);
+        
+        if (environment != null) { 
+            this.environment = new HashMap<String, String>(environment);
+        } else { 
+            this.environment = new HashMap<String, String>();
+        }
     }
 
     /**
@@ -243,7 +248,12 @@ public class JobDescription {
      *            job options of the job.
      */
     public void setJobOptions(Map<String, String> options) {
-        this.jobOptions = new HashMap<String, String>(options);
+        
+        if (options != null) { 
+            this.jobOptions = new HashMap<String, String>(options);
+        } else { 
+            this.jobOptions = new HashMap<String, String>();
+        }
     }
     
     /**
@@ -387,7 +397,8 @@ public class JobDescription {
         		", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + 
                         ", maxTime=" + maxTime + ", mergeOutput=" + mergeOutput + ", interactive=" + interactive +        		
         		", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + 
-        		", workingDirectory=" + workingDirectory + ", environment=" + environment + "]";
+        		", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions +
+        		"]";
     }
 
     /* Generated */
@@ -395,8 +406,9 @@ public class JobDescription {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
-        result = prime * result + ((environment == null) ? 0 : environment.hashCode());
+        result = prime * result + arguments.hashCode();
+        result = prime * result + environment.hashCode();
+        result = prime * result + jobOptions.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + (interactive ? 1231 : 1237);
         result = prime * result + maxTime;
@@ -415,9 +427,9 @@ public class JobDescription {
         
         if (a == null) { 
             if (b == null) { 
-                return false;
-            } else { 
                 return true;
+            } else { 
+                return false;
             }
         }
         
@@ -459,6 +471,7 @@ public class JobDescription {
                 compare(stdout, other.stdout) && 
                 compare(stderr, other.stderr) && 
                 compare(arguments, other.arguments) && 
-                compare(environment, other.environment);
+                compare(environment, other.environment) &&
+                compare(jobOptions, other.jobOptions);
     }
 }

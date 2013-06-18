@@ -23,6 +23,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -98,7 +99,7 @@ public class LocalAdaptor extends Adaptor {
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
-            throw new OctopusException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \""
+            throw new InvalidLocationException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \""
                     + location.getHost() + "\"");
         }
     }
@@ -119,7 +120,7 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public void end() {
-        // TODO: implement!
+        localJobs.end();
     }
 
     @Override

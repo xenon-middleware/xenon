@@ -69,19 +69,7 @@ public class LocalJobs implements Jobs {
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
         
-        URI uri = null;
-
-        try {
-            uri = new URI("local:///");
-        } catch (URISyntaxException e) {
-            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
-        }
-
-        //defaultWorkingDirectory = System.getProperty("user.dir");
-        
-       // if (defaultWorkingDirectory == null) { 
-      //      throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to retrieve current working directory!");
-      //  }
+        URI uri = LocalUtils.getLocalJobURI();
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
                 new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);

@@ -16,6 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.net.URI;
 import java.nio.file.attribute.FileAttribute;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,6 +25,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -143,5 +145,26 @@ public class LocalUtilsTest {
         
         assert(out.value().contains(java.nio.file.attribute.PosixFilePermission.OWNER_READ));         
     }
+
+    @org.junit.Test(expected = OctopusRuntimeException.class)
+    public void test_getURI() throws Exception {
+        LocalUtils.getURI("AAP@@:\\");
+    }
+
+    @org.junit.Test
+    public void test_getURI2() throws Exception {
+        URI uri = LocalUtils.getURI(LocalUtils.LOCAL_FILE_URI);
+        assert(uri.getScheme().equals("file"));        
+    }
+    
+    @org.junit.Test
+    public void test_getURI3() throws Exception {
+        URI uri = LocalUtils.getURI(LocalUtils.LOCAL_JOB_URI);
+        assert(uri.getScheme().equals("local"));        
+    }
+    
+
+    
+    
     
 }

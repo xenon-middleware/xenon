@@ -15,15 +15,22 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidCloseException;
+import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
+import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
+import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
+import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 
 /**
  * Jobs represents the Jobs interface of Octopus.
@@ -61,7 +68,7 @@ public interface Jobs {
      *             If the credentials where invalid to access the location.
      * 
      * @throws OctopusException
-     *             If the creation of the FileSystem failed.
+     *             If the creation of the Scheduler failed.
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
@@ -83,7 +90,7 @@ public interface Jobs {
      *             If a known property was provided with an invalid value.
      * 
      * @throws OctopusException
-     *             If the creation of the FileSystem failed.
+     *             If the creation of the Scheduler failed.
      */
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
 
@@ -93,10 +100,8 @@ public interface Jobs {
      * @param scheduler
      *            the Scheduler to close.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
-     * @throws InvalidCloseException
-     *             If the Scheduler cannot be closed (for example a local Scheduler).
      * @throws OctopusException
      *             If the Scheduler failed to close.
      * @throws OctopusIOException
@@ -110,8 +115,6 @@ public interface Jobs {
      * @param scheduler
      *            the Scheduler to test.
      * 
-     * @throws NoSchedulerException
-     *             If the scheduler is not known.
      * @throws OctopusException
      *             If the test failed.
      * @throws OctopusIOException
@@ -131,7 +134,7 @@ public interface Jobs {
      * 
      * @return an array containing the resulting Jobs.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
@@ -152,7 +155,7 @@ public interface Jobs {
      * 
      * @return the resulting QueueStatus.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.

@@ -26,6 +26,7 @@ import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
+import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -241,7 +242,7 @@ public class SshJobs implements Jobs {
             info = schedulers.remove(s.getUniqueID());
 
             if (info == null) {
-                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
+                throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
             }
         } 
             

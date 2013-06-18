@@ -161,16 +161,16 @@ class LocalBatchProcess implements ProcessWrapper {
 //        }
 //    }
 
-    public int waitFor() throws InterruptedException {
-        
-        int[] results = new int[processes.length];
-
-        for (int i = 0; i < processes.length; i++) {
-            results[i] = processes[i].waitFor();
-        }
-
-        return results[0];
-    }
+//    public int waitFor() throws InterruptedException {
+//        
+//        int[] results = new int[processes.length];
+//
+//        for (int i = 0; i < processes.length; i++) {
+//            results[i] = processes[i].waitFor();
+//        }
+//
+//        return results[0];
+//    }
 
     public boolean isDone() {
         

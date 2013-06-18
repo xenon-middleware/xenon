@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -125,7 +126,7 @@ public class JobQueues {
         }
     }
     
-    public Job[] getJobs(String... queueNames) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(String... queueNames) throws NoSuchQueueException {
         
         LinkedList<Job> out = new LinkedList<Job>();
         
@@ -142,14 +143,14 @@ public class JobQueues {
                 } else if (name.equals("unlimited")) {
                     getJobs(unlimitedQ, out);
                 } else { 
-                    throw new BadParameterException(adaptor.getName(), "Queue \"" + name + "\" does not exist");                    
+                    throw new NoSuchQueueException(adaptor.getName(), "Queue \"" + name + "\" does not exist");                    
                 }
             }
         }
         
         return out.toArray(new Job[out.size()]);
     }
-
+/*
     private synchronized void purgeQ(LinkedList<JobExecutor> q) {
         
         if (maxQSize == -1) {
@@ -172,7 +173,7 @@ public class JobQueues {
             }
         }
     }
-
+*/
     private LinkedList<JobExecutor> findQueue(String queueName) throws OctopusException {
 
         if (queueName == null || queueName.equals("single")) {

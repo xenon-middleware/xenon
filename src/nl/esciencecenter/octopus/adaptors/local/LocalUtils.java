@@ -49,6 +49,9 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
  */
 class LocalUtils {
 
+    public static final String LOCAL_JOB_URI = "local:///";
+    public static final String LOCAL_FILE_URI = "file:///";
+    
     static String getHome() throws OctopusException { 
         
         String path = System.getProperty("user.home");
@@ -71,13 +74,22 @@ class LocalUtils {
         return path;
     }
 
-    static URI getLocalFileURI() { 
+    static URI getURI(String uri) { 
         try {
-            return new URI("file:///");
+            return new URI(uri);
         } catch (URISyntaxException e) {
             // NOTE: Cannot unit test as this will never fail!
-            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create Local File URI", e);
+            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI: " + uri, e);
         }
+    }
+    
+    static URI getLocalJobURI() { 
+        return getURI(LOCAL_JOB_URI);
+    }
+    
+    
+    static URI getLocalFileURI() { 
+        return getURI(LOCAL_FILE_URI);
     }
     
     private static String expandHome(String path) { 
