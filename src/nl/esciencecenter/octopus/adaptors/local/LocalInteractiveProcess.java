@@ -16,15 +16,12 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.octopus.engine.util.CommandRunner;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
-import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,27 +91,7 @@ class LocalInteractiveProcess implements ProcessWrapper {
             return false;
         }
     }
-    
-    private void unixDestroy(java.lang.Process process) throws Throwable {
-        Field pidField = process.getClass().getDeclaredField("pid");
-
-        pidField.setAccessible(true);
-
-        int pid = pidField.getInt(process);
-
-        if (pid <= 0) {
-            throw new Exception("Pid reported as 0 or negative: " + pid);
-        }
-
-        CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
-
-        if (killRunner.getExitCode() != 0) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was " + 
-                    killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
-        }
-
-    }
-
+   
     public int getExitStatus() {
         return exitCode;
     }
@@ -125,11 +102,6 @@ class LocalInteractiveProcess implements ProcessWrapper {
             return;
         }
         
-        try {
-            unixDestroy(process);
-        } catch (Throwable t) {
-            logger.debug("Could not destroy process using getpid/kill, using normal java destroy", t);
-            process.destroy();
-        }
+        LocalUtils.unixDestroy(process);        
     }
 }

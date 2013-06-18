@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
@@ -92,7 +93,7 @@ public class LocalJobs implements Jobs {
         String path = location.getPath();
 
         if (path != null && !path.equals("/")) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with path!");
+            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with path!");
         }
 
         if (credential != null) {

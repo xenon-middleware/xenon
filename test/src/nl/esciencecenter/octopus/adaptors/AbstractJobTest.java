@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
@@ -47,6 +48,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -364,7 +366,7 @@ public abstract class AbstractJobTest {
         }
     }
     
-    @Test(expected = NoSuchQueueException.class)
+    @Test
     public void test18b_getQueueStatus() throws Exception {        
         Scheduler s = getDefaultScheduler();
         try { 
@@ -436,10 +438,13 @@ public abstract class AbstractJobTest {
     public void test22_getQueueStatuses() throws Exception {        
         Scheduler s = getDefaultScheduler();        
         try { 
-            jobs.getQueueStatuses(s, getInvalidQueueName());
-            throw new Exception("getQueueStatuses did NOT throw NoSuchQueueException");
-        } catch (NoSuchSchedulerException e) { 
-            // expected
+            QueueStatus [] tmp = jobs.getQueueStatuses(s, getInvalidQueueName());
+
+            assertTrue(tmp != null);
+            assertTrue(tmp.length == 1);
+            assertTrue(tmp[0].hasException());
+            assertTrue(tmp[0].getException() instanceof NoSuchQueueException);
+
         } finally { 
             jobs.close(s);
         }
@@ -489,6 +494,12 @@ public abstract class AbstractJobTest {
         in.close();
         return new String(buffer, 0, offset);
     }
+
+    private void writeFully(OutputStream out, String message) throws IOException { 
+        out.write(message.getBytes());
+        out.close();
+    }
+
     
     @org.junit.Test
     public void test30_interactiveJobSubmit() throws Exception {
@@ -761,19 +772,23 @@ public abstract class AbstractJobTest {
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
-        jobs.cancelJob(job);
-        
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.cancelJob(job);
         
         if (!status.isDone()) { 
-            throw new Exception("Killing job exceeded deadline!");
+            throw new Exception("Failed to kill job!");
         }
         
         AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
         AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
 
-        files.delete(out);
-        files.delete(err);
+        if (files.exists(out)) { 
+            files.delete(out);
+        }
+        
+        if (files.exists(err)) { 
+            files.delete(err);
+        }
+        
         files.delete(root);
         
         assertTrue(status.hasException());
@@ -784,7 +799,7 @@ public abstract class AbstractJobTest {
     }
 
     @org.junit.Test
-    public void test34_batchJobSubmitWithKill2() throws Exception {
+    public void test35_batchJobSubmitWithKill2() throws Exception {
         
         String workingDir = "octopus_test_" + System.currentTimeMillis();
         
@@ -811,13 +826,9 @@ public abstract class AbstractJobTest {
         }
         
         if (status.isRunning()) { 
-            jobs.cancelJob(job);
-        
-            status = jobs.waitUntilDone(job, 10000);
-            
-            if (!status.isDone()) { 
-                throw new Exception("Killing job exceeded deadline!");
-            }
+            status = jobs.cancelJob(job);
+        } else { 
+            throw new Exception("Job failed to start!");
         }
         
         AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
@@ -834,6 +845,200 @@ public abstract class AbstractJobTest {
         assertTrue(e.getMessage().equals("Process cancelled by user."));
     }
 
+    @org.junit.Test
+    public void test35_batchJobSubmitWithInput() throws Exception {
+        
+        String message = "Hello World!";
+        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        
+        FileSystem filesystem = getDefaultFileSystem();
+        Scheduler scheduler = getDefaultScheduler();
+        
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectory(root);
+        
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+        
+        OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
+        writeFully(out, message);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/cat");
+        description.setInteractive(false);
+        description.setWorkingDirectory(workingDir);
+        description.setStdin(stdin.getPath());
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+       
+        AbsolutePath stdout = root.resolve(new RelativePath(description.getStdout()));
+        AbsolutePath stderr = root.resolve(new RelativePath(description.getStderr()));
+
+        String tmpout = readFully(files.newInputStream(stdout));
+        String tmperr = readFully(files.newInputStream(stderr));
+
+        files.delete(stdin);
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
+        
+        System.err.println("STDOUT: " + tmpout);
+        System.err.println("STDERR: " + tmperr);
+        
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
+    }
+    
+    @org.junit.Test
+    public void test36_batchJobSubmitWithInput() throws Exception {
+        
+        String message = "Hello World!";
+        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        
+        FileSystem filesystem = getDefaultFileSystem();
+        Scheduler scheduler = getDefaultScheduler();
+        
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectory(root);
+        
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+        
+        OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
+        writeFully(out, message);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/cat");
+        description.setInteractive(false);
+        description.setWorkingDirectory(workingDir);
+        description.setStdin("stdin.txt");
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+       
+        AbsolutePath stdout = root.resolve(new RelativePath(description.getStdout()));
+        AbsolutePath stderr = root.resolve(new RelativePath(description.getStderr()));
+
+        String tmpout = readFully(files.newInputStream(stdout));
+        String tmperr = readFully(files.newInputStream(stderr));
+
+        files.delete(stdin);
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
+        
+        System.err.println("STDOUT: " + tmpout);
+        System.err.println("STDERR: " + tmperr);
+        
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
+    }
+    
+    
+    @org.junit.Test
+    public void test37_batchJobSubmitWithoutWorkDir() throws Exception {
+        
+        Scheduler scheduler = getDefaultScheduler();
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        description.setWorkingDirectory(null);
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+    }
+    
+    @org.junit.Test
+    public void test37_multipleBatchJobSubmitWithInput() throws Exception {
+        
+        String message = "Hello World!";
+        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        
+        FileSystem filesystem = getDefaultFileSystem();
+        Scheduler scheduler = getDefaultScheduler();
+        
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectory(root);
+        
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+        
+        OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
+        writeFully(out, message);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/cat");
+        description.setInteractive(false);
+        description.setProcessesPerNode(2);
+        description.setMergeOutputStreams(false);
+        description.setWorkingDirectory(workingDir);
+        description.setStdin("stdin.txt");
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 5000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+       
+        for (int i=0;i<2;i++) { 
+
+            AbsolutePath stdout = root.resolve(new RelativePath(description.getStdout() + "." + i));
+            AbsolutePath stderr = root.resolve(new RelativePath(description.getStderr() + "." + i));
+
+            String tmpout = readFully(files.newInputStream(stdout));
+            String tmperr = readFully(files.newInputStream(stderr));
+
+            System.err.println("STDOUT: " + tmpout);
+            System.err.println("STDERR: " + tmperr);
+            
+            assertTrue(tmpout != null);
+            assertTrue(tmpout.length() > 0);
+            assertTrue(tmpout.equals(message));
+            assertTrue(tmperr.length() == 0);
+            
+            files.delete(stdout);
+            files.delete(stderr);
+        } 
+
+        files.delete(stdin);           
+        files.delete(root);        
+    }
+    
+    
+    
     
     /**
      * Submit a job to a Scheduler.

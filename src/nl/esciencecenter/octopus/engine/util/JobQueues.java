@@ -427,25 +427,31 @@ public class JobQueues {
         checkScheduler(scheduler);
         
         if (queueName == null || queueName.equals("single")) {
-            return new QueueStatusImplementation(scheduler, queueName, null, null);
+            return new QueueStatusImplementation(scheduler, "single", null, null);
         } else if (queueName.equals("multi")) {
-            return new QueueStatusImplementation(scheduler, queueName, null, null);
+            return new QueueStatusImplementation(scheduler, "multi", null, null);
         } else if (queueName.equals("unlimited")) {
-            return new QueueStatusImplementation(scheduler, queueName, null, null);
+            return new QueueStatusImplementation(scheduler, "unlimited", null, null);
         } else {
-            throw new OctopusException(adaptor.getName(), "No such queue: " + queueName);
+            throw new NoSuchQueueException(adaptor.getName(), "No such queue: " + queueName);
         }
     }
     
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
         
-        QueueStatus[] result = new QueueStatus[queueNames.length];
+        String [] names = queueNames;
+        
+        if (names.length == 0) { 
+            names = new String [] { "single", "multi", "unlimited" };
+        }
+        
+        QueueStatus[] result = new QueueStatus[names.length];
 
-        for (int i = 0; i < queueNames.length; i++) {
+        for (int i = 0; i < names.length; i++) {
             try {
-                result[i] = getQueueStatus(scheduler, queueNames[i]);
+                result[i] = getQueueStatus(scheduler, names[i]);
             } catch (OctopusException e) {
-                result[i] = new QueueStatusImplementation(null, queueNames[i], e, null);
+                result[i] = new QueueStatusImplementation(scheduler, names[i], e, null);
             }
         }
 

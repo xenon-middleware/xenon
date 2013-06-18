@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -284,4 +286,29 @@ class LocalUtils {
                     + target, e);
         }
     }
+    
+    static void unixDestroy(java.lang.Process process) {
+        
+        try { 
+            Field pidField = process.getClass().getDeclaredField("pid");
+            pidField.setAccessible(true);
+
+            int pid = pidField.getInt(process);
+
+            if (pid <= 0) {
+                throw new Exception("Pid reported as 0 or negative: " + pid);
+            }
+
+            CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
+
+            if (killRunner.getExitCode() != 0) {
+                throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was " + 
+                        killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
+            }
+        } catch (Throwable t) {
+            // Failed, so use the regular Java destroy.
+            process.destroy();
+        }
+    }
+    
 }
