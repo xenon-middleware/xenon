@@ -122,7 +122,7 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
     }
 
     @Override
-    public synchronized void remove() {
+    public void remove() {
         throw new UnsupportedOperationException("DirectoryStream iterator does not support remove");
     }
 }
