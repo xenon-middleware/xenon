@@ -122,19 +122,13 @@ public class SshFiles implements Files {
             logger.debug(Arrays.toString(attributeViews.toArray()));
         }
     }
-
+    
     @Override
     public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
+     
+        adaptor.checkPath(location, "filesystem");
         
-        String path = location.getPath();
-
-        if (path != null && !path.equals("/")) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME,
-                    "Adaptor does not support a specific entry point. The location URI should not contain a path, or only '/'. URI = "
-                            + location);
-        }
-
         String uniqueID = getNewUniqueID();
 
         OctopusProperties octopusProperties = new OctopusProperties(properties);

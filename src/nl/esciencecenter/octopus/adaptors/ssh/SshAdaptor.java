@@ -33,6 +33,7 @@ import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.NotConnectedException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -165,12 +166,24 @@ public class SshAdaptor extends Adaptor {
         this.jsch = jsch;
     }
 
-    void checkURI(URI location) throws OctopusException {
+    void checkURI(URI location) throws InvalidLocationException {
         if (!supports(location.getScheme())) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme " + location.getScheme());
+            throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme " + location.getScheme());
         }
     }
 
+    void checkPath(URI location, String adaptor) throws InvalidLocationException {
+        
+        String path = location.getPath();
+        
+        if (path == null || path.length() == 0 || path.equals("/")) { 
+            return;
+        }
+        
+        throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "Cannot create SSH " + adaptor + " with path (URI=" + 
+                location.getScheme() + ")");
+    }
+    
     @Override
     public Map<String, String> getSupportedProperties() {
         return new HashMap<String, String>();

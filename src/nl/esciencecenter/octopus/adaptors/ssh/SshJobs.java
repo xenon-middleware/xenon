@@ -107,18 +107,13 @@ public class SshJobs implements Jobs {
             throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Polling delay must be between 100 and 60000!");
         }
     }
-
+    
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
 
-        adaptor.checkURI(location);
-
-        String path = location.getPath();
-
-        if (path != null && !path.equals("") && !path.equals("/")) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with path! (path = " + path + ")");
-        }
+        //adaptor.checkURI(location);
+        adaptor.checkPath(location, "scheduler");
 
         // FIXME: Why can't we add scheduler specific properties ?
         if (properties != null && properties.size() > 0) { 
