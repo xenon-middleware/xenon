@@ -139,7 +139,7 @@ public class CopyEngine {
         }          
     }
     
-    private boolean compareHead(AbsolutePath target, AbsolutePath source) throws OctopusIOException, IOException { 
+    private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws OctopusIOException, IOException { 
         
         byte [] buf1 = new byte[4*1024];
         byte [] buf2 = new byte[4*1024];
@@ -149,10 +149,14 @@ public class CopyEngine {
             
             while (true) { 
 
+                if (ac.isCancelled()) {
+                    throw new IOException("Copy killed by user");
+                }   
+                
                 int size1 = in1.read(buf1);
                 int size2 = in2.read(buf2);
 
-                if (size1 != size2) { 
+                if (size1 > size2) { 
                     return false;
                 }
 
@@ -171,9 +175,16 @@ public class CopyEngine {
     
     private void doResume(CopyInfo ac) throws OctopusIOException {
         
+        if (ac.isCancelled()) {
+            ac.setException(new IOException("Copy killed by user"));
+            return;
+        }
+        
         AbsolutePath source = ac.copy.getSource();
         AbsolutePath target = ac.copy.getTarget();
      
+        System.err.println("RESUME: " + source.getPath() + " -> " + target.getPath() + " " + ac.verify);
+        
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
         }
@@ -202,19 +213,15 @@ public class CopyEngine {
             return;
         }
 
-        long targetSize = owner.size(target); 
-        long sourceSize = owner.size(source);
-
-        // If target is larger than source, they cannot be the same file.
-        if (targetSize > sourceSize) {
-            throw new InvalidDataException("CopyEngine", "Data in target " + target.getPath() + 
-                    " does not match " + source + " " + source.getPath());
-        }
-
         if (ac.verify) {
+            if (ac.isCancelled()) {
+                ac.setException(new IOException("Copy killed by user"));
+                return;
+            }
+            
             // check if the data in target corresponds to the head of source.
             try { 
-                if (!compareHead(target, source)) { 
+                if (!compareHead(ac, target, source)) { 
                     throw new InvalidDataException("CopyEngine", "Data in target " + target.getPath() + 
                             " does not match source " + source.getPath());
                 }
@@ -224,6 +231,17 @@ public class CopyEngine {
             }
         }
 
+        long targetSize = owner.size(target); 
+        long sourceSize = owner.size(source);
+
+        System.err.println("RESUME: " + targetSize + " > " + sourceSize + " ? " + (targetSize > sourceSize));
+        
+        // If target is larger than source, they cannot be the same file.
+        if (targetSize > sourceSize) {
+            throw new InvalidDataException("CopyEngine", "Data in target " + target.getPath() + 
+                    " does not match " + source + " " + source.getPath());
+        }
+        
         // If target is the same size as source we are done.
         if (targetSize == sourceSize) { 
             ac.setBytesToCopy(0);
@@ -238,6 +256,11 @@ public class CopyEngine {
     }
     
     private void doAppend(CopyInfo ac) throws OctopusIOException {
+        
+        if (ac.isCancelled()) {
+            ac.setException(new IOException("Copy killed by user"));
+            return;
+        }
         
         AbsolutePath source = ac.copy.getSource();
         AbsolutePath target = ac.copy.getTarget();
@@ -269,6 +292,11 @@ public class CopyEngine {
     
     private void doCopy(CopyInfo ac) throws OctopusIOException {
 
+        if (ac.isCancelled()) {
+            ac.setException(new IOException("Copy killed by user"));
+            return;
+        }
+        
         AbsolutePath source = ac.copy.getSource();
         AbsolutePath target = ac.copy.getTarget();
         
@@ -286,6 +314,10 @@ public class CopyEngine {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }
 
+        if (source.normalize().equals(target.normalize())) {
+            return;
+        }
+        
         if (owner.exists(target)) { 
             if (ignore) { 
                 return;
@@ -298,10 +330,6 @@ public class CopyEngine {
         if (!owner.exists(target.getParent())) {
             throw new NoSuchFileException("CopyEngine", "Target directory " + target.getParent().getPath()
                     + " does not exist!");
-        }
-
-        if (source.normalize().equals(target.normalize())) {
-            return;
         }
         
         ac.setBytesToCopy(owner.size(source));
@@ -386,6 +414,7 @@ public class CopyEngine {
         if (running != null) { 
             finished.put(running.copy.getUniqueID(), running);
             running = null;
+            notifyAll();
         }
         
         while (!done && pending.size() == 0) {
@@ -405,6 +434,17 @@ public class CopyEngine {
         return running;
     }
     
+    private synchronized void waitUntilCancelled(String ID) { 
+        
+        while (running != null && ID.equals(running.copy.getUniqueID())) { 
+            try { 
+                wait(500);
+            } catch (InterruptedException e) { 
+                // ignored.
+            }
+        }         
+    }
+    
     public synchronized CopyStatus cancel(Copy copy) throws NoSuchCopyException { 
 
         if (!(copy instanceof CopyImplementation)) { 
@@ -418,8 +458,10 @@ public class CopyEngine {
         if (running != null && ID.equals(running.copy.getUniqueID())) { 
             running.cancel();
             
-            return new CopyStatusImplementation(copy, "KILLED", false, false, running.getBytesToCopy(), running.getBytesCopied(), 
-                    running.getException());
+            // We should now wait until the running copy is indeed cancelled. Otherwise, we are in an inconsistent state when 
+            // we return.
+            
+            waitUntilCancelled(ID);
         }
         
         CopyInfo ac = finished.remove(ID);
@@ -438,7 +480,8 @@ public class CopyEngine {
             
             if (c.copy.getUniqueID().equals(ID)) { 
                 it.remove();
-                return new CopyStatusImplementation(copy, "PENDING", false, false, c.getBytesToCopy(), 0, null); 
+                return new CopyStatusImplementation(copy, "KILLED", false, false, c.getBytesToCopy(), 0, 
+                        new IOException("Copy killed by user"));
             }
         }
         

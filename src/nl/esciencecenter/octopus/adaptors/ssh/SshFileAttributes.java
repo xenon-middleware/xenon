@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
@@ -26,21 +25,10 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
 import com.jcraft.jsch.SftpATTRS;
 
 public class SshFileAttributes implements FileAttributes {
+
     static final int SUID = 04000; // set user ID on execution
     static final int SGID = 02000; // set group ID on execution
     static final int SVTX = 01000; // sticky bit   ****** NOT DOCUMENTED *****
-
-    static final int READ = 00400; // read by owner
-    static final int WRITE = 00200; // write by owner
-    static final int EXEC = 00100; // execute/search by owner
-
-    static final int READ_GROUP = 00040; // read by group
-    static final int WRITE_GROUP = 00020; // write by group
-    static final int EXEC_GROUP = 00010; // execute/search by group
-
-    static final int READ_OTHERS = 00004; // read by others
-    static final int WRITE_OTHERS = 00002; // write by others
-    static final int EXEC_OTHERS = 00001; // execute/search by others
 
     SftpATTRS attributes;
     AbsolutePath path;
@@ -103,42 +91,12 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
-        HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();
-        if ((attributes.getPermissions() & READ) != 0) {
-            result.add(PosixFilePermission.OWNER_READ);
-        }
-        if ((attributes.getPermissions() & WRITE) != 0) {
-            result.add(PosixFilePermission.OWNER_WRITE);
-        }
-        if ((attributes.getPermissions() & EXEC) != 0) {
-            result.add(PosixFilePermission.OWNER_EXECUTE);
-        }
-
-        if ((attributes.getPermissions() & READ_GROUP) != 0) {
-            result.add(PosixFilePermission.GROUP_READ);
-        }
-        if ((attributes.getPermissions() & WRITE_GROUP) != 0) {
-            result.add(PosixFilePermission.GROUP_WRITE);
-        }
-        if ((attributes.getPermissions() & EXEC_GROUP) != 0) {
-            result.add(PosixFilePermission.GROUP_EXECUTE);
-        }
-
-        if ((attributes.getPermissions() & READ_OTHERS) != 0) {
-            result.add(PosixFilePermission.OTHERS_READ);
-        }
-        if ((attributes.getPermissions() & WRITE_OTHERS) != 0) {
-            result.add(PosixFilePermission.OTHERS_WRITE);
-        }
-        if ((attributes.getPermissions() & EXEC_OTHERS) != 0) {
-            result.add(PosixFilePermission.OTHERS_EXECUTE);
-        }
-        return result;
+        return SshUtil.bitsToPermissions(attributes.getPermissions());
     }
-
+    
     @Override
     public boolean isExecutable() throws AttributeNotSupportedException {
-        return (attributes.getPermissions() & EXEC) != 0;
+        return SshUtil.isExecutable(attributes.getPermissions());
     }
 
     @Override
@@ -148,16 +106,58 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean isReadable() throws AttributeNotSupportedException {
-        return (attributes.getPermissions() & READ) != 0;
+        return SshUtil.isReadable(attributes.getPermissions());
     }
 
     @Override
     public boolean isWritable() throws AttributeNotSupportedException {
-        return (attributes.getPermissions() & WRITE) != 0;
+        return SshUtil.isWritable(attributes.getPermissions());
     }
 
     @Override
     public String toString() {
         return "" + attributes;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) { 
+            return true;
+        }
+        
+        if (obj == null) { 
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        SshFileAttributes other = (SshFileAttributes) obj;
+        
+        if (!SshUtil.equals(attributes, other.attributes)) { 
+            return false;
+        }
+        
+        if (path == null) {
+            if (other.path != null) { 
+                return false;
+            }
+        } else if (!path.equals(other.path)) { 
+            return false; 
+        }
+           
+        return true;
+    }
+    
+    
 }

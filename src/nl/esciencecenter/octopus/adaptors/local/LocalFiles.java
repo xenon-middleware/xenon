@@ -226,6 +226,15 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException {
+        
+        if (!isDirectory(dir)) {
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
+        }
+
+        if (filter == null) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Filter is null.");
+        }
+        
         return new LocalDirectoryAttributeStream(this, new LocalDirectoryStream(dir, filter));
     }
 

@@ -16,6 +16,8 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
@@ -29,19 +31,28 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
-    private final DirectoryStream.Filter filter;
-    private final AbsolutePath dir;
-    private Vector<LsEntry> listing;
-
-    private int current = 0;
-
-    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing)
-            throws OctopusIOException {
-        this.dir = dir;
-        this.filter = filter;
-        this.listing = listing;
-
-        SshDirectoryStream.filterSpecials(listing);
+    
+    private final LinkedList<PathAttributesPair> stream;
+    
+    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
+ 
+        stream = new LinkedList<PathAttributesPair>();
+        
+        for (LsEntry e : listing) { 
+            
+            String filename = e.getFilename();
+            
+            if (filename.equals(".") || filename.equals("..")) {
+                // filter out the "." and ".."
+            } else { 
+                AbsolutePath tmp = dir.resolve(new RelativePath(filename));
+                
+                if (filter.accept(tmp)) { 
+                    SshFileAttributes attributes = new SshFileAttributes(e.getAttrs(), tmp);
+                    stream.add(new PathAttributesPairImplementation(tmp, attributes));
+                }
+            }
+        }
     }
 
     @Override
@@ -50,28 +61,23 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
     }
 
     @Override
-    public void close() throws OctopusIOException {
-        listing = null;
+    public synchronized void close() throws OctopusIOException {
+        stream.clear();
     }
 
     @Override
     public synchronized boolean hasNext() {
-        return current < listing.size();
+        return (stream.size() > 0);
     }
 
     @Override
     public synchronized PathAttributesPair next() {
-        while (hasNext()) {
-            LsEntry nextEntry = listing.get(current);
-            current++;
-            AbsolutePath nextPath = dir.resolve(new RelativePath(nextEntry.getFilename()));
-            if (filter.accept(nextPath)) {
-                SshFileAttributes attributes = new SshFileAttributes(nextEntry.getAttrs(), nextPath);
-                PathAttributesPair next = new PathAttributesPairImplementation(nextPath, attributes);
-                return next;
-            }
+
+        if (stream.size() > 0) { 
+            return stream.removeFirst();
         }
-        return null;
+
+        throw new NoSuchElementException("No more files in directory");    
     }
 
     @Override

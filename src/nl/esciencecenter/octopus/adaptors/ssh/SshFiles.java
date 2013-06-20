@@ -551,11 +551,10 @@ public class SshFiles implements Files {
         }
         return target;
     }
-
+    
     @SuppressWarnings("unchecked")
-    @Override
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath path, Filter filter) throws OctopusIOException {
-        
+    private Vector<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException { 
+
         if (!isDirectory(path)) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
@@ -563,19 +562,27 @@ public class SshFiles implements Files {
         if (filter == null) { 
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
-        
+
         ChannelSftp channel = getChannel(path);
 
-        Vector<LsEntry> listing = null;
         try {
-            listing = channel.ls(path.getPath());
+            return channel.ls(path.getPath());
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
             channel.disconnect();
         }
+    }
 
-        return new SshDirectoryStream(path, filter, listing);
+    @Override
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath path, Filter filter)
+            throws OctopusIOException {
+        return new SshDirectoryAttributeStream(path, filter, listDirectory(path, filter));
+    }
+    
+    @Override
+    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath path, Filter filter) throws OctopusIOException {
+        return new SshDirectoryStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
@@ -587,29 +594,7 @@ public class SshFiles implements Files {
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath path, Filter filter)
-            throws OctopusIOException {
-        if (!isDirectory(path)) {
-            throw new OctopusIOException(getClass().getName(), "Cannot create directorystream, file is not a directory");
-        }
-
-        ChannelSftp channel = getChannel(path);
-
-        Vector<LsEntry> listing = null;
-        try {
-            listing = channel.ls(path.getPath());
-        } catch (SftpException e) {
-            throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
-
-        return new SshDirectoryAttributeStream(path, filter, listing);
-    }
-
+    
     @Override
     public InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
        
@@ -729,9 +714,18 @@ public class SshFiles implements Files {
 
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
-        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "setPosixFilePermissions not implemented!");
+        
+        ChannelSftp channel = getChannel(path);
+        
+        try { 
+            channel.chmod(SshUtil.permissionsToBits(permissions), path.getPath());
+        } catch (SftpException e) {
+            throw adaptor.sftpExceptionToOctopusException(e);
+        } finally {
+            channel.disconnect();
+        }
     }
-
+        
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "newByteChannel not implemented!");
@@ -762,7 +756,14 @@ public class SshFiles implements Files {
 
     @Override
     public long size(AbsolutePath path) throws OctopusIOException {
-        return stat(path).getSize();
+        
+        SftpATTRS tmp = stat(path);
+        
+        if (tmp.isDir() || tmp.isLink()) { 
+            return 0;
+        } else { 
+            return tmp.getSize();
+        }
     }
 
     @Override

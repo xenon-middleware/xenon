@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;

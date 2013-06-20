@@ -25,6 +25,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 
@@ -304,6 +305,8 @@ public abstract class AbstractFileTest {
             read = in.read(buffer, offset, buffer.length-offset);
         }
         
+        close(in);
+        
         return Arrays.copyOf(buffer, offset);
     }
 
@@ -326,6 +329,8 @@ public abstract class AbstractFileTest {
                         
             read = channel.read(buffer);
         }
+        
+        close(channel);
         
         buffer.flip();
         byte [] tmp = new byte[buffer.remaining()];
@@ -1115,14 +1120,13 @@ public abstract class AbstractFileTest {
         AbsolutePath dir0 = createTestDir(testDir);        
         test10_size(dir0, 0, false);
         deleteTestDir(dir0);        
+        deleteTestDir(testDir);
         
         // test with closed filesystem
         if (supportsClose()) { 
             closeTestFileSystem(fs);
-            test10_size(file1, 0, false);               
+            test10_size(file1, 0, true);               
         }
-        
-        deleteTestDir(testDir);
         
         cleanup();
     }
@@ -1287,7 +1291,15 @@ public abstract class AbstractFileTest {
             throwExpected("test12_newDirectoryStream_with_filter");
         }
         
-        for (AbsolutePath p : in) { 
+        Iterator<AbsolutePath> itt = in.iterator();
+        
+        while (itt.hasNext()) { 
+        
+            AbsolutePath p = itt.next(); 
+            
+            if (p == null) {
+                throwUnexpectedElement("test12_newDirectoryStream_with_filter", null);
+            }
             
             if (tmp.contains(p)) { 
                 tmp.remove(p);
@@ -1303,7 +1315,7 @@ public abstract class AbstractFileTest {
             throwMissingElements("test12_newDirectoryStream_with_filter", tmp);
         }
         
-        close(in);// double close should result in exception
+        // close(in); // double close should result in exception
     }
 
     @org.junit.Test
@@ -1428,7 +1440,6 @@ public abstract class AbstractFileTest {
                 result.isRegularFile() + " " + 
                 result.isHidden() + " " + 
                 result.isOther() + " " + 
-                result.creationTime() + " " + 
                 result.lastAccessTime() + " " +
                 result.lastModifiedTime() + " " +
                 result.group() + " " +
@@ -2331,7 +2342,8 @@ public abstract class AbstractFileTest {
     // 
     // Depends on: 
 
-    private void test23_copy(AbsolutePath source, AbsolutePath target, CopyOption [] options, boolean mustFail) throws Exception {
+    private void test23_copy(AbsolutePath source, AbsolutePath target, CopyOption [] options, byte [] expected, boolean mustFail) 
+            throws Exception {
         
         Copy copy;
         
@@ -2351,73 +2363,133 @@ public abstract class AbstractFileTest {
             throwExpected("test23_copy");
         }
         
-        // TODO: check if the copy actually succeeded!                
+        if (expected != null) { 
+            byte [] tmp = readFully(files.newInputStream(target));
+
+            if (!Arrays.equals(expected, tmp)) { 
+                throwWrong("test23_copy", Arrays.toString(expected), Arrays.toString(tmp));
+            }
+        }
     }
     
     @org.junit.Test
     public void test23_copy() throws Exception { 
         
-        byte [] data = "Hello World!".getBytes();
-        byte [] data2 = "Goodbye World!".getBytes();
-            
+        byte [] data  = "Hello World!".getBytes();
+        byte [] data2 = "Goodbye World!".getBytes();        
+        byte [] data3 = "Hello World!Goodbye World!".getBytes();
+        byte [] data4 = "Hello World!Hello World!".getBytes();
+        byte [] data5 = "Hello World!Hello World!Hello World!".getBytes();
+        
         prepare();
 
         // test with null
-        test23_copy(null, null, null, true);
+        test23_copy(null, null, null, null, true);
         
         FileSystem fs = getTestFileSystem();
         prepareTestDir(fs, "test23_copy");
+        
         AbsolutePath file0 = createTestFile(testDir, data);
-
+        
         // test without target
-        test23_copy(file0, null, new CopyOption [] { CopyOption.CREATE },true);
+        test23_copy(file0, null, new CopyOption [] { CopyOption.CREATE }, null, true);
         
         // test without source
-        test23_copy(null, file0, new CopyOption [] { CopyOption.CREATE }, true);
+        test23_copy(null, file0, new CopyOption [] { CopyOption.CREATE }, null, true);
 
         AbsolutePath file1 = createNewTestFileName(testDir);
         AbsolutePath file2 = createNewTestFileName(testDir);
-
-        // test with non-existing source
-        test23_copy(file1, file2, new CopyOption [0], true);
+        AbsolutePath file3 = createNewTestFileName(testDir);
+      
+        AbsolutePath file4 = createTestFile(testDir, data2);
+        AbsolutePath file5 = createTestFile(testDir, data3);
         
-        // test with non-existing target
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE, CopyOption.CREATE }, true);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.IGNORE }, true);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.REPLACE }, true);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.RESUME }, true);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.APPEND }, true);
+        AbsolutePath dir0 = createTestDir(testDir);
+        AbsolutePath dir1 = createNewTestDirName(testDir);
+      
+        AbsolutePath file6 = createNewTestFileName(dir1);
+        
+        // test copy with non-existing source
+        test23_copy(file1, file2, new CopyOption [0], null, true);
+    
+        // test copy with dir source 
+        test23_copy(dir0, file1, new CopyOption [] { CopyOption.CREATE }, null, true);
+        
+        // test copy with non-existing target
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE, CopyOption.CREATE }, null, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.IGNORE }, null, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.REPLACE }, null, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.RESUME }, null, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.APPEND }, null, true);
          
-        // test with non-existing target
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE }, false);
-        test23_copy(file0, file2, new CopyOption [] { CopyOption.CREATE, CopyOption.CREATE }, false);
-        
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [0], true);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE }, true);
-        
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE }, false);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.IGNORE, CopyOption.IGNORE }, false);
+        // test copy with non-existing target
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE }, data, false);
+        test23_copy(file0, file2, new CopyOption [] { CopyOption.CREATE, CopyOption.CREATE }, data, false);
        
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.RESUME }, false);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.RESUME }, false);
-       
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.APPEND }, false);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.APPEND, CopyOption.APPEND }, false);
+        // test copy with non-existing target with non-existing parent
+        test23_copy(file0, file6, new CopyOption [] { CopyOption.CREATE }, null, true);
         
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE }, false);
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.REPLACE }, false);
-
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, false);
+        // test copy with existing target 
+        test23_copy(file0, file1, new CopyOption [0], null, true);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.CREATE }, null, true);
         
-        // test with existing target 
-        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.VERIFY }, true);
+        // test copy with same target as source
+        test23_copy(file0, file0, new CopyOption [] { CopyOption.CREATE }, data, false);
         
+        // test ignore with existing target 
+        test23_copy(file4, file1, new CopyOption [] { CopyOption.IGNORE }, data, false);
+        test23_copy(file4, file1, new CopyOption [] { CopyOption.IGNORE, CopyOption.IGNORE }, data, false);
+        
+        // test resume with existing target 
+        test23_copy(file4, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(file1, file5, new CopyOption [] { CopyOption.RESUME }, null, true);
+        test23_copy(file5, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, data3, false);
+        test23_copy(file5, file1, new CopyOption [] { CopyOption.RESUME }, data3, false);
+        test23_copy(file5, file2, new CopyOption [] { CopyOption.RESUME, CopyOption.RESUME }, data3, false);
+        test23_copy(file4, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        
+        // test resume with non-existing source 
+        test23_copy(file3, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        
+        // test resume with non-exising target
+        test23_copy(file5, file3, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        
+        // test resume with dir source 
+        test23_copy(dir0, file1, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        
+        // test resume with dir target
+        test23_copy(file5, dir0, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        
+        // test resume with same dir and target
+        test23_copy(file5, file5, new CopyOption [] { CopyOption.RESUME, CopyOption.VERIFY }, data3, false);
+        
+        // test replace with existing target 
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE }, data, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.REPLACE }, data, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.VERIFY }, null, true);
+         
+        // test append with existing target 
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.APPEND }, data4, false);
+        test23_copy(file0, file1, new CopyOption [] { CopyOption.APPEND, CopyOption.APPEND }, data5, false);
+        
+        // test append with non-existing source 
+        test23_copy(file3, file1, new CopyOption [] { CopyOption.APPEND }, null, true);
+        
+        // test append with non-existing target 
+        test23_copy(file0, file3, new CopyOption [] { CopyOption.APPEND }, null, true);
+        
+        // test append with dir source 
+        test23_copy(dir0, file1, new CopyOption [] { CopyOption.APPEND }, null, true);
+        
+        // test append with dir target 
+        test23_copy(file0, dir0, new CopyOption [] { CopyOption.APPEND }, null, true);
+        
+        // test append with source equals target 
+        test23_copy(file0, file0, new CopyOption [] { CopyOption.APPEND }, data, false);
+        
+        deleteTestDir(dir0);
+        deleteTestFile(file5);        
+        deleteTestFile(file4);
         deleteTestFile(file2);        
         deleteTestFile(file1);
         deleteTestFile(file0);
@@ -2437,13 +2509,7 @@ public abstract class AbstractFileTest {
     // Total combinations : N
     // 
     // Depends on: 
-
-    private void test24_copy_async(AbsolutePath source, AbsolutePath target, CopyOption [] options, boolean mustFail) throws Exception {
-        
-           
-        // TODO: check if the copy actually succeeded!                
-    }
-    
+   
     @org.junit.Test
     public void test24_copy_async() throws Exception { 
         
@@ -2454,11 +2520,10 @@ public abstract class AbstractFileTest {
         FileSystem fs = getTestFileSystem();
         prepareTestDir(fs, "test24_copy_async");
         AbsolutePath file0 = createTestFile(testDir, data);
-
         AbsolutePath file1 = createNewTestFileName(testDir);
 
-        Copy copy = files.copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.ASYNCHRONOUS});
-      
+        // Test the async copy
+        Copy copy = files.copy(file0, file1, new CopyOption [] { CopyOption.CREATE, CopyOption.ASYNCHRONOUS});      
         CopyStatus status = files.getCopyStatus(copy);
         
         while (!status.isDone()) { 
@@ -2471,6 +2536,7 @@ public abstract class AbstractFileTest {
             status = files.getCopyStatus(copy);
         }
         
+        // Test the cancel
         copy = files.copy(file0, file1, new CopyOption [] { CopyOption.REPLACE, CopyOption.ASYNCHRONOUS });
         status = files.cancelCopy(copy);
         
@@ -2496,51 +2562,34 @@ public abstract class AbstractFileTest {
     @org.junit.Test
     public void test25_getLocalCWDFileSystem() throws Exception { 
     
-        prepare();
-        
-        try { 
-            files.getLocalCWDFileSystem();
-        } catch (Exception e) { 
-         
-            if (!supportsLocalCWDFileSystem()) { 
-                // expected the exception
-                return;
-            }  
-           
-            throwUnexpected("test25_getLocalCWDFileSystem", e);
+        if (supportsLocalCWDFileSystem()) { 
+
+            prepare();
+
+            try { 
+                files.getLocalCWDFileSystem();
+            } catch (Exception e) { 
+                throwUnexpected("test25_getLocalCWDFileSystem", e);
+            }
+
+            cleanup();
         }
-   
-        if (!supportsLocalCWDFileSystem()) { 
-            // expected an exception
-            throwExpected("test25_getLocalCWDFileSystem");
-        }  
-        
-        cleanup();
     }
     
     @org.junit.Test
     public void test26_getLocalHomeFileSystem() throws Exception { 
-    
-        prepare();
+
+        if (supportsLocalHomeFileSystem()) { 
+            prepare();
         
-        try { 
-            files.getLocalHomeFileSystem();
-        } catch (Exception e) { 
-         
-            if (!supportsLocalHomeFileSystem()) { 
-                // expected the exception
-                return;
-            }  
-           
-            throwUnexpected("test26_getLocalHomeFileSystem", e);
+            try { 
+                files.getLocalHomeFileSystem();
+            } catch (Exception e) { 
+                throwUnexpected("test26_getLocalHomeFileSystem", e);
+            }
+        
+            cleanup();
         }
-   
-        if (!supportsLocalHomeFileSystem()) { 
-            // expected an exception
-            throwExpected("test26_getLocalHomeFileSystem");
-        }  
-        
-        cleanup();
     }
    
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2574,6 +2623,11 @@ public abstract class AbstractFileTest {
             throwExpected("test27_move");
         }
    
+        if (source.normalize().equals(target.normalize())) {
+            // source == target, so the move did nothing. 
+            return;
+        }
+        
         // make sure the source no longer exists, and the target does exist
         if (files.exists(source)) { 
             throwWrong("test27_move", "no source file", "source file");
@@ -2621,7 +2675,7 @@ public abstract class AbstractFileTest {
         
         // test with existing dir
         AbsolutePath dir1 = createTestDir(testDir);
-        test27_move(dir1, file1, true);
+        test27_move(dir1, file1, false);
         
         deleteTestDir(file1);
         deleteTestDir(testDir);

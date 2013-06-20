@@ -107,7 +107,7 @@ public class LocalFileTest {
         
         assertTrue(files.exists(testFile));
         
-        OutputStream out = files.newOutputStream(testFile, OpenOption.WRITE);
+        OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND);
         out.write(data);
         out.close();        
     }
