@@ -289,7 +289,7 @@ public class RelativePath {
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
     public String getName(int index) {
-        if (index >= elements.length) {
+        if (index < 0 || index >= elements.length) {
             throw new IllegalArgumentException("index " + index + " not present in path " + this);
         }
         return elements[index];

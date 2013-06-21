@@ -16,9 +16,12 @@
 
 package nl.esciencecenter.octopus.engine.files;
 
+import static org.junit.Assert.*;
+
 import java.net.URI;
 import java.util.Properties;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -61,6 +64,41 @@ public class FileSystemImplementationTest {
         String tmp = fi.getUniqueID();
         assert(tmp.equals("NOOT"));
     }
+    
+    @org.junit.Test
+    public void test_getCredential() throws Exception {
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new RelativePath("aap"), 
+                null, null);
+        
+        Credential c = fi.getCredential();
+        
+        assertNull(c);
+    }
+    
+    @org.junit.Test
+    public void test_getCredential2() throws Exception {
+        Credential c = new Credential() {
+            
+            @Override
+            public Properties getProperties() {
+                return null;
+            }
+            
+            @Override
+            public String getAdaptorName() {
+                return "test";
+            }
+        };
+        
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new RelativePath("aap"), 
+                c, null);
+        
+        Credential c2 = fi.getCredential();
+        
+        assertTrue(c == c2);
+    }
+
+
     
     @org.junit.Test
     public void test_name_ok() throws Exception {

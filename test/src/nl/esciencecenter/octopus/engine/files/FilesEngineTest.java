@@ -28,6 +28,7 @@ import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
@@ -84,6 +85,14 @@ public class FilesEngineTest {
 
         FilesEngine engine = new FilesEngine(octopus);
 
+        CopyEngine c = engine.getCopyEngine();
+        
+        assertNotNull(c);
+        
+        String tmp = engine.toString();
+       
+        assertNotNull(tmp);
+        
         // TODO verify octopus is in engine
     }
 
@@ -105,30 +114,30 @@ public class FilesEngineTest {
         assertThat((AbsolutePathImplementation) newpath, is(expected_path));
     }
 
-    @Test
-    public void testIsDirectory() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewByteChannelPathOpenOptionArray() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewDirectoryStreamPath() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewAttributesDirectoryStreamPath() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewPathPropertiesURI() {
-        fail("Not yet implemented");
-    }
+//    @Test
+//    public void testIsDirectory() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewByteChannelPathOpenOptionArray() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewDirectoryStreamPath() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewAttributesDirectoryStreamPath() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewPathPropertiesURI() {
+//        fail("Not yet implemented");
+//    }
 
     @Test
     public void testCopy_SameAdaptors_MockedAdaptorCopies() throws URISyntaxException, OctopusIOException, OctopusException {
@@ -203,90 +212,90 @@ public class FilesEngineTest {
         verify(source_adaptor).copy(source, target);
     }
 
-    @Test
-    public void testCreateDirectoriesPathSetOfPosixFilePermission() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCreateDirectoriesPath() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCreateDirectoryPathSetOfPosixFilePermission() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCreateDirectoryPath() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testCreateFile() {
-        fail("Not yet implemented");
-    }
-
 //    @Test
-//    public void testCreateSymbolicLink() {
+//    public void testCreateDirectoriesPathSetOfPosixFilePermission() {
 //        fail("Not yet implemented");
 //    }
-
-    @Test
-    public void testDelete() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testDeleteIfExists() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testExists() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testMove() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewDirectoryStreamPathFilter() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewAttributesDirectoryStreamPathFilter() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewInputStream() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewOutputStream() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewByteChannelPathSetOfPosixFilePermissionOpenOptionArray() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testGetAttributes() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testReadSymbolicLink() {
-        fail("Not yet implemented");
-    }
+//
+//    @Test
+//    public void testCreateDirectoriesPath() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testCreateDirectoryPathSetOfPosixFilePermission() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testCreateDirectoryPath() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testCreateFile() {
+//        fail("Not yet implemented");
+//    }
+//
+////    @Test
+////    public void testCreateSymbolicLink() {
+////        fail("Not yet implemented");
+////    }
+//
+//    @Test
+//    public void testDelete() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testDeleteIfExists() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testExists() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testMove() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewDirectoryStreamPathFilter() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewAttributesDirectoryStreamPathFilter() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewInputStream() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewOutputStream() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewByteChannelPathSetOfPosixFilePermissionOpenOptionArray() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testGetAttributes() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testReadSymbolicLink() {
+//        fail("Not yet implemented");
+//    }
 
 //    @Test
 //    public void testSetOwner_MockedFiles_FilesSetOwnerCalled() throws URISyntaxException, OctopusException, OctopusIOException {
@@ -305,10 +314,10 @@ public class FilesEngineTest {
 //        verify(files_adaptor).setOwner(path, "someone", "somegroup");
 //    }
 
-    @Test
-    public void testSetPosixFilePermissions() {
-        fail("Not yet implemented");
-    }
+//    @Test
+//    public void testSetPosixFilePermissions() {
+//        fail("Not yet implemented");
+//    }
 
 //    @Test
 //    public void testSetFileTimes() {

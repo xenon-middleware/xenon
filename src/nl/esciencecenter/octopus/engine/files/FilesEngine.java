@@ -86,18 +86,7 @@ public class FilesEngine implements Files {
     }
 
     private Files getFilesAdaptor(AbsolutePath path) throws OctopusIOException {
-
-        FileSystem filesystem = path.getFileSystem();
-
-        try {
-            Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
-            return adaptor.filesAdaptor();
-        } catch (OctopusException e) {
-            // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
-            // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException("FilesEngine", "Could not find adaptor named "
-                    + path.getFileSystem().getAdaptorName(), e);
-        }
+        return getFilesAdaptor(path.getFileSystem());
     }
 
     @Override
@@ -187,13 +176,9 @@ public class FilesEngine implements Files {
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).move(source, target);
-        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).move(source, target);
-        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).move(source, target);
-        } else {
-            throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party move!");
-        }
+        } 
+
+        throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party move!");
     }
 
     @Override
