@@ -340,7 +340,7 @@ public class SshAdaptor extends Adaptor {
             }
         } else if (credential instanceof PasswordCredentialImplementation) {
             PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
-            session.setPassword(Arrays.toString(passwordCredential.getPassword()));
+            session.setPassword(new String(passwordCredential.getPassword()));
         } else {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
         }

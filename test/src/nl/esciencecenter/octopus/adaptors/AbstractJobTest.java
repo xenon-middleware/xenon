@@ -16,7 +16,8 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,25 +25,17 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -56,10 +49,19 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class AbstractJobTest {
     
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
@@ -112,18 +114,21 @@ public abstract class AbstractJobTest {
         OctopusFactory.endOctopus(octopus);
     }
     
+    public abstract String getAdaptorName();
+   
     public abstract URI getValidURI() throws Exception;
     public abstract URI getInvalidLocationURI() throws Exception;
     public abstract URI getInvalidPathURI() throws Exception;
     
     public abstract boolean supportsCredentials() throws Exception;
     public abstract Credential getDefaultCredential() throws Exception;
+    public abstract Credential getPasswordCredential() throws Exception;
     public abstract Credential getInvalidCredential() throws Exception ;
     
     public abstract boolean supportsProperties() throws Exception;
     public abstract Properties getDefaultProperties() throws Exception;
     public abstract Properties getUnknownProperties() throws Exception;
-    public abstract Properties getInvalidProperties() throws Exception;
+    public abstract Properties [] getInvalidProperties() throws Exception;
     
     public abstract boolean supportsClose() throws Exception;
     
@@ -131,6 +136,10 @@ public abstract class AbstractJobTest {
     public abstract FileSystem getDefaultFileSystem() throws Exception;
     
     public abstract String getInvalidQueueName() throws Exception;
+    
+    private String getWorkingDir(String testName) { 
+        return "octopus_" + getAdaptorName() + "_" + testName + "_" + System.currentTimeMillis();
+    }
     
     
     // TEST: newScheduler
@@ -147,32 +156,37 @@ public abstract class AbstractJobTest {
     
     @Test
     public void test01_newScheduler() throws Exception { 
-        jobs.newScheduler(getValidURI(), null, null);
+        Scheduler s = jobs.newScheduler(getValidURI(), null, null);
+        jobs.close(s);
     }
     
-    @Test(expected = InvalidLocationException.class)
+    @Test(expected = OctopusException.class)
     public void test02a_newScheduler() throws Exception { 
         jobs.newScheduler(getInvalidLocationURI(), null, null);
     }
 
-    @Test(expected = InvalidLocationException.class)
+    @Test(expected = OctopusException.class)
     public void test02b_newScheduler() throws Exception { 
         jobs.newScheduler(getInvalidPathURI(), null, null);
     }
     
     @Test
     public void test03_newScheduler() throws Exception {
-        jobs.newScheduler(getValidURI(), getDefaultCredential(), null);
+        Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), null);
+        jobs.close(s);
     }
 
     @Test
     public void test04a_newScheduler() throws Exception {
         if (supportsCredentials()) { 
             try {
-                jobs.newScheduler(getValidURI(), getInvalidCredential(), null);
+                Scheduler s = jobs.newScheduler(getValidURI(), getInvalidCredential(), null);
+                jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
             } catch (InvalidCredentialsException e) {
                 // expected
+            } catch (OctopusException e) { 
+                // allowed
             }
         }
     }
@@ -193,8 +207,9 @@ public abstract class AbstractJobTest {
                     }
                 };
                 
-                jobs.newScheduler(getValidURI(), c, null);
-                
+                Scheduler s = jobs.newScheduler(getValidURI(), c, null);
+                jobs.close(s);
+
                 throw new Exception("newScheduler did NOT throw OctopusException");
             } catch (OctopusException e) {
                 // expected
@@ -203,23 +218,39 @@ public abstract class AbstractJobTest {
     }
 
     @Test
+    public void test04c_newScheduler() throws Exception {
+        if (supportsCredentials()) { 
+            Scheduler s = jobs.newScheduler(getValidURI(), getPasswordCredential(), getDefaultProperties());
+            jobs.close(s);
+        }
+    }
+    
+    @Test
     public void test05_newScheduler() throws Exception {
-        jobs.newScheduler(getValidURI(), getDefaultCredential(), new Properties());
+        Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), new Properties());
+        jobs.close(s);
     }
 
     @Test
     public void test06_newScheduler() throws Exception {
-        jobs.newScheduler(getValidURI(), getDefaultCredential(), getDefaultProperties());
+        Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), getDefaultProperties());
+        jobs.close(s);
     }
     
     @Test
     public void test07_newScheduler() throws Exception {
-        if (supportsProperties()) { 
-            try { 
-                jobs.newScheduler(getValidURI(), getDefaultCredential(), getInvalidProperties());
-                throw new Exception("newScheduler did NOT throw InvalidPropertyException");
-            } catch (InvalidPropertyException e) {
-                // expected
+        if (supportsProperties()) {
+            
+            Properties [] tmp = getInvalidProperties();
+            
+            for (Properties p : tmp) { 
+                try { 
+                    Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), p);
+                    jobs.close(s);
+                    throw new Exception("newScheduler did NOT throw InvalidPropertyException");
+                } catch (InvalidPropertyException e) {
+                    // expected
+                }
             }
         }
     }
@@ -228,7 +259,9 @@ public abstract class AbstractJobTest {
     public void test08_newScheduler() throws Exception {
         if (supportsProperties()) { 
             try { 
-                jobs.newScheduler(getValidURI(), getDefaultCredential(), getUnknownProperties());
+                Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), getUnknownProperties());
+                jobs.close(s);
+
                 throw new Exception("newScheduler did NOT throw UnknownPropertyException");
             } catch (UnknownPropertyException e) {
                 // expected
@@ -242,7 +275,9 @@ public abstract class AbstractJobTest {
             try { 
                 Properties p = new Properties();
                 p.put("aap", "noot");
-                jobs.newScheduler(getValidURI(), getDefaultCredential(), p);
+                Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), p);
+                jobs.close(s);
+
                 throw new Exception("newScheduler did NOT throw OctopusException");
             } catch (OctopusException e) {
                 // expected
@@ -253,10 +288,17 @@ public abstract class AbstractJobTest {
     @Test
     public void test10_getLocalScheduler() throws Exception {
         
-        Scheduler s = jobs.getLocalScheduler();
+        Scheduler s = null; 
         
-        assertTrue(s != null);
-        assertTrue(s.getAdaptorName().equals("local"));
+        try { 
+            s = jobs.getLocalScheduler();
+            assertTrue(s != null);
+            assertTrue(s.getAdaptorName().equals("local"));
+        } finally { 
+            if (s != null) { 
+                jobs.close(s);
+            }
+        }
     } 
      
     @Test
@@ -502,63 +544,82 @@ public abstract class AbstractJobTest {
     @org.junit.Test
     public void test30_interactiveJobSubmit() throws Exception {
         
-        String message = "Hello World!";
-        
-        JobDescription description = new JobDescription();
-        description.setExecutable("/bin/echo");
-        description.setArguments("-n", message);
-        description.setInteractive(true);
-
         Scheduler scheduler = getDefaultScheduler();
-        
-        System.err.println("Submitting interactive job to " + scheduler.getUri());
-        
-        Job job = jobs.submitJob(scheduler, description);
 
-        System.err.println("Interactive job submitted to " + scheduler.getUri());
+        if (scheduler.isOnline()) { 
         
-        Streams streams = jobs.getStreams(job);
-        streams.getStdin().close();
-        
-        String out = readFully(streams.getStdout());
-        String err = readFully(streams.getStderr());
+            String message = "Hello World! test30";
 
-        // NOTE: Job should already be done here!
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+            JobDescription description = new JobDescription();
+            description.setExecutable("/bin/echo");
+            description.setArguments("-n", message);
+            description.setInteractive(true);
 
-        if (!status.isDone()) { 
-            throw new Exception("Job exceeded dealine!");
+            System.err.println("Submitting interactive job to " + scheduler.getUri());
+
+            Job job = jobs.submitJob(scheduler, description);
+
+            System.err.println("Interactive job submitted to " + scheduler.getUri());
+
+            Streams streams = jobs.getStreams(job);
+            streams.getStdin().close();
+
+            String out = readFully(streams.getStdout());
+            String err = readFully(streams.getStderr());
+
+            // NOTE: Job should already be done here!
+            JobStatus status = jobs.waitUntilDone(job, 5000);
+
+            if (!status.isDone()) { 
+                throw new Exception("Job exceeded dealine!");
+            }
+
+            if (status.hasException()) {
+                throw status.getException();
+            }
+
+            assertTrue(out.equals(message));
+            assertTrue(err.length() == 0);
         }
         
-        if (status.hasException()) {
-            throw status.getException();
-        }
-
-        assertTrue(out.equals(message));
-        assertTrue(err.length() == 0);
-         
-        octopus.end();
+        jobs.close(scheduler);
     }
     
     @org.junit.Test
     public void test31_batchJobSubmitWithPolling() throws Exception {
         
-        String message = "Hello World!";
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String message = "Hello World! test31";
+        String workingDir = getWorkingDir("test31");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+
+        FileSystem filesystem = null;          
+
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
+
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
+        
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
         description.setStdin(null);
-
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
+        
         Job job = jobs.submitJob(scheduler, description);
         
         long deadline = System.currentTimeMillis() + 5000;
@@ -581,9 +642,6 @@ public abstract class AbstractJobTest {
             throw status.getException();
         }
         
-        AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
-        AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
-
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
@@ -603,21 +661,38 @@ public abstract class AbstractJobTest {
     @org.junit.Test
     public void test32_batchJobSubmitWithWait() throws Exception {
         
-        String message = "Hello World!";
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String message = "Hello World! test32";
+        String workingDir = getWorkingDir("test32");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+
+        FileSystem filesystem = null;          
+
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        
         files.createDirectory(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
+        
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
         description.setStdin(null);
+        description.setStdout(out.getPath());
+        description.setStderr(err.getPath());
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -629,10 +704,10 @@ public abstract class AbstractJobTest {
         if (status.hasException()) {
             throw status.getException();
         }
-       
-        AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
-        AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
 
+        jobs.close(scheduler);
+        
+        
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
@@ -649,11 +724,17 @@ public abstract class AbstractJobTest {
         assertTrue(tmperr.length() == 0);
     }
 
-    private void submitToQueueWithPolling(Scheduler scheduler, String queueName, int jobCount) throws Exception {
+    private void submitToQueueWithPolling(String testName, Scheduler scheduler, String queueName, int jobCount) throws Exception {
     
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String workingDir = getWorkingDir(testName);
         
-        FileSystem filesystem = getDefaultFileSystem();
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
@@ -673,7 +754,11 @@ public abstract class AbstractJobTest {
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
             description.setArguments("1");
-            description.setWorkingDirectory(root.getPath());
+            
+            if (!scheduler.isOnline()) { 
+                description.setWorkingDirectory(root.getPath());
+            }
+            
             description.setQueueName(queueName);
             description.setInteractive(false);
             description.setStdin(null);
@@ -683,7 +768,7 @@ public abstract class AbstractJobTest {
             j[i] = jobs.submitJob(scheduler, description);
         }
         
-        long deadline = System.currentTimeMillis() + ((jobCount * 2) * 1000);
+        long deadline = System.currentTimeMillis() + (10 * jobCount * 1000);
         
         boolean done = false;
         
@@ -745,7 +830,7 @@ public abstract class AbstractJobTest {
         Scheduler scheduler = getDefaultScheduler();
         
         for (String queue : scheduler.getQueueNames()) { 
-            submitToQueueWithPolling(scheduler, queue, 10);    
+            submitToQueueWithPolling("test33_" + queue, scheduler, queue, 10);    
         }
 
         jobs.close(scheduler);
@@ -754,10 +839,17 @@ public abstract class AbstractJobTest {
     @org.junit.Test
     public void test34_batchJobSubmitWithKill() throws Exception {
         
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String workingDir = getWorkingDir("test34");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+        
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
@@ -766,7 +858,11 @@ public abstract class AbstractJobTest {
         description.setExecutable("/bin/sleep");
         description.setArguments("60");
         description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
+        
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
@@ -775,6 +871,8 @@ public abstract class AbstractJobTest {
         if (!status.isDone()) { 
             throw new Exception("Failed to kill job!");
         }
+        
+        jobs.close(scheduler);
         
         AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
         AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
@@ -799,10 +897,17 @@ public abstract class AbstractJobTest {
     @org.junit.Test
     public void test35_batchJobSubmitWithKill2() throws Exception {
         
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String workingDir = getWorkingDir("test35");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+        
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
@@ -811,7 +916,11 @@ public abstract class AbstractJobTest {
         description.setExecutable("/bin/sleep");
         description.setArguments("60");
         description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
+        
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
@@ -829,11 +938,19 @@ public abstract class AbstractJobTest {
             throw new Exception("Job failed to start!");
         }
         
+        jobs.close(scheduler);
+        
         AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
         AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
 
-        files.delete(out);
-        files.delete(err);
+        if (files.exists(out)) { 
+            files.delete(out);
+        } 
+        
+        if (files.exists(err)) { 
+            files.delete(err);
+        }
+        
         files.delete(root);
         
         assertTrue(status.hasException());
@@ -844,18 +961,26 @@ public abstract class AbstractJobTest {
     }
 
     @org.junit.Test
-    public void test35_batchJobSubmitWithInput() throws Exception {
+    public void test36a_batchJobSubmitWithInput() throws Exception {
         
-        String message = "Hello World!";
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String message = "Hello World! test36a";
+        String workingDir = getWorkingDir("test36a");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
         
-        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
+        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -863,9 +988,15 @@ public abstract class AbstractJobTest {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
-        description.setStdin(stdin.getPath());
         
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
+        description.setStdin(stdin.getPath());
+        description.setStdout(stdout.getPath());
+        description.setStderr(stderr.getPath());
+       
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
         
@@ -876,10 +1007,9 @@ public abstract class AbstractJobTest {
         if (status.hasException()) {
             throw status.getException();
         }
+        
+        jobs.close(scheduler);
        
-        AbsolutePath stdout = root.resolve(new RelativePath(description.getStdout()));
-        AbsolutePath stderr = root.resolve(new RelativePath(description.getStderr()));
-
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
 
@@ -898,27 +1028,41 @@ public abstract class AbstractJobTest {
     }
     
     @org.junit.Test
-    public void test36_batchJobSubmitWithInput() throws Exception {
+    public void test36b_batchJobSubmitWithInput() throws Exception {
         
-        String message = "Hello World!";
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String message = "Hello World! test36b";
+        String workingDir = getWorkingDir("test36b");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
         
-        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
+        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
-        writeFully(out, message);
+        writeFully(out, message);        
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
-        description.setStdin("stdin.txt");
+        
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
+        description.setStdin(stdin.getPath());
+        description.setStdout(stdout.getPath());
+        description.setStderr(stderr.getPath());
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -931,9 +1075,8 @@ public abstract class AbstractJobTest {
             throw status.getException();
         }
        
-        AbsolutePath stdout = root.resolve(new RelativePath(description.getStdout()));
-        AbsolutePath stderr = root.resolve(new RelativePath(description.getStderr()));
-
+        jobs.close(scheduler);
+        
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
 
@@ -975,19 +1118,27 @@ public abstract class AbstractJobTest {
         }
     }
     
-    @org.junit.Test
-    public void test37_multipleBatchJobSubmitWithInput() throws Exception {
+    //@org.junit.Test
+    public void test38_multipleBatchJobSubmitWithInput() throws Exception {
         
-        String message = "Hello World!";
-        String workingDir = "octopus_test_" + System.currentTimeMillis();
+        String message = "Hello World! test38";
+        String workingDir = getWorkingDir("test38");
         
-        FileSystem filesystem = getDefaultFileSystem();
         Scheduler scheduler = getDefaultScheduler();
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = getDefaultFileSystem();          
+        }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectory(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -997,8 +1148,14 @@ public abstract class AbstractJobTest {
         description.setInteractive(false);
         description.setProcessesPerNode(2);
         description.setMergeOutputStreams(false);
-        description.setWorkingDirectory(workingDir);
-        description.setStdin("stdin.txt");
+        
+        if (!scheduler.isOnline()) { 
+            description.setWorkingDirectory(workingDir);
+        }
+        
+        description.setStdin(stdin.getPath());
+        description.setStdout(stdout.getPath());
+        description.setStderr(stderr.getPath());
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -1013,11 +1170,11 @@ public abstract class AbstractJobTest {
        
         for (int i=0;i<2;i++) { 
 
-            AbsolutePath stdout = root.resolve(new RelativePath(description.getStdout() + "." + i));
-            AbsolutePath stderr = root.resolve(new RelativePath(description.getStderr() + "." + i));
+            AbsolutePath stdoutTmp = root.resolve(new RelativePath("stdout.txt." + i));
+            AbsolutePath stderrTmp = root.resolve(new RelativePath("stderr.txt." + i));
 
-            String tmpout = readFully(files.newInputStream(stdout));
-            String tmperr = readFully(files.newInputStream(stderr));
+            String tmpout = readFully(files.newInputStream(stdoutTmp));
+            String tmperr = readFully(files.newInputStream(stderrTmp));
 
             System.err.println("STDOUT: " + tmpout);
             System.err.println("STDERR: " + tmperr);
@@ -1027,8 +1184,8 @@ public abstract class AbstractJobTest {
             assertTrue(tmpout.equals(message));
             assertTrue(tmperr.length() == 0);
             
-            files.delete(stdout);
-            files.delete(stderr);
+            files.delete(stdoutTmp);
+            files.delete(stderrTmp);
         } 
 
         files.delete(stdin);           

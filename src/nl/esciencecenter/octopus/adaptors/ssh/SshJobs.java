@@ -148,7 +148,7 @@ public class SshJobs implements Jobs {
     private JobQueues getJobQueue(Scheduler scheduler) throws OctopusException { 
         
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
+            throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
         }
 
         SchedulerImplementation s = (SchedulerImplementation) scheduler;
@@ -156,7 +156,7 @@ public class SshJobs implements Jobs {
         SchedulerInfo info = schedulers.get(s.getUniqueID());
 
         if (info == null) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
+            throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
         }
 
         return info.jobQueues;

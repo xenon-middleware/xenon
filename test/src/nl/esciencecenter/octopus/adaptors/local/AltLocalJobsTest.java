@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.AbstractJobTest;
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -52,18 +53,23 @@ public class AltLocalJobsTest extends AbstractJobTest {
     }
 
     @Override
-    public Credential getDefaultCredential() {
+    public Credential getDefaultCredential() throws OctopusException {
         return null;
     }
 
     @Override
-    public Credential getInvalidCredential() {
+    public Credential getPasswordCredential() throws OctopusException {
+        return null;
+    }
+    
+    @Override
+    public Credential getInvalidCredential() throws OctopusException {
         return null;
     }
 
     @Override
     public boolean supportsProperties() {
-        return false;
+        return true;
     }
 
     @Override
@@ -72,13 +78,30 @@ public class AltLocalJobsTest extends AbstractJobTest {
     }
 
     @Override
-    public Properties getUnknownProperties() {
-        return null;
-    }   
+    public Properties getUnknownProperties() throws Exception {
+        Properties tmp = new Properties();
+        tmp.put("local.queue.multi.aap", "42");
+        return tmp;
+    }
 
     @Override
-    public Properties getInvalidProperties() {
-        return null;
+    public Properties [] getInvalidProperties() throws Exception {
+
+        Properties [] tmp = new Properties[4]; 
+        
+        tmp[0] = new Properties();
+        tmp[0].put("local.queue.multi.maxConcurrentJobs", "0");
+        
+        tmp[1] = new Properties();
+        tmp[1].put("local.queue.historySize", "-2");
+        
+        tmp[2] = new Properties();
+        tmp[2].put("local.queue.pollingDelay", "1");
+       
+        tmp[3] = new Properties();
+        tmp[3].put("local.queue.pollingDelay", "100000");
+        
+        return tmp;
     }
 
     @Override
@@ -99,5 +122,10 @@ public class AltLocalJobsTest extends AbstractJobTest {
     @Override
     public FileSystem getDefaultFileSystem() throws Exception {
         return files.getLocalCWDFileSystem();
+    }
+
+    @Override
+    public String getAdaptorName() {
+        return "local";
     }
 }

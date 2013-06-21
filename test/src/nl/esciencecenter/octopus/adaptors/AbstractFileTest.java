@@ -157,10 +157,10 @@ public abstract class AbstractFileTest {
         throw new Exception(name + " produced unexpected element: " + element);        
     }
     
-    private void throwMissingElement(String name, String element) throws Exception { 
-        cleanup();
-        throw new Exception(name + " did NOT produce element: " + element);        
-    }
+//    private void throwMissingElement(String name, String element) throws Exception { 
+//        cleanup();
+//        throw new Exception(name + " did NOT produce element: " + element);        
+//    }
     
     private void throwMissingElements(String name, Collection elements) throws Exception { 
         cleanup();
@@ -2485,7 +2485,7 @@ public abstract class AbstractFileTest {
         test23_copy(file0, dir0, new CopyOption [] { CopyOption.APPEND }, null, true);
         
         // test append with source equals target 
-        test23_copy(file0, file0, new CopyOption [] { CopyOption.APPEND }, data, false);
+        test23_copy(file0, file0, new CopyOption [] { CopyOption.APPEND }, null, true);
         
         deleteTestDir(dir0);
         deleteTestFile(file5);        
