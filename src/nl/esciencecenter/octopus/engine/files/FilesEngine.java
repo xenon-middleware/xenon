@@ -154,12 +154,12 @@ public class FilesEngine implements Files {
 
     @Override
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        return getAttributes(path).isDirectory();
+        return getFilesAdaptor(path).isDirectory(path);
     }
 
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        return getAttributes(path).isSymbolicLink();
+        return getFilesAdaptor(path).isSymbolicLink(path);
     }
     
     @Override

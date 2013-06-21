@@ -16,6 +16,8 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -809,7 +811,7 @@ public abstract class AbstractFileTest {
                 
         // test with non-existing file
         AbsolutePath file0 = createNewTestFileName(testDir);        
-        test06_isDirectory(file0, false, true);
+        test06_isDirectory(file0, false, false);
         
         // test with existing file
         AbsolutePath file1 = createTestFile(testDir, null);        
@@ -2716,7 +2718,7 @@ public abstract class AbstractFileTest {
    
         // make sure the target is what was expected 
         if (expected != null && !target.equals(expected)) { 
-            throwWrong("test28_readSymbolicLink", target.getPath(), expected.getPath());
+            throwWrong("test28_readSymbolicLink", expected.getPath(), target.getPath());
         }      
     }
     
@@ -2743,24 +2745,107 @@ public abstract class AbstractFileTest {
         // test with existing dir
         AbsolutePath dir0 = createTestDir(testDir);
         test28_readSymbolicLink(dir0, null, true);
-        deleteTestFile(dir0);
         
-        // test with existing link
-        // TODO
-        
-        // test with broken link
-        // TODO
+        deleteTestDir(dir0);
+        deleteTestDir(testDir);
         
         if (supportsClose()) { 
             files.close(fs);
-            
             // TODO
         }
         
-        deleteTestDir(testDir);
         
         cleanup();
     }
+    
+    
+    @org.junit.Test
+    public void test29_readSymbolicLink() throws Exception { 
+
+        prepare();
+
+        FileSystem fs = getTestFileSystem();
+
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
+        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        
+        if (!files.exists(root)) { 
+            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+        }
+
+        // prepare the test files 
+        AbsolutePath file0 = root.resolve(new RelativePath("file0")); // exists
+        AbsolutePath file1 = root.resolve(new RelativePath("file1")); // exists
+        AbsolutePath file2 = root.resolve(new RelativePath("file2")); // does not exist
+        
+        // prepare the test links 
+        AbsolutePath link0 = root.resolve(new RelativePath("link0")); // points to file0 (contains text) 
+        AbsolutePath link1 = root.resolve(new RelativePath("link1")); // points to file1 (is empty)
+        AbsolutePath link2 = root.resolve(new RelativePath("link2")); // points to non-existing file2 
+        AbsolutePath link3 = root.resolve(new RelativePath("link3")); // points to link0 which points to file0 (contains text)
+        AbsolutePath link4 = root.resolve(new RelativePath("link4")); // points to link2 which points to non-existing file2 
+        AbsolutePath link5 = root.resolve(new RelativePath("link5")); // points to link6 (circular)  
+        AbsolutePath link6 = root.resolve(new RelativePath("link6")); // points to link5 (circular)
+        
+        // link0 should point to file0
+        test28_readSymbolicLink(link0, file0, false);
+        
+        // link1 should point to file1
+        test28_readSymbolicLink(link1, file1, false);
+        
+        // link2 should point to file2 which fails
+        test28_readSymbolicLink(link2, file2, false);
+        
+        // link3 should point to link0 which points to file0
+        test28_readSymbolicLink(link3, link0, false);
+        
+        // link4 should point to link2 which points to file2
+        test28_readSymbolicLink(link4, link2, false);
+        
+        // link5 should point to link6 which points to link5
+        test28_readSymbolicLink(link5, link6, false);
+
+        // link6 should point to link5 which points to link6
+        test28_readSymbolicLink(link6, link5, false);
+        
+        cleanup();
+    }
+
+    @org.junit.Test
+    public void test30_isSymbolicLink() throws Exception { 
+
+        prepare();
+
+        FileSystem fs = getTestFileSystem();
+
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
+        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        
+        if (!files.exists(root)) { 
+            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+        }
+
+        // prepare the test files
+        boolean v = files.isSymbolicLink(root.resolve(new RelativePath("file0")));
+        assertFalse(v);
+        
+        v = files.isSymbolicLink(root.resolve(new RelativePath("link0")));
+        assertTrue(v);
+        
+        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
+        assertFalse(v);
+        
+        cleanup();
+    }
+
+    /**
+     * @param v
+     */
+    private void assertTrue(boolean v) {
+        // TODO Auto-generated method stub
+        
+    }
+    
     
     /*        
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;

@@ -199,10 +199,24 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException {
 
         try {
-            java.nio.file.Path target = Files.readSymbolicLink(LocalUtils.javaPath(link));
+              java.nio.file.Path path = LocalUtils.javaPath(link);
+              java.nio.file.Path target = Files.readSymbolicLink(path);
+              
+//            This works, but throws an exception if the target does not exist!              
+//            java.nio.file.Path tmp = LocalUtils.javaPath(link);
+//            java.nio.file.Path target = tmp.toRealPath();
 
+              AbsolutePath parent = link.getParent();
+              
+              if (parent == null || target.isAbsolute()) {
+                  return new AbsolutePathImplementation(link.getFileSystem(), new RelativePath(target.toString()));
+              }
+              
+              return parent.resolve(new RelativePath(target.toString()));              
+//            System.err.println("FOLLOW link " + tmp.toString() + " realpath " + target.toString() + " readsymbolic " + target2.toString());
+            
             // FIXME: No clue if this is correct!!
-            return new AbsolutePathImplementation(link.getFileSystem(), new RelativePath(target.toString()));
+//            return new AbsolutePathImplementation(link.getFileSystem(), new RelativePath(target.toAbsolutePath().toString()));
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }
@@ -502,7 +516,12 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        return Files.isSymbolicLink(LocalUtils.javaPath(path));
+        try { 
+            return Files.isSymbolicLink(LocalUtils.javaPath(path));
+        } catch (Exception e) {
+            // We should return false if the check fails. 
+            return false;
+        }
     }
 
     @Override

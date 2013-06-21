@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -679,7 +680,12 @@ public class SshFiles implements Files {
 
         try {
             String target = channel.readlink(path.getPath());
-            return new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
+            
+            if (!target.startsWith(File.separator)) { 
+                return path.getParent().resolve(new RelativePath(target));
+            } else { 
+                return new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
+            }
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
@@ -751,7 +757,12 @@ public class SshFiles implements Files {
     
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        return stat(path).isLink();
+        try { 
+            return stat(path).isLink();
+        } catch (NoSuchFileException e) {
+            // We should return false if the operation fails. 
+            return false;
+        }
     }
 
     @Override
@@ -768,7 +779,12 @@ public class SshFiles implements Files {
 
     @Override
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        return stat(path).isDir();
+        try { 
+            return stat(path).isDir();
+        } catch (NoSuchFileException e) {
+            // We should return false if the operation fails. 
+            return false;
+        }
     }
     
     @Override
