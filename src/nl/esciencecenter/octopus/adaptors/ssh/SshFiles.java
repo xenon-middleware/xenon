@@ -742,7 +742,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = getChannel(path);
       
         try { 
-            return channel.stat(path.getPath());
+            return channel.lstat(path.getPath());
         } catch (SftpException e) {
             throw adaptor.sftpExceptionToOctopusException(e);
         } finally {
@@ -758,9 +758,12 @@ public class SshFiles implements Files {
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
         try { 
-            return stat(path).isLink();
+            SftpATTRS s = stat(path);
+            System.err.println("SSH isLink " + path.getPath() + " " + s.getPermissionsString() + " " + s.isLink());
+            return s.isLink();
         } catch (NoSuchFileException e) {
-            // We should return false if the operation fails. 
+            // We should return false if the operation fails.
+            System.err.println("SSH isLink " + path.getPath() + " FAILED");
             return false;
         }
     }

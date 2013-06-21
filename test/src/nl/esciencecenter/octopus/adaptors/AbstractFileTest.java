@@ -17,6 +17,7 @@
 package nl.esciencecenter.octopus.adaptors;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Closeable;
 import java.io.InputStream;
@@ -2837,15 +2838,93 @@ public abstract class AbstractFileTest {
         
         cleanup();
     }
-
-    /**
-     * @param v
-     */
-    private void assertTrue(boolean v) {
-        // TODO Auto-generated method stub
-        
-    }
     
+    @org.junit.Test
+    public void test31_newDirectoryStreamWithBrokenLinks() throws Exception { 
+    
+        prepare();
+
+        FileSystem fs = getTestFileSystem();
+
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
+        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        
+        if (!files.exists(root)) { 
+            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+        }
+               
+        // prepare the test files 
+        AbsolutePath file0 = root.resolve(new RelativePath("file0")); // exists
+        AbsolutePath file1 = root.resolve(new RelativePath("file1")); // exists
+        
+        // prepare the test links 
+        AbsolutePath link0 = root.resolve(new RelativePath("link0")); // points to file0 (contains text) 
+        AbsolutePath link1 = root.resolve(new RelativePath("link1")); // points to file1 (is empty)
+        AbsolutePath link2 = root.resolve(new RelativePath("link2")); // points to non-existing file2 
+        AbsolutePath link3 = root.resolve(new RelativePath("link3")); // points to link0 which points to file0 (contains text)
+        AbsolutePath link4 = root.resolve(new RelativePath("link4")); // points to link2 which points to non-existing file2 
+        AbsolutePath link5 = root.resolve(new RelativePath("link5")); // points to link6 (circular)  
+        AbsolutePath link6 = root.resolve(new RelativePath("link6")); // points to link5 (circular)
+        
+        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        tmp.add(file0);
+        tmp.add(file1);
+        tmp.add(link0);
+        tmp.add(link1);
+        tmp.add(link2);
+        tmp.add(link3);
+        tmp.add(link4);
+        tmp.add(link5);
+        tmp.add(link6);
+        
+        test11_newDirectoryStream(root, tmp, false);
+
+        cleanup();
+    }
+
+    @org.junit.Test
+    public void test32_newAttributesDirectoryStreamWithBrokenLinks() throws Exception { 
+    
+        prepare();
+
+        FileSystem fs = getTestFileSystem();
+
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
+        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        
+        if (!files.exists(root)) { 
+            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+        }
+               
+        // prepare the test files 
+        AbsolutePath file0 = root.resolve(new RelativePath("file0")); // exists
+        AbsolutePath file1 = root.resolve(new RelativePath("file1")); // exists
+        
+        // prepare the test links 
+        AbsolutePath link0 = root.resolve(new RelativePath("link0")); // points to file0 (contains text) 
+        AbsolutePath link1 = root.resolve(new RelativePath("link1")); // points to file1 (is empty)
+        AbsolutePath link2 = root.resolve(new RelativePath("link2")); // points to non-existing file2 
+        AbsolutePath link3 = root.resolve(new RelativePath("link3")); // points to link0 which points to file0 (contains text)
+        AbsolutePath link4 = root.resolve(new RelativePath("link4")); // points to link2 which points to non-existing file2 
+        AbsolutePath link5 = root.resolve(new RelativePath("link5")); // points to link6 (circular)  
+        AbsolutePath link6 = root.resolve(new RelativePath("link6")); // points to link5 (circular)
+        
+        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        tmp.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
+        tmp.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
+        tmp.add(new PathAttributesPairImplementation(link0, files.getAttributes(link0)));
+        tmp.add(new PathAttributesPairImplementation(link1, files.getAttributes(link1)));
+        tmp.add(new PathAttributesPairImplementation(link2, files.getAttributes(link2)));
+        tmp.add(new PathAttributesPairImplementation(link3, files.getAttributes(link3)));
+        tmp.add(new PathAttributesPairImplementation(link4, files.getAttributes(link4)));
+        tmp.add(new PathAttributesPairImplementation(link5, files.getAttributes(link5)));
+        tmp.add(new PathAttributesPairImplementation(link6, files.getAttributes(link6)));
+
+        test15_newAttributesDirectoryStream(root, tmp, false);
+
+        cleanup();
+    }
+
     
     /*        
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;

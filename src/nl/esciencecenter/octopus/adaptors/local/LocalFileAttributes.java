@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
@@ -54,9 +55,7 @@ public class LocalFileAttributes implements FileAttributes {
     public LocalFileAttributes(AbsolutePath path) throws OctopusIOException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
-
-            attributes = Files.readAttributes(javaPath, PosixFileAttributes.class);
-
+            attributes = Files.readAttributes(javaPath, PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
             executable = Files.isExecutable(javaPath);
             readable = Files.isReadable(javaPath);
             writable = Files.isWritable(javaPath);
