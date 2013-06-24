@@ -184,9 +184,8 @@ public class AbsolutePathImplementationTest {
     @Test
     public void test_relativize() throws Exception {
         AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/aap/noot"));
-        AbsolutePath path2 = new AbsolutePathImplementation(fs, new RelativePath("/mies/bla"));
-        AbsolutePath path3 = path.relativize(new RelativePath("/aap/noot/mies/bla"));
-        assertEquals(path2, path3);
+        RelativePath path2 = path.relativize(new RelativePath("/aap/noot/mies/bla"));
+        assertEquals(new RelativePath("/mies/bla"), path2);
     }
     
     @Test(expected = UnsupportedOperationException.class)

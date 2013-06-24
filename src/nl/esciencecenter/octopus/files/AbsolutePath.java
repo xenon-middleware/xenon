@@ -173,7 +173,7 @@ public interface AbsolutePath {
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    public AbsolutePath relativize(RelativePath other);
+    public RelativePath relativize(RelativePath other);
 
     /**
      * Create an {@link Iterator} that returns all possible sub paths of this path, in order of increasing length.
