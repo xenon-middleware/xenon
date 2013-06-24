@@ -39,7 +39,7 @@ public class StreamsImplementation implements Streams {
     /**
      * Create a Streams containing the job and its standard streams.  
      * 
-     * @param job the josb.
+     * @param job the job.
      * @param stdout the standard output stream.
      * @param stdin the standard input stream.
      * @param stderr the standard error stream.

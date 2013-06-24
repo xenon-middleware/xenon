@@ -19,7 +19,7 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.net.URI;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.adaptors.AbstractFileTest;
+import nl.esciencecenter.octopus.adaptors.AbstractFileTestParent;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.files.FileSystem;
 
@@ -27,7 +27,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class AltLocalFileTest extends AbstractFileTest {
+public class AltLocalFileTest extends AbstractFileTestParent {
 
     @Override
     public URI getCorrectURI() throws Exception {
@@ -122,6 +122,14 @@ public class AltLocalFileTest extends AbstractFileTest {
 
     @Override
     public boolean supportsLocalHomeFileSystem() {
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see nl.esciencecenter.octopus.adaptors.AbstractFileTestParent#supportsNewByteChannel()
+     */
+    @Override
+    public boolean supportsNewByteChannel() {
         return true;
     }
 }

@@ -30,6 +30,7 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementat
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
+import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
@@ -89,7 +90,7 @@ public class OctopusEngine implements Octopus {
         return result;
     }
 
-    public static synchronized void closeOctopus(Octopus engine) throws OctopusException {
+    public static synchronized void closeOctopus(Octopus engine) throws NoSuchOctopusException {
 
         OctopusEngine result = null;
 
@@ -101,7 +102,7 @@ public class OctopusEngine implements Octopus {
         }
         
         if (result == null) {
-            throw new OctopusException("engine", "No such OctopusEngine");
+            throw new NoSuchOctopusException("engine", "No such OctopusEngine");
         }
 
         result.end();
@@ -112,9 +113,11 @@ public class OctopusEngine implements Octopus {
     }
     
     public static synchronized void endAll() {
-        for (OctopusEngine octopusEngine : octopusEngines) {
-            octopusEngine.end();
+        for (int i=0; i < octopusEngines.size(); i++) {
+            octopusEngines.get(i).end();
         }
+
+        octopusEngines.clear();
     }
 
     private boolean ended = false;
@@ -220,7 +223,7 @@ public class OctopusEngine implements Octopus {
 
         throw new OctopusException("engine", "Could not find adaptor named " + name);
     }
-
+    
     public Adaptor[] getAdaptors() {
         return adaptors;
     }

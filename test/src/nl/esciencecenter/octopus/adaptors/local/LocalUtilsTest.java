@@ -122,7 +122,7 @@ public class LocalUtilsTest {
         assert(!v);
     }
     
-    @org.junit.Test(expected = OctopusException.class)
+    @org.junit.Test
     public void test_javaPath_home() throws Exception {
         
         Octopus octopus = OctopusFactory.newOctopus(null);
@@ -135,7 +135,7 @@ public class LocalUtilsTest {
         assert(tmp.equals(System.getProperty("user.dir")));        
     }
 
-    @org.junit.Test(expected = OctopusException.class)
+    @org.junit.Test
     public void test_javaPermissionAttribute() throws Exception {
         
         Set<PosixFilePermission> tmp = new HashSet<>();

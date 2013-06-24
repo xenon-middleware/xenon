@@ -19,7 +19,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.net.URI;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.adaptors.AbstractJobTest;
+import nl.esciencecenter.octopus.adaptors.AbstractJobTestParent;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Scheduler;
@@ -28,7 +28,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class AltSSHJobsTest extends AbstractJobTest {
+public class AltSSHJobsTest extends AbstractJobTestParent {
 
     @Override
     public String getAdaptorName() {

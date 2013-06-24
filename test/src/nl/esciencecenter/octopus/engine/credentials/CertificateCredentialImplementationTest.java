@@ -36,7 +36,6 @@ public class CertificateCredentialImplementationTest {
         assertEquals(pwc.getUsername(), "username");
         assertEquals(pwc.getKeyfile(), "keyfile");
         assertEquals(pwc.getCertfile(), "certfile");
-        assertEquals(pwc.getPassword(), "password");
         assertEquals(pwc.getProperties(), null);
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));

@@ -55,6 +55,15 @@ public class AbsolutePathImplementationTest {
     }
     
     @Test
+    public void test_getRelativePath() {
+        
+        RelativePath rp = new RelativePath("aap");
+        AbsolutePath path = new AbsolutePathImplementation(fs, rp);
+        
+        assertEquals(rp, path.getRelativePath());
+    }
+    
+    @Test
     public void testGetParent_Root_Null() {
         AbsolutePathImplementation path = new AbsolutePathImplementation(fs, new RelativePath("/"));
 

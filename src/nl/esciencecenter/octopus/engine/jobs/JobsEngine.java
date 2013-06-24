@@ -120,8 +120,8 @@ public class JobsEngine implements Jobs {
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
 
-        // First check for the two simple cases; no jobs or 1 job.
-        if (jobs.length == 0) { 
+        // First check for the three simple cases; null, no jobs or 1 job.
+        if (jobs == null || jobs.length == 0) { 
             return new JobStatus[0];
         }
         

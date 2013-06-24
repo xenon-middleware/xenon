@@ -310,9 +310,9 @@ public class RelativePathTest {
         RelativePath path = new RelativePath("mydir/myfile");
         assertTrue(path.startsWith(path));
     }
-
+    
     @Test
-    public void testResolve() {
+    public void testResolve1() {
 
         RelativePath path = new RelativePath("mydir");
         RelativePath path2 = new RelativePath("file");
@@ -351,10 +351,10 @@ public class RelativePathTest {
     public void testResolve5() {
         RelativePath path = new RelativePath("mydir");
         String s = null;
-        RelativePath path4 = path.resolve(s);
-        assertEquals(path, path4);
+        RelativePath path2 = path.resolve(s);
+        assertEquals(path, path2);
     }
-    
+        
     @Test
     public void testResolve6() {
         RelativePath path = new RelativePath("mydir");
@@ -362,6 +362,17 @@ public class RelativePathTest {
         RelativePath path4 = path.resolve(s);
         assertEquals(path, path4);
     }
+    
+    @Test
+    public void testResolve7() {
+        RelativePath path = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("mydir/test");
+        String s = "test";
+        RelativePath path4 = path.resolve(s);
+        assertEquals(path2, path4);
+    }
+
+
     
     @Test
     public void testResolveSibling() {

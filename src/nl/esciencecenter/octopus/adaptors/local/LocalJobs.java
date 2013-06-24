@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -27,7 +26,6 @@ import nl.esciencecenter.octopus.engine.util.JobQueues;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;

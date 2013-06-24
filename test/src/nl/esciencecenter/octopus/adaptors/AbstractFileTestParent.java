@@ -57,7 +57,7 @@ import org.junit.runners.MethodSorters;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractFileTest {
+public abstract class AbstractFileTestParent {
 
     protected static final String ROOT = "octopus_test_" + System.currentTimeMillis();
     //protected static String TEST_ID = UUID.randomUUID().toString();
@@ -109,6 +109,8 @@ public abstract class AbstractFileTest {
     
     public abstract boolean supportsLocalCWDFileSystem();
     public abstract boolean supportsLocalHomeFileSystem();
+    
+    public abstract boolean supportsNewByteChannel();
     
     // Various util functions ------------------------------------------------------------
 
@@ -2191,6 +2193,10 @@ public abstract class AbstractFileTest {
     
     public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, boolean mustFail) throws Exception {
 
+        if (!supportsNewByteChannel()) {
+            return;
+        }
+        
         SeekableByteChannel channel = null;
         
         try { 
@@ -2235,6 +2241,10 @@ public abstract class AbstractFileTest {
     @org.junit.Test
     public void test21_newByteChannel() throws Exception { 
 
+        if (!supportsNewByteChannel()) {
+            return;
+        }
+        
         byte [] data = "Hello World".getBytes();
         byte [] data2 = "Hello WorldHello World".getBytes();
         

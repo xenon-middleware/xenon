@@ -62,7 +62,7 @@ import org.junit.runners.MethodSorters;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractJobTest {
+public abstract class AbstractJobTestParent {
     
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
     
@@ -512,6 +512,35 @@ public abstract class AbstractJobTest {
         }
     }
     
+    @Test
+    public void test25a_getJobStatuses() throws Exception {
+        
+        JobStatus[] tmp = jobs.getJobStatuses(new Job[0]);
+        
+        assertTrue(tmp != null);
+        assertTrue(tmp.length == 0);
+    }
+
+    @Test
+    public void test25b_getJobStatuses() throws Exception {
+        
+        JobStatus[] tmp = jobs.getJobStatuses((Job []) null);
+        
+        assertTrue(tmp != null);
+        assertTrue(tmp.length == 0);
+    }
+
+    
+    @Test
+    public void test25c_getJobStatuses() throws Exception {
+        
+        JobStatus[] tmp = jobs.getJobStatuses(new Job[1]);
+        
+        assertTrue(tmp != null);
+        assertTrue(tmp.length == 1);
+        assertTrue(tmp[0] == null);
+    }
+    
     private String readFully(InputStream in) throws IOException { 
         
         byte [] buffer = new byte[1024];
@@ -825,17 +854,29 @@ public abstract class AbstractJobTest {
     }
     
     @org.junit.Test
-    public void test33_testMultiBatchJobSubmitWithPolling() throws Exception {
+    public void test33a_testMultiBatchJobSubmitWithPolling() throws Exception {
         
         Scheduler scheduler = getDefaultScheduler();
         
         for (String queue : scheduler.getQueueNames()) { 
-            submitToQueueWithPolling("test33_" + queue, scheduler, queue, 10);    
+            submitToQueueWithPolling("test33a_" + queue, scheduler, queue, 1);    
         }
 
         jobs.close(scheduler);
     }
 
+    @org.junit.Test
+    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
+        
+        Scheduler scheduler = getDefaultScheduler();
+        
+        for (String queue : scheduler.getQueueNames()) { 
+            submitToQueueWithPolling("test33b_" + queue, scheduler, queue, 10);    
+        }
+
+        jobs.close(scheduler);
+    }
+    
     @org.junit.Test
     public void test34_batchJobSubmitWithKill() throws Exception {
         
@@ -1079,11 +1120,6 @@ public abstract class AbstractJobTest {
         
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
-
-        files.delete(stdin);
-        files.delete(stdout);
-        files.delete(stderr);
-        files.delete(root);
         
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
@@ -1092,8 +1128,12 @@ public abstract class AbstractJobTest {
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
         assertTrue(tmperr.length() == 0);
-    }
-    
+        
+        files.delete(stdin);
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
+    }    
     
     @org.junit.Test
     public void test37_batchJobSubmitWithoutWorkDir() throws Exception {
@@ -1192,7 +1232,58 @@ public abstract class AbstractJobTest {
         files.delete(root);        
     }
     
-    
+    @org.junit.Test
+    public void test39_multipleBatchJobSubmitWithExceptions() throws Exception {
+
+        // NOTE: This test assumes that an exception is when the status of a job is requested twice after the job is done!
+        //       This may not be true for all schedulers.
+        
+        Scheduler scheduler = getDefaultScheduler();
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        description.setWorkingDirectory(null);
+        
+        Job[] j = new Job[2];
+        
+        j[0] = jobs.submitJob(scheduler, description);
+        
+        description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("2");
+        description.setInteractive(false);
+        description.setWorkingDirectory(null);
+        
+        j[1] = jobs.submitJob(scheduler, description);
+        
+        long now = System.currentTimeMillis();
+        long deadline = now + 10000;
+
+        JobStatus [] s = null;
+
+        while (now < deadline) { 
+        
+            s = jobs.getJobStatuses(j);
+
+            if (s[0].hasException() && s[1].hasException()) { 
+                break;
+            }
+            
+            try { 
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // ignored
+            }
+            
+            now = System.currentTimeMillis();           
+        } 
+        
+        if (s == null || !(s[0].hasException() && s[1].hasException())) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+    }
     
     
     /**

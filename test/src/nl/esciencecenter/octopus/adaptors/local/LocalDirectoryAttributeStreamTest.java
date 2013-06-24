@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
-import java.nio.file.DirectoryIteratorException;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.Octopus;
@@ -26,6 +25,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;

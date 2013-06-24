@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.adaptors.AbstractJobTest;
+import nl.esciencecenter.octopus.adaptors.AbstractJobTestParent;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -30,7 +30,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class AltLocalJobsTest extends AbstractJobTest {
+public class AltLocalJobsTest extends AbstractJobTestParent {
 
     @Override
     public URI getValidURI() throws URISyntaxException {
@@ -69,7 +69,7 @@ public class AltLocalJobsTest extends AbstractJobTest {
 
     @Override
     public boolean supportsProperties() {
-        return true;
+        return false;
     }
 
     @Override

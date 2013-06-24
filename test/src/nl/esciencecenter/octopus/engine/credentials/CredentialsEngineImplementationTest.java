@@ -67,16 +67,13 @@ public class CredentialsEngineImplementationTest {
         
         CertificateCredentialImplementation cci = (CertificateCredentialImplementation) c;
         
-        assertEquals(cci.getAdaptorName(), "test");
-        assertEquals(cci.getUniqueID(), "id1");
-        assertEquals(cci.getUsername(), "username");
-        assertEquals(cci.getKeyfile(), "keyfile");
-        assertEquals(cci.getCertfile(), "certfile");
-        assertEquals(cci.getPassword(), "password");
-        assertEquals(cci.getProperties(), null);
+        assertEquals("ssh", cci.getAdaptorName());
+        assertEquals("username", cci.getUsername());
+        assertEquals( "keyfile", cci.getKeyfile());
+        assertEquals("certfile", cci.getCertfile());
+        assertEquals(new Properties(), cci.getProperties());
 
         assertTrue(Arrays.equals(cci.getPassword(), "password".toCharArray()));
-        assertTrue(cci.toString().equals("CertificateCredentialImplementation [adaptorName=test, username=username, keyfile=keyfile, certfile=certfile]"));
     }
     
     @org.junit.Test
@@ -88,15 +85,12 @@ public class CredentialsEngineImplementationTest {
         assertTrue(c instanceof PasswordCredentialImplementation);
         
         PasswordCredentialImplementation pci = (PasswordCredentialImplementation) c;
-        
-        assertEquals(pci.getAdaptorName(), "test");
-        assertEquals(pci.getUniqueID(), "id1");
-        assertEquals(pci.getUsername(), "username");
-        assertEquals(pci.getPassword(), "password");
-        assertEquals(pci.getProperties(), null);
+
+        assertEquals("ssh", pci.getAdaptorName());
+        assertEquals("username", pci.getUsername());
+        assertEquals(new Properties(), pci.getProperties());
 
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
-        assertTrue(pci.toString().equals("PasswordCredentialImplementation [adaptorName=test, username=username]"));        
     }
     
     @org.junit.Test
@@ -108,16 +102,14 @@ public class CredentialsEngineImplementationTest {
         assertTrue(c instanceof ProxyCredentialImplementation);
         
         ProxyCredentialImplementation pci = (ProxyCredentialImplementation) c;
-        
-        assertEquals(pci.getAdaptorName(), "test");
-        assertEquals(pci.getUniqueID(), "id1");
-        assertEquals(pci.getUsername(), "username");
+
+        assertEquals("ssh", pci.getAdaptorName());
+        assertEquals("username", pci.getUsername());
         assertEquals(pci.getHost(), "host");
         assertEquals(pci.getPort(), 42);
-        assertEquals(pci.getProperties(), null);
+        assertEquals(new Properties(), pci.getProperties());
         
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
-        assertTrue(pci.toString().equals("ProxyCredentialImplementation [adaptorName=test, username=username, host=host, port=42]"));        
     }
     
 }

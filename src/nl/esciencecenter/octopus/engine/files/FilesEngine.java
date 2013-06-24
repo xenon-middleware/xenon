@@ -72,16 +72,14 @@ public class FilesEngine implements Files {
         return copyEngine;
     }
     
-    private Files getFilesAdaptor(FileSystem filesystem) throws OctopusIOException {
-
+    private Files getFilesAdaptor(FileSystem filesystem) {
         try {
             Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
         } catch (OctopusException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException("FilesEngine",
-                    "Could not find adaptor named " + filesystem.getAdaptorName(), e);
+            throw new OctopusRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
 
