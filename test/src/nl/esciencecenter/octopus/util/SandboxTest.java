@@ -1,7 +1,6 @@
 package nl.esciencecenter.octopus.util;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
@@ -35,9 +34,9 @@ public class SandboxTest {
         Sandbox sandbox = new Sandbox(octopus, path, "sandbox-1");
 
         AbsolutePath expectedPath = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1"));
-        assertThat(sandbox.getPath(), is(expectedPath));
-        assertThat(sandbox.getUploadFiles().size(), is(0));
-        assertThat(sandbox.getDownloadFiles().size(), is(0));
+        assertEquals(expectedPath, sandbox.getPath());
+        assertEquals(0, sandbox.getUploadFiles().size());
+        assertEquals(0, sandbox.getDownloadFiles().size());
     }
 
     @Test
@@ -64,9 +63,9 @@ public class SandboxTest {
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
         AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input"));
-        assertThat(uploadfiles.size(), is(1));
-        assertThat(uploadfiles.get(0).source, is(src));
-        assertThat(uploadfiles.get(0).destination, is(dst));
+        assertEquals(1, uploadfiles.size());
+        assertEquals(src, uploadfiles.get(0).source);
+        assertEquals(dst, uploadfiles.get(0).destination);
     }
 
     @Test
@@ -81,9 +80,9 @@ public class SandboxTest {
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
         AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandboxes/sandbox-1/inputfile"));
-        assertThat(uploadfiles.size(), is(1));
-        assertThat(uploadfiles.get(0).source, is(src));
-        assertThat(uploadfiles.get(0).destination, is(dst));
+        assertEquals(1, uploadfiles.size());
+        assertEquals(src, uploadfiles.get(0).source);
+        assertEquals(dst, uploadfiles.get(0).destination);
     }
 
     @Test
@@ -97,7 +96,7 @@ public class SandboxTest {
             sandbox.addUploadFile(null);
             fail("Expected an NullPointerException");
         } catch (NullPointerException e) {
-            assertThat(e.getMessage(), is("the source path cannot be null when adding a preStaged file"));
+            assertEquals("the source path cannot be null when adding a preStaged file", e.getMessage());
         }
     }
 
@@ -167,9 +166,9 @@ public class SandboxTest {
 
         List<Pair> uploadfiles = sandbox.getDownloadFiles();
         AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/output"));
-        assertThat(uploadfiles.size(), is(1));
-        assertThat(uploadfiles.get(0).source, is(src));
-        assertThat(uploadfiles.get(0).destination, is(dst));
+        assertEquals(1, uploadfiles.size());
+        assertEquals(src, uploadfiles.get(0).source);
+        assertEquals(dst, uploadfiles.get(0).destination);
     }
 
     @Test
@@ -184,9 +183,9 @@ public class SandboxTest {
 
         List<Pair> uploadfiles = sandbox.getDownloadFiles();
         AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandboxes/sandbox-1/outputfile"));
-        assertThat(uploadfiles.size(), is(1));
-        assertThat(uploadfiles.get(0).source, is(src));
-        assertThat(uploadfiles.get(0).destination, is(dst));
+        assertEquals(1, uploadfiles.size());
+        assertEquals(src, uploadfiles.get(0).source);
+        assertEquals(dst, uploadfiles.get(0).destination);
     }
 
     @Test
@@ -201,7 +200,7 @@ public class SandboxTest {
             sandbox.addDownloadFile("output", null);
             fail("Expected an NullPointerException");
         } catch (NullPointerException e) {
-            assertThat(e.getMessage(), is("the destination path cannot be null when adding a postStaged file"));
+            assertEquals("the destination path cannot be null when adding a postStaged file", e.getMessage());
         }
     }
 
@@ -279,7 +278,7 @@ public class SandboxTest {
         Sandbox sandbox1 = new Sandbox(octopus, path, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(octopus2, path, "sandbox-1");
 
-        assertThat(sandbox1, is(not(sandbox2)));
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -290,8 +289,8 @@ public class SandboxTest {
 
         Sandbox sandbox1 = new Sandbox(null, path, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(octopus, path, "sandbox-1");
-
-        assertThat(sandbox1, is(not(sandbox2)));
+        
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -303,7 +302,7 @@ public class SandboxTest {
         Sandbox sandbox1 = new Sandbox(octopus, path, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(null, path, "sandbox-1");
 
-        assertThat(sandbox1, is(not(sandbox2)));
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -314,7 +313,7 @@ public class SandboxTest {
         Sandbox sandbox1 = new Sandbox(null, path, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(null, path, "sandbox-1");
 
-        assertThat(sandbox1, is(sandbox2));
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -326,7 +325,7 @@ public class SandboxTest {
         Sandbox sandbox1 = new Sandbox(octopus, path, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(octopus, path, "sandbox-2");
 
-        assertThat(sandbox1, is(not(sandbox2)));
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -340,7 +339,7 @@ public class SandboxTest {
         sandbox1.addUploadFile(src);
         Sandbox sandbox2 = new Sandbox(octopus, path, "sandbox-1");
 
-        assertThat(sandbox1, is(not(sandbox2)));
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -354,7 +353,7 @@ public class SandboxTest {
         sandbox1.addDownloadFile("outputfile", src);
         Sandbox sandbox2 = new Sandbox(octopus, path, "sandbox-1");
 
-        assertThat(sandbox1, is(not(sandbox2)));
+        assertNotEquals(sandbox1,sandbox2);
     }
 
     @Test
@@ -370,7 +369,7 @@ public class SandboxTest {
         AbsolutePath src2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
         sandbox2.addUploadFile(src2);
 
-        assertThat(sandbox1, is(sandbox2));
+        assertEquals(sandbox1,sandbox2);
     }
 
 }
