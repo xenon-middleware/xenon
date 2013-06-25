@@ -81,6 +81,7 @@ public class RemoteCommandRunner {
             }
             
             //wait for a bit
+            //FIXME: use octopus API to wait
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
