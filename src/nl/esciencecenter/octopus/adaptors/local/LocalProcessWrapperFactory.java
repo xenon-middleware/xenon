@@ -34,10 +34,13 @@ public class LocalProcessWrapperFactory implements ProcessWrapperFactory {
 
     @Override
     public ProcessWrapper createProcessWrapper(Adaptor adaptor, JobImplementation job) throws IOException {
+        
+        LocalInteractiveProcess tmp = new LocalInteractiveProcess(job);
+        
         if (job.getJobDescription().isInteractive()) {
-            return new LocalInteractiveProcess(job);
-        } else { 
-            return new LocalBatchProcess(job);
+            return tmp;
         }
+        
+        return new LocalBatchProcess(tmp, job.getJobDescription());
     }
 }

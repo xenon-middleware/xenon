@@ -353,7 +353,4 @@ public class FileUtils {
         octopus.files().delete(path);
     }
 
-    public static void recursiveWipe(Octopus octopus, AbsolutePath path) {
-        // TODO Auto-generated method stub
-    }
 }

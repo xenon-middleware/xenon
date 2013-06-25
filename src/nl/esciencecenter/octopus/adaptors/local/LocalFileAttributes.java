@@ -152,7 +152,7 @@ public class LocalFileAttributes implements FileAttributes {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        result = prime * result + attributes.hashCode();
         result = prime * result + (executable ? 1231 : 1237);
         result = prime * result + (hidden ? 1231 : 1237);
         result = prime * result + (readable ? 1231 : 1237);
@@ -180,15 +180,15 @@ public class LocalFileAttributes implements FileAttributes {
             return false;
         }
         
-        if (hidden != other.hidden) { 
-            return false;
-        }
-        
         if (readable != other.readable) { 
             return false;
         }
         
         if (writable != other.writable) { 
+            return false;
+        }
+
+        if (hidden != other.hidden) { 
             return false;
         }
         

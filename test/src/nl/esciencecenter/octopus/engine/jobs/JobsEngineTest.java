@@ -15,22 +15,20 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 import java.util.UUID;
 
-import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.junit.Test;
 
@@ -44,6 +42,64 @@ public class JobsEngineTest {
     
         assertTrue(je.toString().equals("JobsEngine [octopusEngine=" + oe + "]"));
     }
+    
+    @Test
+    public void testGetJobStatusesWithException() throws Exception {
+    
+        OctopusEngine oe = new OctopusEngine(new Properties());
+        JobsEngine je = new JobsEngine(oe); 
+        
+        JobDescription desc = new JobDescription();
+
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
+                null, true, true, true);     
+        
+        UUID uuid = UUID.randomUUID();
+        
+        Job job = new JobImplementation(desc, s, uuid, "id1", true, true);
+       
+        JobStatus [] status = je.getJobStatuses(job);
+        
+        assertNotNull(status);
+        assertTrue(status.length == 1);
+        assertNotNull(status[0]);
+        assertTrue(status[0].hasException());
+    }
+
+    @Test
+    public void testGetJobStatusesWithException2() throws Exception {
+    
+        OctopusEngine oe = new OctopusEngine(new Properties());
+        JobsEngine je = new JobsEngine(oe); 
+        
+        JobDescription desc = new JobDescription();
+
+        Scheduler s = new SchedulerImplementation("test1", "id1", new URI("test:///"), new String [] { "testq" }, null, 
+                null, true, true, true);     
+        
+        UUID uuid = UUID.randomUUID();
+        
+        Job job1 = new JobImplementation(desc, s, uuid, "id1", true, true);
+       
+        s = new SchedulerImplementation("test1", "id1", new URI("test:///"), new String [] { "testq" }, null, 
+                null, true, true, true);     
+         
+        uuid = UUID.randomUUID();
+        
+        Job job2 = new JobImplementation(desc, s, uuid, "id2", true, true);
+        
+        JobStatus [] status = je.getJobStatuses(job1, null, job2);
+        
+        assertNotNull(status);
+        assertTrue(status.length == 3);
+        assertNotNull(status[0]);
+        assertNull(status[1]);
+        assertNotNull(status[2]);
+        assertTrue(status[0].hasException());
+        assertTrue(status[2].hasException());
+    }
+
+    
     
 //    
 //    

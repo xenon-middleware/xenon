@@ -25,6 +25,30 @@ import org.junit.Test;
 
 public class SandboxTest {
 
+    private Sandbox sampleSandbox() throws URISyntaxException, OctopusException, OctopusIOException {
+        
+        Octopus o = mock(Octopus.class);
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
+        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        Sandbox sandbox = new Sandbox(o, path, "sandbox-1");
+        sandbox.addUploadFile(new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile")));
+        sandbox.addDownloadFile("outputfile", new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile")));
+        return sandbox;
+    }
+   
+    
+    @Test(expected = OctopusException.class)
+    public void testSandbox_WithNullOctopus() throws URISyntaxException, OctopusIOException, OctopusException {
+        // throws exception
+        new Sandbox(null, mock(AbsolutePath.class), "sandbox-1");
+    }
+
+    @Test(expected = OctopusException.class)
+    public void testSandbox_WithNullPath() throws URISyntaxException, OctopusIOException, OctopusException {
+        // throws exception
+        new Sandbox(mock(Octopus.class), null, "sandbox-1");
+    }
+    
     @Test
     public void testSandbox_WithName() throws URISyntaxException, OctopusIOException, OctopusException {
         Octopus octopus = mock(Octopus.class);
@@ -68,6 +92,31 @@ public class SandboxTest {
         assertEquals(dst, uploadfiles.get(0).destination);
     }
 
+    @Test
+    public void testSetUploadFiles() throws URISyntaxException, OctopusIOException, OctopusException {
+        Octopus octopus = mock(Octopus.class);
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
+        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        Sandbox sandbox = new Sandbox(octopus, path, "sandbox-1");
+
+        AbsolutePath src1 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/input1"));
+        AbsolutePath src2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/input2"));
+        
+        sandbox.setUploadFiles(src1, src2);
+
+        List<Pair> uploadfiles = sandbox.getUploadFiles();
+        
+        AbsolutePath dst1 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input1"));
+        AbsolutePath dst2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input2"));
+         
+        assertEquals(2, uploadfiles.size());
+        assertEquals(src1, uploadfiles.get(0).source);
+        assertEquals(dst1, uploadfiles.get(0).destination);
+    
+        assertEquals(src2, uploadfiles.get(1).source);
+        assertEquals(dst2, uploadfiles.get(1).destination);
+    }
+    
     @Test
     public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, OctopusIOException, OctopusException {
         Octopus octopus = mock(Octopus.class);
@@ -221,32 +270,6 @@ public class SandboxTest {
         verify(files).copy(src, dst);
     }
 
-    private Sandbox sampleSandbox() throws URISyntaxException, OctopusException, OctopusIOException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
-        // Use null for octopus so hashcode is the same every time
-        Sandbox sandbox = new Sandbox(null, path, "sandbox-1");
-        sandbox.addUploadFile(new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile")));
-        sandbox.addDownloadFile("outputfile", new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile")));
-        return sandbox;
-    }
-
-    @Test
-    public void testHashCode() throws URISyntaxException, OctopusIOException, OctopusException {
-        Sandbox sandbox = sampleSandbox();
-
-        assertEquals(47434737, sandbox.hashCode());
-    }
-
-    @Test
-    public void testToString() throws URISyntaxException, OctopusIOException, OctopusException {
-        Sandbox sandbox = sampleSandbox();
-
-        String expected =
-                "Sandbox [octopus=null, path=FileSystemImplementation [adaptorName=local, uri=file:///, entryPath=RelativePath [element=[], seperator=/], properties=null]RelativePath [element=[tmp, sandbox-1], seperator=/], uploadFiles=[Pair [source=FileSystemImplementation [adaptorName=local, uri=file:///, entryPath=RelativePath [element=[], seperator=/], properties=null]RelativePath [element=[tmp, inputfile], seperator=/], destination=FileSystemImplementation [adaptorName=local, uri=file:///, entryPath=RelativePath [element=[], seperator=/], properties=null]RelativePath [element=[tmp, sandbox-1, inputfile], seperator=/]]], downloadFiles=[Pair [source=FileSystemImplementation [adaptorName=local, uri=file:///, entryPath=RelativePath [element=[], seperator=/], properties=null]RelativePath [element=[tmp, sandbox-1, outputfile], seperator=/], destination=FileSystemImplementation [adaptorName=local, uri=file:///, entryPath=RelativePath [element=[], seperator=/], properties=null]RelativePath [element=[tmp, outputfile], seperator=/]]]]";
-        assertEquals(expected, sandbox.toString());
-    }
-
     @Test
     public void testEquals_sameObject_equal() throws URISyntaxException, OctopusIOException, OctopusException {
         Sandbox sandbox = sampleSandbox();
@@ -282,52 +305,19 @@ public class SandboxTest {
     }
 
     @Test
-    public void testEquals_thisOctopusIsNull_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
-        Octopus octopus = mock(Octopus.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
-
-        Sandbox sandbox1 = new Sandbox(null, path, "sandbox-1");
-        Sandbox sandbox2 = new Sandbox(octopus, path, "sandbox-1");
-        
-        assertNotEquals(sandbox1,sandbox2);
-    }
-
-    @Test
-    public void testEquals_otherOctopusIsNull_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
-        Octopus octopus = mock(Octopus.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
-
-        Sandbox sandbox1 = new Sandbox(octopus, path, "sandbox-1");
-        Sandbox sandbox2 = new Sandbox(null, path, "sandbox-1");
-
-        assertNotEquals(sandbox1,sandbox2);
-    }
-
-    @Test
-    public void testEquals_bothOctopusNull_Equal() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
-
-        Sandbox sandbox1 = new Sandbox(null, path, "sandbox-1");
-        Sandbox sandbox2 = new Sandbox(null, path, "sandbox-1");
-
-        assertNotEquals(sandbox1,sandbox2);
-    }
-
-    @Test
     public void testEquals_otherPath_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
         Octopus octopus = mock(Octopus.class);
         FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
 
-        Sandbox sandbox1 = new Sandbox(octopus, path, "sandbox-1");
-        Sandbox sandbox2 = new Sandbox(octopus, path, "sandbox-2");
+        AbsolutePath path1 = new AbsolutePathImplementation(fs, new RelativePath("/tmp1"));
+        AbsolutePath path2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp2"));
+        
+        Sandbox sandbox1 = new Sandbox(octopus, path1, "sandbox-1");
+        Sandbox sandbox2 = new Sandbox(octopus, path2, "sandbox-2");
 
         assertNotEquals(sandbox1,sandbox2);
     }
-
+   
     @Test
     public void testEquals_otherUpload_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
         Octopus octopus = mock(Octopus.class);
@@ -371,5 +361,4 @@ public class SandboxTest {
 
         assertEquals(sandbox1,sandbox2);
     }
-
 }

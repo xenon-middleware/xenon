@@ -69,12 +69,6 @@ class LocalInteractiveProcess implements ProcessWrapper {
     public Streams getStreams() { 
         return streams;
     }
-    
-//    public int waitFor() throws InterruptedException {
-//        exitCode = process.waitFor();
-//        done = true;
-//        return exitCode;
-//    }
 
     public boolean isDone() {
         
