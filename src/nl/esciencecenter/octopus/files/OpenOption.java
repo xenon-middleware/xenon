@@ -25,19 +25,29 @@ package nl.esciencecenter.octopus.files;
 public enum OpenOption {
 
     /**
+     * Create a new file, failing if the file already exists.
+     */
+    CREATE,
+
+    /**
+     * Open an existing file, failing if the file does not exist.
+     */
+    OPEN,
+    
+    /**
+     * Open an existing file or create a new file if it does not exist.
+     */
+    OPEN_OR_CREATE,
+    
+    /**
      * If the file is opened for WRITE access then bytes will be written to the end of the file rather than the beginning.
      */
     APPEND,
 
     /**
-     * Create a new file if it does not exist.
+     * If the file is opened for WRITE access, then its length is truncated to 0. All existing data is overwritten.
      */
-    CREATE,
-
-    /**
-     * Create a new file, failing if the file already exists.
-     */
-    CREATE_NEW,
+    TRUNCATE,
 
     /**
      * Open for read access.
@@ -45,13 +55,16 @@ public enum OpenOption {
     READ,
 
     /**
-     * If the file already exists and it is opened for WRITE access, then its length is truncated to 0.
-     */
-    TRUNCATE_EXISTING,
-
-    /**
      * Open for write access.
      */
-    WRITE,
-
+    WRITE;
+    
+    public static boolean contains(OpenOption toFind, OpenOption... options) {
+        for (OpenOption curr : options) {
+            if (curr == toFind) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

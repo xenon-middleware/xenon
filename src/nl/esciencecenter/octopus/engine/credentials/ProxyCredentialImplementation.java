@@ -48,7 +48,7 @@ public class ProxyCredentialImplementation extends CredentialImplementation {
      *            the password to use to connect to the myproxy server
      */
     public ProxyCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String host, int port,
-            String username, String password) {
+            String username, char [] password) {
         super(adaptorName, uniqueID, properties, username, password);
         this.host = host;
         this.port = port;

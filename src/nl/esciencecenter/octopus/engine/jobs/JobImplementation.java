@@ -77,25 +77,16 @@ public class JobImplementation implements Job {
         return identifier;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.jobs.Job#isInteractive()
-     */
     @Override
     public boolean isInteractive() {
         return interactive;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.jobs.Job#isOnline()
-     */
     @Override
     public boolean isOnline() {
         return online;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.jobs.Job#getUUID()
-     */
     @Override
     public UUID getUUID() {
         return uuid;
@@ -103,7 +94,8 @@ public class JobImplementation implements Job {
 
     @Override
     public String toString() {
-        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description + "]";
+        return "JobImplementation [identifier=" + identifier + ", uuid=" + uuid +  ", scheduler=" + scheduler + 
+                ", description=" + description + ", isInteractive=" + isInteractive() + ", isOnline=" + online + "]";
     }
 
     @Override

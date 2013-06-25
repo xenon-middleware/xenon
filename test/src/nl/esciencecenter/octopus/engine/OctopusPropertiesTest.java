@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.*;
 
 public class OctopusPropertiesTest {
@@ -39,7 +39,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.clear();
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -178,6 +178,20 @@ public class OctopusPropertiesTest {
     }
 
     @Test
+    public void testGetBooleanProperty_unset() {
+        OctopusProperties octprop = new OctopusProperties();
+        boolean v = octprop.getBooleanProperty("key");
+        assertFalse(v);
+    }
+
+    @Test
+    public void testGetBooleanProperty_unset2() {
+        OctopusProperties octprop = new OctopusProperties();
+        boolean v = octprop.getBooleanProperty("key", true);
+        assertTrue(v);
+    }
+    
+    @Test
     public void testGetIntProperty_int_int() {
         Properties props = new Properties();
         props.setProperty("key", "42");
@@ -185,8 +199,7 @@ public class OctopusPropertiesTest {
 
         int result = octprop.getIntProperty("key");
 
-        int expected = 42;
-        assertThat(result, is(expected));
+        assertTrue(result == 42);
     }
 
     @Test
@@ -198,22 +211,35 @@ public class OctopusPropertiesTest {
             octprop.getIntProperty("key");
             fail("No NumberFormatException thrown");
         } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("property undefined: key"));
+            assertTrue(e.getMessage().equals("property undefined: key"));
         }
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testGetIntProperty_null_IntParseException() {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
+        octprop.getIntProperty("key");        
+    }
 
-        try {
-            octprop.getIntProperty("key");
-            fail("No NumberFormatException thrown");
-        } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("Integer expected for property key, not \"foo\""));
-        }
+    @Test(expected = NumberFormatException.class)
+    public void testGetIntProperty_null_IntParseException2() {
+        Properties props = new Properties();
+        props.setProperty("key", "foo");
+        OctopusProperties octprop = new OctopusProperties(props);
+        octprop.getIntProperty("key", 42);        
+    }
+    
+    @Test
+    public void testGetIntProperty_withDefault2() {
+        Properties props = new Properties();
+        props.setProperty("key", "33");
+        OctopusProperties octprop = new OctopusProperties(props);
+
+        int result = octprop.getIntProperty("key", 42);
+
+        assertTrue(result == 33);
     }
 
     @Test
@@ -222,10 +248,11 @@ public class OctopusPropertiesTest {
 
         int result = octprop.getIntProperty("key", 42);
 
-        int expected = 42;
-        assertThat(result, is(expected));
+        assertTrue(result == 42);
     }
 
+    
+    
     @Test
     public void testGetIntProperty_SetAndDefault_returnsSet() {
         Properties props = new Properties();
@@ -234,8 +261,7 @@ public class OctopusPropertiesTest {
 
         int result = octprop.getIntProperty("key", 42);
 
-        int expected = 13;
-        assertThat(result, is(expected));
+        assertTrue(result == 13);
     }
 
     @Test
@@ -246,8 +272,7 @@ public class OctopusPropertiesTest {
 
         long result = octprop.getLongProperty("key");
 
-        long expected = 42;
-        assertThat(result, is(expected));
+        assertTrue(result == 42);
     }
 
     @Test
@@ -259,32 +284,33 @@ public class OctopusPropertiesTest {
             octprop.getLongProperty("key");
             fail("No NumberFormatException thrown");
         } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("property undefined: key"));
+            assertTrue(e.getMessage().equals("property undefined: key"));
         }
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testGetLongProperty_null_LongParseException() {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
-
-        try {
-            octprop.getLongProperty("key");
-            fail("No NumberFormatException thrown");
-        } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("Long expected for property key, not \"foo\""));
-        }
+        octprop.getLongProperty("key");
     }
 
+    @Test(expected = NumberFormatException.class)
+    public void testGetLongProperty_null_LongParseException2() {
+        Properties props = new Properties();
+        props.setProperty("key", "foo");
+        OctopusProperties octprop = new OctopusProperties(props);
+        octprop.getLongProperty("key", 42L);
+    }
+    
     @Test
     public void testGetLongProperty_withDefault() {
         OctopusProperties octprop = new OctopusProperties();
 
         long result = octprop.getLongProperty("key", 42);
 
-        long expected = 42;
-        assertThat(result, is(expected));
+        assertTrue(result == 42);
     }
 
     @Test
@@ -295,8 +321,7 @@ public class OctopusPropertiesTest {
 
         long result = octprop.getLongProperty("key", 42);
 
-        long expected = 13;
-        assertThat(result, is(expected));
+        assertTrue(result == 13);
     }
 
     @Test
@@ -308,7 +333,7 @@ public class OctopusPropertiesTest {
         short result = octprop.getShortProperty("key");
 
         short expected = 42;
-        assertThat(result, is(expected));
+        assertTrue(result== expected);
     }
 
     @Test
@@ -320,24 +345,26 @@ public class OctopusPropertiesTest {
             octprop.getShortProperty("key");
             fail("No NumberFormatException thrown");
         } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("property undefined: key"));
+            assertTrue(e.getMessage().equals("property undefined: key"));
         }
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testGetShortProperty_null_ShortParseException() {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
-
-        try {
-            octprop.getShortProperty("key");
-            fail("No NumberFormatException thrown");
-        } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("Short expected for property key, not \"foo\""));
-        }
+        octprop.getShortProperty("key");
     }
 
+    @Test(expected = NumberFormatException.class)
+    public void testGetShortProperty_null_ShortParseException2() {
+        Properties props = new Properties();
+        props.setProperty("key", "foo");
+        OctopusProperties octprop = new OctopusProperties(props);
+        octprop.getShortProperty("key", (short) 42);
+    }
+    
     @Test
     public void testGetShortProperty_withDefault() {
         OctopusProperties octprop = new OctopusProperties();
@@ -345,8 +372,7 @@ public class OctopusPropertiesTest {
 
         short result = octprop.getShortProperty("key", default_value);
 
-        short expected = 42;
-        assertThat(result, is(expected));
+        assertTrue(result == 42);
     }
 
     @Test
@@ -358,8 +384,7 @@ public class OctopusPropertiesTest {
         short default_value = 42;
         short result = octprop.getShortProperty("key", default_value);
 
-        short expected = 13;
-        assertThat(result, is(expected));
+        assertTrue(result == 13);
     }
 
     @Test
@@ -370,8 +395,7 @@ public class OctopusPropertiesTest {
 
         double result = octprop.getDoubleProperty("key");
 
-        double expected = 42.123;
-        assertThat(result, is(expected));
+        assertTrue(result == 42.123);
     }
 
     @Test
@@ -383,22 +407,16 @@ public class OctopusPropertiesTest {
             octprop.getDoubleProperty("key");
             fail("No NumberFormatException thrown");
         } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("property undefined: key"));
+            assertTrue(e.getMessage().equals("property undefined: key"));
         }
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testGetDoubleProperty_null_DoubleParseException() {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
-
-        try {
-            octprop.getDoubleProperty("key");
-            fail("No NumberFormatException thrown");
-        } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("Double expected for property key, not \"foo\""));
-        }
+        octprop.getDoubleProperty("key");
     }
 
     @Test
@@ -408,10 +426,17 @@ public class OctopusPropertiesTest {
 
         double result = octprop.getDoubleProperty("key", default_value);
 
-        double expected = 42.123;
-        assertThat(result, is(expected));
+        assertTrue(result == 42.123);
     }
 
+    @Test(expected = NumberFormatException.class)
+    public void testGetDoubleProperty_withDefault_DoubleParseException() {
+        Properties props = new Properties();
+        props.setProperty("key", "foo");
+        OctopusProperties octprop = new OctopusProperties(props);
+        octprop.getDoubleProperty("key", 42.0);
+    }
+    
     @Test
     public void testGetDoubleProperty_SetAndDefault_returnsSet() {
         Properties props = new Properties();
@@ -421,8 +446,7 @@ public class OctopusPropertiesTest {
         double default_value = 42.123;
         double result = octprop.getDoubleProperty("key", default_value);
 
-        double expected = 13.456;
-        assertThat(result, is(expected));
+        assertTrue(result == 13.456);
     }
 
     @Test
@@ -433,35 +457,21 @@ public class OctopusPropertiesTest {
 
         float result = octprop.getFloatProperty("key");
 
-        float expected = 42.123f;
-        assertThat(result, is(expected));
+        assertTrue(result == 42.123f);
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testGetFloatProperty_null_UndefinedException() {
         Properties props = new Properties();
-        OctopusProperties octprop = new OctopusProperties(props);
-
-        try {
-            octprop.getFloatProperty("key");
-            fail("No NumberFormatException thrown");
-        } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("property undefined: key"));
-        }
+        new OctopusProperties(props).getFloatProperty("key");        
     }
 
-    @Test
+    @Test(expected = NumberFormatException.class)
     public void testGetFloatProperty_null_FloatParseException() {
         Properties props = new Properties();
         props.setProperty("key", "foo");
-        OctopusProperties octprop = new OctopusProperties(props);
-
-        try {
-            octprop.getFloatProperty("key");
-            fail("No NumberFormatException thrown");
-        } catch (NumberFormatException e) {
-            assertThat(e.getMessage(), is("Float expected for property key, not \"foo\""));
-        }
+        new OctopusProperties(props).getFloatProperty("key");
+        
     }
 
     @Test
@@ -471,10 +481,17 @@ public class OctopusPropertiesTest {
 
         float result = octprop.getFloatProperty("key", default_value);
 
-        float expected = 42.123f;
-        assertThat(result, is(expected));
+        assertTrue(result == 42.123f);
     }
 
+    @Test(expected = NumberFormatException.class)
+    public void testGetFloatProperty_withDefault_FloatParseException() {
+        Properties props = new Properties();
+        props.setProperty("key", "foo");
+        new OctopusProperties(props).getFloatProperty("key", 42.0f);
+    }
+
+    
     @Test
     public void testGetFloatProperty_SetAndDefault_returnsSet() {
         Properties props = new Properties();
@@ -484,8 +501,7 @@ public class OctopusPropertiesTest {
         float default_value = 42.123f;
         float result = octprop.getFloatProperty("key", default_value);
 
-        float expected = 13.456f;
-        assertThat(result, is(expected));
+        assertTrue(result ==13.456f);
     }
 
     @Test
@@ -501,21 +517,69 @@ public class OctopusPropertiesTest {
 
         long result = octprop.getSizeProperty("B");
 
-        assertThat(result, is(100L));
+        assertTrue(result == 100L);
 
         result = octprop.getSizeProperty("K");
 
-        assertThat(result, is(100L * 1024L));
+        assertTrue(result == (100L * 1024L));
 
         result = octprop.getSizeProperty("M");
 
-        assertThat(result, is(100L * 1024L * 1024L));
+        assertTrue(result == (100L * 1024L * 1024L));
 
         result = octprop.getSizeProperty("G");
 
-        assertThat(result, is(100L * 1024L * 1024L * 1024L));
+        assertTrue(result == (100L * 1024L * 1024L * 1024L));
     }
 
+    @Test
+    public void testGetSizeProperty1() {
+
+        Properties props = new Properties();
+        props.setProperty("B", "100");
+        props.setProperty("K", "100k");
+        props.setProperty("M", "100m");
+        props.setProperty("G", "100g");
+
+        OctopusProperties octprop = new OctopusProperties(props);
+
+        long result = octprop.getSizeProperty("B");
+
+        assertTrue(result == 100L);
+
+        result = octprop.getSizeProperty("K");
+
+        assertTrue(result == (100L * 1024L));
+
+        result = octprop.getSizeProperty("M");
+
+        assertTrue(result == (100L * 1024L * 1024L));
+
+        result = octprop.getSizeProperty("G");
+
+        assertTrue(result == (100L * 1024L * 1024L * 1024L));
+    }
+    
+    @Test(expected = NumberFormatException.class)
+    public void testGetSizeProperty2() {
+
+        Properties props = new Properties();
+        props.setProperty("K", "100Q");
+
+        OctopusProperties octprop = new OctopusProperties(props);
+        
+        octprop.getSizeProperty("K");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void testGetSizeProperty3() {
+
+        Properties props = new Properties();
+        OctopusProperties octprop = new OctopusProperties(props);
+        
+        octprop.getSizeProperty("K");
+    }
+    
     @Test
     public void testGetSizePropertyStringLong() {
 
@@ -526,11 +590,11 @@ public class OctopusPropertiesTest {
 
         long result = octprop.getSizeProperty("B", 999);
 
-        assertThat(result, is(100L));
+        assertTrue(result == 100L);
 
         result = octprop.getSizeProperty("X", 999);
 
-        assertThat(result, is(999L));
+        assertTrue(result == 999L);
     }
 
     @Test
@@ -538,9 +602,8 @@ public class OctopusPropertiesTest {
         OctopusProperties octprop = new OctopusProperties();
 
         String[] result = octprop.getStringList("key");
-
         String[] expected = new String[] {};
-        assertThat(result, is(expected));
+        assertTrue(Arrays.equals(result, expected));
     }
 
     @Test
@@ -550,7 +613,7 @@ public class OctopusPropertiesTest {
         String[] result = octprop.getStringList("key", ", ", defaults);
 
         String[] expected = new String[] { "value1", "value2", "value3" };
-        assertThat(result, is(expected));
+        assertTrue(Arrays.equals(result, expected));
     }
 
     @Test
@@ -562,7 +625,7 @@ public class OctopusPropertiesTest {
         String[] result = octprop.getStringList("key");
 
         String[] expected = new String[] { "value1", "value2", "value3" };
-        assertThat(result, is(expected));
+        assertTrue(Arrays.equals(result, expected));
     }
 
     @Test
@@ -574,7 +637,7 @@ public class OctopusPropertiesTest {
         String[] result = octprop.getStringList("key", ", ");
 
         String[] expected = new String[] { "value1", "value2", "value3" };
-        assertThat(result, is(expected));
+        assertTrue(Arrays.equals(result, expected));
     }
 
     @Test
@@ -586,6 +649,13 @@ public class OctopusPropertiesTest {
         assertEquals(noctprop.toString(), "OctopusProperties [properties={key=value}]");
     }
 
+    @Test
+    public void testFilter_null() {
+        OctopusProperties octprop = getSample();
+        OctopusProperties noctprop = octprop.filter(null);
+        assertEquals(noctprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
+    }
+    
     @Test
     public void testFilter_emptyPrefix_returnsSame() {
         OctopusProperties octprop = getSample();
@@ -608,21 +678,28 @@ public class OctopusPropertiesTest {
 
         String s = out.toString();
 
-        assertThat(s, is("key = value\nitem = value2\n"));
+        assertTrue(s.equals("key = value\nitem = value2\n"));
 
         out = new ByteArrayOutputStream();
         octprop.printProperties(new PrintStream(out), "NOOT");
 
         s = out.toString();
 
-        assertThat(s, is(""));
+        assertTrue(s.equals(""));
 
         out = new ByteArrayOutputStream();
         octprop.printProperties(new PrintStream(out), "key");
 
         s = out.toString();
 
-        assertThat(s, is("key = value\n"));
+        assertTrue(s.equals("key = value\n"));
+
+        out = new ByteArrayOutputStream();
+        octprop.printProperties(new PrintStream(out), null);
+
+        s = out.toString();
+
+        assertTrue(s.equals("key = value\nitem = value2\n"));
     }
 
     @Test
@@ -645,7 +722,7 @@ public class OctopusPropertiesTest {
         OctopusProperties octprop = getSample();
         String[] names = octprop.getPropertyNames();
         String[] expected_names = new String[] { "item", "key" };
-        assertThat(names, is(expected_names));
+        assertTrue(Arrays.equals(names, expected_names));
     }
 
     @Test
@@ -655,13 +732,13 @@ public class OctopusPropertiesTest {
 
         boolean b = octprop1.equals(octprop1);
 
-        assertThat(b, is(true));
+        assertTrue(b);
 
         OctopusProperties octprop2 = getSample();
 
         b = octprop1.equals(octprop2);
 
-        assertThat(b, is(true));
+        assertTrue(b);
 
         Properties props = new Properties();
         props.setProperty("key", "value");
@@ -669,7 +746,7 @@ public class OctopusPropertiesTest {
         OctopusProperties octprop3 = new OctopusProperties(props);
         b = octprop1.equals(octprop3);
 
-        assertThat(b, is(false));
+        assertFalse(b);
     }
 
     @Test
@@ -678,7 +755,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.setProperty("key", "value");
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -688,7 +765,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.put("key", "value");
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -698,7 +775,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.remove("key");
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -713,7 +790,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.putAll(tmp);
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -723,7 +800,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.load(mock(Reader.class));
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -733,7 +810,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.load(mock(InputStream.class));
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 
@@ -743,7 +820,7 @@ public class OctopusPropertiesTest {
         try {
             octprop.loadFromXML(mock(InputStream.class));
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("setting properties unsupported in ImmutableTypedProperties"));
+            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
 }

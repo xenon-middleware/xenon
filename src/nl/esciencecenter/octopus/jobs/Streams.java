@@ -23,64 +23,33 @@ import java.io.OutputStream;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class Streams {
+public interface Streams {
     
-    private Job job;
-    
-    private InputStream stdout;
-
-    private InputStream stderr;
-
-    private OutputStream stdin;
-
-    /**
-     * Create a Streams containing the job and its standard streams.  
-     * 
-     * @param job the josb.
-     * @param stdout the standard output stream.
-     * @param stdin the standard input stream.
-     * @param stderr the standard error stream.
-     */
-    public Streams(Job job, InputStream stdout, OutputStream stdin, InputStream stderr) {        
-        this.job = job;
-        this.stdout = stdout;
-        this.stdin = stdin;
-        this.stderr = stderr;
-    }
-
     /**
      * Get the job for which this Streams was created.
      * 
      * @return the Job.
      */
-    public Job getJob() { 
-        return job;
-    }
+    public Job getJob(); 
     
     /** 
      * Returns the standard output stream of job.
      * 
      * @return the standard output stream of job.
      */
-    public InputStream getStdout() { 
-        return stdout;
-    }
+    public InputStream getStdout(); 
     
     /** 
      * Returns the standard error stream of job.
      * 
      * @return the standard error stream of job.
      */
-    public InputStream getStderr() { 
-        return stderr;
-    }
+    public InputStream getStderr(); 
 
     /** 
      * Returns the standard input stream of job.
      * 
      * @return the standard input stream of this job.
      */
-    public OutputStream getStdin() { 
-        return stdin;     
-    }
+    public OutputStream getStdin(); 
 }

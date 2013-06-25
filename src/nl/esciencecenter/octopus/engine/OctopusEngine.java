@@ -29,6 +29,8 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
+import nl.esciencecenter.octopus.engine.util.CopyEngine;
+import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
@@ -82,32 +84,25 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public static Octopus newOctopus(Properties properties) throws OctopusException {
-
+    public static synchronized Octopus newOctopus(Properties properties) throws OctopusException {
         OctopusEngine result = new OctopusEngine(properties);
-
-        synchronized (octopusEngines) {
-            octopusEngines.add(result);
-        }
-
+        octopusEngines.add(result);
         return result;
     }
 
-    public static void closeOctopus(Octopus engine) throws OctopusException {
+    public static synchronized void closeOctopus(Octopus engine) throws NoSuchOctopusException {
 
         OctopusEngine result = null;
 
-        synchronized (octopusEngines) {
-            for (int i = 0; i < octopusEngines.size(); i++) {
-                if (octopusEngines.get(i) == engine) {
-                    result = octopusEngines.remove(i);
-                    break;
-                }
+        for (int i = 0; i < octopusEngines.size(); i++) {
+            if (octopusEngines.get(i) == engine) {
+                result = octopusEngines.remove(i);
+                break;
             }
         }
-
+        
         if (result == null) {
-            throw new OctopusException("engine", "No such OctopusEngine");
+            throw new NoSuchOctopusException("engine", "No such OctopusEngine");
         }
 
         result.end();
@@ -117,12 +112,12 @@ public class OctopusEngine implements Octopus {
         return UUID.randomUUID();
     }
     
-    public static void endAll() {
-        synchronized (octopusEngines) {
-            for (OctopusEngine octopusEngine : octopusEngines) {
-                octopusEngine.end();
-            }
+    public static synchronized void endAll() {
+        for (int i=0; i < octopusEngines.size(); i++) {
+            octopusEngines.get(i).end();
         }
+
+        octopusEngines.clear();
     }
 
     private boolean ended = false;
@@ -136,6 +131,8 @@ public class OctopusEngine implements Octopus {
     private final CredentialsEngineImplementation credentialsEngine;
 
     private final Adaptor[] adaptors;
+    
+    private final CopyEngine copyEngine;
 
     /**
      * Constructs a OctopusEngine.
@@ -150,7 +147,7 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    private OctopusEngine(Properties properties) throws OctopusException {
+    public OctopusEngine(Properties properties) throws OctopusException {
 
         octopusProperties = new OctopusProperties(VALID_PROPERTIES, properties);
 
@@ -164,6 +161,8 @@ public class OctopusEngine implements Octopus {
 
         credentialsEngine = new CredentialsEngineImplementation(this);
 
+        copyEngine = new CopyEngine(filesEngine);
+        
         logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
@@ -224,7 +223,7 @@ public class OctopusEngine implements Octopus {
 
         throw new OctopusException("engine", "Could not find adaptor named " + name);
     }
-
+    
     public Adaptor[] getAdaptors() {
         return adaptors;
     }
@@ -249,18 +248,28 @@ public class OctopusEngine implements Octopus {
         return credentialsEngine;
     }
 
-    @Override
-    public void end() {
-        synchronized (this) {
-            if (ended) {
-                return;
-            }
-
-            ended = true;
+    /**
+     * @return
+     */
+    public CopyEngine getCopyEngine() {
+        return copyEngine;
+    }
+    
+    private synchronized boolean setEnd() { 
+        if (ended) {
+            return false;
         }
 
-        for (Adaptor adaptor : adaptors) {
-            adaptor.end();
+        ended = true;
+        return true;
+    }
+        
+    @Override
+    public void end() {
+        if (setEnd()) { 
+            for (Adaptor adaptor : adaptors) {
+                adaptor.end();
+            }
         }
     }
 

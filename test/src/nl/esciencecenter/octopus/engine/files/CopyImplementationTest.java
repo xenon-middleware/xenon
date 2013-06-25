@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.util;
+package nl.esciencecenter.octopus.engine.files;
 
-import static org.junit.Assert.*;
-
-import nl.esciencecenter.octopus.files.CopyOption;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -26,11 +25,18 @@ import org.junit.Test;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class CopyOptionsTestFullTrue {
+public class CopyImplementationTest {
 
     @Test
-    public void test() {
-        assertFalse(CopyOption.contains(new CopyOption[] { CopyOption.REPLACE }, 
-                CopyOption.CREATE));
+    public void test_getters_and_setters() { 
+        
+       CopyImplementation c = new CopyImplementation("NAME", "ID", null,  null); 
+        
+       assertTrue("NAME".equals(c.getAdaptorName()));
+       assertTrue("ID".equals(c.getUniqueID()));
+      
+       assertNull(c.getSource());
+       assertNull(c.getTarget());
     }
+    
 }

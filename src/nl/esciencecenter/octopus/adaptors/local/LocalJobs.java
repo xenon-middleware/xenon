@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -24,9 +23,9 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -38,6 +37,15 @@ import nl.esciencecenter.octopus.jobs.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * LocalFiles implements an Octopus <code>Jobs</code> adaptor for local job operations.  
+ * 
+ * @see nl.esciencecenter.octopus.jobs.Jobs
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalJobs implements Jobs {
 
     @SuppressWarnings("unused")
@@ -60,19 +68,7 @@ public class LocalJobs implements Jobs {
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
         
-        URI uri = null;
-
-        try {
-            uri = new URI("local:///");
-        } catch (URISyntaxException e) {
-            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI", e);
-        }
-
-        //defaultWorkingDirectory = System.getProperty("user.dir");
-        
-       // if (defaultWorkingDirectory == null) { 
-      //      throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to retrieve current working directory!");
-      //  }
+        URI uri = LocalUtils.getLocalJobURI();
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
                 new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
@@ -95,7 +91,7 @@ public class LocalJobs implements Jobs {
         String path = location.getPath();
 
         if (path != null && !path.equals("/")) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with path!");
+            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with path!");
         }
 
         if (credential != null) {
@@ -130,13 +126,18 @@ public class LocalJobs implements Jobs {
     }
 
     @Override
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+        return jobQueues.waitUntilDone(job, timeout);
+    }
+    
+    @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
         return jobQueues.getJobStatuses(jobs);
     }
 
     @Override
-    public void cancelJob(Job job) throws OctopusException {
-        jobQueues.cancelJob(job);
+    public JobStatus cancelJob(Job job) throws OctopusException {
+        return jobQueues.cancelJob(job);
     }
 
     public void end() {
@@ -167,4 +168,5 @@ public class LocalJobs implements Jobs {
     public Streams getStreams(Job job) throws OctopusException {
         return jobQueues.getStreams(job);
     }
+
 }

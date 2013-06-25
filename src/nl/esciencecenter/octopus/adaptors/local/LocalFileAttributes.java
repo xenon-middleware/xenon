@@ -17,7 +17,9 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
@@ -26,6 +28,13 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
+/**
+ * LocalFileAttributes implements a {@link FileAttributes} for local files. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalFileAttributes implements FileAttributes {
 
     /** The file attributes from the underlying java.nio implementation */
@@ -46,9 +55,7 @@ public class LocalFileAttributes implements FileAttributes {
     public LocalFileAttributes(AbsolutePath path) throws OctopusIOException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
-
-            attributes = Files.readAttributes(javaPath, PosixFileAttributes.class);
-
+            attributes = Files.readAttributes(javaPath, PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
             executable = Files.isExecutable(javaPath);
             readable = Files.isReadable(javaPath);
             writable = Files.isWritable(javaPath);
@@ -133,9 +140,74 @@ public class LocalFileAttributes implements FileAttributes {
     public boolean isWritable() throws AttributeNotSupportedException {
         return writable;
     }
+    
+    @Override
+    public String toString() {
+        return "LocalFileAttributes [executable=" + executable + ", readable=" + readable
+                + ", writable=" + writable + ", hidden=" + hidden + ", attributes=" 
+                + PosixFilePermissions.toString(attributes.permissions()) + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        result = prime * result + (executable ? 1231 : 1237);
+        result = prime * result + (hidden ? 1231 : 1237);
+        result = prime * result + (readable ? 1231 : 1237);
+        result = prime * result + (writable ? 1231 : 1237);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        LocalFileAttributes other = (LocalFileAttributes) obj;
+                
+        if (executable != other.executable) { 
+            return false;
+        }
+        
+        if (hidden != other.hidden) { 
+            return false;
+        }
+        
+        if (readable != other.readable) { 
+            return false;
+        }
+        
+        if (writable != other.writable) { 
+            return false;
+        }
+        
+// FIXME: Always fails ?         
+//        if (attributes == null) { 
+//            if (other.attributes != null) { 
+//                return false;
+//            }
+//        } else if (!attributes.equals(other.attributes)) { 
+//            return false;
+//        }
+//        
+        return true;
+    }
 
     //    @Override
     //    public List<AclEntry> getAcl() throws AttributeNotSupportedException {
     //        throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
     //    }
+    
+    
 }

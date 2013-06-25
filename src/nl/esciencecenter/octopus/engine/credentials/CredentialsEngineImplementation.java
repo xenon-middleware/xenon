@@ -32,13 +32,13 @@ public class CredentialsEngineImplementation implements Credentials {
 
     @Override
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
-            String username, String password) throws OctopusException {
+            String username, char [] password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, properties, keyfile, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, String password)
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, char [] password)
             throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, properties, username, password);
@@ -46,7 +46,7 @@ public class CredentialsEngineImplementation implements Credentials {
 
     @Override
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
-            String password) throws OctopusException {
+            char [] password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newProxyCredential(scheme, properties, host, port, username, password);
     }

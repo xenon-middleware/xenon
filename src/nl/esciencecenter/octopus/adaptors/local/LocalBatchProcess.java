@@ -19,20 +19,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
+
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.util.MergingOutputStream;
+import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
+import nl.esciencecenter.octopus.engine.util.StreamForwarder;
+import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
-import nl.esciencecenter.octopus.engine.util.CommandRunner;
-import nl.esciencecenter.octopus.engine.util.MergingOutputStream;
-import nl.esciencecenter.octopus.engine.util.StreamForwarder;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.Streams;
-import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
-
+/**
+ * LocalBatchProcess implements a {@link ProcessWrapper} for local batch processes. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 class LocalBatchProcess implements ProcessWrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalBatchProcess.class);
@@ -70,6 +74,18 @@ class LocalBatchProcess implements ProcessWrapper {
             workingDirectory = System.getProperty("user.dir");
         }
         
+        if (!stdout.startsWith(File.separator)) { 
+            stdout = workingDirectory + File.separator + stdout;
+        }
+        
+        if (!stderr.startsWith(File.separator)) { 
+            stderr = workingDirectory + File.separator + stderr;
+        }
+
+        if (stdin != null && !stdin.startsWith(File.separator)) { 
+            stdin = workingDirectory + File.separator + stdin;
+        }
+        
         builder.command().add(description.getExecutable());
         builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
@@ -77,8 +93,8 @@ class LocalBatchProcess implements ProcessWrapper {
 
         // Merge stdout and stderr into a single stream
         if (description.getMergeOutputStreams()) {             
-            stdoutStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stdout));
-            stderrStream = new MergingOutputStream(new FileOutputStream(workingDirectory + File.separator + stderr));
+            stdoutStream = new MergingOutputStream(new FileOutputStream(stdout));
+            stderrStream = new MergingOutputStream(new FileOutputStream(stderr));
         } else { 
             stdoutStream = null;
             stderrStream = null;
@@ -96,7 +112,7 @@ class LocalBatchProcess implements ProcessWrapper {
                 stdinForwarders[i] = null;
                 processes[i].getOutputStream().close();
             } else {
-                stdinForwarders[i] = new StreamForwarder(new FileInputStream(workingDirectory + File.separator + stdin),
+                stdinForwarders[i] = new StreamForwarder(new FileInputStream(stdin),
                                 processes[i].getOutputStream());
             }
 
@@ -105,53 +121,53 @@ class LocalBatchProcess implements ProcessWrapper {
                 stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
             } else { 
                 stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), 
-                        new FileOutputStream(workingDirectory + File.separator + stdout + "." + i));
+                        new FileOutputStream(stdout + "." + i));
                  
                 stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(),
-                        new FileOutputStream(workingDirectory + File.separator + stderr  + "." + i));
+                        new FileOutputStream(stderr  + "." + i));
             }
         }
     }
 
-    private void kill() {
-        for (int i = 0; i < processes.length; i++) {
-            processes[i].destroy();
+//    private void kill() {
+//        for (int i = 0; i < processes.length; i++) {
+//            processes[i].destroy();
+//
+//            if (stdinForwarders[i] != null) {
+//                stdinForwarders[i].close();
+//            }
+//
+//            stdoutForwarders[i].close();
+//            stderrForwarders[i].close();
+//        }
+//        
+//        try {
+//            if (stdoutStream != null) { 
+//                stdoutStream.close();
+//            }
+//        } catch (IOException e) {
+//            // IGNORE
+//        }
+//        
+//        try {
+//            if (stderrStream != null) { 
+//                stderrStream.close();
+//            }
+//        } catch (IOException e) {
+//            // IGNORE
+//        }
+//    }
 
-            if (stdinForwarders[i] != null) {
-                stdinForwarders[i].close();
-            }
-
-            stdoutForwarders[i].close();
-            stderrForwarders[i].close();
-        }
-        
-        try {
-            if (stdoutStream != null) { 
-                stdoutStream.close();
-            }
-        } catch (IOException e) {
-            // IGNORE
-        }
-        
-        try {
-            if (stderrStream != null) { 
-                stderrStream.close();
-            }
-        } catch (IOException e) {
-            // IGNORE
-        }
-    }
-
-    public int waitFor() throws InterruptedException {
-        
-        int[] results = new int[processes.length];
-
-        for (int i = 0; i < processes.length; i++) {
-            results[i] = processes[i].waitFor();
-        }
-
-        return results[0];
-    }
+//    public int waitFor() throws InterruptedException {
+//        
+//        int[] results = new int[processes.length];
+//
+//        for (int i = 0; i < processes.length; i++) {
+//            results[i] = processes[i].waitFor();
+//        }
+//
+//        return results[0];
+//    }
 
     public boolean isDone() {
         
@@ -170,27 +186,7 @@ class LocalBatchProcess implements ProcessWrapper {
         
         return true;
     }
-    
-    private void unixDestroy(java.lang.Process process) throws Throwable {
-        Field pidField = process.getClass().getDeclaredField("pid");
-
-        pidField.setAccessible(true);
-
-        int pid = pidField.getInt(process);
-
-        if (pid <= 0) {
-            throw new Exception("Pid reported as 0 or negative: " + pid);
-        }
-
-        CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
-
-        if (killRunner.getExitCode() != 0) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was " + 
-                    killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
-        }
-
-    }
-
+  
     public int getExitStatus() {
         
         for (int i=0;i<exitCodes.length;i++) { 
@@ -204,12 +200,7 @@ class LocalBatchProcess implements ProcessWrapper {
     
     public void destroy() {
         for (int i = 0; i < processes.length; i++) {
-            try {
-                unixDestroy(processes[i]);
-            } catch (Throwable t) {
-                logger.debug("Could not destroy process using getpid/kill, using normal java destroy", t);
-                processes[i].destroy();
-            }
+            LocalUtils.unixDestroy(processes[i]);
         }
     }
 

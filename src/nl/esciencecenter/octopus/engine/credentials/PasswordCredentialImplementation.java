@@ -31,7 +31,7 @@ public class PasswordCredentialImplementation extends CredentialImplementation {
      *            the password for the given user name
      */
     public PasswordCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, 
-            String username, String password) {        
+            String username, char [] password) {        
         super(adaptorName, uniqueID, properties, username, password);    
     }
 

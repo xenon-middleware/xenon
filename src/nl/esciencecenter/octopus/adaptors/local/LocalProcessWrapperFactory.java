@@ -24,8 +24,11 @@ import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import nl.esciencecenter.octopus.engine.util.ProcessWrapperFactory;
 
 /**
+ * LocalProcessWrapperFactory implements a {@link ProcessWrapperFactory} to create local processes.  
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * @version 1.0
+ * @since 1.0
  */
 public class LocalProcessWrapperFactory implements ProcessWrapperFactory {
 

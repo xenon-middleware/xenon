@@ -202,10 +202,6 @@ public class OctopusProperties extends Properties {
      */
     public int getIntProperty(String key, int defaultValue) {
 
-        if (!containsKey(key)) {
-            return defaultValue;
-        }
-
         String value = getProperty(key);
 
         if (value == null) {

@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -25,6 +26,7 @@ import java.util.Map.Entry;
 
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -92,45 +94,49 @@ public class SshProcessWrapper implements ProcessWrapper {
         // set the streams first, then connect the channel.
         if (isInteractive) {
             try {
-                streams = new Streams(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
+                streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), 
+                        channel.getErrStream());
+                
             } catch (IOException e) {
-                throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
         } else {
 
-            String stdinPath = description.getStdin();
+            String workingDirectory = description.getWorkingDirectory();
             
-            if (stdinPath != null && stdinPath.length() != 0) {
+            String stdinPath = fixPath(workingDirectory, description.getStdin());
+            
+            if (stdinPath != null) {
                 try {
                     stdin = new FileInputStream(stdinPath);
                 } catch (FileNotFoundException e) {
-                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                    throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
                 }
                 channel.setInputStream(stdin);
             } else {
                 channel.setInputStream(null);
             }
 
-            String stdoutPath = description.getStdout();
+            String stdoutPath = fixPath(workingDirectory, description.getStdout());
             
-            if (stdoutPath != null && stdoutPath.length() != 0) {
+            if (stdoutPath != null) {
                 try {
                     stdout = new FileOutputStream(stdoutPath);
                 } catch (FileNotFoundException e) {
-                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                    throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
                 }
                 channel.setOutputStream(stdout);
             } else {
                 channel.setOutputStream(null);
             }
 
-            String stderrPath = description.getStderr();
+            String stderrPath = fixPath(workingDirectory, description.getStderr());
 
-            if (stderrPath != null && stderrPath.length() != 0) {
+            if (stderrPath != null) {
                 try {
                     stderr = new FileOutputStream(stderrPath);
                 } catch (FileNotFoundException e) {
-                    throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+                    throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
                 }
                 channel.setErrStream(stderr);
             } else {
@@ -145,11 +151,28 @@ public class SshProcessWrapper implements ProcessWrapper {
         try {
             channel.connect();
         } catch (JSchException e) {
-            throw new OctopusIOException(adaptor.getName(), e.getMessage(), e);
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
         logger.debug("Connecting channel done");
     }
 
+    private String fixPath(String workingDirectory, String path) { 
+        
+        if (path == null || path.length() == 0) { 
+            return null;
+        }
+        
+        if (workingDirectory == null || workingDirectory.length() == 0) { 
+            return path;
+        }
+        
+        if (!path.startsWith(File.separator)) { 
+            return workingDirectory + File.separator + path;
+        } else { 
+            return path;
+        }
+    }
+    
     public Streams getStreams() { 
         return streams;
     }

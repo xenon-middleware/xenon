@@ -39,14 +39,14 @@ public abstract class CredentialImplementation implements Credential {
     protected final OctopusProperties properties;
 
     protected CredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String username, 
-            String password) {
+            char [] password) {
         
         this.adaptorName = adaptorName;
         this.properties = properties;
         this.username = username;
         this.uniqueID = uniqueID;
         
-        this.password = password.toCharArray();
+        this.password = password;
     }
 
     public String getUniqueID() {

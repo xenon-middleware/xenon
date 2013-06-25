@@ -28,6 +28,30 @@ import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 
+/**
+ * Sandbox is a place where files/directories can be uploaded to or downloaded from.
+ *
+ * Example to submit a job with input and output files:
+ *
+ * <blockquote>
+ * <pre class="code">
+ * {@code
+ * Sandbox sandbox = new Sandbox(octopus, sandboxBase);
+ * sandbox.addUploadFile(inputfile);
+ * sandbox.addDownloadFile(outputfile);
+ *
+ * sandbox.upload();
+ *
+ * Job job = octopus.jobs().submitJob(description);
+ *
+ * JobStatus = octopus.jobs().waitUntilDone(job, 60000);
+ *
+ * sandbox.download();
+ * }
+ * </pre>
+ * </blockquote>
+ *
+ */
 public class Sandbox {
 
     private final Octopus octopus;
@@ -48,15 +72,65 @@ public class Sandbox {
             this.destination = destination;
         }
 
-        public AbsolutePath getSource() {
-            return source;
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((destination == null) ? 0 : destination.hashCode());
+            result = prime * result + ((source == null) ? 0 : source.hashCode());
+            return result;
         }
 
-        public AbsolutePath getDestination() {
-            return destination;
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Pair other = (Pair) obj;
+            if (destination == null) {
+                if (other.destination != null) {
+                    return false;
+                }
+            } else if (!destination.equals(other.destination)) {
+                return false;
+            }
+            if (source == null) {
+                if (other.source != null) {
+                    return false;
+                }
+            } else if (!source.equals(other.source)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Pair [source=").append(source).append(", destination=").append(destination).append("]");
+            return builder.toString();
         }
     }
 
+    /**
+     * Creates a sandbox.
+     * Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
+     *
+     * @param octopus
+     *            An Octopus instance
+     * @param root
+     *            Directory in which sandbox will be created.
+     * @param sandboxName
+     *            Name of the sandbox. If null a random name will be used.
+     * @throws OctopusException
+     * @throws OctopusIOException
+     */
     public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
         this.octopus = octopus;
 
@@ -67,10 +141,16 @@ public class Sandbox {
         }
     }
 
+    /**
+     * @return Path in which files will be uploaded and downloaded.
+     */
     public AbsolutePath getPath() {
         return path;
     }
 
+    /**
+     * @return List of files that will be uploaded on execution of {@Link #upload() upload} method.
+     */
     public List<Pair> getUploadFiles() {
         return uploadFiles;
     }
@@ -82,39 +162,56 @@ public class Sandbox {
         }
     }
 
+    /**
+     * Add a file to the list of files to upload.
+     *
+     * @param src
+     *            Source path of file. Can not be null.
+     */
     public void addUploadFile(AbsolutePath src) {
         addUploadFile(src, null);
     }
 
+    /**
+     * Add a file to the list of files to upload.
+     *
+     * @param src
+     *            Where file should be uploaded from. Can not be null.
+     * @param dest
+     *            Name of file in sandbox. When null the src.getFilename() will be used.
+     */
     public void addUploadFile(AbsolutePath src, String dest) {
         if (src == null) {
-            throw new NullPointerException("the source file cannot be null when adding a preStaged file");
+            throw new NullPointerException("the source path cannot be null when adding a preStaged file");
+        }
+        if (dest == null) {
+            dest = src.getFileName();
         }
 
         uploadFiles.add(new Pair(src, path.resolve(new RelativePath(dest))));
     }
 
+    /**
+     * @return List of files that will be downloaded on execution of {@Link #download() download} method.
+     */
     public List<Pair> getDownloadFiles() {
         return downloadFiles;
     }
 
-// FIXME!
-//
-//    public void setDownloadFiles(String... files) {
-//        downloadFiles = new LinkedList<Pair>();
-//
-//        for (int i = 0; i < files.length; i++) {
-//            addDownloadFile(files[i]);
-//        }
-//    }
-//
-//    public void addDownloadFile(String src) {
-//        addDownloadFile(src, src);
-//    }
-
+    /**
+     * Add file to the list of files to download.
+     *
+     * @param src
+     *            Name of file in sandbox. When null the dest.getFilename() will be used.
+     * @param dest
+     *            Where file should be downloaded to. Can not be null.
+     */
     public void addDownloadFile(String src, AbsolutePath dest) {
+        if (dest == null) {
+            throw new NullPointerException("the destination path cannot be null when adding a postStaged file");
+        }
         if (src == null) {
-            throw new NullPointerException("the source file cannot be null when adding a postStaged file");
+            src = dest.getFileName();
         }
 
         downloadFiles.add(new Pair(path.resolve(new RelativePath(src)), dest));
@@ -158,7 +255,66 @@ public class Sandbox {
         FileUtils.recursiveWipe(octopus, path);
     }
 
+    /**
+     * Deletes all files in sandbox.
+     *
+     * @throws OctopusIOException
+     */
     public void delete() throws OctopusIOException {
         FileUtils.recursiveDelete(octopus, path);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((octopus == null) ? 0 : octopus.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + uploadFiles.hashCode();
+        result = prime * result + downloadFiles.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Sandbox other = (Sandbox) obj;
+        if (octopus == null) {
+            if (other.octopus != null) {
+                return false;
+            }
+        } else if (!octopus.equals(other.octopus)) {
+            return false;
+        }
+        if (path == null) {
+            if (other.path != null) {
+                return false;
+            }
+        } else if (!path.equals(other.path)) {
+            return false;
+        }
+        if (!downloadFiles.equals(other.downloadFiles)) {
+            return false;
+        }
+        if (!uploadFiles.equals(other.uploadFiles)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Sandbox [octopus=").append(octopus).append(", path=").append(path).append(", uploadFiles=")
+                .append(uploadFiles).append(", downloadFiles=").append(downloadFiles).append("]");
+        return builder.toString();
     }
 }

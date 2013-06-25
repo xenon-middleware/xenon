@@ -81,7 +81,13 @@ public abstract class Adaptor {
             validSet.add(defaultProperties[i][0]);
         }
 
-        OctopusProperties p = properties.filter("octopus.adaptors." + name);
+        OctopusProperties p = null;
+        
+        if (properties == null) { 
+            p = new OctopusProperties();
+        } else { 
+            p = properties.filter("octopus.adaptors." + name);
+        }
 
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             if (!validSet.contains(entry.getKey())) {

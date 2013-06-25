@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
@@ -34,35 +33,36 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class JobExecutor implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(JobExecutor.class);
-    
+
     private final JobImplementation job;
-    
+
     private final ProcessWrapperFactory factory;
 
     private final int pollingDelay;
-    
-    private final Adaptor adaptor; 
-    
+
+    private final Adaptor adaptor;
+
     private Streams streams;
-    
+
     private Integer exitStatus;
 
     private Thread thread = null;
-    
+
     private boolean killed = false;
     private boolean done = false;
     private boolean hasRun = false;
-    
+
     private String state = "PENDING";
-    
+
     private Exception error;
 
-    public JobExecutor(Adaptor adaptor, JobImplementation job, ProcessWrapperFactory factory, int pollingDelay) throws BadParameterException {
+    public JobExecutor(Adaptor adaptor, JobImplementation job, ProcessWrapperFactory factory, int pollingDelay)
+            throws BadParameterException {
         this.adaptor = adaptor;
         this.job = job;
         this.factory = factory;
@@ -72,10 +72,15 @@ public class JobExecutor implements Runnable {
     public synchronized boolean hasRun() {
         return hasRun;
     }
-    
+
     public synchronized void kill() throws OctopusException {
+
+        if (done) {
+            return;
+        }
+
         killed = true;
-        
+
         if (thread != null) {
             thread.interrupt();
         }
@@ -102,86 +107,115 @@ public class JobExecutor implements Runnable {
     }
 
     private synchronized void updateState(String state, int exitStatus, Exception e) {
-        
-        if (state.equals("ERROR") || state.equals("KILLED")) { 
+
+        if (state.equals("ERROR") || state.equals("KILLED")) {
             error = e;
-            done = true;        
-        } else if (state.equals("DONE")) { 
+            done = true;
+        } else if (state.equals("DONE")) {
             this.exitStatus = exitStatus;
             done = true;
-        } else if (state.equals("RUNNING")) { 
+        } else if (state.equals("RUNNING")) {
             hasRun = true;
-        } else { 
+        } else {
             throw new RuntimeException("INTERNAL ERROR: Illegal state: " + state);
         }
-        
+
         this.state = state;
         notifyAll();
     }
-    
-    private synchronized boolean getKilled() { 
+
+    private synchronized boolean getKilled() {
         return killed;
     }
 
-    private synchronized void setStreams(Streams streams) { 
+    private synchronized void setStreams(Streams streams) {
         this.streams = streams;
     }
-    
-    public synchronized Streams getStreams() throws OctopusException { 
-        
-        if (job.getJobDescription().isInteractive()) { 
+
+    public synchronized Streams getStreams() throws OctopusException {
+
+        if (job.getJobDescription().isInteractive()) {
             return streams;
-        } 
-        
-        throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Job is not interactive!");
+        }
+
+        throw new OctopusException(adaptor.getName(), "Job is not interactive!");
     }
 
     public synchronized void waitUntilRunning() {
 
-        while (state.equals("PENDING")) { 
-            try { 
+        while (state.equals("PENDING")) {
+            try {
                 wait();
-            } catch (InterruptedException e) { 
+            } catch (InterruptedException e) {
                 // ignored
             }
         }
     }
-    
+
+    /**
+     * @param timeout
+     * @return
+     */
+    public synchronized JobStatus waitUntilDone(long timeout) {
+
+        long deadline = System.currentTimeMillis() + timeout;
+        long leftover = timeout;
+
+        while (!done) {
+
+            try {
+                wait(leftover);
+            } catch (InterruptedException e) {
+                // ignored
+            }
+
+            long now = System.currentTimeMillis();
+
+            if (now >= deadline) {
+                break;
+            }
+
+            leftover = deadline - now;
+        }
+
+        return getStatus();
+    }
+
     @Override
     public void run() {
 
         ProcessWrapper process = null;
 
         JobDescription description = job.getJobDescription();
-        
+
         if (getKilled()) {
             updateState("KILLED", -1, new IOException("Process cancelled by user."));
             return;
         }
-        
+
         this.thread = Thread.currentThread();
-       
+
         long endTime = 0;
         int maxTime = description.getMaxTime();
-        
-        if (maxTime > 0) { 
+
+        if (maxTime > 0) {
             endTime = System.currentTimeMillis() + maxTime * 60 * 1000;
         }
-        
-        try { 
+
+        try {
             process = factory.createProcessWrapper(adaptor, job);
-        
-            if (description.isInteractive()) { 
-                setStreams(process.getStreams());                   
-            }            
+
+            if (description.isInteractive()) {
+                setStreams(process.getStreams());
+            }
         } catch (Exception e) {
             updateState("ERROR", -1, e);
             return;
         }
-        
+
         updateState("RUNNING", -1, null);
-            
-        while (true) { 
+
+        while (true) {
 
             if (process.isDone()) {
                 updateState("DONE", process.getExitStatus(), null);
@@ -193,18 +227,19 @@ public class JobExecutor implements Runnable {
                 process.destroy();
                 return;
             }
-               
+
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
                 updateState("KILLED", -1, new IOException("Process timed out."));
                 process.destroy();
                 return;
             }
-                
-            try { 
+
+            try {
                 Thread.sleep(pollingDelay);
-            } catch (InterruptedException e) { 
+            } catch (InterruptedException e) {
                 // ignored
             }
         }
     }
+
 }

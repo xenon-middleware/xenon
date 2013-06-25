@@ -23,10 +23,18 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
+/**
+ * LocalAdaptor implements an Octopus adaptor for local operations.  
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 public class LocalAdaptor extends Adaptor {
 
     /** Name of the local adaptor is defined in the engine. */
@@ -60,7 +68,7 @@ public class LocalAdaptor extends Adaptor {
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
-            { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
+            { POLLING_DELAY, "500", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
             { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
 
     /** Local implementation for Files */
@@ -72,7 +80,7 @@ public class LocalAdaptor extends Adaptor {
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
-        localFiles = new LocalFiles(getProperties(), this);
+        localFiles = new LocalFiles(getProperties(), this, octopusEngine);
         localJobs = new LocalJobs(getProperties(), this, octopusEngine);
     }
 
@@ -91,7 +99,7 @@ public class LocalAdaptor extends Adaptor {
         String host = location.getHost();
 
         if (host != null && !host.equals("localhost")) {
-            throw new OctopusException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \""
+            throw new InvalidLocationException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \""
                     + location.getHost() + "\"");
         }
     }
@@ -112,7 +120,7 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public void end() {
-        // TODO: implement!
+        localJobs.end();
     }
 
     @Override

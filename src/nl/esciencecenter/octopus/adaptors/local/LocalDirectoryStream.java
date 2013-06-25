@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -26,6 +25,13 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.RelativePath;
 
+/**
+ * LocalDirectoryStream implements a {@link DirectoryStream} for local directories. 
+ * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
 class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
 
     /** The DirectoryStream from the underlying java.nio implementation */
@@ -37,11 +43,11 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
     /** The filter to use. */
     private final DirectoryStream.Filter filter;
 
-    /** A buffer to read ahead. */
-    private final LinkedList<AbsolutePath> readAhead;
-
     /** The directory to produce a stream for. */
     private final AbsolutePath dir;
+
+    /** A buffer to read ahead. */
+    private AbsolutePath readAhead;
 
     LocalDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
         try {
@@ -49,7 +55,7 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
             this.filter = filter;
-            this.readAhead = new LinkedList<AbsolutePath>();
+            //this.readAhead = new LinkedList<AbsolutePath>();
 
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir.getPath(), e);
@@ -67,46 +73,55 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
 
     @Override
     public void close() throws OctopusIOException {
+        
         try {
             stream.close();
         } catch (IOException e) {
+            // NOTE: No unit test possible here, as this does not occur for local file system.
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to close stream.", e);
         }
     }
 
     @Override
     public synchronized boolean hasNext() {
-        if (!readAhead.isEmpty()) {
+        
+        if (readAhead != null) {
             return true;
         }
+        
         while (iterator.hasNext()) {
             AbsolutePath next = getPath(iterator.next());
             if (filter.accept(next)) {
-                readAhead.addLast(next);
+                readAhead = next;
                 return true;
             }
         }
+        
         return false;
     }
 
     @Override
     public synchronized AbsolutePath next() {
-        if (!readAhead.isEmpty()) {
-            return readAhead.removeFirst();
+    
+        if (readAhead != null) {
+            AbsolutePath tmp = readAhead;
+            readAhead = null;
+            return tmp;
         }
 
         while (iterator.hasNext()) {
             AbsolutePath next = getPath(iterator.next());
+            
             if (filter.accept(next)) {
                 return next;
             }
         }
+        
         throw new NoSuchElementException("No more files in directory");
-
     }
 
     @Override
-    public synchronized void remove() {
+    public void remove() {
         throw new UnsupportedOperationException("DirectoryStream iterator does not support remove");
     }
 }

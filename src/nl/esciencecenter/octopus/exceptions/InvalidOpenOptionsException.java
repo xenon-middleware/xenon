@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package nl.esciencecenter.octopus.exceptions;
 
-package nl.esciencecenter.octopus.util;
+public class InvalidOpenOptionsException extends OctopusIOException {
 
-import static org.junit.Assert.*;
+    private static final long serialVersionUID = 1L;
 
-import nl.esciencecenter.octopus.files.CopyOption;
+    public InvalidOpenOptionsException(String adaptorName, String message, Throwable t) {
+        super(adaptorName, message, t);
+    }
 
-import org.junit.Test;
-
-/**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
- */
-public class CopyOptionsTestEmpty {
-
-    @Test
-    public void test() {
-        assertFalse(CopyOption.contains(new CopyOption[0], CopyOption.CREATE));
+    public InvalidOpenOptionsException(String adaptorName, String message) {
+        super(adaptorName, message);
     }
 }

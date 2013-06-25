@@ -15,11 +15,7 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.UUID;
-
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * Job represents a Job belonging to a {@link Scheduler}.

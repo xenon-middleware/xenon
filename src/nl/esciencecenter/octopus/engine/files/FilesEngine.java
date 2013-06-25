@@ -25,6 +25,7 @@ import java.util.Set;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
@@ -47,8 +48,8 @@ import nl.esciencecenter.octopus.files.RelativePath;
  * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
  * object.
  * 
- * @author Niels Drost
- * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  */
 public class FilesEngine implements Files {
 
@@ -60,36 +61,30 @@ public class FilesEngine implements Files {
 
     private final OctopusEngine octopusEngine;
 
+    private final CopyEngine copyEngine;
+    
     public FilesEngine(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
+        this.copyEngine = new CopyEngine(this);
     }
 
-    private Files getFilesAdaptor(FileSystem filesystem) throws OctopusIOException {
-
+    public CopyEngine getCopyEngine() { 
+        return copyEngine;
+    }
+    
+    private Files getFilesAdaptor(FileSystem filesystem) {
         try {
             Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
         } catch (OctopusException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException(getClass().getName(),
-                    "could not find adaptor named " + filesystem.getAdaptorName(), e);
+            throw new OctopusRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
 
     private Files getFilesAdaptor(AbsolutePath path) throws OctopusIOException {
-
-        FileSystem filesystem = path.getFileSystem();
-
-        try {
-            Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
-            return adaptor.filesAdaptor();
-        } catch (OctopusException e) {
-            // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
-            // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException(getClass().getName(), "could not find adaptor named "
-                    + path.getFileSystem().getAdaptorName(), e);
-        }
+        return getFilesAdaptor(path.getFileSystem());
     }
 
     @Override
@@ -129,10 +124,10 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(path).createFile(path);
     }
 
-    @Override
-    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
-        return getFilesAdaptor(link).createSymbolicLink(link, target);
-    }
+//    @Override
+//    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
+//        return getFilesAdaptor(link).createSymbolicLink(link, target);
+//    }
 
     @Override
     public void delete(AbsolutePath path) throws OctopusIOException {
@@ -146,12 +141,12 @@ public class FilesEngine implements Files {
 
     @Override
     public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        return getAttributes(path).isDirectory();
+        return getFilesAdaptor(path).isDirectory(path);
     }
 
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        return getAttributes(path).isSymbolicLink();
+        return getFilesAdaptor(path).isSymbolicLink(path);
     }
     
     @Override
@@ -167,7 +162,7 @@ public class FilesEngine implements Files {
         } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).copy(source, target, options);
         } else {
-            throw new OctopusIOException("cannot do inter-scheme third party copy (yet)", null, null);
+            throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party copy!");
         }
     }
     
@@ -179,13 +174,9 @@ public class FilesEngine implements Files {
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).move(source, target);
-        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).move(source, target);
-        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).move(source, target);
-        } else {
-            throw new OctopusIOException("cannot do inter-scheme third party move (yet)", null, null);
-        }
+        } 
+
+        throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party move!");
     }
 
     @Override
@@ -194,52 +185,10 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
-        getFilesAdaptor(copy.getSource()).cancelCopy(copy);
+    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+        return getFilesAdaptor(copy.getSource()).cancelCopy(copy);
     }
     
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.files.Files#resumeCopy(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath, boolean)
-     */
-/*    
-    @Override
-    public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean check) throws OctopusIOException {
-
-        FileSystem sourcefs = source.getFileSystem();
-        FileSystem targetfs = target.getFileSystem();
-
-        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).resumeCopy(source, target, check);
-        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).resumeCopy(source, target, check);
-        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).resumeCopy(source, target, check);
-        } else {
-            throw new OctopusIOException("cannot do inter-scheme third party resumeCopy (yet)", null, null);
-        }
-    }
-*/
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.files.Files#append(nl.esciencecenter.octopus.files.AbsolutePath, nl.esciencecenter.octopus.files.AbsolutePath)
-     */
-/*    
-    @Override
-    public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        
-        FileSystem sourcefs = source.getFileSystem();
-        FileSystem targetfs = target.getFileSystem();
-
-        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).append(source, target);
-        } else if (sourcefs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).append(source, target);
-        } else if (targetfs.getAdaptorName().equals(OctopusEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).append(source, target);
-        } else {
-            throw new OctopusIOException("cannot do inter-scheme third party append (yet)", null, null);
-        }
-    }
-*/    
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).newDirectoryStream(dir);
@@ -287,19 +236,8 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public void setOwner(AbsolutePath path, String owner, String group) throws OctopusIOException {
-        getFilesAdaptor(path).setOwner(path, owner, group);
-    }
-
-    @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
-    }
-
-    @Override
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusIOException {
-        getFilesAdaptor(path).setFileTimes(path, lastModifiedTime, lastAccessTime, createTime);
     }
 
     @Override

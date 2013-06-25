@@ -182,8 +182,8 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     }
 
     @Override
-    public AbsolutePath relativize(RelativePath other) {
-        return new AbsolutePathImplementation(filesystem, relativePath.relativize(other));
+    public RelativePath relativize(RelativePath other) {
+        return relativePath.relativize(other);
     }
 
     @Override

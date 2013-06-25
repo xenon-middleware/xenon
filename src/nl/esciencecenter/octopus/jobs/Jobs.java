@@ -15,15 +15,22 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidCloseException;
+import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
+import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
+import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
+import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 
 /**
  * Jobs represents the Jobs interface of Octopus.
@@ -61,7 +68,7 @@ public interface Jobs {
      *             If the credentials where invalid to access the location.
      * 
      * @throws OctopusException
-     *             If the creation of the FileSystem failed.
+     *             If the creation of the Scheduler failed.
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
@@ -83,7 +90,7 @@ public interface Jobs {
      *             If a known property was provided with an invalid value.
      * 
      * @throws OctopusException
-     *             If the creation of the FileSystem failed.
+     *             If the creation of the Scheduler failed.
      */
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
 
@@ -93,10 +100,8 @@ public interface Jobs {
      * @param scheduler
      *            the Scheduler to close.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
-     * @throws InvalidCloseException
-     *             If the Scheduler cannot be closed (for example a local Scheduler).
      * @throws OctopusException
      *             If the Scheduler failed to close.
      * @throws OctopusIOException
@@ -110,8 +115,6 @@ public interface Jobs {
      * @param scheduler
      *            the Scheduler to test.
      * 
-     * @throws NoSchedulerException
-     *             If the scheduler is not known.
      * @throws OctopusException
      *             If the test failed.
      * @throws OctopusIOException
@@ -131,7 +134,7 @@ public interface Jobs {
      * 
      * @return an array containing the resulting Jobs.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
@@ -152,7 +155,7 @@ public interface Jobs {
      * 
      * @return the resulting QueueStatus.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
@@ -227,7 +230,11 @@ public interface Jobs {
     /**
      * Get the status of all specified <code>jobs</code>.
      * 
-     * If the retrieval of the JobStatus for a specific job fails the exception will be stored in the associated JobsStatus.
+     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the 
+     * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters.   
+     * If a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be 
+     * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the 
+     * corresponding <code>JobsStatus</code> entry.
      * 
      * @param jobs
      *            the jobs for which to retrieve the status.
@@ -256,8 +263,11 @@ public interface Jobs {
     /**
      * Cancel a job.
      * 
-     * @param job
-     *            the job.
+     * A status is returned that indicates the state of the job after the cancel.  If the jobs was already done it cannot be 
+     * killed afterwards.   
+     * 
+     * @param job the job to kill.
+     * @return the status of the Job.
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
@@ -266,5 +276,29 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void cancelJob(Job job) throws OctopusException, OctopusIOException;
+    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
+
+
+    /**
+     * Wait until a job is done or until a timeout expires. 
+     * 
+     * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the  
+     * timeout expires, the job will continue to run normally. 
+     * 
+     * The timeout is in milliseconds and must be >= 0, where 0 means and infinite timeout.      
+     * 
+     * A JobStatus is returned that can be used to determine why the call returned.    
+     * 
+     * @param job the job.
+     * @param timeout the maximum time to wait for the job in milliseconds.   
+     * @returns  the status of the Job.
+     * 
+     * @throws NoSuchJobException
+     *             If the job is not known.
+     * @throws OctopusException
+     *             If the status of the job could not be retrieved.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
 }

@@ -160,34 +160,6 @@ public interface Files {
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException;
 
     /**
-     * Copy an existing source file or link to a non-existing target path.
-     * 
-     * The source must NOT be a directory.
-     * 
-     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
-     * 
-     * If the target is equal to the source this method has no effect.
-     * 
-     * If the source is a link, the link itself will be copied, not the path to which it refers.
-     * 
-     * @param source
-     *            the existing source file or link.
-     * @param target
-     *            the non existing target path.
-     * @return the target path.
-     * 
-     * @throws NoSuchFileException
-     *             If the source file does not exist or the target parent directory does not exist.
-     * @throws FileAlreadyExistsException
-     *             If the target file already exists.
-     * @throws IllegalSourcePathException
-     *             If the source is a directory.
-     * @throws OctopusIOException
-     *             If the move failed.
-     */
-    //public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
-    
-    /**
      * Copy an existing source file or symbolic link to a target file.
      * 
      * Both source and target must NOT be a directory. 
@@ -253,70 +225,8 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException, OctopusIOException;
-    
-
-    /**
-     * Resume the copy of an existing source file to an existing target file. 
-     * 
-     * The size of the target is used as the start position in the source. All data from the source after this start position is 
-     * append to the target. For example, if the target contains 100 bytes (0-99) and the source 200 bytes (0-199), the data at 
-     * bytes 100-199 will be copied appended from source and append to target.   
-     * 
-     * If the <code>verify</code> is set to true, the existing data in the target is compared to the head of the source. If any 
-     * difference are found an exception is thrown.    
-     * 
-     * Both the source and target must NOT be a directory or link.
-     * 
-     * If the target is equal to the source this method has no effect.
-     * 
-     * @param source
-     *            the existing source file.
-     * @param target
-     *            the existing target file.
-     * @param verify 
-     *            should the existing data in the target is compared to the head of the source?
-     *            
-     * @return the target path.
-     * 
-     * @throws NoSuchFileException
-     *             If the source or target file does not exist.
-     * @throws IllegalSourcePathException
-     *             If the source is a directory or link.
-     * @throws IllegalTargetPathException
-     *             If the target is a directory or link.
-     * @throws InvalidDataException
-     *             If the target file is larger than the source file, or the existing data in target differs from source.  
-     * @throws OctopusIOException
-     *             If the move failed.
-     */
-    //public AbsolutePath resumeCopy(AbsolutePath source, AbsolutePath target, boolean verify) throws OctopusIOException;
-    
-    /**
-     * Append the existing source file or link to an existing target file or link.
-     * 
-     * The source or target must NOT be a directory.
-     * 
-     * If the target is equal to the source an exception will be thrown.
-     * 
-     * If the source is a link, the path to which it refers will be appended to the target.
-     * 
-     * @param source
-     *            the existing source file or link.
-     * @param target
-     *            the existing target file or link.
-     * @return the target path.
-     * 
-     * @throws NoSuchFileException
-     *             If the source or target does not exist.
-     * @throws IllegalSourcePathException
-     *             If the source is a directory.
-     * @throws IllegalTargetPathException
-     *             If the target is a directory or target equals source.
-     * @throws OctopusIOException
-     *             If the move failed.
-     */
-    //public AbsolutePath append(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) 
+            throws UnsupportedOperationException, OctopusIOException;
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -346,34 +256,6 @@ public interface Files {
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
     
     /**
-     * Copy an existing source file or link to a non-existing target path. 
-     * 
-     * This copy is asynchronous. Instead of blocking until the copy is complete, this call returns immediately and the copy is
-     * performed in the background. 
-     * 
-     * A {@link Copy} is returned that can be used to retrieve the status of the copy in a {@link CopyStatus} or cancel it. Any 
-     * exceptions produced during the copy operation are also stored in the {@link CopyStatus}.    
-     * 
-     * The source must NOT be a directory.
-     * 
-     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
-     * 
-     * If the target is equal to the source this method has no effect.
-     * 
-     * If the source is a link, the link itself will be copied, not the path to which it refers.
-     * 
-     * @param source
-     *            the existing source file or link.
-     * @param target
-     *            the non existing target path.
-     * @return the target path.
-     *
-     * @throws OctopusIOException
-     *             If the asynchronous copy failed.
-     */
-    //public Copy asynchronousCopy(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
-
-    /**
      * Retrieve the status of an asynchronous copy. 
      *  
      * @param copy the asynchronous copy for which to retrieve the status. 
@@ -398,7 +280,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
+    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
     
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
@@ -444,25 +326,6 @@ public interface Files {
      *             If an I/O error occurred.
      */
     public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
-
-    /**
-     * Creates a symbolic link to a target, failing if the <code>link</code> already exists (optional operation).
-     * 
-     * @param link
-     *            the link to create.
-     * @param target
-     *            the target to link to.
-     * 
-     * @return an AbsolutePath representing the created link.
-     * 
-     * @throws FileAlreadyExistsException
-     *             If the <code>link</code> already exists.
-     * @throws UnsupportedOperationException
-     *             If the adaptor used does not support symbolic links.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException;
 
     /**
      * Deletes an existing path.
@@ -627,18 +490,33 @@ public interface Files {
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
      * 
-     * If no options are present then this method works as if the CREATE, TRUNCATE_EXISTING, and WRITE options are present.
+     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and 
+     * if the file should be written or read. 
      * 
-     * If options are set, the <code>WRITE</code> option must be set.
-     * 
-     * If the file does not exist, it will be created first if the <code>CREATE</code> option is specified.
-     * 
-     * If the <code>CREATE_NEW</code> option is specified, a new file will be created and an exception is thrown if the file
+     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file
      * already exists.
      * 
-     * If the <code>APPEND</code> option is specified, data will be appended to the file.
+     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the 
+     * file does not exist. 
      * 
-     * If the <code>TRUNCATE_EXISTING</code> option is specified, an existing file will be truncated before data is appended.
+     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not 
+     * exist a new file will be created.  
+     * 
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more 
+     * than one will result in an exception.
+     * 
+     * If the <code>APPEND</code> option is specified, data will be added to the end of the file. No existing data will be 
+     * overwritten. 
+     * 
+     * If the <code>TRUNCATE</code> option is specified, any existing data in the file will be deleted (resulting in a file of 
+     * size 0). The data will then be appended from the beginning of the file.
+     * 
+     * Either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both will result in an exception. 
+     * 
+     * The <code>READ</code> option must not be set. If it is set, an exception will be thrown.
+     *
+     * If the <code>WRITE</code> option is specified, the file is opened for writing. As this is the default behavior, the 
+     * <code>WRITE</code> option may be omitted.  
      * 
      * @param path
      *            the target file for the OutputStream.
@@ -657,18 +535,42 @@ public interface Files {
     /**
      * Open an file and return an {@link SeekableByteChannel} to read from or write to this file.
      * 
-     * Options may not be empty.
+     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and 
+     * if the file should be written or read. 
      * 
-     * If the file does not exist, it will be created first if the <code>CREATE</code> option is specified.
-     * 
-     * If the <code>CREATE_NEW</code> option is specified, a new file will be created and an exception is thrown if the file
+     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file
      * already exists.
      * 
-     * If the <code>APPEND</code> option is specified, data will be appended to the file.
+     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the 
+     * file does not exist. 
      * 
-     * If the <code>TRUNCATE_EXISTING</code> option is specified, an existing file will be truncated before data is appended.
+     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not 
+     * exist a new file will be created.  
      * 
-     * The <code>READ</code> and <code>WRITE</code> determine if the file is opened for reading or writing.
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more 
+     * than one will result in an exception.
+     * 
+     * If the <code>READ</code> option is set the file is opened for reading. 
+     *
+     * If the <code>WRITE</code> option is specified, the file is opened for writing. 
+     * 
+     * At least one of <code>READ</code> and <code>WRITE</code> must be set. These options may also be combined.
+     * 
+     * If the <code>APPEND</code> option is specified, and the <code>WRITE</code> option is set, data will be added to the end of
+     * the file. No existing data will be overwritten. If the <code>WRITE</code> is not set, an exception will be thrown. 
+     * 
+     * If the <code>TRUNCATE</code> option is specified, and the <code>WRITE</code> option is set, any existing data in the file 
+     * will be deleted (resulting in a file of size 0). The data will then be appended from the beginning of the file.  
+     * If the <code>WRITE</code> is not set, an exception will be thrown.
+     * 
+     * When only <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both 
+     * will result in an exception. 
+     * 
+     * When only <code>READ</code> is set, neither <code>APPEND</code> nor <code>TRUNCATE</code> may be specified, or an exception 
+     * will be thrown. 
+     * 
+     * When both <code>WRITE</code> and <code>READ</code> are set, only <code>TRUNCATE</code> may be used. If the 
+     * <code>APPEND</code> option is specified, an exception will be thrown.
      * 
      * @param path
      *            the target file for the SeekableByteChannel.
@@ -717,27 +619,6 @@ public interface Files {
     public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
 
     /**
-     * Updates the file owner and group. Use null for either to keep current owner/group
-     */
-
-    /**
-     * Set the owner an group of a path.
-     * 
-     * @param path
-     *            the target path.
-     * @param user
-     *            the new user, or <code>null</code> if unused.
-     * @param group
-     *            the new group, or <code>null</code> if unused.
-     * 
-     * @throws NoSuchFileException
-     *             If the target path does not exists.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    public void setOwner(AbsolutePath path, String user, String group) throws OctopusIOException;
-
-    /**
      * Sets the POSIX permissions of a path.
      * 
      * @param path
@@ -752,29 +633,4 @@ public interface Files {
      */
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
-    /**
-     * Sets the last modified, last access and create time attributes of a path.
-     * 
-     * @param path
-     *            the target path.
-     * 
-     * @param lastModifiedTime
-     *            the new last modified time, or <code>-1</code> if unused.
-     * @param lastAccessTime
-     *            the new last access time, or <code>-1</code> if unused.
-     * @param createTime
-     *            the new create time, or <code>-1</code> if unused.
-     * 
-     * @throws NoSuchFileException
-     *             If the target path does not exists.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    public void setFileTimes(AbsolutePath path, long lastModifiedTime, long lastAccessTime, long createTime)
-            throws OctopusIOException;
-    
-    
-    
-    
-    
 }

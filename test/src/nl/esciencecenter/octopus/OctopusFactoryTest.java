@@ -15,13 +15,13 @@
  */
 package nl.esciencecenter.octopus;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 import org.junit.Test;
@@ -31,6 +31,28 @@ public class OctopusFactoryTest {
     @Test
     public void testNewOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
-        assertThat(octopus.getProperties(), is(new Properties()));
+        assertTrue(octopus.getProperties().equals(new Properties()));
+    }
+    
+    @Test
+    public void testEndOctopus() throws OctopusException {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        OctopusFactory.endOctopus(octopus);
+    }
+
+    @Test(expected = NoSuchOctopusException.class)
+    public void testEndOctopus2() throws OctopusException {
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        OctopusFactory.endOctopus(octopus);
+        OctopusFactory.endOctopus(octopus);
+    }
+    
+    @Test(expected = NoSuchOctopusException.class)
+    public void testEndAll() throws OctopusException {
+        Octopus octopus1 = OctopusFactory.newOctopus(null);
+        Octopus octopus2 = OctopusFactory.newOctopus(null);
+        
+        OctopusFactory.endAll();
+        OctopusFactory.endOctopus(octopus1);
     }
 }

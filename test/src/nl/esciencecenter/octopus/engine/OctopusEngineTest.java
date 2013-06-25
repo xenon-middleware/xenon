@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.engine;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 import java.util.Properties;
 
@@ -33,7 +32,7 @@ public class OctopusEngineTest {
     @Test
     public void testNewEngineWithNulls() throws OctopusException {
         Octopus octopus = OctopusEngine.newOctopus(null);
-        assertThat(octopus.getProperties(), is(new Properties()));
+        assertEquals(new Properties(), octopus.getProperties());
     }
 
     @Test
@@ -41,7 +40,7 @@ public class OctopusEngineTest {
         Properties properties = new Properties();
         properties.setProperty("key", "value");
         Octopus octopus = OctopusEngine.newOctopus(properties);
-        assertThat(octopus.getProperties(), is(properties));
+        assertEquals(properties, octopus.getProperties());
     }
 
     public OctopusEngine getEngineWithOnlyLocalAdaptor() throws OctopusException {
@@ -56,7 +55,7 @@ public class OctopusEngineTest {
     public void testGetAdaptorInfo() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         AdaptorStatus adaptorInfo = octopus.getAdaptorInfo("local");
-        assertThat(adaptorInfo.getName(), is("local"));
+        assertEquals("local", adaptorInfo.getName());
     }
 
     @Test
@@ -66,7 +65,7 @@ public class OctopusEngineTest {
             octopus.getAdaptorInfo("hupsefluts");
             fail();
         } catch (OctopusException e) {
-            assertThat(e.getMessage(), is("engine adaptor: Could not find adaptor named hupsefluts"));
+            assertEquals("engine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
         }
     }
 
@@ -74,7 +73,7 @@ public class OctopusEngineTest {
     public void testGetAdaptorFor() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         Adaptor adaptor = octopus.getAdaptorFor("file");
-        assertThat(adaptor.getName(), is("local"));
+        assertEquals("local", adaptor.getName());
     }
 
     @Test
@@ -84,7 +83,7 @@ public class OctopusEngineTest {
             octopus.getAdaptorFor("hupsefluts");
             fail();
         } catch (OctopusException e) {
-            assertThat(e.getMessage(), is("engine adaptor: Could not find adaptor for scheme hupsefluts"));
+            assertEquals("engine adaptor: Could not find adaptor for scheme hupsefluts", e.getMessage());
         }
     }
 
@@ -92,7 +91,7 @@ public class OctopusEngineTest {
     public void testGetAdaptor() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         Adaptor adaptor = octopus.getAdaptor("local");
-        assertThat(adaptor.getName(), is("local"));
+        assertEquals("local", adaptor.getName());
     }
 
     @Test
@@ -102,8 +101,82 @@ public class OctopusEngineTest {
             octopus.getAdaptor("hupsefluts");
             fail();
         } catch (OctopusException e) {
-            assertThat(e.getMessage(), is("engine adaptor: Could not find adaptor named hupsefluts"));
+            assertEquals("engine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
         }
     }
 
+    @Test
+    public void testGetAdaptors() throws OctopusException {
+        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
+ 
+        Adaptor [] tmp = octopus.getAdaptors();
+        
+        assert(tmp != null);
+        assert(tmp.length == 3);
+    }
+
+    @Test
+    public void testGetAdaptorInfos() throws OctopusException {
+        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
+ 
+        AdaptorStatus [] tmp = octopus.getAdaptorInfos();
+        
+        assert(tmp != null);
+        assert(tmp.length == 3);
+    }
+
+    @Test
+    public void testClose() throws OctopusException {
+        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
+        OctopusEngine.closeOctopus(octopus);
+    }  
+      
+    @Test
+    public void testCloseMultiple() throws OctopusException {
+        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        OctopusEngine octopus2 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        
+        OctopusEngine.closeOctopus(octopus2);
+        OctopusEngine.closeOctopus(octopus1);
+    }  
+
+    @Test
+    public void testEndAll() throws OctopusException {
+        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        OctopusEngine octopus2 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        
+        OctopusEngine.endAll();
+    }  
+
+    @Test
+    public void testEnd() throws OctopusException {
+        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        octopus1.end();
+    }
+   
+    @Test
+    public void testEndTwice() throws OctopusException {
+        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        octopus1.end();
+        octopus1.end();
+    }
+    
+    @Test(expected = OctopusException.class)
+    public void testCloseTwice() throws OctopusException {
+        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        
+        OctopusEngine.closeOctopus(octopus1);
+        OctopusEngine.closeOctopus(octopus1);
+    }  
+
+    @Test
+    public void testToString() throws OctopusException {
+        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        String tmp = octopus1.toString();
+
+        // TODO; should check output of toString() ?
+    }
+        
 }
+
+

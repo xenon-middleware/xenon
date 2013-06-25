@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.adaptors.local;
-
-import java.util.Arrays;
+package nl.esciencecenter.octopus.engine.util;
 
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.files.CopyOption;
 
 /**
+ * CopyInfo contains all necessary information needed for asynchronous copy operations. 
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * @version 1.0
+ * @since 1.0
  */
-class CopyInfo {
+public class CopyInfo {
     
     final CopyImplementation copy;
     final CopyOption mode;

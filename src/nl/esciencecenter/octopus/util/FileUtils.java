@@ -68,13 +68,13 @@ public class FileUtils {
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
 
-        OpenOption openOption = OpenOption.CREATE_NEW;
+        OpenOption openOption = OpenOption.CREATE;
 
         for (CopyOption copyOption : options) {
             if (copyOption != CopyOption.REPLACE) {
                 throw new UnsupportedOperationException("FileUtils", "unsupported copy option " + copyOption + " for " + target);
             }
-            openOption = OpenOption.TRUNCATE_EXISTING;
+            openOption = OpenOption.TRUNCATE;
         }
 
         try (OutputStream out = octopus.files().newOutputStream(target, openOption)) {
