@@ -24,7 +24,7 @@ import java.util.Properties;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTest;
+import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;

@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTest;
+import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,15 +25,15 @@ import org.junit.BeforeClass;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class SSHJobAdaptorTest extends GenericJobAdaptorTest {
+public class SSHJobAdaptorTest extends GenericJobAdaptorTestParent {
     
     @BeforeClass
     public static void prepareSSHJobAdaptorTest() throws Exception { 
-        GenericJobAdaptorTest.prepareClass(new SSHJobTestConfig(null));
+        GenericJobAdaptorTestParent.prepareClass(new SSHJobTestConfig(null));
     }
 
     @AfterClass
     public static void cleanupSSHJobAdaptorTest() throws Exception { 
-        GenericJobAdaptorTest.cleanupClass();
+        GenericJobAdaptorTestParent.cleanupClass();
     }
 }

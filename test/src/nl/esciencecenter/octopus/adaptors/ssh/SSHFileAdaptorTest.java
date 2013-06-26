@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import nl.esciencecenter.octopus.adaptors.GenericFileAdaptorTest;
+import nl.esciencecenter.octopus.adaptors.GenericFileAdaptorTestParent;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,15 +25,15 @@ import org.junit.BeforeClass;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class SSHFileAdaptorTest extends GenericFileAdaptorTest {
+public class SSHFileAdaptorTest extends GenericFileAdaptorTestParent {
     
     @BeforeClass
     public static void prepareSSHFileAdaptorTest() throws Exception { 
-        GenericFileAdaptorTest.prepareClass(new SSHFileTestConfig(null));
+        GenericFileAdaptorTestParent.prepareClass(new SSHFileTestConfig(null));
     }
 
     @AfterClass
     public static void cleanupSSHFileAdaptorTest() throws Exception { 
-        GenericFileAdaptorTest.cleanupClass();
+        GenericFileAdaptorTestParent.cleanupClass();
     }
 }

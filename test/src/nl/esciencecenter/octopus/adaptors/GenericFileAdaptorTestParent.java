@@ -58,7 +58,7 @@ import org.junit.runners.MethodSorters;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class GenericFileAdaptorTest {
+public abstract class GenericFileAdaptorTestParent {
 
     protected static String TEST_ROOT;
     

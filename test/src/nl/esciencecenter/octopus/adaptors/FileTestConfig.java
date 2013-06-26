@@ -24,7 +24,7 @@ import nl.esciencecenter.octopus.files.Files;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public abstract class FileTestConfig extends TestConfig {
+public abstract class FileTestConfig extends GenericTestConfig {
     
     protected FileTestConfig(String adaptorName) { 
         super(adaptorName);

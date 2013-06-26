@@ -19,21 +19,21 @@ package nl.esciencecenter.octopus.adaptors.local;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTest;
+import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class LocalJobAdaptorTest extends GenericJobAdaptorTest {
+public class LocalJobAdaptorTest extends GenericJobAdaptorTestParent {
     
     @BeforeClass
     public static void prepareLocalJobAdaptorTest() throws Exception { 
-        GenericJobAdaptorTest.prepareClass(new LocalJobTestConfig());
+        GenericJobAdaptorTestParent.prepareClass(new LocalJobTestConfig());
     }
 
     @AfterClass
     public static void cleanupAltLocalJobsTest() throws Exception { 
-        GenericJobAdaptorTest.cleanupClass();
+        GenericJobAdaptorTestParent.cleanupClass();
     }
 }

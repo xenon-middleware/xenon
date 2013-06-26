@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public abstract class JobTestConfig extends TestConfig {
+public abstract class JobTestConfig extends GenericTestConfig {
   
     protected JobTestConfig(String adaptorName) { 
         super(adaptorName);

@@ -26,11 +26,11 @@ import nl.esciencecenter.octopus.credentials.Credentials;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public abstract class TestConfig {
+public abstract class GenericTestConfig {
 
     private final String adaptorName;
     
-    protected TestConfig(String adaptorName) { 
+    protected GenericTestConfig(String adaptorName) { 
         this.adaptorName = adaptorName;
     }
     
