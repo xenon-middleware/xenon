@@ -174,7 +174,7 @@ public class GridEngineJobs implements Jobs {
         Job[] result = new Job[jobIDs.length];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = new JobImplementation(null, scheduler, OctopusEngine.getNextUUID(), jobIDs[i], false, false);
+            result[i] = new JobImplementation(scheduler, jobIDs[i], null, false, false);
         }
 
         return result;
@@ -283,7 +283,7 @@ public class GridEngineJobs implements Jobs {
 
         String identifier = connection.submitJob(jobScript);
 
-        return new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), identifier, false, false);
+        return new JobImplementation(scheduler, identifier, description, false, false);
     }
 
     @Override

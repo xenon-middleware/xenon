@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
-import java.util.UUID;
-
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Scheduler;
@@ -29,25 +27,15 @@ public class JobImplementation implements Job {
 
     private final String identifier;
 
-    private final UUID uuid;
-    
     private final boolean interactive; 
     
     private final boolean online; 
         
-    public JobImplementation(JobDescription description, Scheduler scheduler, UUID uuid, String identifier, boolean interactive, 
+    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description, boolean interactive, 
             boolean online) {  
-        
-        if (description == null) { 
-            throw new IllegalArgumentException("JobDescription may not be null!");
-        }
-        
+                
         if (scheduler == null) { 
             throw new IllegalArgumentException("Scheduler may not be null!");
-        }
-        
-        if (uuid == null) { 
-            throw new IllegalArgumentException("UUID may not be null!");
         }
         
         if (identifier == null) { 
@@ -56,7 +44,6 @@ public class JobImplementation implements Job {
         
         this.description = description;
         this.scheduler = scheduler;
-        this.uuid = uuid;
         this.identifier = identifier;
         this.interactive = interactive;
         this.online = online;
@@ -88,19 +75,14 @@ public class JobImplementation implements Job {
     }
 
     @Override
-    public UUID getUUID() {
-        return uuid;
-    }
-
-    @Override
     public String toString() {
-        return "JobImplementation [identifier=" + identifier + ", uuid=" + uuid +  ", scheduler=" + scheduler + 
+        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + 
                 ", description=" + description + ", isInteractive=" + isInteractive() + ", isOnline=" + online + "]";
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return scheduler.hashCode() + identifier.hashCode();
     }
 
     @Override
@@ -119,6 +101,6 @@ public class JobImplementation implements Job {
         
         JobImplementation other = (JobImplementation) obj;
         
-        return uuid.equals(other.uuid);
+        return identifier.equals(other.identifier) && scheduler.equals(other.scheduler); 
     }
 }

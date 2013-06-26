@@ -43,9 +43,7 @@ public class StreamsImplementationTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        Job j = new JobImplementation(desc, s, uuid, "id1", true, true);
+        Job j = new JobImplementation(s, "id1", desc, true, true);
         
         OutputStream stdin = new ByteArrayOutputStream();
         InputStream stdout = new ByteArrayInputStream(new byte[42]);

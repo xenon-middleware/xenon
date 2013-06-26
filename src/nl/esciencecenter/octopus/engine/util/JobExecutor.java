@@ -28,16 +28,11 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class JobExecutor implements Runnable {
-
-    private static Logger logger = LoggerFactory.getLogger(JobExecutor.class);
 
     private final JobImplementation job;
 

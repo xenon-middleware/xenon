@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.HashSet;
 import java.util.Set;
 

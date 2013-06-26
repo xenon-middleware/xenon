@@ -54,9 +54,7 @@ public class JobsEngineTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        Job job = new JobImplementation(desc, s, uuid, "id1", true, true);
+        Job job = new JobImplementation(s, "id1", desc, true, true);
        
         JobStatus [] status = je.getJobStatuses(job);
         
@@ -77,16 +75,12 @@ public class JobsEngineTest {
         Scheduler s = new SchedulerImplementation("test1", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        Job job1 = new JobImplementation(desc, s, uuid, "id1", true, true);
+        Job job1 = new JobImplementation(s, "id1", desc, true, true);
        
         s = new SchedulerImplementation("test1", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
-         
-        uuid = UUID.randomUUID();
         
-        Job job2 = new JobImplementation(desc, s, uuid, "id2", true, true);
+        Job job2 = new JobImplementation(s, "id2", desc, true, true);
         
         JobStatus [] status = je.getJobStatuses(job1, null, job2);
         
