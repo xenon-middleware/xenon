@@ -86,32 +86,20 @@ public class SchedulerImplementation implements Scheduler {
         return queueNames.clone();
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.jobs.Scheduler#supportsInteractive()
-     */
     @Override
     public boolean supportsInteractive() {
         return supportsInteractive;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.jobs.Scheduler#supportsBatch()
-     */
     @Override
     public boolean supportsBatch() {
         return supportsBatch;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.jobs.Scheduler#isOnline()
-     */
     @Override
     public boolean isOnline() {
         return isOnline;
     }
-
-
-    
     
     @Override
     public String toString() {

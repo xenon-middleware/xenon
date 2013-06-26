@@ -22,7 +22,7 @@ import nl.esciencecenter.octopus.jobs.Streams;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public interface ProcessWrapper {
+public interface InteractiveProcess {
     
     public Streams getStreams();
     public boolean isDone();

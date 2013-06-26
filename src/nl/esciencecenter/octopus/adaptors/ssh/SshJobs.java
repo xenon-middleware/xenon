@@ -29,6 +29,7 @@ import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -53,22 +54,22 @@ public class SshJobs implements Jobs {
 
     /**
      * Used to store all state attached to a scheduler. This way, SchedulerImplementation is immutable.
-     * 
      */
     class SchedulerInfo {
         
         final SchedulerImplementation impl;
         final Session session;
+        final FileSystem filesystem;
         final JobQueues jobQueues; 
         
-        SchedulerInfo(SchedulerImplementation impl, Session session, JobQueues jobQueues) {
+        SchedulerInfo(SchedulerImplementation impl, FileSystem fs, Session session, JobQueues jobQueues) {
             this.impl = impl;
+            this.filesystem = fs;
             this.session = session;
             this.jobQueues = jobQueues;
         }
     }
         
-    @SuppressWarnings("unused")
     private final OctopusEngine octopusEngine;
 
     private final SshAdaptor adaptor;
@@ -119,19 +120,24 @@ public class SshJobs implements Jobs {
 
         String uniqueID = getNewUniqueID();
         
-        Session session = adaptor.createNewSession(uniqueID, location, credential, this.properties);
+        Session session = adaptor.createNewSession(location, credential, this.properties);
         
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, 
                 new OctopusProperties(properties), true, true, true);
+        
+        
+        SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(adaptor, session);
+        
+        // Create a file system that uses the same SSH session as the scheduler.
+        SshFiles files = (SshFiles) adaptor.filesAdaptor();        
+        FileSystem fs = files.newFileSystem(session, location, credential, this.properties);
+       
+        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, 
+                multiQThreads, maxQSize, pollingDelay);
 
-        SSHProcessWrapperFactory factory = new SSHProcessWrapperFactory(session);
-        
-        // TODO: use the properties to change the JobQueue settings!
-        JobQueues jobQueues = new JobQueues(adaptor, scheduler, factory, multiQThreads, maxQSize, pollingDelay);
-        
         synchronized (this) {
-            schedulers.put(uniqueID, new SchedulerInfo(scheduler, session, jobQueues));
+            schedulers.put(uniqueID, new SchedulerInfo(scheduler, fs, session, jobQueues));
         }
         
         return scheduler;
@@ -166,7 +172,7 @@ public class SshJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
-        return getJobQueue(scheduler).submitJob(scheduler, description);
+        return getJobQueue(scheduler).submitJob(description);
     }
         
 

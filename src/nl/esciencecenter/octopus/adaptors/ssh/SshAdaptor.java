@@ -346,7 +346,7 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected Session createNewSession(String uniqueID, URI location, Credential credential, OctopusProperties localProperties)
+    protected Session createNewSession(URI location, Credential credential, OctopusProperties localProperties)
             throws OctopusException {
         
         URI uri = location;

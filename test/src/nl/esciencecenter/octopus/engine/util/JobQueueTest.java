@@ -18,12 +18,14 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
+import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -46,17 +48,15 @@ public class JobQueueTest {
 
     public static final int POLLING_DELAY = 250;
     
-    static class MyProcessWrapper implements ProcessWrapper {
+    static class MyProcessWrapper implements InteractiveProcess {
         
-        final Adaptor adaptor; 
         final JobImplementation job;
         
         boolean destoyed = false;
         boolean done = false;
         int exit = -1;
         
-        public MyProcessWrapper(Adaptor adaptor, JobImplementation job) { 
-            this.adaptor = adaptor;
+        public MyProcessWrapper(JobImplementation job) { 
             this.job = job;
         }
         
@@ -93,7 +93,7 @@ public class JobQueueTest {
         }
     }
     
-    static class MyFactory implements ProcessWrapperFactory {
+    static class MyFactory implements InteractiveProcessFactory {
         
         private boolean fail = false;
         
@@ -102,20 +102,21 @@ public class JobQueueTest {
         }
         
         @Override
-        public ProcessWrapper createProcessWrapper(Adaptor adaptor, JobImplementation job) throws IOException {
+        public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
             
             if (fail) {
                 currentWrapper = null;
                 throw new IOException("Failed to create process!");
             }
             
-            currentWrapper = new MyProcessWrapper(adaptor, job);
+            currentWrapper = new MyProcessWrapper(job);
             return currentWrapper;
         }
     }
     
     public static Scheduler scheduler;
-    public static Adaptor adaptor;
+    public static Octopus octopus;
+    public static FileSystem filesystem;
     public static JobQueues jobQueue;
     public static MyFactory myFactory;
     
@@ -124,12 +125,12 @@ public class JobQueueTest {
     @BeforeClass
     public static void prepare() throws Exception { 
 
+        octopus = mock(Octopus.class);
         scheduler = mock(Scheduler.class);
-        adaptor = mock(Adaptor.class);
-        when(adaptor.getName()).thenReturn("test");
-    
+        filesystem = mock(FileSystem.class);
+        
         myFactory = new MyFactory();
-        jobQueue = new JobQueues(adaptor, scheduler, myFactory, 2, -1, POLLING_DELAY);
+        jobQueue = new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, -1, POLLING_DELAY);
     }
 
     @AfterClass
@@ -152,37 +153,37 @@ public class JobQueueTest {
     @Test(expected = BadParameterException.class)
     public void test_constructor1() throws Exception {
         // throws exception
-        new JobQueues(adaptor, scheduler, myFactory, 2, -2, POLLING_DELAY);
+        new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, -2, POLLING_DELAY);
     }
 
     @Test(expected = BadParameterException.class)
     public void test_constructor2() throws Exception {
         // throws exception
-        new JobQueues(adaptor, scheduler, myFactory, 0, -1, POLLING_DELAY);
+        new JobQueues("test", octopus, scheduler, filesystem, myFactory, 0, -1, POLLING_DELAY);
     }
     
     @Test(expected = BadParameterException.class)
     public void test_constructor3() throws Exception {
         // throws exception
-        new JobQueues(adaptor, scheduler, myFactory, 2, -1, 1);
+        new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, -1, 1);
     }
     
     @Test(expected = BadParameterException.class)
     public void test_constructor4() throws Exception {
         // throws exception
-        new JobQueues(adaptor, scheduler, myFactory, 2, -1, 100000);
+        new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, -1, 100000);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
     public void test_invalidJobDescription1() throws Exception {
         JobDescription d = new JobDescription();
         d.setQueueName("aap");
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
     
     @Test(expected = IncompleteJobDescriptionException.class)
     public void test_incompleteJobDescription1() throws Exception { 
-        jobQueue.submitJob(scheduler, new JobDescription());
+        jobQueue.submitJob(new JobDescription());
     }
     
     @Test(expected = InvalidJobDescriptionException.class)
@@ -190,7 +191,7 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_invalidJobDescription2");
         d.setNodeCount(42);
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -198,7 +199,7 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_invalidJobDescription3");
         d.setProcessesPerNode(0);
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -206,7 +207,7 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_invalidJobDescription4");
         d.setMaxTime(-1);
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -215,7 +216,7 @@ public class JobQueueTest {
         d.setExecutable("exec_invalidJobDescription5");
         d.setInteractive(true);
         d.setStdin("aap");
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -224,7 +225,7 @@ public class JobQueueTest {
         d.setExecutable("exec_invalidJobDescription6");
         d.setInteractive(true);
         d.setStdout("aap");
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -233,7 +234,7 @@ public class JobQueueTest {
         d.setExecutable("exec_invalidJobDescription7");
         d.setInteractive(true);
         d.setStderr("aap");
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -241,7 +242,7 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_invalidJobDescription8");
         d.setStdout(null);
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
@@ -249,7 +250,7 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_invalidJobDescription9");
         d.setStderr(null);
-        jobQueue.submitJob(scheduler, d);
+        jobQueue.submitJob(d);
     }
 
     @Test(expected = OctopusException.class)
@@ -263,7 +264,7 @@ public class JobQueueTest {
         
         try {
             // throws exception
-            jobQueue.submitJob(scheduler, d);
+            jobQueue.submitJob(d);
         } finally { 
             myFactory.setFail(false);
         }        
@@ -282,14 +283,11 @@ public class JobQueueTest {
         
         try {
             // throws exception
-            jobQueue.submitJob(scheduler, d);
+            jobQueue.submitJob(d);
         } finally { 
             myFactory.setFail(false);
         }        
     }
-
-    
-    
 
     @Test(expected = OctopusException.class)
     public void test_invalidWaitTimeout() throws Exception {
@@ -342,7 +340,7 @@ public class JobQueueTest {
         d.setExecutable("exec_cancelJob1");
         d.setQueueName("unlimited");
 
-        Job job = jobQueue.submitJob(scheduler, d);
+        Job job = jobQueue.submitJob(d);
         
         // Wait for at least the polling delay!
         try { 
@@ -365,7 +363,7 @@ public class JobQueueTest {
         d.setExecutable("exec_cancelJob2");
         d.setQueueName("unlimited");
         
-        Job job = jobQueue.submitJob(scheduler, d);
+        Job job = jobQueue.submitJob(d);
 
         // Wait for at least the polling delay!
         try { 
@@ -392,7 +390,7 @@ public class JobQueueTest {
         d.setExecutable("exec_pollJob");
         d.setQueueName("unlimited");
         
-        Job job = jobQueue.submitJob(scheduler, d);
+        Job job = jobQueue.submitJob(d);
 
         // Wait for at least the polling delay!
         try { 
@@ -431,7 +429,7 @@ public class JobQueueTest {
         d.setExecutable("exec_waitForJob");
         d.setQueueName("unlimited");
         
-        Job job = jobQueue.submitJob(scheduler, d);
+        Job job = jobQueue.submitJob(d);
 
         JobStatus status = jobQueue.getJobStatus(job);
         
@@ -456,7 +454,7 @@ public class JobQueueTest {
         d.setExecutable("exec_getJobs");
         d.setQueueName("unlimited");
         
-        Job job = jobQueue.submitJob(scheduler, d);
+        Job job = jobQueue.submitJob(d);
 
         Job [] status = jobQueue.getJobs();
         
@@ -478,7 +476,7 @@ public class JobQueueTest {
         d.setExecutable("exec_getJobs");
         d.setQueueName("unlimited");
         
-        Job job = jobQueue.submitJob(scheduler, d);
+        Job job = jobQueue.submitJob(d);
 
         Job [] status = jobQueue.getJobs("unlimited");
         

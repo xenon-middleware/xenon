@@ -19,18 +19,18 @@ import java.io.IOException;
 
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
+import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
- * LocalInteractiveProcess implements a {@link ProcessWrapper} for local interactive processes. 
+ * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-class LocalInteractiveProcess implements ProcessWrapper {
+class LocalInteractiveProcess implements InteractiveProcess {
 
     private final java.lang.Process process;
 

@@ -74,20 +74,8 @@ public abstract class GenericJobAdaptorTestParent {
     
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(JobTestConfig testConfig) { 
-
         config = testConfig;
         TEST_ROOT = "octopus_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
-        
-//        Octopus octopus = OctopusFactory.newOctopus(null);
-//        
-//        Files files = octopus.files();
-//        
-//        FileSystem fs = files.getLocalCWDFileSystem();
-//        AbsolutePath root = fs.getEntryPath();
-//        AbsolutePath testDir = root.resolve(new RelativePath(TEST_DIR));
-//        files.createDirectory(testDir);
-//        
-//        OctopusFactory.endOctopus(octopus);
     }
 
     // MUST be invoked by a @AfterClass method of the subclass! 
@@ -98,18 +86,9 @@ public abstract class GenericJobAdaptorTestParent {
         Octopus octopus = OctopusFactory.newOctopus(null);
         
         Files files = octopus.files();
-        Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
         
-        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(TEST_ROOT));
         
@@ -620,33 +599,17 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test31");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-
-        FileSystem filesystem = null;          
-
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
-        
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
+        description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-        description.setStdout(out.getPath());
-        description.setStderr(err.getPath());
         
         Job job = jobs.submitJob(scheduler, description);
         
@@ -669,6 +632,9 @@ public abstract class GenericJobAdaptorTestParent {
         if (status.hasException()) {
             throw status.getException();
         }
+        
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
         
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -693,34 +659,17 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test32");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-
-        FileSystem filesystem = null;          
-
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
-        
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+                
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-
-        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
-        
         files.createDirectories(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
+        description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-        description.setStdout(out.getPath());
-        description.setStderr(err.getPath());
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -735,6 +684,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
         
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -752,17 +703,12 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(tmperr.length() == 0);
     }
 
-    private void submitToQueueWithPolling(String testName, Scheduler scheduler, String queueName, int jobCount) throws Exception {
+    private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
     
         String workingDir = getWorkingDir(testName);
         
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
@@ -782,16 +728,13 @@ public abstract class GenericJobAdaptorTestParent {
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
             description.setArguments("1");
-            
-            if (!scheduler.isOnline()) { 
-                description.setWorkingDirectory(root.getPath());
-            }
+            description.setWorkingDirectory(workingDir);
             
             description.setQueueName(queueName);
             description.setInteractive(false);
             description.setStdin(null);
-            description.setStdout(out[i].getPath());
-            description.setStderr(err[i].getPath());
+            description.setStdout("stdout" + i + ".txt");
+            description.setStderr("stderr" + i + ".txt");
     
             j[i] = jobs.submitJob(scheduler, description);
         }
@@ -848,32 +791,24 @@ public abstract class GenericJobAdaptorTestParent {
             files.delete(out[i]);
             files.delete(err[i]);
         }
-        
+
+        jobs.close(scheduler);
         files.delete(root);
     }
     
     @org.junit.Test
-    public void test33a_testMultiBatchJobSubmitWithPolling() throws Exception {
-        
-        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
-        for (String queue : scheduler.getQueueNames()) { 
-            submitToQueueWithPolling("test33a_" + queue, scheduler, queue, 1);    
+    public void test33a_testMultiBatchJobSubmitWithPolling() throws Exception {               
+        for (String queue : config.getQueueNames()) { 
+            submitToQueueWithPolling("test33a_" + queue, queue, 1);    
         }
 
-        jobs.close(scheduler);
     }
 
     @org.junit.Test
-    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
-        
-        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
-        for (String queue : scheduler.getQueueNames()) { 
-            submitToQueueWithPolling("test33b_" + queue, scheduler, queue, 10);    
+    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {        
+        for (String queue : config.getQueueNames()) { 
+            submitToQueueWithPolling("test33b_" + queue, queue, 3);    
         }
-
-        jobs.close(scheduler);
     }
     
     @org.junit.Test
@@ -882,14 +817,7 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test34");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
@@ -898,11 +826,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setExecutable("/bin/sleep");
         description.setArguments("60");
         description.setInteractive(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
+        description.setWorkingDirectory(workingDir);
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
@@ -940,14 +864,7 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test35");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
@@ -956,11 +873,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setExecutable("/bin/sleep");
         description.setArguments("60");
         description.setInteractive(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
+        description.setWorkingDirectory(workingDir);
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
@@ -1007,20 +920,12 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test36a");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -1028,14 +933,8 @@ public abstract class GenericJobAdaptorTestParent {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
-        description.setStdin(stdin.getPath());
-        description.setStdout(stdout.getPath());
-        description.setStderr(stderr.getPath());
+        description.setWorkingDirectory(workingDir);
+        description.setStdin("stdin.txt");
        
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -1049,7 +948,10 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         jobs.close(scheduler);
-       
+
+        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
+        
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
 
@@ -1074,20 +976,12 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test36b");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);        
@@ -1095,14 +989,8 @@ public abstract class GenericJobAdaptorTestParent {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
-        description.setStdin(stdin.getPath());
-        description.setStdout(stdout.getPath());
-        description.setStderr(stderr.getPath());
+        description.setWorkingDirectory(workingDir);
+        description.setStdin("stdin.txt");
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);
@@ -1116,6 +1004,9 @@ public abstract class GenericJobAdaptorTestParent {
         }
        
         jobs.close(scheduler);
+        
+        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
@@ -1138,6 +1029,18 @@ public abstract class GenericJobAdaptorTestParent {
     public void test37_batchJobSubmitWithoutWorkDir() throws Exception {
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+          
+        AbsolutePath stdout = filesystem.getEntryPath().resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = filesystem.getEntryPath().resolve(new RelativePath("stderr.txt"));
+        
+        if (files.exists(stdout)) { 
+            files.delete(stdout);
+        }
+        
+        if (files.exists(stderr)) { 
+            files.delete(stderr);
+        }
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
@@ -1164,20 +1067,12 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test38");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = null;
-        
-        if (scheduler.isOnline()) { 
-            filesystem = files.getLocalCWDFileSystem();
-        } else { 
-            filesystem = config.getDefaultFileSystem(files, credentials);          
-        }
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
         
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -1187,14 +1082,8 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setProcessesPerNode(2);
         description.setMergeOutputStreams(false);
-        
-        if (!scheduler.isOnline()) { 
-            description.setWorkingDirectory(workingDir);
-        }
-        
-        description.setStdin(stdin.getPath());
-        description.setStdout(stdout.getPath());
-        description.setStderr(stderr.getPath());
+        description.setWorkingDirectory(workingDir);
+        description.setStdin("stdin.txt");
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 5000);

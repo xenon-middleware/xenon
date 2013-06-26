@@ -14,31 +14,17 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.adaptors.ssh;
+package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
-import com.jcraft.jsch.Session;
-
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
-import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
-import nl.esciencecenter.octopus.engine.util.ProcessWrapperFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
-public class SSHProcessWrapperFactory implements ProcessWrapperFactory {
-
-    private final Session session;
-    
-    public SSHProcessWrapperFactory(Session session) { 
-        this.session = session;
-    }
-    
-    @Override
-    public ProcessWrapper createProcessWrapper(Adaptor adaptor, JobImplementation job) throws IOException {
-        return new SshProcessWrapper(adaptor, session, job);
-    }
+public interface InteractiveProcessFactory {
+    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException;
 }

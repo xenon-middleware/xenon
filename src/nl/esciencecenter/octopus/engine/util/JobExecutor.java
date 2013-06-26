@@ -18,11 +18,12 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -36,12 +37,15 @@ public class JobExecutor implements Runnable {
 
     private final JobImplementation job;
 
-    private final ProcessWrapperFactory factory;
+    private final InteractiveProcessFactory factory;
 
     private final int pollingDelay;
 
-    private final Adaptor adaptor;
-
+    private final String adaptorName;
+    
+    private final Files files;
+    private final FileSystem filesytem; 
+    
     private Streams streams;
 
     private Integer exitStatus;
@@ -55,10 +59,13 @@ public class JobExecutor implements Runnable {
     private String state = "PENDING";
 
     private Exception error;
-
-    public JobExecutor(Adaptor adaptor, JobImplementation job, ProcessWrapperFactory factory, int pollingDelay)
-            throws BadParameterException {
-        this.adaptor = adaptor;
+    
+    public JobExecutor(String adaptorName, Files files, FileSystem filesytem, InteractiveProcessFactory factory, 
+            JobImplementation job, int pollingDelay) throws BadParameterException {
+        
+        this.adaptorName = adaptorName;
+        this.files = files;
+        this.filesytem = filesytem;
         this.job = job;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
@@ -133,7 +140,7 @@ public class JobExecutor implements Runnable {
             return streams;
         }
 
-        throw new OctopusException(adaptor.getName(), "Job is not interactive!");
+        throw new OctopusException(adaptorName, "Job is not interactive!");
     }
 
     public synchronized void waitUntilRunning() {
@@ -179,7 +186,7 @@ public class JobExecutor implements Runnable {
     @Override
     public void run() {
 
-        ProcessWrapper process = null;
+        InteractiveProcess process = null;
 
         JobDescription description = job.getJobDescription();
 
@@ -198,10 +205,11 @@ public class JobExecutor implements Runnable {
         }
 
         try {
-            process = factory.createProcessWrapper(adaptor, job);
-
             if (description.isInteractive()) {
+                process = factory.createInteractiveProcess(job);
                 setStreams(process.getStreams());
+            } else {
+                process = new BatchProcess(files, filesytem, job, factory);
             }
         } catch (Exception e) {
             updateState("ERROR", -1, e);
