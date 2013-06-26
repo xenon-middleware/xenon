@@ -20,15 +20,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
-import nl.esciencecenter.octopus.engine.util.MergingOutputStream;
 import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import nl.esciencecenter.octopus.engine.util.StreamForwarder;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * LocalBatchProcess implements a {@link ProcessWrapper} for local batch processes. 
@@ -39,31 +34,16 @@ import org.slf4j.LoggerFactory;
  */
 class LocalBatchProcess implements ProcessWrapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocalBatchProcess.class);
-
-    private final java.lang.Process[] processes;
-
-    private final StreamForwarder[] stdinForwarders;
-    private final StreamForwarder[] stdoutForwarders;
-    private final StreamForwarder[] stderrForwarders;
-
-    private final MergingOutputStream stdoutStream;
-    private final MergingOutputStream stderrStream;
-
-    private final int [] exitCodes;
-    private final boolean [] done;
+    private final LocalInteractiveProcess process;
     
-    LocalBatchProcess(JobImplementation job) throws IOException { 
+    private StreamForwarder stdinForwarder;
+    private StreamForwarder stdoutForwarder;
+    private StreamForwarder stderrForwarder;
 
-        JobDescription description = job.getJobDescription();
+    LocalBatchProcess(LocalInteractiveProcess process, JobDescription description) throws IOException { 
+
+        this.process = process;
         
-        int count = description.getProcessesPerNode();
-
-        exitCodes = new int[count];
-        done = new boolean[count];
-
-        ProcessBuilder builder = new ProcessBuilder();
-            
         String workingDirectory = description.getWorkingDirectory();
         
         String stdout = description.getStdout();
@@ -86,122 +66,54 @@ class LocalBatchProcess implements ProcessWrapper {
             stdin = workingDirectory + File.separator + stdin;
         }
         
-        builder.command().add(description.getExecutable());
-        builder.command().addAll(description.getArguments());
-        builder.environment().putAll(description.getEnvironment());
-        builder.directory(new java.io.File(workingDirectory));
-
-        // Merge stdout and stderr into a single stream
-        if (description.getMergeOutputStreams()) {             
-            stdoutStream = new MergingOutputStream(new FileOutputStream(stdout));
-            stderrStream = new MergingOutputStream(new FileOutputStream(stderr));
+        Streams s = process.getStreams();
+        
+        stdoutForwarder = new StreamForwarder(s.getStdout(), new FileOutputStream(stdout));
+        stderrForwarder = new StreamForwarder(s.getStderr(), new FileOutputStream(stderr));
+        
+        if (stdin == null) { 
+            stdinForwarder = null;
+            s.getStdin().close();
         } else { 
-            stdoutStream = null;
-            stderrStream = null;
-        }
-
-        processes = new java.lang.Process[count];
-        stdinForwarders = new StreamForwarder[count];
-        stdoutForwarders = new StreamForwarder[count];
-        stderrForwarders = new StreamForwarder[count];
-
-        for (int i = 0; i < count; i++) {
-            processes[i] = builder.start();
-
-            if (stdin == null) {
-                stdinForwarders[i] = null;
-                processes[i].getOutputStream().close();
-            } else {
-                stdinForwarders[i] = new StreamForwarder(new FileInputStream(stdin),
-                                processes[i].getOutputStream());
-            }
-
-            if (description.getMergeOutputStreams()) { 
-                stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), stdoutStream);
-                stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(), stderrStream);
-            } else { 
-                stdoutForwarders[i] = new StreamForwarder(processes[i].getInputStream(), 
-                        new FileOutputStream(stdout + "." + i));
-                 
-                stderrForwarders[i] = new StreamForwarder(processes[i].getErrorStream(),
-                        new FileOutputStream(stderr  + "." + i));
-            }
+            stdinForwarder = new StreamForwarder(new FileInputStream(stdin), s.getStdin());
         }
     }
 
-//    private void kill() {
-//        for (int i = 0; i < processes.length; i++) {
-//            processes[i].destroy();
-//
-//            if (stdinForwarders[i] != null) {
-//                stdinForwarders[i].close();
-//            }
-//
-//            stdoutForwarders[i].close();
-//            stderrForwarders[i].close();
-//        }
-//        
-//        try {
-//            if (stdoutStream != null) { 
-//                stdoutStream.close();
-//            }
-//        } catch (IOException e) {
-//            // IGNORE
-//        }
-//        
-//        try {
-//            if (stderrStream != null) { 
-//                stderrStream.close();
-//            }
-//        } catch (IOException e) {
-//            // IGNORE
-//        }
-//    }
-
-//    public int waitFor() throws InterruptedException {
-//        
-//        int[] results = new int[processes.length];
-//
-//        for (int i = 0; i < processes.length; i++) {
-//            results[i] = processes[i].waitFor();
-//        }
-//
-//        return results[0];
-//    }
-
+    private synchronized void closeStreams() { 
+        
+        if (stdinForwarder != null) { 
+            stdinForwarder.close();
+            stdinForwarder = null;
+        }
+        
+        if (stdoutForwarder != null) { 
+            stdoutForwarder.close();
+            stdoutForwarder = null;
+        }
+        
+        if (stderrForwarder != null) { 
+            stderrForwarder.close();
+            stderrForwarder = null;
+        }
+    }
+    
     public boolean isDone() {
         
-        for (int i=0;i<processes.length;i++) {
-            
-            if (!done[i]) {
-                try { 
-                    exitCodes[i] = processes[i].exitValue();
-                    done[i] = true;
-                } catch (IllegalThreadStateException e) { 
-                    // ignored
-                    return false;
-                }
-            }
-        } 
-        
-        return true;
-    }
-  
-    public int getExitStatus() {
-        
-        for (int i=0;i<exitCodes.length;i++) { 
-            if (exitCodes[i] != 0) { 
-                return exitCodes[i];
-            }
+        if (process.isDone()) {
+            closeStreams();
+            return true;
         }
         
-        return 0;
+        return false;
+    }
+   
+    public int getExitStatus() {
+        return process.getExitStatus();
     }
     
     public void destroy() {
-        for (int i = 0; i < processes.length; i++) {
-            LocalUtils.unixDestroy(processes[i]);
-        }
+        process.destroy();
+        closeStreams();
     }
 
     @Override

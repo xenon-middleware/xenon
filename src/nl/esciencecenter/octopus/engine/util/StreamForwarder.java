@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.engine.util;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,12 +51,18 @@ public class StreamForwarder extends Thread {
     /**
      * Closes the input stream, thereby stopping the stream forwarder, and closing the output stream.
      */
-    public void close() {
+    private void close(Closeable c, String error) {
         try {
-            in.close();
-        } catch (IOException e) {
-            logger.error("Cannot close input stream", e);
+            c.close();
+        } catch (Exception e) {
+            if (error != null) { 
+                logger.error(error, e);
+            }
         }
+    }
+    
+    public void close() {
+        close(in, "Cannot close input stream");
     }
 
     public void run() {
@@ -73,16 +80,8 @@ public class StreamForwarder extends Thread {
         } catch (IOException e) {
             logger.error("Cannot forward stream", e);
         } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                logger.error("Cannot close input stream", e);
-            }
-            try {
-                out.close();
-            } catch (IOException e) {
-                logger.error("Cannot close output stream", e);
-            }
+            close(in, null);
+            close(out, null);
         }
     }
 }

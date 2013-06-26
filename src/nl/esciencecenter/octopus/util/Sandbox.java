@@ -62,7 +62,7 @@ public class Sandbox {
 
     private List<Pair> downloadFiles = new LinkedList<Pair>();
 
-    public class Pair {
+    public static class Pair {
 
         final AbsolutePath source;
         final AbsolutePath destination;
@@ -132,13 +132,21 @@ public class Sandbox {
      * @throws OctopusIOException
      */
     public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
-        this.octopus = octopus;
-
-        if (sandboxName == null) {
-            path = root.resolve(new RelativePath("octopus_sandbox_" + UUID.randomUUID()));
-        } else {
-            path = root.resolve(new RelativePath(sandboxName));
+        
+        if (octopus == null) { 
+            throw new OctopusException("Sandbox", "Need an octopus to create a sandbox!");
         }
+        
+        if (root == null) { 
+            throw new OctopusException("Sandbox", "Need an root directory to create a sandbox!");
+        }
+        
+        if (sandboxName == null) {
+            sandboxName = "octopus_sandbox_" + UUID.randomUUID();
+        }
+        
+        this.octopus = octopus;
+        this.path = root.resolve(new RelativePath(sandboxName));
     }
 
     /**
@@ -251,10 +259,6 @@ public class Sandbox {
         copy(downloadFiles, options);
     }
 
-    public void wipe() throws OctopusIOException {
-        FileUtils.recursiveWipe(octopus, path);
-    }
-
     /**
      * Deletes all files in sandbox.
      *
@@ -268,8 +272,8 @@ public class Sandbox {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((octopus == null) ? 0 : octopus.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + octopus.hashCode();
+        result = prime * result + path.hashCode();
         result = prime * result + uploadFiles.hashCode();
         result = prime * result + downloadFiles.hashCode();
         return result;
@@ -286,27 +290,25 @@ public class Sandbox {
         if (getClass() != obj.getClass()) {
             return false;
         }
+        
         Sandbox other = (Sandbox) obj;
-        if (octopus == null) {
-            if (other.octopus != null) {
-                return false;
-            }
-        } else if (!octopus.equals(other.octopus)) {
+    
+        if (!octopus.equals(other.octopus)) {
             return false;
         }
-        if (path == null) {
-            if (other.path != null) {
-                return false;
-            }
-        } else if (!path.equals(other.path)) {
+        
+        if (!path.equals(other.path)) {
             return false;
         }
+        
         if (!downloadFiles.equals(other.downloadFiles)) {
             return false;
         }
+        
         if (!uploadFiles.equals(other.uploadFiles)) {
             return false;
         }
+        
         return true;
     }
 

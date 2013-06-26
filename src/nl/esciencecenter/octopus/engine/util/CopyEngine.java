@@ -127,16 +127,20 @@ public class CopyEngine {
     private void append(AbsolutePath source, long fromOffset, AbsolutePath target, CopyInfo ac) throws OctopusIOException { 
 
         // We need to append some bytes from source to target. 
-        try (InputStream in = owner.newInputStream(source); 
-             OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND)) {
-
+        
+        InputStream in = owner.newInputStream(source);
+        OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND);
+        
+        try { 
             in.skip(fromOffset);
-            
             streamCopy(in, out, ac);
         } catch (IOException e) { 
             throw new OctopusIOException("CopyEngine", "Failed to copy " + source.getPath() + ":" + fromOffset + 
                     " to target " + target.getPath(), e);
-        }          
+        } finally { 
+            close(in);
+            close(out);
+        }
     }
     
     private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws OctopusIOException, IOException { 
@@ -144,9 +148,10 @@ public class CopyEngine {
         byte [] buf1 = new byte[4*1024];
         byte [] buf2 = new byte[4*1024];
         
-        try (InputStream in1 = owner.newInputStream(target);
-             InputStream in2 = owner.newInputStream(source)) { 
-            
+        InputStream in1 = owner.newInputStream(target);
+        InputStream in2 = owner.newInputStream(source);
+        
+        try {  
             while (true) { 
 
                 if (ac.isCancelled()) {
@@ -169,8 +174,11 @@ public class CopyEngine {
                         return false;
                     }
                 }
-            }           
-        }        
+            }
+        } finally { 
+            close(in1);
+            close(in2);            
+        }
     }
     
     private void doResume(CopyInfo ac) throws OctopusIOException {
@@ -361,9 +369,7 @@ public class CopyEngine {
     
     private void copy(CopyInfo info) {
         
-        if (logger.isDebugEnabled()) { 
-            logger.debug("Start copy: " + info);
-        }
+        logger.debug("Start copy: {}", info);
         
         try { 
             switch (info.mode) { 
@@ -386,9 +392,7 @@ public class CopyEngine {
             info.setException(e);
         }
         
-        if (logger.isDebugEnabled()) { 
-            logger.debug("Finished copy: " + info);
-        }        
+        logger.debug("Finished copy: {}", info);
     }
     
     public void copy(CopyInfo info, boolean asynchronous) {
