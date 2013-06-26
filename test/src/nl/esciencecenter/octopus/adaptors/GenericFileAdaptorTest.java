@@ -35,6 +35,7 @@ import java.util.Set;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Copy;
@@ -57,61 +58,59 @@ import org.junit.runners.MethodSorters;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractFileTestParent {
+public abstract class GenericFileAdaptorTest {
 
-    protected static final String ROOT = "octopus_test_" + System.currentTimeMillis();
-    //protected static String TEST_ID = UUID.randomUUID().toString();
+    protected static String TEST_ROOT;
+    
+    public static FileTestConfig config;
     
     protected Octopus octopus;
     protected Files files;
+    protected Credentials credentials;
+    
     protected AbsolutePath testDir;
     
     private long counter = 0;
     
+    // MUST be invoked by a @BeforeClass method of the subclass! 
+    public static void prepareClass(FileTestConfig testConfig) throws Exception {
+        config = testConfig;
+        TEST_ROOT = "octopus_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
+    }
+
+    // MUST be invoked by a @AfterClass method of the subclass! 
+    public static void cleanupClass() throws Exception { 
+        
+        System.err.println("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
+        
+        Octopus octopus = OctopusFactory.newOctopus(null);
+        
+        Files files = octopus.files();
+        Credentials credentials = octopus.credentials();
+        
+        FileSystem filesystem = config.getTestFileSystem(files, credentials);
+        
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(TEST_ROOT));
+        
+        if (files.exists(root)) { 
+            files.delete(root);
+        }
+
+        OctopusFactory.endOctopus(octopus);
+    }
+    
     protected void prepare() throws Exception { 
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
+        credentials = octopus.credentials();
     }
 
     protected void cleanup() throws Exception { 
-        octopus.end();
-        
+        octopus.end();        
         files = null;
         octopus = null;
     }
-    
-    public abstract URI getCorrectURI() throws Exception;
-    public abstract URI getCorrectURIWithPath() throws Exception;
-    
-    public abstract URI getURIWrongUser() throws Exception;
-    public abstract URI getURIWrongLocation() throws Exception;
-    
-    public abstract URI getURIWrongPath() throws Exception;
-    
-    public abstract boolean supportURIUser();
-    public abstract boolean supportURILocation();
-    
-    public abstract Credential getDefaultCredential() throws Exception;
-    public abstract Credential getNonDefaultCredential() throws Exception;
-    
-    public abstract boolean supportNonDefaultCredential();
-    public abstract boolean supportNullCredential();
-    
-    public abstract Properties getCorrectProperties() throws Exception;
-    public abstract Properties getIncorrectProperties() throws Exception;
-    
-    public abstract boolean supportProperties();
-
-    public abstract FileSystem getTestFileSystem() throws Exception;
-    public abstract void closeTestFileSystem(FileSystem fs) throws Exception;
-    
-    public abstract boolean supportsClose();
-    
-    public abstract boolean supportsLocalCWDFileSystem();
-    public abstract boolean supportsLocalHomeFileSystem();
-    
-    public abstract boolean supportsNewByteChannel();
-    
+        
     // Various util functions ------------------------------------------------------------
 
     class AllTrue implements DirectoryStream.Filter { 
@@ -219,7 +218,7 @@ public abstract class AbstractFileTestParent {
         }
 
         AbsolutePath entry = fs.getEntryPath();
-        testDir = entry.resolve(new RelativePath(new String [] { ROOT, testName }));
+        testDir = entry.resolve(new RelativePath(new String [] { TEST_ROOT, testName }));
         
         if (!files.exists(testDir)) { 
             files.createDirectories(testDir);
@@ -391,45 +390,47 @@ public abstract class AbstractFileTestParent {
         test00_newFileSystem(null, null, null, true);
         
         // test with correct URI with default credential and without properties
-        test00_newFileSystem(getCorrectURI(), getDefaultCredential(), null, false);
+        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), null, false);
  
         // test with correct URI with default credential and without properties
-        test00_newFileSystem(getCorrectURIWithPath(), getDefaultCredential(), null, false);
+        test00_newFileSystem(config.getCorrectURIWithPath(), config.getDefaultCredential(credentials), null, false);
         
         // test with correct URI with default credential and without properties
-        test00_newFileSystem(getCorrectURIWithPath(), getDefaultCredential(), null, false);
+        test00_newFileSystem(config.getCorrectURIWithPath(), config.getDefaultCredential(credentials), null, false);
         
         // test with wrong URI user with default credential and without properties
-        if (supportURIUser()) { 
-            test00_newFileSystem(getURIWrongUser(), getDefaultCredential(), null, true);
+        if (config.supportURIUser()) { 
+            test00_newFileSystem(config.getURIWrongUser(), config.getDefaultCredential(credentials), null, true);
         }
         
         // test with wrong URI location with default credential and without properties
-        if (supportURILocation()) { 
-            test00_newFileSystem(getURIWrongLocation(), getDefaultCredential(), null, true);
+        if (config.supportURILocation()) { 
+            test00_newFileSystem(config.getURIWrongLocation(), config.getDefaultCredential(credentials), null, true);
         }
         
         // test with wrong URI path with default credential and without properties
-        test00_newFileSystem(getURIWrongPath(), getDefaultCredential(), null, true);
+        test00_newFileSystem(config.getURIWrongPath(), config.getDefaultCredential(credentials), null, true);
         
         // test with correct URI without credential and without properties
-        boolean allowNull = supportNullCredential();
-        test00_newFileSystem(getCorrectURI(), null, null, !allowNull);
+        boolean allowNull = config.supportNullCredential();
+        test00_newFileSystem(config.getCorrectURI(), null, null, !allowNull);
        
         // test with correct URI with non-default credential and without properties
-        if (supportNonDefaultCredential()) { 
-            test00_newFileSystem(getCorrectURI(), getNonDefaultCredential(), null, false);
+        if (config.supportNonDefaultCredential()) { 
+            test00_newFileSystem(config.getCorrectURI(), config.getNonDefaultCredential(credentials), null, false);
         }
         
         // test with correct URI with default credential and with empty properties
-        test00_newFileSystem(getCorrectURI(), getDefaultCredential(), new Properties(), false);
+        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), new Properties(), false);
     
         // test with correct URI with default credential and with correct properties
-        if (supportProperties()) { 
-            test00_newFileSystem(getCorrectURI(), getDefaultCredential(), getCorrectProperties(), false);
+        if (config.supportsProperties()) { 
+            test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), config.getCorrectProperties(), 
+                    false);
         
             // test with correct URI with default credential and with wrong properties
-            test00_newFileSystem(getCorrectURI(), getDefaultCredential(), getIncorrectProperties(), true);
+            // test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), getIncorrectProperties(), 
+            // true);
         }
         
         cleanup();
@@ -478,12 +479,12 @@ public abstract class AbstractFileTestParent {
         // test with null filesystem 
         test01_isOpen(null, false, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
 
         // test with correct open filesystem
         test01_isOpen(fs, true, false);
 
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             files.close(fs);
             
             // test with correct closed filesystem
@@ -529,9 +530,9 @@ public abstract class AbstractFileTestParent {
         // test with null filesystem 
         test02_close(null, true);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
 
-            FileSystem fs = getTestFileSystem();
+            FileSystem fs =  config.getTestFileSystem(files, credentials);
 
             // test with correct open filesystem
             test02_close(fs, false);
@@ -585,7 +586,7 @@ public abstract class AbstractFileTestParent {
         
         prepare();
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         String root = "/";
         
         // test with null filesystem and null relative path 
@@ -644,10 +645,10 @@ public abstract class AbstractFileTestParent {
         // test with null
         test04_createDirectory(null, true);
         
-        FileSystem fs = getTestFileSystem();      
+        FileSystem fs = config.getTestFileSystem(files, credentials);      
         
         AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(new String [] { ROOT }));
+        AbsolutePath root = entry.resolve(new RelativePath(new String [] { TEST_ROOT }));
 
         // test with non-existing dir
         test04_createDirectory(root, false);
@@ -668,9 +669,9 @@ public abstract class AbstractFileTestParent {
         // cleanup 
         deleteTestDir(root);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test04_createDirectory(root, true);
         }
 
@@ -721,10 +722,10 @@ public abstract class AbstractFileTestParent {
         // test with null
         test05_createDirectories(null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         
         AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(new String [] { ROOT, "test05_createDirectories" }));
+        AbsolutePath root = entry.resolve(new RelativePath(new String [] { TEST_ROOT, "test05_createDirectories" }));
                
         // test with non-existing dir
         test05_createDirectories(root, false);
@@ -752,9 +753,9 @@ public abstract class AbstractFileTestParent {
         deleteTestDir(dir0);
         deleteTestDir(root);
 
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test05_createDirectories(root, true);
         }
 
@@ -806,7 +807,7 @@ public abstract class AbstractFileTestParent {
         prepare();
         
         // prepare
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test06_isDirectory");
         
         // test with null        
@@ -826,9 +827,9 @@ public abstract class AbstractFileTestParent {
         
         // cleanup        
         deleteTestDir(testDir);
-        closeTestFileSystem(fs);      
+        config.closeTestFileSystem(files,fs);      
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed filesystem
             test06_isDirectory(testDir, true, true);
         }        
@@ -873,7 +874,7 @@ public abstract class AbstractFileTestParent {
         prepare();
         
         // prepare
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test07_createFile");
         
         // test with null        
@@ -898,9 +899,9 @@ public abstract class AbstractFileTestParent {
         // cleanup 
         files.delete(file0);
         deleteTestDir(testDir);
-        closeTestFileSystem(fs);      
+        config.closeTestFileSystem(files,fs);      
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed filesystem
             test07_createFile(file0, true);
         }        
@@ -951,7 +952,7 @@ public abstract class AbstractFileTestParent {
         prepare();
         
         // prepare
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test08_exists");
         
         // test with null
@@ -968,7 +969,7 @@ public abstract class AbstractFileTestParent {
         
         // cleanup
         deleteTestDir(testDir);
-        closeTestFileSystem(fs);
+        config.closeTestFileSystem(files,fs);
         
         cleanup();
     }
@@ -1017,7 +1018,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test09_delete(null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test09_delete");        
 
         // test with non-existing file
@@ -1050,9 +1051,9 @@ public abstract class AbstractFileTestParent {
         deleteTestDir(dir1);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test09_delete(testDir, true);
         }
 
@@ -1104,7 +1105,7 @@ public abstract class AbstractFileTestParent {
         // test with null parameter 
         test10_size(null, -1, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test10_size");
         
         // test with non existing file
@@ -1128,8 +1129,8 @@ public abstract class AbstractFileTestParent {
         deleteTestDir(testDir);
         
         // test with closed filesystem
-        if (supportsClose()) { 
-            closeTestFileSystem(fs);
+        if (config.supportsClose()) { 
+            config.closeTestFileSystem(files,fs);
             test10_size(file1, 0, true);               
         }
         
@@ -1201,7 +1202,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test11_newDirectoryStream(null, null, true);
        
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test11_newDirectoryStream");
                
         // test with empty dir 
@@ -1244,9 +1245,9 @@ public abstract class AbstractFileTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test11_newDirectoryStream(testDir, null, true);
         }
 
@@ -1331,7 +1332,7 @@ public abstract class AbstractFileTestParent {
         // test with null 
         test12_newDirectoryStream(null, null, null, true);
        
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test12_newDirectoryStream_with_filter");
                
         // test with empty dir + null filter 
@@ -1386,9 +1387,9 @@ public abstract class AbstractFileTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test12_newDirectoryStream(testDir, new AllTrue(), null, true);
         }
 
@@ -1460,7 +1461,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test13_getAttributes(null, false, -1, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test13_getAttributes");
         
         // test with non-existing file
@@ -1486,9 +1487,9 @@ public abstract class AbstractFileTestParent {
         deleteTestFile(file1);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test13_getAttributes(testDir, false, -1, true);
         }
     }
@@ -1541,7 +1542,7 @@ public abstract class AbstractFileTestParent {
         // test with null, null
         test14_setPosixFilePermissions(null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test14_setPosixFilePermissions");
         
         // test with existing file, null set
@@ -1586,9 +1587,9 @@ public abstract class AbstractFileTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test14_setPosixFilePermissions(file0, permissions, true);
         }
     }
@@ -1690,7 +1691,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test15_newAttributesDirectoryStream(null, null, true);
        
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test15_newAttrributesDirectoryStream");
         
         // test with empty dir 
@@ -1733,9 +1734,9 @@ public abstract class AbstractFileTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test15_newAttributesDirectoryStream(testDir, null, true);
         }
 
@@ -1839,7 +1840,7 @@ public abstract class AbstractFileTestParent {
         // test with null 
         test16_newAttributesDirectoryStream(null, null, null, true);
        
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test15_newAttributesDirectoryStream_with_filter");
         
         // test with empty dir + null filter 
@@ -1903,9 +1904,9 @@ public abstract class AbstractFileTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, true);
         }
 
@@ -1973,7 +1974,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test20_newInputStream(null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test20_newInputStream");
         
         // test with non-existing file
@@ -1998,9 +1999,9 @@ public abstract class AbstractFileTestParent {
         deleteTestDir(dir0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test20_newInputStream(file2, data, true);
         }
 
@@ -2074,7 +2075,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test21_newOutputStream(null, null, null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test21_newOuputStream");
         
         // test with existing file and null options
@@ -2170,9 +2171,9 @@ public abstract class AbstractFileTestParent {
         
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test21_newOutputStream(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, null, null, true);             
         }
 
@@ -2193,7 +2194,7 @@ public abstract class AbstractFileTestParent {
     
     public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, boolean mustFail) throws Exception {
 
-        if (!supportsNewByteChannel()) {
+        if (!config.supportsNewByteChannel()) {
             return;
         }
         
@@ -2241,7 +2242,7 @@ public abstract class AbstractFileTestParent {
     @org.junit.Test
     public void test21_newByteChannel() throws Exception { 
 
-        if (!supportsNewByteChannel()) {
+        if (!config.supportsNewByteChannel()) {
             return;
         }
         
@@ -2253,7 +2254,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test22_newByteChannel(null, null, null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test22_newByteChannel");
         
         // test with existing file and null options
@@ -2333,9 +2334,9 @@ public abstract class AbstractFileTestParent {
         
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             // test with closed fs
-            closeTestFileSystem(fs);
+            config.closeTestFileSystem(files,fs);
             test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND, OpenOption.READ }, 
                     null, null, true);             
         }
@@ -2399,7 +2400,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test23_copy(null, null, null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test23_copy");
         
         AbsolutePath file0 = createTestFile(testDir, data);
@@ -2530,7 +2531,7 @@ public abstract class AbstractFileTestParent {
             
         prepare();
 
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test24_copy_async");
         AbsolutePath file0 = createTestFile(testDir, data);
         AbsolutePath file1 = createNewTestFileName(testDir);
@@ -2575,7 +2576,7 @@ public abstract class AbstractFileTestParent {
     @org.junit.Test
     public void test25_getLocalCWDFileSystem() throws Exception { 
     
-        if (supportsLocalCWDFileSystem()) { 
+        if (config.supportsLocalCWDFileSystem()) { 
 
             prepare();
 
@@ -2592,7 +2593,7 @@ public abstract class AbstractFileTestParent {
     @org.junit.Test
     public void test26_getLocalHomeFileSystem() throws Exception { 
 
-        if (supportsLocalHomeFileSystem()) { 
+        if (config.supportsLocalHomeFileSystem()) { 
             prepare();
         
             try { 
@@ -2658,7 +2659,7 @@ public abstract class AbstractFileTestParent {
     
         test27_move(null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test27_move");
         
         // test with non-existing source
@@ -2741,7 +2742,7 @@ public abstract class AbstractFileTestParent {
         // test with null
         test28_readSymbolicLink(null, null, true);
         
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test28_readSybmolicLink");
         
         // test with non-exising file
@@ -2760,7 +2761,7 @@ public abstract class AbstractFileTestParent {
         deleteTestDir(dir0);
         deleteTestDir(testDir);
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
             files.close(fs);
             // TODO
         }
@@ -2775,7 +2776,7 @@ public abstract class AbstractFileTestParent {
 
         prepare();
 
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
         AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
@@ -2827,7 +2828,7 @@ public abstract class AbstractFileTestParent {
 
         prepare();
 
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
         AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
@@ -2854,7 +2855,7 @@ public abstract class AbstractFileTestParent {
     
         prepare();
 
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
         AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
@@ -2897,7 +2898,7 @@ public abstract class AbstractFileTestParent {
     
         prepare();
 
-        FileSystem fs = getTestFileSystem();
+        FileSystem fs =  config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
         AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));

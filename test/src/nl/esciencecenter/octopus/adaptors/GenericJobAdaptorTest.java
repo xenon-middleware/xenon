@@ -22,13 +22,13 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
+import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
@@ -50,9 +50,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -62,43 +60,64 @@ import org.junit.runners.MethodSorters;
  *
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractJobTestParent {
+public abstract class GenericJobAdaptorTest {
     
-    private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
+    private static String TEST_ROOT;
+    
+    private static JobTestConfig config;
     
     protected Octopus octopus;
     protected Files files;
     protected Jobs jobs;
+    protected Credentials credentials;
+
     protected AbsolutePath testDir;
     
-    @BeforeClass
-    public static void prepareClass() throws OctopusIOException, OctopusException { 
+    // MUST be invoked by a @BeforeClass method of the subclass! 
+    public static void prepareClass(JobTestConfig testConfig) { 
 
-        Octopus octopus = OctopusFactory.newOctopus(null);
+        config = testConfig;
+        TEST_ROOT = "octopus_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
         
-        Files files = octopus.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath root = fs.getEntryPath();
-        AbsolutePath testDir = root.resolve(new RelativePath(TEST_DIR));
-        files.createDirectory(testDir);
-        
-        OctopusFactory.endOctopus(octopus);
+//        Octopus octopus = OctopusFactory.newOctopus(null);
+//        
+//        Files files = octopus.files();
+//        
+//        FileSystem fs = files.getLocalCWDFileSystem();
+//        AbsolutePath root = fs.getEntryPath();
+//        AbsolutePath testDir = root.resolve(new RelativePath(TEST_DIR));
+//        files.createDirectory(testDir);
+//        
+//        OctopusFactory.endOctopus(octopus);
     }
 
-    @AfterClass
-    public static void cleanupClass() throws OctopusException, OctopusIOException { 
+    // MUST be invoked by a @AfterClass method of the subclass! 
+    public static void cleanupClass() throws Exception { 
+        
+        System.err.println("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
         
         Octopus octopus = OctopusFactory.newOctopus(null);
         
         Files files = octopus.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath root = fs.getEntryPath();
-        AbsolutePath testDir = root.resolve(new RelativePath(TEST_DIR));
-    
-        if (files.exists(testDir)) { 
-            files.delete(testDir);
+        Jobs jobs = octopus.jobs();
+        Credentials credentials = octopus.credentials();
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        
+        FileSystem filesystem = null;
+        
+        if (scheduler.isOnline()) { 
+            filesystem = files.getLocalCWDFileSystem();
+        } else { 
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(TEST_ROOT));
+        
+        if (files.exists(root)) { 
+            files.delete(root);
+        }
+
         OctopusFactory.endOctopus(octopus);
     }
     
@@ -107,6 +126,7 @@ public abstract class AbstractJobTestParent {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
         jobs = octopus.jobs();
+        credentials = octopus.credentials();
     }
     
     @After
@@ -114,31 +134,8 @@ public abstract class AbstractJobTestParent {
         OctopusFactory.endOctopus(octopus);
     }
     
-    public abstract String getAdaptorName();
-   
-    public abstract URI getValidURI() throws Exception;
-    public abstract URI getInvalidLocationURI() throws Exception;
-    public abstract URI getInvalidPathURI() throws Exception;
-    
-    public abstract boolean supportsCredentials() throws Exception;
-    public abstract Credential getDefaultCredential() throws Exception;
-    public abstract Credential getPasswordCredential() throws Exception;
-    public abstract Credential getInvalidCredential() throws Exception ;
-    
-    public abstract boolean supportsProperties() throws Exception;
-    public abstract Properties getDefaultProperties() throws Exception;
-    public abstract Properties getUnknownProperties() throws Exception;
-    public abstract Properties [] getInvalidProperties() throws Exception;
-    
-    public abstract boolean supportsClose() throws Exception;
-    
-    public abstract Scheduler getDefaultScheduler() throws Exception;
-    public abstract FileSystem getDefaultFileSystem() throws Exception;
-    
-    public abstract String getInvalidQueueName() throws Exception;
-    
     private String getWorkingDir(String testName) { 
-        return "octopus_" + getAdaptorName() + "_" + testName + "_" + System.currentTimeMillis();
+        return TEST_ROOT + "/" + testName;
     }
     
     
@@ -156,31 +153,31 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test01_newScheduler() throws Exception { 
-        Scheduler s = jobs.newScheduler(getValidURI(), null, null);
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), null, null);
         jobs.close(s);
     }
     
     @Test(expected = OctopusException.class)
     public void test02a_newScheduler() throws Exception { 
-        jobs.newScheduler(getInvalidLocationURI(), null, null);
+        jobs.newScheduler(config.getURIWrongLocation(), null, null);
     }
 
     @Test(expected = OctopusException.class)
     public void test02b_newScheduler() throws Exception { 
-        jobs.newScheduler(getInvalidPathURI(), null, null);
+        jobs.newScheduler(config.getURIWrongPath(), null, null);
     }
     
     @Test
     public void test03_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), null);
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), null);
         jobs.close(s);
     }
 
     @Test
     public void test04a_newScheduler() throws Exception {
-        if (supportsCredentials()) { 
+        if (config.supportsCredentials()) { 
             try {
-                Scheduler s = jobs.newScheduler(getValidURI(), getInvalidCredential(), null);
+                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getInvalidCredential(credentials), null);
                 jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
             } catch (InvalidCredentialsException e) {
@@ -193,7 +190,7 @@ public abstract class AbstractJobTestParent {
 
     @Test
     public void test04b_newScheduler() throws Exception {
-        if (!supportsCredentials()) { 
+        if (!config.supportsCredentials()) { 
             try {
                 Credential c = new Credential() { 
                     @Override
@@ -207,7 +204,7 @@ public abstract class AbstractJobTestParent {
                     }
                 };
                 
-                Scheduler s = jobs.newScheduler(getValidURI(), c, null);
+                Scheduler s = jobs.newScheduler(config.getCorrectURI(), c, null);
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw OctopusException");
@@ -219,33 +216,35 @@ public abstract class AbstractJobTestParent {
 
     @Test
     public void test04c_newScheduler() throws Exception {
-        if (supportsCredentials()) { 
-            Scheduler s = jobs.newScheduler(getValidURI(), getPasswordCredential(), getDefaultProperties());
+        if (config.supportsCredentials()) { 
+            Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials), 
+                    config.getDefaultProperties());
             jobs.close(s);
         }
     }
     
     @Test
     public void test05_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), new Properties());
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new Properties());
         jobs.close(s);
     }
 
     @Test
     public void test06_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), getDefaultProperties());
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), 
+                config.getDefaultProperties());
         jobs.close(s);
     }
     
     @Test
     public void test07_newScheduler() throws Exception {
-        if (supportsProperties()) {
+        if (config.supportsProperties()) {
             
-            Properties [] tmp = getInvalidProperties();
+            Properties [] tmp = config.getInvalidProperties();
             
             for (Properties p : tmp) { 
                 try { 
-                    Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), p);
+                    Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                     jobs.close(s);
                     throw new Exception("newScheduler did NOT throw InvalidPropertyException");
                 } catch (InvalidPropertyException e) {
@@ -257,9 +256,10 @@ public abstract class AbstractJobTestParent {
 
     @Test
     public void test08_newScheduler() throws Exception {
-        if (supportsProperties()) { 
+        if (config.supportsProperties()) { 
             try { 
-                Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), getUnknownProperties());
+                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), 
+                        config.getUnknownProperties());
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw UnknownPropertyException");
@@ -271,11 +271,11 @@ public abstract class AbstractJobTestParent {
 
     @Test
     public void test09_newScheduler() throws Exception {
-        if (!supportsProperties()) { 
+        if (!config.supportsProperties()) { 
             try { 
                 Properties p = new Properties();
                 p.put("aap", "noot");
-                Scheduler s = jobs.newScheduler(getValidURI(), getDefaultCredential(), p);
+                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw OctopusException");
@@ -303,8 +303,8 @@ public abstract class AbstractJobTestParent {
      
     @Test
     public void test11_open_close() throws Exception {
-        if (supportsClose()) { 
-            Scheduler s = getDefaultScheduler(); 
+        if (config.supportsClose()) { 
+            Scheduler s = config.getDefaultScheduler(jobs, credentials); 
              
             assertTrue(jobs.isOpen(s));
             
@@ -316,8 +316,8 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test12_open_close() throws Exception {
-        if (!supportsClose()) { 
-            Scheduler s = getDefaultScheduler(); 
+        if (!config.supportsClose()) { 
+            Scheduler s = config.getDefaultScheduler(jobs, credentials); 
              
             assertTrue(jobs.isOpen(s));
             
@@ -329,8 +329,8 @@ public abstract class AbstractJobTestParent {
 
     @Test
     public void test13_open_close() throws Exception {
-        if (supportsClose()) { 
-            Scheduler s = getDefaultScheduler(); 
+        if (config.supportsClose()) { 
+            Scheduler s = config.getDefaultScheduler(jobs, credentials); 
             jobs.close(s);
             
             try { 
@@ -344,24 +344,24 @@ public abstract class AbstractJobTestParent {
  
     @Test
     public void test14a_getJobs() throws Exception {
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         jobs.getJobs(s, s.getQueueNames());
         jobs.close(s);
     }
     
     @Test
     public void test14b_getJobs() throws Exception {
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         jobs.getJobs(s);
         jobs.close(s);
     }
     
     @Test
     public void test15_getJobs() throws Exception {
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
 
         try {
-            jobs.getJobs(s, getInvalidQueueName());
+            jobs.getJobs(s, config.getInvalidQueueName());
             throw new Exception("close did NOT throw NoSuchQueueException");
         } catch (NoSuchQueueException e) { 
             // expected
@@ -373,9 +373,9 @@ public abstract class AbstractJobTestParent {
     @Test
     public void test16_getJobs() throws Exception {
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
         
-            Scheduler s = getDefaultScheduler();        
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);        
 
             jobs.close(s);
             
@@ -391,16 +391,16 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test17_getQueueStatus() throws Exception {        
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         jobs.getQueueStatus(s, s.getQueueNames()[0]);
         jobs.close(s);
     }
     
     @Test(expected = NoSuchQueueException.class)
     public void test18a_getQueueStatus() throws Exception {        
-        Scheduler s = getDefaultScheduler();
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
         try { 
-            jobs.getQueueStatus(s, getInvalidQueueName());
+            jobs.getQueueStatus(s, config.getInvalidQueueName());
         } finally { 
             jobs.close(s);
         }
@@ -408,7 +408,7 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test18b_getQueueStatus() throws Exception {        
-        Scheduler s = getDefaultScheduler();
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
         try { 
             jobs.getQueueStatus(s, null);
         } finally { 
@@ -426,9 +426,9 @@ public abstract class AbstractJobTestParent {
     @Test
     public void test20_getQueueStatus() throws Exception {
         
-        if (supportsClose()) { 
+        if (config.supportsClose()) { 
         
-            Scheduler s = getDefaultScheduler();
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);
             jobs.close(s);
             
             try { 
@@ -443,7 +443,7 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test21a_getQueueStatuses() throws Exception {        
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         QueueStatus [] tmp = jobs.getQueueStatuses(s, s.getQueueNames());
         jobs.close(s);
 
@@ -459,7 +459,7 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test21b_getQueueStatuses() throws Exception {        
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         QueueStatus [] tmp = jobs.getQueueStatuses(s);
         jobs.close(s);
         
@@ -476,9 +476,9 @@ public abstract class AbstractJobTestParent {
     
     @Test
     public void test22_getQueueStatuses() throws Exception {        
-        Scheduler s = getDefaultScheduler();        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         try { 
-            QueueStatus [] tmp = jobs.getQueueStatuses(s, getInvalidQueueName());
+            QueueStatus [] tmp = jobs.getQueueStatuses(s, config.getInvalidQueueName());
 
             assertTrue(tmp != null);
             assertTrue(tmp.length == 1);
@@ -499,8 +499,8 @@ public abstract class AbstractJobTestParent {
     @Test
     public void test24_getQueueStatuses() throws Exception {
         
-        if (supportsClose()) { 
-            Scheduler s = getDefaultScheduler();
+        if (config.supportsClose()) { 
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);
             jobs.close(s);
             
             try { 
@@ -573,7 +573,7 @@ public abstract class AbstractJobTestParent {
     @org.junit.Test
     public void test30_interactiveJobSubmit() throws Exception {
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         if (scheduler.isOnline()) { 
         
@@ -620,18 +620,18 @@ public abstract class AbstractJobTestParent {
         String message = "Hello World! test31";
         String workingDir = getWorkingDir("test31");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         FileSystem filesystem = null;          
 
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
 
         AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
         AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
@@ -656,7 +656,7 @@ public abstract class AbstractJobTestParent {
         JobStatus status = jobs.getJobStatus(job);
         
         while (!status.isDone()) {
-            Thread.sleep(100);
+            Thread.sleep(1000);
             
             long now = System.currentTimeMillis();
             
@@ -693,14 +693,14 @@ public abstract class AbstractJobTestParent {
         String message = "Hello World! test32";
         String workingDir = getWorkingDir("test32");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         FileSystem filesystem = null;          
 
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
@@ -708,7 +708,7 @@ public abstract class AbstractJobTestParent {
         AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
         AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
         
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
@@ -762,11 +762,11 @@ public abstract class AbstractJobTestParent {
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         AbsolutePath [] out = new AbsolutePath[jobCount]; 
         AbsolutePath [] err = new AbsolutePath[jobCount]; 
@@ -825,7 +825,7 @@ public abstract class AbstractJobTestParent {
             if (count == 0) { 
                 done = true;
             } else { 
-                Thread.sleep(100);
+                Thread.sleep(1000);
                 
                 long now = System.currentTimeMillis();
                 
@@ -856,7 +856,7 @@ public abstract class AbstractJobTestParent {
     @org.junit.Test
     public void test33a_testMultiBatchJobSubmitWithPolling() throws Exception {
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         for (String queue : scheduler.getQueueNames()) { 
             submitToQueueWithPolling("test33a_" + queue, scheduler, queue, 1);    
@@ -868,7 +868,7 @@ public abstract class AbstractJobTestParent {
     @org.junit.Test
     public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         for (String queue : scheduler.getQueueNames()) { 
             submitToQueueWithPolling("test33b_" + queue, scheduler, queue, 10);    
@@ -882,18 +882,18 @@ public abstract class AbstractJobTestParent {
         
         String workingDir = getWorkingDir("test34");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         FileSystem filesystem = null;
         
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
@@ -940,18 +940,18 @@ public abstract class AbstractJobTestParent {
         
         String workingDir = getWorkingDir("test35");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         FileSystem filesystem = null;
         
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
@@ -1007,17 +1007,17 @@ public abstract class AbstractJobTestParent {
         String message = "Hello World! test36a";
         String workingDir = getWorkingDir("test36a");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = null;
         
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
@@ -1074,17 +1074,17 @@ public abstract class AbstractJobTestParent {
         String message = "Hello World! test36b";
         String workingDir = getWorkingDir("test36b");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = null;
         
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
@@ -1138,7 +1138,7 @@ public abstract class AbstractJobTestParent {
     @org.junit.Test
     public void test37_batchJobSubmitWithoutWorkDir() throws Exception {
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
@@ -1164,17 +1164,17 @@ public abstract class AbstractJobTestParent {
         String message = "Hello World! test38";
         String workingDir = getWorkingDir("test38");
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = null;
         
         if (scheduler.isOnline()) { 
             filesystem = files.getLocalCWDFileSystem();
         } else { 
-            filesystem = getDefaultFileSystem();          
+            filesystem = config.getDefaultFileSystem(files, credentials);          
         }
         
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectory(root);
+        files.createDirectories(root);
         
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
@@ -1238,7 +1238,7 @@ public abstract class AbstractJobTestParent {
         // NOTE: This test assumes that an exception is when the status of a job is requested twice after the job is done!
         //       This may not be true for all schedulers.
         
-        Scheduler scheduler = getDefaultScheduler();
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
@@ -1272,7 +1272,7 @@ public abstract class AbstractJobTestParent {
             }
             
             try { 
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // ignored
             }
@@ -1284,122 +1284,4 @@ public abstract class AbstractJobTestParent {
             throw new Exception("Job exceeded deadline!");
         }
     }
-    
-    
-    /**
-     * Submit a job to a Scheduler.
-     * 
-     * @param scheduler
-     *            the Scheduler.
-     * @param description
-     *            the description of the job to submit.
-     * 
-     * @return Job representing the running job.
-     * 
-     * @throws NoSchedulerException
-     *             If the scheduler is not known.
-     * @throws IncompleteJobDescriptionException
-     *             If the description did not contain the required information.
-     * @throws InvalidJobDescriptionException
-     *             If the description contains illegal or conflicting values.
-     * @throws UnsupportedJobDescriptionException
-     *             If the description is not legal for this scheduler.
-     * @throws OctopusException
-     *             If the Scheduler failed to get submit the job.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException;
-
-    /**
-     * Get the status of a Job.
-     * 
-     * @param job
-     *            the job.
-     * 
-     * @return the status of the Job.
-     * 
-     * @throws NoSuchJobException
-     *             If the job is not known.
-     * @throws OctopusException
-     *             If the status of the job could not be retrieved.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-   // public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
-
-    /**
-     * Get the status of all specified <code>jobs</code>.
-     * 
-     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the 
-     * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters.   
-     * If a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be 
-     * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the 
-     * corresponding <code>JobsStatus</code> entry.
-     * 
-     * @param jobs
-     *            the jobs for which to retrieve the status.
-     * 
-     * @return an array of the resulting JobStatusses.
-     * 
-     * @throws OctopusException
-     *             If the statuses of the job could not be retrieved.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public JobStatus[] getJobStatuses(Job... jobs);
-    
-    /** 
-     * Returns the standard streams of a job.
-     * 
-     * The standard streams can only be retrieved if it is an interactive job.  
-     * 
-     * @param job the interactive job for which to retrieve the streams.
-     * @return the streams of the job.
-     *
-     * @throws OctopusException if the job is not interactive.
-     */
-   // public Streams getStreams(Job job) throws OctopusException;
-        
-    /**
-     * Cancel a job.
-     * 
-     * A status is returned that indicates the state of the job after the cancel.  If the jobs was already done it cannot be 
-     * killed afterwards.   
-     * 
-     * @param job the job to kill.
-     * @return the status of the Job.
-     * 
-     * @throws NoSuchJobException
-     *             If the job is not known.
-     * @throws OctopusException
-     *             If the status of the job could not be retrieved.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
-
-
-    /**
-     * Wait until a job is done or until a timeout expires. 
-     * 
-     * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the  
-     * timeout expires, the job will continue to run normally. 
-     * 
-     * The timeout is in milliseconds and must be >= 0, where 0 means and infinite timeout.      
-     * 
-     * A JobStatus is returned that can be used to determine why the call returned.    
-     * 
-     * @param job the job.
-     * @param timeout the maximum time to wait for the job in milliseconds.   
-     * @returns  the status of the Job.
-     * 
-     * @throws NoSuchJobException
-     *             If the job is not known.
-     * @throws OctopusException
-     *             If the status of the job could not be retrieved.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    //public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
 }
