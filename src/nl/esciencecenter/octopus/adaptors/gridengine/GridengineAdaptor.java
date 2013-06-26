@@ -90,11 +90,6 @@ public class GridengineAdaptor extends Adaptor {
     }
 
     @Override
-    public String toString() {
-        return getName();
-    }
-
-    @Override
     public Files filesAdaptor() throws OctopusException {
         throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support files.");
     }
