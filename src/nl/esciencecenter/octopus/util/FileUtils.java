@@ -294,8 +294,8 @@ public class FileUtils {
             throws OctopusIOException, UnsupportedOperationException {
 
         boolean exist = octopus.files().exists(target);
-        boolean replace = CopyOption.contains(options, CopyOption.REPLACE);
-        boolean ignore = CopyOption.contains(options, CopyOption.IGNORE);
+        boolean replace = CopyOption.contains(CopyOption.REPLACE, options);
+        boolean ignore = CopyOption.contains(CopyOption.IGNORE, options);
         if (replace && ignore) {
             throw new UnsupportedOperationException("FileUtils", "Can not replace and ignore existing files at the same time");
         }

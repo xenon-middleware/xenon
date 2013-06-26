@@ -69,15 +69,15 @@ public enum CopyOption {
      *
      * @return if <code>options</code> contains <code>option<code>.
      */
-    public static boolean contains(CopyOption[] options, CopyOption option) {
+    public static boolean contains(CopyOption toFind, CopyOption... options) {
 
-        if (option == null || options == null || options.length == 0) {
+        if (toFind == null || options == null || options.length == 0) {
             return false;
         }
 
         for (int i=0;i<options.length;i++) {
 
-            if (options[i] != null && options[i] == option) {
+            if (options[i] != null && options[i] == toFind) {
                 return true;
             }
         }

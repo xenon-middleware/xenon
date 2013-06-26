@@ -60,6 +60,11 @@ public enum OpenOption {
     WRITE;
     
     public static boolean contains(OpenOption toFind, OpenOption... options) {
+        
+        if (toFind == null || options == null || options.length == 0) {
+            return false;
+        }
+        
         for (OpenOption curr : options) {
             if (curr == toFind) {
                 return true;

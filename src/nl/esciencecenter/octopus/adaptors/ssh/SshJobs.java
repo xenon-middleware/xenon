@@ -37,14 +37,11 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jcraft.jsch.Session;
 
 public class SshJobs implements Jobs {
 
-    private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
+    //private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
 
     private static int currentID = 1;
 
@@ -60,9 +57,9 @@ public class SshJobs implements Jobs {
      */
     class SchedulerInfo {
         
-        private final SchedulerImplementation impl;
-        private final Session session;
-        private final JobQueues jobQueues; 
+        final SchedulerImplementation impl;
+        final Session session;
+        final JobQueues jobQueues; 
         
         SchedulerInfo(SchedulerImplementation impl, Session session, JobQueues jobQueues) {
             this.impl = impl;

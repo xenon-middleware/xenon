@@ -23,9 +23,6 @@ import nl.esciencecenter.octopus.engine.util.ProcessWrapper;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * LocalInteractiveProcess implements a {@link ProcessWrapper} for local interactive processes. 
  * 
@@ -34,8 +31,6 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 class LocalInteractiveProcess implements ProcessWrapper {
-
-    private static final Logger logger = LoggerFactory.getLogger(LocalInteractiveProcess.class);
 
     private final java.lang.Process process;
 
