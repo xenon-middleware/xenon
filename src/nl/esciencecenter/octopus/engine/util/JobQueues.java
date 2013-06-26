@@ -335,8 +335,7 @@ public class JobQueues {
 
         logger.debug("{}: JobDescription verified OK", adaptorName);
         
-        JobImplementation result = new JobImplementation(description, scheduler, OctopusEngine.getNextUUID(), 
-                adaptorName + "-" + getNextJobID(), description.isInteractive(), true);
+        JobImplementation result = new JobImplementation(scheduler, adaptorName + "-" + getNextJobID(), description, description.isInteractive(), true);
 
         logger.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
         

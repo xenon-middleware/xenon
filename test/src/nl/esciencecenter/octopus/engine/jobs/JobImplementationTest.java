@@ -39,20 +39,18 @@ public class JobImplementationTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        new JobImplementation(desc, s, uuid, "id1", true, true);
+        new JobImplementation(s, "id1", desc, true, true);
     }
         
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor1() throws Exception {
-        new JobImplementation(null, null, null, null, true, true);
+        new JobImplementation(null, null, null, true, true);
     }
     
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor2() throws Exception {
         JobDescription desc = new JobDescription();
-        new JobImplementation(desc, null, null, null, true, true);
+        new JobImplementation(null, null, desc, true, true);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
@@ -62,19 +60,7 @@ public class JobImplementationTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
 
-        new JobImplementation(desc, s, null, null, true, true);
-    }
-
-    @org.junit.Test(expected = IllegalArgumentException.class)
-    public void test_constructor4() throws Exception {
-        JobDescription desc = new JobDescription();
-
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-
-        UUID uuid = UUID.randomUUID();
-
-        new JobImplementation(desc, s, uuid, null, true, true);
+        new JobImplementation(s, null, desc, true, true);
     }
 
     @org.junit.Test
@@ -85,13 +71,10 @@ public class JobImplementationTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        JobImplementation ji = new JobImplementation(desc, s, uuid, "id1", true, true);
+        JobImplementation ji = new JobImplementation(s, "id1", desc, true, true);
 
         assertEquals(s, ji.getScheduler());
         assertEquals(desc, ji.getJobDescription());
-        assertEquals(uuid, ji.getUUID());
         assertEquals("id1", ji.getIdentifier());
         assertTrue(ji.isInteractive());
         assertTrue(ji.isOnline());
@@ -105,12 +88,10 @@ public class JobImplementationTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        JobImplementation ji = new JobImplementation(desc, s, uuid, "id1", true, true);
+        JobImplementation ji = new JobImplementation(s, "id1", desc, true, true);
 
         assertTrue(ji.toString().equals(
-                "JobImplementation [identifier=id1, uuid=" + uuid +  ", scheduler=" + s + 
+                "JobImplementation [identifier=id1, scheduler=" + s + 
                 ", description=" + desc + ", isInteractive=true, isOnline=true]"));
     }
 
@@ -122,25 +103,19 @@ public class JobImplementationTest {
         Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
                 null, true, true, true);     
         
-        UUID uuid = UUID.randomUUID();
-        
-        JobImplementation ji = new JobImplementation(desc, s, uuid, "id1", true, true);
+        JobImplementation ji = new JobImplementation(s, "id1",desc, true, true);
 
-        int hash = uuid.hashCode();
+        int hash = s.hashCode() + "id1".hashCode();
         
         assertTrue(hash == ji.hashCode());
-
-        
         assertTrue(ji.equals(ji));
         assertFalse(ji.equals(null));
         assertFalse(ji.equals("AAP"));
         
-        JobImplementation ji2 = new JobImplementation(desc, s, uuid, "id1", true, true);
-
+        JobImplementation ji2 = new JobImplementation(s, "id1", desc, true, true);
         assertTrue(ji.equals(ji2));
         
-        JobImplementation ji3 = new JobImplementation(desc, s, UUID.randomUUID(), "id1", true, true);
-
+        JobImplementation ji3 = new JobImplementation(s, "id2", desc, true, true);
         assertFalse(ji.equals(ji3));
     }
     
