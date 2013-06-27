@@ -27,21 +27,35 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ITJobLocal {
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
+    final Logger logger = LoggerFactory.getLogger(ITJobLocal.class);
+
+    /**
+     * Regression test for issue #109
+     *
+     * @throws Exception
+     */
     @Test
     public void WorkingDirectoryRelativlyToCwd() throws Exception {
         Octopus octopus = OctopusFactory.newOctopus(null);
-        Path testdir = Files.createTempDirectory("octopustest");
-        System.out.println("Absolute tmp dir "+testdir.toString());
+        Path testdir = testFolder.newFolder("octopustest").toPath();
+        // testdir == /tmp/junit<random>/octopustest/
+        logger.info("Absolute tmp dir {}", testdir);
 
         JobDescription description = new JobDescription();
         description.setExecutable("/usr/bin/touch");
         description.setArguments("bla");
         description.setQueueName("single");
-        // testdir == /tmp/octopustest<random>/
         description.setWorkingDirectory(testdir.toString());
 
         Scheduler scheduler = octopus.jobs().getLocalScheduler();
@@ -49,15 +63,13 @@ public class ITJobLocal {
 
         octopus.jobs().waitUntilDone(job, 5000);
 
-        //Expected files in /tmp/octopustest<random>/
+        // Expect files in /tmp/junit<random>/octopustest/
         assertTrue(Files.exists(testdir.resolve("bla")));
 
-        //Assertions below fail, as files are in $PWD/tmp/octopustest<random>/
-        System.out.println("stdout written to "+testdir.resolve("stdout.txt"));
+        logger.info("stdout written to {}", testdir.resolve("stdout.txt"));
         assertTrue(Files.exists(testdir.resolve("stdout.txt")));
         assertTrue(Files.exists(testdir.resolve("stderr.txt")));
 
-        // TODO clean up
         octopus.end();
     }
 }
