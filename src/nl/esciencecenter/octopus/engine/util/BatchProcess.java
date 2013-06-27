@@ -18,6 +18,8 @@ package nl.esciencecenter.octopus.engine.util;
 import java.io.IOException;
 
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -41,44 +43,48 @@ class BatchProcess implements InteractiveProcess {
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
 
+    private AbsolutePath processPath(Files files, AbsolutePath root, String path) throws OctopusIOException, OctopusException { 
+        
+        AbsolutePath result = null;
+        
+        if (path == null) { 
+            result = root;
+        } else if (path.startsWith("/")) {  
+            result = files.newPath(root.getFileSystem(), new RelativePath(path));
+        } else { 
+            result = root.resolve(new RelativePath(path));
+        }
+
+        return result;
+    }
+    
+    
     public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory) throws Exception { 
         
         JobDescription description = job.getJobDescription();
         
-        String workingDirectory = description.getWorkingDirectory();
-        
-        String stdout = description.getStdout();
-        String stderr = description.getStderr();
-        String stdin = description.getStdin();
-        
         // Retrieve the filesystem that goes with the scheduler.
-        AbsolutePath workDirPath = null;
+        AbsolutePath workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
         
-        if (workingDirectory == null) { 
-            workDirPath = filesystem.getEntryPath();
-        } else { 
-            workDirPath = filesystem.getEntryPath().resolve(new RelativePath(workingDirectory));
+        if (!files.exists(workdir)) { 
+            files.createDirectories(workdir);
         }
         
-        if (!files.exists(workDirPath)) { 
-            files.createDirectories(workDirPath);
-        }
-        
-        AbsolutePath stdoutPath = workDirPath.resolve(new RelativePath(stdout));
-        AbsolutePath stderrPath = workDirPath.resolve(new RelativePath(stderr));
+        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
+        AbsolutePath stderr = processPath(files, workdir, description.getStderr());
         
         // Create the files for stdout and stderr. Will fail if the files already exist!
-        files.createFile(stdoutPath);
-        files.createFile(stderrPath);
+        files.createFile(stdout);
+        files.createFile(stderr);
         
         // If needed create a file for stdin, and make sure it exists!
-        AbsolutePath stdinPath = null;
+        AbsolutePath stdin = null;
         
-        if (stdin != null) { 
-            stdinPath = workDirPath.resolve(new RelativePath(stdin));
-        
-            if (!files.exists(stdinPath)) { 
-                throw new IOException("Stdin cannot be redirected from " + stdinPath.getPath() + " (file does not exist!)");
+        if (description.getStdin() != null) {
+            stdin = processPath(files, workdir, description.getStdin());
+            
+            if (!files.exists(stdin)) { 
+                throw new IOException("Stdin cannot be redirected from " + stdin.getPath() + " (file does not exist!)");
             }
         }
         
@@ -86,16 +92,16 @@ class BatchProcess implements InteractiveProcess {
         Streams streams = process.getStreams();
         
         stdoutForwarder = new StreamForwarder(streams.getStdout(), 
-                files.newOutputStream(stdoutPath, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE));
+                files.newOutputStream(stdout, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE));
         
         stderrForwarder = new StreamForwarder(streams.getStderr(),
-                files.newOutputStream(stderrPath, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE));
+                files.newOutputStream(stderr, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE));
         
         if (stdin == null) { 
             stdinForwarder = null;
             streams.getStdin().close();
         } else { 
-            stdinForwarder = new StreamForwarder(files.newInputStream(stdinPath), streams.getStdin()); 
+            stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin()); 
         }
     }
 
