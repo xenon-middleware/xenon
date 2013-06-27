@@ -259,6 +259,12 @@ public class SshJobs implements Jobs {
     }
 
     @Override
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException { 
+        return getJobQueue(scheduler).getDefaultQueueName(scheduler);
+    }
+    
+    
+    @Override
     public Streams getStreams(Job job) throws OctopusException {
         return getJobQueue(job.getScheduler()).getStreams(job);
     }

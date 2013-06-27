@@ -387,8 +387,10 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test18b_getQueueStatus() throws Exception {        
         Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        String queueName = config.getDefaultQueueName();
+        
         try { 
-            jobs.getQueueStatus(s, null);
+            jobs.getQueueStatus(s, queueName);
         } finally { 
             jobs.close(s);
         }

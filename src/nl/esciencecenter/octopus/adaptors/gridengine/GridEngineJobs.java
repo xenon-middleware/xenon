@@ -103,7 +103,13 @@ public class GridEngineJobs implements Jobs {
     public synchronized boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return connections.containsKey(scheduler);
     }
-
+    
+    @Override
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
+        // TODO: implement!
+        return null;
+    }
+    
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         SchedulerConnection connection = getConnection(scheduler);

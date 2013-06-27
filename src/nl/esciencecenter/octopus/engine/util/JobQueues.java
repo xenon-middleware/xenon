@@ -131,6 +131,10 @@ public class JobQueues {
         }
     }
     
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException { 
+        return "single";
+    }
+    
     public Job[] getJobs(String... queueNames) throws NoSuchQueueException {
         
         logger.debug("{}: getJobs for queues {}", adaptorName, queueNames);
@@ -393,11 +397,15 @@ public class JobQueues {
 
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
 
-        checkScheduler(scheduler);
-        
         logger.debug("{}: getQueueStatus {}:{}", adaptorName, scheduler, queueName);
 
-        if (queueName == null || queueName.equals("single")) {
+        if (queueName == null) { 
+            throw new OctopusException(adaptorName, "Queue name is null!");
+        }
+        
+        checkScheduler(scheduler);
+        
+        if (queueName.equals("single")) {
             return new QueueStatusImplementation(scheduler, "single", null, null);
         } else if (queueName.equals("multi")) {
             return new QueueStatusImplementation(scheduler, "multi", null, null);

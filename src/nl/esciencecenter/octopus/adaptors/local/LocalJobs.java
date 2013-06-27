@@ -173,6 +173,11 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return true;
     }
+    
+    @Override
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException { 
+        return jobQueues.getDefaultQueueName(scheduler);
+    }
 
     @Override
     public Streams getStreams(Job job) throws OctopusException {
