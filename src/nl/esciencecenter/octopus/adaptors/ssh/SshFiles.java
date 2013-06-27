@@ -129,21 +129,15 @@ public class SshFiles implements Files {
         }
     }
     
-    @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
-            OctopusIOException {
-     
-        adaptor.checkPath(location, "filesystem");
+    public FileSystem newFileSystem(Session session, URI location, Credential credential, OctopusProperties properties) 
+            throws OctopusException, OctopusIOException {
         
         String uniqueID = getNewUniqueID();
-
-        OctopusProperties octopusProperties = new OctopusProperties(properties);
-        
-        Session session = adaptor.createNewSession(uniqueID, location, credential, octopusProperties);
 
         ChannelSftp channel = getSftpChannel(session);
 
         String wd = null;
+
         try {
             wd = channel.pwd();
         } catch (SftpException e) {
@@ -151,6 +145,7 @@ public class SshFiles implements Files {
             session.disconnect();
             throw adaptor.sftpExceptionToOctopusException(e);
         }
+        
         channel.disconnect();
 
         RelativePath entryPath = new RelativePath(wd);
@@ -158,9 +153,24 @@ public class SshFiles implements Files {
         logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
         FileSystemImplementation result =
-                new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath, credential, octopusProperties);
+                new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath, credential, properties);
+      
         fileSystems.put(uniqueID, new FileSystemInfo(result, session));
-        return result;
+        
+        return result;        
+    }
+    
+    @Override
+    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
+            OctopusIOException {
+     
+        adaptor.checkPath(location, "filesystem");
+        
+        OctopusProperties octopusProperties = new OctopusProperties(properties);
+        
+        Session session = adaptor.createNewSession(location, credential, octopusProperties);
+
+        return newFileSystem(session, location, credential, octopusProperties);
     }
 
     private ChannelSftp getChannel(AbsolutePath path) throws OctopusIOException {

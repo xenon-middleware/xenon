@@ -35,8 +35,12 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public boolean supportsClose() throws Exception { 
         return false;
     }
+
+    public String[] getQueueNames() {
+        return new String [] { "single", "multi", "unlimited" };
+    }
     
     public abstract Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception;
     public abstract FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception;
-    public abstract String getInvalidQueueName() throws Exception;
+    public abstract String getInvalidQueueName() throws Exception;    
 }

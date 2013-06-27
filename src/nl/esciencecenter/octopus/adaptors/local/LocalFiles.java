@@ -138,7 +138,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 //        }
 //    }
 
-    public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine) {
+    private final FileSystem cwd;
+    private final FileSystem home;
+    
+    public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine) throws OctopusException {
         this.localAdaptor = localAdaptor;
         this.octopusEngine = octopusEngine;
         
@@ -147,6 +150,12 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
             logger.debug(Arrays.toString(attributeViews.toArray()));
         }
+        
+        cwd = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(), 
+                new RelativePath(LocalUtils.getCWD()), null, null);
+        
+        home = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(), 
+                new RelativePath(LocalUtils.getHome()), null, null);
     }
 
     /**
@@ -503,16 +512,13 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public FileSystem getLocalCWDFileSystem() throws OctopusException {
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(), 
-                new RelativePath(LocalUtils.getCWD()), null, null);
+        return cwd;
     }
 
     @Override
     public FileSystem getLocalHomeFileSystem() throws OctopusException {
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(), 
-                new RelativePath(LocalUtils.getHome()), null, null);
+        return home;
     }
-
 
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {

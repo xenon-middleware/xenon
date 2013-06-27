@@ -21,15 +21,17 @@ import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
+import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -37,11 +39,8 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import nl.esciencecenter.octopus.engine.Adaptor;
-import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
-import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
-import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -53,7 +52,11 @@ public class JobQueues {
     
     private final String adaptorName;
     
+    private final Octopus myOctopus;
+    
     private final Scheduler myScheduler;
+    
+    private final FileSystem myFileSystem;
     
     private final LinkedList<JobExecutor> singleQ;
 
@@ -70,24 +73,24 @@ public class JobQueues {
     private final int maxQSize;
 
     private final int pollingDelay;
-    
-    private final Adaptor adaptor;
 
-    private final ProcessWrapperFactory factory;
+    private final InteractiveProcessFactory factory;
     
     private int jobID = 0;
     
-    public JobQueues(Adaptor adaptor, Scheduler myScheduler, ProcessWrapperFactory factory, int multiQThreads, int maxQSize, 
-            int pollingDelay) throws BadParameterException { 
+    public JobQueues(String adaptorName, Octopus myOctopus, Scheduler myScheduler, FileSystem myFileSystem, 
+            InteractiveProcessFactory factory, 
+            int multiQThreads, int maxQSize, int pollingDelay) throws BadParameterException { 
         
         logger.debug("{}: Creating JobQueues for Adaptor {} with multiQThreads: {}, maxQSize: {} and pollingDelay: {}", 
-                adaptor.getName(), multiQThreads, maxQSize, pollingDelay);
+                adaptorName, multiQThreads, maxQSize, pollingDelay);
         
-        this.adaptor = adaptor;
-        this.adaptorName = adaptor.getName();
-        
+        this.adaptorName = adaptorName;
+        this.myOctopus = myOctopus;
         this.myScheduler = myScheduler;
+        this.myFileSystem = myFileSystem;
         this.factory = factory;
+        
         this.maxQSize = maxQSize;
         this.pollingDelay = pollingDelay;
         
@@ -325,21 +328,20 @@ public class JobQueues {
         }
     }
     
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
+    public Job submitJob(JobDescription description) throws OctopusException {
         
         logger.debug("{}: Submitting job", adaptorName);
-        
-        checkScheduler(scheduler);
-        
+
         verifyJobDescription(description);
 
         logger.debug("{}: JobDescription verified OK", adaptorName);
         
-        JobImplementation result = new JobImplementation(scheduler, adaptorName + "-" + getNextJobID(), description, description.isInteractive(), true);
+        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), description, 
+                description.isInteractive(), true);
 
         logger.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
         
-        JobExecutor executor = new JobExecutor(adaptor, result, factory, pollingDelay);
+        JobExecutor executor = new JobExecutor(adaptorName, myOctopus.files(), myFileSystem, factory, result, pollingDelay);
         
         String queueName = description.getQueueName();
        

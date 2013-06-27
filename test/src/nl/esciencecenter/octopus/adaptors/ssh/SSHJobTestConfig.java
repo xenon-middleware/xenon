@@ -86,7 +86,7 @@ public class SSHJobTestConfig extends JobTestConfig {
         String tmp = p.getProperty(property);
         
         if (tmp == null) { 
-            throw new Exception("Failed to retireve property " + property);
+            throw new Exception("Failed to retrieve property " + property);
         }
         
         return tmp;
@@ -168,7 +168,7 @@ public class SSHJobTestConfig extends JobTestConfig {
 
     @Override
     public Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception {
-        return jobs.newScheduler(correctFSURI, getDefaultCredential(credentials), getDefaultProperties());
+        return jobs.newScheduler(correctURI, getDefaultCredential(credentials), getDefaultProperties());
     }
 
     @Override

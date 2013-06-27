@@ -346,7 +346,7 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected Session createNewSession(String uniqueID, URI location, Credential credential, OctopusProperties localProperties)
+    protected Session createNewSession(URI location, Credential credential, OctopusProperties localProperties)
             throws OctopusException {
         
         URI uri = location;
@@ -366,10 +366,11 @@ public class SshAdaptor extends Adaptor {
         }
 
         String credentialUserName = ((CredentialImplementation) credential).getUsername();
-        if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
-            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
-                    "If a user name is given in the URI, it must match the one in the credential");
-        }
+    
+//        if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
+//            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
+//                    "If a user name is given in the URI, it must match the one in the credential");
+//        }
 
         if (user == null) {
             user = credentialUserName;

@@ -81,7 +81,7 @@ public class LocalAdaptor extends Adaptor {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
         localFiles = new LocalFiles(getProperties(), this, octopusEngine);
-        localJobs = new LocalJobs(getProperties(), this, octopusEngine);
+        localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWDFileSystem(), octopusEngine);
     }
 
     void checkURI(URI location) throws OctopusException {
