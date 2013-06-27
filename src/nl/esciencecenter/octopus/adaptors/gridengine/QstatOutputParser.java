@@ -26,8 +26,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
+import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
+import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.QueueStatus;
+import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +44,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class XmlOutputParser {
+/**
+ * Parser for output of XML produced by qstat command, and 
+ * @author Niels Drost
+ *
+ */
+public class QstatOutputParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(XmlOutputParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(QstatOutputParser.class);
+
+    public static final String[] QUEUE_STATUS_COMMAND = {"qstat", "-g", "c","-xml"};
 
     //string in the xmlns:xsd tag of qstat -xml
     public static String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
@@ -51,11 +65,11 @@ public class XmlOutputParser {
 
     private final boolean ignoreVersion;
 
-    XmlOutputParser(OctopusProperties properties) throws OctopusIOException {
+    QstatOutputParser(OctopusProperties properties) throws OctopusIOException {
         this(properties.getBooleanProperty(GridengineAdaptor.IGNORE_VERSION_PROPERTY));
     }
 
-    XmlOutputParser(boolean ignoreVersion) throws OctopusIOException {
+    QstatOutputParser(boolean ignoreVersion) throws OctopusIOException {
         this.ignoreVersion = ignoreVersion;
 
         try {
@@ -198,6 +212,26 @@ public class XmlOutputParser {
 
         return result;
     }
+    
+    private QueueStatus getQueueStatusFromMap(Map<String, Map<String, String>> allMap, Scheduler scheduler, String queue) {
+        if (allMap == null || allMap.isEmpty()) {
+            Exception exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
+            return new QueueStatusImplementation(scheduler, queue, exception, null);
+        }
+
+        //state for only the requested job
+        Map<String, String> map = allMap.get(queue);
+
+        if (map == null || map.isEmpty()) {
+            Exception exception =
+                    new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queue
+                            + " from server");
+            return new QueueStatusImplementation(scheduler, queue, exception, null);
+        }
+
+        return new QueueStatusImplementation(scheduler, queue, null, map);
+    }
 
     /**
      * Parses job info from "qstat -xml"
@@ -261,5 +295,34 @@ public class XmlOutputParser {
         }
 
         return result;
+    }
+    
+    private JobStatus getJobStatusFromMap(Map<String, Map<String, String>> allMap, Job job) {
+        if (allMap == null || allMap.isEmpty()) {
+            Exception exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of jobs on server");
+            return new JobStatusImplementation(job, null, null, exception, false, false, null);
+        }
+
+        //state for only the requested job
+        Map<String, String> map = allMap.get(job.getIdentifier());
+
+        if (map == null || map.isEmpty()) {
+            Exception exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
+            return new JobStatusImplementation(job, null, null, exception, false, false, null);
+        }
+
+        String state = map.get("state");
+
+        if (state == null || state.length() == 0) {
+            Exception exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
+                            + " not found on server");
+            return new JobStatusImplementation(job, null, null, exception, false, false, map);
+        }
+
+        //FIXME: add isDone and exitcode for job
+        return new JobStatusImplementation(job, state, null, null, state.equals("running"), false, map);
     }
 }

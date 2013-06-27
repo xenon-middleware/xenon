@@ -47,11 +47,14 @@ public class GridengineAdaptor extends Adaptor {
                     "Boolean: If true, the version check is skipped. WARNING: it is not recommended to use this setting in production environments" }, };
 
     private final GridEngineJobs jobsAdaptor;
+    
+    private final GridEngineCredentials credentialsAdaptor;
 
     public GridengineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, validPropertiesList, properties);
 
-        this.jobsAdaptor = new GridEngineJobs(properties, octopusEngine);
+        this.jobsAdaptor = new GridEngineJobs(getProperties(), octopusEngine);
+        this.credentialsAdaptor = new GridEngineCredentials(octopusEngine);
     }
 
     static void checkLocation(URI location) throws InvalidLocationException {
@@ -75,11 +78,6 @@ public class GridengineAdaptor extends Adaptor {
         throw new InvalidLocationException(ADAPTOR_NAME, "Adaptor does not support scheme: " + location.getScheme());
     }
 
-    @Override
-    public Map<String, String> getSupportedProperties() {
-        return new HashMap<String, String>();
-    }
-
     public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;
     }
@@ -96,7 +94,7 @@ public class GridengineAdaptor extends Adaptor {
 
     @Override
     public Credentials credentialsAdaptor() throws OctopusException {
-        throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support credentials.");
+        return credentialsAdaptor;
     }
 
     @Override
