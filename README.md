@@ -27,21 +27,21 @@ to improve the Octopus API and implementation.
 The Latest Version
 ------------------
 
-Details of the latest version can be found on the Octopus project web site at
+Details of the latest version can be found on the octopus project web site at
 <https://github.com/NLeSC/octopus>.
 
 
 Documentation
 -------------
 
-For an overview of Octopus please consult the users guide in the docs directory 
+For an overview of octopus please consult the users guide in the docs directory 
 "docs/usersguide.pdf".
 
-See the file "INSTALL.txt" for a description of how to install Octopus. 
+See the file "INSTALL.txt" for a description of how to install octopus. 
 
-The javadoc of Octopus library is available in "javadoc/index.html".
+The javadoc of octopus library is available in "javadoc/index.html".
 
-The source of Octopus can be found in "src/". Example applications can be found 
+The source of octopus can be found in "src/". Example applications can be found 
 in "examples/src/".
 
 
