@@ -17,7 +17,9 @@ package nl.esciencecenter.octopus.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,6 +52,25 @@ public class FileUtils {
 
     public static final int BUFFER_SIZE = 10240;
 
+    private static void close(Closeable c) { 
+        
+        try {
+            if (c != null) { 
+                c.close();
+            } 
+        } catch (Exception e) { 
+            // ignored!
+        }
+    }
+    
+    private static OpenOption [] openOptionsForWrite(boolean truncate) { 
+        if (truncate) { 
+            return new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE };
+        } else { 
+            return new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND };
+        }        
+    }
+    
     /**
      * Copies all bytes from an input stream to a file.
      *
@@ -64,20 +85,16 @@ public class FileUtils {
      * @throws UnsupportedOperationException
      *             if {@code options} contains a copy option that is not supported
      */
-    public static long copy(Octopus octopus, InputStream in, AbsolutePath target, CopyOption... options) throws OctopusException {
+    public static long copy(Octopus octopus, InputStream in, AbsolutePath target, boolean truncate) throws OctopusException {
+        
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
 
-        OpenOption openOption = OpenOption.CREATE;
-
-        for (CopyOption copyOption : options) {
-            if (copyOption != CopyOption.REPLACE) {
-                throw new UnsupportedOperationException("FileUtils", "unsupported copy option " + copyOption + " for " + target);
-            }
-            openOption = OpenOption.TRUNCATE;
-        }
-
-        try (OutputStream out = octopus.files().newOutputStream(target, openOption)) {
+        OutputStream out = null;
+        
+        try {
+            out = octopus.files().newOutputStream(target, openOptionsForWrite(truncate));
+            
             while (true) {
                 int read = in.read(buffer);
 
@@ -85,10 +102,12 @@ public class FileUtils {
                     out.close();
                     return totalBytes;
                 }
+         
                 out.write(buffer, 0, read);
                 totalBytes += read;
             }
         } catch (IOException e) {
+            close(out);
             throw new OctopusException("FileUtils", "failed to copy stream to file", e);
         }
     }
@@ -104,7 +123,11 @@ public class FileUtils {
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
 
-        try (InputStream in = octopus.files().newInputStream(source)) {
+        InputStream in = null;
+        
+        try {
+            in = octopus.files().newInputStream(source);
+            
             while (true) {
                 int read = in.read(buffer);
 
@@ -116,6 +139,7 @@ public class FileUtils {
                 totalBytes += read;
             }
         } catch (IOException e) {
+            close(in);
             throw new OctopusException("FileUtils", "failed to copy stream to file", e);
         }
     }
@@ -126,19 +150,17 @@ public class FileUtils {
      * @throws OctopusIOException
      */
     public static BufferedReader newBufferedReader(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
-        InputStream in = octopus.files().newInputStream(path);
-
-        return new BufferedReader(new InputStreamReader(in, cs));
+        return new BufferedReader(new InputStreamReader(octopus.files().newInputStream(path), cs));
     }
 
     /**
      * Opens or creates a file for writing, returning a BufferedWriter that may be used to write text to the file in an efficient
      * manner.
      */
-    public static BufferedWriter newBufferedWriter(Octopus octopus, AbsolutePath path, Charset cs, OpenOption... options)
+    public static BufferedWriter newBufferedWriter(Octopus octopus, AbsolutePath path, Charset cs, boolean truncate)
             throws OctopusIOException {
-        OutputStream out = octopus.files().newOutputStream(path, options);
-
+        
+        OutputStream out = octopus.files().newOutputStream(path, openOptionsForWrite(truncate));
         return new BufferedWriter(new OutputStreamWriter(out, cs));
     }
 
@@ -147,20 +169,22 @@ public class FileUtils {
      */
     public static byte[] readAllBytes(Octopus octopus, AbsolutePath path) throws OctopusException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         copy(octopus, path, out);
-
         return out.toByteArray();
-
     }
 
     /**
      * Read all lines from a file.
      */
     public static List<String> readAllLines(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
+        
         ArrayList<String> result = new ArrayList<String>();
 
-        try (BufferedReader reader = newBufferedReader(octopus, path, cs)) {
+        BufferedReader reader = null;
+        
+        try {
+            reader = newBufferedReader(octopus, path, cs);
+            
             while (true) {
                 String line = reader.readLine();
 
@@ -168,41 +192,46 @@ public class FileUtils {
                     reader.close();
                     return result;
                 }
+                
+                result.add(line);
             }
         } catch (IOException e) {
+            close(reader);
             throw new OctopusIOException("FileUtils", "failed to read lines", e);
         }
-
     }
 
     /**
      * Writes bytes to a file.
      */
-    public static AbsolutePath write(Octopus octopus, AbsolutePath path, byte[] bytes, OpenOption... options)
-            throws OctopusIOException {
-        try (OutputStream out = octopus.files().newOutputStream(path, options)) {
-            out.write(bytes);
-        } catch (IOException e) {
-            throw new OctopusIOException("FileUtils", "failed to copy stream to file", e);
-        }
-        return path;
+    public static void write(Octopus octopus, AbsolutePath path, byte[] bytes, boolean truncate) throws OctopusException {
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        copy(octopus, in, path, truncate);
+        close(in);        
     }
 
     /**
      * Write lines of text to a file.
      *
      */
-    public static AbsolutePath write(Octopus octopus, AbsolutePath path, Iterable<? extends CharSequence> lines, Charset cs,
-            OpenOption... options) throws OctopusIOException {
-        try (BufferedWriter writer = newBufferedWriter(octopus, path, cs, options)) {
+    public static void write(Octopus octopus, AbsolutePath path, Iterable<? extends CharSequence> lines, Charset cs,
+            boolean truncate) throws OctopusIOException {
+        
+        BufferedWriter writer = null;
+        
+        try { 
+            writer = newBufferedWriter(octopus, path, cs, truncate);
+
             for (CharSequence line : lines) {
                 writer.write(line.toString());
                 writer.newLine();
             }
+            
+            writer.close();            
         } catch (IOException e) {
+            close(writer);
             throw new OctopusIOException("FileUtils", "failed to write lines", e);
         }
-        return path;
     }
 
     /**
