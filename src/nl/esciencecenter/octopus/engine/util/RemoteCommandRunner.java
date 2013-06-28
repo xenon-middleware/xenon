@@ -64,31 +64,19 @@ public class RemoteCommandRunner {
         in.waitUntilFinished();
         out.waitUntilFinished();
         err.waitUntilFinished();
+        
+        JobStatus status = octopus.jobs().waitUntilDone(job, 0);
 
-        while (true) {
-            JobStatus status = octopus.jobs().getJobStatus(job);
-
-            if (status.hasException()) {
-                throw new OctopusException("engine", "Could not run command remotely", status.getException());
-            }
-
-            if (status.isDone()) {
-                this.exitCode = status.getExitCode();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("CommandRunner out: " + out.getResult() + "\n" + "CommandRunner err: " + err.getResult());
-                }
-                return;
-            }
-            
-            //wait for a bit
-            //FIXME: use octopus API to wait
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        if (status.hasException()) {
+            throw new OctopusException("engine", "Could not run command remotely", status.getException());
         }
+
+        this.exitCode = status.getExitCode();
+        if (logger.isDebugEnabled()) {
+            logger.debug("CommandRunner out: " + out.getResult() + "\n" + "CommandRunner err: " + err.getResult());
+        }
+        return;
+
     }
 
     public String getStdout() {
