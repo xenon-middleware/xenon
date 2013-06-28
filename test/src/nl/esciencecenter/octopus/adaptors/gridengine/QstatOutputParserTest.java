@@ -36,14 +36,14 @@ public class QstatOutputParserTest {
 
     @Test
     public void testQstatOutputParser() throws Throwable {
-        new QstatOutputParser(false);
+        new GridEngineCommandLineInterface(false);
     }
 
     @Test
     public void testCheckVersion() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs.xml");
 
-        QstatOutputParser parser = new QstatOutputParser(false);
+        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
 
         parser.checkVersion(testFile);
     }
@@ -52,7 +52,7 @@ public class QstatOutputParserTest {
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
-        QstatOutputParser parser = new QstatOutputParser(false);
+        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
 
         parser.checkVersion(testFile);
     }
@@ -61,7 +61,7 @@ public class QstatOutputParserTest {
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
-        QstatOutputParser parser = new QstatOutputParser(false);
+        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
 
         parser.checkVersion(testFile);
     }
@@ -70,7 +70,7 @@ public class QstatOutputParserTest {
     public void testCheckVersion_EmptyFile_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
 
-        QstatOutputParser parser = new QstatOutputParser(false);
+        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
 
         parser.checkVersion(testFile);
     }
@@ -82,7 +82,7 @@ public class QstatOutputParserTest {
 
         String content = new String(encoded);
 
-        QstatOutputParser parser = new QstatOutputParser(false);
+        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
 
         Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
 
@@ -102,7 +102,7 @@ public class QstatOutputParserTest {
         
         System.err.println("parsing queue info from: " + content);
 
-        QstatOutputParser parser = new QstatOutputParser(false);
+        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(content);
 
