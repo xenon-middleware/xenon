@@ -123,6 +123,23 @@ public interface Jobs {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
 
     /**
+     * Get the name of the default queue for the <code>scheduler</code>.
+     * 
+     * @param scheduler
+     *            the Scheduler.
+     * 
+     * @return the name of the default queue for the scheduler, or <code>null</code> if no default queue is available.
+     * 
+     * @throws NoSuchSchedulerException
+     *             If the scheduler is not known.
+     * @throws OctopusException
+     *             If the Scheduler failed to get its status.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException;
+    
+    /**
      * Get all jobs currently in (one ore more) queues of <code>scheduler</code>.
      * 
      * Note that jobs submitted by other users or other schedulers may also be returned.

@@ -105,12 +105,15 @@ public class JobQueueTest {
         public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
             
             if (fail) {
-                currentWrapper = null;
+                setCurrentWrapper(null);
                 throw new IOException("Failed to create process!");
             }
             
-            currentWrapper = new MyProcessWrapper(job);
-            return currentWrapper;
+            MyProcessWrapper wrapper = new MyProcessWrapper(job);
+            
+            setCurrentWrapper(wrapper);
+            
+            return wrapper;
         }
     }
     
@@ -121,6 +124,14 @@ public class JobQueueTest {
     public static MyFactory myFactory;
     
     public static MyProcessWrapper currentWrapper;
+    
+    public synchronized static MyProcessWrapper getCurrentWrapper() { 
+        return currentWrapper;
+    }
+    
+    public synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) { 
+        currentWrapper = wrapper;
+    }
     
     @BeforeClass
     public static void prepare() throws Exception { 
@@ -431,9 +442,17 @@ public class JobQueueTest {
         
         Job job = jobQueue.submitJob(d);
 
-        JobStatus status = jobQueue.getJobStatus(job);
+        // Give the job 1 sec. to start.
+        JobStatus status = jobQueue.waitUntilDone(job, 1000);
         
         assertNotNull(status);
+        
+        if (status.isDone()) { 
+            Exception e = status.getException();
+            System.err.println("EEP: " + status.getException());
+            e.printStackTrace(System.err);
+        }
+        
         assertFalse(status.isDone());
         
         currentWrapper.setExitStatus(42);

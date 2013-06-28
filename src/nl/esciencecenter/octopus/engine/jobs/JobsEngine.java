@@ -66,7 +66,12 @@ public class JobsEngine implements Jobs {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return getAdaptor(scheduler).jobsAdaptor().isOpen(scheduler);
     }
-
+    
+    @Override
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException { 
+        return getAdaptor(scheduler).jobsAdaptor().getDefaultQueueName(scheduler);
+    }
+    
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
