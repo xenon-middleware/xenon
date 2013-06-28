@@ -78,7 +78,7 @@ public class GridEngineJobs implements Jobs {
         connections.put(connection.getID(), connection);
     }
 
-    private synchronized void removeConnection(AbstractSchedulerConnection connection) {
+    private synchronized void removeConnection(GridEngineSchedulerConnection connection) {
         connections.remove(connection.getID());
     }
 
@@ -112,7 +112,7 @@ public class GridEngineJobs implements Jobs {
     
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
-        AbstractSchedulerConnection connection = getConnection(scheduler);
+        GridEngineSchedulerConnection connection = getConnection(scheduler);
 
         connection.close();
 
@@ -146,7 +146,7 @@ public class GridEngineJobs implements Jobs {
     @Override
     public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
         //find connection
-        AbstractSchedulerConnection connection = getConnection(scheduler);
+        GridEngineSchedulerConnection connection = getConnection(scheduler);
 
         //fetch and parse info
         return connection.getJobs(queueNames);
@@ -154,19 +154,19 @@ public class GridEngineJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
-        AbstractSchedulerConnection connection = getConnection(scheduler);
+        GridEngineSchedulerConnection connection = getConnection(scheduler);
 
         return connection.submitJob(description);
     }
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
-        AbstractSchedulerConnection connection = getConnection(job.getScheduler());
+        GridEngineSchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.getJobStatus(job);
     }
 
-    private AbstractSchedulerConnection[] getConnections(Job[] jobs) {
+    private GridEngineSchedulerConnection[] getConnections(Job[] jobs) {
         Map<String, GridEngineSchedulerConnection> result = new HashMap<String, GridEngineSchedulerConnection>();
 
         for (Job job : jobs) {
@@ -188,7 +188,7 @@ public class GridEngineJobs implements Jobs {
         return result.values().toArray(new GridEngineSchedulerConnection[0]);
     }
 
-    private void selectJobs(AbstractSchedulerConnection connection, Job[] in, Job[] out) {
+    private void selectJobs(GridEngineSchedulerConnection connection, Job[] in, Job[] out) {
         for (int i = 0; i < in.length; i++) {
             if (in[i] != null && connection.getScheduler().equals(in[i].getScheduler())) {
                 out[i] = in[i];
@@ -198,7 +198,7 @@ public class GridEngineJobs implements Jobs {
         }
     }
 
-    private void getJobStatus(AbstractSchedulerConnection connection, Job[] in, JobStatus[] out) {
+    private void getJobStatus(GridEngineSchedulerConnection connection, Job[] in, JobStatus[] out) {
         JobStatus[] result = null;
         Exception exception = null;
 
@@ -224,14 +224,14 @@ public class GridEngineJobs implements Jobs {
         //implementation inspired by / copy pasted from JobsEngine.getJobStatuses()
 
         // If we have more than one job, we first collect all connections
-        AbstractSchedulerConnection[] connections = getConnections(jobs);
+        GridEngineSchedulerConnection[] connections = getConnections(jobs);
 
         JobStatus[] result = new JobStatus[jobs.length];
         Job[] tmp = new Job[jobs.length];
 
         // Next we iterate over the connections, and get the JobStatus for each scheduler individually, merging the result into
         // the overall result on the fly.
-        for (AbstractSchedulerConnection connection : connections) {
+        for (GridEngineSchedulerConnection connection : connections) {
             selectJobs(connection, jobs, tmp);
             getJobStatus(connection, tmp, result);
         }
@@ -249,19 +249,19 @@ public class GridEngineJobs implements Jobs {
 
     @Override
     public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
-        AbstractSchedulerConnection connection = getConnection(job.getScheduler());
+        GridEngineSchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.cancelJob(job);
     }
 
     public void end() {
-        AbstractSchedulerConnection[] connections;
+        GridEngineSchedulerConnection[] connections;
 
         synchronized (this) {
             connections = this.connections.values().toArray(new GridEngineSchedulerConnection[0]);
         }
 
-        for (AbstractSchedulerConnection connection : connections) {
+        for (GridEngineSchedulerConnection connection : connections) {
             try {
                 connection.close();
             } catch (OctopusIOException | OctopusException e) {
@@ -278,7 +278,7 @@ public class GridEngineJobs implements Jobs {
 
     @Override
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
-        AbstractSchedulerConnection connection = getConnection(job.getScheduler());
+        GridEngineSchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.waitUntilDone(job, timeout);
     }
