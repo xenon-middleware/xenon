@@ -202,7 +202,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    private Map<String, Map<String, String>> parseQueueInfos(String data) throws OctopusIOException, OctopusException {
+    Map<String, Map<String, String>> parseQueueInfos(String data) throws OctopusIOException, OctopusException {
         Document document = parseDocument(data);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
@@ -284,7 +284,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    private Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusIOException, OctopusException {
+    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusIOException, OctopusException {
         Document document = parseDocument(data);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
