@@ -99,7 +99,7 @@ public abstract class AbstractSchedulerConnection {
         String stderr = runner.getStderr();
 
         if (runner.getExitCode() != 0 || !stderr.isEmpty()) {
-            throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable
+            throw new CommandFailedException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable
                     + "\" at server \"" + actualLocation.getHost() + "\". Error output: " + stderr);
         }
 

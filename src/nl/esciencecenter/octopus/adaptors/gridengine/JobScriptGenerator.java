@@ -28,6 +28,19 @@ public class JobScriptGenerator {
 
         script.format("#!/bin/sh\n");
         script.format("#$ -N octopus\n");
+        
+        if (description.getWorkingDirectory() != null) {
+            script.format("#$ -wd %s\n", description.getWorkingDirectory());
+        }
+        
+        if (description.getStdout() != null) {
+            script.format("#$ -o %s\n", description.getStdout());
+        }
+        
+        if (description.getStderr() != null) {
+            script.format("#$ -e %s\n", description.getStderr());
+        }
+        
         script.format("\n");
 
         script.format("%s", description.getExecutable());

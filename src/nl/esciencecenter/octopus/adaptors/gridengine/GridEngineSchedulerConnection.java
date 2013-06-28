@@ -109,9 +109,14 @@ public class GridEngineSchedulerConnection extends AbstractSchedulerConnection {
 
         if (map == null || map.isEmpty()) {
             //perhaps the job is already finished?
-            String output = runCommand(null, "qacct", "-j", job.getIdentifier());
+            Map<String, String> accountingInfo = null;
+            try {
+                String output = runCommand(null, "qacct", "-j", job.getIdentifier());
 
-            Map<String, String> accountingInfo = QAcctOutputParser.getJobAccountingInfo(output);
+                accountingInfo = QAcctOutputParser.getJobAccountingInfo(output);
+            } catch (CommandFailedException e) {
+                logger.debug("qacct command failed" ,e);
+            }
 
             if (accountingInfo != null) {
                 Integer exitCode = null;
