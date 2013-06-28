@@ -613,7 +613,7 @@ public abstract class GenericJobAdaptorTestParent {
         
         Job job = jobs.submitJob(scheduler, description);
         
-        long deadline = System.currentTimeMillis() + 5000;
+        long deadline = System.currentTimeMillis() + 60000;
         
         JobStatus status = jobs.getJobStatus(job);
         
