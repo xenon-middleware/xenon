@@ -455,7 +455,7 @@ public abstract class GenericJobAdaptorTestParent {
     }
     
     @Test
-    public void test22_getQueueStatuses() throws Exception {        
+    public void test22a_getQueueStatuses() throws Exception {        
         Scheduler s = config.getDefaultScheduler(jobs, credentials);        
         try { 
             QueueStatus [] tmp = jobs.getQueueStatuses(s, config.getInvalidQueueName());
@@ -470,6 +470,16 @@ public abstract class GenericJobAdaptorTestParent {
         }
     }
     
+    @Test(expected = NullPointerException.class)
+    public void test22b_getQueueStatuses() throws Exception {        
+        jobs.getQueueStatuses(null, config.getDefaultQueueName());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test22c_getQueueStatuses() throws Exception {    
+        Scheduler s = config.getDefaultScheduler(jobs, credentials); 
+        jobs.getQueueStatuses(s, (String []) null);
+    }
     
     @Test(expected = NullPointerException.class)
     public void test23_getQueueStatuses() throws Exception {        

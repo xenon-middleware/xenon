@@ -120,6 +120,11 @@ public class JobQueues {
     }
     
     private void checkScheduler(Scheduler scheduler) throws OctopusException { 
+        
+        if (scheduler == null) { 
+            throw new NullPointerException("Adaptor " + adaptorName + ": Scheduler is null!");
+        }
+        
         if (scheduler != myScheduler) {
             throw new OctopusException(adaptorName, "Scheduler mismatch! " + scheduler + " != " + myScheduler) ;
         }
@@ -400,7 +405,7 @@ public class JobQueues {
         logger.debug("{}: getQueueStatus {}:{}", adaptorName, scheduler, queueName);
 
         if (queueName == null) { 
-            throw new OctopusException(adaptorName, "Queue name is null!");
+            throw new NullPointerException("Adaptor " + adaptorName + ": Queue name is null!");
         }
         
         checkScheduler(scheduler);
@@ -420,10 +425,16 @@ public class JobQueues {
         
         String [] names = queueNames;
         
+        if (names == null) { 
+            throw new NullPointerException("Adaptor " + adaptorName + ": Queue names are null!");
+        }
+        
         if (names.length == 0) { 
             names = new String [] { "single", "multi", "unlimited" };
         }
         
+        checkScheduler(scheduler);
+                        
         QueueStatus[] result = new QueueStatus[names.length];
 
         for (int i = 0; i < names.length; i++) {

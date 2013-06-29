@@ -186,6 +186,11 @@ public interface Jobs {
     /**
      * Get the status of all <code>queues</code> of <code>scheduler</code>.
      * 
+     * Note that this method will only throw an exception when this exception will influence all status requests. For example, 
+     * if the scheduler is invalid or not reachable. 
+     * 
+     * Exceptions that only refer to a single queue are returned in the QueueStatus returned for that queue. 
+     * 
      * @param scheduler
      *            the Scheduler.
      * @param queueNames
@@ -193,7 +198,7 @@ public interface Jobs {
      * 
      * @return an array containing the resulting QueueStatus.
      * 
-     * @throws NoSchedulerException
+     * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
      * @throws OctopusException
      *             If the Scheduler failed to get the statusses.
