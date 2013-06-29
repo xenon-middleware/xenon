@@ -9,13 +9,15 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 
 public interface CommandLineInterface {
 
-    public Job[] getJobs(SchedulerConnection connection, String[] queueNames) throws OctopusIOException,
-            OctopusException;
-
     public String[] getQueueNames(SchedulerConnection connection) throws OctopusIOException, OctopusException;
 
-    public QueueStatus[] getQueueStatuses(SchedulerConnection connection, String[] queueNames)
+    public QueueStatus getQueueStatus(SchedulerConnection connection, String queueName) throws OctopusIOException, OctopusException;
+
+    public QueueStatus[] getQueueStatuses(SchedulerConnection connection, String... queueNames)
             throws OctopusIOException, OctopusException;
+
+    public Job[] getJobs(SchedulerConnection connection, String... queueNames) throws OctopusIOException,
+    OctopusException;
 
     public Job submitJob(SchedulerConnection connection, JobDescription description) throws OctopusIOException,
             OctopusException;
@@ -24,7 +26,7 @@ public interface CommandLineInterface {
 
     public JobStatus getJobStatus(SchedulerConnection connection, Job job) throws OctopusException, OctopusIOException;
 
-    public JobStatus[] getJobStatuses(SchedulerConnection connection, Job[] jobs) throws OctopusIOException,
+    public JobStatus[] getJobStatuses(SchedulerConnection connection, Job... jobs) throws OctopusIOException,
             OctopusException;
 
 }

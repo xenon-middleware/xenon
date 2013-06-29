@@ -465,9 +465,23 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return allMap.keySet().toArray(new String[0]);
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#getQueueStatuses(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, java.lang.String[])
-     */
+    @Override
+    public QueueStatus getQueueStatus(SchedulerConnection connection, String queueName) throws OctopusIOException,
+            OctopusException {
+        String qstatOutput = connection.runCommand(null, "qstat", "-xml", "-g", "c");
+
+        Map<String, Map<String, String>> allMap = parseQueueInfos(qstatOutput);
+
+        Map<String, String> map = allMap.get(queueName);
+
+        if (map == null || map.isEmpty()) {
+            throw new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueName
+                    + " from server, perhaps it does not exist?");
+        }
+
+        return new QueueStatusImplementation(connection.getScheduler(), queueName, null, map);
+    }
+
     @Override
     public QueueStatus[] getQueueStatuses(SchedulerConnection connection, String[] queueNames) throws OctopusIOException,
             OctopusException {
@@ -505,8 +519,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
      * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#submitJob(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, nl.esciencecenter.octopus.jobs.JobDescription)
      */
     @Override
-    public Job submitJob(SchedulerConnection connection, JobDescription description) throws OctopusIOException,
-            OctopusException {
+    public Job submitJob(SchedulerConnection connection, JobDescription description) throws OctopusIOException, OctopusException {
         String jobScript = JobScriptGenerator.generate(description);
 
         String output = connection.runCommand(jobScript, "qsub");
@@ -598,8 +611,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
      * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#getJobStatuses(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, nl.esciencecenter.octopus.jobs.Job[])
      */
     @Override
-    public JobStatus[] getJobStatuses(SchedulerConnection connection, Job[] jobs) throws OctopusIOException,
-            OctopusException {
+    public JobStatus[] getJobStatuses(SchedulerConnection connection, Job[] jobs) throws OctopusIOException, OctopusException {
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < result.length; i++) {

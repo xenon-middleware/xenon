@@ -155,51 +155,15 @@ public class SchedulerConnection {
         return status;
     }
 
-    private void checkQueueNames(String[] queueNames) throws NoSuchQueueException {
-        for (String requestedQueueName : queueNames) {
-            boolean found = false;
-            for (String queueName : getQueueNames()) {
-                if (requestedQueueName.equals(queueName)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throw new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, requestedQueueName
-                        + " does not exist at this scheduler");
-            }
-        }
-    }
-
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
-        if (queueName == null) {
-            throw new NullPointerException("queue name cannot be null");
-        }
-
-        String[] queueNames = { queueName };
-
-        checkQueueNames(queueNames);
-
-        return getQueueStatuses(queueNames)[0];
+        return cli.getQueueStatus(this, queueName);
     }
 
     public QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException {
-        if (queueNames.length == 0) {
-            queueNames = getQueueNames();
-        } else {
-            checkQueueNames(queueNames);
-        }
-        
         return cli.getQueueStatuses(this, queueNames);
-
     }
 
     public Job[] getJobs(String[] queueNames) throws OctopusIOException, OctopusException {
-        if (queueNames.length == 0) {
-            queueNames = getQueueNames();
-        } else {
-            checkQueueNames(queueNames);
-        }
-
         return cli.getJobs(this, queueNames);
 
     }
