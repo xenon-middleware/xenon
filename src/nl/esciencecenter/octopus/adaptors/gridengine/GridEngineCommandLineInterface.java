@@ -320,7 +320,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
                 String state = element.getAttribute("state");
 
                 if (state != null && state.length() > 0) {
-                    jobInfo.put("state", state);
+                    jobInfo.put("long_state", state);
                 }
 
                 String jobID = jobInfo.get("JB_job_number");
@@ -334,35 +334,6 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         }
 
         return result;
-    }
-
-    private JobStatus getJobStatusFromMap(Map<String, Map<String, String>> allMap, Job job) {
-        if (allMap == null || allMap.isEmpty()) {
-            Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of jobs on server");
-            return new JobStatusImplementation(job, null, null, exception, false, false, null);
-        }
-
-        //state for only the requested job
-        Map<String, String> map = allMap.get(job.getIdentifier());
-
-        if (map == null || map.isEmpty()) {
-            Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, false, null);
-        }
-
-        String state = map.get("state");
-
-        if (state == null || state.length() == 0) {
-            Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
-                            + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, false, map);
-        }
-
-        //FIXME: add isDone and exitcode for job
-        return new JobStatusImplementation(job, state, null, null, state.equals("running"), false, map);
     }
 
     private static String checkSubmitJobResult(String output) throws OctopusIOException {
@@ -412,7 +383,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         }
     }
 
-    private static Map<String, String> getJobAccountingInfo(String output) throws OctopusIOException {
+    private static Map<String, String> parseJobAccountingInfo(String output) throws OctopusIOException {
         Map<String, String> result = new HashMap<String, String>();
 
         String lines[] = output.split("\\r?\\n");
@@ -436,7 +407,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
      * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#getJobs(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, java.lang.String[])
      */
     @Override
-    public Job[] getJobs(SchedulerConnection connection, String[] queueNames) throws OctopusIOException, OctopusException {
+    public Job[] getJobs(SchedulerConnection connection, String... queueNames) throws OctopusIOException, OctopusException {
         String statusOutput = connection.runCommand(null, "qstat", "-xml");
 
         Map<String, Map<String, String>> status = parseJobInfos(statusOutput);
@@ -483,7 +454,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(SchedulerConnection connection, String[] queueNames) throws OctopusIOException,
+    public QueueStatus[] getQueueStatuses(SchedulerConnection connection, String... queueNames) throws OctopusIOException,
             OctopusException {
         QueueStatus[] result = new QueueStatus[queueNames.length];
 
@@ -515,9 +486,6 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#submitJob(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, nl.esciencecenter.octopus.jobs.JobDescription)
-     */
     @Override
     public Job submitJob(SchedulerConnection connection, JobDescription description) throws OctopusIOException, OctopusException {
         String jobScript = JobScriptGenerator.generate(description);
@@ -530,9 +498,6 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return new JobImplementation(connection.getScheduler(), identifier, description, false, false);
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#cancelJob(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, nl.esciencecenter.octopus.jobs.Job)
-     */
     @Override
     public JobStatus cancelJob(SchedulerConnection connection, Job job) throws OctopusIOException, OctopusException {
         String output = connection.runCommand(null, "qdel", job.getIdentifier());
@@ -542,9 +507,61 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return getJobStatus(connection, job);
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#getJobStatus(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, nl.esciencecenter.octopus.jobs.Job)
-     */
+    private JobStatus qstatJobStatus(Map<String, String> info, SchedulerConnection connection, Job job) {
+        Exception exception = null;
+
+        if (info == null || info.isEmpty()) {
+            logger.debug("job state not in map");
+            return null;
+        }
+
+        String longState = info.get("long_state");
+        if (longState == null || longState.length() == 0) {
+            exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
+                            + " not found on server");
+        }
+
+        String stateCode = info.get("state");
+        if (stateCode != null && stateCode.contains("E")) {
+            logger.debug("job is in error state, try to cancel job, pick up status from qacct");
+            try {
+                connection.runCommand(null, "qdel", job.getIdentifier());
+            } catch (OctopusIOException | OctopusException e) {
+                logger.error("Failed to cancel job in error state", e);
+            }
+            return null;
+        }
+
+        return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), false, info);
+    }
+
+    private JobStatus qacctJobStatus(Map<String, String> info, Job job) {
+        Integer exitCode = null;
+        Exception exception = null;
+        String state = "done";
+        String exitCodeString = info.get("exit_status");
+
+        try {
+            if (exitCodeString != null) {
+                exitCode = Integer.parseInt(exitCodeString);
+            }
+        } catch (NumberFormatException e) {
+            exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
+                            + " from string " + exitCodeString, e);
+
+        }
+
+        String failedString = info.get("failed");
+
+        if (failedString != null && !failedString.equals("0")) {
+            exception = new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
+        }
+
+        return new JobStatusImplementation(job, state, exitCode, exception, false, true, info);
+    }
+
     @Override
     public JobStatus getJobStatus(SchedulerConnection connection, Job job) throws OctopusException, OctopusIOException {
 
@@ -552,66 +569,49 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
 
         Map<String, Map<String, String>> allMap = parseJobInfos(statusOutput);
 
+        //mark all jobs in this map as recently seen
         markJobsSeen(allMap.keySet());
 
         Map<String, String> map = allMap.get(job.getIdentifier());
 
-        if (map == null || map.isEmpty()) {
-            //perhaps the job is already finished?
-            Map<String, String> accountingInfo = null;
+        JobStatus status = qstatJobStatus(allMap.get(job.getIdentifier()), connection, job);
+
+        Exception exception = null;
+        if (status == null) {
+            //this job cannot be found in the queue, or is reporting some sort of error.
+            //to get some more information, run qacct
             try {
                 String output = connection.runCommand(null, "qacct", "-j", job.getIdentifier());
+                clearJobSeen(job.getIdentifier());
 
-                accountingInfo = getJobAccountingInfo(output);
+                Map<String, String> accountingInfo = parseJobAccountingInfo(output);
+
+                status = qacctJobStatus(accountingInfo, job);
             } catch (CommandFailedException e) {
                 logger.debug("qacct command failed", e);
-            }
-
-            if (accountingInfo != null) {
-                Integer exitCode = null;
-
-                String exitCodeString = accountingInfo.get("exit_status");
-
-                try {
-                    if (exitCodeString != null) {
-                        exitCode = Integer.parseInt(exitCodeString);
-                    }
-                } catch (NumberFormatException e) {
-                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
-                            + job.getIdentifier() + " from string " + exitCodeString, e);
-
-                }
-
-                clearJobSeen(job.getIdentifier());
-                return new JobStatusImplementation(job, "done", exitCode, null, false, true, accountingInfo);
-            } else if (haveRecentlySeen(job.getIdentifier())) {
-                return new JobStatusImplementation(job, "pending", null, null, false, true, accountingInfo);
-            } else {
-                Exception exception =
-                        new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
-                                + " not found on server");
-                return new JobStatusImplementation(job, null, null, exception, false, false, null);
+                exception = e;
             }
         }
 
-        String state = map.get("state");
-
-        if (state == null || state.length() == 0) {
-            Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
-                            + " not found on server");
-            return new JobStatusImplementation(job, null, null, exception, false, false, map);
+        if (status == null && haveRecentlySeen(job.getIdentifier())) {
+            status = new JobStatusImplementation(job, "pending", null, null, false, true, new HashMap<String, String>());
         }
 
-        markJobSeen(job.getIdentifier());
-        return new JobStatusImplementation(job, state, null, null, state.equals("running"), false, map);
+        if (status == null) {
+            //list qacct exception as cause (if set)
+            exception =
+                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server",
+                            exception);
+            status = new JobStatusImplementation(job, null, null, exception, false, false, null);
+        }
+
+        logger.debug("got job status {}", status);
+
+        return status;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#getJobStatuses(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, nl.esciencecenter.octopus.jobs.Job[])
-     */
     @Override
-    public JobStatus[] getJobStatuses(SchedulerConnection connection, Job[] jobs) throws OctopusIOException, OctopusException {
+    public JobStatus[] getJobStatuses(SchedulerConnection connection, Job... jobs) throws OctopusIOException, OctopusException {
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < result.length; i++) {
