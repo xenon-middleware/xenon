@@ -395,7 +395,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         for (String jobID : jobIDs) {
             markJobSeen(jobID);
 
-            result.add(new JobImplementation(scheduler, jobID, null, false, false));
+            result.add(new JobImplementation(scheduler, jobID, false, false));
         }
 
     }
