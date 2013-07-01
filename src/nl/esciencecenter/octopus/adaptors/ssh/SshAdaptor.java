@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.ssh.SshFiles.FileSystemInfo;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
@@ -29,6 +30,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
+import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
@@ -38,8 +40,11 @@ import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.NotConnectedException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.exceptions.PermissionDeniedException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedIOOperationException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
@@ -444,10 +449,28 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected void putExecChannel(ChannelExec channel) {
+    protected void releaseExecChannel(ChannelExec channel) {
         channel.disconnect();
     }
-
+        
+    /**
+     * Get a connected channel for doing sftp operations.
+     * 
+     * @param session
+     *            The authenticated session.
+     * @return the channel
+     * @throws OctopusIOException
+     */
+    protected ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
+        try {
+            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+            channel.connect();
+            return channel;
+        } catch (JSchException e) {
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+        }
+    }
+    
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         // TODO Auto-generated method stub

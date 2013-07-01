@@ -843,6 +843,11 @@ public abstract class GenericJobAdaptorTestParent {
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.cancelJob(job);
+
+        // Wait until the job is killed. We assume it takes less than a minute!
+        if (!status.isDone()) { 
+            status = jobs.waitUntilDone(job, 60000);
+        }
         
         if (!status.isDone()) { 
             throw new Exception("Failed to kill job!");
@@ -897,11 +902,20 @@ public abstract class GenericJobAdaptorTestParent {
             status = jobs.waitUntilDone(job, 1000);            
         }
         
-        if (status.isRunning()) { 
-            status = jobs.cancelJob(job);
-        } else { 
+        if (!status.isRunning()) {
             throw new Exception("Job failed to start!");
         }
+            
+        status = jobs.cancelJob(job);
+            
+        // Wait until the job is killed. We assume it takes less than a minute!
+        if (!status.isDone()) { 
+            status = jobs.waitUntilDone(job, 60000);
+        }
+        
+        if (!status.isDone()) { 
+            throw new Exception("Failed to kill job!");
+        }   
         
         jobs.close(scheduler);
         

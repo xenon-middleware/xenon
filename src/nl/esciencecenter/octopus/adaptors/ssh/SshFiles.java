@@ -76,6 +76,7 @@ import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
 public class SshFiles implements Files {
+    
     private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
     
     private static int currentID = 1;
@@ -129,12 +130,12 @@ public class SshFiles implements Files {
         }
     }
     
-    public FileSystem newFileSystem(Session session, URI location, Credential credential, OctopusProperties properties) 
+    protected FileSystem newFileSystem(Session session, URI location, Credential credential, OctopusProperties properties) 
             throws OctopusException, OctopusIOException {
         
         String uniqueID = getNewUniqueID();
 
-        ChannelSftp channel = getSftpChannel(session);
+        ChannelSftp channel = adaptor.getSftpChannel(session);
 
         String wd = null;
 
@@ -174,7 +175,7 @@ public class SshFiles implements Files {
     }
 
     private ChannelSftp getChannel(AbsolutePath path) throws OctopusIOException {
- 
+        
         FileSystem fileSystem = path.getFileSystem();
         
         if (!fileSystem.getAdaptorName().equals(SshAdaptor.ADAPTOR_NAME)) {
@@ -188,26 +189,9 @@ public class SshFiles implements Files {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
         }
 
-        return getSftpChannel(info.getSession());
+        return adaptor.getSftpChannel(info.getSession());
     }
-    
-    /**
-     * Get a connected channel for doing sftp operations.
-     * 
-     * @param session
-     *            The authenticated session.
-     * @return the channel
-     * @throws OctopusIOException
-     */
-    private ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
-        try {
-            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-            return channel;
-        } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
-    }
+
 
     @Override
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
@@ -744,7 +728,47 @@ public class SshFiles implements Files {
         
     @Override
     public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "newByteChannel not implemented!");
+        
+        OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
+
+        boolean read = tmp.getReadMode() != null;
+        boolean write = tmp.getWriteMode() != null;
+        boolean append = false;
+        
+        if (!read && !write) {
+            throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");        
+        } 
+        
+        if (read) { 
+            if (tmp.getAppendMode() != null) {
+                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading a file!");
+            } 
+            
+            append = (tmp.getAppendMode() == OpenOption.APPEND); 
+        } else { 
+            if (tmp.getAppendMode() == null) {
+                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
+            }
+        }
+        
+        if (tmp.getOpenMode() == OpenOption.CREATE) { 
+            if (exists(path)) { 
+                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+            }
+        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
+            if (!exists(path)) { 
+                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
+            }
+        }
+        
+        ChannelSftp channel = getChannel(path);
+        
+        try { 
+            return new SSHSeekableByteChannel(channel, path.getPath(), read, write, append);
+        } catch (IOException e) {
+            channel.disconnect();
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to open channel!", e);
+        }
     }
     
     private SftpATTRS stat(AbsolutePath path) throws OctopusIOException {

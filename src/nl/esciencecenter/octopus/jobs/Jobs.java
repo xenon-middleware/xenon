@@ -290,6 +290,10 @@ public interface Jobs {
      * A status is returned that indicates the state of the job after the cancel.  If the jobs was already done it cannot be 
      * killed afterwards.   
      * 
+     * A JobStatus is returned that can be used to determine the state of the job after cancelJob returns. Note that it may take 
+     * some time before the job is actually terminated. The {@link waitUntilDone} method can be used to wait until the job is 
+     * terminated.   
+     * 
      * @param job the job to kill.
      * @return the status of the Job.
      * 
