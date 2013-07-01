@@ -35,6 +35,7 @@ public class SSHSeekableByteChannel implements SeekableByteChannel {
     
     private final boolean read;
     private final boolean write;
+    private final boolean append;
     
     private String file;
     private ChannelSftp channel;
@@ -45,13 +46,13 @@ public class SSHSeekableByteChannel implements SeekableByteChannel {
         
         this.file = file;
         this.channel = channel;
-        
         this.read = read;
         this.write = write;
-
-        if (write && append) { 
+        this.append = append;
+        
+        if (write && !read && append) { 
             this.offset = size();
-        } 
+        }
     }
     
     @Override
@@ -104,6 +105,8 @@ public class SSHSeekableByteChannel implements SeekableByteChannel {
         
         int maxSize = dst.remaining();
         
+        System.err.println("READING " + maxSize + " bytes");
+        
         if (maxSize == 0) {
             return 0;
         }
@@ -121,8 +124,14 @@ public class SSHSeekableByteChannel implements SeekableByteChannel {
         } finally { 
             in.close();
         }
+
+        System.err.println("READ " + len + " bytes");
         
-        dst.put(buffer, 0, len);
+        if (len > 0) { 
+            dst.put(buffer, 0, len);
+            offset += len;
+        }
+        
         return len;
     }
 
@@ -144,14 +153,15 @@ public class SSHSeekableByteChannel implements SeekableByteChannel {
         }
         
         byte [] buffer = new byte[maxSize];
-        int len = 0;
-        
+
         src.get(buffer);
         
         OutputStream out = null;
         
+        System.out.println("WRITING " + maxSize + " bytes to file " + file + " at offset " + offset);
+        
         try {
-            out = channel.put(file, null, ChannelSftp.RESUME, offset);
+            out = channel.put(file, null, ChannelSftp.OVERWRITE, offset);
             out.write(buffer);
         } catch (SftpException e) {
             throw new IOException("Failed to write bytes to " + file, e);
@@ -159,7 +169,8 @@ public class SSHSeekableByteChannel implements SeekableByteChannel {
             out.close();
         }
 
-        return len;
+        offset += maxSize;
+        return maxSize;
     }
     
     @Override

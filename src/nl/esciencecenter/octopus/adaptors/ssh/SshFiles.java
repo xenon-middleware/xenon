@@ -733,21 +733,27 @@ public class SshFiles implements Files {
 
         boolean read = tmp.getReadMode() != null;
         boolean write = tmp.getWriteMode() != null;
+        
         boolean append = false;
         
         if (!read && !write) {
-            throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");        
-        } 
-        
-        if (read) { 
-            if (tmp.getAppendMode() != null) {
-                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading a file!");
-            } 
+            throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");
             
-            append = (tmp.getAppendMode() == OpenOption.APPEND); 
-        } else { 
+        } else if (write && !read) { 
+            
             if (tmp.getAppendMode() == null) {
                 throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
+            }
+            
+            append = (tmp.getAppendMode() == OpenOption.APPEND);
+            
+        } else if (read && !write) { 
+            if (tmp.getAppendMode() != null) {
+                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading a file!");
+            }            
+        } else { // read and write 
+            if (tmp.getAppendMode() != null) {
+                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading and writing a file!");
             }
         }
         

@@ -324,16 +324,16 @@ public class JobQueues {
                         "Illegal stderr redirect for interactive job!");            
             }
         } else {             
-            
-            if (description.getStdout() == null) { 
-                throw new InvalidJobDescriptionException(adaptorName, 
-                        "Missing stdout redirect for interactive job!");            
-            }
-            
-            if (description.getStderr() == null) { 
-                throw new InvalidJobDescriptionException(adaptorName, 
-                        "Missing stderr redirect for interactive job!");            
-            }            
+//            
+//            if (description.getStdout() == null) { 
+//                throw new InvalidJobDescriptionException(adaptorName, 
+//                        "Missing stdout redirect for batch job!");            
+//            }
+//            
+//            if (description.getStderr() == null) { 
+//                throw new InvalidJobDescriptionException(adaptorName, 
+//                        "Missing stderr redirect for batch job!");            
+//            }            
         }
     }
     

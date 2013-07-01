@@ -2192,7 +2192,8 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: 
     
-    public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, boolean mustFail) throws Exception {
+    public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, 
+            boolean mustFail) throws Exception {
 
         if (!config.supportsNewByteChannel()) {
             return;
@@ -2296,7 +2297,7 @@ public abstract class GenericFileAdaptorTestParent {
         test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
 
         // Test with existing file and OPEN + APPEND + READ + WRITE 
-        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE, OpenOption.READ }, data, data, false);
+        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE, OpenOption.READ }, data, data, false);
         
         // Test with existing file and OPEN + APPEND + READ + WRITE 
         test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.APPEND, OpenOption.WRITE, OpenOption.READ }, null, null, true);
@@ -2321,8 +2322,7 @@ public abstract class GenericFileAdaptorTestParent {
         
         // test with non-existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
         AbsolutePath file4 = createNewTestFileName(testDir);
-        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE, 
-                OpenOption.READ }, data, data, false);
+        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.READ }, data, data, false);
 
         // test with existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
         test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, 

@@ -75,13 +75,18 @@ public class StreamForwarder extends Thread {
                     return;
                 }
 
-                out.write(buffer, 0, read);
+                if (out != null) { 
+                    out.write(buffer, 0, read);
+                }
             }
         } catch (IOException e) {
             logger.error("Cannot forward stream", e);
         } finally {
             close(in, null);
-            close(out, null);
+            
+            if (out != null) { 
+                close(out, null);
+            }
         }
     }
 }

@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -58,6 +59,21 @@ class BatchProcess implements InteractiveProcess {
         return result;
     }
     
+    private OutputStream createOutputStream(Files files, AbsolutePath workdir, String filename) throws OctopusIOException, OctopusException {
+        
+        if (filename == null) { 
+            return null;
+        }
+        
+        AbsolutePath file = processPath(files, workdir, filename);
+
+        // Create the files for the output stream. Will fail if the files already exist!
+        files.createFile(file);
+        
+        // Create the output stream and return it. 
+        return files.newOutputStream(file, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE);
+    }
+    
     
     public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory) throws Exception { 
         
@@ -70,13 +86,13 @@ class BatchProcess implements InteractiveProcess {
             files.createDirectories(workdir);
         }
         
-        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
-        AbsolutePath stderr = processPath(files, workdir, description.getStderr());
-        
-        // Create the files for stdout and stderr. Will fail if the files already exist!
-        files.createFile(stdout);
-        files.createFile(stderr);
-        
+//        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
+//        AbsolutePath stderr = processPath(files, workdir, description.getStderr());
+//        
+//        // Create the files for stdout and stderr. Will fail if the files already exist!
+//        files.createFile(stdout);
+//        files.createFile(stderr);
+//        
         // If needed create a file for stdin, and make sure it exists!
         AbsolutePath stdin = null;
         
@@ -91,11 +107,8 @@ class BatchProcess implements InteractiveProcess {
         process = factory.createInteractiveProcess(job);
         Streams streams = process.getStreams();
         
-        stdoutForwarder = new StreamForwarder(streams.getStdout(), 
-                files.newOutputStream(stdout, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE));
-        
-        stderrForwarder = new StreamForwarder(streams.getStderr(),
-                files.newOutputStream(stderr, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE));
+        stdoutForwarder = new StreamForwarder(streams.getStdout(), createOutputStream(files, workdir, description.getStdout()));
+        stderrForwarder = new StreamForwarder(streams.getStderr(), createOutputStream(files, workdir, description.getStderr()));
         
         if (stdin == null) { 
             stdinForwarder = null;
