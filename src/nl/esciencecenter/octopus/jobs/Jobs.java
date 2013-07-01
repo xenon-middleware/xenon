@@ -142,12 +142,14 @@ public interface Jobs {
     /**
      * Get all jobs currently in (one ore more) queues of <code>scheduler</code>.
      * 
-     * Note that jobs submitted by other users or other schedulers may also be returned.
+     * If no queue names are specified, the jobs for all queues are returned.
+     * 
+     * Note that jobs submitted by other users or other schedulers may also be returned. 
      * 
      * @param scheduler
      *            the Scheduler.
      * @param queueNames
-     *            the names of the queues, or null for all queues. 
+     *            the names of the queues.  
      * 
      * @return an array containing the resulting Jobs.
      * 

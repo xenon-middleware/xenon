@@ -94,31 +94,34 @@ public class RelativePathTest {
 
     @Test
     public void testRelativePathPathSeperator() {
-        RelativePath path = new RelativePath("mydir@myfile", "@");
+        RelativePath path = new RelativePath('@', "mydir@myfile");
         assertEquals(path.getPath(), "@mydir@myfile");
     }
 
     @Test
     public void testRelativePathPathSeperator2() {
-        RelativePath path = new RelativePath(new String[] { "mydir", "myfile" }, null);
+        RelativePath path = new RelativePath('/', "mydir", "myfile");
         assertEquals(path.getPath(), "/mydir/myfile");
     }
 
     @Test
     public void testRelativePathPathSeperator3() {
-        RelativePath path = new RelativePath(new String[] { "mydir", "myfile" }, "");
+        RelativePath path = new RelativePath('/', "mydir", null, "myfile");
         assertEquals(path.getPath(), "/mydir/myfile");
     }
-    
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test
     public void testRelativePathPathSeperator4() {
-        new RelativePath(new String[] { "mydir", "myfile" }, "@@");
+        RelativePath path = new RelativePath('/', "mydir", "", "myfile");
+        assertEquals(path.getPath(), "/mydir/myfile");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testRelativePathPathSeperator5() {
-        new RelativePath("mydir", "@@");
+        RelativePath path = new RelativePath('/', (String []) null);
+        assertEquals(path.getPath(), "");
     }
+
 
     @Test
     public void testRelativePathPathSeperator6() {
@@ -134,16 +137,14 @@ public class RelativePathTest {
 
     @Test
     public void testRelativePathPathSeperator8() {
-        RelativePath path = new RelativePath(new String[0], "");
+        RelativePath path = new RelativePath('/', new String[0]);
         assertEquals(path.getPath(), "");
     }
     
     @Test
     public void testRelativePathStringArraySeperator() {
-        String[] strings = new String[2];
-        strings[0] = "mydir";
-        strings[1] = "myfile";
-        RelativePath path = new RelativePath(strings, "@");
+        String[] strings = new String[] { "mydir", "myfile" };
+        RelativePath path = new RelativePath('@', strings);
         assertEquals(path.getPath(), "@mydir@myfile");
     }
 
@@ -581,8 +582,8 @@ public class RelativePathTest {
     public void testEquals3() {
         String [] s = new String [] { "a", "b", "c" };
         
-        RelativePath p1 = new RelativePath(s, "/");
-        RelativePath p2 = new RelativePath(s, "@");
+        RelativePath p1 = new RelativePath('/', s);
+        RelativePath p2 = new RelativePath('@', s);
          
         boolean v = p1.equals(p2);
         assert(!v);
@@ -592,8 +593,8 @@ public class RelativePathTest {
     public void testEquals4() {
         String [] s = new String [] { "a", "b", "c" };
         
-        RelativePath p1 = new RelativePath(s, "/");
-        RelativePath p2 = new RelativePath(s, "");
+        RelativePath p1 = new RelativePath('/', s);
+        RelativePath p2 = new RelativePath(s);
          
         boolean v = p1.equals(p2);
         assert(v);
