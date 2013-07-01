@@ -63,7 +63,7 @@ public class JobScriptGenerator {
         }
         script.format("\n");
 
-        script.format("exit 22\n");
+        //script.format("exit 22\n");
 
         script.close();
         
