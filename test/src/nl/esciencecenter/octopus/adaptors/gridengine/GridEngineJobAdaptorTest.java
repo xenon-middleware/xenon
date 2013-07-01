@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 
-import org.junit.Test;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-public class JobScriptGeneratorTest {
-
-    @Test
-    public void testGenerate() {
-        //JobScriptGenerator generator = new JobScriptGenerator();
-        
-        JobDescription job = new JobDescription();
-        
-        job.setExecutable("/bin/echo");
-        
-        job.setArguments("this", "and", "that");
-        
-        System.out.println(JobScriptGenerator.generate(job, null));
+/**
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ *
+ */
+public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
+    
+    @BeforeClass
+    public static void prepareGridEngineJobAdaptorTest() throws Exception { 
+        GenericJobAdaptorTestParent.prepareClass(new GridEngineJobTestConfig(null));
     }
 
+    @AfterClass
+    public static void cleanupGridEngineJobAdaptorTest() throws Exception { 
+        GenericJobAdaptorTestParent.cleanupClass();
+    }
 }

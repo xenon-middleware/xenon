@@ -18,16 +18,50 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.Formatter;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 public class JobScriptGenerator {
 
-    public static String generate(JobDescription description) {
+    private static final Logger logger = LoggerFactory.getLogger(JobScriptGenerator.class);
+    
+    public static String generate(JobDescription description, AbsolutePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
         script.format("#!/bin/sh\n");
         script.format("#$ -N octopus\n");
+        
+        if (description.getWorkingDirectory() != null) {
+            AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
+            
+            script.format("#$ -wd %s\n", workingDirectory.getPath());
+        }
+        
+        if (description.getQueueName() != null) {
+            script.format("#$ -q %s\n", description.getQueueName());
+        }
+
+        if (description.getStdin() != null) {
+            script.format("#$ -i %s\n", description.getStdin());
+        }
+        
+        if (description.getStdout() == null) {
+            script.format("#$ -o /dev/null\n");
+        } else {
+            script.format("#$ -o %s\n", description.getStdout());
+        }
+
+        if (description.getStderr() == null) {
+            script.format("#$ -e /dev/null\n");
+        } else {
+            script.format("#$ -e %s\n", description.getStderr());
+        }
+        
         script.format("\n");
 
         script.format("%s", description.getExecutable());
@@ -35,10 +69,14 @@ public class JobScriptGenerator {
         for (String argument : description.getArguments()) {
             script.format(" %s", argument);
         }
+        script.format("\n");
 
-        script.format("exit 22\n");
+        //script.format("exit 22\n");
 
         script.close();
+        
+        logger.debug("Created job script {}", stringBuilder);
+        
         return stringBuilder.toString();
     }
 }
