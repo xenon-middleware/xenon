@@ -40,14 +40,10 @@ public class CommandRunner {
     private final OutputReader out;
 
     private final OutputReader err;
-
-    public CommandRunner(String... command) throws OctopusException {
-        this(null, command);
-    }
-
+    
     // determine location of exe file using path, will return given location if
     // not found in path
-    private String getExeFile(String exe) {
+    private static String getExeFile(String exe) {
         String path = System.getenv("PATH");
 
         if (path != null) {
@@ -70,7 +66,11 @@ public class CommandRunner {
         return exe;
     }
 
-    public CommandRunner(File workingDir, String... command) throws CommandNotFoundException {
+    public CommandRunner(String... command) throws OctopusException {
+        this(null, null, command);
+    }
+
+    public CommandRunner(String stdin, File workingDir, String... command) throws CommandNotFoundException {
         if (command.length == 0) {
             throw new ArrayIndexOutOfBoundsException("runCommand: command array has length 0");
         }
@@ -92,12 +92,12 @@ public class CommandRunner {
                     + Arrays.toString(command), e);
         }
 
-        // close stdin.
-        try {
-            p.getOutputStream().close();
-        } catch (Throwable e) {
-            // ignore
+        if (stdin == null) {
+            stdin = "";
         }
+        
+        //write given content to stdin of process
+        new InputWriter(stdin, p.getOutputStream());
 
         // we must always read the output and error streams to avoid deadlocks
         out = new OutputReader(p.getInputStream());

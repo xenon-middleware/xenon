@@ -19,12 +19,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 /**
- * Reads output of a process, and puts it in a buffer.
+ * Reads output from a stream, buffers it, and makes it available as a string when the stream reaches EndOfStream.
  * 
  * @author Niels Drost
  * 
  */
-class OutputReader extends Thread {
+public class OutputReader extends Thread {
 
     private final InputStream source;
 
