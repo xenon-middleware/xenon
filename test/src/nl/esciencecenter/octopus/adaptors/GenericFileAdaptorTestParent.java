@@ -218,7 +218,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         AbsolutePath entry = fs.getEntryPath();
-        testDir = entry.resolve(new RelativePath(new String [] { TEST_ROOT, testName }));
+        testDir = entry.resolve(new RelativePath(TEST_ROOT, testName));
         
         if (!files.exists(testDir)) { 
             files.createDirectories(testDir);
@@ -648,7 +648,7 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);      
         
         AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(new String [] { TEST_ROOT }));
+        AbsolutePath root = entry.resolve(new RelativePath(TEST_ROOT));
 
         // test with non-existing dir
         test04_createDirectory(root, false);
@@ -725,7 +725,7 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs =  config.getTestFileSystem(files, credentials);
         
         AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(new String [] { TEST_ROOT, "test05_createDirectories" }));
+        AbsolutePath root = entry.resolve(new RelativePath(TEST_ROOT, "test05_createDirectories"));
                
         // test with non-existing dir
         test05_createDirectories(root, false);

@@ -57,8 +57,7 @@ public class RelativePathIteratorTest {
     
     @Test
     public void test_ok2() {
-        String [] s = new String [] { "aap", "noot", "mies" };
-        RelativePath path = new RelativePath(s);
+        RelativePath path = new RelativePath("aap", "noot", "mies");
         Iterator<RelativePath> itt = path.iterator();
         itt.next();
         itt.next();
@@ -67,16 +66,14 @@ public class RelativePathIteratorTest {
     
     @Test(expected = UnsupportedOperationException.class)
     public void test_remove() {
-        String [] s = new String [] { "aap", "noot", "mies" };
-        RelativePath path = new RelativePath(s);
+        RelativePath path = new RelativePath("aap", "noot", "mies");
         Iterator<RelativePath> itt = path.iterator();
         itt.remove();
     }
 
     @Test(expected = NoSuchElementException.class)
     public void test_one_next_too_many() {
-        String [] s = new String [] { "aap", "noot", "mies" };
-        RelativePath path = new RelativePath(s);
+        RelativePath path = new RelativePath("aap", "noot", "mies");
         Iterator<RelativePath> itt = path.iterator();
         itt.next();
         itt.next();
