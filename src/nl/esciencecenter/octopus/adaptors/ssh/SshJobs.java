@@ -126,7 +126,6 @@ public class SshJobs implements Jobs {
                 new String[] { "single", "multi", "unlimited" }, credential, 
                 new OctopusProperties(properties), true, true, true);
         
-        
         SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(adaptor, session);
         
         // Create a file system that uses the same SSH session as the scheduler.

@@ -29,6 +29,12 @@ import org.junit.Test;
 public class OctopusFactoryTest {
 
     @Test
+    public void testNewOctopusFactory() throws OctopusException {
+        // Test to satisfy coverage.
+        new OctopusFactory();        
+    }
+    
+    @Test
     public void testNewOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         assertTrue(octopus.getProperties().equals(new Properties()));

@@ -25,7 +25,6 @@ import com.jcraft.jsch.SftpATTRS;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
  */
 public class SshUtil {
 

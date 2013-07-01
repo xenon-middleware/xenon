@@ -30,9 +30,9 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 public class OctopusFactory {
 
     /**
-     * Private constructor as OctopusFactory should never be created.
+     * Constructor of OctopusFactory should never be used.
      */
-    private OctopusFactory() {
+    OctopusFactory() {
         //DO NOT USE
     }
 
