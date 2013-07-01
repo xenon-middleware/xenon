@@ -963,7 +963,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
        
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -1019,7 +1019,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
         
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -1075,7 +1075,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(null);
         
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -1112,7 +1112,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
         
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -1197,5 +1197,64 @@ public abstract class GenericJobAdaptorTestParent {
         if (s == null || !(s[0].hasException() && s[1].hasException())) { 
             throw new Exception("Job exceeded deadline!");
         }
+    }
+    
+    @org.junit.Test
+    public void test40_batchJobSubmitWithExitcode() throws Exception {
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        
+        description.setWorkingDirectory(null);
+        description.setStderr(null);
+        description.setStdout(null);
+        description.setStdin(null);
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+        
+        assertTrue(status.getExitCode() == 0);
+    }
+    
+    @org.junit.Test
+    public void test40_batchJobSubmitWithNoneZeroExitcode() throws Exception {
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        
+        //run an ls with a non existing file. This should make ls return exitcode 2
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/ls");
+        description.setArguments("non.existing.file");
+        description.setInteractive(false);
+        
+        description.setWorkingDirectory(null);
+        description.setStderr(null);
+        description.setStdout(null);
+        description.setStdin(null);
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw status.getException();
+        }
+        
+        assertTrue(status.getExitCode() == 2);
     }
 }

@@ -45,12 +45,20 @@ public class JobScriptGenerator {
         if (description.getQueueName() != null) {
             script.format("#$ -q %s\n", description.getQueueName());
         }
-        
-        if (description.getStdout() != null) {
-            script.format("#$ -o %s\n", description.getStdout());
+
+        if (description.getStdin() != null) {
+            script.format("#$ -i %s\n", description.getStdin());
         }
         
-        if (description.getStderr() != null) {
+        if (description.getStdout() == null) {
+            script.format("#$ -o /dev/null\n");
+        } else {
+            script.format("#$ -o %s\n", description.getStdout());
+        }
+
+        if (description.getStderr() == null) {
+            script.format("#$ -e /dev/null\n");
+        } else {
             script.format("#$ -e %s\n", description.getStderr());
         }
         
