@@ -52,6 +52,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     private URI wrongPathURI;
     
     private String defaultQueue;
+    private String[] queues;
     
     public GridEngineJobTestConfig(String configfile) throws Exception { 
         
@@ -71,13 +72,14 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         username = getPropertyOrFail(p, "test.gridengine.user");
         passwd = getPropertyOrFail(p, "test.gridengine.password").toCharArray();
         
-        
         String location = getPropertyOrFail(p, "test.gridengine.location");
         
         String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
         String wrongLocation = getPropertyOrFail(p, "test.gridengine.location.wrong");
         
-        defaultQueue = getPropertyOrFail(p, "test.gridengine.queue");
+        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
+        String queueList = getPropertyOrFail(p, "test.gridengine.queues");
+        queues = queueList.split("\\s*,\\s*");
         
         correctURI = new URI("ge://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
@@ -174,6 +176,10 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     
     public String getDefaultQueueName() {
         return defaultQueue;
+    }
+    
+    public String[] getQueueNames() {
+        return queues;
     }
 
     @Override

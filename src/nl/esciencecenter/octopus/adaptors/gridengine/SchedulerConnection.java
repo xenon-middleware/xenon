@@ -3,6 +3,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -14,6 +15,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -50,8 +52,9 @@ public class SchedulerConnection {
     private final String id;
     private final OctopusEngine engine;
     private final Scheduler sshScheduler;
+    private final FileSystem sshFileSystem;
     private final SchedulerImplementation schedulerImplementation;
-
+    
     public SchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
         this.engine = engine;
@@ -81,6 +84,10 @@ public class SchedulerConnection {
 
         logger.debug("creating ssh scheduler for GridEngine adaptor at " + actualLocation);
         sshScheduler = engine.jobs().newScheduler(actualLocation, credential, this.properties);
+        
+        logger.debug("creating file system for GridEngine adaptor at " + actualLocation);
+        
+        sshFileSystem = engine.files().newFileSystem(actualLocation,  credential,  this.properties);
 
         this.queueNames = cli.getQueueNames(this);
 
@@ -102,8 +109,8 @@ public class SchedulerConnection {
         String stderr = runner.getStderr();
 
         if (runner.getExitCode() != 0 || !stderr.isEmpty()) {
-            throw new CommandFailedException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable
-                    + "\" at server \"" + actualLocation.getHost() + "\". Error output: " + stderr);
+            throw new CommandFailedException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable + "\" with arguments \"" + Arrays.toString(arguments)
+                    + "\" at server \"" + actualLocation.getHost() + "\". Exit code = " + runner.getExitCode() + " Error output: " + stderr, runner.getExitCode(), runner.getStderr());
         }
 
         return runner.getStdout();
@@ -111,6 +118,24 @@ public class SchedulerConnection {
 
     public String[] getQueueNames() {
         return queueNames;
+    }
+
+    /**
+     * Checks if the queue names given are valid, and throw an exception otherwise. Checks against the list of queues when the
+     * scheduler was created.
+     */
+    private void checkQueueNames(String[] givenQueueNames) throws NoSuchQueueException {
+        //create a hashset with all given queues
+        HashSet<String> invalidQueues = new HashSet<String>(Arrays.asList(givenQueueNames));
+
+        //remove all valid queues from the set
+        invalidQueues.removeAll(Arrays.asList(this.queueNames));
+
+        //if anything remains, these are invalid. throw an exception with the invalid queues
+        if (!invalidQueues.isEmpty()) {
+            throw new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Invalid queues given: "
+                    + Arrays.toString(invalidQueues.toArray(new String[0])));
+        }
     }
 
     public OctopusProperties getProperties() {
@@ -160,10 +185,19 @@ public class SchedulerConnection {
     }
 
     public QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException {
+        if (queueNames.length == 0) {
+            queueNames = getQueueNames();
+        }
+        
         return cli.getQueueStatuses(this, queueNames);
     }
 
-    public Job[] getJobs(String[] queueNames) throws OctopusIOException, OctopusException {
+    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
+        if (queueNames.length == 0) {
+            queueNames = getQueueNames();
+        } else {
+            checkQueueNames(queueNames);
+        }
         return cli.getJobs(this, queueNames);
 
     }
@@ -179,7 +213,8 @@ public class SchedulerConnection {
      * @throws OctopusIOException
      */
     public Job submitJob(JobDescription description) throws OctopusException, OctopusIOException {
-        return cli.submitJob(this, description);
+        
+        return cli.submitJob(this, description, sshFileSystem.getEntryPath());
     }
 
     /**

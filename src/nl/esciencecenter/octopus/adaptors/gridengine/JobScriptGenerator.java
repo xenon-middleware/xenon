@@ -18,11 +18,18 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.Formatter;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 public class JobScriptGenerator {
 
-    public static String generate(JobDescription description) {
+    private static final Logger logger = LoggerFactory.getLogger(JobScriptGenerator.class);
+    
+    public static String generate(JobDescription description, AbsolutePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -30,7 +37,13 @@ public class JobScriptGenerator {
         script.format("#$ -N octopus\n");
         
         if (description.getWorkingDirectory() != null) {
-            script.format("#$ -wd %s\n", description.getWorkingDirectory());
+            AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
+            
+            script.format("#$ -wd %s\n", workingDirectory.getPath());
+        }
+        
+        if (description.getQueueName() != null) {
+            script.format("#$ -q %s\n", description.getQueueName());
         }
         
         if (description.getStdout() != null) {
@@ -53,6 +66,9 @@ public class JobScriptGenerator {
         script.format("exit 22\n");
 
         script.close();
+        
+        logger.debug("Created job script {}", stringBuilder);
+        
         return stringBuilder.toString();
     }
 }

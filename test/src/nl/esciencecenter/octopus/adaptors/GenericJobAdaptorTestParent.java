@@ -684,7 +684,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -751,7 +751,7 @@ public abstract class GenericJobAdaptorTestParent {
             j[i] = jobs.submitJob(scheduler, description);
         }
         
-        long deadline = System.currentTimeMillis() + (10 * jobCount * 1000);
+        long deadline = System.currentTimeMillis() + (60 * jobCount * 1000);
         
         boolean done = false;
         

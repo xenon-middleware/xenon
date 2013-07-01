@@ -31,7 +31,7 @@ public class JobScriptGeneratorTest {
         
         job.setArguments("this", "and", "that");
         
-        System.out.println(JobScriptGenerator.generate(job));
+        System.out.println(JobScriptGenerator.generate(job, null));
     }
 
 }

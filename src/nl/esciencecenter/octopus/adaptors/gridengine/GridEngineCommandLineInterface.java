@@ -18,8 +18,10 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +36,7 @@ import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -252,26 +255,6 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return result;
     }
 
-    private QueueStatus getQueueStatusFromMap(Map<String, Map<String, String>> allMap, Scheduler scheduler, String queue) {
-        if (allMap == null || allMap.isEmpty()) {
-            Exception exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
-            return new QueueStatusImplementation(scheduler, queue, exception, null);
-        }
-
-        //state for only the requested  queue
-        Map<String, String> map = allMap.get(queue);
-
-        if (map == null || map.isEmpty()) {
-            Exception exception =
-                    new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queue
-                            + " from server");
-            return new QueueStatusImplementation(scheduler, queue, exception, null);
-        }
-
-        return new QueueStatusImplementation(scheduler, queue, null, map);
-    }
-
     /**
      * Parses job info from "qstat -xml"
      * 
@@ -403,25 +386,47 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
 
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.octopus.adaptors.gridengine.CommandLineInterface#getJobs(nl.esciencecenter.octopus.adaptors.gridengine.SchedulerConnection, java.lang.String[])
-     */
-    @Override
-    public Job[] getJobs(SchedulerConnection connection, String... queueNames) throws OctopusIOException, OctopusException {
-        String statusOutput = connection.runCommand(null, "qstat", "-xml");
-
+    private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws OctopusIOException,
+            OctopusException {
         Map<String, Map<String, String>> status = parseJobInfos(statusOutput);
 
         String[] jobIDs = status.keySet().toArray(new String[0]);
 
-        Job[] result = new Job[jobIDs.length];
+        for (String jobID : jobIDs) {
+            markJobSeen(jobID);
 
-        for (int i = 0; i < result.length; i++) {
-            markJobSeen(jobIDs[i]);
-            result[i] = new JobImplementation(connection.getScheduler(), jobIDs[i], null, false, false);
+            result.add(new JobImplementation(scheduler, jobID, null, false, false));
         }
 
-        return result;
+    }
+
+    @Override
+    public Job[] getJobs(SchedulerConnection connection, String... queueNames) throws OctopusIOException, OctopusException {
+        ArrayList<Job> result = new ArrayList<Job>();
+
+        if (queueNames == null || queueNames.length == 0) {
+            String statusOutput = connection.runCommand(null, "qstat", "-xml");
+
+            jobsFromStatus(statusOutput, connection.getScheduler(), result);
+        } else {
+            for (String queueName : queueNames) {
+                try {
+                    String statusOutput = connection.runCommand(null, "qstat", "-xml", "-q", queueName);
+
+                    jobsFromStatus(statusOutput, connection.getScheduler(), result);
+                } catch (CommandFailedException e) {
+                    //sge returns "1" as the exit code if there is something wrong with the queue, ignore
+                    if (e.getExitCode() != 1) {
+                        throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue "
+                                + queueName, e);
+                    } else {
+                        logger.debug("Failed to get queue status for queue " + queueName, e);
+                    }
+                }
+            }
+        }
+
+        return result.toArray(new Job[result.size()]);
     }
 
     /* (non-Javadoc)
@@ -467,19 +472,19 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
                 Exception exception =
                         new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
                 result[i] = new QueueStatusImplementation(connection.getScheduler(), queueNames[i], exception, null);
+            } else {
+                //state for only the requested queue
+                Map<String, String> map = allMap.get(queueNames[i]);
+
+                if (map == null || map.isEmpty()) {
+                    Exception exception =
+                            new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
+                                    + queueNames[i] + " from server");
+                    result[i] = new QueueStatusImplementation(connection.getScheduler(), queueNames[i], exception, null);
+                } else {
+                    result[i] = new QueueStatusImplementation(connection.getScheduler(), queueNames[i], null, map);
+                }
             }
-
-            //state for only the requested job
-            Map<String, String> map = allMap.get(queueNames[i]);
-
-            if (map == null || map.isEmpty()) {
-                Exception exception =
-                        new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueNames[i]
-                                + " from server");
-                result[i] = new QueueStatusImplementation(connection.getScheduler(), queueNames[i], exception, null);
-            }
-
-            result[i] = new QueueStatusImplementation(connection.getScheduler(), queueNames[i], null, map);
         }
 
         return result;
@@ -487,8 +492,9 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
     }
 
     @Override
-    public Job submitJob(SchedulerConnection connection, JobDescription description) throws OctopusIOException, OctopusException {
-        String jobScript = JobScriptGenerator.generate(description);
+    public Job submitJob(SchedulerConnection connection, JobDescription description, AbsolutePath fsEntryPath)
+            throws OctopusIOException, OctopusException {
+        String jobScript = JobScriptGenerator.generate(description, fsEntryPath);
 
         String output = connection.runCommand(jobScript, "qsub");
 
@@ -572,8 +578,6 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         //mark all jobs in this map as recently seen
         markJobsSeen(allMap.keySet());
 
-        Map<String, String> map = allMap.get(job.getIdentifier());
-
         JobStatus status = qstatJobStatus(allMap.get(job.getIdentifier()), connection, job);
 
         Exception exception = null;
@@ -593,12 +597,14 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
             }
         }
 
+        //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(job.getIdentifier())) {
-            status = new JobStatusImplementation(job, "pending", null, null, false, true, new HashMap<String, String>());
+            status = new JobStatusImplementation(job, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
+        //this job really does not exist. set it to an error state. List qacct exception as cause (if set)
         if (status == null) {
-            //list qacct exception as cause (if set)
+
             exception =
                     new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server",
                             exception);

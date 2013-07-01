@@ -2,6 +2,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -19,7 +20,7 @@ public interface CommandLineInterface {
     public Job[] getJobs(SchedulerConnection connection, String... queueNames) throws OctopusIOException,
     OctopusException;
 
-    public Job submitJob(SchedulerConnection connection, JobDescription description) throws OctopusIOException,
+    public Job submitJob(SchedulerConnection connection, JobDescription description, AbsolutePath fsEntryPath) throws OctopusIOException,
             OctopusException;
 
     public JobStatus cancelJob(SchedulerConnection connection, Job job) throws OctopusIOException, OctopusException;
