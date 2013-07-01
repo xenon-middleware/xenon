@@ -297,6 +297,7 @@ public class SshAdaptor extends Adaptor {
         // FIXME implement agent forwarding
 
         String userHome = System.getProperty("user.home");
+        
         if (userHome == null) {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user home directory.");
         }

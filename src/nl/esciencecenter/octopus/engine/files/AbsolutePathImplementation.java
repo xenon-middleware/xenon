@@ -195,7 +195,7 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     public String getPath() {
 
         if (relativePath.isEmpty()) {
-            return relativePath.getSeparator();
+            return "" + relativePath.getSeparator();
         }
 
         return relativePath.getPath();

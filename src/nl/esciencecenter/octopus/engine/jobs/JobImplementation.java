@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 public class JobImplementation implements Job {
 
-    private final JobDescription description;
+    private JobDescription description;
 
     private final Scheduler scheduler;
 
@@ -31,8 +31,7 @@ public class JobImplementation implements Job {
     
     private final boolean online; 
         
-    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description, boolean interactive, 
-            boolean online) {  
+    public JobImplementation(Scheduler scheduler, String identifier, boolean interactive, boolean online) {  
                 
         if (scheduler == null) { 
             throw new IllegalArgumentException("Scheduler may not be null!");
@@ -42,13 +41,25 @@ public class JobImplementation implements Job {
             throw new IllegalArgumentException("Identifier may not be null!");
         }
         
-        this.description = description;
+        this.description = null;
         this.scheduler = scheduler;
         this.identifier = identifier;
         this.interactive = interactive;
         this.online = online;
     }
 
+    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description, boolean interactive, 
+            boolean online) {  
+
+        this(scheduler, identifier, interactive, online);
+        
+        if (description == null) { 
+            throw new IllegalArgumentException("JobDescription may not be null!");
+        }
+        
+        this.description = description;
+    }
+    
     @Override
     public JobDescription getJobDescription() {
         return description;
