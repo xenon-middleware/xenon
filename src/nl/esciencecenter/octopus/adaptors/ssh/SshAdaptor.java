@@ -40,8 +40,6 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.SftpException;
 
-// TODO cache van sessions / channels
-
 public class SshAdaptor extends Adaptor {
 
    // private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
@@ -196,130 +194,31 @@ public class SshAdaptor extends Adaptor {
         case ChannelSftp.SSH_FX_OK:
             return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_EOF:
-            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, "Unexpected EOF", e);
         case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-            return new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "No such file", e);
         case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, "Permission denied", e);
         case ChannelSftp.SSH_FX_FAILURE:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
         case ChannelSftp.SSH_FX_BAD_MESSAGE:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
         case ChannelSftp.SSH_FX_NO_CONNECTION:
-            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, "SSH does not have a connection!", e);
         case ChannelSftp.SSH_FX_CONNECTION_LOST:
-            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, "SSH lost connection!", e);
         case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
-            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, "Unsupported operation", e);
         default:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
         }
     }
 
-   
-
-//    private void setCredential(CredentialImplementation credential, Session session) throws OctopusException {
-//        logger.debug("using credential: " + credential);
-//
-//        if (credential instanceof CertificateCredentialImplementation) {
-//            CertificateCredentialImplementation certificate = (CertificateCredentialImplementation) credential;
-//            try {
-//                jsch.addIdentity(certificate.getKeyfile(), Arrays.toString(certificate.getPassword()));
-//            } catch (JSchException e) {
-//                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
-//            }
-//        } else if (credential instanceof PasswordCredentialImplementation) {
-//            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
-//            session.setPassword(new String(passwordCredential.getPassword()));
-//        } else {
-//            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
-//        }
-//    }
-
-      protected SshSession createNewSession(URI location, Credential credential, OctopusProperties properties)
-              throws OctopusException {
-          return new SshSession(this, jsch, location, credential, properties);
-      }
+    protected SshSession createNewSession(URI location, Credential credential, OctopusProperties properties)
+            throws OctopusException {
+        return new SshSession(this, jsch, location, credential, properties);
+    }
     
-    
-//    protected Session createNewSession(URI location, Credential credential, OctopusProperties localProperties)
-//            throws OctopusException {
-//        
-//        URI uri = location;
-//        String user = uri.getUserInfo();
-//        String host = uri.getHost();
-//        int port = uri.getPort();
-//
-//        if (credential == null) {
-//            credential = getDefaultCredential();
-//        }
-//
-//        if (port < 0) {
-//            port = DEFAULT_PORT;
-//        }
-//        if (host == null) {
-//            host = "localhost";
-//        }
-//
-//        String credentialUserName = ((CredentialImplementation) credential).getUsername();
-//    
-////        if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
-////            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
-////                    "If a user name is given in the URI, it must match the one in the credential");
-////        }
-//
-//        if (user == null) {
-//            user = credentialUserName;
-//        }
-//
-//        if (user == null) {
-//            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in URI or credential.");
-//        }
-//
-//        logger.debug("creating new session to " + user + "@" + host + ":" + port);
-//
-//        Session session;
-//        try {
-//            session = jsch.getSession(user, host, port);
-//        } catch (JSchException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//
-//        setCredential((CredentialImplementation) credential, session);
-//
-//        if (localProperties.getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
-//            logger.debug("strict host key checking enabled");
-//       
-//            if (localProperties.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY)) { 
-//                logger.debug("automatically add host key to known_hosts");
-//                session.setConfig("StrictHostKeyChecking", "ask");
-//                session.setUserInfo(new Robot(true));
-//            } else { 
-//                session.setConfig("StrictHostKeyChecking", "yes");
-//            }
-//        } else {
-//            logger.debug("strict host key checking disabled");
-//            session.setConfig("StrictHostKeyChecking", "no");
-//        }
-//        
-//        if (localProperties.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
-//            String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
-//            logger.debug("setting ssh known hosts file to: " + knownHosts);
-//            setKnownHostsFile(knownHosts);
-//        }
-//
-//        try {
-//            session.connect();
-//        } catch (JSchException e) {
-//            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-//        }
-//
-//        return session;
-//    }
-
-   
-   
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         // TODO Auto-generated method stub

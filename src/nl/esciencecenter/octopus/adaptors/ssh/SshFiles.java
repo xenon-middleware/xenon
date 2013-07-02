@@ -139,7 +139,7 @@ public class SshFiles implements Files {
         try {
             wd = channel.pwd();
         } catch (SftpException e) {
-            session.releaseSftpChannel(channel);
+            session.failedSftpChannel(channel);
             session.disconnect();
             throw adaptor.sftpExceptionToOctopusException(e);
         }
@@ -340,11 +340,11 @@ public class SshFiles implements Files {
         try {
             channel.mkdir(dir.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
-        }
-
+        } 
+          
+        session.releaseSftpChannel(channel);
         return dir;
     }
 
@@ -416,10 +416,11 @@ public class SshFiles implements Files {
                 channel.rm(path.getPath());
             }
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
-        }
+        } 
+        
+        session.releaseSftpChannel(channel);        
     }
 
     /**
@@ -535,10 +536,11 @@ public class SshFiles implements Files {
             logger.debug("move from " + source.getPath() + " to " + target.getPath());
             channel.rename(source.getPath(), target.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
         }
+         
+        session.releaseSftpChannel(channel);
         return target;
     }
     
@@ -556,13 +558,17 @@ public class SshFiles implements Files {
         SshSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel(); 
         
+        Vector<LsEntry> result = null;
+        
         try {
-            return channel.ls(path.getPath());
+            result = channel.ls(path.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
-        }
+        } 
+          
+        session.releaseSftpChannel(channel);
+        return result;
     }
 
     @Override
@@ -604,6 +610,7 @@ public class SshFiles implements Files {
             InputStream in = channel.get(path.getPath());
             return new SshInputStream(in, session, channel);
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
         }
     }
@@ -659,9 +666,10 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel(); 
         
         try {
-            OutputStream out = channel.put(path.getPath(), mode);
+            OutputStream out = channel.put(path.getPath(), mode);            
             return new SshOutputStream(out, session, channel);
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
         }
     }
@@ -672,19 +680,23 @@ public class SshFiles implements Files {
         SshSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel(); 
 
+        AbsolutePath result = null;
+        
         try {
             String target = channel.readlink(path.getPath());
             
             if (!target.startsWith(File.separator)) { 
-                return path.getParent().resolve(new RelativePath(target));
+                result = path.getParent().resolve(new RelativePath(target));
             } else { 
-                return new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
+                result = new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
             }
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
-        }
+        } 
+        
+        session.releaseSftpChannel(channel);
+        return result;
     }
 
     public void end() {
@@ -721,10 +733,11 @@ public class SshFiles implements Files {
         try { 
             channel.chmod(SshUtil.permissionsToBits(permissions), path.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
-        }
+        } 
+          
+        session.releaseSftpChannel(channel);
     }
         
 //    @Override
@@ -782,13 +795,17 @@ public class SshFiles implements Files {
         SshSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel(); 
         
+        SftpATTRS result = null;
+        
         try { 
-            return channel.lstat(path.getPath());
+            result = channel.lstat(path.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            session.releaseSftpChannel(channel);
-        }
+        } 
+          
+        session.releaseSftpChannel(channel);
+        return result;
     } 
     
     @Override
@@ -798,13 +815,14 @@ public class SshFiles implements Files {
     
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
+        
         try { 
             SftpATTRS s = stat(path);
-            System.err.println("SSH isLink " + path.getPath() + " " + s.getPermissionsString() + " " + s.isLink());
+            // System.err.println("SSH isLink " + path.getPath() + " " + s.getPermissionsString() + " " + s.isLink());
             return s.isLink();
         } catch (NoSuchFileException e) {
             // We should return false if the operation fails.
-            System.err.println("SSH isLink " + path.getPath() + " FAILED");
+            //  System.err.println("SSH isLink " + path.getPath() + " FAILED");
             return false;
         }
     }

@@ -38,9 +38,10 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class SshInteractiveProcess  implements InteractiveProcess {
     
-    private SshSession session;
-    private ChannelExec channel;    
-    private Streams streams; 
+    private final SshSession session;
+    private final ChannelExec channel;    
+    private final Streams streams; 
+    private boolean done = false;
     
     public SshInteractiveProcess(SshSession session, Job job) throws OctopusIOException {
         
@@ -60,7 +61,6 @@ public class SshInteractiveProcess  implements InteractiveProcess {
         Map<String, String> environment = description.getEnvironment();
         
         if (environment != null) { 
-            
             for (Entry<String, String> entry : environment.entrySet()) { 
                 channel.setEnv(entry.getKey(), entry.getValue());
             }
@@ -73,12 +73,14 @@ public class SshInteractiveProcess  implements InteractiveProcess {
         try {
             streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());                
         } catch (Exception e) {
+            session.failedExecChannel(channel);
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
         
         try {
             channel.connect();
         } catch (Exception e) {
+            session.failedExecChannel(channel);
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
@@ -87,10 +89,22 @@ public class SshInteractiveProcess  implements InteractiveProcess {
     public Streams getStreams() { 
         return streams;
     }
-
+    
     @Override
-    public boolean isDone() {
-        return channel.isClosed();
+    public synchronized boolean isDone() {
+        
+        if (done) { 
+            return true;
+        }
+        
+        boolean tmp = channel.isClosed();
+        
+        if (tmp) { 
+            done = true;
+            session.releaseExecChannel(channel);
+        }
+        
+        return tmp;
     }
 
     @Override

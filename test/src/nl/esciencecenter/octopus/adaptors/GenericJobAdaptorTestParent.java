@@ -642,6 +642,8 @@ public abstract class GenericJobAdaptorTestParent {
             status = jobs.getJobStatus(job);
         }
 
+        jobs.close(scheduler);
+        
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
@@ -656,6 +658,8 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(err);
         files.delete(root);
 
+        files.close(filesystem);
+        
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
         
@@ -711,6 +715,8 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(out);
         files.delete(err);
         files.delete(root);
+        
+        files.close(filesystem);
         
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
@@ -814,6 +820,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         files.delete(root);
+        files.close(filesystem);
     }
     
     @org.junit.Test
@@ -827,7 +834,7 @@ public abstract class GenericJobAdaptorTestParent {
     @org.junit.Test
     public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {        
         for (String queue : config.getQueueNames()) { 
-            submitToQueueWithPolling("test33b_" + queue, queue, 3);    
+            submitToQueueWithPolling("test33b_" + queue, queue, 10);    
         }
     }
     
@@ -876,11 +883,14 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         files.delete(root);
+        files.close(filesystem);
         
         assertTrue(status.hasException());
         Exception e = status.getException(); 
-        
-        assertTrue(e instanceof JobCanceledException);
+
+        if (!(e instanceof JobCanceledException)) { 
+            throw new Exception("test34 expected JobCanceledException, not " + e.getMessage(), e);
+        }
     }
 
     @org.junit.Test
@@ -935,6 +945,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         files.delete(root);
+        files.close(filesystem);
         
         assertTrue(status.hasException());
         Exception e = status.getException(); 
@@ -993,6 +1004,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(stdout);
         files.delete(stderr);
         files.delete(root);
+        files.close(filesystem);
         
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
@@ -1053,15 +1065,16 @@ public abstract class GenericJobAdaptorTestParent {
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
         
-        assertTrue(tmpout != null);
-        assertTrue(tmpout.length() > 0);
-        assertTrue(tmpout.equals(message));
-        assertTrue(tmperr.length() == 0);
-        
         files.delete(stdin);
         files.delete(stdout);
         files.delete(stderr);
         files.delete(root);
+        files.close(filesystem);
+        
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
     }    
     
     @org.junit.Test
@@ -1097,6 +1110,9 @@ public abstract class GenericJobAdaptorTestParent {
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
+        
+        jobs.close(scheduler);
+        files.close(filesystem);
     }
     
     //@org.junit.Test
@@ -1157,6 +1173,9 @@ public abstract class GenericJobAdaptorTestParent {
 
         files.delete(stdin);           
         files.delete(root);        
+        
+        jobs.close(scheduler);
+        files.close(filesystem);
     }
     
     @org.junit.Test
@@ -1214,6 +1233,8 @@ public abstract class GenericJobAdaptorTestParent {
         if (s == null || !(s[0].hasException() && s[1].hasException())) { 
             throw new Exception("Job exceeded deadline!");
         }
+        
+        jobs.close(scheduler);
     }
     
     @org.junit.Test
@@ -1241,6 +1262,8 @@ public abstract class GenericJobAdaptorTestParent {
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
+        
+        jobs.close(scheduler);
         
         assertTrue(status.getExitCode() == 0);
     }
@@ -1271,6 +1294,8 @@ public abstract class GenericJobAdaptorTestParent {
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
+        
+        jobs.close(scheduler);
         
         assertTrue(status.getExitCode() == 2);
     }

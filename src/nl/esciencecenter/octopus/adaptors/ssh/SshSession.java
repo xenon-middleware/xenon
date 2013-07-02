@@ -63,6 +63,7 @@ class SshSession {
     private int port; 
     
     private Session session;
+    private ChannelSftp sftpChannel;
     
     static class Robot implements UserInfo {
 
@@ -221,7 +222,23 @@ class SshSession {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
         }
     }
-
+    
+    private synchronized ChannelSftp getSftpChannelFromCache() { 
+        ChannelSftp channel = sftpChannel;
+        sftpChannel = null;
+        return channel;        
+    }
+    
+    private synchronized boolean putSftpChannelInCache(ChannelSftp channel) { 
+        
+        if (sftpChannel != null) {
+            return false;
+        }
+        
+        sftpChannel = channel;
+        return true;
+    }
+    
     /**
      * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
      * connecting.
@@ -232,17 +249,23 @@ class SshSession {
      * @throws OctopusIOException
      */
     ChannelExec getExecChannel() throws OctopusIOException {
-        ChannelExec channel;
+        
+        ChannelExec channel = null;
 
         try {
             channel = (ChannelExec) session.openChannel("exec");
-            return channel;
         } catch (JSchException e) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
+        
+        return channel;        
     }
 
     void releaseExecChannel(ChannelExec channel) {
+        channel.disconnect();
+    }
+    
+    void failedExecChannel(ChannelExec channel) {
         channel.disconnect();
     }
         
@@ -255,20 +278,39 @@ class SshSession {
      * @throws OctopusIOException
      */
     ChannelSftp getSftpChannel() throws OctopusIOException {
-        try {
-            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-            return channel;
-        } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+        
+        ChannelSftp channel = getSftpChannelFromCache();
+
+        if (channel == null) { 
+            try {
+                channel = (ChannelSftp) session.openChannel("sftp");
+                channel.connect();
+            } catch (JSchException e) {
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            }
         }
+
+        return channel;
     }
     
     void releaseSftpChannel(ChannelSftp channel) {
+        if (!putSftpChannelInCache(channel)) { 
+            channel.disconnect();
+        }
+    }
+    
+    void failedSftpChannel(ChannelSftp channel) {
         channel.disconnect();
     }
     
-    void disconnect() { 
+    synchronized void disconnect() {
+        
+        if (sftpChannel != null) { 
+            sftpChannel.disconnect();
+        }
+        
         session.disconnect();
     }
+
+    
 }

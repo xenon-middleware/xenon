@@ -84,9 +84,9 @@ public class JobExecutor implements Runnable {
 
         killed = true;
 
-        if (thread != null) {
-            thread.interrupt();
-        }
+//        if (thread != null) {
+//            thread.interrupt();
+//        }
     }
 
     public synchronized boolean isDone() {
@@ -209,9 +209,7 @@ public class JobExecutor implements Runnable {
             updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return;
         }
-
-        this.thread = Thread.currentThread();
-
+        
         long endTime = 0;
         int maxTime = description.getMaxTime();
 
@@ -231,6 +229,8 @@ public class JobExecutor implements Runnable {
             return;
         }
 
+       // this.thread = Thread.currentThread();
+        
         updateState("RUNNING", -1, null);
 
         while (true) {
