@@ -595,7 +595,7 @@ public abstract class GenericJobAdaptorTestParent {
             }
 
             if (status.hasException()) {
-                throw status.getException();
+                throw new Exception("Job failed!", status.getException());
             }
 
             assertTrue(out.equals(message));
@@ -643,7 +643,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
         
         AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
@@ -697,7 +697,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
 
         jobs.close(scheduler);
@@ -978,7 +978,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
         
         jobs.close(scheduler);
@@ -1039,7 +1039,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
        
         jobs.close(scheduler);
@@ -1095,7 +1095,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
     }
     
@@ -1132,7 +1132,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
        
         for (int i=0;i<2;i++) { 
@@ -1239,7 +1239,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
         
         assertTrue(status.getExitCode() == 0);
@@ -1269,7 +1269,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         if (status.hasException()) {
-            throw status.getException();
+            throw new Exception("Job failed!", status.getException());
         }
         
         assertTrue(status.getExitCode() == 2);
