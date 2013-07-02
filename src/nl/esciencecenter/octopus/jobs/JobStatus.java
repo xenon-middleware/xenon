@@ -48,7 +48,8 @@ public interface JobStatus {
     public Integer getExitCode();
 
     /**
-     * Get the exception produced by the Job or while retrieving the status.
+     * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a
+     * JobCanceledException.
      * 
      * @return the exception.
      */
@@ -60,7 +61,7 @@ public interface JobStatus {
      * @return if the Job is running.
      */
     public boolean isRunning();
-    
+
     /**
      * Is the Job done.
      * 
