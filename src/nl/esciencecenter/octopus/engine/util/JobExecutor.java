@@ -143,15 +143,29 @@ public class JobExecutor implements Runnable {
         throw new OctopusException(adaptorName, "Job is not interactive!");
     }
 
-    public synchronized void waitUntilRunning() {
+    public synchronized JobStatus waitUntilRunning(long timeout) {
 
+        long deadline = System.currentTimeMillis() + timeout;
+        long leftover = timeout;
+        
         while (state.equals("PENDING")) {
             try {
-                wait();
+                // Note: will wait forever if leftover == 0.
+                wait(leftover);
             } catch (InterruptedException e) {
                 // ignored
             }
+            
+            long now = System.currentTimeMillis();
+
+            if (now >= deadline) {
+                break;
+            }
+
+            leftover = deadline - now;            
         }
+        
+        return getStatus();
     }
 
     /**
@@ -164,8 +178,8 @@ public class JobExecutor implements Runnable {
         long leftover = timeout;
 
         while (!done) {
-
             try {
+                // Note: will wait forever if leftover == 0.
                 wait(leftover);
             } catch (InterruptedException e) {
                 // ignored

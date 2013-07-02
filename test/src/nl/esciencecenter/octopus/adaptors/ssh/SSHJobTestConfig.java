@@ -190,4 +190,19 @@ public class SSHJobTestConfig extends JobTestConfig {
     public boolean supportsStatusAfterDone() {
         return false;
     }
+
+    @Override
+    public long getDefaultQueueWaitTimeout() {
+        return 1000;
+    }
+
+    @Override
+    public long getDefaultShortJobTimeout() {
+        return 1000;
+    }
+
+    @Override
+    public long getDefaultCancelTimeout() {
+        return 1000;
+    }
 }

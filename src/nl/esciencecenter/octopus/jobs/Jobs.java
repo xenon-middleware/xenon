@@ -313,7 +313,7 @@ public interface Jobs {
      * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the  
      * timeout expires, the job will continue to run normally. 
      * 
-     * The timeout is in milliseconds and must be >= 0, where 0 means and infinite timeout.      
+     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.      
      * 
      * A JobStatus is returned that can be used to determine why the call returned.    
      * 
@@ -329,4 +329,28 @@ public interface Jobs {
      *             If an I/O error occurred.
      */
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
+    
+    /**
+     * Wait for as long a job is waiting in a queue, or until a timeout expires. 
+     * 
+     * This method will return as soon as the job is no longer waiting in the queue. This is generally the case when it starts 
+     * running, but it may also be killed or produce an error. If the timeout expires, the job will continue to be queued 
+     * normally. 
+     * 
+     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.      
+     * 
+     * A JobStatus is returned that can be used to determine why the call returned.    
+     * 
+     * @param job the job.
+     * @param timeout the maximum time to wait in milliseconds.   
+     * @returns the status of the Job.
+     * 
+     * @throws NoSuchJobException
+     *             If the job is not known.
+     * @throws OctopusException
+     *             If the status of the job could not be retrieved.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException;
 }

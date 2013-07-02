@@ -205,6 +205,11 @@ public class SshJobs implements Jobs {
     }
 
     @Override
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+        return getJobQueue(job.getScheduler()).waitUntilRunning(job, timeout);
+    }
+    
+    @Override
     public JobStatus cancelJob(Job job) throws OctopusException {
         return getJobQueue(job.getScheduler()).cancelJob(job);
     }

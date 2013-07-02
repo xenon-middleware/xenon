@@ -282,4 +282,12 @@ public class GridEngineJobs implements Jobs {
         return connection.waitUntilDone(job, timeout);
     }
 
+    @Override
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+        SchedulerConnection connection = getConnection(job.getScheduler());
+
+        return connection.waitUntilRunning(job, timeout);
+    }
+
+    
 }

@@ -50,4 +50,8 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public abstract FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception;
     public abstract String getInvalidQueueName() throws Exception;
 
+    public abstract long getDefaultQueueWaitTimeout();
+    public abstract long getDefaultShortJobTimeout();
+    public abstract long getDefaultCancelTimeout();
+
 }

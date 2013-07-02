@@ -139,6 +139,11 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
         return jobQueues.waitUntilDone(job, timeout);
     }
+
+    @Override
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+        return jobQueues.waitUntilRunning(job, timeout);
+    }
     
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {

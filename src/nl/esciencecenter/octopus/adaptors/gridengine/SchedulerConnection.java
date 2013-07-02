@@ -180,6 +180,32 @@ public class SchedulerConnection {
         return status;
     }
 
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusIOException, OctopusException {
+        long deadline = System.currentTimeMillis() + timeout;
+
+        if (timeout == 0) {
+            deadline = Long.MAX_VALUE;
+        }
+
+        JobStatus status = getJobStatus(job);
+
+        while (System.currentTimeMillis() < deadline) {
+            status = getJobStatus(job);
+
+            if (status.isRunning() || status.isDone()) {
+                return status;
+            }
+
+            try {
+                Thread.sleep(POLL_DELAY);
+            } catch (InterruptedException e) {
+                return status;
+            }
+        }
+
+        return status;
+    }
+    
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
         return cli.getQueueStatus(this, queueName);
     }

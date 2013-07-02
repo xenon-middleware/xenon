@@ -165,6 +165,11 @@ public class JobsEngine implements Jobs {
     }
     
     @Override
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {      
+        return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilRunning(job, timeout);
+    }
+    
+    @Override
     public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }

@@ -268,6 +268,30 @@ public class JobQueues {
         
         return status;    
     }
+
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+        
+        logger.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, job.getIdentifier(), timeout);
+        
+        if (timeout < 0) { 
+            throw new OctopusException(adaptorName, "Illegal timeout " + timeout);
+        }
+        
+        checkScheduler(job.getScheduler());
+        
+        LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
+        JobStatus status = findJob(queue, job).waitUntilRunning(timeout);
+        
+        if (status.isDone()) {
+            logger.debug("{}: Job {} is done after {} ms.", adaptorName, job.getIdentifier(), timeout);
+            cleanupJob(queue, job);
+        } else { 
+            logger.debug("{}: Job {} is NOT done after {} ms.", adaptorName, job.getIdentifier(), timeout);
+        }
+        
+        return status;    
+    }
+
     
     private void verifyJobDescription(JobDescription description) throws OctopusException { 
         
@@ -369,7 +393,7 @@ public class JobQueues {
         }  
         
         if (description.isInteractive()) {
-            executor.waitUntilRunning();
+            executor.waitUntilRunning(0);
             
             if (executor.isDone() && !executor.hasRun()) { 
                 cleanupJob(findQueue(queueName), result);

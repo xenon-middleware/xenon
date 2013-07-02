@@ -202,4 +202,19 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public boolean supportsStatusAfterDone() {
         return true;
     }
+    
+    @Override
+    public long getDefaultQueueWaitTimeout() {
+        return 5*60000;
+    }
+
+    @Override
+    public long getDefaultShortJobTimeout() {
+        return 60000;
+    }
+
+    @Override
+    public long getDefaultCancelTimeout() {
+        return 60000;
+    }
 }

@@ -625,7 +625,7 @@ public abstract class GenericJobAdaptorTestParent {
         
         Job job = jobs.submitJob(scheduler, description);
         
-        long deadline = System.currentTimeMillis() + 60000;
+        long deadline = System.currentTimeMillis() + config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout();
         
         JobStatus status = jobs.getJobStatus(job);
         
@@ -684,7 +684,12 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
         
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
+        
+        if (status.isRunning()) { 
+            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
+        }
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -751,7 +756,9 @@ public abstract class GenericJobAdaptorTestParent {
             j[i] = jobs.submitJob(scheduler, description);
         }
         
-        long deadline = System.currentTimeMillis() + (60 * jobCount * 1000);
+        // Bit hard to determine realistic deadline here ?
+        long deadline = System.currentTimeMillis() + (60 * jobCount * config.getDefaultQueueWaitTimeout() + 
+                config.getDefaultShortJobTimeout());
         
         boolean done = false;
         
@@ -841,12 +848,13 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
         
+        // We immediately kill the job. Hopefully it isn't running yet!
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.cancelJob(job);
 
         // Wait until the job is killed. We assume it takes less than a minute!
         if (!status.isDone()) { 
-            status = jobs.waitUntilDone(job, 60000);
+            status = jobs.waitUntilDone(job, config.getDefaultCancelTimeout());
         }
         
         if (!status.isDone()) { 
@@ -896,11 +904,7 @@ public abstract class GenericJobAdaptorTestParent {
         Job job = jobs.submitJob(scheduler, description);
         
         // Wait for job to run before killing it!
-        JobStatus status = jobs.waitUntilDone(job, 1000);
-        
-        while (!status.isDone() && !status.isRunning()) { 
-            status = jobs.waitUntilDone(job, 1000);            
-        }
+        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
         
         if (!status.isRunning()) {
             throw new Exception("Job failed to start!");
@@ -910,7 +914,7 @@ public abstract class GenericJobAdaptorTestParent {
             
         // Wait until the job is killed. We assume it takes less than a minute!
         if (!status.isDone()) { 
-            status = jobs.waitUntilDone(job, 60000);
+            status = jobs.waitUntilDone(job, config.getDefaultCancelTimeout());
         }
         
         if (!status.isDone()) { 
@@ -963,7 +967,12 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
        
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
+        
+        if (status.isRunning()) { 
+            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());            
+        }
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
@@ -1019,7 +1028,12 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
         
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
+        
+        if (status.isRunning()) { 
+            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());            
+        }
         
         if (!status.isDone()) { 
             throw new Exception("Job exceeded deadline!");
