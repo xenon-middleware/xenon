@@ -31,6 +31,7 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
+import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -871,8 +872,7 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(status.hasException());
         Exception e = status.getException(); 
         
-        assertTrue(e instanceof IOException);
-        assertTrue(e.getMessage().equals("Process cancelled by user."));
+        assertTrue(e instanceof JobCanceledException);
     }
 
     @org.junit.Test
@@ -935,8 +935,7 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(status.hasException());
         Exception e = status.getException(); 
         
-        assertTrue(e instanceof IOException);
-        assertTrue(e.getMessage().equals("Process cancelled by user."));
+        assertTrue(e instanceof JobCanceledException);
     }
 
     @org.junit.Test

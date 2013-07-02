@@ -33,6 +33,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
+import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -66,6 +67,8 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
 
     public static String SGE62_SCHEMA_VALUE =
             "http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11";
+    
+    private static final String QACCT_HEADER = "==============================================================";
 
     private final DocumentBuilder documentBuilder;
 
@@ -319,7 +322,8 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return result;
     }
 
-    private static String checkSubmitJobResult(String output) throws OctopusIOException {
+    //parse qsub output, find and return the job ID
+    private static String parseQsubOutput(String output) throws OctopusIOException {
         String lines[] = output.split("\\r?\\n");
 
         if (lines.length == 0 || !lines[0].startsWith("Your job ") | lines[0].split(" ").length < 3) {
@@ -339,7 +343,8 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return jobID;
     }
 
-    private static void checkCancelJobResult(Job job, String qdelOutput) throws OctopusIOException {
+    //parse qdel output and check if we get the expected output
+    private static void parseQdelOutput(Job job, String qdelOutput) throws OctopusIOException {
         String[] stdoutLines = qdelOutput.split("\\r?\\n");
 
         String serverMessages = "output: " + Arrays.toString(stdoutLines);
@@ -366,16 +371,21 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         }
     }
 
-    private static Map<String, String> parseJobAccountingInfo(String output) throws OctopusIOException {
+    //get all key/value pairs from the qacct output
+    private static Map<String, String> parseQacctOutput(String output) throws OctopusIOException {
         Map<String, String> result = new HashMap<String, String>();
 
+        if (!output.startsWith(QACCT_HEADER)) {
+            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Qacct output is excepted to start with " + QACCT_HEADER);
+        }
+        
         String lines[] = output.split("\\r?\\n");
         for (String line : lines) {
             String[] elements = line.split(" ", 2);
 
             if (elements.length == 2) {
                 result.put(elements[0].trim(), elements[1].trim());
-            } else if (line.startsWith("================")) {
+            } else if (line.equals(QACCT_HEADER)) {
                 //IGNORE first line
             } else {
                 logger.debug("found line " + line + " in output");
@@ -498,7 +508,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
 
         String output = connection.runCommand(jobScript, "qsub");
 
-        String identifier = checkSubmitJobResult(output);
+        String identifier = parseQsubOutput(output);
 
         markJobSeen(identifier);
         return new JobImplementation(connection.getScheduler(), identifier, description, false, false);
@@ -508,7 +518,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
     public JobStatus cancelJob(SchedulerConnection connection, Job job) throws OctopusIOException, OctopusException {
         String output = connection.runCommand(null, "qdel", job.getIdentifier());
 
-        checkCancelJobResult(job, output);
+        parseQdelOutput(job, output);
 
         return getJobStatus(connection, job);
     }
@@ -542,6 +552,14 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), false, info);
     }
 
+    /**
+     * Creates a JobStatus from qacct output. For more info on the output, see the "N1 Grid Engine 6 User's Guide". Retrieved
+     * from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
+     * 
+     * @param info a map containing key/value pairs parsed from the qacct output.
+     * @param job the job to get the info for.
+     * @return the current status of the job.
+     */
     private JobStatus qacctJobStatus(Map<String, String> info, Job job) {
         Integer exitCode = null;
         Exception exception = null;
@@ -562,7 +580,12 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
         String failedString = info.get("failed");
 
         if (failedString != null && !failedString.equals("0")) {
-            exception = new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
+            if (failedString.startsWith("100")) {
+                //error code for killed jobs
+                exception = new JobCanceledException(GridengineAdaptor.ADAPTOR_NAME, "Job killed by signal");
+            } else {
+                exception = new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
+            }
         }
 
         return new JobStatusImplementation(job, state, exitCode, exception, false, true, info);
@@ -588,7 +611,7 @@ public class GridEngineCommandLineInterface implements CommandLineInterface {
                 String output = connection.runCommand(null, "qacct", "-j", job.getIdentifier());
                 clearJobSeen(job.getIdentifier());
 
-                Map<String, String> accountingInfo = parseJobAccountingInfo(output);
+                Map<String, String> accountingInfo = parseQacctOutput(output);
 
                 status = qacctJobStatus(accountingInfo, job);
             } catch (CommandFailedException e) {
