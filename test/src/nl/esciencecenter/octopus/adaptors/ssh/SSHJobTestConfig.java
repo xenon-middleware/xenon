@@ -185,4 +185,9 @@ public class SSHJobTestConfig extends JobTestConfig {
     public Properties getDefaultProperties() throws Exception {
         return null;
     }
+
+    @Override
+    public boolean supportsStatusAfterDone() {
+        return false;
+    }
 }

@@ -95,4 +95,9 @@ public class LocalJobTestConfig extends JobTestConfig {
         return null;
     }
 
+    @Override
+    public boolean supportsStatusAfterDone() {
+        return false;
+    }
+
 }

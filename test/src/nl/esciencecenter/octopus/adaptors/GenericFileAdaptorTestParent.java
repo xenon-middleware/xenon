@@ -23,8 +23,8 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
+//import java.nio.ByteBuffer;
+//import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -314,36 +314,36 @@ public abstract class GenericFileAdaptorTestParent {
         return Arrays.copyOf(buffer, offset);
     }
 
-    private byte [] readFully(SeekableByteChannel channel) throws Exception { 
-        
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        
-        int read = channel.read(buffer);
-        
-        while (read != -1) { 
-            
-            System.err.println("READ from channel " + read);
-            
-            if (buffer.position() == buffer.limit()) {                 
-                ByteBuffer tmp = ByteBuffer.allocate(buffer.limit()*2);
-                buffer.flip();
-                tmp.put(buffer);
-                buffer = tmp;
-            }
-                        
-            read = channel.read(buffer);
-        }
-        
-        close(channel);
-        
-        buffer.flip();
-        byte [] tmp = new byte[buffer.remaining()];
-        buffer.get(tmp);
-        
-        System.err.println("Returning byte[" + tmp.length + "]");
-        
-        return tmp;  
-    }
+//    private byte [] readFully(SeekableByteChannel channel) throws Exception { 
+//        
+//        ByteBuffer buffer = ByteBuffer.allocate(1024);
+//        
+//        int read = channel.read(buffer);
+//        
+//        while (read != -1) { 
+//            
+//            System.err.println("READ from channel " + read);
+//            
+//            if (buffer.position() == buffer.limit()) {                 
+//                ByteBuffer tmp = ByteBuffer.allocate(buffer.limit()*2);
+//                buffer.flip();
+//                tmp.put(buffer);
+//                buffer = tmp;
+//            }
+//                        
+//            read = channel.read(buffer);
+//        }
+//        
+//        close(channel);
+//        
+//        buffer.flip();
+//        byte [] tmp = new byte[buffer.remaining()];
+//        buffer.get(tmp);
+//        
+//        System.err.println("Returning byte[" + tmp.length + "]");
+//        
+//        return tmp;  
+//    }
 
     
     // The test start here.
@@ -2192,157 +2192,157 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: 
     
-    public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, 
-            boolean mustFail) throws Exception {
-
-        if (!config.supportsNewByteChannel()) {
-            return;
-        }
-        
-        SeekableByteChannel channel = null;
-        
-        try { 
-            channel = files.newByteChannel(path, options);
-        } catch (Exception e) { 
-
-            if (mustFail) { 
-                // expected
-                return;
-            } 
-            
-            throwUnexpected("test22_newByteChannel", e);
-        }
-        
-        if (mustFail) {             
-            close(channel);            
-            throwExpected("test22_newByteChannel");
-        }
-        
-        if (toWrite != null) { 
-            channel.write(ByteBuffer.wrap(toWrite));
-        }
-
-        if (toRead != null) {
-            
-            channel.position(0);
-            
-            byte [] tmp = readFully(channel);
-        
-            if (toRead.length != tmp.length) { 
-                throwWrong("test22_newByteChannel", toRead.length + " bytes", tmp.length + " bytes");            
-            }
-        
-            if (!Arrays.equals(toRead, tmp)) { 
-                throwWrong("test22_newByteChannel", Arrays.toString(toRead), Arrays.toString(tmp));
-            }
-        }
-        
-        close(channel);
-    }
+//    public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, 
+//            boolean mustFail) throws Exception {
+//
+//        if (!config.supportsNewByteChannel()) {
+//            return;
+//        }
+//        
+//        SeekableByteChannel channel = null;
+//        
+//        try { 
+//            channel = files.newByteChannel(path, options);
+//        } catch (Exception e) { 
+//
+//            if (mustFail) { 
+//                // expected
+//                return;
+//            } 
+//            
+//            throwUnexpected("test22_newByteChannel", e);
+//        }
+//        
+//        if (mustFail) {             
+//            close(channel);            
+//            throwExpected("test22_newByteChannel");
+//        }
+//        
+//        if (toWrite != null) { 
+//            channel.write(ByteBuffer.wrap(toWrite));
+//        }
+//
+//        if (toRead != null) {
+//            
+//            channel.position(0);
+//            
+//            byte [] tmp = readFully(channel);
+//        
+//            if (toRead.length != tmp.length) { 
+//                throwWrong("test22_newByteChannel", toRead.length + " bytes", tmp.length + " bytes");            
+//            }
+//        
+//            if (!Arrays.equals(toRead, tmp)) { 
+//                throwWrong("test22_newByteChannel", Arrays.toString(toRead), Arrays.toString(tmp));
+//            }
+//        }
+//        
+//        close(channel);
+//    }
     
-    @org.junit.Test
-    public void test21_newByteChannel() throws Exception { 
-
-        if (!config.supportsNewByteChannel()) {
-            return;
-        }
-        
-        byte [] data = "Hello World".getBytes();
-        byte [] data2 = "Hello WorldHello World".getBytes();
-        
-        prepare();
-
-        // test with null
-        test22_newByteChannel(null, null, null, null, true);
-        
-        FileSystem fs =  config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test22_newByteChannel");
-        
-        // test with existing file and null options
-        AbsolutePath file0 = createTestFile(testDir, null);
-        test22_newByteChannel(file0, null, null, null, true);
-        
-        // test with existing file and empty options
-        test22_newByteChannel(file0, new OpenOption[0],  null, null, true);
-        
-        // test with existing file and CREATE option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.CREATE }, null, null, true);
-
-        // test with existing file and OPEN option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN }, null, null, true);
-
-        // test with existing file and OPEN_OR_CREATE option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE }, null, null, true);
-
-        // test with existing file and APPEND option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.APPEND }, null, null, true);
-
-        // test with existing file and TRUNCATE option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.TRUNCATE }, null, null, true);
-        
-        // test with existing file and READ option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.READ }, null, null, true);
-        
-        // test with existing file and WRITE option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.WRITE }, null, null, true);
-        
-        // test with existing file and CREATE + APPEND option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.CREATE, OpenOption.APPEND }, null, null, true);
-
-        // test with existing file and OPEN + READ + APPEND option
-        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, OpenOption.APPEND }, null, null, true);
-        
-        // test with existing file and OPEN + READ option
-        AbsolutePath file1 = createTestFile(testDir, data);
-        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
-
-        // Test with existing file and OPEN + APPEND + READ + WRITE 
-        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE, OpenOption.READ }, data, data, false);
-        
-        // Test with existing file and OPEN + APPEND + READ + WRITE 
-        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.APPEND, OpenOption.WRITE, OpenOption.READ }, null, null, true);
-        
-        // test with existing file and OPEN + WRITE without APPEND option
-        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE }, null, null, true);
-        
-        // test with existing file and CREATE + WRITE + APPEND 
-        test22_newByteChannel(file1, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, null, null, true);
-        
-        deleteTestFile(file1);
-        
-        // test with non-existing file and CREATE + WRITE + APPEND
-        AbsolutePath file2 = createNewTestFileName(testDir);
-        test22_newByteChannel(file2, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, null, false);
-        test22_newByteChannel(file2, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
-        deleteTestFile(file2);
-        
-        // test with non-existing file and OPEN + READ
-        AbsolutePath file3 = createNewTestFileName(testDir);
-        test22_newByteChannel(file3, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, null, true);
-        
-        // test with non-existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
-        AbsolutePath file4 = createNewTestFileName(testDir);
-        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.READ }, data, data, false);
-
-        // test with existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
-        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, 
-                null, false);
-        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, }, null, data2, false);
-        
-        deleteTestFile(file0);
-        deleteTestFile(file4);
-        
-        deleteTestDir(testDir);
-        
-        if (config.supportsClose()) { 
-            // test with closed fs
-            config.closeTestFileSystem(files,fs);
-            test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND, OpenOption.READ }, 
-                    null, null, true);             
-        }
-
-        cleanup();
-    }
+//    @org.junit.Test
+//    public void test21_newByteChannel() throws Exception { 
+//
+//        if (!config.supportsNewByteChannel()) {
+//            return;
+//        }
+//        
+//        byte [] data = "Hello World".getBytes();
+//        byte [] data2 = "Hello WorldHello World".getBytes();
+//        
+//        prepare();
+//
+//        // test with null
+//        test22_newByteChannel(null, null, null, null, true);
+//        
+//        FileSystem fs =  config.getTestFileSystem(files, credentials);
+//        prepareTestDir(fs, "test22_newByteChannel");
+//        
+//        // test with existing file and null options
+//        AbsolutePath file0 = createTestFile(testDir, null);
+//        test22_newByteChannel(file0, null, null, null, true);
+//        
+//        // test with existing file and empty options
+//        test22_newByteChannel(file0, new OpenOption[0],  null, null, true);
+//        
+//        // test with existing file and CREATE option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.CREATE }, null, null, true);
+//
+//        // test with existing file and OPEN option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN }, null, null, true);
+//
+//        // test with existing file and OPEN_OR_CREATE option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE }, null, null, true);
+//
+//        // test with existing file and APPEND option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.APPEND }, null, null, true);
+//
+//        // test with existing file and TRUNCATE option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.TRUNCATE }, null, null, true);
+//        
+//        // test with existing file and READ option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.READ }, null, null, true);
+//        
+//        // test with existing file and WRITE option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.WRITE }, null, null, true);
+//        
+//        // test with existing file and CREATE + APPEND option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.CREATE, OpenOption.APPEND }, null, null, true);
+//
+//        // test with existing file and OPEN + READ + APPEND option
+//        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, OpenOption.APPEND }, null, null, true);
+//        
+//        // test with existing file and OPEN + READ option
+//        AbsolutePath file1 = createTestFile(testDir, data);
+//        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
+//
+//        // Test with existing file and OPEN + APPEND + READ + WRITE 
+//        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE, OpenOption.READ }, data, data, false);
+//        
+//        // Test with existing file and OPEN + APPEND + READ + WRITE 
+//        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.APPEND, OpenOption.WRITE, OpenOption.READ }, null, null, true);
+//        
+//        // test with existing file and OPEN + WRITE without APPEND option
+//        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE }, null, null, true);
+//        
+//        // test with existing file and CREATE + WRITE + APPEND 
+//        test22_newByteChannel(file1, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, null, null, true);
+//        
+//        deleteTestFile(file1);
+//        
+//        // test with non-existing file and CREATE + WRITE + APPEND
+//        AbsolutePath file2 = createNewTestFileName(testDir);
+//        test22_newByteChannel(file2, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, null, false);
+//        test22_newByteChannel(file2, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
+//        deleteTestFile(file2);
+//        
+//        // test with non-existing file and OPEN + READ
+//        AbsolutePath file3 = createNewTestFileName(testDir);
+//        test22_newByteChannel(file3, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, null, true);
+//        
+//        // test with non-existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
+//        AbsolutePath file4 = createNewTestFileName(testDir);
+//        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.READ }, data, data, false);
+//
+//        // test with existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
+//        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, 
+//                null, false);
+//        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, }, null, data2, false);
+//        
+//        deleteTestFile(file0);
+//        deleteTestFile(file4);
+//        
+//        deleteTestDir(testDir);
+//        
+//        if (config.supportsClose()) { 
+//            // test with closed fs
+//            config.closeTestFileSystem(files,fs);
+//            test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND, OpenOption.READ }, 
+//                    null, null, true);             
+//        }
+//
+//        cleanup();
+//    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: copy (synchronous) 
