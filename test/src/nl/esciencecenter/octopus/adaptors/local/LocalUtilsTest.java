@@ -32,7 +32,6 @@ import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
  */
 public class LocalUtilsTest {
 
@@ -56,94 +55,108 @@ public class LocalUtilsTest {
     public void test_createFile_null() throws Exception {
         LocalUtils.createFile(null);
     }
-    
+
     @org.junit.Test(expected = OctopusIOException.class)
     public void test_move_null() throws Exception {
         LocalUtils.move(null, null);
     }
-    
+
     @org.junit.Test(expected = OctopusIOException.class)
     public void test_setPosixFilePermissions_null() throws Exception {
         LocalUtils.setPosixFilePermissions(null, null);
     }
 
     @org.junit.Test(expected = OctopusIOException.class)
-    public void test_newByteChannel_null() throws Exception { 
+    public void test_newByteChannel_null() throws Exception {
         LocalUtils.newByteChannel(null);
     }
 
     @org.junit.Test(expected = OctopusIOException.class)
-    public void test_newInputStream_null() throws Exception { 
+    public void test_newInputStream_null() throws Exception {
         LocalUtils.newInputStream(null);
     }
 
     @org.junit.Test
-    public void test_exists_null() throws Exception { 
+    public void test_exists_null() throws Exception {
         boolean v = LocalUtils.exists(null);
-        assert(!v);
+        assert (!v);
     }
 
     @org.junit.Test(expected = OctopusException.class)
     public void test_broken_home() throws Exception {
-        System.setProperty("user.home", "/home/aap");        
-        LocalUtils.getHome();
+        String originalHome = System.getProperty("user.home");
+
+        System.setProperty("user.home", "/home/aap");
+
+        try {
+            LocalUtils.getHome();
+        } finally {
+            System.setProperty("user.home", originalHome);
+        }
     }
-    
+
     @org.junit.Test(expected = OctopusException.class)
     public void test_broken_cwd() throws Exception {
-        System.setProperty("user.dir", "/home/aap/noot");        
-        LocalUtils.getCWD();
+        String originalCWD = System.getProperty("user.dir");
+
+        System.setProperty("user.dir", "/home/aap/noot");
+
+        try {
+            LocalUtils.getCWD();
+        } finally {
+            System.setProperty("user.dir", originalCWD);
+        }
     }
 
     @org.junit.Test
     public void test_octopusPermissions_null() throws Exception {
-        Set<PosixFilePermission> tmp = LocalUtils.octopusPermissions(null);        
-        assert(tmp == null);        
+        Set<PosixFilePermission> tmp = LocalUtils.octopusPermissions(null);
+        assert (tmp == null);
     }
 
     @org.junit.Test
     public void test_javaPermissions_null() throws Exception {
         Set<java.nio.file.attribute.PosixFilePermission> tmp = LocalUtils.javaPermissions(null);
-        
-        assert(tmp != null);
-        assert(tmp.size() == 0);
+
+        assert (tmp != null);
+        assert (tmp.size() == 0);
     }
 
     @org.junit.Test
     public void test_exists_home() throws Exception {
         boolean v = LocalUtils.exists("~");
-        assert(v);
+        assert (v);
     }
 
     @org.junit.Test
     public void test_exists_bashrc() throws Exception {
         // Assumes "aap" does not exist
         boolean v = LocalUtils.exists("~/aap");
-        assert(!v);
+        assert (!v);
     }
-    
+
     @org.junit.Test
     public void test_javaPath_home() throws Exception {
-        
+
         Octopus octopus = OctopusFactory.newOctopus(null);
         Files files = octopus.files();
-        
+
         String tmp = LocalUtils.javaPath(files.newPath(files.getLocalCWDFileSystem(), new RelativePath("~"))).toString();
-        
+
         OctopusFactory.endOctopus(octopus);
 
-        assert(tmp.equals(System.getProperty("user.dir")));        
+        assert (tmp.equals(System.getProperty("user.dir")));
     }
 
     @org.junit.Test
     public void test_javaPermissionAttribute() throws Exception {
-        
+
         Set<PosixFilePermission> tmp = new HashSet<>();
         tmp.add(PosixFilePermission.OWNER_READ);
-        
+
         FileAttribute<Set<java.nio.file.attribute.PosixFilePermission>> out = LocalUtils.javaPermissionAttribute(tmp);
-        
-        assert(out.value().contains(java.nio.file.attribute.PosixFilePermission.OWNER_READ));         
+
+        assert (out.value().contains(java.nio.file.attribute.PosixFilePermission.OWNER_READ));
     }
 
     @org.junit.Test(expected = OctopusRuntimeException.class)
@@ -154,17 +167,13 @@ public class LocalUtilsTest {
     @org.junit.Test
     public void test_getURI2() throws Exception {
         URI uri = LocalUtils.getURI(LocalUtils.LOCAL_FILE_URI);
-        assert(uri.getScheme().equals("file"));        
+        assert (uri.getScheme().equals("file"));
     }
-    
+
     @org.junit.Test
     public void test_getURI3() throws Exception {
         URI uri = LocalUtils.getURI(LocalUtils.LOCAL_JOB_URI);
-        assert(uri.getScheme().equals("local"));        
+        assert (uri.getScheme().equals("local"));
     }
-    
 
-    
-    
-    
 }

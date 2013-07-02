@@ -21,6 +21,7 @@ import java.io.IOException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
+import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -42,10 +43,10 @@ public class JobExecutor implements Runnable {
     private final int pollingDelay;
 
     private final String adaptorName;
-    
+
     private final Files files;
-    private final FileSystem filesytem; 
-    
+    private final FileSystem filesytem;
+
     private Streams streams;
 
     private Integer exitStatus;
@@ -59,10 +60,10 @@ public class JobExecutor implements Runnable {
     private String state = "PENDING";
 
     private Exception error;
-    
-    public JobExecutor(String adaptorName, Files files, FileSystem filesytem, InteractiveProcessFactory factory, 
+
+    public JobExecutor(String adaptorName, Files files, FileSystem filesytem, InteractiveProcessFactory factory,
             JobImplementation job, int pollingDelay) throws BadParameterException {
-        
+
         this.adaptorName = adaptorName;
         this.files = files;
         this.filesytem = filesytem;
@@ -205,7 +206,7 @@ public class JobExecutor implements Runnable {
         JobDescription description = job.getJobDescription();
 
         if (getKilled()) {
-            updateState("KILLED", -1, new IOException("Process cancelled by user."));
+            updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return;
         }
 
@@ -240,13 +241,13 @@ public class JobExecutor implements Runnable {
             }
 
             if (getKilled()) {
-                updateState("KILLED", -1, new IOException("Process cancelled by user."));
+                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
                 process.destroy();
                 return;
             }
 
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
-                updateState("KILLED", -1, new IOException("Process timed out."));
+                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process timed out."));
                 process.destroy();
                 return;
             }
