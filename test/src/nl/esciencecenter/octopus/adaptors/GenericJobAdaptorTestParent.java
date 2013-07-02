@@ -1195,7 +1195,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
         
         assertTrue(status.hasException());
-        assertTrue(status.getException() instanceof OctopusException);
+        
         jobs.close(scheduler);
     }
     

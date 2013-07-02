@@ -28,22 +28,20 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
 
-public class QstatOutputParserTest {
+public class GridEngineOutputParserTest {
 
-    @Test
-    public void testQstatOutputParser() throws Throwable {
-        new GridEngineCommandLineInterface(false);
-    }
-
+    
     @Test
     public void testCheckVersion() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs.xml");
-
-        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
+        
+        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
 
         parser.checkVersion(testFile);
     }
@@ -52,7 +50,7 @@ public class QstatOutputParserTest {
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
-        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
+        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
 
         parser.checkVersion(testFile);
     }
@@ -61,7 +59,7 @@ public class QstatOutputParserTest {
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
-        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
+        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
 
         parser.checkVersion(testFile);
     }
@@ -70,7 +68,7 @@ public class QstatOutputParserTest {
     public void testCheckVersion_EmptyFile_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
 
-        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
+        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
 
         parser.checkVersion(testFile);
     }
@@ -82,7 +80,7 @@ public class QstatOutputParserTest {
 
         String content = new String(encoded);
 
-        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
+        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
 
         Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
 
@@ -99,10 +97,10 @@ public class QstatOutputParserTest {
         byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/jobs.xml"));
 
         String content = new String(encoded);
-        
+
         System.err.println("parsing queue info from: " + content);
 
-        GridEngineCommandLineInterface parser = new GridEngineCommandLineInterface(false);
+        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(content);
 

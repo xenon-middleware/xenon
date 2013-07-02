@@ -35,7 +35,7 @@ public class GridengineAdaptor extends Adaptor {
             "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
                     + "or the ssh adaptor to gain access to the scheduler machine.";
 
-    private static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
+    public static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
 
     public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + ADAPTOR_NAME + ".";
 
@@ -57,26 +57,7 @@ public class GridengineAdaptor extends Adaptor {
         this.credentialsAdaptor = new GridEngineCredentials(octopusEngine);
     }
 
-    static void checkLocation(URI location) throws InvalidLocationException {
-        //only null or "/" are allowed as paths
-        if (!(location.getPath() == null || location.getPath().length() == 0 || location.getPath().equals("/"))) {
-            throw new InvalidLocationException(GridengineAdaptor.ADAPTOR_NAME,
-                    "Paths are not allowed in a uri for this scheduler, uri given: " + location);
-        }
-
-        if (location.getFragment() != null && location.getFragment().length() > 0) {
-            throw new InvalidLocationException(GridengineAdaptor.ADAPTOR_NAME,
-                    "Fragments are not allowed in a uri for this scheduler, uri given: " + location);
-        }
-
-        for (String scheme : ADAPTOR_SCHEMES) {
-            if (scheme.equals(location.getScheme())) {
-                //alls-well
-                return;
-            }
-        }
-        throw new InvalidLocationException(ADAPTOR_NAME, "Adaptor does not support scheme: " + location.getScheme());
-    }
+    
 
     public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;

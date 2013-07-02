@@ -52,7 +52,7 @@ public class GridEngineJobs implements Jobs {
     public GridEngineJobs(OctopusProperties properties, OctopusEngine octopusEngine) {
         this.properties = properties;
         this.octopusEngine = octopusEngine;
-
+    
         connections = new HashMap<String, SchedulerConnection>();
     }
 
@@ -96,7 +96,9 @@ public class GridEngineJobs implements Jobs {
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        SchedulerConnection connection = new SchedulerConnection(location, credential, properties, octopusEngine);
+        
+        
+        SchedulerConnection connection = new GridEngineSchedulerConnection(location, credential, properties, octopusEngine);
 
         addConnection(connection);
 
