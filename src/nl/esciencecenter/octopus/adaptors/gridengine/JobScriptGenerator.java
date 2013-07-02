@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,13 @@ public class JobScriptGenerator {
         } else {
             script.format("#$ -e %s\n", description.getStderr());
         }
-
+        
+        if (description.getEnvironment() != null) {
+            for (Map.Entry<String, String> entry: description.getEnvironment().entrySet()) {
+                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());    
+            }
+        }
+        
         script.format("\n");
 
         script.format("%s", description.getExecutable());
