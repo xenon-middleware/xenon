@@ -105,7 +105,6 @@ public class GridEngineJobs implements Jobs {
     
     @Override
     public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
-        // TODO: implement!
         return null;
     }
     
