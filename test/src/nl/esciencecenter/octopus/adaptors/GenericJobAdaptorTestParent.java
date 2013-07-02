@@ -1148,8 +1148,12 @@ public abstract class GenericJobAdaptorTestParent {
     @org.junit.Test
     public void test39_multipleBatchJobSubmitWithExceptions() throws Exception {
 
-        // NOTE: This test assumes that an exception is when the status of a job is requested twice after the job is done!
+        // NOTE: This test assumes that an exception is thrown when the status of a job is requested twice after the job is done!
         //       This may not be true for all schedulers.
+
+        if (config.supportsStatusAfterDone()) { 
+            return;
+        }
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         

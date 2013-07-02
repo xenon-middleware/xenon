@@ -197,4 +197,9 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public Properties getDefaultProperties() throws Exception {
         return null;
     }
+
+    @Override
+    public boolean supportsStatusAfterDone() {
+        return true;
+    }
 }

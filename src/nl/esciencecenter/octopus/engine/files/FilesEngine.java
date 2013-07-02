@@ -220,10 +220,10 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(path).newOutputStream(path, options);
     }
 
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        return getFilesAdaptor(path).newByteChannel(path, options);
-    }
+//    @Override
+//    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
+//        return getFilesAdaptor(path).newByteChannel(path, options);
+//    }
 
     @Override
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {

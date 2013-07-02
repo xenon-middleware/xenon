@@ -478,37 +478,37 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
     
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-
-        OpenOptions tmp = OpenOptions.processOptions(LocalAdaptor.ADAPTOR_NAME, options);
-
-        if (tmp.getReadMode() != null && tmp.getAppendMode() == OpenOption.APPEND) { 
-            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Cannot set append mode when reading a file!");
-        }
-        
-        if (tmp.getWriteMode() == null) { 
-            if (tmp.getReadMode() == null) { 
-                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");        
-            } 
-        } else { 
-            if (tmp.getAppendMode() == null) {
-                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
-            }
-        }
-        
-        if (tmp.getOpenMode() == OpenOption.CREATE) { 
-            if (exists(path)) { 
-                throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
-            }
-        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
-            if (!exists(path)) { 
-                throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
-            }
-        }
- 
-        return LocalUtils.newByteChannel(path, options);
-    }
+//    @Override
+//    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
+//
+//        OpenOptions tmp = OpenOptions.processOptions(LocalAdaptor.ADAPTOR_NAME, options);
+//
+//        if (tmp.getReadMode() != null && tmp.getAppendMode() == OpenOption.APPEND) { 
+//            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Cannot set append mode when reading a file!");
+//        }
+//        
+//        if (tmp.getWriteMode() == null) { 
+//            if (tmp.getReadMode() == null) { 
+//                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");        
+//            } 
+//        } else { 
+//            if (tmp.getAppendMode() == null) {
+//                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
+//            }
+//        }
+//        
+//        if (tmp.getOpenMode() == OpenOption.CREATE) { 
+//            if (exists(path)) { 
+//                throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+//            }
+//        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
+//            if (!exists(path)) { 
+//                throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
+//            }
+//        }
+// 
+//        return LocalUtils.newByteChannel(path, options);
+//    }
 
     @Override
     public FileSystem getLocalCWDFileSystem() throws OctopusException {

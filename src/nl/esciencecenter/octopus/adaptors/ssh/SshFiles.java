@@ -726,56 +726,55 @@ public class SshFiles implements Files {
         }
     }
         
-    @Override
-    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-        
-        OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
-
-        boolean read = tmp.getReadMode() != null;
-        boolean write = tmp.getWriteMode() != null;
-        
-        boolean append = false;
-        
-        if (!read && !write) {
-            throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");
-            
-        } else if (write && !read) { 
-            
-            if (tmp.getAppendMode() == null) {
-                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
-            }
-            
-            append = (tmp.getAppendMode() == OpenOption.APPEND);
-            
-        } else if (read && !write) { 
-            if (tmp.getAppendMode() != null) {
-                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading a file!");
-            }            
-        } else { // read and write 
-            if (tmp.getAppendMode() != null) {
-                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading and writing a file!");
-            }
-        }
-        
-        if (tmp.getOpenMode() == OpenOption.CREATE) { 
-            if (exists(path)) { 
-                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
-            }
-        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
-            if (!exists(path)) { 
-                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
-            }
-        }
-        
-        ChannelSftp channel = getChannel(path);
-        
-        try { 
-            return new SSHSeekableByteChannel(channel, path.getPath(), read, write, append);
-        } catch (IOException e) {
-            channel.disconnect();
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to open channel!", e);
-        }
-    }
+//    @Override
+//    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
+//        
+//        OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
+//
+//        boolean read = tmp.getReadMode() != null;
+//        boolean write = tmp.getWriteMode() != null;        
+//        boolean append = false;
+//        
+//        if (!read && !write) {
+//            throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");
+//            
+//        } else if (write && !read) { 
+//            
+//            if (tmp.getAppendMode() == null) {
+//                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
+//            }
+//            
+//            append = (tmp.getAppendMode() == OpenOption.APPEND);
+//            
+//        } else if (read && !write) { 
+//            if (tmp.getAppendMode() != null) {
+//                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading a file!");
+//            }            
+//        } else { // read and write 
+//            if (tmp.getAppendMode() != null) {
+//                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading and writing a file!");
+//            }
+//        }
+//        
+//        if (tmp.getOpenMode() == OpenOption.CREATE) { 
+//            if (exists(path)) { 
+//                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+//            }
+//        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
+//            if (!exists(path)) { 
+//                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
+//            }
+//        }
+//        
+//        ChannelSftp channel = getChannel(path);
+//        
+//        try { 
+//            return new SSHSeekableByteChannel(channel, path.getPath(), read, write, append);
+//        } catch (IOException e) {
+//            channel.disconnect();
+//            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to open channel!", e);
+//        }
+//    }
     
     private SftpATTRS stat(AbsolutePath path) throws OctopusIOException {
         

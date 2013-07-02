@@ -43,8 +43,11 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public String getDefaultQueueName() {
         return "single";
     }
+
+    public abstract boolean supportsStatusAfterDone(); 
     
     public abstract Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception;
     public abstract FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception;
-    public abstract String getInvalidQueueName() throws Exception;    
+    public abstract String getInvalidQueueName() throws Exception;
+
 }
