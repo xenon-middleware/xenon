@@ -18,8 +18,6 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.IOException;
 
-import com.jcraft.jsch.Session;
-
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcessFactory;
@@ -30,16 +28,14 @@ import nl.esciencecenter.octopus.engine.util.InteractiveProcessFactory;
  */
 public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 
-    private final Session session;
-    private final SshAdaptor adaptor;
+    private final SshSession session;
     
-    public SshInteractiveProcessFactory(SshAdaptor adaptor, Session session) {
-        this.adaptor = adaptor;
+    public SshInteractiveProcessFactory(SshSession session) {
         this.session = session;
     }
     
     @Override
     public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
-        return new SshInteractiveProcess(adaptor.getExecChannel(session), job);
+        return new SshInteractiveProcess(session, job);
     }
 }

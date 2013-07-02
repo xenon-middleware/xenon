@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.io.File;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -24,6 +25,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.ProxyCredentialImplementation;
+import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class SshCredentials implements Credentials {
@@ -69,6 +71,38 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
-        return adaptor.getDefaultCredential();
+        
+        String userHome = System.getProperty("user.home");
+        
+        if (userHome == null) {
+            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user home directory.");
+        }
+
+        String user = System.getProperty("user.name");
+        
+        if (user == null) {
+            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
+        }
+
+        File keyFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
+        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa.pub");
+
+        if (keyFile.exists() && certFile.exists()) {
+           // logger.info("Using default credential: "+ keyFile.getPath());
+            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
+                    new OctopusProperties(properties), keyFile.getPath(), certFile.getPath(), user, null);
+        }
+
+        File keyFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
+        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa.pub");
+
+        if (keyFile2.exists() && certFile2.exists()) {
+           // logger.info("Using default credential: "+ keyFile2.getPath());
+            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
+                    new OctopusProperties(properties), keyFile2.getPath(), certFile2.getPath(), user, null);
+        }
+
+        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried " + 
+                keyFile.getPath() + " and " + keyFile2.getPath());
     }
 }

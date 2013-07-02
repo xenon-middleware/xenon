@@ -29,10 +29,12 @@ import com.jcraft.jsch.ChannelSftp;
  */
 public class SshOutputStream extends OutputStream {
     private OutputStream out;
+    private SshSession session;
     private ChannelSftp channel;
 
-    public SshOutputStream(OutputStream out, ChannelSftp channel) {
+    public SshOutputStream(OutputStream out, SshSession session, ChannelSftp channel) {
         this.out = out;
+        this.session = session;
         this.channel = channel;
     }
 
@@ -71,7 +73,7 @@ public class SshOutputStream extends OutputStream {
         try {
             out.close();
         } finally {
-            channel.disconnect();
+            session.releaseSftpChannel(channel);
         }
     }
 

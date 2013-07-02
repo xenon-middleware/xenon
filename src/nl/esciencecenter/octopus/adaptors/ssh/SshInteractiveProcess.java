@@ -38,12 +38,14 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class SshInteractiveProcess  implements InteractiveProcess {
     
+    private SshSession session;
     private ChannelExec channel;    
     private Streams streams; 
     
-    public SshInteractiveProcess(ChannelExec channel, Job job) throws OctopusIOException {
+    public SshInteractiveProcess(SshSession session, Job job) throws OctopusIOException {
         
-        this.channel = channel;
+        this.session = session;
+        this.channel = session.getExecChannel();
 
         JobDescription description = job.getJobDescription();
         
@@ -109,6 +111,6 @@ public class SshInteractiveProcess  implements InteractiveProcess {
             // logger.debug("Failed to kill remote process!", e);
         }
 
-        channel.disconnect();
+        session.releaseExecChannel(channel);
     }
 }
