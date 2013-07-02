@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
-import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 
 /**

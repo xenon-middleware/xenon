@@ -15,61 +15,38 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.adaptors.ssh.SshFiles.FileSystemInfo;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
-import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
-import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
-import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.NotConnectedException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.exceptions.PermissionDeniedException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedIOOperationException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.HostKey;
-import com.jcraft.jsch.HostKeyRepository;
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import com.jcraft.jsch.UserInfo;
-
-// TODO cache van sessions / channels
 
 public class SshAdaptor extends Adaptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+   // private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
 
     public static final String ADAPTOR_NAME = "ssh";
     
-    private static final int DEFAULT_PORT = 22; // The default ssh port.
+    protected static final int DEFAULT_PORT = 22; // The default ssh port.
 
     private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
 
@@ -111,45 +88,6 @@ public class SshAdaptor extends Adaptor {
             { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." }, 
             { MULTIQ_MAX_CONCURRENT, "4", "Int: the maximum number of concurrent jobs in the multiq." } };
         
-    class Robot implements UserInfo {
-
-        private final boolean yesNo;
-        
-        Robot(boolean yesyNo) { 
-            this.yesNo = yesyNo;
-        }
-        
-        @Override
-        public String getPassphrase() {
-            return null;
-        }
-
-        @Override
-        public String getPassword() {
-            return null;
-        }
-
-        @Override
-        public boolean promptPassphrase(String message) {
-            return false;
-        }
-
-        @Override
-        public boolean promptPassword(String message) {
-            return false;
-        }
-
-        @Override
-        public boolean promptYesNo(String message) {
-            return yesNo;
-        }
-
-        @Override
-        public void showMessage(String message) {
-            // ignored
-        } 
-    }
-
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;
@@ -256,219 +194,29 @@ public class SshAdaptor extends Adaptor {
         case ChannelSftp.SSH_FX_OK:
             return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_EOF:
-            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, "Unexpected EOF", e);
         case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-            return new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "No such file", e);
         case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, "Permission denied", e);
         case ChannelSftp.SSH_FX_FAILURE:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
         case ChannelSftp.SSH_FX_BAD_MESSAGE:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
         case ChannelSftp.SSH_FX_NO_CONNECTION:
-            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, "SSH does not have a connection!", e);
         case ChannelSftp.SSH_FX_CONNECTION_LOST:
-            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, "SSH lost connection!", e);
         case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
-            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, "Unsupported operation", e);
         default:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
         }
     }
 
-    void setKnownHostsFile(String knownHostsFile) throws OctopusException {
-        try {
-            jsch.setKnownHosts(knownHostsFile);
-        } catch (JSchException e) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
-        }
-
-        if (logger.isDebugEnabled()) {
-            HostKeyRepository hkr = jsch.getHostKeyRepository();
-            HostKey[] hks = hkr.getHostKey();
-            if (hks != null) {
-                logger.debug("Host keys in " + hkr.getKnownHostsRepositoryID());
-                for (HostKey hk : hks) {
-                    logger.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
-                }
-                logger.debug("");
-            } else { 
-                logger.debug("No keys in " + knownHostsFile);
-            }
-        }
-    }
-
-    protected Credential getDefaultCredential() throws OctopusException {
-        // FIXME implement agent forwarding
-
-        String userHome = System.getProperty("user.home");
-        
-        if (userHome == null) {
-            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user home directory.");
-        }
-
-        String userName = System.getProperty("user.name");
-        if (userName == null) {
-            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
-        }
-
-        File keyFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
-        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa.pub");
-
-        if (keyFile.exists() && certFile.exists()) {
-            logger.info("Using default credential: "+ keyFile.getPath());
-            return octopusEngine.credentials().newCertificateCredential("ssh", getProperties(), keyFile.getPath(),
-                    certFile.getPath(), userName, null);
-        }
-
-        File keyFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
-        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa.pub");
-
-        if (keyFile2.exists() && certFile2.exists()) {
-            logger.info("Using default credential: "+ keyFile2.getPath());
-            return octopusEngine.credentials().newCertificateCredential("ssh", getProperties(), keyFile2.getPath(),
-                    certFile2.getPath(), userName, null);
-        }
-
-        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried " + 
-                keyFile.getPath() + " and " + keyFile2.getPath());
-    }
-
-    private void setCredential(CredentialImplementation credential, Session session) throws OctopusException {
-        logger.debug("using credential: " + credential);
-
-        if (credential instanceof CertificateCredentialImplementation) {
-            CertificateCredentialImplementation certificate = (CertificateCredentialImplementation) credential;
-            try {
-                jsch.addIdentity(certificate.getKeyfile(), Arrays.toString(certificate.getPassword()));
-            } catch (JSchException e) {
-                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
-            }
-        } else if (credential instanceof PasswordCredentialImplementation) {
-            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
-            session.setPassword(new String(passwordCredential.getPassword()));
-        } else {
-            throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
-        }
-    }
-
-    protected Session createNewSession(URI location, Credential credential, OctopusProperties localProperties)
+    protected SshSession createNewSession(URI location, Credential credential, OctopusProperties properties)
             throws OctopusException {
-        
-        URI uri = location;
-        String user = uri.getUserInfo();
-        String host = uri.getHost();
-        int port = uri.getPort();
-
-        if (credential == null) {
-            credential = getDefaultCredential();
-        }
-
-        if (port < 0) {
-            port = DEFAULT_PORT;
-        }
-        if (host == null) {
-            host = "localhost";
-        }
-
-        String credentialUserName = ((CredentialImplementation) credential).getUsername();
-    
-//        if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
-//            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
-//                    "If a user name is given in the URI, it must match the one in the credential");
-//        }
-
-        if (user == null) {
-            user = credentialUserName;
-        }
-
-        if (user == null) {
-            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in URI or credential.");
-        }
-
-        logger.debug("creating new session to " + user + "@" + host + ":" + port);
-
-        Session session;
-        try {
-            session = jsch.getSession(user, host, port);
-        } catch (JSchException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        setCredential((CredentialImplementation) credential, session);
-
-        if (localProperties.getBooleanProperty(STRICT_HOST_KEY_CHECKING)) {
-            logger.debug("strict host key checking enabled");
-       
-            if (localProperties.getBooleanProperty(AUTOMATICALLY_ADD_HOST_KEY)) { 
-                logger.debug("automatically add host key to known_hosts");
-                session.setConfig("StrictHostKeyChecking", "ask");
-                session.setUserInfo(new Robot(true));
-            } else { 
-                session.setConfig("StrictHostKeyChecking", "yes");
-            }
-        } else {
-            logger.debug("strict host key checking disabled");
-            session.setConfig("StrictHostKeyChecking", "no");
-        }
-        
-        if (localProperties.getBooleanProperty(LOAD_STANDARD_KNOWN_HOSTS)) {
-            String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
-            logger.debug("setting ssh known hosts file to: " + knownHosts);
-            setKnownHostsFile(knownHosts);
-        }
-
-        try {
-            session.connect();
-        } catch (JSchException e) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
-
-        return session;
-    }
-
-   
-    /**
-     * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
-     * connecting.
-     * 
-     * @param session
-     *            The authenticated session.
-     * @return the channel
-     * @throws OctopusIOException
-     */
-    protected ChannelExec getExecChannel(Session session) throws OctopusIOException {
-        ChannelExec channel;
-
-        try {
-            channel = (ChannelExec) session.openChannel("exec");
-            return channel;
-        } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
-    }
-
-    protected void releaseExecChannel(ChannelExec channel) {
-        channel.disconnect();
-    }
-        
-    /**
-     * Get a connected channel for doing sftp operations.
-     * 
-     * @param session
-     *            The authenticated session.
-     * @return the channel
-     * @throws OctopusIOException
-     */
-    protected ChannelSftp getSftpChannel(Session session) throws OctopusIOException {
-        try {
-            ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-            channel.connect();
-            return channel;
-        } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
+        return new SshSession(this, jsch, location, credential, properties);
     }
     
     @Override

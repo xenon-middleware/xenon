@@ -82,8 +82,8 @@ class BatchProcess implements InteractiveProcess {
         // Retrieve the filesystem that goes with the scheduler.
         AbsolutePath workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
         
-        if (!files.exists(workdir)) { 
-            files.createDirectories(workdir);
+        if (!files.exists(workdir)) {
+            throw new IOException("Working directory does not exist!");
         }
         
 //        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
@@ -104,11 +104,14 @@ class BatchProcess implements InteractiveProcess {
             }
         }
         
+        OutputStream out = createOutputStream(files, workdir, description.getStdout());
+        OutputStream err = createOutputStream(files, workdir, description.getStderr());
+        
         process = factory.createInteractiveProcess(job);
         Streams streams = process.getStreams();
         
-        stdoutForwarder = new StreamForwarder(streams.getStdout(), createOutputStream(files, workdir, description.getStdout()));
-        stderrForwarder = new StreamForwarder(streams.getStderr(), createOutputStream(files, workdir, description.getStderr()));
+        stdoutForwarder = new StreamForwarder(streams.getStdout(), out);
+        stderrForwarder = new StreamForwarder(streams.getStderr(), err);
         
         if (stdin == null) { 
             stdinForwarder = null;

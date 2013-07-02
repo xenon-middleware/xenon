@@ -38,8 +38,6 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import com.jcraft.jsch.Session;
-
 public class SshJobs implements Jobs {
 
     //private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
@@ -58,11 +56,11 @@ public class SshJobs implements Jobs {
     class SchedulerInfo {
         
         final SchedulerImplementation impl;
-        final Session session;
+        final SshSession session;
         final FileSystem filesystem;
         final JobQueues jobQueues; 
         
-        SchedulerInfo(SchedulerImplementation impl, FileSystem fs, Session session, JobQueues jobQueues) {
+        SchedulerInfo(SchedulerImplementation impl, FileSystem fs, SshSession session, JobQueues jobQueues) {
             this.impl = impl;
             this.filesystem = fs;
             this.session = session;
@@ -120,13 +118,13 @@ public class SshJobs implements Jobs {
 
         String uniqueID = getNewUniqueID();
         
-        Session session = adaptor.createNewSession(location, credential, this.properties);
+        SshSession session = adaptor.createNewSession(location, credential, this.properties);
         
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, 
                 new OctopusProperties(properties), true, true, true);
         
-        SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(adaptor, session);
+        SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(session);
         
         // Create a file system that uses the same SSH session as the scheduler.
         SshFiles files = (SshFiles) adaptor.filesAdaptor();        

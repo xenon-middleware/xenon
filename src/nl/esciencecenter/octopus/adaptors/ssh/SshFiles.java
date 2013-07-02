@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,8 +69,6 @@ import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
@@ -93,9 +90,9 @@ public class SshFiles implements Files {
      */
     class FileSystemInfo {
         FileSystemImplementation impl;
-        Session session;
+        SshSession session;
 
-        public FileSystemInfo(FileSystemImplementation impl, Session session) {
+        public FileSystemInfo(FileSystemImplementation impl, SshSession session) {
             super();
             this.impl = impl;
             this.session = session;
@@ -105,7 +102,7 @@ public class SshFiles implements Files {
             return impl;
         }
 
-        public Session getSession() {
+        public SshSession getSession() {
             return session;
         }
     }
@@ -130,25 +127,25 @@ public class SshFiles implements Files {
         }
     }
     
-    protected FileSystem newFileSystem(Session session, URI location, Credential credential, OctopusProperties properties) 
+    protected FileSystem newFileSystem(SshSession session, URI location, Credential credential, OctopusProperties properties) 
             throws OctopusException, OctopusIOException {
         
         String uniqueID = getNewUniqueID();
 
-        ChannelSftp channel = adaptor.getSftpChannel(session);
+        ChannelSftp channel = session.getSftpChannel();
 
         String wd = null;
 
         try {
             wd = channel.pwd();
         } catch (SftpException e) {
-            channel.disconnect();
+            session.failedSftpChannel(channel);
             session.disconnect();
             throw adaptor.sftpExceptionToOctopusException(e);
         }
         
-        channel.disconnect();
-
+        session.releaseSftpChannel(channel);
+        
         RelativePath entryPath = new RelativePath(wd);
 
         logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
@@ -169,12 +166,12 @@ public class SshFiles implements Files {
         
         OctopusProperties octopusProperties = new OctopusProperties(properties);
         
-        Session session = adaptor.createNewSession(location, credential, octopusProperties);
+        SshSession session = adaptor.createNewSession(location, credential, octopusProperties);
 
         return newFileSystem(session, location, credential, octopusProperties);
     }
 
-    private ChannelSftp getChannel(AbsolutePath path) throws OctopusIOException {
+    private SshSession getSession(AbsolutePath path) throws OctopusIOException {
         
         FileSystem fileSystem = path.getFileSystem();
         
@@ -189,9 +186,8 @@ public class SshFiles implements Files {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
         }
 
-        return adaptor.getSftpChannel(info.getSession());
+        return info.getSession();
     }
-
 
     @Override
     public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
@@ -338,16 +334,17 @@ public class SshFiles implements Files {
 //            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
 //        }
 
-        ChannelSftp channel = getChannel(dir);
-
+        SshSession session = getSession(dir);
+        ChannelSftp channel = session.getSftpChannel(); 
+        
         try {
             channel.mkdir(dir.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
-
+        } 
+          
+        session.releaseSftpChannel(channel);
         return dir;
     }
 
@@ -405,7 +402,8 @@ public class SshFiles implements Files {
             throw new NoSuchFileException(getClass().getName(), "Cannot delete file, as it does not exist");
         }
 
-        ChannelSftp channel = getChannel(path);
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
 
         try {
             if (isDirectory(path)) {
@@ -418,14 +416,12 @@ public class SshFiles implements Files {
                 channel.rm(path.getPath());
             }
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
+        } 
+        
+        session.releaseSftpChannel(channel);        
     }
-
-    
-   
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -533,17 +529,18 @@ public class SshFiles implements Files {
         }
         
         // Ok, here, we just have a local move
-
-        ChannelSftp channel = getChannel(target);
-
+        SshSession session = getSession(target);
+        ChannelSftp channel = session.getSftpChannel(); 
+        
         try {
             logger.debug("move from " + source.getPath() + " to " + target.getPath());
             channel.rename(source.getPath(), target.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
         }
+         
+        session.releaseSftpChannel(channel);
         return target;
     }
     
@@ -557,16 +554,21 @@ public class SshFiles implements Files {
         if (filter == null) { 
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
-
-        ChannelSftp channel = getChannel(path);
-
+        
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
+        
+        Vector<LsEntry> result = null;
+        
         try {
-            return channel.ls(path.getPath());
+            result = channel.ls(path.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
+        } 
+          
+        session.releaseSftpChannel(channel);
+        return result;
     }
 
     @Override
@@ -601,12 +603,14 @@ public class SshFiles implements Files {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }
 
-        ChannelSftp channel = getChannel(path);
-
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
+        
         try {
             InputStream in = channel.get(path.getPath());
-            return new SshInputStream(in, channel);
+            return new SshInputStream(in, session, channel);
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
         }
     }
@@ -657,34 +661,42 @@ public class SshFiles implements Files {
         if (OpenOption.contains(OpenOption.APPEND, options)) {
             mode = ChannelSftp.APPEND;
         }
-
-        ChannelSftp channel = getChannel(path);
-
+        
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
+        
         try {
-            OutputStream out = channel.put(path.getPath(), mode);
-            return new SshOutputStream(out, channel);
+            OutputStream out = channel.put(path.getPath(), mode);            
+            return new SshOutputStream(out, session, channel);
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
         }
     }
 
     @Override
     public AbsolutePath readSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        ChannelSftp channel = getChannel(path);
+        
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
 
+        AbsolutePath result = null;
+        
         try {
             String target = channel.readlink(path.getPath());
             
             if (!target.startsWith(File.separator)) { 
-                return path.getParent().resolve(new RelativePath(target));
+                result = path.getParent().resolve(new RelativePath(target));
             } else { 
-                return new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
+                result = new AbsolutePathImplementation(path.getFileSystem(), new RelativePath(target));
             }
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
+        } 
+        
+        session.releaseSftpChannel(channel);
+        return result;
     }
 
     public void end() {
@@ -715,15 +727,17 @@ public class SshFiles implements Files {
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         
-        ChannelSftp channel = getChannel(path);
-        
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
+
         try { 
             channel.chmod(SshUtil.permissionsToBits(permissions), path.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
+        } 
+          
+        session.releaseSftpChannel(channel);
     }
         
 //    @Override
@@ -778,15 +792,20 @@ public class SshFiles implements Files {
     
     private SftpATTRS stat(AbsolutePath path) throws OctopusIOException {
         
-        ChannelSftp channel = getChannel(path);
-      
+        SshSession session = getSession(path);
+        ChannelSftp channel = session.getSftpChannel(); 
+        
+        SftpATTRS result = null;
+        
         try { 
-            return channel.lstat(path.getPath());
+            result = channel.lstat(path.getPath());
         } catch (SftpException e) {
+            session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
-        } finally {
-            channel.disconnect();
-        }
+        } 
+          
+        session.releaseSftpChannel(channel);
+        return result;
     } 
     
     @Override
@@ -796,13 +815,14 @@ public class SshFiles implements Files {
     
     @Override
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
+        
         try { 
             SftpATTRS s = stat(path);
-            System.err.println("SSH isLink " + path.getPath() + " " + s.getPermissionsString() + " " + s.isLink());
+            // System.err.println("SSH isLink " + path.getPath() + " " + s.getPermissionsString() + " " + s.isLink());
             return s.isLink();
         } catch (NoSuchFileException e) {
             // We should return false if the operation fails.
-            System.err.println("SSH isLink " + path.getPath() + " FAILED");
+            //  System.err.println("SSH isLink " + path.getPath() + " FAILED");
             return false;
         }
     }
