@@ -11,6 +11,8 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.RemoteCommandRunner;
+import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -54,7 +56,7 @@ public class SchedulerConnection {
     private final Scheduler sshScheduler;
     private final FileSystem sshFileSystem;
     private final SchedulerImplementation schedulerImplementation;
-    
+
     public SchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
         this.engine = engine;
@@ -84,10 +86,10 @@ public class SchedulerConnection {
 
         logger.debug("creating ssh scheduler for GridEngine adaptor at " + actualLocation);
         sshScheduler = engine.jobs().newScheduler(actualLocation, credential, this.properties);
-        
+
         logger.debug("creating file system for GridEngine adaptor at " + actualLocation);
-        
-        sshFileSystem = engine.files().newFileSystem(actualLocation,  credential,  this.properties);
+
+        sshFileSystem = engine.files().newFileSystem(actualLocation, credential, this.properties);
 
         this.queueNames = cli.getQueueNames(this);
 
@@ -109,8 +111,10 @@ public class SchedulerConnection {
         String stderr = runner.getStderr();
 
         if (runner.getExitCode() != 0 || !stderr.isEmpty()) {
-            throw new CommandFailedException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable + "\" with arguments \"" + Arrays.toString(arguments)
-                    + "\" at server \"" + actualLocation.getHost() + "\". Exit code = " + runner.getExitCode() + " Error output: " + stderr, runner.getExitCode(), runner.getStderr());
+            throw new CommandFailedException(GridengineAdaptor.ADAPTOR_NAME, "could not run command \"" + executable
+                    + "\" with arguments \"" + Arrays.toString(arguments) + "\" at server \"" + actualLocation.getHost()
+                    + "\". Exit code = " + runner.getExitCode() + " Error output: " + stderr, runner.getExitCode(),
+                    runner.getStderr());
         }
 
         return runner.getStdout();
@@ -205,7 +209,7 @@ public class SchedulerConnection {
 
         return status;
     }
-    
+
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
         return cli.getQueueStatus(this, queueName);
     }
@@ -214,7 +218,7 @@ public class SchedulerConnection {
         if (queueNames.length == 0) {
             queueNames = getQueueNames();
         }
-        
+
         return cli.getQueueStatuses(this, queueNames);
     }
 
@@ -228,6 +232,38 @@ public class SchedulerConnection {
 
     }
 
+    //do some checks on the job description. cli may perform additional checks
+    private void verifyJobDescription(JobDescription description) throws OctopusException {
+        String executable = description.getExecutable();
+
+        if (executable == null) {
+            throw new IncompleteJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Executable missing in JobDescription!");
+        }
+
+        int nodeCount = description.getNodeCount();
+
+        if (nodeCount < 1) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Illegal node count: " + nodeCount);
+        }
+
+        int processesPerNode = description.getProcessesPerNode();
+
+        if (processesPerNode < 1) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Illegal processes per node count: "
+                    + processesPerNode);
+        }
+
+        int maxTime = description.getMaxTime();
+
+        if (maxTime <= 0) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Illegal maximum runtime: " + maxTime);
+        }
+
+        if (description.isInteractive()) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
+        }
+    }
+
     /**
      * Submit a job to a GridEngine machine. Mostly involves parsing output
      * 
@@ -239,7 +275,7 @@ public class SchedulerConnection {
      * @throws OctopusIOException
      */
     public Job submitJob(JobDescription description) throws OctopusException, OctopusIOException {
-        
+        verifyJobDescription(description);
         return cli.submitJob(this, description, sshFileSystem.getEntryPath());
     }
 

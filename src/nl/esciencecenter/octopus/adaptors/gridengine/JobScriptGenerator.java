@@ -28,20 +28,24 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 public class JobScriptGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(JobScriptGenerator.class);
-    
+
     public static String generate(JobDescription description, AbsolutePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
         script.format("#!/bin/sh\n");
         script.format("#$ -N octopus\n");
-        
+
         if (description.getWorkingDirectory() != null) {
-            AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
-            
-            script.format("#$ -wd %s\n", workingDirectory.getPath());
+            if (description.getWorkingDirectory().startsWith("/")) {
+                script.format("#$ -wd %s\n", description.getWorkingDirectory());
+            } else {
+                //make relative path absolute
+                AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
+                script.format("#$ -wd %s\n", workingDirectory.getPath());
+            }
         }
-        
+
         if (description.getQueueName() != null) {
             script.format("#$ -q %s\n", description.getQueueName());
         }
@@ -49,7 +53,7 @@ public class JobScriptGenerator {
         if (description.getStdin() != null) {
             script.format("#$ -i %s\n", description.getStdin());
         }
-        
+
         if (description.getStdout() == null) {
             script.format("#$ -o /dev/null\n");
         } else {
@@ -61,7 +65,7 @@ public class JobScriptGenerator {
         } else {
             script.format("#$ -e %s\n", description.getStderr());
         }
-        
+
         script.format("\n");
 
         script.format("%s", description.getExecutable());
@@ -74,9 +78,9 @@ public class JobScriptGenerator {
         //script.format("exit 22\n");
 
         script.close();
-        
+
         logger.debug("Created job script {}", stringBuilder);
-        
+
         return stringBuilder.toString();
     }
 }
