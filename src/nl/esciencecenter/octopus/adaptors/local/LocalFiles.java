@@ -390,7 +390,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
 
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, 
-                new RelativePath(LocalUtils.getHome()), credential, new OctopusProperties(properties));
+                new RelativePath(LocalUtils.getCWD()), credential, new OctopusProperties(properties));
     }
 
     @Override

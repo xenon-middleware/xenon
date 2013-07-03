@@ -28,7 +28,9 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
- * A simple example of how to check if a given file exists. This example assumes the user provides a path to check. 
+ * A simple example of how to check if a given file exists. 
+ * 
+ * This example assumes the user provides a path to check. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -55,7 +57,7 @@ public class CheckingFile {
             
             // Next we create a FileSystem 
             URI uri = new URI("file://localhost/");
-            Credential c = credentials.getDefaultCredential("file:");  
+            Credential c = credentials.getDefaultCredential("file");  
             FileSystem fs = files.newFileSystem(uri, c, null);
             
             // We now create an AbsolutePath representing the file
@@ -63,7 +65,7 @@ public class CheckingFile {
             
             // Check if the file exists 
             if (files.exists(path)) { 
-                System.out.println("File " + filename + " exist and contains " + files.size(path) + " bytes.");
+                System.out.println("File " + filename + " exist!");
             } else { 
                 System.out.println("File " + filename + " does not exist!");
             }
