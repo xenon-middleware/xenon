@@ -1386,6 +1386,10 @@ public abstract class GenericJobAdaptorTestParent {
     @org.junit.Test
     public void test41_batchJobSubmitWithEnvironmentVariable() throws Exception {
         
+        if (!config.supportsEnvironmentVariables()) { 
+            return;
+        }
+        
         String workingDir = getWorkingDir("test41");
         
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
@@ -1409,7 +1413,7 @@ public abstract class GenericJobAdaptorTestParent {
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
         
-        if (!status.isDone()) { 
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
         
@@ -1423,7 +1427,45 @@ public abstract class GenericJobAdaptorTestParent {
         
         assertTrue(stdoutContent.equals("some_value\n"));
         
-        files.delete(stdout);           
+        files.delete(stdout);
         files.delete(root);
+        files.close(filesystem);
+    }
+    
+    @org.junit.Test
+    public void test41b_batchJobSubmitWithEnvironmentVariable() throws Exception {
+        
+        if (config.supportsEnvironmentVariables()) { 
+            return;
+        }
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+       
+        // echo the given variable, to see if the va
+        JobDescription description = new JobDescription();
+        description.setExecutable("/usr/bin/printenv");
+        description.setArguments("SOME_VARIABLE");
+        description.setInteractive(false);
+        
+        description.getEnvironment().put("SOME_VARIABLE", "some_value");
+        
+        description.setWorkingDirectory(null);
+        description.setStderr(null);
+        description.setStdin(null);
+
+        boolean gotException = false;
+        
+        try { 
+            Job job = jobs.submitJob(scheduler, description);
+            jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
+        } catch (Exception e) { 
+            gotException = true;
+        }
+                
+        jobs.close(scheduler);
+        
+        if (!gotException) { 
+            throw new Exception("Submit did not throw exception, which was expected!");
+        }
     }
 }

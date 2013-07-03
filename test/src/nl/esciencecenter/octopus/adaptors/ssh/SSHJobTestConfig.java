@@ -205,4 +205,9 @@ public class SSHJobTestConfig extends JobTestConfig {
     public long getDefaultCancelTimeout() {
         return 5000;
     }
+
+    @Override
+    public boolean supportsEnvironmentVariables() {
+        return false;
+    }
 }
