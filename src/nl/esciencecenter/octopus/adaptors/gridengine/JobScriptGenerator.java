@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,20 +29,24 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 public class JobScriptGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(JobScriptGenerator.class);
-    
+
     public static String generate(JobDescription description, AbsolutePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
         script.format("#!/bin/sh\n");
         script.format("#$ -N octopus\n");
-        
+
         if (description.getWorkingDirectory() != null) {
-            AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
-            
-            script.format("#$ -wd %s\n", workingDirectory.getPath());
+            if (description.getWorkingDirectory().startsWith("/")) {
+                script.format("#$ -wd %s\n", description.getWorkingDirectory());
+            } else {
+                //make relative path absolute
+                AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
+                script.format("#$ -wd %s\n", workingDirectory.getPath());
+            }
         }
-        
+
         if (description.getQueueName() != null) {
             script.format("#$ -q %s\n", description.getQueueName());
         }
@@ -49,7 +54,7 @@ public class JobScriptGenerator {
         if (description.getStdin() != null) {
             script.format("#$ -i %s\n", description.getStdin());
         }
-        
+
         if (description.getStdout() == null) {
             script.format("#$ -o /dev/null\n");
         } else {
@@ -60,6 +65,15 @@ public class JobScriptGenerator {
             script.format("#$ -e /dev/null\n");
         } else {
             script.format("#$ -e %s\n", description.getStderr());
+        }
+
+        //add maximum runtime in hour:minute:second format (converted from minutes in description)
+        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / 60, description.getMaxTime() % 60);
+        
+        if (description.getEnvironment() != null) {
+            for (Map.Entry<String, String> entry: description.getEnvironment().entrySet()) {
+                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());    
+            }
         }
         
         script.format("\n");
@@ -74,9 +88,9 @@ public class JobScriptGenerator {
         //script.format("exit 22\n");
 
         script.close();
-        
+
         logger.debug("Created job script {}", stringBuilder);
-        
+
         return stringBuilder.toString();
     }
 }
