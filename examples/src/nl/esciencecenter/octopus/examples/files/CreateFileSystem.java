@@ -22,31 +22,19 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
- * A simple example of how to check if a given file exists. 
- * 
- * This example assumes the user provides a path to check. 
+ * A simple example of how to create a filesystem.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class CheckingFile {
+public class CreateFileSystem {
 
     public static void main(String [] args) { 
-        
-        if (args.length != 1) { 
-            System.out.println("Example required an absolute file path as a parameter!");
-            System.exit(1);
-        }
-        
-        String filename = args[0];
-        
         try { 
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
@@ -55,20 +43,17 @@ public class CheckingFile {
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
             
-            // Next we create a FileSystem 
+            // To create a new FileSystem we need a URI indicating its location.
             URI uri = new URI("file://localhost/");
+            
+            // We also need a Credential that enable us to access the location. 
             Credential c = credentials.getDefaultCredential("file");  
+            
+            // Now we can create a FileSystem (we don't provide any properties). 
             FileSystem fs = files.newFileSystem(uri, c, null);
             
-            // We now create an AbsolutePath representing the file
-            AbsolutePath path = files.newPath(fs, new RelativePath(filename)); 
-            
-            // Check if the file exists 
-            if (files.exists(path)) { 
-                System.out.println("File " + filename + " exist!");
-            } else { 
-                System.out.println("File " + filename + " does not exist!");
-            }
+            // We can now uses the FileSystem to access files!
+            // ....
             
             // If we are done we need to close the FileSystem
             files.close(fs);

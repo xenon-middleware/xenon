@@ -21,25 +21,23 @@ import java.net.URI;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.FileAttributes;
+import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * A simple example of how to check file attributes. 
+ * A simple example of how to list a directory. 
  * 
- * This example assumes the user provides a URI on the command line to check. 
+ * This example assumes the user provides the URI of the directory on the command line. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class CheckingFileAttributes {
+public class DirectoryListing {
 
     public static void main(String [] args) { 
         
@@ -55,18 +53,15 @@ public class CheckingFileAttributes {
             // Next, extract the parts from the URI we need to access the FileSystem, the file, and the Credential.
             URI fsURI = URIUtils.getFileSystemURI(uri);
             String filepath = uri.getPath();
-            String scheme = uri.getScheme();
             
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
-            Credentials credentials = octopus.credentials();
             
-            // Next we create a FileSystem 
-            Credential c = credentials.getDefaultCredential(scheme);  
-            FileSystem fs = files.newFileSystem(fsURI, c, null);
+            // Next we create a FileSystem. Note that both credential and properties are null (which means: use default)
+            FileSystem fs = files.newFileSystem(fsURI, null, null);
             
             // We now create an AbsolutePath representing the file.
             //
@@ -85,26 +80,21 @@ public class CheckingFileAttributes {
                 path = fs.getEntryPath().resolve(new RelativePath(filepath));
             }
             
-            try { 
-                // Retrieve the attributes of the file
-                FileAttributes attributes = files.getAttributes(path);
+            // Retrieve the attributes of the file
+            if (files.isDirectory(path)) { 
                 
-                System.out.println("File " + uri + " exists and has the following attributes:");
-                System.out.println("  isDirectory: " + attributes.isDirectory());
-                System.out.println("  isSymbolicLink: " + attributes.isSymbolicLink());
-                System.out.println("  size: " + attributes.size());
-                System.out.println("  owner: " + attributes.owner());
-                System.out.println("  group: " + attributes.group());
-                System.out.println("  permissions: " + attributes.permissions());
+                System.out.println("Directory " + uri + " exists and contains the following:");
                 
-            } catch (NoSuchFileException e) { 
-                System.out.println("File " + uri + " does not exist!");
-            
-            } catch (Exception e) {
-                System.out.println("Failed to retrieve attributes of " + uri + " " + e.getMessage());
-                e.printStackTrace();
+                DirectoryStream<AbsolutePath> stream = files.newDirectoryStream(path);
+                
+                for (AbsolutePath p : stream) { 
+                    System.out.println("   " + p.getFileName());
+                }
+                
+            } else { 
+                System.out.println("Directory " + uri + " does not exists or is not a directory.");
             }
-            
+                
             // If we are done we need to close the FileSystem
             files.close(fs);
             
