@@ -65,7 +65,7 @@ public abstract class GenericJobAdaptorTestParent {
     
     private static String TEST_ROOT;
     
-    private static JobTestConfig config;
+    protected static JobTestConfig config;
     
     protected Octopus octopus;
     protected Files files;
@@ -114,7 +114,7 @@ public abstract class GenericJobAdaptorTestParent {
         OctopusFactory.endOctopus(octopus);
     }
     
-    private String getWorkingDir(String testName) { 
+    protected String getWorkingDir(String testName) { 
         return TEST_ROOT + "/" + testName;
     }
     
@@ -533,7 +533,7 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(tmp[0] == null);
     }
     
-    private String readFully(InputStream in) throws IOException { 
+    protected String readFully(InputStream in) throws IOException { 
         
         byte [] buffer = new byte[1024];
          
@@ -556,7 +556,7 @@ public abstract class GenericJobAdaptorTestParent {
         return new String(buffer, 0, offset);
     }
 
-    private void writeFully(OutputStream out, String message) throws IOException { 
+    protected void writeFully(OutputStream out, String message) throws IOException { 
         out.write(message.getBytes());
         out.close();
     }

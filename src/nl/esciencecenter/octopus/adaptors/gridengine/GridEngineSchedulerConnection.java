@@ -41,6 +41,8 @@ import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -70,6 +72,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     public static String SGE62_SCHEMA_VALUE =
             "http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11";
+
+    public static final String JOB_OPTION_SCRIPT = "ge.job.script";
 
     public static final int QACCT_GRACE_TIME = 60000; //ms, 1 minute
 
@@ -547,11 +551,28 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
+        String output;
+        AbsolutePath fsEntryPath = getFsEntryPath();
+        
         verifyJobDescription(description);
 
-        String jobScript = JobScriptGenerator.generate(description, getFsEntryPath());
+        String customScriptFile = description.getJobOptions().get(JOB_OPTION_SCRIPT);
 
-        String output = runCommand(jobScript, "qsub");
+        if (customScriptFile == null) {
+            String jobScript = JobScriptGenerator.generate(description, fsEntryPath);
+
+            output = runCommand(jobScript, "qsub");
+        } else {
+            //the user gave us a job script. Pass it to qsub as-is
+            
+            //convert to absolute path if needed
+            if (!customScriptFile.startsWith("/")) {
+                AbsolutePath scriptFile = fsEntryPath.resolve(new RelativePath(customScriptFile));
+                customScriptFile = scriptFile.getPath();
+            }
+            
+            output = runCommand(null, "qsub", customScriptFile);
+        }
 
         String identifier = parseQsubOutput(output);
 
