@@ -90,6 +90,9 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
      */
     private final HashMap<String, Long> lastSeenMap;
 
+    //list of jobs we have killed before they even started. These will not end up in qacct, so we keep them here.
+    private final ArrayList<String> deletedJobList;
+
     private final Scheduler scheduler;
 
     private final String[] queueNames;
@@ -114,6 +117,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         scheduler = null;
         queueNames = new String[] {};
         lastSeenMap = null;
+        deletedJobList = null;
 
         documentBuilder = createDocumentBuilder();
     }
@@ -124,6 +128,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         this.ignoreVersion = getProperties().getBooleanProperty(GridengineAdaptor.IGNORE_VERSION_PROPERTY);
 
         lastSeenMap = new HashMap<String, Long>();
+        deletedJobList = new ArrayList<String>();
 
         documentBuilder = createDocumentBuilder();
 
@@ -167,6 +172,23 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             return false;
         }
         return System.currentTimeMillis() < (lastSeenMap.get(identifier) + QACCT_GRACE_TIME);
+    }
+
+    private synchronized void setJobDeleted(String identifier) {
+        deletedJobList.add(identifier);
+    }
+
+    /**
+     * Note: Works exactly once per job.
+     */
+    private synchronized boolean jobWasDeleted(String identifier) {
+        for (int i = 0; i < deletedJobList.size(); i++) {
+            if (deletedJobList.get(i).equals(identifier)) {
+                deletedJobList.remove(i);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkVersion(Document document) throws IncompatibleServerException {
@@ -388,7 +410,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     //parse qdel output and check if we get the expected output
-    static void parseQdelOutput(Job job, String qdelOutput) throws OctopusIOException {
+    void parseQdelOutput(Job job, String qdelOutput) throws OctopusIOException {
         String[] stdoutLines = qdelOutput.split("\\r?\\n");
 
         String serverMessages = "output: " + Arrays.toString(stdoutLines);
@@ -406,10 +428,15 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String identifier = job.getIdentifier();
 
         //two cases, 1 for running and one for pending jobs
-        String[] expected1 = { "has", "registered", "the", "job", identifier, "for", "deletion" };
-        String[] expected2 = { "has", "deleted", "job", identifier };
+        String[] killedOutput = { "has", "registered", "the", "job", identifier, "for", "deletion" };
+        String[] deletedOutput = { "has", "deleted", "job", identifier };
 
-        if (!(Arrays.equals(withoutUser, expected1) || Arrays.equals(withoutUser, expected2))) {
+        //this job was deleted. It will thus now disappear completely, forever. Keep a record of this job
+        if (Arrays.equals(withoutUser, deletedOutput)) {
+            setJobDeleted(identifier);
+        } else if (Arrays.equals(withoutUser, killedOutput)) {
+            //NOTHING
+        } else {
             throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: \""
                     + serverMessages + "\"");
         }
@@ -553,7 +580,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
         AbsolutePath fsEntryPath = getFsEntryPath();
-        
+
         verifyJobDescription(description);
 
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_SCRIPT);
@@ -564,13 +591,13 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             output = runCommand(jobScript, "qsub");
         } else {
             //the user gave us a job script. Pass it to qsub as-is
-            
+
             //convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
                 AbsolutePath scriptFile = fsEntryPath.resolve(new RelativePath(customScriptFile));
                 customScriptFile = scriptFile.getPath();
             }
-            
+
             output = runCommand(null, "qsub", customScriptFile);
         }
 
@@ -691,6 +718,15 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(job.getIdentifier())) {
             status = new JobStatusImplementation(job, "unknown", null, null, false, false, new HashMap<String, String>());
+        }
+
+        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it dissapear from
+        //qstat/qacct output completely
+        if (jobWasDeleted(job.getIdentifier())) {
+            exception =
+                    new JobCanceledException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                            + " deleted by user while still pending", exception);
+            status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
         }
 
         //this job really does not exist. set it to an error state. List qacct exception as cause (if set)
