@@ -176,9 +176,10 @@ public abstract class SchedulerConnection {
             deadline = Long.MAX_VALUE;
         }
 
-        JobStatus status = getJobStatus(job);
+        JobStatus status = null;
 
-        while (System.currentTimeMillis() < deadline) {
+        //make sure status is retrieved at least once
+        while (status == null || System.currentTimeMillis() < deadline) {
             status = getJobStatus(job);
 
             if (status.isDone()) {
@@ -202,9 +203,10 @@ public abstract class SchedulerConnection {
             deadline = Long.MAX_VALUE;
         }
 
-        JobStatus status = getJobStatus(job);
+        JobStatus status = null;
 
-        while (System.currentTimeMillis() < deadline) {
+        //make sure status is retrieved at least once
+        while (status == null || System.currentTimeMillis() < deadline) {
             status = getJobStatus(job);
 
             if (status.isRunning() || status.isDone()) {
