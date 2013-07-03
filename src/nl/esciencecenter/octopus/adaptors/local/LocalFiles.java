@@ -381,7 +381,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             OctopusIOException {
 
         localAdaptor.checkURI(location);
-
+        localAdaptor.checkCredential(credential);
+        
         String path = location.getPath();
         
         if (path != null && !path.equals("/")) {
