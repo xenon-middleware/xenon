@@ -581,11 +581,12 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String output;
         AbsolutePath fsEntryPath = getFsEntryPath();
 
-        verifyJobDescription(description);
-
+        //check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_SCRIPT);
 
         if (customScriptFile == null) {
+            verifyJobDescription(description);
+
             String jobScript = JobScriptGenerator.generate(description, fsEntryPath);
 
             output = runCommand(jobScript, "qsub");

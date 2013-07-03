@@ -21,8 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.OutputStream;
 import java.net.URI;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
@@ -82,9 +80,11 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.getJobOptions().put("ge.job.script", script.getPath());
-        //FIXME: limitation of ge adaptor.
-        description.setExecutable("ignored");
+        description.addJobOptions("ge.job.script", script.getPath());
+
+        //the executable should be allowed to be null, as this field is not used at all. Check if this works
+        description.setExecutable(null);
+        
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
