@@ -36,6 +36,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -1458,7 +1459,7 @@ public abstract class GenericJobAdaptorTestParent {
         try { 
             Job job = jobs.submitJob(scheduler, description);
             jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
-        } catch (Exception e) { 
+        } catch (UnsupportedJobDescriptionException e) { 
             gotException = true;
         }
                 

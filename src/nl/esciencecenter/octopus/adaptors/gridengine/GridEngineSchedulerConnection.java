@@ -312,7 +312,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
      */
     Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusIOException, OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
-        
+
         Document document = parseDocument(data);
 
         logger.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
