@@ -36,6 +36,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -627,11 +628,12 @@ public abstract class GenericJobAdaptorTestParent {
         Job job = jobs.submitJob(scheduler, description);
         
         long deadline = System.currentTimeMillis() + config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout();
+        long pollDelay = (config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout()) / 10;
         
         JobStatus status = jobs.getJobStatus(job);
         
         while (!status.isDone()) {
-            Thread.sleep(1000);
+            Thread.sleep(pollDelay);
             
             long now = System.currentTimeMillis();
             
@@ -978,18 +980,14 @@ public abstract class GenericJobAdaptorTestParent {
        
         Job job = jobs.submitJob(scheduler, description);
         
-        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
-        
-        if (status.isRunning()) { 
-            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());            
-        }
+        JobStatus status = jobs.waitUntilDone(job, config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());      
         
         if (!status.isDone()) { 
-            throw new Exception("Job exceeded deadline!");
+            throw new Exception("Job exceeded deadline! status = " + status);
         }
         
         if (status.hasException()) {
-            throw new Exception("Job failed!", status.getException());
+            throw new Exception("Job failed! exception is = ", status.getException());
         }
         
         jobs.close(scheduler);
@@ -1078,27 +1076,48 @@ public abstract class GenericJobAdaptorTestParent {
     }    
     
     @org.junit.Test
-    public void test37_batchJobSubmitWithoutWorkDir() throws Exception {
-        
+    public void test37a_batchJobSubmitWithoutWorkDir() throws Exception {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
           
-        AbsolutePath stdout = filesystem.getEntryPath().resolve(new RelativePath("stdout.txt"));
-        AbsolutePath stderr = filesystem.getEntryPath().resolve(new RelativePath("stderr.txt"));
-        
-        if (files.exists(stdout)) { 
-            files.delete(stdout);
-        }
-        
-        if (files.exists(stderr)) { 
-            files.delete(stderr);
-        }
-        
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("1");
         description.setInteractive(false);
         description.setWorkingDirectory(null);
+        description.setStdout(null);
+        description.setStderr(null);
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw new Exception("Job failed!", status.getException());
+        }
+        jobs.close(scheduler);
+    }
+    
+    @org.junit.Test
+    public void test37b_batchJobSubmitWithRelativeWorkDir() throws Exception {
+        String workingDir = getWorkingDir("test37b");
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        description.setStdout(null);
+        description.setStderr(null);
+        //relative working dir name used
+        description.setWorkingDirectory(workingDir);
         
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
@@ -1111,13 +1130,78 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
         
+        files.delete(root); 
         jobs.close(scheduler);
         files.close(filesystem);
     }
     
+    @org.junit.Test
+    public void test37c_batchJobSubmitWithAbsoluteWorkDir() throws Exception {
+        String workingDir = getWorkingDir("test37c");
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+        
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        description.setStdout(null);
+        description.setStderr(null);
+        
+        //absolute working dir name used
+        description.setWorkingDirectory(root.getPath());
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        if (status.hasException()) {
+            throw new Exception("Job failed!", status.getException());
+        }
+        
+        files.delete(root); 
+        jobs.close(scheduler);
+        files.close(filesystem);
+    }
+    
+    @org.junit.Test
+    public void test37d_batchJobSubmitWithIncorrectWorkingDir() throws Exception {
+        //note that we are _not_ creating this directory, making it invalid
+        String workingDir = getWorkingDir("test37d");
+        
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        description.setStdout(null);
+        description.setStderr(null);
+        
+        //incorrect working dir used
+        description.setWorkingDirectory(workingDir);
+        
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
+        
+        if (!status.isDone()) { 
+            throw new Exception("Job exceeded deadline!");
+        }
+        
+        assertTrue(status.hasException());
+        
+        jobs.close(scheduler);
+    }
+    
     //@org.junit.Test
     public void test38_multipleBatchJobSubmitWithInput() throws Exception {
-        
         String message = "Hello World! test38";
         String workingDir = getWorkingDir("test38");
         
@@ -1375,7 +1459,7 @@ public abstract class GenericJobAdaptorTestParent {
         try { 
             Job job = jobs.submitJob(scheduler, description);
             jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
-        } catch (Exception e) { 
+        } catch (UnsupportedJobDescriptionException e) { 
             gotException = true;
         }
                 
