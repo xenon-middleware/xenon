@@ -43,10 +43,6 @@ public class JobDescriptionTest {
         boolean b = j.isInteractive();
         assertTrue(b);
        
-        j.setMergeOutputStreams(true);
-        b = j.getMergeOutputStreams();
-        assertTrue(b);
-        
         j.setWorkingDirectory("aap");
         String tmp  = j.getWorkingDirectory();
         assertTrue(tmp.equals("aap"));
@@ -106,6 +102,54 @@ public class JobDescriptionTest {
         assertTrue(opt.equals(opt2));
     }
 
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_argumentNull() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addArgument(null);
+    }
+    
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_argumentEmpty() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addArgument("");
+    }
+    
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_environmentKeyEmpty() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addEnvironment("", "value");
+    }
+    
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_environmentKeyNull() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addEnvironment(null, "value");
+    }
+    
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_jobOptionKeyEmpty() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addJobOptions("", "value");
+    }
+    
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_jobOptionKeyNull() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addJobOptions(null, "value");
+    }
+
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_jobOptionValueEmpty() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addJobOptions("key", "");
+    }
+    
+    @org.junit.Test(expected = IllegalArgumentException.class)
+    public void test_jobOptionValueNull() throws Exception {
+        JobDescription j = new JobDescription();
+        j.addJobOptions("key", null);
+    }
+    
     @org.junit.Test
     public void test_hashCode() throws Exception {
         JobDescription j = new JobDescription();
@@ -138,7 +182,6 @@ public class JobDescriptionTest {
 
         JobDescription j = new JobDescription();
         j.setInteractive(true);
-        j.setMergeOutputStreams(false);
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
         j.setStdout(null);
@@ -201,10 +244,6 @@ public class JobDescriptionTest {
         other.setMaxTime(42);
         assertFalse(j.equals(other));
         other.setMaxTime(30);
-        
-        other.setMergeOutputStreams(false);
-        assertFalse(j.equals(other));
-        other.setMergeOutputStreams(true);
         
         other.setNodeCount(2);
         assertFalse(j.equals(other));
@@ -280,7 +319,6 @@ public class JobDescriptionTest {
         
         JobDescription j = new JobDescription();
         j.setInteractive(true);
-        j.setMergeOutputStreams(false);
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
         j.setStdin("stdin.txt");

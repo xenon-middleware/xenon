@@ -71,8 +71,8 @@ public class JobDescription {
     /** Should the job be run offline? */
     // private boolean offlineMode = false;
     
-    /** Should the output streams be merged? */
-    private boolean mergeOutput = true;
+//    /** Should the output streams be merged? */
+//    private boolean mergeOutput = true;
     
     /** Is this an interactive job ? */
     private boolean interactive = false;
@@ -425,18 +425,18 @@ public class JobDescription {
      * 
      * @param value if the the output streams of a parallel job should be merged.
      */
-    public void setMergeOutputStreams(boolean value) { 
-        mergeOutput = value;
-    }
+//    public void setMergeOutputStreams(boolean value) { 
+//        mergeOutput = value;
+//    }
     
     /**
      * Get if the the output streams of a parallel job should be merged.
      * 
      * @return if the output streams of a parallel job should be merged.
      */    
-    public boolean getMergeOutputStreams() { 
-        return mergeOutput;
-    }
+//    public boolean getMergeOutputStreams() { 
+//        return mergeOutput;
+//    }
 
     /** 
      * Is this an interactive job ?
@@ -462,7 +462,7 @@ public class JobDescription {
         return "JobDescription [queueName=" + queueName + ", " +
         		"executable=" + executable + ", arguments=" + arguments +
         		", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + 
-                        ", maxTime=" + maxTime + ", mergeOutput=" + mergeOutput + ", interactive=" + interactive +        		
+                        ", maxTime=" + maxTime + ", interactive=" + interactive +        		
         		", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + 
         		", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions +
         		"]";
@@ -479,7 +479,6 @@ public class JobDescription {
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
         result = prime * result + (interactive ? 1231 : 1237);
         result = prime * result + maxTime;
-        result = prime * result + (mergeOutput ? 1231 : 1237);
         result = prime * result + nodeCount;
         result = prime * result + processesPerNode;
         result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
@@ -525,7 +524,6 @@ public class JobDescription {
         
         if (interactive != other.interactive || 
             maxTime != other.maxTime || 
-            mergeOutput != other.mergeOutput || 
             nodeCount != other.nodeCount || 
             processesPerNode != other.processesPerNode) { 
             return false;

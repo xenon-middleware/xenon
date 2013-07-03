@@ -465,5 +465,16 @@ public class ExceptionsTest {
         Throwable t = new Throwable();        
         testException(new UnsupportedOperationException("name", "message", t), t);
     }
-   
+
+    @Test
+    public void testJobCanceledException1() throws Exception {
+        testException(new JobCanceledException("name", "message"));
+    }
+    
+    @Test
+    public void testJobCanceledException2() throws Exception {
+        Throwable t = new Throwable();        
+        testException(new JobCanceledException("name", "message", t), t);
+    }
+    
   }

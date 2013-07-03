@@ -1225,7 +1225,6 @@ public abstract class GenericJobAdaptorTestParent {
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
         description.setProcessesPerNode(2);
-        description.setMergeOutputStreams(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
         
