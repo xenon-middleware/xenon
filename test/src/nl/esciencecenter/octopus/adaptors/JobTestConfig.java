@@ -44,6 +44,10 @@ public abstract class JobTestConfig extends GenericTestConfig {
         return "single";
     }
 
+    public boolean supportsEnvironmentVariables() {
+        return true;
+    }
+
     public abstract boolean supportsStatusAfterDone(); 
     
     public abstract Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception;
@@ -53,5 +57,6 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public abstract long getDefaultQueueWaitTimeout();
     public abstract long getDefaultShortJobTimeout();
     public abstract long getDefaultCancelTimeout();
+
 
 }

@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -29,6 +30,7 @@ import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -169,6 +171,11 @@ public class SshJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
+        
+        if (description.getEnvironment().size() != 0) { 
+            throw new UnsupportedJobDescriptionException(SshAdaptor.ADAPTOR_NAME, "Environment variables not supported!");
+        }
+        
         return getJobQueue(scheduler).submitJob(description);
     }
         
