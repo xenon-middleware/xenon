@@ -22,13 +22,10 @@ import java.net.URI;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.FileTestConfig;
-import nl.esciencecenter.octopus.adaptors.JobTestConfig;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>

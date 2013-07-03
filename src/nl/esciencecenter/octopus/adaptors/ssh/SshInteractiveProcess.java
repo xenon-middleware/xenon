@@ -90,6 +90,14 @@ public class SshInteractiveProcess  implements InteractiveProcess {
         return streams;
     }
     
+    private void cleanup() { 
+        try { 
+            session.releaseExecChannel(channel);
+        } catch (OctopusIOException e) { 
+            // FIXME: What now ? 
+        }
+    }
+    
     @Override
     public synchronized boolean isDone() {
         
@@ -101,7 +109,7 @@ public class SshInteractiveProcess  implements InteractiveProcess {
         
         if (tmp) { 
             done = true;
-            session.releaseExecChannel(channel);
+            cleanup();
         }
         
         return tmp;
@@ -125,6 +133,6 @@ public class SshInteractiveProcess  implements InteractiveProcess {
             // logger.debug("Failed to kill remote process!", e);
         }
 
-        session.releaseExecChannel(channel);
+        cleanup();
     }
 }

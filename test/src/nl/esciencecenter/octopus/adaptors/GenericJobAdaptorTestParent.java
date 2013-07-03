@@ -729,6 +729,8 @@ public abstract class GenericJobAdaptorTestParent {
 
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
     
+        System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount);
+        
         String workingDir = getWorkingDir(testName);
         
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
@@ -779,7 +781,7 @@ public abstract class GenericJobAdaptorTestParent {
                     if (status[i].isDone()) {                         
                         if (status[i].hasException()) { 
                             System.err.println("Job " + i + " failed!");
-                            throw status[i].getException();
+                            throw new Exception("Job " + i + " failed" , status[i].getException()); 
                         }
                         
                         System.err.println("Job " + i + " done.");
@@ -832,7 +834,10 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {        
+    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {    
+        
+        System.err.println("STARTING TEST test33b");
+        
         for (String queue : config.getQueueNames()) { 
             submitToQueueWithPolling("test33b_" + queue, queue, 10);    
         }

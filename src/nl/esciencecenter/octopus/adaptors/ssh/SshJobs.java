@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
