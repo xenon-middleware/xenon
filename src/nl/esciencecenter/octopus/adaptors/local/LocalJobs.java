@@ -80,11 +80,10 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
-        int maxQSize = properties.getIntProperty(LocalAdaptor.MAX_HISTORY);
         int pollingDelay = properties.getIntProperty(LocalAdaptor.POLLING_DELAY);
         
         jobQueues = new JobQueues(LocalAdaptor.ADAPTOR_NAME, octopusEngine, localScheduler, 
-                cwd, this, multiQThreads, maxQSize, pollingDelay);        
+                cwd, this, multiQThreads, pollingDelay);        
     }
 
     @Override

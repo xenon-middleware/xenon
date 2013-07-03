@@ -78,12 +78,7 @@ public class FilesEngineTest {
         
         OctopusEngine oe = new OctopusEngine(new Properties());
         FilesEngine engine = new FilesEngine(oe);
-        CopyEngine c = engine.getCopyEngine();
-        
-        assertNotNull(c);
-        
         String tmp = engine.toString();
-       
         assertNotNull(tmp);
     }
 

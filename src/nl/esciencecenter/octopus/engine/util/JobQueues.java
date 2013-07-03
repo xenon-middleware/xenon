@@ -70,8 +70,6 @@ public class JobQueues {
 
     private final ExecutorService unlimitedExecutor;
 
-    private final int maxQSize;
-
     private final int pollingDelay;
 
     private final InteractiveProcessFactory factory;
@@ -80,28 +78,22 @@ public class JobQueues {
     
     public JobQueues(String adaptorName, Octopus myOctopus, Scheduler myScheduler, FileSystem myFileSystem, 
             InteractiveProcessFactory factory, 
-            int multiQThreads, int maxQSize, int pollingDelay) throws BadParameterException { 
+            int multiQThreads, int pollingDelay) throws BadParameterException { 
         
         logger.debug("{}: Creating JobQueues for Adaptor {} with multiQThreads: {}, maxQSize: {} and pollingDelay: {}", 
-                adaptorName, multiQThreads, maxQSize, pollingDelay);
+                adaptorName, multiQThreads, pollingDelay);
         
         this.adaptorName = adaptorName;
         this.myOctopus = myOctopus;
         this.myScheduler = myScheduler;
         this.myFileSystem = myFileSystem;
         this.factory = factory;
-        
-        this.maxQSize = maxQSize;
         this.pollingDelay = pollingDelay;
         
         singleQ = new LinkedList<JobExecutor>();
         multiQ = new LinkedList<JobExecutor>();
         unlimitedQ = new LinkedList<JobExecutor>();
-
-        if (maxQSize < 0 && maxQSize != -1) {
-            throw new BadParameterException(adaptorName, "Maximum queue size cannot be negative (excluding -1 for unlimited)");
-        }
-
+       
         if (multiQThreads < 1) {
             throw new BadParameterException(adaptorName, "Number of slots for the multi queue cannot be smaller than one!");
         }

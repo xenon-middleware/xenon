@@ -61,17 +61,10 @@ public class FilesEngine implements Files {
 
     private final OctopusEngine octopusEngine;
 
-    private final CopyEngine copyEngine;
-    
     public FilesEngine(OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
-        this.copyEngine = new CopyEngine(this);
     }
 
-    public CopyEngine getCopyEngine() { 
-        return copyEngine;
-    }
-    
     private Files getFilesAdaptor(FileSystem filesystem) {
         try {
             Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());

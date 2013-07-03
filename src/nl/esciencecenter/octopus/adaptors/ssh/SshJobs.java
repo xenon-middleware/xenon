@@ -75,7 +75,6 @@ public class SshJobs implements Jobs {
 
     private final OctopusProperties properties;
     
-    private final int maxQSize;
     private final int pollingDelay;
     private final int multiQThreads;
     
@@ -87,15 +86,8 @@ public class SshJobs implements Jobs {
         this.properties = properties;
 
         multiQThreads = properties.getIntProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT, 1);
-        
-        maxQSize = properties.getIntProperty(SshAdaptor.MAX_HISTORY);
-        
         pollingDelay = properties.getIntProperty(SshAdaptor.POLLING_DELAY);
-        
-        if (maxQSize < 0 && maxQSize != -1) {
-            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Maximum queue size cannot be negative (excluding -1 for unlimited)");
-        }
-
+       
         if (multiQThreads <= 1) {
             throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Number of slots for the multi queue cannot be smaller than one!");
         }
@@ -132,7 +124,7 @@ public class SshJobs implements Jobs {
         FileSystem fs = files.newFileSystem(session, location, credential, this.properties);
        
         JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, 
-                multiQThreads, maxQSize, pollingDelay);
+                multiQThreads, pollingDelay);
 
         synchronized (this) {
             schedulers.put(uniqueID, new SchedulerInfo(scheduler, fs, session, jobQueues));

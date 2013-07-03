@@ -16,42 +16,42 @@
 
 package nl.esciencecenter.octopus.examples;
 
+import java.util.Properties;
+
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
- * A simple example of how to create an octopus and how to retrieve the various interfaces.
+ * A simple example of how to configure an octopus with properties. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class CreatingOctopus {
+public class CreatingOctopusWithProperties {
 
-    @SuppressWarnings("unused")
     public static void main(String [] args) { 
         try { 
             
-            // We create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
-
-            // Next, we retrieve the Files, Jobs and Credentials API
-            Files files = octopus.files();
-            Jobs jobs = octopus.jobs();
-            Credentials credentials = octopus.credentials();
+            // We create some properties here to configure octopus. In this example 
+            // we set the polling delay of the local adaptor to 1000ms. We also set 
+            // the strictHostKeyChecking property of the ssh adaptor to true. 
+            Properties p = new Properties();
+            p.put("octopus.adaptors.local.queue.pollingDelay", "1000");
+            p.put("octopus.adaptors.ssh.strictHostKeyChecking", "true");
             
-            // We can now uses the interfaces to get some work done!
+            // We now create a new octopus with the properties using the OctopusFactory.
+            Octopus octopus = OctopusFactory.newOctopus(p);
+           
+            // We can now uses the octopus to get some work done!
             // ....
             
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
         } catch (OctopusException e) { 
-            System.out.println("CreatingOctopus example failed: " + e.getMessage());
+            System.out.println("CreatingOctopusWithProperties example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

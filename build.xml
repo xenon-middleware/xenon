@@ -25,6 +25,10 @@
 		<ant dir="test" target="test-integration" />
 	</target>
 
+	<target name="examples" description="compile the examples" depends="build">
+		<ant dir="examples" target="build" />
+	</target>
+
 	<target name="compile" description="compile the source ">
 		<mkdir dir="build/classes" />
 		<mkdir dir="dist" />

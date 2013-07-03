@@ -19,10 +19,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
@@ -67,7 +69,6 @@ public class LocalAdaptor extends Adaptor {
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
-            { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { POLLING_DELAY, "500", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
             { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
 
@@ -77,13 +78,31 @@ public class LocalAdaptor extends Adaptor {
     /** Local implementation for Jobs */
     private final LocalJobs localJobs;
 
+    /** Local implementation for Credentials */
+    private final LocalCredentials localCredentials;
+    
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
         localFiles = new LocalFiles(getProperties(), this, octopusEngine);
         localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWDFileSystem(), octopusEngine);
+        localCredentials = new LocalCredentials();
     }
 
+
+    void checkCredential(Credential credential) throws OctopusException {
+
+        if (credential == null) { 
+            return;
+        }
+        
+        if (credential instanceof LocalCredential) {
+            return;
+        }
+        
+        throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");        
+    } 
+        
     void checkURI(URI location) throws OctopusException {
 
         if (location == null) {
@@ -135,7 +154,7 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public Credentials credentialsAdaptor() throws OctopusException {
-        throw new OctopusException(ADAPTOR_NAME, "Adaptor does not need or understand credentials.");
+        return localCredentials;
     }
 
     @Override

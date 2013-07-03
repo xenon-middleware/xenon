@@ -404,7 +404,12 @@ public class CopyEngine {
     }
     
     public synchronized void done() { 
+        
+        
         done = true;
+        
+       // System.err.println("Set CopyEngine done " + done);
+        
         notifyAll();
     }
 
@@ -423,11 +428,15 @@ public class CopyEngine {
         
         while (!done && pending.size() == 0) {
             try { 
-                wait();
+                //System.err.println("Copy engine " + done + " " + pending.size());
+                
+                wait(1000);
             } catch (InterruptedException e) { 
                 // ignore ?
             }
         }
+        
+        //System.err.println("Copy engine EXIT " + done + " " + pending.size());
         
         if (done) { 
             // FIXME: Should do something with pending copies ? 

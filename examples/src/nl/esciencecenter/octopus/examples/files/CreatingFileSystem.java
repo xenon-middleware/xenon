@@ -14,44 +14,55 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.examples;
+package nl.esciencecenter.octopus.examples.files;
+
+import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
- * A simple example of how to create an octopus and how to retrieve the various interfaces.
+ * A simple example of how to create a filesystem.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class CreatingOctopus {
+public class CreatingFileSystem {
 
-    @SuppressWarnings("unused")
     public static void main(String [] args) { 
         try { 
-            
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
-            // Next, we retrieve the Files, Jobs and Credentials API
+            // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
-            Jobs jobs = octopus.jobs();
             Credentials credentials = octopus.credentials();
             
-            // We can now uses the interfaces to get some work done!
+            // To create a new FileSystem we need a URI indicating its location.
+            URI uri = new URI("file://localhost/");
+            
+            // We also need a Credential that enable us to access the location. 
+            Credential c = credentials.getDefaultCredential("file");  
+            
+            // Now we can create a FileSystem (we don't provide any properties). 
+            FileSystem fs = files.newFileSystem(uri, c, null);
+            
+            // We can now uses the FileSystem to access files!
             // ....
+            
+            // If we are done we need to close the FileSystem
+            files.close(fs);
             
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) { 
-            System.out.println("CreatingOctopus example failed: " + e.getMessage());
+        } catch (Exception e) { 
+            System.out.println("CreatingFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

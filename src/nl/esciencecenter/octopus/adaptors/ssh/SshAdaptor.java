@@ -84,7 +84,6 @@ public class SshAdaptor extends Adaptor {
             { AUTOMATICALLY_ADD_HOST_KEY, "true", "Boolean: automatically add unknown host keys to known_hosts." },
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
             { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
-            { MAX_HISTORY, "1000", "Int: the maximum history length for finished jobs." },
             { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." }, 
             { MULTIQ_MAX_CONCURRENT, "4", "Int: the maximum number of concurrent jobs in the multiq." } };
         
