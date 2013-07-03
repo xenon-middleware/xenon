@@ -264,9 +264,9 @@ public class OctopusEngine implements Octopus {
         return true;
     }
         
-    @Override
     public void end() {
-        if (setEnd()) { 
+        if (setEnd()) {
+            copyEngine.done();
             for (Adaptor adaptor : adaptors) {
                 adaptor.end();
             }

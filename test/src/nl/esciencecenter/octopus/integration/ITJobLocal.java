@@ -70,6 +70,6 @@ public class ITJobLocal {
         assertTrue(Files.exists(testdir.resolve("stdout.txt")));
         assertTrue(Files.exists(testdir.resolve("stderr.txt")));
 
-        octopus.end();
+        OctopusFactory.endOctopus(octopus);        
     }
 }

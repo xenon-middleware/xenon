@@ -105,8 +105,8 @@ public abstract class GenericFileAdaptorTestParent {
         credentials = octopus.credentials();
     }
 
-    protected void cleanup() throws Exception { 
-        octopus.end();        
+    protected void cleanup() throws Exception {
+        OctopusFactory.endOctopus(octopus);        
         files = null;
         octopus = null;
     }

@@ -28,10 +28,8 @@ public class BasicTests {
 
     @org.junit.Test
     public void test1() throws Exception {
-
         Octopus octopus = OctopusFactory.newOctopus(null);
-
-        octopus.end();
+        OctopusFactory.endOctopus(octopus);
     }
 
     @org.junit.Test
@@ -44,8 +42,9 @@ public class BasicTests {
         Octopus octopus = OctopusFactory.newOctopus(properties);
 
         assertEquals(octopus.getProperties().get("some.key"), "some.value");
-
-        octopus.end();
+        
+        OctopusFactory.endOctopus(octopus);
+        
     }
 
     @org.junit.Test
@@ -61,6 +60,6 @@ public class BasicTests {
         System.out.println(Arrays.toString(localInfo.getSupportedSchemes()));
         System.out.println(localInfo.getSupportedProperties());
 
-        octopus.end();
+        OctopusFactory.endOctopus(octopus);        
     }
 }

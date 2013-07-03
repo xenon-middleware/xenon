@@ -86,7 +86,5 @@ public interface Octopus {
     //public Networks networks();
 
     //public ??
-
-    public void end() throws Exception;
-
+ 
 }
