@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * JobDescription contains a description of a job that can be submitted to a {@link} Scheduler.
@@ -38,7 +39,7 @@ public class JobDescription {
     private String executable = null;
 
     /** The arguments to pass to the executable. */
-    private List<String> arguments = new ArrayList<String>();
+    private final List<String> arguments = new ArrayList<String>();
 
     /** The location file from which to redirect stdin. (optional) */
     private String stdin = null;
@@ -53,10 +54,10 @@ public class JobDescription {
     private String workingDirectory = null;
 
     /** The environment variables and their values */
-    private Map<String, String> environment = new HashMap<String, String>();
+    private final Map<String, String> environment = new HashMap<String, String>();
 
     /** The job options of this job */
-    private Map<String, String> jobOptions = new HashMap<String, String>();
+    private final Map<String, String> jobOptions = new HashMap<String, String>();
     
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
@@ -195,9 +196,28 @@ public class JobDescription {
      */
     public void setArguments(String... arguments) {
         this.arguments.clear();
-        this.arguments.addAll(Arrays.asList(arguments));
+        
+        for (String argument : arguments) { 
+            addArgument(argument);
+        }
     }
+    
+    /**
+     * Add a command line argument for the executable.
+     * 
+     * The argument may not be <code>null</code> or empty. 
+     * 
+     * @param argument
+     *            the command line argument to add.
+     */
+    public void addArgument(String argument) {
 
+        if (argument == null || argument.length() == 0) { 
+            throw new IllegalArgumentException("Argument may not be null or empty!");
+        }
+        
+        arguments.add(argument);
+    }
     /**
      * Get the environment of the executable.
      * 
@@ -220,16 +240,38 @@ public class JobDescription {
      *            environment of the executable.
      */
     public void setEnvironment(Map<String, String> environment) {
+          
+        this.environment.clear();
         
-        if (environment != null) { 
-            this.environment = new HashMap<String, String>(environment);
-        } else { 
-            this.environment = new HashMap<String, String>();
+        if (environment != null) {
+            for (Entry<String, String> entry : environment.entrySet()) { 
+                addEnvironment(entry.getKey(), entry.getValue());
+            }
+        } 
+    }
+    
+    /**
+     * Add a variable to the environment of the executable.
+     * 
+     * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
+     * "JAVA_HOME", "/path/to/java").
+     * 
+     * The name of an environment variable may not be <code>null</code> or empty.  
+     * 
+     * @param environment
+     *            environment of the executable.
+     */
+    public void addEnvironment(String key, String value) {
+        
+        if (key == null || key.length() == 0) { 
+            throw new IllegalArgumentException("Envrionment variable name may not be null or empty!");
         }
+
+        environment.put(key, value);
     }
 
     /**
-     * Get the job options of this job.
+     * Get a copy of the job options of this job.
      * 
      * The job options consist of a {@link Map} of options variables with their values (for example: "PE", "MPI").
      * 
@@ -249,11 +291,36 @@ public class JobDescription {
      */
     public void setJobOptions(Map<String, String> options) {
         
+        jobOptions.clear();
+        
         if (options != null) { 
-            this.jobOptions = new HashMap<String, String>(options);
-        } else { 
-            this.jobOptions = new HashMap<String, String>();
+            for (Entry<String, String> entry : options.entrySet()) { 
+                addJobOptions(entry.getKey(), entry.getValue());
+            }
         }
+    }
+    
+    /**
+     * Add a job option to the job.
+     * 
+     * The job option consist of a key-value pair (for example: "PE", "MPI").
+     * 
+     * Neither the key or value of a job option may be <code>null</code> or empty. 
+     * 
+     * @param options
+     *            job options of the job.
+     */
+    public void addJobOptions(String key, String value) {
+        
+        if (key == null || key.length() == 0) { 
+            throw new IllegalArgumentException("Job option key may not be null or empty!");
+        }
+
+        if (value == null || value.length() == 0) { 
+            throw new IllegalArgumentException("Job option value may not be null or empty!");
+        }
+        
+        jobOptions.put(key, value);
     }
     
     /**
