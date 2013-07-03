@@ -2425,7 +2425,7 @@ public abstract class GenericFileAdaptorTestParent {
         
         // test copy with non-existing source
         test23_copy(file1, file2, new CopyOption [0], null, true);
-    
+
         // test copy with dir source 
         test23_copy(dir0, file1, new CopyOption [] { CopyOption.CREATE }, null, true);
         
@@ -2500,6 +2500,9 @@ public abstract class GenericFileAdaptorTestParent {
         
         // test append with source equals target 
         test23_copy(file0, file0, new CopyOption [] { CopyOption.APPEND }, null, true);
+
+        // test with source equals target and empty option 
+        test23_copy(file0, file0, new CopyOption [] { null }, null, true);
         
         deleteTestDir(dir0);
         deleteTestFile(file5);        

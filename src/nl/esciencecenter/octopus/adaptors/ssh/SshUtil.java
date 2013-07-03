@@ -40,6 +40,10 @@ public class SshUtil {
     static final int WRITE_OTHERS = 00002; // write by others
     static final int EXEC_OTHERS = 00001; // execute/search by others
     
+    protected SshUtil() { 
+        // do not use
+    }
+    
     static boolean equals(SftpATTRS a1, SftpATTRS a2) { 
 
         // Handles case of aliased object + both null

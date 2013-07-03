@@ -119,12 +119,6 @@ public class SshFiles implements Files {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
-
-        if (logger.isDebugEnabled()) {
-            Set<String> attributeViews = FileSystems.getDefault().supportedFileAttributeViews();
-
-            logger.debug(Arrays.toString(attributeViews.toArray()));
-        }
     }
     
     protected FileSystem newFileSystem(SshSession session, URI location, Credential credential, OctopusProperties properties) 
@@ -173,13 +167,7 @@ public class SshFiles implements Files {
 
     private SshSession getSession(AbsolutePath path) throws OctopusIOException {
         
-        FileSystem fileSystem = path.getFileSystem();
-        
-        if (!fileSystem.getAdaptorName().equals(SshAdaptor.ADAPTOR_NAME)) {
-            throw new OctopusRuntimeException(SshAdaptor.ADAPTOR_NAME, "Illegal Filesystem type: " + fileSystem.getAdaptorName());
-        }
-        
-        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
+        FileSystemImplementation fs = (FileSystemImplementation) path.getFileSystem();
         FileSystemInfo info = fileSystems.get(fs.getUniqueID());
         
         if (info == null) {
@@ -501,11 +489,7 @@ public class SshFiles implements Files {
        
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
-
-        if (!sourcefs.getAdaptorName().equals("ssh") || !targetfs.getAdaptorName().equals("ssh")) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Can only move within one remote ssh location.");
-        }
-
+      
         if (!sourcefs.getUri().getHost().equals(targetfs.getUri().getHost())) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different sites: " 
                     + sourcefs.getUri().getHost() + " and " + targetfs.getUri().getHost());
@@ -915,7 +899,9 @@ public class SshFiles implements Files {
                 break;                
             case ASYNCHRONOUS:
                 async = true;
-                break;                
+                break;
+            default:
+                // ignored
             }
         }
         
