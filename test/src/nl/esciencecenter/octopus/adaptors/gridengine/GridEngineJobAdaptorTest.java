@@ -19,8 +19,12 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import static org.junit.Assert.assertTrue;
 
 import java.io.OutputStream;
+import java.net.URI;
 
+import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
@@ -33,6 +37,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 /**
@@ -51,7 +56,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     public static void cleanupGridEngineJobAdaptorTest() throws Exception {
         GenericJobAdaptorTestParent.cleanupClass();
     }
-
+    
     @org.junit.Test
     public void ge_test01_jobWithCustomScript() throws Exception {
         String message = "Hello World! test01\n";
@@ -103,4 +108,25 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         
         assertTrue(outputContent.equals(message));
     }
+    
+    @Test
+    public void ge_test02_newScheduler_pathWithSlash() throws Exception {
+        
+        URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
+        
+        Scheduler s = jobs.newScheduler(uriWithSlash, null, null);
+        jobs.close(s);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void ge_test03_newScheduler_pathWithFragment_Exception() throws Exception {
+        
+        URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
+        
+        Scheduler s = jobs.newScheduler(uriWithFragment, null, null);
+        jobs.close(s);
+    }
+
+    
+
 }
