@@ -24,7 +24,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
- * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes. 
+ * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -36,61 +36,61 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
     private int exitCode;
     private boolean done;
-    
+
     private Streams streams;
-    
-    LocalInteractiveProcess(JobImplementation job) throws IOException { 
+
+    LocalInteractiveProcess(JobImplementation job) throws IOException {
 
         JobDescription description = job.getJobDescription();
-        
+
         ProcessBuilder builder = new ProcessBuilder();
-            
+
         builder.command().add(description.getExecutable());
         builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
-        
+
         String workingDirectory = description.getWorkingDirectory();
-        
-        if (workingDirectory == null) { 
+
+        if (workingDirectory == null) {
             workingDirectory = System.getProperty("user.dir");
         }
-        
+
         builder.directory(new java.io.File(workingDirectory));
-        
-        process = builder.start();       
+
+        process = builder.start();
         streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 
-    public Streams getStreams() { 
+    public Streams getStreams() {
         return streams;
     }
 
     public boolean isDone() {
-        
-        if (done) { 
+
+        if (done) {
             return true;
         }
-        
-        try { 
+
+        try {
             exitCode = process.exitValue();
             done = true;
             return true;
-        } catch (IllegalThreadStateException e) { 
+        } catch (IllegalThreadStateException e) {
             // ignored
             return false;
         }
     }
-   
+
     public int getExitStatus() {
         return exitCode;
     }
-    
+
     public void destroy() {
-        
-        if (done) { 
+
+        if (done) {
             return;
         }
-        
-        LocalUtils.unixDestroy(process);        
+
+        LocalUtils.unixDestroy(process);
     }
 }

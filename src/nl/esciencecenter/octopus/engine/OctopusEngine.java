@@ -100,7 +100,7 @@ public class OctopusEngine implements Octopus {
                 break;
             }
         }
-        
+
         if (result == null) {
             throw new NoSuchOctopusException("engine", "No such OctopusEngine");
         }
@@ -108,12 +108,12 @@ public class OctopusEngine implements Octopus {
         result.end();
     }
 
-    public static UUID getNextUUID() { 
+    public static UUID getNextUUID() {
         return UUID.randomUUID();
     }
-    
+
     public static synchronized void endAll() {
-        for (int i=0; i < octopusEngines.size(); i++) {
+        for (int i = 0; i < octopusEngines.size(); i++) {
             octopusEngines.get(i).end();
         }
 
@@ -131,7 +131,7 @@ public class OctopusEngine implements Octopus {
     private final CredentialsEngineImplementation credentialsEngine;
 
     private final Adaptor[] adaptors;
-    
+
     private final CopyEngine copyEngine;
 
     /**
@@ -154,7 +154,7 @@ public class OctopusEngine implements Octopus {
         // adaptors = AdaptorLoader.loadAdaptors(octopusProperties, this);
 
         adaptors = loadAdaptors();
-        
+
         filesEngine = new FilesEngine(this);
 
         jobsEngine = new JobsEngine(this);
@@ -162,22 +162,22 @@ public class OctopusEngine implements Octopus {
         credentialsEngine = new CredentialsEngineImplementation(this);
 
         copyEngine = new CopyEngine(filesEngine);
-        
+
         logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
-    private Adaptor[] loadAdaptors() throws OctopusException { 
-        
-        Adaptor [] result = new Adaptor[3];
-        
+    private Adaptor[] loadAdaptors() throws OctopusException {
+
+        Adaptor[] result = new Adaptor[3];
+
         result[0] = new LocalAdaptor(octopusProperties, this);
         result[1] = new SshAdaptor(octopusProperties, this);
         result[2] = new GridengineAdaptor(octopusProperties, this);
-        
+
         // TODO: Add properties to extend list later.  
         return result;
     }
-    
+
     // ************** Octopus Interface Implementation ***************\\
 
     @Override
@@ -223,7 +223,7 @@ public class OctopusEngine implements Octopus {
 
         throw new OctopusException("engine", "Could not find adaptor named " + name);
     }
-    
+
     public Adaptor[] getAdaptors() {
         return adaptors;
     }
@@ -254,8 +254,8 @@ public class OctopusEngine implements Octopus {
     public CopyEngine getCopyEngine() {
         return copyEngine;
     }
-    
-    private synchronized boolean setEnd() { 
+
+    private synchronized boolean setEnd() {
         if (ended) {
             return false;
         }
@@ -263,7 +263,7 @@ public class OctopusEngine implements Octopus {
         ended = true;
         return true;
     }
-        
+
     public void end() {
         if (setEnd()) {
             copyEngine.done();
@@ -275,7 +275,7 @@ public class OctopusEngine implements Octopus {
 
     @Override
     public String toString() {
-        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " octopusProperties=" + octopusProperties + 
-                    ",  + ended=" + ended + "]";
+        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " octopusProperties=" + octopusProperties + ",  + ended="
+                + ended + "]";
     }
 }

@@ -20,37 +20,37 @@ import java.net.URI;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class URIUtils {
 
     public static URI getFileSystemURI(URI uri) {
-        
+
         // Strip the URI of all the parts we do not need for octopus. 
         String scheme = uri.getScheme();
         String host = uri.getHost();
         String user = uri.getRawUserInfo();
         int port = uri.getPort();
-        
+
         StringBuilder tmp = new StringBuilder(scheme);
         tmp.append("://");
-        
+
         if (user != null && user.length() > 0) {
             tmp.append(user);
             tmp.append("@");
         }
-            
-        if (host != null) { 
+
+        if (host != null) {
             tmp.append(host);
         }
 
-        if (port >= 0) { 
+        if (port >= 0) {
             tmp.append(":");
             tmp.append(port);
         }
 
         tmp.append("/");
-        
+
         return URI.create(tmp.toString());
     }
 }

@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.files.Copy;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class CopyImplementation implements Copy {
 
@@ -29,7 +29,7 @@ public class CopyImplementation implements Copy {
     private final String uniqueID;
     private final AbsolutePath source;
     private final AbsolutePath target;
-    
+
     public CopyImplementation(String adaptorName, String uniqueID, AbsolutePath source, AbsolutePath target) {
         super();
         this.adaptorName = adaptorName;

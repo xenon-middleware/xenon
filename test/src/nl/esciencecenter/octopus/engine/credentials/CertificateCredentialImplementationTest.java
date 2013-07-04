@@ -22,15 +22,16 @@ import java.util.Arrays;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class CertificateCredentialImplementationTest {
-    
+
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
-        CertificateCredentialImplementation pwc = new CertificateCredentialImplementation("test", "id1", null, "keyfile", 
-                "certfile", "username", "password".toCharArray());
-        
+        CertificateCredentialImplementation pwc =
+                new CertificateCredentialImplementation("test", "id1", null, "keyfile", "certfile", "username",
+                        "password".toCharArray());
+
         assertEquals(pwc.getAdaptorName(), "test");
         assertEquals(pwc.getUniqueID(), "id1");
         assertEquals(pwc.getUsername(), "username");
@@ -39,6 +40,7 @@ public class CertificateCredentialImplementationTest {
         assertEquals(pwc.getProperties(), null);
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
-        assertTrue(pwc.toString().equals("CertificateCredentialImplementation [adaptorName=test, username=username, keyfile=keyfile, certfile=certfile]"));
+        assertTrue(pwc.toString().equals(
+                "CertificateCredentialImplementation [adaptorName=test, username=username, keyfile=keyfile, certfile=certfile]"));
     }
 }

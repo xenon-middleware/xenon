@@ -56,49 +56,48 @@ public interface Scheduler {
     public String[] getQueueNames();
 
     /**
-     * Does this Scheduler supports the submission of interactive jobs ? 
+     * Does this Scheduler supports the submission of interactive jobs ?
      * 
      * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
      * the job to hang indefinately.
      * 
-     * @return if this scheduler supports the submission of interactive jobs ? 
-     */    
+     * @return if this scheduler supports the submission of interactive jobs ?
+     */
     public boolean supportsInteractive();
-        
+
     /**
-     * Does this Scheduler support the submission of batch jobs ?   
+     * Does this Scheduler support the submission of batch jobs ?
      * 
-     * For batch jobs the standard streams of the jobs are redirected from / to files. 
+     * For batch jobs the standard streams of the jobs are redirected from / to files.
      * 
-     * @return if this scheduler supports the submission of batch jobs ? 
-     */    
+     * @return if this scheduler supports the submission of batch jobs ?
+     */
     public boolean supportsBatch();
-    
+
     /**
-     * Is this an online scheduler ? 
+     * Is this an online scheduler ?
      * 
-     * Online schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that were 
-     * submitted to it. 
+     * Online schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that were
+     * submitted to it.
      * 
-     * Offline schedulers do not need to remains active for their jobs to run. A submitted job will typically be handed over to 
+     * Offline schedulers do not need to remains active for their jobs to run. A submitted job will typically be handed over to
      * some external server that will manage the job for the rest of its lifetime.
-     *
-     * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs 
-     * (where the standard streams are redirected to/from files). 
      * 
-     * Offline schedulers only support batch jobs. 
+     * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs
+     * (where the standard streams are redirected to/from files).
      * 
-     * @return if this scheduler is online. 
-     */    
+     * Offline schedulers only support batch jobs.
+     * 
+     * @return if this scheduler is online.
+     */
     public boolean isOnline();
 
-    
     /**
      * Are the standard streams (stdin, stdout, stderr) local ?
      * 
      * @return If the standard streams are local.
      */
-//    public boolean hasLocalStandardStreams();
+    //    public boolean hasLocalStandardStreams();
 
     /**
      * Are the jobs of this scheduler detached ?

@@ -29,27 +29,27 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
- * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes. 
+ * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes.
  * 
  * @author Rob van Nieuwpoort <R.vanNieuwpoort@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class SshInteractiveProcess  implements InteractiveProcess {
-    
+public class SshInteractiveProcess implements InteractiveProcess {
+
     private final SshSession session;
-    private final ChannelExec channel;    
-    private final Streams streams; 
+    private final ChannelExec channel;
+    private final Streams streams;
     private boolean done = false;
-    
+
     public SshInteractiveProcess(SshSession session, Job job) throws OctopusIOException {
-        
+
         this.session = session;
         this.channel = session.getExecChannel();
 
         JobDescription description = job.getJobDescription();
-        
+
         String command = description.getExecutable();
 
         for (String s : description.getArguments()) {
@@ -59,24 +59,24 @@ public class SshInteractiveProcess  implements InteractiveProcess {
         channel.setCommand(command);
 
         Map<String, String> environment = description.getEnvironment();
-        
-        if (environment != null) { 
-            for (Entry<String, String> entry : environment.entrySet()) { 
+
+        if (environment != null) {
+            for (Entry<String, String> entry : environment.entrySet()) {
                 channel.setEnv(entry.getKey(), entry.getValue());
             }
         }
-        
+
         // TODO make property for X Forwarding
         // channel.setXForwarding(true);
 
         // set the streams first, then connect the channel.
         try {
-            streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());                
+            streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
         } catch (Exception e) {
             session.failedExecChannel(channel);
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
-        
+
         try {
             channel.connect();
         } catch (Exception e) {
@@ -86,32 +86,32 @@ public class SshInteractiveProcess  implements InteractiveProcess {
     }
 
     @Override
-    public Streams getStreams() { 
+    public Streams getStreams() {
         return streams;
     }
-    
-    private void cleanup() { 
-        try { 
+
+    private void cleanup() {
+        try {
             session.releaseExecChannel(channel);
-        } catch (OctopusIOException e) { 
+        } catch (OctopusIOException e) {
             // FIXME: What now ? 
         }
     }
-    
+
     @Override
     public synchronized boolean isDone() {
-        
-        if (done) { 
+
+        if (done) {
             return true;
         }
-        
+
         boolean tmp = channel.isClosed();
-        
-        if (tmp) { 
+
+        if (tmp) {
             done = true;
             cleanup();
         }
-        
+
         return tmp;
     }
 
@@ -119,14 +119,14 @@ public class SshInteractiveProcess  implements InteractiveProcess {
     public int getExitStatus() {
         return channel.getExitStatus();
     }
-    
+
     @Override
     public void destroy() {
 
-        if (isDone()) { 
+        if (isDone()) {
             return;
         }
-        
+
         try {
             channel.sendSignal("KILL");
         } catch (Exception e) {

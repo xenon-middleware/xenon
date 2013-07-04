@@ -23,20 +23,20 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class CopyImplementationTest {
 
     @Test
-    public void test_getters_and_setters() { 
-        
-       CopyImplementation c = new CopyImplementation("NAME", "ID", null,  null); 
-        
-       assertTrue("NAME".equals(c.getAdaptorName()));
-       assertTrue("ID".equals(c.getUniqueID()));
-      
-       assertNull(c.getSource());
-       assertNull(c.getTarget());
+    public void test_getters_and_setters() {
+
+        CopyImplementation c = new CopyImplementation("NAME", "ID", null, null);
+
+        assertTrue("NAME".equals(c.getAdaptorName()));
+        assertTrue("ID".equals(c.getUniqueID()));
+
+        assertNull(c.getSource());
+        assertNull(c.getTarget());
     }
-    
+
 }

@@ -63,7 +63,7 @@ public class RelativePath {
             throw new UnsupportedOperationException("Remove not supported!");
         }
     }
-    
+
     /**
      * Create a new empty RelativePath using the default separator.
      */
@@ -129,14 +129,14 @@ public class RelativePath {
         elements = tmp;
         separator = paths[0].separator;
     }
-    
+
     /**
      * Create a new RelativePath using the given path elements and the separator.
      * 
      * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
      * 
-     * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is 
-     * encountered. Elements that are <code>null</code> or contain an empty string are ignored.    
+     * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is
+     * encountered. Elements that are <code>null</code> or contain an empty string are ignored.
      * 
      * @param elements
      *            the path elements to use.
@@ -146,26 +146,26 @@ public class RelativePath {
     public RelativePath(char separator, String... elements) {
 
         this.separator = separator;
-        
+
         if (elements == null || elements.length == 0) {
             this.elements = new String[0];
         } else {
-            
+
             ArrayList<String> tmp = new ArrayList<String>();
-            
-            for (int i=0;i<elements.length;i++) { 
-                
+
+            for (int i = 0; i < elements.length; i++) {
+
                 String elt = elements[i];
-                
-                if (elt != null && elt.length() > 0) { 
+
+                if (elt != null && elt.length() > 0) {
                     StringTokenizer tok = new StringTokenizer(elt, "" + this.separator);
 
-                    while (tok.hasMoreTokens()) { 
+                    while (tok.hasMoreTokens()) {
                         tmp.add(tok.nextToken());
                     }
                 }
             }
-            
+
             this.elements = tmp.toArray(new String[tmp.size()]);
         }
     }
@@ -385,10 +385,10 @@ public class RelativePath {
             return this;
         }
 
-        if (isEmpty()) { 
+        if (isEmpty()) {
             return other;
         }
-        
+
         return new RelativePath(separator, merge(elements, other.elements));
     }
 
@@ -602,27 +602,27 @@ public class RelativePath {
         result = prime * result + separator;
         return result;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { 
+        if (this == obj) {
             return true;
-        } 
-        
-        if (obj == null) { 
+        }
+
+        if (obj == null) {
             return false;
         }
-        
-        if (getClass() != obj.getClass()) { 
+
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         RelativePath other = (RelativePath) obj;
-        
-        if (separator != other.separator) { 
+
+        if (separator != other.separator) {
             return false;
         }
-        
+
         return Arrays.equals(elements, other.elements);
     }
 

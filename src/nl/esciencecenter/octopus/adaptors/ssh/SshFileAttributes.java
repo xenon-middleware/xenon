@@ -93,7 +93,7 @@ public class SshFileAttributes implements FileAttributes {
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
         return SshUtil.bitsToPermissions(attributes.getPermissions());
     }
-    
+
     @Override
     public boolean isExecutable() throws AttributeNotSupportedException {
         return SshUtil.isExecutable(attributes.getPermissions());
@@ -130,34 +130,33 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { 
+        if (this == obj) {
             return true;
         }
-        
-        if (obj == null) { 
+
+        if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         SshFileAttributes other = (SshFileAttributes) obj;
-        
-        if (!SshUtil.equals(attributes, other.attributes)) { 
+
+        if (!SshUtil.equals(attributes, other.attributes)) {
             return false;
         }
-        
+
         if (path == null) {
-            if (other.path != null) { 
+            if (other.path != null) {
                 return false;
             }
-        } else if (!path.equals(other.path)) { 
-            return false; 
+        } else if (!path.equals(other.path)) {
+            return false;
         }
-           
+
         return true;
     }
-    
-    
+
 }

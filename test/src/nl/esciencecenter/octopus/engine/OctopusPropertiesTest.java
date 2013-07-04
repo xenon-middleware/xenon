@@ -190,7 +190,7 @@ public class OctopusPropertiesTest {
         boolean v = octprop.getBooleanProperty("key", true);
         assertTrue(v);
     }
-    
+
     @Test
     public void testGetIntProperty_int_int() {
         Properties props = new Properties();
@@ -220,7 +220,7 @@ public class OctopusPropertiesTest {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
-        octprop.getIntProperty("key");        
+        octprop.getIntProperty("key");
     }
 
     @Test(expected = NumberFormatException.class)
@@ -228,9 +228,9 @@ public class OctopusPropertiesTest {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
-        octprop.getIntProperty("key", 42);        
+        octprop.getIntProperty("key", 42);
     }
-    
+
     @Test
     public void testGetIntProperty_withDefault2() {
         Properties props = new Properties();
@@ -251,8 +251,6 @@ public class OctopusPropertiesTest {
         assertTrue(result == 42);
     }
 
-    
-    
     @Test
     public void testGetIntProperty_SetAndDefault_returnsSet() {
         Properties props = new Properties();
@@ -303,7 +301,7 @@ public class OctopusPropertiesTest {
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getLongProperty("key", 42L);
     }
-    
+
     @Test
     public void testGetLongProperty_withDefault() {
         OctopusProperties octprop = new OctopusProperties();
@@ -333,7 +331,7 @@ public class OctopusPropertiesTest {
         short result = octprop.getShortProperty("key");
 
         short expected = 42;
-        assertTrue(result== expected);
+        assertTrue(result == expected);
     }
 
     @Test
@@ -364,7 +362,7 @@ public class OctopusPropertiesTest {
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getShortProperty("key", (short) 42);
     }
-    
+
     @Test
     public void testGetShortProperty_withDefault() {
         OctopusProperties octprop = new OctopusProperties();
@@ -436,7 +434,7 @@ public class OctopusPropertiesTest {
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getDoubleProperty("key", 42.0);
     }
-    
+
     @Test
     public void testGetDoubleProperty_SetAndDefault_returnsSet() {
         Properties props = new Properties();
@@ -463,7 +461,7 @@ public class OctopusPropertiesTest {
     @Test(expected = NumberFormatException.class)
     public void testGetFloatProperty_null_UndefinedException() {
         Properties props = new Properties();
-        new OctopusProperties(props).getFloatProperty("key");        
+        new OctopusProperties(props).getFloatProperty("key");
     }
 
     @Test(expected = NumberFormatException.class)
@@ -471,7 +469,7 @@ public class OctopusPropertiesTest {
         Properties props = new Properties();
         props.setProperty("key", "foo");
         new OctopusProperties(props).getFloatProperty("key");
-        
+
     }
 
     @Test
@@ -491,7 +489,6 @@ public class OctopusPropertiesTest {
         new OctopusProperties(props).getFloatProperty("key", 42.0f);
     }
 
-    
     @Test
     public void testGetFloatProperty_SetAndDefault_returnsSet() {
         Properties props = new Properties();
@@ -501,7 +498,7 @@ public class OctopusPropertiesTest {
         float default_value = 42.123f;
         float result = octprop.getFloatProperty("key", default_value);
 
-        assertTrue(result ==13.456f);
+        assertTrue(result == 13.456f);
     }
 
     @Test
@@ -559,7 +556,7 @@ public class OctopusPropertiesTest {
 
         assertTrue(result == (100L * 1024L * 1024L * 1024L));
     }
-    
+
     @Test(expected = NumberFormatException.class)
     public void testGetSizeProperty2() {
 
@@ -567,7 +564,7 @@ public class OctopusPropertiesTest {
         props.setProperty("K", "100Q");
 
         OctopusProperties octprop = new OctopusProperties(props);
-        
+
         octprop.getSizeProperty("K");
     }
 
@@ -576,10 +573,10 @@ public class OctopusPropertiesTest {
 
         Properties props = new Properties();
         OctopusProperties octprop = new OctopusProperties(props);
-        
+
         octprop.getSizeProperty("K");
     }
-    
+
     @Test
     public void testGetSizePropertyStringLong() {
 
@@ -655,7 +652,7 @@ public class OctopusPropertiesTest {
         OctopusProperties noctprop = octprop.filter(null);
         assertEquals(noctprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
     }
-    
+
     @Test
     public void testFilter_emptyPrefix_returnsSame() {
         OctopusProperties octprop = getSample();

@@ -20,66 +20,66 @@ import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.files.CopyOption;
 
 /**
- * CopyInfo contains all necessary information needed for asynchronous copy operations. 
+ * CopyInfo contains all necessary information needed for asynchronous copy operations.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
 public class CopyInfo {
-    
+
     final CopyImplementation copy;
     final CopyOption mode;
     final boolean verify;
-    
+
     Exception exception;
     boolean cancel = false;
     long bytesToCopy = -1;
     long bytesCopied = 0;
-    
+
     public CopyInfo(CopyImplementation copy, CopyOption mode, boolean verify) {
         super();
         this.copy = copy;
         this.mode = mode;
         this.verify = verify;
     }
-    
-    public synchronized Exception getException() { 
+
+    public synchronized Exception getException() {
         return exception;
     }
-    
-    public synchronized void setException(Exception e) { 
+
+    public synchronized void setException(Exception e) {
         exception = e;
     }
-    
-    public synchronized void cancel() { 
+
+    public synchronized void cancel() {
         this.cancel = true;
     }
-    
-    public synchronized boolean isCancelled() { 
+
+    public synchronized boolean isCancelled() {
         return cancel;
     }
 
-    public synchronized void setBytesToCopy(long bytesToCopy) { 
+    public synchronized void setBytesToCopy(long bytesToCopy) {
         this.bytesToCopy = bytesToCopy;
     }
-    
-    public synchronized long getBytesToCopy() { 
+
+    public synchronized long getBytesToCopy() {
         return bytesToCopy;
     }
-    
-    public synchronized void setBytesCopied(long bytesCopied) { 
+
+    public synchronized void setBytesCopied(long bytesCopied) {
         this.bytesCopied = bytesCopied;
     }
-    
-    public synchronized long getBytesCopied() { 
+
+    public synchronized long getBytesCopied() {
         return bytesCopied;
     }
-    
+
     @Override
-    public String toString() { 
-        return "CopyInfo [ID=" + copy.getUniqueID() + ", source=" + copy.getSource().getPath() + ", target=" 
-                + copy.getTarget().getPath() + ", mode=" + mode  + ", verify=" + verify + ", bytesToCopy=" + getBytesToCopy()  
-                + ", bytesCopied=" + getBytesCopied()  + ", isCancelled=" + isCancelled() + "]";
+    public String toString() {
+        return "CopyInfo [ID=" + copy.getUniqueID() + ", source=" + copy.getSource().getPath() + ", target="
+                + copy.getTarget().getPath() + ", mode=" + mode + ", verify=" + verify + ", bytesToCopy=" + getBytesToCopy()
+                + ", bytesCopied=" + getBytesCopied() + ", isCancelled=" + isCancelled() + "]";
     }
 }

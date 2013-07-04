@@ -30,11 +30,10 @@ import org.junit.Test;
 
 public class GridEngineParserTest {
 
-    
     @Test
     public void testCheckVersion() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs.xml");
-        
+
         GridEngineParser parser = new GridEngineParser(false);
 
         parser.checkVersion(testFile);

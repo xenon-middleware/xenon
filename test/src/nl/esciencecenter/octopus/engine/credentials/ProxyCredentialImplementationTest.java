@@ -23,23 +23,24 @@ import java.util.Arrays;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class ProxyCredentialImplementationTest {
 
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
-        ProxyCredentialImplementation pwc = new ProxyCredentialImplementation("test", "id1", null, "host", 42, "username", 
-                "password".toCharArray());
-        
+        ProxyCredentialImplementation pwc =
+                new ProxyCredentialImplementation("test", "id1", null, "host", 42, "username", "password".toCharArray());
+
         assertEquals(pwc.getAdaptorName(), "test");
         assertEquals(pwc.getUniqueID(), "id1");
         assertEquals(pwc.getUsername(), "username");
         assertEquals(pwc.getHost(), "host");
         assertEquals(pwc.getPort(), 42);
         assertEquals(pwc.getProperties(), null);
-        
+
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
-        assertTrue(pwc.toString().equals("ProxyCredentialImplementation [adaptorName=test, username=username, host=host, port=42]"));
+        assertTrue(pwc.toString().equals(
+                "ProxyCredentialImplementation [adaptorName=test, username=username, host=host, port=42]"));
     }
 }

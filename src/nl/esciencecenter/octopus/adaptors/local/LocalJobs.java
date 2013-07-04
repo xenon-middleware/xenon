@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * LocalFiles implements an Octopus <code>Jobs</code> adaptor for local job operations.  
+ * LocalFiles implements an Octopus <code>Jobs</code> adaptor for local job operations.
  * 
  * @see nl.esciencecenter.octopus.jobs.Jobs
  * 
@@ -62,35 +62,36 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     private final LocalAdaptor localAdaptor;
 
     private final Scheduler localScheduler;
-    
-    private final JobQueues jobQueues; 
-    
-   // private final String defaultWorkingDirectory;
+
+    private final JobQueues jobQueues;
+
+    // private final String defaultWorkingDirectory;
 
     public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, FileSystem cwd, OctopusEngine octopusEngine)
             throws OctopusException {
 
         this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
-        
+
         URI uri = LocalUtils.getLocalJobURI();
 
-        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
-                new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
+        localScheduler =
+                new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, new String[] { "single", "multi",
+                        "unlimited" }, null, properties, true, true, true);
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         int pollingDelay = properties.getIntProperty(LocalAdaptor.POLLING_DELAY);
-        
-        jobQueues = new JobQueues(LocalAdaptor.ADAPTOR_NAME, octopusEngine, localScheduler, 
-                cwd, this, multiQThreads, pollingDelay);        
+
+        jobQueues =
+                new JobQueues(LocalAdaptor.ADAPTOR_NAME, octopusEngine, localScheduler, cwd, this, multiQThreads, pollingDelay);
     }
 
     @Override
     public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
         return new LocalInteractiveProcess(job);
     }
-    
+
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
@@ -143,7 +144,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
         return jobQueues.waitUntilRunning(job, timeout);
     }
-    
+
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) {
         return jobQueues.getJobStatuses(jobs);
@@ -155,7 +156,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     public void end() {
-        jobQueues.end();        
+        jobQueues.end();
     }
 
     @Override
@@ -177,9 +178,9 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return true;
     }
-    
+
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException { 
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return jobQueues.getDefaultQueueName(scheduler);
     }
 

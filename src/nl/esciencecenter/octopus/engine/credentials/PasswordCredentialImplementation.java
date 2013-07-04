@@ -30,9 +30,9 @@ public class PasswordCredentialImplementation extends CredentialImplementation {
      * @param password
      *            the password for the given user name
      */
-    public PasswordCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, 
-            String username, char [] password) {        
-        super(adaptorName, uniqueID, properties, username, password);    
+    public PasswordCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String username,
+            char[] password) {
+        super(adaptorName, uniqueID, properties, username, password);
     }
 
     @Override

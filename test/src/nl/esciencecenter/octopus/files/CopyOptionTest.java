@@ -38,7 +38,7 @@ public class CopyOptionTest {
 
     @Test
     public void testContains_optionsNull_doesNotContainIt() {
-        assertFalse(CopyOption.contains(CopyOption.CREATE, (CopyOption [])null));
+        assertFalse(CopyOption.contains(CopyOption.CREATE, (CopyOption[]) null));
     }
 
     @Test
@@ -50,13 +50,13 @@ public class CopyOptionTest {
     public void testContains_optionsFilledNull_doesNotContainIt() {
         assertFalse(CopyOption.contains(CopyOption.CREATE, new CopyOption[] { null }));
     }
-    
+
     @Test
     public void testContains_valueOf() {
         CopyOption option = CopyOption.valueOf("CREATE");
         assertTrue(option.equals(CopyOption.CREATE));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testContains_valueOf_fails() {
         CopyOption.valueOf("AAP");

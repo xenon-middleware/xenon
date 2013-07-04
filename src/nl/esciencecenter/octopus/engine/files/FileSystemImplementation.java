@@ -33,25 +33,25 @@ public class FileSystemImplementation implements FileSystem {
     private final OctopusProperties properties;
     private final RelativePath entryPath;
 
-    public FileSystemImplementation(String adaptorName, String identifier, URI uri, RelativePath entryPath, Credential credential,
-            OctopusProperties properties) {
-        
-        if (adaptorName == null) { 
+    public FileSystemImplementation(String adaptorName, String identifier, URI uri, RelativePath entryPath,
+            Credential credential, OctopusProperties properties) {
+
+        if (adaptorName == null) {
             throw new IllegalArgumentException("AdaptorName may not be null!");
         }
 
-        if (identifier == null) { 
+        if (identifier == null) {
             throw new IllegalArgumentException("Identifier may not be null!");
         }
-        
-        if (uri == null) { 
+
+        if (uri == null) {
             throw new IllegalArgumentException("URI may not be null!");
         }
-        
-        if (entryPath == null) { 
+
+        if (entryPath == null) {
             throw new IllegalArgumentException("EntryPath may not be null!");
         }
-        
+
         this.adaptorName = adaptorName;
         this.uniqueID = identifier;
         this.uri = uri;
@@ -67,12 +67,12 @@ public class FileSystemImplementation implements FileSystem {
     public String getUniqueID() {
         return uniqueID;
     }
-    
+
     @Override
     public AbsolutePath getEntryPath() {
         return new AbsolutePathImplementation(this, entryPath);
     }
-    
+
     @Override
     public URI getUri() {
         return uri;
@@ -90,8 +90,8 @@ public class FileSystemImplementation implements FileSystem {
 
     @Override
     public String toString() {
-        return "FileSystemImplementation [adaptorName=" + adaptorName + ", uri=" + uri
-                + ", entryPath=" + entryPath + ", properties=" + properties + "]";
+        return "FileSystemImplementation [adaptorName=" + adaptorName + ", uri=" + uri + ", entryPath=" + entryPath
+                + ", properties=" + properties + "]";
     }
 
     @Override
@@ -102,18 +102,18 @@ public class FileSystemImplementation implements FileSystem {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { 
+        if (this == obj) {
             return true;
         }
-        
-        if (obj == null) { 
+
+        if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         FileSystemImplementation other = (FileSystemImplementation) obj;
         return adaptorName.equals(other.adaptorName) && uniqueID.equals(other.uniqueID);
     }

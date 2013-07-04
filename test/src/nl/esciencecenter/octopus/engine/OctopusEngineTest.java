@@ -108,66 +108,66 @@ public class OctopusEngineTest {
     @Test
     public void testGetAdaptors() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
- 
-        Adaptor [] tmp = octopus.getAdaptors();
-        
-        assert(tmp != null);
-        assert(tmp.length == 3);
+
+        Adaptor[] tmp = octopus.getAdaptors();
+
+        assert (tmp != null);
+        assert (tmp.length == 3);
     }
 
     @Test
     public void testGetAdaptorInfos() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
- 
-        AdaptorStatus [] tmp = octopus.getAdaptorInfos();
-        
-        assert(tmp != null);
-        assert(tmp.length == 3);
+
+        AdaptorStatus[] tmp = octopus.getAdaptorInfos();
+
+        assert (tmp != null);
+        assert (tmp.length == 3);
     }
 
     @Test
     public void testClose() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         OctopusEngine.closeOctopus(octopus);
-    }  
-      
+    }
+
     @Test
     public void testCloseMultiple() throws OctopusException {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         OctopusEngine octopus2 = (OctopusEngine) OctopusEngine.newOctopus(null);
-        
+
         OctopusEngine.closeOctopus(octopus2);
         OctopusEngine.closeOctopus(octopus1);
-    }  
+    }
 
     @Test
     public void testEndAll() throws OctopusException {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         OctopusEngine octopus2 = (OctopusEngine) OctopusEngine.newOctopus(null);
-        
+
         OctopusEngine.endAll();
-    }  
+    }
 
     @Test
     public void testEnd() throws OctopusException {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         octopus1.end();
     }
-   
+
     @Test
     public void testEndTwice() throws OctopusException {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         octopus1.end();
         octopus1.end();
     }
-    
+
     @Test(expected = OctopusException.class)
     public void testCloseTwice() throws OctopusException {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
-        
+
         OctopusEngine.closeOctopus(octopus1);
         OctopusEngine.closeOctopus(octopus1);
-    }  
+    }
 
     @Test
     public void testToString() throws OctopusException {
@@ -176,7 +176,5 @@ public class OctopusEngineTest {
 
         // TODO; should check output of toString() ?
     }
-        
+
 }
-
-

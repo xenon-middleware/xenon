@@ -42,9 +42,9 @@ public class BasicTests {
         Octopus octopus = OctopusFactory.newOctopus(properties);
 
         assertEquals(octopus.getProperties().get("some.key"), "some.value");
-        
+
         OctopusFactory.endOctopus(octopus);
-        
+
     }
 
     @org.junit.Test
@@ -60,6 +60,6 @@ public class BasicTests {
         System.out.println(Arrays.toString(localInfo.getSupportedSchemes()));
         System.out.println(localInfo.getSupportedProperties());
 
-        OctopusFactory.endOctopus(octopus);        
+        OctopusFactory.endOctopus(octopus);
     }
 }

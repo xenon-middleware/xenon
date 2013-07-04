@@ -1492,7 +1492,7 @@ public abstract class GenericJobAdaptorTestParent {
         } finally {
             jobs.close(scheduler);
         }
-        
+
         if (!gotException) {
             throw new Exception("Submit did not throw exception, which was expected!");
         }

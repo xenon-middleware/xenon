@@ -61,14 +61,14 @@ public abstract class SchedulerConnection {
     protected static synchronized int getNextSchedulerID() {
         return schedulerID++;
     }
-    
+
     private final String adaptorName;
     private final String[] adaptorSchemes;
     private final String id;
     private final OctopusEngine engine;
     private final Scheduler sshScheduler;
     private final FileSystem sshFileSystem;
-    
+
     private final int pollDelay;
 
     private final String[][] defaultProperties;
@@ -87,7 +87,7 @@ public abstract class SchedulerConnection {
         checkLocation(location);
 
         //FIXME: duplicate from Adaptor class
-        
+
         this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
 
         Map<String, String> tmp = new HashMap<String, String>();
@@ -102,7 +102,7 @@ public abstract class SchedulerConnection {
         this.properties = processProperties(properties);
 
         this.pollDelay = this.properties.getIntProperty(GridEngineSchedulerConnection.POLL_DELAY_PROPERTY);
-        
+
         try {
             id = adaptorName + "-" + getNextSchedulerID();
             URI actualLocation = new URI("ssh", location.getSchemeSpecificPart(), location.getFragment());
@@ -317,7 +317,7 @@ public abstract class SchedulerConnection {
     abstract Scheduler getScheduler();
 
     abstract String[] getQueueNames();
-    
+
     abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
 
     abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;

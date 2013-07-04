@@ -50,36 +50,36 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
-            String username, char [] password) throws OctopusException {
-        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
-                new OctopusProperties(properties), keyfile, certfile, username, password);
+            String username, char[] password) throws OctopusException {
+        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), new OctopusProperties(properties),
+                keyfile, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, char [] password)
+    public Credential newPasswordCredential(String scheme, Properties properties, String username, char[] password)
             throws OctopusException {
-        return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(),
-                new OctopusProperties(properties), username, password);
+        return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(), new OctopusProperties(properties),
+                username, password);
     }
 
     @Override
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
-            char [] password) throws OctopusException {
-        return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(),
-                new OctopusProperties(properties), host, port, username, password);
+            char[] password) throws OctopusException {
+        return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), new OctopusProperties(properties), host,
+                port, username, password);
     }
 
     @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
-        
+
         String userHome = System.getProperty("user.home");
-        
+
         if (userHome == null) {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user home directory.");
         }
 
         String user = System.getProperty("user.name");
-        
+
         if (user == null) {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
         }
@@ -88,8 +88,8 @@ public class SshCredentials implements Credentials {
         File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa.pub");
 
         if (keyFile.exists() && certFile.exists()) {
-           // logger.info("Using default credential: "+ keyFile.getPath());
-            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
+            // logger.info("Using default credential: "+ keyFile.getPath());
+            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
                     new OctopusProperties(properties), keyFile.getPath(), certFile.getPath(), user, null);
         }
 
@@ -97,12 +97,12 @@ public class SshCredentials implements Credentials {
         File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa.pub");
 
         if (keyFile2.exists() && certFile2.exists()) {
-           // logger.info("Using default credential: "+ keyFile2.getPath());
-            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), 
+            // logger.info("Using default credential: "+ keyFile2.getPath());
+            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
                     new OctopusProperties(properties), keyFile2.getPath(), certFile2.getPath(), user, null);
         }
 
-        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried " + 
-                keyFile.getPath() + " and " + keyFile2.getPath());
+        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried "
+                + keyFile.getPath() + " and " + keyFile2.getPath());
     }
 }

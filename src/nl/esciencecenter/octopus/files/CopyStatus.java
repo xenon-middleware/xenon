@@ -24,14 +24,14 @@ package nl.esciencecenter.octopus.files;
  * @since 1.0
  */
 public interface CopyStatus {
-    
+
     /**
      * Get the Copy for which this CopyStatus was created.
      * 
      * @return the Copy.
      */
     public Copy getCopy();
-    
+
     /**
      * Get the state of the Job.
      * 
@@ -52,7 +52,7 @@ public interface CopyStatus {
      * @return if the Copy is running.
      */
     public boolean isRunning();
-    
+
     /**
      * Is the Copy done.
      * 
@@ -71,13 +71,13 @@ public interface CopyStatus {
      * Get the number of bytes that need to be copied.
      * 
      * @return the number of bytes that need to be copied.
-     */    
+     */
     public long bytesToCopy();
-    
+
     /**
      * Get the number of bytes that have been copied.
      * 
      * @return the number of bytes that have been copied.
-     */    
+     */
     public long bytesCopied();
 }

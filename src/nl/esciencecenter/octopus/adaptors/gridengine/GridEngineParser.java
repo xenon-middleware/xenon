@@ -99,8 +99,8 @@ public class GridEngineParser {
             } else {
 
                 throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
-                        + schemaValue + ") incompatible with adaptor. Use the " + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY
-                        + " property to ignore this error");
+                        + schemaValue + ") incompatible with adaptor. Use the "
+                        + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
         }
 

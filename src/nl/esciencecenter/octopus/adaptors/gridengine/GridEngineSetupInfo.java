@@ -60,11 +60,8 @@ public class GridEngineSetupInfo {
             }
             this.parallelEnvironments = parallelEnvironments.split("\\s+");
 
-            
             logger.debug("found queue details {} slots {} pe {}", this.name, this.slots, this.parallelEnvironments);
         }
-        
-        
 
     }
 

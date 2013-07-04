@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 
 /**
- * LocalDirectoryAttributeStream implements a {@link DirectoryStream} for local directories. 
+ * LocalDirectoryAttributeStream implements a {@link DirectoryStream} for local directories.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -40,10 +40,9 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     private final LocalFiles localFiles;
 
     /** The LocalDirectoryStream to retrieve the files */
-    private final LocalDirectoryStream stream;    
+    private final LocalDirectoryStream stream;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream)
-            throws OctopusIOException {
+    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws OctopusIOException {
         this.localFiles = localFiles;
         this.stream = stream;
     }
@@ -55,7 +54,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
 
     @Override
     public void close() throws OctopusIOException {
-        stream.close();        
+        stream.close();
     }
 
     @Override
@@ -65,10 +64,10 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
 
     @Override
     public PathAttributesPair next() {
-       
+
         AbsolutePath path = stream.next();
-        
-        try { 
+
+        try {
             FileAttributes attributes = localFiles.getAttributes(path);
             return new PathAttributesPairImplementation(path, attributes);
         } catch (Exception e) {

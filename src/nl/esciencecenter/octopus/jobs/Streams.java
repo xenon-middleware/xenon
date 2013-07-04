@@ -21,35 +21,35 @@ import java.io.OutputStream;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public interface Streams {
-    
+
     /**
      * Get the job for which this Streams was created.
      * 
      * @return the Job.
      */
-    public Job getJob(); 
-    
-    /** 
+    public Job getJob();
+
+    /**
      * Returns the standard output stream of job.
      * 
      * @return the standard output stream of job.
      */
-    public InputStream getStdout(); 
-    
-    /** 
+    public InputStream getStdout();
+
+    /**
      * Returns the standard error stream of job.
      * 
      * @return the standard error stream of job.
      */
-    public InputStream getStderr(); 
+    public InputStream getStderr();
 
-    /** 
+    /**
      * Returns the standard input stream of job.
      * 
      * @return the standard input stream of this job.
      */
-    public OutputStream getStdin(); 
+    public OutputStream getStdin();
 }

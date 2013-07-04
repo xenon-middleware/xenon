@@ -58,7 +58,7 @@ public class JobDescription {
 
     /** The job options of this job */
     private final Map<String, String> jobOptions = new HashMap<String, String>();
-    
+
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
 
@@ -70,13 +70,13 @@ public class JobDescription {
 
     /** Should the job be run offline? */
     // private boolean offlineMode = false;
-    
-//    /** Should the output streams be merged? */
-//    private boolean mergeOutput = true;
-    
+
+    //    /** Should the output streams be merged? */
+    //    private boolean mergeOutput = true;
+
     /** Is this an interactive job ? */
     private boolean interactive = false;
-        
+
     /**
      * Create a JobDescription.
      */
@@ -196,28 +196,29 @@ public class JobDescription {
      */
     public void setArguments(String... arguments) {
         this.arguments.clear();
-        
-        for (String argument : arguments) { 
+
+        for (String argument : arguments) {
             addArgument(argument);
         }
     }
-    
+
     /**
      * Add a command line argument for the executable.
      * 
-     * The argument may not be <code>null</code> or empty. 
+     * The argument may not be <code>null</code> or empty.
      * 
      * @param argument
      *            the command line argument to add.
      */
     public void addArgument(String argument) {
 
-        if (argument == null || argument.length() == 0) { 
+        if (argument == null || argument.length() == 0) {
             throw new IllegalArgumentException("Argument may not be null or empty!");
         }
-        
+
         arguments.add(argument);
     }
+
     /**
      * Get the environment of the executable.
      * 
@@ -240,30 +241,30 @@ public class JobDescription {
      *            environment of the executable.
      */
     public void setEnvironment(Map<String, String> environment) {
-          
+
         this.environment.clear();
-        
+
         if (environment != null) {
-            for (Entry<String, String> entry : environment.entrySet()) { 
+            for (Entry<String, String> entry : environment.entrySet()) {
                 addEnvironment(entry.getKey(), entry.getValue());
             }
-        } 
+        }
     }
-    
+
     /**
      * Add a variable to the environment of the executable.
      * 
      * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
      * "JAVA_HOME", "/path/to/java").
      * 
-     * The name of an environment variable may not be <code>null</code> or empty.  
+     * The name of an environment variable may not be <code>null</code> or empty.
      * 
      * @param environment
      *            environment of the executable.
      */
     public void addEnvironment(String key, String value) {
-        
-        if (key == null || key.length() == 0) { 
+
+        if (key == null || key.length() == 0) {
             throw new IllegalArgumentException("Envrionment variable name may not be null or empty!");
         }
 
@@ -290,39 +291,39 @@ public class JobDescription {
      *            job options of the job.
      */
     public void setJobOptions(Map<String, String> options) {
-        
+
         jobOptions.clear();
-        
-        if (options != null) { 
-            for (Entry<String, String> entry : options.entrySet()) { 
+
+        if (options != null) {
+            for (Entry<String, String> entry : options.entrySet()) {
                 addJobOptions(entry.getKey(), entry.getValue());
             }
         }
     }
-    
+
     /**
      * Add a job option to the job.
      * 
      * The job option consist of a key-value pair (for example: "PE", "MPI").
      * 
-     * Neither the key or value of a job option may be <code>null</code> or empty. 
+     * Neither the key or value of a job option may be <code>null</code> or empty.
      * 
      * @param options
      *            job options of the job.
      */
     public void addJobOptions(String key, String value) {
-        
-        if (key == null || key.length() == 0) { 
+
+        if (key == null || key.length() == 0) {
             throw new IllegalArgumentException("Job option key may not be null or empty!");
         }
 
-        if (value == null || value.length() == 0) { 
+        if (value == null || value.length() == 0) {
             throw new IllegalArgumentException("Job option value may not be null or empty!");
         }
-        
+
         jobOptions.put(key, value);
     }
-    
+
     /**
      * Should the job run in offline mode ?
      * 
@@ -330,9 +331,9 @@ public class JobDescription {
      * 
      * @return if the job will run in offline mode.
      */
-//    public boolean getOfflineMode() {
-//        return offlineMode;
-//    }
+    //    public boolean getOfflineMode() {
+    //        return offlineMode;
+    //    }
 
     /**
      * Set the off line mode for the job.
@@ -340,9 +341,9 @@ public class JobDescription {
      * @param offlineMode
      *            the off line mode for the job.
      */
-//    public void setOfflineMode(boolean offlineMode) {
-//        this.offlineMode = offlineMode;
-//    }
+    //    public void setOfflineMode(boolean offlineMode) {
+    //        this.offlineMode = offlineMode;
+    //    }
 
     /**
      * Sets the path to the file from which the executable must redirect stdin.
@@ -419,38 +420,40 @@ public class JobDescription {
     public String getWorkingDirectory() {
         return workingDirectory;
     }
-    
+
     /**
      * Set if the the output streams of a parallel job should be merged.
      * 
-     * @param value if the the output streams of a parallel job should be merged.
+     * @param value
+     *            if the the output streams of a parallel job should be merged.
      */
-//    public void setMergeOutputStreams(boolean value) { 
-//        mergeOutput = value;
-//    }
-    
+    //    public void setMergeOutputStreams(boolean value) { 
+    //        mergeOutput = value;
+    //    }
+
     /**
      * Get if the the output streams of a parallel job should be merged.
      * 
      * @return if the output streams of a parallel job should be merged.
-     */    
-//    public boolean getMergeOutputStreams() { 
-//        return mergeOutput;
-//    }
+     */
+    //    public boolean getMergeOutputStreams() { 
+    //        return mergeOutput;
+    //    }
 
-    /** 
+    /**
      * Is this an interactive job ?
      * 
-     * @return if this an interactive job. 
+     * @return if this an interactive job.
      */
     public boolean isInteractive() {
         return interactive;
     }
-    
+
     /**
-     * Set if this is an interactive job. 
+     * Set if this is an interactive job.
      * 
-     * @param interactive if this is an interactive job.
+     * @param interactive
+     *            if this is an interactive job.
      */
     public void setInteractive(boolean interactive) {
         this.interactive = interactive;
@@ -459,13 +462,10 @@ public class JobDescription {
     /* Generated */
     @Override
     public String toString() {
-        return "JobDescription [queueName=" + queueName + ", " +
-        		"executable=" + executable + ", arguments=" + arguments +
-        		", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + 
-                        ", maxTime=" + maxTime + ", interactive=" + interactive +        		
-        		", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr + 
-        		", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions +
-        		"]";
+        return "JobDescription [queueName=" + queueName + ", " + "executable=" + executable + ", arguments=" + arguments
+                + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", maxTime=" + maxTime
+                + ", interactive=" + interactive + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr
+                + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions + "]";
     }
 
     /* Generated */
@@ -488,21 +488,21 @@ public class JobDescription {
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
         return result;
     }
-    
-    private boolean compare(Object a, Object b) { 
-        
-        if (a == null) { 
-            if (b == null) { 
+
+    private boolean compare(Object a, Object b) {
+
+        if (a == null) {
+            if (b == null) {
                 return true;
-            } else { 
+            } else {
                 return false;
             }
         }
-        
-        if (b == null) { 
+
+        if (b == null) {
             return false;
         }
-        
+
         return a.equals(b);
     }
 
@@ -511,32 +511,25 @@ public class JobDescription {
         if (this == obj) {
             return true;
         }
-        
-        if (obj == null) { 
+
+        if (obj == null) {
             return false;
         }
-        
-        if (getClass() != obj.getClass()) { 
+
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         JobDescription other = (JobDescription) obj;
-        
-        if (interactive != other.interactive || 
-            maxTime != other.maxTime || 
-            nodeCount != other.nodeCount || 
-            processesPerNode != other.processesPerNode) { 
+
+        if (interactive != other.interactive || maxTime != other.maxTime || nodeCount != other.nodeCount
+                || processesPerNode != other.processesPerNode) {
             return false;
         }
-        
-        return compare(executable, other.executable) && 
-                compare(workingDirectory, other.workingDirectory) && 
-                compare(queueName, other.queueName) && 
-                compare(stdin, other.stdin) && 
-                compare(stdout, other.stdout) && 
-                compare(stderr, other.stderr) && 
-                compare(arguments, other.arguments) && 
-                compare(environment, other.environment) &&
-                compare(jobOptions, other.jobOptions);
+
+        return compare(executable, other.executable) && compare(workingDirectory, other.workingDirectory)
+                && compare(queueName, other.queueName) && compare(stdin, other.stdin) && compare(stdout, other.stdout)
+                && compare(stderr, other.stderr) && compare(arguments, other.arguments)
+                && compare(environment, other.environment) && compare(jobOptions, other.jobOptions);
     }
 }

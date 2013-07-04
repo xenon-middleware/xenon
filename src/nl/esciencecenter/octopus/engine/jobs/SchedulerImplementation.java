@@ -39,11 +39,11 @@ public class SchedulerImplementation implements Scheduler {
     public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String[] queueNames, Credential credential,
             OctopusProperties properties, boolean isOnline, boolean supportsInteractive, boolean supportsBatch) {
 
-        if (adaptorName == null) { 
+        if (adaptorName == null) {
             throw new IllegalArgumentException("AdaptorName may not be null!");
         }
-        
-        if (uniqueID == null) { 
+
+        if (uniqueID == null) {
             throw new IllegalArgumentException("uniqueID may not be null!");
         }
 
@@ -100,14 +100,13 @@ public class SchedulerImplementation implements Scheduler {
     public boolean isOnline() {
         return isOnline;
     }
-    
+
     @Override
     public String toString() {
         return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
-                + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames)
-                + ", isOnline=" + isOnline + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" 
-                + supportsBatch + "]";
-                // + ", localStandardStreams=" + localStandardStreams + ", hasDetachedJobs=" + hasDetachedJobs + "]";
+                + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames) + ", isOnline=" + isOnline
+                + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" + supportsBatch + "]";
+        // + ", localStandardStreams=" + localStandardStreams + ", hasDetachedJobs=" + hasDetachedJobs + "]";
     }
 
     @Override
@@ -118,18 +117,18 @@ public class SchedulerImplementation implements Scheduler {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { 
+        if (this == obj) {
             return true;
         }
-        
-        if (obj == null) { 
+
+        if (obj == null) {
             return false;
         }
-        
-        if (getClass() != obj.getClass()) { 
+
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         SchedulerImplementation other = (SchedulerImplementation) obj;
         return adaptorName.equals(other.adaptorName) && uniqueID.equals(other.uniqueID);
     }

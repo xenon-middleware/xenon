@@ -29,14 +29,14 @@ public class QueueStatusImplementation implements QueueStatus {
     public QueueStatusImplementation(Scheduler scheduler, String queueName, Exception exception,
             Map<String, String> schedulerSpecificInformation) {
 
-        if (scheduler == null) { 
+        if (scheduler == null) {
             throw new IllegalArgumentException("Scheduler may not be null!");
         }
 
-        if (queueName == null) { 
+        if (queueName == null) {
             throw new IllegalArgumentException("QueueName may not be null!");
         }
-        
+
         this.scheduler = scheduler;
         this.queueName = queueName;
         this.exception = exception;

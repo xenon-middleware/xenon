@@ -35,7 +35,7 @@ public class GridengineAdaptor extends Adaptor {
 
     public static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
 
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. No properties exist for this adaptor.*/
+    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. No properties exist for this adaptor. */
     private static final String[][] validPropertiesList = new String[0][0];
 
     private final GridEngineJobs jobsAdaptor;

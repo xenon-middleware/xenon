@@ -69,13 +69,13 @@ public class JobScriptGenerator {
 
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / 60, description.getMaxTime() % 60);
-        
+
         if (description.getEnvironment() != null) {
-            for (Map.Entry<String, String> entry: description.getEnvironment().entrySet()) {
-                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());    
+            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
             }
         }
-        
+
         script.format("\n");
 
         script.format("%s", description.getExecutable());

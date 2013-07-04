@@ -27,7 +27,6 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -42,7 +41,7 @@ public class ITJobLocal {
 
     /**
      * Regression test for issue #109
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -70,6 +69,6 @@ public class ITJobLocal {
         assertTrue(Files.exists(testdir.resolve("stdout.txt")));
         assertTrue(Files.exists(testdir.resolve("stderr.txt")));
 
-        OctopusFactory.endOctopus(octopus);        
+        OctopusFactory.endOctopus(octopus);
     }
 }
