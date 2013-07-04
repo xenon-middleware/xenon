@@ -53,19 +53,4 @@ public class URIUtils {
         
         return URI.create(tmp.toString());
     }
-
-    public static String getFilePath(URI uri) {
-        
-        // Retrieve the file path  
-        String path = uri.getPath();
-        
-        if (path.startsWith("/") && path.length() > 1) { 
-            path = path.substring(1);
-        }
-        
-        return path;
-    }
-
-    
-    
 }

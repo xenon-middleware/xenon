@@ -51,8 +51,10 @@ public class ShowFileAttributes {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
             
-            // Next, extract the parts from the URI we need to access the FileSystem, the file, and the Credential.
+            // Next, extract the parts from the URI we need to access the FileSystem.
             URI fsURI = URIUtils.getFileSystemURI(uri);
+            
+            // Also get the (absolute) path to the file.
             String filepath = uri.getPath();
             
             // We create a new octopus using the OctopusFactory (without providing any properties).
@@ -65,21 +67,7 @@ public class ShowFileAttributes {
             FileSystem fs = files.newFileSystem(fsURI, null, null);
             
             // We now create an AbsolutePath representing the file.
-            //
-            // Note we can either create a path that is relative to our entry point into the file system 
-            // (for example, the current working directory), or relative to the root of the file system.
-            //
-            // We can tell the difference by checking if the path starts with '//' (absolute) or '/' (relative).   
-            
-            AbsolutePath path = null;
-            
-            if (filepath.startsWith("//")) { 
-                // Path is absolute from file system root
-                path = files.newPath(fs, new RelativePath(filepath));
-            } else { 
-                // Path is relative to entry point 
-                path = fs.getEntryPath().resolve(new RelativePath(filepath));
-            }
+            AbsolutePath path = files.newPath(fs, new RelativePath(filepath));
             
             try { 
                 // Retrieve the attributes of the file

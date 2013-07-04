@@ -80,19 +80,11 @@ public interface Scheduler {
      * Online schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that were 
      * submitted to it. 
      * 
-     * In addition, online schedulers redirect the standard streams from / to files that are local to the submitting process. In
-     * other words any bytes written to stdout and stderr will end up on the machine that submitted the job, not the machine where
-     * the job is actually run! Similarly, stdin will be read from the storage of the submitted machine.    
-     * 
-     * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs 
-     * (where the standard streams are redirected to/from files). 
-     * 
      * Offline schedulers do not need to remains active for their jobs to run. A submitted job will typically be handed over to 
      * some external server that will manage the job for the rest of its lifetime.
-     * 
-     * As a result, offline schedulers redirect the standard streams from / to files that are local to this external server. In 
-     * other words any bytes written to stdout and stderr will end up on the machine that controls the job, which is not 
-     * necessarily the machine from where it was submitted. Similarly, stdin will be read from the storage of that machine.
+     *
+     * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs 
+     * (where the standard streams are redirected to/from files). 
      * 
      * Offline schedulers only support batch jobs. 
      * 

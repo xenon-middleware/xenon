@@ -20,12 +20,10 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.CopyOption;
-import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -41,19 +39,6 @@ import nl.esciencecenter.octopus.util.URIUtils;
  * @since 1.0
  */
 public class CopyFile {
-
-    private static AbsolutePath createPath(Files files, FileSystem fs, URI file) throws OctopusIOException, OctopusException {  
-
-        String filepath = file.getPath();
-        
-        if (filepath.startsWith("//")) { 
-            // Path is absolute from file system root
-            return files.newPath(fs, new RelativePath(filepath));
-        } else { 
-            // Path is relative to entry point 
-            return fs.getEntryPath().resolve(new RelativePath(filepath));
-        }
-    }
     
     public static void main(String [] args) { 
         
@@ -78,8 +63,8 @@ public class CopyFile {
             FileSystem targetFS = files.newFileSystem(URIUtils.getFileSystemURI(target), null, null);
             
             // We now create an AbsolutePath representing both files.
-            AbsolutePath sourcePath = createPath(files, sourceFS, source);
-            AbsolutePath targetPath = createPath(files, targetFS, target);
+            AbsolutePath sourcePath = files.newPath(sourceFS, new RelativePath(source.getPath()));
+            AbsolutePath targetPath = files.newPath(targetFS, new RelativePath(target.getPath()));
 
             // Copy the file. The CREATE options ensures the target does not exist yet. 
             files.copy(sourcePath, targetPath, CopyOption.CREATE);
