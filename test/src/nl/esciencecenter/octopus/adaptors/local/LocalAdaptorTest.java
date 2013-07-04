@@ -99,7 +99,7 @@ public class LocalAdaptorTest {
         assert (map != null);
     }
 
-    @org.junit.Test(expected = OctopusException.class)
+    @org.junit.Test
     public void test_credentialsAdaptor() throws Exception {
         new LocalAdaptor(null, null).credentialsAdaptor();
     }
