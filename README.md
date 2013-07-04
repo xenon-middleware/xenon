@@ -39,7 +39,9 @@ For an overview of octopus please consult the users guide in the docs directory
 
 See the file "INSTALL.txt" for a description of how to install octopus. 
 
-The javadoc of octopus library is available in "javadoc/index.html".
+The javadoc of octopus library is available in "javadoc/index.html" or online at 
+
+http://nlesc.github.io/octopus/javadoc
 
 The source of octopus can be found in "src/". Example applications can be found 
 in "examples/src/".
