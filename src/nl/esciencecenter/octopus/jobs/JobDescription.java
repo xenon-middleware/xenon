@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.jobs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,12 +66,6 @@ public class JobDescription {
 
     /** The maximum run time in minutes. */
     private int maxTime = 30;
-
-    /** Should the job be run offline? */
-    // private boolean offlineMode = false;
-
-    //    /** Should the output streams be merged? */
-    //    private boolean mergeOutput = true;
 
     /** Is this an interactive job ? */
     private boolean interactive = false;
@@ -325,27 +318,6 @@ public class JobDescription {
     }
 
     /**
-     * Should the job run in offline mode ?
-     * 
-     * Offline mode allows jobs to keep running after the Scheduler that created then is closed.
-     * 
-     * @return if the job will run in offline mode.
-     */
-    //    public boolean getOfflineMode() {
-    //        return offlineMode;
-    //    }
-
-    /**
-     * Set the off line mode for the job.
-     * 
-     * @param offlineMode
-     *            the off line mode for the job.
-     */
-    //    public void setOfflineMode(boolean offlineMode) {
-    //        this.offlineMode = offlineMode;
-    //    }
-
-    /**
      * Sets the path to the file from which the executable must redirect stdin.
      * 
      * @param stdin
@@ -420,25 +392,6 @@ public class JobDescription {
     public String getWorkingDirectory() {
         return workingDirectory;
     }
-
-    /**
-     * Set if the the output streams of a parallel job should be merged.
-     * 
-     * @param value
-     *            if the the output streams of a parallel job should be merged.
-     */
-    //    public void setMergeOutputStreams(boolean value) { 
-    //        mergeOutput = value;
-    //    }
-
-    /**
-     * Get if the the output streams of a parallel job should be merged.
-     * 
-     * @return if the output streams of a parallel job should be merged.
-     */
-    //    public boolean getMergeOutputStreams() { 
-    //        return mergeOutput;
-    //    }
 
     /**
      * Is this an interactive job ?

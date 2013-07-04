@@ -91,19 +91,4 @@ public interface Scheduler {
      * @return if this scheduler is online.
      */
     public boolean isOnline();
-
-    /**
-     * Are the standard streams (stdin, stdout, stderr) local ?
-     * 
-     * @return If the standard streams are local.
-     */
-    //    public boolean hasLocalStandardStreams();
-
-    /**
-     * Are the jobs of this scheduler detached ?
-     * 
-     * @return if the jobs of this scheduler are detached.
-     */
-    //public boolean hasDetachedJobs();
-
 }

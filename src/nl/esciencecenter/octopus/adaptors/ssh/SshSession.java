@@ -178,10 +178,7 @@ class SshSession {
         }
     }
 
-    private final SshAdaptor adaptor;
     private final JSch jsch;
-
-    private final URI location;
     private final OctopusProperties properties;
 
     private Credential credential;
@@ -192,10 +189,6 @@ class SshSession {
     private int nextSessionID = 0;
 
     private ArrayList<SessionInfo> sessions = new ArrayList<>();
-
-    //    private Session session;
-    //    private ChannelSftp sftpChannel;
-    //    private int openChannels = 0;
 
     static class Robot implements UserInfo {
 
@@ -239,9 +232,7 @@ class SshSession {
     SshSession(SshAdaptor adaptor, JSch jsch, URI location, Credential credential, OctopusProperties properties)
             throws OctopusException {
 
-        this.adaptor = adaptor;
         this.jsch = jsch;
-        this.location = location;
         this.properties = properties;
         this.credential = credential;
 

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Arrays;

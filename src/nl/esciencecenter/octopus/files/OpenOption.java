@@ -59,6 +59,18 @@ public enum OpenOption {
      */
     WRITE;
 
+    /**
+     * Check if an array of <code>OpenOption</code> contains a specific option.
+     * 
+     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     * 
+     * @param options
+     *            the array to check.
+     * @param option
+     *            the option to check for.
+     * 
+     * @return if <code>options</code> contains <code>option<code>.
+     */
     public static boolean contains(OpenOption toFind, OpenOption... options) {
 
         if (toFind == null || options == null || options.length == 0) {

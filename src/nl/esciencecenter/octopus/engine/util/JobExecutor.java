@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
-import java.io.IOException;
-
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
@@ -51,7 +49,7 @@ public class JobExecutor implements Runnable {
 
     private Integer exitStatus;
 
-    private Thread thread = null;
+    // private Thread thread = null;
 
     private boolean killed = false;
     private boolean done = false;

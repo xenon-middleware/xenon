@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
-import java.util.UUID;
-
 /**
  * Job represents a Job belonging to a {@link Scheduler}.
  * 

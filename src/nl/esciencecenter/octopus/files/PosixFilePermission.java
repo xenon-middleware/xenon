@@ -59,6 +59,31 @@ public enum PosixFilePermission {
     /**
      * Write permission, owner.
      */
-    OWNER_WRITE,
+    OWNER_WRITE,;
+        
+    /**
+     * Check if an array of <code>PosixFilePermission</code> contains a specific option.
+     * 
+     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     * 
+     * @param options
+     *            the array to check.
+     * @param option
+     *            the option to check for.
+     * 
+     * @return if <code>options</code> contains <code>option<code>.
+     */
+    public static boolean contains(PosixFilePermission toFind, PosixFilePermission... options) {
 
+        if (toFind == null || options == null || options.length == 0) {
+            return false;
+        }
+
+        for (PosixFilePermission curr : options) {
+            if (curr == toFind) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -46,7 +46,9 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
         boolean accept(AbsolutePath entry);
     }
 
+    @Override
     public Iterator<T> iterator();
 
+    @Override
     public void close() throws OctopusIOException;
 }
