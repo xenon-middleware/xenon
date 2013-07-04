@@ -54,12 +54,36 @@ import org.slf4j.LoggerFactory;
 public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(GridEngineSchedulerConnection.class);
-    
-    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
-    
-    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
-    public static final int QACCT_GRACE_TIME = 60000; //ms, 1 minute
+    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + GridengineAdaptor.ADAPTOR_NAME + ".";
+
+    public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
+    public static final String ACCOUNTING_GRACE_TIME_PROPERTY = PROPERTY_PREFIX + "accounting.grace.time";
+    public static final String POLL_DELAY_PROPERTY = PROPERTY_PREFIX + "poll.delay";
+
+    //FIXME: last property should be defined in generic scheduler connection
+    
+    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
+    private static final String[][] validPropertiesList = new String[][] {
+            { IGNORE_VERSION_PROPERTY, "false",
+                    "Boolean: If true, the version check is skipped when connecting to remote machines. "
+                            + "WARNING: it is not recommended to use this setting in production environments" },
+
+            { ACCOUNTING_GRACE_TIME_PROPERTY, "60000",
+                    "Int: number of milliseconds a job is allowed to take going from the queue to the qacct output" },
+
+            { ACCOUNTING_GRACE_TIME_PROPERTY, "60000",
+                    "Int: number of milliseconds a job is allowed to take going from the queue to the qacct output" },
+
+            { POLL_DELAY_PROPERTY, "100", "Int: number of milliseconds between polling the status of a job" },
+
+    };
+
+    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
+
+    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    
+    private final int accountingGraceTime;
 
     /**
      * Map with the last seen time of jobs. There is a short but noticeable delay between jobs disappearing from the qstat queue
@@ -79,8 +103,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     GridEngineSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
-        super(location, credential, properties, engine, GridengineAdaptor.ADAPTOR_NAME, GridengineAdaptor.ADAPTOR_SCHEMES);
-        boolean ignoreVersion = getProperties().getBooleanProperty(GridengineAdaptor.IGNORE_VERSION_PROPERTY);
+        super(location, credential, properties, engine, validPropertiesList, GridengineAdaptor.ADAPTOR_NAME,
+                GridengineAdaptor.ADAPTOR_SCHEMES);
+
+        boolean ignoreVersion = getProperties().getBooleanProperty(IGNORE_VERSION_PROPERTY);
+        accountingGraceTime = getProperties().getIntProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
 
         parser = new GridEngineParser(ignoreVersion);
 
@@ -127,7 +154,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (!lastSeenMap.containsKey(identifier)) {
             return false;
         }
-        return System.currentTimeMillis() < (lastSeenMap.get(identifier) + QACCT_GRACE_TIME);
+        return System.currentTimeMillis() < (lastSeenMap.get(identifier) + accountingGraceTime);
     }
 
     private synchronized void setJobDeleted(String identifier) {
@@ -247,41 +274,42 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
 
     }
-    
+
     @Override
     protected void verifyJobDescription(JobDescription description) throws OctopusException {
         //check if all given job options make sense
         //FIXME: this should be build on top of OctopusProperties, see #132
-        for(String option: description.getJobOptions().keySet()) {
+        for (String option : description.getJobOptions().keySet()) {
             boolean found = false;
-            for (String validOption: VALID_JOB_OPTIONS) {
+            for (String validOption : VALID_JOB_OPTIONS) {
                 if (validOption.equals(option)) {
                     found = true;
                 }
             }
             if (!found) {
-                throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Given Job option \"" + option + "\" not supported");
+                throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Given Job option \"" + option
+                        + "\" not supported");
             }
         }
-        
+
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
         }
-        
+
         //check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
             //no remaining settings checked.
             return;
         }
-        
+
         //perform standard checks.
         super.verifyJobDescription(description);
 
         //FIXME: temporary checks until we _do_ support parallel jobs
 
         if (description.getNodeCount() != 1) {
-            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Parallel jobs not supported yet, illegal nodecount: "
-                    + description.getNodeCount());
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
+                    "Parallel jobs not supported yet, illegal nodecount: " + description.getNodeCount());
         }
 
         if (description.getProcessesPerNode() != 1) {
@@ -289,7 +317,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                     "Parallel jobs not supported yet, illegal processes per node count: " + description.getProcessesPerNode());
         }
 
-        
     }
 
     @Override
@@ -298,7 +325,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         AbsolutePath fsEntryPath = getFsEntryPath();
 
         verifyJobDescription(description);
-        
+
         //check for option that overrides job script completely.
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 

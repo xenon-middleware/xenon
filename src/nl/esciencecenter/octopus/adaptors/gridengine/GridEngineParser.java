@@ -78,12 +78,12 @@ public class GridEngineParser {
 
             if (ignoreVersion) {
                 logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
-                        + GridengineAdaptor.IGNORE_VERSION_PROPERTY);
+                        + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY);
             } else {
 
                 throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME,
                         "cannot determine version, version attribute not found. Use the "
-                                + GridengineAdaptor.IGNORE_VERSION_PROPERTY + " property to ignore this error");
+                                + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
         }
 
@@ -95,11 +95,11 @@ public class GridEngineParser {
         if (!SGE62_SCHEMA_VALUE.equals(schemaValue)) {
             if (ignoreVersion) {
                 logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
-                        + GridengineAdaptor.IGNORE_VERSION_PROPERTY);
+                        + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY);
             } else {
 
                 throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
-                        + schemaValue + ") incompatible with adaptor. Use the " + GridengineAdaptor.IGNORE_VERSION_PROPERTY
+                        + schemaValue + ") incompatible with adaptor. Use the " + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY
                         + " property to ignore this error");
             }
         }
