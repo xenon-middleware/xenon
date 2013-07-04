@@ -535,60 +535,6 @@ public interface Files {
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     /**
-     * Open an file and return an {@link SeekableByteChannel} to read from or write to this file.
-     * 
-     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and
-     * if the file should be written or read.
-     * 
-     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file already
-     * exists.
-     * 
-     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the
-     * file does not exist.
-     * 
-     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not
-     * exist a new file will be created.
-     * 
-     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more
-     * than one will result in an exception.
-     * 
-     * If the <code>READ</code> option is set the file is opened for reading.
-     * 
-     * If the <code>WRITE</code> option is specified, the file is opened for writing.
-     * 
-     * At least one of <code>READ</code> and <code>WRITE</code> must be set. These options may also be combined.
-     * 
-     * If the <code>APPEND</code> option is specified, and the <code>WRITE</code> option is set, data will be added to the end of
-     * the file. No existing data will be overwritten. If the <code>WRITE</code> is not set, an exception will be thrown.
-     * 
-     * If the <code>TRUNCATE</code> option is specified, and the <code>WRITE</code> option is set, any existing data in the file
-     * will be deleted (resulting in a file of size 0). The data will then be appended from the beginning of the file. If the
-     * <code>WRITE</code> is not set, an exception will be thrown.
-     * 
-     * When only <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both
-     * will result in an exception.
-     * 
-     * When only <code>READ</code> is set, neither <code>APPEND</code> nor <code>TRUNCATE</code> may be specified, or an exception
-     * will be thrown.
-     * 
-     * When both <code>WRITE</code> and <code>READ</code> are set, only <code>TRUNCATE</code> may be used. If the
-     * <code>APPEND</code> option is specified, an exception will be thrown.
-     * 
-     * @param path
-     *            the target file for the SeekableByteChannel.
-     * @param options
-     *            the options to use for opening this file.
-     * 
-     * @return the {@link SeekableByteChannel} to access the file.
-     * 
-     * @throws IllegalSourcePathException
-     *             If path is not a file.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    // public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
-
-    /**
      * Get the {@link FileAttributes} of an existing path.
      * 
      * @param path
