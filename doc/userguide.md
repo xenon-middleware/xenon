@@ -19,10 +19,12 @@ the Apache License, Version 2.0.
 See the "LICENSE" and "NOTICE" files in the octopus distribution for more 
 information. 
 
-See <http://www.esciencecenter.nl> for more information on the Netherlands
-eScience Center.
+For more information on the Netherlands eScience Center see:
 
-The octopus project web site can be found at 
+<http://www.esciencecenter.nl> 
+
+The octopus project web site can be found at:
+
 <https://github.com/NLeSC/octopus>.
 
 This product includes the SLF4J library, which is Copyright (c) 2004-2013 QOS.ch
@@ -37,11 +39,10 @@ of the JSch library.
 What is it?
 -----------
 
-Octopus is a middleware abstraction library. It provides a simple programming 
-interface to various pieces of software that can be used to access distributed
-compute and storage resources. 
+Octopus is a middleware abstraction library. It provides a simple Java 
+programming interface to various pieces of software that can be used to 
+access distributed compute and storage resources. 
 
-_TODO_: mention Java!
 
 Why Octopus?
 ------------
@@ -57,7 +58,8 @@ applications is used to improve the Octopus API and implementation.
 Installation
 ------------
 
-_TODO_: explain intallation procedure
+The installation procedure and dependencies of the octopus library can be found 
+in the file "INSTALL.md" in the octopus distribution. 
 
 
 Design
@@ -381,7 +383,7 @@ To copy files, the following methods are available:
     
        CopyStatus cancelCopy(Copy copy) throws ...
 
-   }
+    }
 
 The `copy` method supports various operations such as  regular copy, a resume or an append. The 
 `CopyOption...options` parameter can be used to specify the desired operation. The details can be 
@@ -400,13 +402,12 @@ parts:
 
     public interface Jobs {
 
-        Scheduler newScheduler(URI location, Credential credential, Properties properties) throws ...
+        Scheduler newScheduler(URI location, Credential credential, 
+           Properties properties) throws ...
 
-        Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
-
-        void close(Scheduler scheduler) throws OctopusException, OctopusIOException;
-
-        boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
+        Scheduler getLocalScheduler() throws ...
+        void close(Scheduler scheduler) throws ...
+        boolean isOpen(Scheduler scheduler) throws ...
 
         // ... more follows
     }
@@ -423,11 +424,13 @@ machine. When a `Scheduler` is no longer used, is __must__ be closed using the `
 A `Scheduler` contains the following:
 
     public interface Scheduler {
-        // ... 
+
         String[] getQueueNames();
         boolean isOnline();
         boolean supportsInteractive();
         boolean supportsBatch();
+
+        // ... 
     }
 
 Each `Scheduler` contains one or more queues to which jobs can be submitted. Each queue has a name that 
@@ -450,11 +453,14 @@ Once a `Scheduler` is created, `Jobs` contains several methods to retrieve infor
 
         String getDefaultQueueName(Scheduler scheduler) throws ...
 
-        QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws ...
+        QueueStatus getQueueStatus(Scheduler scheduler, 
+           String queueName) throws ...
 
-        QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws ...
+        QueueStatus[] getQueueStatuses(Scheduler scheduler, 
+           String... queueNames) throws ...
 
-        Job[] getJobs(Scheduler scheduler, String... queueNames) throws ...
+        Job[] getJobs(Scheduler scheduler, 
+           String... queueNames) throws ...
 
         // ... more follows
     }
@@ -469,7 +475,8 @@ To submit and manage jobs, the `Jobs` interface contains the following methods:
 
     public interface Jobs {
 
-        Job submitJob(Scheduler scheduler, JobDescription description) throws ...
+        Job submitJob(Scheduler scheduler, 
+            JobDescription description) throws ...
 
         Streams getStreams(Job job) throws ...
 
@@ -477,12 +484,11 @@ To submit and manage jobs, the `Jobs` interface contains the following methods:
 
         JobStatus[] getJobStatuses(Job... jobs);
 
-        JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException;
+        JobStatus waitUntilRunning(Job job, long timeout) throws ...
 
-        JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
+        JobStatus waitUntilDone(Job job, long timeout) throws ...
 
-        JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
-
+        JobStatus cancelJob(Job job) throws ...
    }    
 
 The `submitJob` method can be used to submit a job to a `Scheduler`. A `JobDescription` must be provided 
@@ -527,12 +533,147 @@ octopus. See the Javadoc for the available exceptions.
 
 ### Utilities classes ###
 
-_TODO_ explain functionality in package: `nl.esciencecenter.octopus.util`
+The `nl.esciencecenter.octopus.util` package contains various utility classes. 
+__This package is experimental and not yet ready for use!!__
 
 
 Examples
 --------
 
-This section will show examples of how to use each of the interfaces in octopus..
+This section will show several code snippets that illustrate how to the interfaces in octopus. The 
+complete verions of these example can be found in the _examples_ directory of the octopus 
+distribution.
+
+### Initialize Octopus ###
+
+We will start with a simple example that shows how to initialize and cleanup an octopus instance. 
+This example starts by using the `OctopusFactory.newOctopus` method to create an `Octopus`. Next, 
+the `Files`, `Jobs` and `Credentials` interfaces are retrieved from this octopus instance. 
+Finally, the octopus instance is ended using `OctopusFactory.endOctopus`.
+
+    // We create a new octopus using the OctopusFactory.
+    Octopus octopus = OctopusFactory.newOctopus(null);
+
+    // Next, we retrieve the Files, Jobs and Credentials API
+    Files files = octopus.files();
+    Jobs jobs = octopus.jobs();
+    Credentials credentials = octopus.credentials();
+            
+    // We can now uses the interfaces to get some work done!
+    // ....
+            
+    // Finally, we end octopus to release all resources 
+    OctopusFactory.endOctopus(octopus);
 
 
+### Check if a file exists ### 
+
+In this example we want to check if a file exists. To do so, we create first create a `FileSystem`, 
+and use it to create an `AbsolutePath` that represents the file. Using the `Files` interface we can
+then check if the file exists. This test assumes the `String filename` contains the name of the file
+to check.
+
+    // ... create an octopus as shown in Initialize Octopus
+     
+    String filename = .... 
+       
+    // Next we create a FileSystem 
+    URI uri = new URI("file://localhost/");
+    Credential c = credentials.getDefaultCredential("file");  
+    FileSystem fs = files.newFileSystem(uri, c, null);
+            
+    // We now create an AbsolutePath representing the file
+    AbsolutePath path = files.newPath(fs, new RelativePath(filename)); 
+            
+    // Check if the file exists 
+    if (files.exists(path)) { 
+       System.out.println("File " + filename + " exist!");
+    } else { 
+       System.out.println("File " + filename + " does not exist!");
+    }
+            
+    // If we are done we need to close the FileSystem
+    files.close(fs);
+          
+    // Finally, we end octopus as shown in Initialize Octopus ...
+
+
+### Copy a file ###
+
+In this example we want to copy a file. To do so, we create first create two `FileSystem`s, 
+one representing the source and one representing the destination. These `FileSystem`s may 
+be located on different machines. This test assumes the `URI source` and `URI target` 
+contain the source and target URIs. We use the `URIUtils.getFileSystemURI` method to 
+extract the file system URIs (that do not contain paths). 
+
+    // ... create an octopus as shown in Initialize Octopus
+
+    // We first turn the user provided argument into a URI.
+    URI source = ...
+    URI target = ...
+                        
+    // Next we create a FileSystem 
+    FileSystem sourceFS = files.newFileSystem(
+        URIUtils.getFileSystemURI(source), null, null);
+
+    FileSystem targetFS = files.newFileSystem(
+        URIUtils.getFileSystemURI(target), null, null);
+            
+    // We now create an AbsolutePath representing both files.
+    AbsolutePath sourcePath = files.newPath(sourceFS,
+        new RelativePath(source.getPath()));
+
+    AbsolutePath targetPath = files.newPath(targetFS,
+        new RelativePath(target.getPath()));
+
+    // Copy the file. The CREATE options ensures the target 
+    // does not exist yet (or throw an exception if it does).
+    files.copy(sourcePath, targetPath, CopyOption.CREATE);
+                
+    // If we are done we need to close the FileSystems
+    files.close(sourceFS);
+    files.close(targetFS);
+
+    // Finally, we end octopus as shown in Initialize Octopus ...
+
+
+### Submit a job ###
+
+In this example submit a simple job. To do so, we create first create a `Scheduler`, 
+
+and use it to create an `AbsolutePath` that represents the file. Using the `Files` interface we can
+then check if the file exists. This test assumes the `String filename` contains the name of the file
+to check.
+
+    // ... create an octopus as shown in Initialize Octopus
+        
+    // We can now create a JobDescription for the job we want to run.
+    JobDescription description = new JobDescription();
+    description.setExecutable("/bin/sleep");
+    description.setArguments("5");
+            
+    // Create a scheduler to run the job
+    Scheduler scheduler = jobs.newScheduler(new URI("local:///"), 
+       null, null);
+            
+    // Submit the job
+    Job job = jobs.submitJob(scheduler, description);
+            
+    // Wait for the job to finish
+    JobStatus status = jobs.waitUntilDone(job, 60000);
+            
+    // Check if the job was successful. 
+    if (!status.isDone()) { 
+       System.out.println("Job failed to run withing deadline.");
+    } else if (status.hasException()) { 
+       Exception e = status.getException();
+       System.out.println("Job produced an exception: " + e.getMessage());
+       e.printStackTrace();
+    } else { 
+       System.out.println("Job ran succesfully!");
+    }
+
+    // Close the scheduler
+    jobs.close(scheduler);
+            
+    // Finally, we end octopus as shown in Initialize Octopus ...

@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.files;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.channels.SeekableByteChannel;
 import java.util.Properties;
 import java.util.Set;
 
