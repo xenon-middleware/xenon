@@ -82,10 +82,10 @@ public abstract class Adaptor {
         }
 
         OctopusProperties p = null;
-        
-        if (properties == null) { 
+
+        if (properties == null) {
             p = new OctopusProperties();
-        } else { 
+        } else {
             p = properties.filter("octopus.adaptors." + name);
         }
 
@@ -143,5 +143,5 @@ public abstract class Adaptor {
 
     public abstract Credentials credentialsAdaptor() throws OctopusException;
 
-    public abstract void end();    
+    public abstract void end();
 }

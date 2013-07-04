@@ -44,36 +44,36 @@ import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Some additional functionality build on top of the standard API
- *
+ * 
  * @author Niels Drost
- *
+ * 
  */
 public class FileUtils {
 
     public static final int BUFFER_SIZE = 10240;
 
-    private static void close(Closeable c) { 
-        
+    private static void close(Closeable c) {
+
         try {
-            if (c != null) { 
+            if (c != null) {
                 c.close();
-            } 
-        } catch (Exception e) { 
+            }
+        } catch (Exception e) {
             // ignored!
         }
     }
-    
-    private static OpenOption [] openOptionsForWrite(boolean truncate) { 
-        if (truncate) { 
-            return new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE };
-        } else { 
-            return new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND };
-        }        
+
+    private static OpenOption[] openOptionsForWrite(boolean truncate) {
+        if (truncate) {
+            return new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE };
+        } else {
+            return new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND };
+        }
     }
-    
+
     /**
      * Copies all bytes from an input stream to a file.
-     *
+     * 
      * @throws OctopusException
      *             if an I/O error occurs when reading or writing
      * @throws FileAlreadyExistsException
@@ -86,15 +86,15 @@ public class FileUtils {
      *             if {@code options} contains a copy option that is not supported
      */
     public static long copy(Octopus octopus, InputStream in, AbsolutePath target, boolean truncate) throws OctopusException {
-        
+
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
 
         OutputStream out = null;
-        
+
         try {
             out = octopus.files().newOutputStream(target, openOptionsForWrite(truncate));
-            
+
             while (true) {
                 int read = in.read(buffer);
 
@@ -102,7 +102,7 @@ public class FileUtils {
                     out.close();
                     return totalBytes;
                 }
-         
+
                 out.write(buffer, 0, read);
                 totalBytes += read;
             }
@@ -114,20 +114,20 @@ public class FileUtils {
 
     /**
      * Copies all bytes from a file to an output stream.
-     *
+     * 
      * @throws OctopusException
      *             if and I/O error occurs while reading or writing
-     *
+     * 
      */
     public static long copy(Octopus octopus, AbsolutePath source, OutputStream out) throws OctopusException {
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
 
         InputStream in = null;
-        
+
         try {
             in = octopus.files().newInputStream(source);
-            
+
             while (true) {
                 int read = in.read(buffer);
 
@@ -146,7 +146,7 @@ public class FileUtils {
 
     /**
      * Opens a file for reading, returning a BufferedReader that may be used to read text from the file in an efficient manner.
-     *
+     * 
      * @throws OctopusIOException
      */
     public static BufferedReader newBufferedReader(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
@@ -159,7 +159,7 @@ public class FileUtils {
      */
     public static BufferedWriter newBufferedWriter(Octopus octopus, AbsolutePath path, Charset cs, boolean truncate)
             throws OctopusIOException {
-        
+
         OutputStream out = octopus.files().newOutputStream(path, openOptionsForWrite(truncate));
         return new BufferedWriter(new OutputStreamWriter(out, cs));
     }
@@ -177,14 +177,14 @@ public class FileUtils {
      * Read all lines from a file.
      */
     public static List<String> readAllLines(Octopus octopus, AbsolutePath path, Charset cs) throws OctopusIOException {
-        
+
         ArrayList<String> result = new ArrayList<String>();
 
         BufferedReader reader = null;
-        
+
         try {
             reader = newBufferedReader(octopus, path, cs);
-            
+
             while (true) {
                 String line = reader.readLine();
 
@@ -192,7 +192,7 @@ public class FileUtils {
                     reader.close();
                     return result;
                 }
-                
+
                 result.add(line);
             }
         } catch (IOException e) {
@@ -207,27 +207,27 @@ public class FileUtils {
     public static void write(Octopus octopus, AbsolutePath path, byte[] bytes, boolean truncate) throws OctopusException {
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         copy(octopus, in, path, truncate);
-        close(in);        
+        close(in);
     }
 
     /**
      * Write lines of text to a file.
-     *
+     * 
      */
     public static void write(Octopus octopus, AbsolutePath path, Iterable<? extends CharSequence> lines, Charset cs,
             boolean truncate) throws OctopusIOException {
-        
+
         BufferedWriter writer = null;
-        
-        try { 
+
+        try {
             writer = newBufferedWriter(octopus, path, cs, truncate);
 
             for (CharSequence line : lines) {
                 writer.write(line.toString());
                 writer.newLine();
             }
-            
-            writer.close();            
+
+            writer.close();
         } catch (IOException e) {
             close(writer);
             throw new OctopusIOException("FileUtils", "failed to write lines", e);
@@ -310,14 +310,15 @@ public class FileUtils {
 
     /**
      * Recursively copies directories, files and symbolic links from source to target.
-     *
+     * 
      * @param octopus
      * @param source
      * @param target
      * @param options
-     *
+     * 
      * @throws OctopusIOException
-     * @throws UnsupportedOperationException Thrown when CopyOption.REPLACE_EXISTING and CopyOption.IGNORE_EXISTING are used together.
+     * @throws UnsupportedOperationException
+     *             Thrown when CopyOption.REPLACE_EXISTING and CopyOption.IGNORE_EXISTING are used together.
      */
     public static void recursiveCopy(Octopus octopus, AbsolutePath source, AbsolutePath target, CopyOption... options)
             throws OctopusIOException, UnsupportedOperationException {
@@ -368,7 +369,7 @@ public class FileUtils {
 
     /**
      * Recursively removes all directories, files and symbolic links in path.
-     *
+     * 
      * @param octopus
      * @param path
      * @throws OctopusIOException

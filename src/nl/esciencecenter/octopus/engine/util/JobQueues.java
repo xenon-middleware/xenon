@@ -44,20 +44,20 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class JobQueues {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(JobQueues.class);
-    
+
     private final String adaptorName;
-    
+
     private final Octopus myOctopus;
-    
+
     private final Scheduler myScheduler;
-    
+
     private final FileSystem myFileSystem;
-    
+
     private final LinkedList<JobExecutor> singleQ;
 
     private final LinkedList<JobExecutor> multiQ;
@@ -73,32 +73,31 @@ public class JobQueues {
     private final int pollingDelay;
 
     private final InteractiveProcessFactory factory;
-    
+
     private int jobID = 0;
-    
-    public JobQueues(String adaptorName, Octopus myOctopus, Scheduler myScheduler, FileSystem myFileSystem, 
-            InteractiveProcessFactory factory, 
-            int multiQThreads, int pollingDelay) throws BadParameterException { 
-        
-        logger.debug("{}: Creating JobQueues for Adaptor {} with multiQThreads: {}, maxQSize: {} and pollingDelay: {}", 
+
+    public JobQueues(String adaptorName, Octopus myOctopus, Scheduler myScheduler, FileSystem myFileSystem,
+            InteractiveProcessFactory factory, int multiQThreads, int pollingDelay) throws BadParameterException {
+
+        logger.debug("{}: Creating JobQueues for Adaptor {} with multiQThreads: {}, maxQSize: {} and pollingDelay: {}",
                 adaptorName, multiQThreads, pollingDelay);
-        
+
         this.adaptorName = adaptorName;
         this.myOctopus = myOctopus;
         this.myScheduler = myScheduler;
         this.myFileSystem = myFileSystem;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
-        
+
         singleQ = new LinkedList<JobExecutor>();
         multiQ = new LinkedList<JobExecutor>();
         unlimitedQ = new LinkedList<JobExecutor>();
-       
+
         if (multiQThreads < 1) {
             throw new BadParameterException(adaptorName, "Number of slots for the multi queue cannot be smaller than one!");
         }
-        
-        if (pollingDelay < 100 ||  pollingDelay > 60000) {
+
+        if (pollingDelay < 100 || pollingDelay > 60000) {
             throw new BadParameterException(adaptorName, "Polling delay must be between 100 and 60000!");
         }
 
@@ -106,56 +105,56 @@ public class JobQueues {
         singleExecutor = Executors.newSingleThreadExecutor();
         multiExecutor = Executors.newFixedThreadPool(multiQThreads);
     }
-    
+
     private synchronized int getNextJobID() {
         return jobID++;
     }
-    
-    private void checkScheduler(Scheduler scheduler) throws OctopusException { 
-        
-        if (scheduler == null) { 
+
+    private void checkScheduler(Scheduler scheduler) throws OctopusException {
+
+        if (scheduler == null) {
             throw new NullPointerException("Adaptor " + adaptorName + ": Scheduler is null!");
         }
-        
+
         if (scheduler != myScheduler) {
-            throw new OctopusException(adaptorName, "Scheduler mismatch! " + scheduler + " != " + myScheduler) ;
+            throw new OctopusException(adaptorName, "Scheduler mismatch! " + scheduler + " != " + myScheduler);
         }
     }
-    
+
     private void getJobs(LinkedList<JobExecutor> list, LinkedList<Job> out) {
         for (JobExecutor e : list) {
             out.add(e.getJob());
         }
     }
-    
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException { 
+
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return "single";
     }
-    
+
     public Job[] getJobs(String... queueNames) throws NoSuchQueueException {
-        
+
         logger.debug("{}: getJobs for queues {}", adaptorName, queueNames);
-        
+
         LinkedList<Job> out = new LinkedList<Job>();
-        
+
         if (queueNames == null || queueNames.length == 0) {
             getJobs(singleQ, out);
             getJobs(multiQ, out);
             getJobs(unlimitedQ, out);
-        } else {              
-            for (String name : queueNames) { 
-                if (name.equals("single")) { 
+        } else {
+            for (String name : queueNames) {
+                if (name.equals("single")) {
                     getJobs(singleQ, out);
-                } else if (name.equals("multi")) { 
+                } else if (name.equals("multi")) {
                     getJobs(multiQ, out);
                 } else if (name.equals("unlimited")) {
                     getJobs(unlimitedQ, out);
-                } else { 
-                    throw new NoSuchQueueException(adaptorName, "Queue \"" + name + "\" does not exist");                    
+                } else {
+                    throw new NoSuchQueueException(adaptorName, "Queue \"" + name + "\" does not exist");
                 }
             }
         }
-        
+
         return out.toArray(new Job[out.size()]);
     }
 
@@ -186,48 +185,48 @@ public class JobQueues {
     private JobExecutor findJob(Job job) throws OctopusException {
         return findJob(findQueue(job.getJobDescription().getQueueName()), job);
     }
-    
-    private void cleanupJob(LinkedList<JobExecutor> queue, Job job) { 
-        
+
+    private void cleanupJob(LinkedList<JobExecutor> queue, Job job) {
+
         Iterator<JobExecutor> itt = queue.iterator();
-        
+
         while (itt.hasNext()) {
             JobExecutor e = itt.next();
-            
+
             if (e.getJob().equals(job)) {
                 itt.remove();
                 return;
             }
         }
     }
-    
+
     public JobStatus getJobStatus(Job job) throws OctopusException {
-        
+
         logger.debug("{}: getJobStatus for job {}", adaptorName, job.getIdentifier());
-        
+
         checkScheduler(job.getScheduler());
-        
+
         LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
         JobStatus status = findJob(queue, job).getStatus();
-        
-        if (status.isDone()) { 
+
+        if (status.isDone()) {
             cleanupJob(queue, job);
         }
-        
+
         return status;
     }
-    
+
     public JobStatus[] getJobStatuses(Job... jobs) {
 
         logger.debug("{}: getJobStatuses for jobs {}", adaptorName, jobs);
-        
+
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < jobs.length; i++) {
             try {
-                if (jobs[i] != null) { 
+                if (jobs[i] != null) {
                     result[i] = getJobStatus(jobs[i]);
-                } else { 
+                } else {
                     result[i] = null;
                 }
             } catch (OctopusException e) {
@@ -237,141 +236,137 @@ public class JobQueues {
 
         return result;
     }
-    
+
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
-        
+
         logger.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
-        
-        if (timeout < 0) { 
+
+        if (timeout < 0) {
             throw new OctopusException(adaptorName, "Illegal timeout " + timeout);
         }
-        
+
         checkScheduler(job.getScheduler());
-        
+
         LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
         JobStatus status = findJob(queue, job).waitUntilDone(timeout);
-        
+
         if (status.isDone()) {
             logger.debug("{}: Job {} is done after {} ms.", adaptorName, job.getIdentifier(), timeout);
             cleanupJob(queue, job);
-        } else { 
+        } else {
             logger.debug("{}: Job {} is NOT done after {} ms.", adaptorName, job.getIdentifier(), timeout);
         }
-        
-        return status;    
+
+        return status;
     }
 
     public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
-        
+
         logger.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, job.getIdentifier(), timeout);
-        
-        if (timeout < 0) { 
+
+        if (timeout < 0) {
             throw new OctopusException(adaptorName, "Illegal timeout " + timeout);
         }
-        
+
         checkScheduler(job.getScheduler());
-        
+
         LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
         JobStatus status = findJob(queue, job).waitUntilRunning(timeout);
-        
+
         if (status.isDone()) {
             logger.debug("{}: Job {} is done after {} ms.", adaptorName, job.getIdentifier(), timeout);
             cleanupJob(queue, job);
-        } else { 
+        } else {
             logger.debug("{}: Job {} is NOT done after {} ms.", adaptorName, job.getIdentifier(), timeout);
         }
-        
-        return status;    
+
+        return status;
     }
 
-    
-    private void verifyJobDescription(JobDescription description) throws OctopusException { 
-        
+    private void verifyJobDescription(JobDescription description) throws OctopusException {
+
         String queue = description.getQueueName();
-              
-        if (queue == null) { 
+
+        if (queue == null) {
             queue = "single";
             description.setQueueName("single");
         }
-        
+
         if (!(queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
             throw new InvalidJobDescriptionException(adaptorName, "Queue " + queue + " not available locally!");
         }
 
-        String executable = description.getExecutable(); 
-        
-        if (executable == null) { 
+        String executable = description.getExecutable();
+
+        if (executable == null) {
             throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
         }
-        
+
         int nodeCount = description.getNodeCount();
-        
-        if (nodeCount != 1) { 
+
+        if (nodeCount != 1) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
         }
-        
+
         int processesPerNode = description.getProcessesPerNode();
-        
-        if (processesPerNode != 1) { 
-            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + 
-                    processesPerNode);
+
+        if (processesPerNode != 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
         }
 
         int maxTime = description.getMaxTime();
-        
-        if (maxTime <= 0) { 
+
+        if (maxTime <= 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 
-        if (description.isInteractive()) { 
+        if (description.isInteractive()) {
 
-            if (description.getStdin() != null) { 
-                throw new InvalidJobDescriptionException(adaptorName, 
-                        "Illegal stdin redirect for interactive job!");            
+            if (description.getStdin() != null) {
+                throw new InvalidJobDescriptionException(adaptorName, "Illegal stdin redirect for interactive job!");
             }
-            
-            if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) { 
-                throw new InvalidJobDescriptionException(adaptorName, 
-                        "Illegal stdout redirect for interactive job!");            
+
+            if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) {
+                throw new InvalidJobDescriptionException(adaptorName, "Illegal stdout redirect for interactive job!");
             }
-            
-            if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) { 
-                throw new InvalidJobDescriptionException(adaptorName, 
-                        "Illegal stderr redirect for interactive job!");            
+
+            if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
+                throw new InvalidJobDescriptionException(adaptorName, "Illegal stderr redirect for interactive job!");
             }
-        } else {             
-//            
-//            if (description.getStdout() == null) { 
-//                throw new InvalidJobDescriptionException(adaptorName, 
-//                        "Missing stdout redirect for batch job!");            
-//            }
-//            
-//            if (description.getStderr() == null) { 
-//                throw new InvalidJobDescriptionException(adaptorName, 
-//                        "Missing stderr redirect for batch job!");            
-//            }            
+        } else {
+            //            
+            //            if (description.getStdout() == null) { 
+            //                throw new InvalidJobDescriptionException(adaptorName, 
+            //                        "Missing stdout redirect for batch job!");            
+            //            }
+            //            
+            //            if (description.getStderr() == null) { 
+            //                throw new InvalidJobDescriptionException(adaptorName, 
+            //                        "Missing stderr redirect for batch job!");            
+            //            }            
         }
     }
-    
+
     public Job submitJob(JobDescription description) throws OctopusException {
-        
+
         logger.debug("{}: Submitting job", adaptorName);
 
         verifyJobDescription(description);
 
         logger.debug("{}: JobDescription verified OK", adaptorName);
-        
-        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), description, 
-                description.isInteractive(), true);
+
+        JobImplementation result =
+                new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), description, description.isInteractive(),
+                        true);
 
         logger.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
-        
+
         JobExecutor executor = new JobExecutor(adaptorName, myOctopus.files(), myFileSystem, factory, result, pollingDelay);
-        
+
         String queueName = description.getQueueName();
-       
+
         logger.debug("{}: Submitting job to queue ", adaptorName, queueName);
-        
+
         // NOTE: the verifyJobDescription ensures that the queueName has a valid value!
         if (queueName.equals("unlimited")) {
             unlimitedQ.add(executor);
@@ -382,36 +377,36 @@ public class JobQueues {
         } else { // queueName == "single"  
             singleQ.add(executor);
             singleExecutor.execute(executor);
-        }  
-        
+        }
+
         if (description.isInteractive()) {
             executor.waitUntilRunning(0);
-            
-            if (executor.isDone() && !executor.hasRun()) { 
+
+            if (executor.isDone() && !executor.hasRun()) {
                 cleanupJob(findQueue(queueName), result);
                 throw new OctopusException(adaptorName, "Job failed to start!", executor.getError());
-            } 
+            }
         }
-        
+
         return result;
     }
-    
+
     public JobStatus cancelJob(Job job) throws OctopusException {
-        
+
         logger.debug("{}: Cancel job {}", adaptorName, job);
-        
+
         checkScheduler(job.getScheduler());
-        
+
         LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
-        
+
         JobExecutor e = findJob(queue, job);
         e.kill();
         JobStatus status = e.waitUntilDone(pollingDelay);
-        
-        if (status.isDone()) { 
+
+        if (status.isDone()) {
             cleanupJob(queue, job);
-        }        
-        
+        }
+
         // FIXME: Should throw exception if the cancel fails ??
         return status;
     }
@@ -420,12 +415,12 @@ public class JobQueues {
 
         logger.debug("{}: getQueueStatus {}:{}", adaptorName, scheduler, queueName);
 
-        if (queueName == null) { 
+        if (queueName == null) {
             throw new NullPointerException("Adaptor " + adaptorName + ": Queue name is null!");
         }
-        
+
         checkScheduler(scheduler);
-        
+
         if (queueName.equals("single")) {
             return new QueueStatusImplementation(scheduler, "single", null, null);
         } else if (queueName.equals("multi")) {
@@ -436,21 +431,21 @@ public class JobQueues {
             throw new NoSuchQueueException(adaptorName, "No such queue: " + queueName);
         }
     }
-    
+
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
-        
-        String [] names = queueNames;
-        
-        if (names == null) { 
+
+        String[] names = queueNames;
+
+        if (names == null) {
             throw new NullPointerException("Adaptor " + adaptorName + ": Queue names are null!");
         }
-        
-        if (names.length == 0) { 
-            names = new String [] { "single", "multi", "unlimited" };
+
+        if (names.length == 0) {
+            names = new String[] { "single", "multi", "unlimited" };
         }
-        
+
         checkScheduler(scheduler);
-                        
+
         QueueStatus[] result = new QueueStatus[names.length];
 
         for (int i = 0; i < names.length; i++) {
@@ -461,15 +456,15 @@ public class JobQueues {
             }
         }
 
-        return result;        
+        return result;
     }
-    
+
     public Streams getStreams(Job job) throws OctopusException {
         checkScheduler(job.getScheduler());
         return findJob(job).getStreams();
     }
-    
-    public void end() { 
+
+    public void end() {
         singleExecutor.shutdownNow();
         multiExecutor.shutdownNow();
         unlimitedExecutor.shutdownNow();

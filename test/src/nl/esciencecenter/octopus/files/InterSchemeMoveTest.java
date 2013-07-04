@@ -26,7 +26,7 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class InterSchemeMoveTest {
 
@@ -40,8 +40,8 @@ public class InterSchemeMoveTest {
         FileSystem fs1 = files.getLocalCWDFileSystem();
         FileSystem fs2 = files.newFileSystem(new URI("ssh://test@localhost"), null, null);
 
-        AbsolutePath file1 = fs1.getEntryPath().resolve(new RelativePath("test")); 
-        AbsolutePath file2 = fs2.getEntryPath().resolve(new RelativePath("test")); 
+        AbsolutePath file1 = fs1.getEntryPath().resolve(new RelativePath("test"));
+        AbsolutePath file2 = fs2.getEntryPath().resolve(new RelativePath("test"));
 
         files.move(file1, file2);
     }

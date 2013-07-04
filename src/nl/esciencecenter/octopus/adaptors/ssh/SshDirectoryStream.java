@@ -29,23 +29,23 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
-    
+
     private final LinkedList<AbsolutePath> stream;
-    
+
     SshDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
-        
+
         stream = new LinkedList<AbsolutePath>();
-        
-        for (LsEntry e : listing) { 
-            
+
+        for (LsEntry e : listing) {
+
             String filename = e.getFilename();
-            
+
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
-            } else { 
+            } else {
                 AbsolutePath tmp = dir.resolve(new RelativePath(filename));
-                
-                if (filter.accept(tmp)) { 
+
+                if (filter.accept(tmp)) {
                     stream.add(tmp);
                 }
             }
@@ -69,8 +69,8 @@ public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterat
 
     @Override
     public synchronized AbsolutePath next() {
-        
-        if (stream.size() > 0) { 
+
+        if (stream.size() > 0) {
             return stream.removeFirst();
         }
 

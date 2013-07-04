@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.files.OpenOption;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class OpenOptions {
 
@@ -29,85 +29,84 @@ public class OpenOptions {
     private OpenOption appendMode;
     private OpenOption readMode;
     private OpenOption writeMode;
-    
+
     public OpenOption getOpenMode() {
         return openMode;
     }
 
     public void setOpenMode(String adaptorName, OpenOption openMode) throws InvalidOpenOptionsException {
-                    
-        if (this.openMode != null && openMode != this.openMode) { 
-            throw new InvalidOpenOptionsException(adaptorName, "Conflicting open options: " + openMode 
-                    + " and " + this.openMode);
+
+        if (this.openMode != null && openMode != this.openMode) {
+            throw new InvalidOpenOptionsException(adaptorName, "Conflicting open options: " + openMode + " and " + this.openMode);
         }
-        
+
         this.openMode = openMode;
     }
-    
+
     public OpenOption getAppendMode() {
         return appendMode;
     }
-    
+
     public void setAppendMode(String adaptorName, OpenOption appendMode) throws InvalidOpenOptionsException {
-        
-        if (this.appendMode != null && appendMode != this.appendMode) { 
-            throw new InvalidOpenOptionsException(adaptorName, "Conflicting append options: " + appendMode 
-                    + " and " + this.appendMode);
+
+        if (this.appendMode != null && appendMode != this.appendMode) {
+            throw new InvalidOpenOptionsException(adaptorName, "Conflicting append options: " + appendMode + " and "
+                    + this.appendMode);
         }
-        
+
         this.appendMode = appendMode;
     }
-    
+
     public OpenOption getReadMode() {
         return readMode;
     }
-    
+
     public void setReadMode(OpenOption readMode) {
         this.readMode = readMode;
     }
-    
+
     public OpenOption getWriteMode() {
         return writeMode;
     }
-    
+
     public void setWriteMode(OpenOption writeMode) {
         this.writeMode = writeMode;
     }
-    
-    public static OpenOptions processOptions(String adaptorName, OpenOption... options) throws InvalidOpenOptionsException { 
-        
-        if (options == null || options.length == 0) { 
+
+    public static OpenOptions processOptions(String adaptorName, OpenOption... options) throws InvalidOpenOptionsException {
+
+        if (options == null || options.length == 0) {
             throw new InvalidOpenOptionsException(adaptorName, "Missing open options!");
         }
-        
+
         OpenOptions result = new OpenOptions();
-        
-        for (OpenOption opt : options) {             
-            switch (opt) { 
+
+        for (OpenOption opt : options) {
+            switch (opt) {
             case CREATE:
             case OPEN:
             case OPEN_OR_CREATE:
                 result.setOpenMode(adaptorName, opt);
                 break;
-                
+
             case APPEND:
             case TRUNCATE:
                 result.setAppendMode(adaptorName, opt);
                 break;
-                
+
             case WRITE:
                 result.setWriteMode(opt);
-                break;     
+                break;
             case READ:
                 result.setReadMode(opt);
                 break;
             }
         }
-        
-        if (result.getOpenMode() == null) { 
+
+        if (result.getOpenMode() == null) {
             throw new InvalidOpenOptionsException(adaptorName, "No open mode provided!");
         }
-        
+
         return result;
     }
 }

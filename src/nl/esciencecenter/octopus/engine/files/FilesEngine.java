@@ -101,7 +101,7 @@ public class FilesEngine implements Files {
     public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException {
         return getFilesAdaptor(filesystem).isOpen(filesystem);
     }
-  
+
     @Override
     public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).createDirectories(dir);
@@ -117,10 +117,10 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(path).createFile(path);
     }
 
-//    @Override
-//    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
-//        return getFilesAdaptor(link).createSymbolicLink(link, target);
-//    }
+    //    @Override
+    //    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
+    //        return getFilesAdaptor(link).createSymbolicLink(link, target);
+    //    }
 
     @Override
     public void delete(AbsolutePath path) throws OctopusIOException {
@@ -141,9 +141,10 @@ public class FilesEngine implements Files {
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
         return getFilesAdaptor(path).isSymbolicLink(path);
     }
-    
+
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException, OctopusIOException {
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
+            OctopusIOException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
@@ -158,7 +159,7 @@ public class FilesEngine implements Files {
             throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party copy!");
         }
     }
-    
+
     @Override
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
 
@@ -167,7 +168,7 @@ public class FilesEngine implements Files {
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).move(source, target);
-        } 
+        }
 
         throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party move!");
     }
@@ -181,7 +182,7 @@ public class FilesEngine implements Files {
     public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
         return getFilesAdaptor(copy.getSource()).cancelCopy(copy);
     }
-    
+
     @Override
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
         return getFilesAdaptor(dir).newDirectoryStream(dir);
@@ -213,10 +214,10 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(path).newOutputStream(path, options);
     }
 
-//    @Override
-//    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-//        return getFilesAdaptor(path).newByteChannel(path, options);
-//    }
+    //    @Override
+    //    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
+    //        return getFilesAdaptor(path).newByteChannel(path, options);
+    //    }
 
     @Override
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {

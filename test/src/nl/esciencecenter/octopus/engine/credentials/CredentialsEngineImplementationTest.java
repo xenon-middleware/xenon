@@ -30,60 +30,58 @@ import org.junit.BeforeClass;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class CredentialsEngineImplementationTest {
 
-    
     private static OctopusEngine octopusEngine;
-    
+
     @BeforeClass
-    public static void prepare() throws OctopusException { 
+    public static void prepare() throws OctopusException {
         octopusEngine = new OctopusEngine(new Properties());
     }
-    
+
     @AfterClass
-    public static void cleanup() { 
+    public static void cleanup() {
         octopusEngine.end();
     }
-    
+
     @org.junit.Test
-    public void testDefault() throws Exception { 
-        
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine); 
+    public void testDefault() throws Exception {
+
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
         Credential c = ce.getDefaultCredential("ssh");
-        
+
         assertEquals("ssh", c.getAdaptorName());
     }
 
-    
     @org.junit.Test
-    public void testCertificate() throws Exception { 
-        
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine); 
+    public void testCertificate() throws Exception {
+
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
         Credential c = ce.newCertificateCredential("ssh", null, "keyfile", "certfile", "username", "password".toCharArray());
-        
+
         assertTrue(c instanceof CertificateCredentialImplementation);
-        
+
         CertificateCredentialImplementation cci = (CertificateCredentialImplementation) c;
-        
+
         assertEquals("ssh", cci.getAdaptorName());
         assertEquals("username", cci.getUsername());
-        assertEquals( "keyfile", cci.getKeyfile());
+        assertEquals("keyfile", cci.getKeyfile());
         assertEquals("certfile", cci.getCertfile());
         assertEquals(new Properties(), cci.getProperties());
 
         assertTrue(Arrays.equals(cci.getPassword(), "password".toCharArray()));
     }
-    
-    @org.junit.Test
-    public void testPassword() throws Exception { 
 
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine); 
+    @org.junit.Test
+    public void testPassword() throws Exception {
+
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
         Credential c = ce.newPasswordCredential("ssh", null, "username", "password".toCharArray());
-        
+
         assertTrue(c instanceof PasswordCredentialImplementation);
-        
+
         PasswordCredentialImplementation pci = (PasswordCredentialImplementation) c;
 
         assertEquals("ssh", pci.getAdaptorName());
@@ -92,15 +90,15 @@ public class CredentialsEngineImplementationTest {
 
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
     }
-    
+
     @org.junit.Test
-    public void testProxy() throws Exception { 
-        
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine); 
+    public void testProxy() throws Exception {
+
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
         Credential c = ce.newProxyCredential("ssh", null, "host", 42, "username", "password".toCharArray());
-        
+
         assertTrue(c instanceof ProxyCredentialImplementation);
-        
+
         ProxyCredentialImplementation pci = (ProxyCredentialImplementation) c;
 
         assertEquals("ssh", pci.getAdaptorName());
@@ -108,8 +106,8 @@ public class CredentialsEngineImplementationTest {
         assertEquals(pci.getHost(), "host");
         assertEquals(pci.getPort(), 42);
         assertEquals(new Properties(), pci.getProperties());
-        
+
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
     }
-    
+
 }

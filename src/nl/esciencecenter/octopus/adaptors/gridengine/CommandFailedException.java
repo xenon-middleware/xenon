@@ -20,7 +20,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 public class CommandFailedException extends OctopusException {
 
     private static final long serialVersionUID = 1L;
-    
+
     private int exitCode;
     private String stderr;
 
@@ -33,7 +33,7 @@ public class CommandFailedException extends OctopusException {
     }
 
     public CommandFailedException(String adaptorName, String message, int exitCode, String stderr) {
-        super(adaptorName, message);    
+        super(adaptorName, message);
         this.exitCode = exitCode;
         this.stderr = stderr;
     }

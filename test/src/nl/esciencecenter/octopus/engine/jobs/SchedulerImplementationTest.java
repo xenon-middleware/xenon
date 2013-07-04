@@ -23,86 +23,93 @@ import java.util.Arrays;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
- */ 
+ * 
+ */
 public class SchedulerImplementationTest {
-    
+
     @org.junit.Test
     public void test_constructor0() throws Exception {
-        new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "aap",  "noot" }, null, null, true, true,
-                true);     
+        new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true, true,
+                true);
     }
-        
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor1() throws Exception {
-        new SchedulerImplementation(null, "id1", new URI("test:///"), new String [] { "aap",  "noot" }, null, null, true, true,
-                true);     
+        new SchedulerImplementation(null, "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true, true,
+                true);
     }
-    
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor2() throws Exception {
-        new SchedulerImplementation("test", null, new URI("test:///"), new String [] { "aap",  "noot" }, null, null, true, true,
-                true);     
+        new SchedulerImplementation("test", null, new URI("test:///"), new String[] { "aap", "noot" }, null, null, true, true,
+                true);
     }
-    
+
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
-    
-        SchedulerImplementation si = new SchedulerImplementation("test", "id1", new URI("test:///"),  
-                new String [] { "aap",  "noot" }, null, null, true, true, true);
-        
+
+        SchedulerImplementation si =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
+                        true, true);
+
         assertEquals("test", si.getAdaptorName());
         assertEquals("id1", si.getUniqueID());
         assertEquals(null, si.getCredential());
         assertEquals(null, si.getProperties());
         assertEquals(new URI("test:///"), si.getUri());
-        
-        assertTrue(Arrays.equals(new String [] { "aap",  "noot" },  si.getQueueNames()));
-        
+
+        assertTrue(Arrays.equals(new String[] { "aap", "noot" }, si.getQueueNames()));
+
         assertTrue(si.isOnline());
         assertTrue(si.supportsInteractive());
         assertTrue(si.supportsBatch());
-    } 
-    
+    }
+
     @org.junit.Test
     public void test_toString() throws Exception {
-    
-        SchedulerImplementation si = new SchedulerImplementation("test", "id1", new URI("test:///"),  
-                new String [] { "aap",  "noot" }, null, null, true, true, true);
-     
+
+        SchedulerImplementation si =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
+                        true, true);
+
         System.err.println("SI: " + si.toString());
-        
-        assertTrue(si.toString().equals("SchedulerImplementation [uniqueID=id1, adaptorName=test, uri=test:///, properties=null," 
-                + " queueNames=[aap, noot], isOnline=true, supportsInteractive=true, supportsBatch=true]"));
+
+        assertTrue(si.toString().equals(
+                "SchedulerImplementation [uniqueID=id1, adaptorName=test, uri=test:///, properties=null,"
+                        + " queueNames=[aap, noot], isOnline=true, supportsInteractive=true, supportsBatch=true]"));
     }
-    
+
     @org.junit.Test
     public void test_hashcode_equals() throws Exception {
-        
-        SchedulerImplementation si = new SchedulerImplementation("test", "id1", new URI("test:///"),  
-                new String [] { "aap",  "noot" }, null, null, true, true, true);
-        
+
+        SchedulerImplementation si =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
+                        true, true);
+
         int hash = (31 + "test".hashCode()) * 31 + "id1".hashCode();
-        
+
         assertTrue(hash == si.hashCode());
 
         assertTrue(si.equals(si));
         assertFalse(si.equals(null));
         assertFalse(si.equals("AAP"));
-        
-        SchedulerImplementation si2 = new SchedulerImplementation("test2", "id1", new URI("test:///"),  
-                new String [] { "aap",  "noot" }, null, null, true, true, true);
-        
+
+        SchedulerImplementation si2 =
+                new SchedulerImplementation("test2", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null,
+                        true, true, true);
+
         assertFalse(si.equals(si2));
-        
-        SchedulerImplementation si3 = new SchedulerImplementation("test", "id2", new URI("test:///"),  
-                new String [] { "aap",  "noot" }, null, null, true, true, true);
+
+        SchedulerImplementation si3 =
+                new SchedulerImplementation("test", "id2", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
+                        true, true);
 
         assertFalse(si.equals(si3));
-        
-        SchedulerImplementation si4 = new SchedulerImplementation("test", "id1", new URI("test:///"),  
-                new String [] { "aap",  "noot" }, null, null, true, true, true);
-        
+
+        SchedulerImplementation si4 =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
+                        true, true);
+
         assertTrue(si.equals(si4));
     }
 }

@@ -42,42 +42,42 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class JobQueueTest {
 
     public static final int POLLING_DELAY = 250;
-    
+
     static class MyProcessWrapper implements InteractiveProcess {
-        
+
         final JobImplementation job;
-        
+
         boolean destoyed = false;
         boolean done = false;
         int exit = -1;
-        
-        public MyProcessWrapper(JobImplementation job) { 
+
+        public MyProcessWrapper(JobImplementation job) {
             this.job = job;
         }
-        
+
         @Override
         public Streams getStreams() {
             return null;
         }
 
-        public synchronized void setDone() { 
-           done = true;
+        public synchronized void setDone() {
+            done = true;
         }
-        
+
         @Override
         public synchronized boolean isDone() {
             return done;
         }
 
-        public synchronized void setExitStatus(int exit) { 
+        public synchronized void setExitStatus(int exit) {
             this.exit = exit;
         }
-        
+
         @Override
         public synchronized int getExitStatus() {
             return exit;
@@ -86,93 +86,93 @@ public class JobQueueTest {
         @Override
         public synchronized void destroy() {
             destoyed = true;
-        }         
-        
+        }
+
         public synchronized boolean isDestroyed() {
             return destoyed;
         }
     }
-    
+
     static class MyFactory implements InteractiveProcessFactory {
-        
+
         private boolean fail = false;
-        
-        public void setFail(boolean value) { 
+
+        public void setFail(boolean value) {
             fail = value;
         }
-        
+
         @Override
         public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
-            
+
             if (fail) {
                 setCurrentWrapper(null);
                 throw new IOException("Failed to create process!");
             }
-            
+
             MyProcessWrapper wrapper = new MyProcessWrapper(job);
-            
+
             setCurrentWrapper(wrapper);
-            
+
             return wrapper;
         }
     }
-    
+
     public static Scheduler scheduler;
     public static Octopus octopus;
     public static FileSystem filesystem;
     public static JobQueues jobQueue;
     public static MyFactory myFactory;
-    
+
     public static MyProcessWrapper currentWrapper;
-    
-    public synchronized static MyProcessWrapper getCurrentWrapper() { 
+
+    public synchronized static MyProcessWrapper getCurrentWrapper() {
         return currentWrapper;
     }
-    
-    public synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) { 
+
+    public synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) {
         currentWrapper = wrapper;
     }
-    
+
     @BeforeClass
-    public static void prepare() throws Exception { 
+    public static void prepare() throws Exception {
 
         octopus = mock(Octopus.class);
         scheduler = mock(Scheduler.class);
         filesystem = mock(FileSystem.class);
-        
+
         myFactory = new MyFactory();
         jobQueue = new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, POLLING_DELAY);
     }
 
     @AfterClass
-    public static void cleanup() throws Exception { 
+    public static void cleanup() throws Exception {
 
-        Job [] jobs = jobQueue.getJobs();
-        
-        if (jobs != null && jobs.length > 0) { 
-            
+        Job[] jobs = jobQueue.getJobs();
+
+        if (jobs != null && jobs.length > 0) {
+
             System.err.println("Jobs stuck in queue: " + jobs.length);
-            
-            for (int i=0;i<jobs.length;i++) { 
-                System.err.println("   " + jobs[i]);                   
+
+            for (int i = 0; i < jobs.length; i++) {
+                System.err.println("   " + jobs[i]);
             }
-            
+
             throw new Exception("There are jobs sutck in the queue!");
-        }        
+        }
     }
-    
+
     @Test(expected = BadParameterException.class)
     public void test_constructor2() throws Exception {
         // throws exception
         new JobQueues("test", octopus, scheduler, filesystem, myFactory, 0, POLLING_DELAY);
     }
-    
+
     @Test(expected = BadParameterException.class)
     public void test_constructor3() throws Exception {
         // throws exception
         new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, 1);
     }
-    
+
     @Test(expected = BadParameterException.class)
     public void test_constructor4() throws Exception {
         // throws exception
@@ -185,12 +185,12 @@ public class JobQueueTest {
         d.setQueueName("aap");
         jobQueue.submitJob(d);
     }
-    
+
     @Test(expected = IncompleteJobDescriptionException.class)
-    public void test_incompleteJobDescription1() throws Exception { 
+    public void test_incompleteJobDescription1() throws Exception {
         jobQueue.submitJob(new JobDescription());
     }
-    
+
     @Test(expected = InvalidJobDescriptionException.class)
     public void test_invalidJobDescription2() throws Exception {
         JobDescription d = new JobDescription();
@@ -266,15 +266,15 @@ public class JobQueueTest {
         d.setQueueName("unlimited");
 
         myFactory.setFail(true);
-        
+
         try {
             // throws exception
             jobQueue.submitJob(d);
-        } finally { 
+        } finally {
             myFactory.setFail(false);
-        }        
+        }
     }
-    
+
     @Test(expected = OctopusException.class)
     public void test_failingInteractiveJob2() throws Exception {
         JobDescription d = new JobDescription();
@@ -283,15 +283,15 @@ public class JobQueueTest {
         d.setQueueName("unlimited");
         d.setStderr(null);
         d.setStdout(null);
-        
+
         myFactory.setFail(true);
-        
+
         try {
             // throws exception
             jobQueue.submitJob(d);
-        } finally { 
+        } finally {
             myFactory.setFail(false);
-        }        
+        }
     }
 
     @Test(expected = OctopusException.class)
@@ -305,39 +305,39 @@ public class JobQueueTest {
         Scheduler s = mock(Scheduler.class);
         Job job = mock(Job.class);
         when(job.getScheduler()).thenReturn(s);
-       
+
         // throws exception
         jobQueue.getJobStatus(job);
     }
 
     @Test(expected = OctopusException.class)
     public void test_invalidQueueName() throws Exception {
-        
+
         JobDescription d = new JobDescription();
         d.setQueueName("test");
-        
+
         Job job = mock(Job.class);
         when(job.getScheduler()).thenReturn(scheduler);
         when(job.getJobDescription()).thenReturn(d);
-        
+
         // throws exception
         jobQueue.getJobStatus(job);
     }
 
     @Test(expected = OctopusException.class)
     public void test_invalidJob() throws Exception {
-        
+
         JobDescription d = new JobDescription();
         d.setQueueName("unlimited");
-        
+
         Job job = mock(Job.class);
         when(job.getScheduler()).thenReturn(scheduler);
         when(job.getJobDescription()).thenReturn(d);
-        
+
         // throws exception
         jobQueue.getJobStatus(job);
     }
-    
+
     @Test
     public void test_cancelJob1() throws Exception {
 
@@ -346,16 +346,16 @@ public class JobQueueTest {
         d.setQueueName("unlimited");
 
         Job job = jobQueue.submitJob(d);
-        
+
         // Wait for at least the polling delay!
-        try { 
+        try {
             Thread.sleep(POLLING_DELAY * 2);
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             // ignored
         }
 
         JobStatus status = jobQueue.cancelJob(job);
-        
+
         assertNotNull(status);
         assertTrue(status.isDone());
         assertTrue(status.hasException());
@@ -367,21 +367,21 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_cancelJob2");
         d.setQueueName("unlimited");
-        
+
         Job job = jobQueue.submitJob(d);
 
         // Wait for at least the polling delay!
-        try { 
+        try {
             Thread.sleep(POLLING_DELAY * 2);
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             // ignored
         }
-        
+
         currentWrapper.setExitStatus(42);
         currentWrapper.setDone();
-        
+
         JobStatus status = jobQueue.cancelJob(job);
-        
+
         assertNotNull(status);
         assertTrue(status.isDone());
         assertFalse(status.hasException());
@@ -394,113 +394,113 @@ public class JobQueueTest {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_pollJob");
         d.setQueueName("unlimited");
-        
+
         Job job = jobQueue.submitJob(d);
 
         // Wait for at least the polling delay!
-        try { 
+        try {
             Thread.sleep(POLLING_DELAY * 2);
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             // ignored
         }
-        
+
         JobStatus status = jobQueue.getJobStatus(job);
-        
+
         assertNotNull(status);
         assertFalse(status.isDone());
-        
+
         currentWrapper.setExitStatus(42);
         currentWrapper.setDone();
-        
+
         // Wait for at least the polling delay!
-        try { 
+        try {
             Thread.sleep(POLLING_DELAY * 2);
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             // ignored
         }
-        
+
         status = jobQueue.getJobStatus(job);
-        
+
         assertNotNull(status);
         assertTrue(status.isDone());
         assertFalse(status.hasException());
         assertTrue(status.getExitCode() == 42);
     }
-    
+
     @Test
     public void test_waitForJob() throws Exception {
 
         JobDescription d = new JobDescription();
         d.setExecutable("exec_waitForJob");
         d.setQueueName("unlimited");
-        
+
         Job job = jobQueue.submitJob(d);
 
         // Give the job 1 sec. to start.
         JobStatus status = jobQueue.waitUntilDone(job, 1000);
-        
+
         assertNotNull(status);
-        
-        if (status.isDone()) { 
+
+        if (status.isDone()) {
             Exception e = status.getException();
             System.err.println("EEP: " + status.getException());
             e.printStackTrace(System.err);
         }
-        
+
         assertFalse(status.isDone());
-        
+
         currentWrapper.setExitStatus(42);
         currentWrapper.setDone();
-   
-        status = jobQueue.waitUntilDone(job, POLLING_DELAY*3);
-        
+
+        status = jobQueue.waitUntilDone(job, POLLING_DELAY * 3);
+
         assertNotNull(status);
         assertTrue(status.isDone());
         assertFalse(status.hasException());
         assertTrue(status.getExitCode() == 42);
     }
-    
+
     @Test
     public void test_getJobs1() throws Exception {
 
         JobDescription d = new JobDescription();
         d.setExecutable("exec_getJobs");
         d.setQueueName("unlimited");
-        
+
         Job job = jobQueue.submitJob(d);
 
-        Job [] status = jobQueue.getJobs();
-        
+        Job[] status = jobQueue.getJobs();
+
         assertNotNull(status);
         assertTrue(status.length == 1);
-        
-        status = jobQueue.getJobs((String []) null);
-        
+
+        status = jobQueue.getJobs((String[]) null);
+
         assertNotNull(status);
         assertTrue(status.length == 1);
-        
+
         jobQueue.cancelJob(job);
     }
-    
+
     @Test
     public void test_getJobs2() throws Exception {
 
         JobDescription d = new JobDescription();
         d.setExecutable("exec_getJobs");
         d.setQueueName("unlimited");
-        
+
         Job job = jobQueue.submitJob(d);
 
-        Job [] status = jobQueue.getJobs("unlimited");
-        
+        Job[] status = jobQueue.getJobs("unlimited");
+
         assertNotNull(status);
         assertTrue(status.length == 1);
-        
+
         status = jobQueue.getJobs("single");
-        
+
         assertNotNull(status);
         assertTrue(status.length == 0);
-        
+
         jobQueue.cancelJob(job);
     }
 

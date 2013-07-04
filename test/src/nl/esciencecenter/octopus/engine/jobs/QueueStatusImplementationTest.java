@@ -26,88 +26,94 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class QueueStatusImplementationTest {
-    
+
     @org.junit.Test
     public void test_constructor0() throws Exception {
-        
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         new QueueStatusImplementation(s, "testq", null, null);
     }
-        
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor1() throws Exception {
         new QueueStatusImplementation(null, "testq", null, null);
     }
-    
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor2() throws Exception {
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         new QueueStatusImplementation(s, null, null, null);
     }
-    
+
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         Exception e = new Exception("Test Exception");
-        
-        Map<String,String> info = new HashMap<>();
+
+        Map<String, String> info = new HashMap<>();
         info.put("key1", "value1");
-        
+
         QueueStatusImplementation qsi = new QueueStatusImplementation(s, "testq", e, info);
-        
+
         assertEquals(s, qsi.getScheduler());
         assertEquals("testq", qsi.getQueueName());
         assertEquals(e, qsi.getException());
         assertEquals(info, qsi.getSchedulerSpecficInformation());
-        
+
         assertTrue(qsi.hasException());
-    } 
+    }
 
     @org.junit.Test
     public void test_hasException() throws Exception {
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         Exception e = new Exception("Test Exception");
-        
-        Map<String,String> info = new HashMap<>();
+
+        Map<String, String> info = new HashMap<>();
         info.put("key1", "value1");
-        
-        QueueStatusImplementation qsi = new QueueStatusImplementation(s, "testq", e, info);
-        
-        assertTrue(qsi.hasException());
-        
-        qsi = new QueueStatusImplementation(s, "testq", null, info);
-        
-        assertFalse(qsi.hasException());        
-    } 
-    
-    @org.junit.Test
-    public void test_toString() throws Exception {
-    
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
-        Exception e = new Exception("Test Exception");
-        
-        Map<String,String> info = new HashMap<>();
-        info.put("key1", "value1");
-        
+
         QueueStatusImplementation qsi = new QueueStatusImplementation(s, "testq", e, info);
 
-        assertTrue(qsi.toString().equals("QueueStatusImplementation [scheduler=" + s.toString() + ", queueName=testq, " +
-        		"exception=" + e.toString() + ", schedulerSpecificInformation=" + info.toString() + "]"));
+        assertTrue(qsi.hasException());
+
+        qsi = new QueueStatusImplementation(s, "testq", null, info);
+
+        assertFalse(qsi.hasException());
+    }
+
+    @org.junit.Test
+    public void test_toString() throws Exception {
+
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
+        Exception e = new Exception("Test Exception");
+
+        Map<String, String> info = new HashMap<>();
+        info.put("key1", "value1");
+
+        QueueStatusImplementation qsi = new QueueStatusImplementation(s, "testq", e, info);
+
+        assertTrue(qsi.toString().equals(
+                "QueueStatusImplementation [scheduler=" + s.toString() + ", queueName=testq, " + "exception=" + e.toString()
+                        + ", schedulerSpecificInformation=" + info.toString() + "]"));
     }
 }

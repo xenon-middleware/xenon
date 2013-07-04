@@ -47,23 +47,23 @@ public interface Job {
      * @return the identifier that was assigned to this job by the scheduler.
      */
     public String getIdentifier();
-        
-    /** 
+
+    /**
      * Returns if this is an interactive job.
-      * 
+     * 
      * @return if this is an interactive job.
-     */    
+     */
     public boolean isInteractive();
 
-    /** 
-     * Returns if this is an online job. 
+    /**
+     * Returns if this is an online job.
      * 
-     * Online jobs will disappear when the application that submitted is exist, while offlines jobs will keep running. 
+     * Online jobs will disappear when the application that submitted is exist, while offlines jobs will keep running.
      * 
-     * Interactive jobs are by definition online. Batch jobs will be online if the scheduler to which they were submitted is 
-     * online.  
-      * 
+     * Interactive jobs are by definition online. Batch jobs will be online if the scheduler to which they were submitted is
+     * online.
+     * 
      * @return if this is an online job.
-     */    
+     */
     public boolean isOnline();
 }

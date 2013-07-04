@@ -27,7 +27,7 @@ import nl.esciencecenter.octopus.files.Files;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class LocalFileTestConfig extends FileTestConfig {
 
@@ -36,16 +36,15 @@ public class LocalFileTestConfig extends FileTestConfig {
     private final URI wrongPathURI;
     private final URI wrongLocationURI;
 
-    
-    public LocalFileTestConfig() throws Exception { 
+    public LocalFileTestConfig() throws Exception {
         super("local");
-        
+
         correctURI = new URI("file:///");
         correctURIWithPath = new URI("file:////");
         wrongPathURI = new URI("file:///aap/noot/mies/");
-        wrongLocationURI = new URI("file://machine/");        
+        wrongLocationURI = new URI("file://machine/");
     }
-    
+
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
         return files.getLocalCWDFileSystem();
@@ -71,14 +70,14 @@ public class LocalFileTestConfig extends FileTestConfig {
         return wrongPathURI;
     }
 
-    public boolean supportURILocation() { 
+    public boolean supportURILocation() {
         return true;
     }
-    
-    public URI getURIWrongLocation() throws Exception { 
+
+    public URI getURIWrongLocation() throws Exception {
         return wrongLocationURI;
     }
-    
+
     @Override
     public Credential getDefaultCredential(Credentials c) throws Exception {
         return null;
@@ -88,8 +87,8 @@ public class LocalFileTestConfig extends FileTestConfig {
     public Properties getDefaultProperties() throws Exception {
         return null;
     }
-    
-    public boolean supportNullCredential() { 
+
+    public boolean supportNullCredential() {
         return true;
     }
 }

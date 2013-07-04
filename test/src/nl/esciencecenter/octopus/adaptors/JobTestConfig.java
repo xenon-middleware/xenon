@@ -24,22 +24,22 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public abstract class JobTestConfig extends GenericTestConfig {
-  
-    protected JobTestConfig(String adaptorName) { 
+
+    protected JobTestConfig(String adaptorName) {
         super(adaptorName);
     }
-    
-    public boolean supportsClose() throws Exception { 
+
+    public boolean supportsClose() throws Exception {
         return false;
     }
 
     public String[] getQueueNames() {
-        return new String [] { "single", "multi", "unlimited" };
+        return new String[] { "single", "multi", "unlimited" };
     }
-    
+
     public String getDefaultQueueName() {
         return "single";
     }
@@ -48,15 +48,19 @@ public abstract class JobTestConfig extends GenericTestConfig {
         return true;
     }
 
-    public abstract boolean supportsStatusAfterDone(); 
-    
+    public abstract boolean supportsStatusAfterDone();
+
     public abstract Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception;
+
     public abstract FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception;
+
     public abstract String getInvalidQueueName() throws Exception;
 
     public abstract long getDefaultQueueWaitTimeout();
+
     public abstract long getDefaultShortJobTimeout();
+
     public abstract long getDefaultCancelTimeout();
-    
-    public abstract boolean supportsParallelJobs(); 
+
+    public abstract boolean supportsParallelJobs();
 }

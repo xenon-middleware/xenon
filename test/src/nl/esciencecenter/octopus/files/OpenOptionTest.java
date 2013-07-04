@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class OpenOptionTest {
 
@@ -61,17 +61,16 @@ public class OpenOptionTest {
         OpenOption[] options = new OpenOption[] { null };
         assertFalse(OpenOption.contains(OpenOption.CREATE, options));
     }
-    
+
     @Test
     public void testContains_valueOf() {
         OpenOption option = OpenOption.valueOf("CREATE");
         assertTrue(option.equals(OpenOption.CREATE));
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testContains_valueOf_fails() {
         OpenOption.valueOf("AAP");
     }
 
-    
 }

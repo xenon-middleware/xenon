@@ -23,17 +23,17 @@ import org.junit.BeforeClass;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class SSHFileAdaptorTest extends GenericFileAdaptorTestParent {
-    
+
     @BeforeClass
-    public static void prepareSSHFileAdaptorTest() throws Exception { 
+    public static void prepareSSHFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.prepareClass(new SSHFileTestConfig(null));
     }
 
     @AfterClass
-    public static void cleanupSSHFileAdaptorTest() throws Exception { 
+    public static void cleanupSSHFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.cleanupClass();
     }
 }

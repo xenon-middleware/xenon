@@ -52,7 +52,7 @@ public class GridEngineJobs implements Jobs {
     public GridEngineJobs(OctopusProperties properties, OctopusEngine octopusEngine) {
         this.properties = properties;
         this.octopusEngine = octopusEngine;
-    
+
         connections = new HashMap<String, SchedulerConnection>();
     }
 
@@ -96,20 +96,19 @@ public class GridEngineJobs implements Jobs {
     @Override
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
-        
-        
+
         SchedulerConnection connection = new GridEngineSchedulerConnection(location, credential, properties, octopusEngine);
 
         addConnection(connection);
 
         return connection.getScheduler();
     }
-    
+
     @Override
     public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
         return null;
     }
-    
+
     @Override
     public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
         SchedulerConnection connection = getConnection(scheduler);
@@ -129,7 +128,7 @@ public class GridEngineJobs implements Jobs {
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
-        
+
         //fetch and parse info
         return connection.getQueueStatus(queueName);
     }
@@ -290,5 +289,4 @@ public class GridEngineJobs implements Jobs {
         return connection.waitUntilRunning(job, timeout);
     }
 
-    
 }

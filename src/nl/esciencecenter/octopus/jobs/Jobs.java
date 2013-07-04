@@ -138,18 +138,18 @@ public interface Jobs {
      *             If an I/O error occurred.
      */
     public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException;
-    
+
     /**
      * Get all jobs currently in (one ore more) queues of <code>scheduler</code>.
      * 
      * If no queue names are specified, the jobs for all queues are returned.
      * 
-     * Note that jobs submitted by other users or other schedulers may also be returned. 
+     * Note that jobs submitted by other users or other schedulers may also be returned.
      * 
      * @param scheduler
      *            the Scheduler.
      * @param queueNames
-     *            the names of the queues.  
+     *            the names of the queues.
      * 
      * @return an array containing the resulting Jobs.
      * 
@@ -188,10 +188,10 @@ public interface Jobs {
     /**
      * Get the status of all <code>queues</code> of <code>scheduler</code>.
      * 
-     * Note that this method will only throw an exception when this exception will influence all status requests. For example, 
-     * if the scheduler is invalid or not reachable. 
+     * Note that this method will only throw an exception when this exception will influence all status requests. For example, if
+     * the scheduler is invalid or not reachable.
      * 
-     * Exceptions that only refer to a single queue are returned in the QueueStatus returned for that queue. 
+     * Exceptions that only refer to a single queue are returned in the QueueStatus returned for that queue.
      * 
      * @param scheduler
      *            the Scheduler.
@@ -254,10 +254,10 @@ public interface Jobs {
     /**
      * Get the status of all specified <code>jobs</code>.
      * 
-     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the 
-     * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters.   
-     * If a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be 
-     * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the 
+     * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the
+     * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters. If
+     * a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be
+     * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the
      * corresponding <code>JobsStatus</code> entry.
      * 
      * @param jobs
@@ -271,30 +271,33 @@ public interface Jobs {
      *             If an I/O error occurred.
      */
     public JobStatus[] getJobStatuses(Job... jobs);
-    
-    /** 
+
+    /**
      * Returns the standard streams of a job.
      * 
-     * The standard streams can only be retrieved if it is an interactive job.  
+     * The standard streams can only be retrieved if it is an interactive job.
      * 
-     * @param job the interactive job for which to retrieve the streams.
+     * @param job
+     *            the interactive job for which to retrieve the streams.
      * @return the streams of the job.
-     *
-     * @throws OctopusException if the job is not interactive.
+     * 
+     * @throws OctopusException
+     *             if the job is not interactive.
      */
     public Streams getStreams(Job job) throws OctopusException;
-        
+
     /**
      * Cancel a job.
      * 
-     * A status is returned that indicates the state of the job after the cancel.  If the jobs was already done it cannot be 
-     * killed afterwards.   
+     * A status is returned that indicates the state of the job after the cancel. If the jobs was already done it cannot be killed
+     * afterwards.
      * 
-     * A JobStatus is returned that can be used to determine the state of the job after cancelJob returns. Note that it may take 
-     * some time before the job is actually terminated. The {@link waitUntilDone} method can be used to wait until the job is 
-     * terminated.   
+     * A JobStatus is returned that can be used to determine the state of the job after cancelJob returns. Note that it may take
+     * some time before the job is actually terminated. The {@link waitUntilDone} method can be used to wait until the job is
+     * terminated.
      * 
-     * @param job the job to kill.
+     * @param job
+     *            the job to kill.
      * @return the status of the Job.
      * 
      * @throws NoSuchJobException
@@ -306,20 +309,21 @@ public interface Jobs {
      */
     public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
 
-
     /**
-     * Wait until a job is done or until a timeout expires. 
+     * Wait until a job is done or until a timeout expires.
      * 
-     * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the  
-     * timeout expires, the job will continue to run normally. 
+     * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the timeout
+     * expires, the job will continue to run normally.
      * 
-     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.      
+     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
      * 
-     * A JobStatus is returned that can be used to determine why the call returned.    
+     * A JobStatus is returned that can be used to determine why the call returned.
      * 
-     * @param job the job.
-     * @param timeout the maximum time to wait for the job in milliseconds.   
-     * @returns  the status of the Job.
+     * @param job
+     *            the job.
+     * @param timeout
+     *            the maximum time to wait for the job in milliseconds.
+     * @returns the status of the Job.
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
@@ -329,20 +333,22 @@ public interface Jobs {
      *             If an I/O error occurred.
      */
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
-    
+
     /**
-     * Wait for as long a job is waiting in a queue, or until a timeout expires. 
+     * Wait for as long a job is waiting in a queue, or until a timeout expires.
      * 
-     * This method will return as soon as the job is no longer waiting in the queue. This is generally the case when it starts 
-     * running, but it may also be killed or produce an error. If the timeout expires, the job will continue to be queued 
-     * normally. 
+     * This method will return as soon as the job is no longer waiting in the queue. This is generally the case when it starts
+     * running, but it may also be killed or produce an error. If the timeout expires, the job will continue to be queued
+     * normally.
      * 
-     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.      
+     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
      * 
-     * A JobStatus is returned that can be used to determine why the call returned.    
+     * A JobStatus is returned that can be used to determine why the call returned.
      * 
-     * @param job the job.
-     * @param timeout the maximum time to wait in milliseconds.   
+     * @param job
+     *            the job.
+     * @param timeout
+     *            the maximum time to wait in milliseconds.
      * @returns the status of the Job.
      * 
      * @throws NoSuchJobException

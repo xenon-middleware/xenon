@@ -29,7 +29,7 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 /**
- * LocalFileAttributes implements a {@link FileAttributes} for local files. 
+ * LocalFileAttributes implements a {@link FileAttributes} for local files.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -140,12 +140,11 @@ public class LocalFileAttributes implements FileAttributes {
     public boolean isWritable() throws AttributeNotSupportedException {
         return writable;
     }
-    
+
     @Override
     public String toString() {
-        return "LocalFileAttributes [executable=" + executable + ", readable=" + readable
-                + ", writable=" + writable + ", hidden=" + hidden + ", attributes=" 
-                + PosixFilePermissions.toString(attributes.permissions()) + "]";
+        return "LocalFileAttributes [executable=" + executable + ", readable=" + readable + ", writable=" + writable
+                + ", hidden=" + hidden + ", attributes=" + PosixFilePermissions.toString(attributes.permissions()) + "]";
     }
 
     @Override
@@ -169,38 +168,38 @@ public class LocalFileAttributes implements FileAttributes {
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         LocalFileAttributes other = (LocalFileAttributes) obj;
-                
-        if (executable != other.executable) { 
-            return false;
-        }
-        
-        if (readable != other.readable) { 
-            return false;
-        }
-        
-        if (writable != other.writable) { 
+
+        if (executable != other.executable) {
             return false;
         }
 
-        if (hidden != other.hidden) { 
+        if (readable != other.readable) {
             return false;
         }
-        
-// FIXME: Always fails ?         
-//        if (attributes == null) { 
-//            if (other.attributes != null) { 
-//                return false;
-//            }
-//        } else if (!attributes.equals(other.attributes)) { 
-//            return false;
-//        }
-//        
+
+        if (writable != other.writable) {
+            return false;
+        }
+
+        if (hidden != other.hidden) {
+            return false;
+        }
+
+        // FIXME: Always fails ?         
+        //        if (attributes == null) { 
+        //            if (other.attributes != null) { 
+        //                return false;
+        //            }
+        //        } else if (!attributes.equals(other.attributes)) { 
+        //            return false;
+        //        }
+        //        
         return true;
     }
 
@@ -208,6 +207,5 @@ public class LocalFileAttributes implements FileAttributes {
     //    public List<AclEntry> getAcl() throws AttributeNotSupportedException {
     //        throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
     //    }
-    
-    
+
 }

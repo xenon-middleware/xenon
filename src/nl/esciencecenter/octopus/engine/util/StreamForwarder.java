@@ -55,12 +55,12 @@ public class StreamForwarder extends Thread {
         try {
             c.close();
         } catch (Exception e) {
-            if (error != null) { 
+            if (error != null) {
                 logger.error(error, e);
             }
         }
     }
-    
+
     public void close() {
         close(in, "Cannot close input stream");
     }
@@ -75,7 +75,7 @@ public class StreamForwarder extends Thread {
                     return;
                 }
 
-                if (out != null) { 
+                if (out != null) {
                     out.write(buffer, 0, read);
                 }
             }
@@ -83,8 +83,8 @@ public class StreamForwarder extends Thread {
             logger.error("Cannot forward stream", e);
         } finally {
             close(in, null);
-            
-            if (out != null) { 
+
+            if (out != null) {
                 close(out, null);
             }
         }

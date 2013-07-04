@@ -42,7 +42,7 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 /**
- * LocalUtils contains various utilities for local file operations.  
+ * LocalUtils contains various utilities for local file operations.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -53,9 +53,9 @@ class LocalUtils {
 
     public static final String LOCAL_JOB_URI = "local:///";
     public static final String LOCAL_FILE_URI = "file:///";
-    
-    static String getHome() throws OctopusException { 
-        
+
+    static String getHome() throws OctopusException {
+
         String path = System.getProperty("user.home");
 
         if (!LocalUtils.exists(path)) {
@@ -65,8 +65,8 @@ class LocalUtils {
         return path;
     }
 
-    static String getCWD() throws OctopusException { 
-        
+    static String getCWD() throws OctopusException {
+
         String path = System.getProperty("user.dir");
 
         if (!LocalUtils.exists(path)) {
@@ -76,7 +76,7 @@ class LocalUtils {
         return path;
     }
 
-    static URI getURI(String uri) { 
+    static URI getURI(String uri) {
         try {
             return new URI(uri);
         } catch (URISyntaxException e) {
@@ -84,25 +84,24 @@ class LocalUtils {
             throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to create URI: " + uri, e);
         }
     }
-    
-    static URI getLocalJobURI() { 
+
+    static URI getLocalJobURI() {
         return getURI(LOCAL_JOB_URI);
     }
-    
-    
-    static URI getLocalFileURI() { 
+
+    static URI getLocalFileURI() {
         return getURI(LOCAL_FILE_URI);
     }
-    
-    private static String expandHome(String path) { 
+
+    private static String expandHome(String path) {
 
         if (path.startsWith("~")) {
-            return System.getProperty("user.home") + "/" + (path.length() > 1 ? path.substring(1) : "");  
+            return System.getProperty("user.home") + "/" + (path.length() > 1 ? path.substring(1) : "");
         }
-        
+
         return path;
     }
-    
+
     static boolean exists(String path) {
 
         if (path == null) {
@@ -130,9 +129,9 @@ class LocalUtils {
 
         for (PosixFilePermission permission : permissions) {
             //try {
-                result.add(java.nio.file.attribute.PosixFilePermission.valueOf(permission.toString()));
+            result.add(java.nio.file.attribute.PosixFilePermission.valueOf(permission.toString()));
             //} catch (IllegalArgumentException e) {
-              //  throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
+            //  throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
             //}
         }
 
@@ -148,9 +147,9 @@ class LocalUtils {
 
         for (java.nio.file.attribute.PosixFilePermission permission : permissions) {
             //try {
-                result.add(PosixFilePermission.valueOf(permission.toString()));
+            result.add(PosixFilePermission.valueOf(permission.toString()));
             //} catch (IllegalArgumentException e) {
-              //  throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
+            //  throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
             //}
         }
 
@@ -161,8 +160,8 @@ class LocalUtils {
 
         ArrayList<java.nio.file.OpenOption> result = new ArrayList<java.nio.file.OpenOption>();
 
-        for (OpenOption opt : options) {            
-            switch (opt) { 
+        for (OpenOption opt : options) {
+            switch (opt) {
             case CREATE:
                 result.add(StandardOpenOption.CREATE_NEW);
                 break;
@@ -172,25 +171,25 @@ class LocalUtils {
                 break;
             case APPEND:
                 result.add(StandardOpenOption.APPEND);
-                break; 
+                break;
             case TRUNCATE:
                 result.add(StandardOpenOption.TRUNCATE_EXISTING);
-                break; 
+                break;
             case WRITE:
                 result.add(StandardOpenOption.WRITE);
-                break;     
+                break;
             case READ:
                 result.add(StandardOpenOption.READ);
                 break;
             }
         }
-            
+
         return result.toArray(new java.nio.file.OpenOption[result.size()]);
     }
 
     /**
      * @param path
-     * @throws OctopusIOException 
+     * @throws OctopusIOException
      */
     static InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
         try {
@@ -203,8 +202,8 @@ class LocalUtils {
     /**
      * @param path
      * @param options
-     * @throws OctopusIOException 
-     */    
+     * @throws OctopusIOException
+     */
     static SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
         try {
             return Files.newByteChannel(javaPath(path), javaOpenOptions(options));
@@ -216,7 +215,7 @@ class LocalUtils {
     /**
      * @param path
      * @param permissions
-     * @throws OctopusIOException 
+     * @throws OctopusIOException
      */
     static void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         try {
@@ -229,7 +228,7 @@ class LocalUtils {
 
     /**
      * @param path
-     * @throws OctopusIOException 
+     * @throws OctopusIOException
      */
     static void createFile(AbsolutePath path) throws OctopusIOException {
         try {
@@ -239,26 +238,25 @@ class LocalUtils {
         }
     }
 
-
     /**
      * @param path
      * @return
-     * @throws OctopusIOException 
+     * @throws OctopusIOException
      */
     static long size(AbsolutePath path) throws OctopusIOException {
-        try { 
+        try {
             return Files.size(LocalUtils.javaPath(path));
-        } catch (Exception e) { 
+        } catch (Exception e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to retrieve size of " + path, e);
         }
     }
 
     /**
      * @param path
-     * @throws OctopusIOException 
+     * @throws OctopusIOException
      */
     static void delete(AbsolutePath path) throws OctopusIOException {
-        
+
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
@@ -275,21 +273,20 @@ class LocalUtils {
     /**
      * @param source
      * @param target
-     * @throws OctopusIOException 
+     * @throws OctopusIOException
      */
     static void move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-        
+
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
         } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to "
-                    + target, e);
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
         }
     }
-    
+
     static void unixDestroy(java.lang.Process process) {
-        
-        try { 
+
+        try {
             Field pidField = process.getClass().getDeclaredField("pid");
             pidField.setAccessible(true);
 
@@ -302,13 +299,13 @@ class LocalUtils {
             CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
 
             if (killRunner.getExitCode() != 0) {
-                throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was " + 
-                        killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
+                throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was "
+                        + killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
             }
         } catch (Throwable t) {
             // Failed, so use the regular Java destroy.
             process.destroy();
         }
     }
-    
+
 }

@@ -31,23 +31,24 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
-    
+
     private final LinkedList<PathAttributesPair> stream;
-    
-    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
- 
+
+    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing)
+            throws OctopusIOException {
+
         stream = new LinkedList<PathAttributesPair>();
-        
-        for (LsEntry e : listing) { 
-            
+
+        for (LsEntry e : listing) {
+
             String filename = e.getFilename();
-            
+
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
-            } else { 
+            } else {
                 AbsolutePath tmp = dir.resolve(new RelativePath(filename));
-                
-                if (filter.accept(tmp)) { 
+
+                if (filter.accept(tmp)) {
                     SshFileAttributes attributes = new SshFileAttributes(e.getAttrs(), tmp);
                     stream.add(new PathAttributesPairImplementation(tmp, attributes));
                 }
@@ -73,11 +74,11 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
     @Override
     public synchronized PathAttributesPair next() {
 
-        if (stream.size() > 0) { 
+        if (stream.size() > 0) {
             return stream.removeFirst();
         }
 
-        throw new NoSuchElementException("No more files in directory");    
+        throw new NoSuchElementException("No more files in directory");
     }
 
     @Override

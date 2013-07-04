@@ -33,44 +33,44 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class PathAttributesPairImplementationTest {
 
-    Octopus octopus; 
+    Octopus octopus;
     Files files;
     FileSystem filesystem;
     AbsolutePath root;
-    FileAttributes att; 
-    
+    FileAttributes att;
+
     @Before
     public void prepare() throws OctopusException, OctopusIOException {
-     
+
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
         filesystem = files.getLocalCWDFileSystem();
         root = filesystem.getEntryPath();
         att = files.getAttributes(root);
     }
-    
+
     @After
-    public void cleanup() throws OctopusIOException, OctopusException { 
+    public void cleanup() throws OctopusIOException, OctopusException {
         files.close(filesystem);
         OctopusFactory.endOctopus(octopus);
     }
-    
+
     @Test
     public void test_equals() throws OctopusIOException {
-        
+
         PathAttributesPairImplementation tmp = new PathAttributesPairImplementation(root, att);
         PathAttributesPairImplementation tmp2 = new PathAttributesPairImplementation(root, null);
         PathAttributesPairImplementation tmp3 = new PathAttributesPairImplementation(null, att);
 
         PathAttributesPairImplementation tmp4 = new PathAttributesPairImplementation(root, att);
-        
+
         PathAttributesPairImplementation tmp5 = new PathAttributesPairImplementation(root, null);
         PathAttributesPairImplementation tmp6 = new PathAttributesPairImplementation(null, att);
-        
+
         assertFalse(tmp.equals(null));
         assertFalse(tmp.equals("AAP"));
         assertTrue(tmp.equals(tmp));
@@ -82,7 +82,7 @@ public class PathAttributesPairImplementationTest {
         assertTrue(tmp3.equals(tmp6));
         assertTrue(tmp.equals(tmp4));
     }
-    
+
     @Test
     public void test_hashCode() throws OctopusIOException {
 
@@ -90,34 +90,32 @@ public class PathAttributesPairImplementationTest {
         int result = 1;
         result = prime * result + att.hashCode();
         result = prime * result + root.hashCode();
-     
+
         assertTrue(result == new PathAttributesPairImplementation(root, att).hashCode());
-        
+
         result = 1;
         result = prime * result + 0;
         result = prime * result + root.hashCode();
-     
+
         assertTrue(result == new PathAttributesPairImplementation(root, null).hashCode());
-        
+
         result = 1;
         result = prime * result + att.hashCode();
         result = prime * result + 0;
-     
+
         assertTrue(result == new PathAttributesPairImplementation(null, att).hashCode());
-        
+
         result = 1;
         result = prime * result + 0;
         result = prime * result + 0;
-     
+
         assertTrue(result == new PathAttributesPairImplementation(null, null).hashCode());
 
         PathAttributesPairImplementation tmp1 = new PathAttributesPairImplementation(root, att);
         PathAttributesPairImplementation tmp2 = new PathAttributesPairImplementation(root, att);
-    
+
         assertTrue(tmp1.equals(tmp2));
         assertTrue(tmp1.hashCode() == tmp2.hashCode());
     }
 
-    
-    
 }

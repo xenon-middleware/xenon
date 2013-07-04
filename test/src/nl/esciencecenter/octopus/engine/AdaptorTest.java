@@ -33,7 +33,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class AdaptorTest {
 
@@ -66,67 +66,71 @@ public class AdaptorTest {
 
         @Override
         public void end() {
-        } 
-        
+        }
+
     }
 
     @Test
     public void test0() throws OctopusException {
-    
-        String [] schemes = new String [] { "SCHEME1", "SCHEME2" };
-  
+
+        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, null, new OctopusProperties());
-        
-        String [] tmp = t.getSupportedSchemes();
-        
-        assert(tmp != null);
-        assert(Arrays.equals(schemes, tmp));
+
+        String[] tmp = t.getSupportedSchemes();
+
+        assert (tmp != null);
+        assert (Arrays.equals(schemes, tmp));
     }
-    
+
     @Test
     public void test1() throws OctopusException {
-    
-        String [] schemes = new String [] { "SCHEME1", "SCHEME2" };
-        String [][] defaultProperties = new String [][] { { "octopus.adaptors.test.p1", "aap1", "aap2" }, { "octopus.adaptors.test.p2", "noot1", "noot2" }, };
- 
+
+        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        String[][] defaultProperties =
+                new String[][] { { "octopus.adaptors.test.p1", "aap1", "aap2" },
+                        { "octopus.adaptors.test.p2", "noot1", "noot2" }, };
+
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, defaultProperties, new OctopusProperties());
-        
-        Map<String,String> p = t.getSupportedProperties();
-        
-        assert(p.get("octopus.adaptors.test.p1").equals("aap2"));
-        assert(p.get("octopus.adaptors.test.p2").equals("noot2"));
+
+        Map<String, String> p = t.getSupportedProperties();
+
+        assert (p.get("octopus.adaptors.test.p1").equals("aap2"));
+        assert (p.get("octopus.adaptors.test.p2").equals("noot2"));
     }
 
     @Test
     public void test2() throws OctopusException {
-    
-        String [] schemes = new String [] { "SCHEME1", "SCHEME2" };
-        String [][] defaultProperties = new String [][] { { "octopus.adaptors.test.p1", "aap1", "aap2" }, { "octopus.adaptors.test.p2", "noot1", "noot2" }, };
+
+        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        String[][] defaultProperties =
+                new String[][] { { "octopus.adaptors.test.p1", "aap1", "aap2" },
+                        { "octopus.adaptors.test.p2", "noot1", "noot2" }, };
 
         Properties p = new Properties();
         p.put("octopus.adaptors.test.p1", "mies");
         p.put("octopus.adaptors.test.p2", "zus");
-        
+
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, defaultProperties, new OctopusProperties(p));
-        
-        Map<String,String> sp = t.getSupportedProperties();
-        
-        assert(sp.get("octopus.adaptors.test.p1").equals("mies"));
-        assert(sp.get("octopus.adaptors.test.p2").equals("zus"));
+
+        Map<String, String> sp = t.getSupportedProperties();
+
+        assert (sp.get("octopus.adaptors.test.p1").equals("mies"));
+        assert (sp.get("octopus.adaptors.test.p2").equals("zus"));
     }
- 
+
     @Test(expected = OctopusException.class)
     public void test3() throws OctopusException {
-    
-        String [] schemes = new String [] { "SCHEME1", "SCHEME2" };
-        String [][] defaultProperties = new String [][] { { "octopus.adaptors.test.p1", "aap1", "aap2" }, { "octopus.adaptors.test.p2", "noot1", "noot2" }, };
+
+        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        String[][] defaultProperties =
+                new String[][] { { "octopus.adaptors.test.p1", "aap1", "aap2" },
+                        { "octopus.adaptors.test.p2", "noot1", "noot2" }, };
 
         Properties p = new Properties();
         p.put("octopus.adaptors.test.p3", "mies");
-        
+
         new TestAdaptor(null, "test", "DESCRIPTION", schemes, defaultProperties, new OctopusProperties(p));
     }
-    
+
 }
-
-
