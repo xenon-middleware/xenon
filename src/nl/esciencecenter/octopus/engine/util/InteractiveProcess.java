@@ -20,12 +20,15 @@ import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public interface InteractiveProcess {
-    
+
     public Streams getStreams();
+
     public boolean isDone();
+
     public int getExitStatus();
+
     public void destroy();
 }

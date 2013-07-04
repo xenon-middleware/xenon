@@ -23,17 +23,17 @@ import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class LocalJobAdaptorTest extends GenericJobAdaptorTestParent {
-    
+
     @BeforeClass
-    public static void prepareLocalJobAdaptorTest() throws Exception { 
+    public static void prepareLocalJobAdaptorTest() throws Exception {
         GenericJobAdaptorTestParent.prepareClass(new LocalJobTestConfig());
     }
 
     @AfterClass
-    public static void cleanupAltLocalJobsTest() throws Exception { 
+    public static void cleanupAltLocalJobsTest() throws Exception {
         GenericJobAdaptorTestParent.cleanupClass();
     }
 }

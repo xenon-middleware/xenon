@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class InputWriter extends Thread {
-    
+
     static final Logger logger = LoggerFactory.getLogger(StreamForwarder.class);
 
     private final byte[] bytes;
@@ -39,7 +39,7 @@ public class InputWriter extends Thread {
 
     public InputWriter(String content, OutputStream destination) {
         this.destination = destination;
-        
+
         this.bytes = content.getBytes();
 
         setDaemon(true);
@@ -68,7 +68,7 @@ public class InputWriter extends Thread {
 
     public void run() {
         try {
-           destination.write(bytes);
+            destination.write(bytes);
         } catch (IOException e) {
             logger.error("Cannot write content to stream", e);
         } finally {

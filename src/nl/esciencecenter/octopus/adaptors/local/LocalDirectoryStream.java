@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
- * LocalDirectoryStream implements a {@link DirectoryStream} for local directories. 
+ * LocalDirectoryStream implements a {@link DirectoryStream} for local directories.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -73,7 +73,7 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
 
     @Override
     public void close() throws OctopusIOException {
-        
+
         try {
             stream.close();
         } catch (IOException e) {
@@ -84,11 +84,11 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
 
     @Override
     public synchronized boolean hasNext() {
-        
+
         if (readAhead != null) {
             return true;
         }
-        
+
         while (iterator.hasNext()) {
             AbsolutePath next = getPath(iterator.next());
             if (filter.accept(next)) {
@@ -96,13 +96,13 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
                 return true;
             }
         }
-        
+
         return false;
     }
 
     @Override
     public synchronized AbsolutePath next() {
-    
+
         if (readAhead != null) {
             AbsolutePath tmp = readAhead;
             readAhead = null;
@@ -111,12 +111,12 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
 
         while (iterator.hasNext()) {
             AbsolutePath next = getPath(iterator.next());
-            
+
             if (filter.accept(next)) {
                 return next;
             }
         }
-        
+
         throw new NoSuchElementException("No more files in directory");
     }
 

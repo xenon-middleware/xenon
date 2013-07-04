@@ -31,35 +31,32 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class StreamsImplementationTest {
 
     @org.junit.Test
     public void test_getters() throws Exception {
-        
+
         JobDescription desc = new JobDescription();
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         Job j = new JobImplementation(s, "id1", desc, true, true);
-        
+
         OutputStream stdin = new ByteArrayOutputStream();
         InputStream stdout = new ByteArrayInputStream(new byte[42]);
         InputStream stderr = new ByteArrayInputStream(new byte[42]);
-        
+
         StreamsImplementation si = new StreamsImplementation(j, stdout, stdin, stderr);
-        
+
         assertTrue(si.getStderr() == stderr);
         assertTrue(si.getStdout() == stdout);
         assertTrue(si.getStdin() == stdin);
-        
+
         assertEquals(j, si.getJob());
     }
-    
-        
-    
-    
-    
+
 }

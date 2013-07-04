@@ -40,7 +40,7 @@ public class CommandRunner {
     private final OutputReader out;
 
     private final OutputReader err;
-    
+
     // determine location of exe file using path, will return given location if
     // not found in path
     private static String getExeFile(String exe) {
@@ -95,7 +95,7 @@ public class CommandRunner {
         if (stdin == null) {
             stdin = "";
         }
-        
+
         //write given content to stdin of process
         new InputWriter(stdin, p.getOutputStream());
 

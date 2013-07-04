@@ -53,7 +53,7 @@ public class GridEngineCredentials implements Credentials {
     @Override
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
             char[] password) throws OctopusException {
-        return octopusEngine.credentials().newProxyCredential("ssh", properties, host, port, username, password); 
+        return octopusEngine.credentials().newProxyCredential("ssh", properties, host, port, username, password);
     }
 
     @Override

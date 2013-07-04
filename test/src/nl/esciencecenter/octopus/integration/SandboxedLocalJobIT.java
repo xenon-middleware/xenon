@@ -83,13 +83,13 @@ public class SandboxedLocalJobIT {
         String sandbox_id = "MIES" + UUID.randomUUID().toString();
         AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(tmpdir));
         Sandbox sandbox = new Sandbox(octopus, sandboxPath, sandbox_id);
-        
+
         sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
                 "lorem_ipsum.txt");
-        
+
         sandbox.addDownloadFile("stdout.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
         sandbox.addDownloadFile("stderr.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
-        
+
         // upload lorem_ipsum.txt to sandbox
         sandbox.upload();
 

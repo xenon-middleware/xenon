@@ -30,27 +30,30 @@ import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Sandbox is a place where files/directories can be uploaded to or downloaded from.
- *
+ * 
  * Example to submit a job with input and output files:
- *
+ * 
  * <blockquote>
+ * 
  * <pre class="code">
- * {@code
- * Sandbox sandbox = new Sandbox(octopus, sandboxBase);
- * sandbox.addUploadFile(inputfile);
- * sandbox.addDownloadFile(outputfile);
- *
- * sandbox.upload();
- *
- * Job job = octopus.jobs().submitJob(description);
- *
- * JobStatus = octopus.jobs().waitUntilDone(job, 60000);
- *
- * sandbox.download();
+ * {
+ *     &#064;code
+ *     Sandbox sandbox = new Sandbox(octopus, sandboxBase);
+ *     sandbox.addUploadFile(inputfile);
+ *     sandbox.addDownloadFile(outputfile);
+ * 
+ *     sandbox.upload();
+ * 
+ *     Job job = octopus.jobs().submitJob(description);
+ * 
+ *     JobStatus = octopus.jobs().waitUntilDone(job, 60000);
+ * 
+ *     sandbox.download();
  * }
  * </pre>
+ * 
  * </blockquote>
- *
+ * 
  */
 public class Sandbox {
 
@@ -119,9 +122,8 @@ public class Sandbox {
     }
 
     /**
-     * Creates a sandbox.
-     * Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
-     *
+     * Creates a sandbox. Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
+     * 
      * @param octopus
      *            An Octopus instance
      * @param root
@@ -132,19 +134,19 @@ public class Sandbox {
      * @throws OctopusIOException
      */
     public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
-        
-        if (octopus == null) { 
+
+        if (octopus == null) {
             throw new OctopusException("Sandbox", "Need an octopus to create a sandbox!");
         }
-        
-        if (root == null) { 
+
+        if (root == null) {
             throw new OctopusException("Sandbox", "Need an root directory to create a sandbox!");
         }
-        
+
         if (sandboxName == null) {
             sandboxName = "octopus_sandbox_" + UUID.randomUUID();
         }
-        
+
         this.octopus = octopus;
         this.path = root.resolve(new RelativePath(sandboxName));
     }
@@ -172,7 +174,7 @@ public class Sandbox {
 
     /**
      * Add a file to the list of files to upload.
-     *
+     * 
      * @param src
      *            Source path of file. Can not be null.
      */
@@ -182,7 +184,7 @@ public class Sandbox {
 
     /**
      * Add a file to the list of files to upload.
-     *
+     * 
      * @param src
      *            Where file should be uploaded from. Can not be null.
      * @param dest
@@ -208,7 +210,7 @@ public class Sandbox {
 
     /**
      * Add file to the list of files to download.
-     *
+     * 
      * @param src
      *            Name of file in sandbox. When null the dest.getFilename() will be used.
      * @param dest
@@ -233,9 +235,9 @@ public class Sandbox {
 
     /**
      * Copy uploaded files to sandbox.
-     *
+     * 
      * Creates sandbox directory when needed.
-     *
+     * 
      * @param options
      * @throws OctopusIOException
      * @throws UnsupportedOperationException
@@ -250,7 +252,7 @@ public class Sandbox {
 
     /**
      * Copy downloaded files from sandbox.
-     *
+     * 
      * @param options
      * @throws OctopusIOException
      * @throws UnsupportedOperationException
@@ -261,7 +263,7 @@ public class Sandbox {
 
     /**
      * Deletes all files in sandbox.
-     *
+     * 
      * @throws OctopusIOException
      */
     public void delete() throws OctopusIOException {
@@ -290,25 +292,25 @@ public class Sandbox {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         Sandbox other = (Sandbox) obj;
-    
+
         if (!octopus.equals(other.octopus)) {
             return false;
         }
-        
+
         if (!path.equals(other.path)) {
             return false;
         }
-        
+
         if (!downloadFiles.equals(other.downloadFiles)) {
             return false;
         }
-        
+
         if (!uploadFiles.equals(other.uploadFiles)) {
             return false;
         }
-        
+
         return true;
     }
 

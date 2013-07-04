@@ -92,7 +92,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleFile_CopiedFile() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleFile_CopiedFile() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -109,7 +110,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -133,7 +135,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -166,7 +169,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -190,7 +194,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -221,7 +226,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -261,7 +267,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreDir_DirNotCopied() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void recursiveCopy_IgnoreDir_DirNotCopied() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
@@ -289,7 +296,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreFile_FileNotCopied() throws OctopusIOException, nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void recursiveCopy_IgnoreFile_FileNotCopied() throws OctopusIOException,
+            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);

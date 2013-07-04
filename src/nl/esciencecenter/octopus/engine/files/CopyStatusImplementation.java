@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.files.CopyStatus;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class CopyStatusImplementation implements CopyStatus {
 
@@ -34,7 +34,7 @@ public class CopyStatusImplementation implements CopyStatus {
 
     private final long bytesToCopy;
     private final long bytesCopied;
-    
+
     public CopyStatusImplementation(Copy copy, String state, boolean isRunning, boolean isDone, long bytesToCopy,
             long bytesCopied, Exception exception) {
         super();

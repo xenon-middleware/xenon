@@ -33,12 +33,12 @@ public enum OpenOption {
      * Open an existing file, failing if the file does not exist.
      */
     OPEN,
-    
+
     /**
      * Open an existing file or create a new file if it does not exist.
      */
     OPEN_OR_CREATE,
-    
+
     /**
      * If the file is opened for WRITE access then bytes will be written to the end of the file rather than the beginning.
      */
@@ -58,13 +58,13 @@ public enum OpenOption {
      * Open for write access.
      */
     WRITE;
-    
+
     public static boolean contains(OpenOption toFind, OpenOption... options) {
-        
+
         if (toFind == null || options == null || options.length == 0) {
             return false;
         }
-        
+
         for (OpenOption curr : options) {
             if (curr == toFind) {
                 return true;

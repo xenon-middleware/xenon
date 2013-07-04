@@ -31,7 +31,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
- * LocalAdaptor implements an Octopus adaptor for local operations.  
+ * LocalAdaptor implements an Octopus adaptor for local operations.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -60,7 +60,7 @@ public class LocalAdaptor extends Adaptor {
 
     /** Property for maximum history length for finished jobs */
     public static final String POLLING_DELAY = QUEUE + "pollingDelay";
-    
+
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
 
@@ -80,7 +80,7 @@ public class LocalAdaptor extends Adaptor {
 
     /** Local implementation for Credentials */
     private final LocalCredentials localCredentials;
-    
+
     public LocalAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, properties);
 
@@ -89,20 +89,19 @@ public class LocalAdaptor extends Adaptor {
         localCredentials = new LocalCredentials();
     }
 
-
     void checkCredential(Credential credential) throws OctopusException {
 
-        if (credential == null) { 
+        if (credential == null) {
             return;
         }
-        
+
         if (credential instanceof LocalCredential) {
             return;
         }
-        
-        throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");        
-    } 
-        
+
+        throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
+    }
+
     void checkURI(URI location) throws OctopusException {
 
         if (location == null) {

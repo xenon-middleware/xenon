@@ -42,10 +42,10 @@ import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
 
-   // private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+    // private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
 
     public static final String ADAPTOR_NAME = "ssh";
-    
+
     protected static final int DEFAULT_PORT = 22; // The default ssh port.
 
     private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
@@ -54,7 +54,7 @@ public class SshAdaptor extends Adaptor {
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "ssh.";
-    
+
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
 
@@ -63,30 +63,30 @@ public class SshAdaptor extends Adaptor {
 
     /** Enable strict host key checking. */
     public static final String AUTOMATICALLY_ADD_HOST_KEY = PREFIX + "autoAddHostKey";
-    
+
     /** All our own queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
-        
+
     /** Maximum history length for finished jobs */
     public static final String MAX_HISTORY = QUEUE + "historySize";
-    
+
     /** Property for maximum history length for finished jobs */
     public static final String POLLING_DELAY = QUEUE + "pollingDelay";
-    
+
     /** Local multi queue properties start with this prefix. */
     public static final String MULTIQ = QUEUE + "multi.";
-    
+
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
-    
+
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] VALID_PROPERTIES = new String[][] {
             { AUTOMATICALLY_ADD_HOST_KEY, "true", "Boolean: automatically add unknown host keys to known_hosts." },
             { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
             { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
-            { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." }, 
+            { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
             { MULTIQ_MAX_CONCURRENT, "4", "Int: the maximum number of concurrent jobs in the multiq." } };
-        
+
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;
@@ -110,22 +110,23 @@ public class SshAdaptor extends Adaptor {
 
     void checkURI(URI location) throws InvalidLocationException {
         if (!supports(location.getScheme())) {
-            throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme " + location.getScheme());
+            throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme "
+                    + location.getScheme());
         }
     }
 
     void checkPath(URI location, String adaptor) throws InvalidLocationException {
-        
+
         String path = location.getPath();
-        
-        if (path == null || path.length() == 0 || path.equals("/")) { 
+
+        if (path == null || path.length() == 0 || path.equals("/")) {
             return;
         }
-        
-        throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "Cannot create SSH " + adaptor + " with path (URI=" + 
-                location.getScheme() + ")");
+
+        throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "Cannot create SSH " + adaptor + " with path (URI="
+                + location.getScheme() + ")");
     }
-    
+
     @Override
     public Map<String, String> getSupportedProperties() {
         return new HashMap<String, String>();
@@ -217,7 +218,7 @@ public class SshAdaptor extends Adaptor {
             throws OctopusException {
         return new SshSession(this, jsch, location, credential, properties);
     }
-    
+
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         // TODO Auto-generated method stub

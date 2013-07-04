@@ -62,10 +62,12 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public static final String POLL_DELAY_PROPERTY = PROPERTY_PREFIX + "poll.delay";
 
     //FIXME: last property should be defined in generic scheduler connection
-    
+
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] validPropertiesList = new String[][] {
-            { IGNORE_VERSION_PROPERTY, "false",
+            {
+                    IGNORE_VERSION_PROPERTY,
+                    "false",
                     "Boolean: If true, the version check is skipped when connecting to remote machines. "
                             + "WARNING: it is not recommended to use this setting in production environments" },
 
@@ -82,7 +84,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
     public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
-    
+
     private final int accountingGraceTime;
 
     /**

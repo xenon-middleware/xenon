@@ -86,5 +86,5 @@ public interface Octopus {
     //public Networks networks();
 
     //public ??
- 
+
 }

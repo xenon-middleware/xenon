@@ -31,7 +31,7 @@ public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
     public java.net.URI getTestLocation() throws Exception {
 
         String user = getTestUser();
-        return new URI("sftp://" + user + "@ui.grid.sara.nl/tmp/"+user);
+        return new URI("sftp://" + user + "@ui.grid.sara.nl/tmp/" + user);
     }
 
     public Credential getCredentials() throws OctopusException {
@@ -41,12 +41,8 @@ public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
 
         Credentials creds = octopus.credentials();
         String user = getTestUser();
-        Credential cred =  creds.newCertificateCredential("ssh", 
-                        null, 
-                        userHome + "/.ssh/id_rsa", 
-                        userHome + "/.ssh/id_rsa.pub", 
-                        user,
-                        null);
+        Credential cred =
+                creds.newCertificateCredential("ssh", null, userHome + "/.ssh/id_rsa", userHome + "/.ssh/id_rsa.pub", user, null);
         return cred;
     }
 

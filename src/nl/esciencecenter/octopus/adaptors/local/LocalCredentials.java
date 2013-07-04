@@ -23,7 +23,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
- * A Credentials for local use. 
+ * A Credentials for local use.
  * 
  * Only getDefaultCredential returns a (dummy) credential. All other methods throw an exception.
  * 
@@ -34,7 +34,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 public class LocalCredentials implements Credentials {
 
     private final LocalCredential credential = new LocalCredential();
-    
+
     @Override
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
             String username, char[] password) throws OctopusException {

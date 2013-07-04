@@ -64,7 +64,7 @@ public class RemoteCommandRunner {
         in.waitUntilFinished();
         out.waitUntilFinished();
         err.waitUntilFinished();
-        
+
         JobStatus status = octopus.jobs().waitUntilDone(job, 0);
 
         if (status.hasException()) {

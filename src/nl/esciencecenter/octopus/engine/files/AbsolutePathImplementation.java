@@ -56,14 +56,14 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath relativePath) {
 
-        if (filesystem == null) { 
+        if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
         }
-        
-        if (relativePath == null) { 
+
+        if (relativePath == null) {
             throw new IllegalArgumentException("RelativePath may not be null!");
         }
-        
+
         this.filesystem = filesystem;
         this.relativePath = relativePath;
 
@@ -94,10 +94,10 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath... relativePaths) {
 
-        if (filesystem == null) { 
+        if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
         }
-        
+
         this.filesystem = filesystem;
 
         if (relativePaths.length == 0) {
@@ -214,25 +214,25 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) { 
+        if (this == obj) {
             return true;
         }
-        
-        if (obj == null) { 
+
+        if (obj == null) {
             return false;
         }
-        
-        if (!(obj instanceof AbsolutePathImplementation)) { 
+
+        if (!(obj instanceof AbsolutePathImplementation)) {
             return false;
         }
-        
+
         AbsolutePathImplementation other = (AbsolutePathImplementation) obj;
-        
-        if (!filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())) { 
+
+        if (!filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())) {
             return false;
         }
-        
-        if (!filesystem.getUri().equals(other.filesystem.getUri())) { 
+
+        if (!filesystem.getUri().equals(other.filesystem.getUri())) {
             return false;
         }
 

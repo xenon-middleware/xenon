@@ -32,51 +32,51 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @author Niels Drost <N.Drost@esciencecenter.nl>
- *
+ * 
  */
 public class GridEngineJobTestConfig extends JobTestConfig {
 
     private String username;
-    private char [] passwd;
-    
+    private char[] passwd;
+
     private URI correctURI;
     private URI correctURIWithPath;
     private URI correctFSURI;
-    
+
     private URI wrongUserURI;
     private URI wrongLocationURI;
     private URI wrongPathURI;
-    
+
     private String defaultQueue;
     private String[] queues;
-    
-    public GridEngineJobTestConfig(String configfile) throws Exception { 
-        
+
+    public GridEngineJobTestConfig(String configfile) throws Exception {
+
         super("gridengine");
-        
-        if (configfile == null) { 
+
+        if (configfile == null) {
             configfile = System.getProperty("test.gridengine.adaptor.config");
         }
-            
-        if (configfile == null) { 
+
+        if (configfile == null) {
             configfile = System.getProperty("user.home") + File.separator + "test_gridengine.properties";
         }
-        
+
         Properties p = new Properties();
         p.load(new FileInputStream(configfile));
-        
+
         username = getPropertyOrFail(p, "test.gridengine.user");
         passwd = getPropertyOrFail(p, "test.gridengine.password").toCharArray();
-        
+
         String location = getPropertyOrFail(p, "test.gridengine.location");
-        
+
         String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
         String wrongLocation = getPropertyOrFail(p, "test.gridengine.location.wrong");
-        
+
         defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
         String queueList = getPropertyOrFail(p, "test.gridengine.queues");
         queues = queueList.split("\\s*,\\s*");
-        
+
         correctURI = new URI("ge://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
         correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
@@ -84,37 +84,38 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         wrongLocationURI = new URI("ge://" + username + "@" + wrongLocation);
         wrongPathURI = new URI("ge://" + username + "@" + location + "/aap/noot");
     }
-    
-    private String getPropertyOrFail(Properties p, String property) throws Exception { 
-        
+
+    private String getPropertyOrFail(Properties p, String property) throws Exception {
+
         String tmp = p.getProperty(property);
-        
-        if (tmp == null) { 
+
+        if (tmp == null) {
             throw new Exception("Failed to retrieve property " + property);
         }
-        
+
         return tmp;
     }
-    
+
     @Override
     public URI getCorrectURI() throws Exception {
         return correctURI;
     }
+
     @Override
     public URI getCorrectURIWithPath() throws Exception {
         return correctURIWithPath;
     }
-    
+
     @Override
     public boolean supportURILocation() {
         return true;
     }
-    
+
     @Override
     public URI getURIWrongLocation() throws Exception {
         return wrongLocationURI;
     }
-    
+
     @Override
     public URI getURIWrongPath() throws Exception {
         return wrongPathURI;
@@ -134,7 +135,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public boolean supportsCredentials() {
         return true;
     }
-    
+
     @Override
     public Credential getDefaultCredential(Credentials credentials) throws Exception {
         return credentials.getDefaultCredential("ge");
@@ -144,7 +145,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
         return credentials.newPasswordCredential("ge", new Properties(), username, passwd);
     }
-    
+
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
         return credentials.newPasswordCredential("ge", new Properties(), username, "wrongpassword".toCharArray());
@@ -169,11 +170,11 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public boolean supportsClose() {
         return true;
     }
-    
+
     public String getDefaultQueueName() {
         return defaultQueue;
     }
-    
+
     public String[] getQueueNames() {
         return queues;
     }
@@ -202,10 +203,10 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public boolean supportsStatusAfterDone() {
         return true;
     }
-    
+
     @Override
     public long getDefaultQueueWaitTimeout() {
-        return 5*60000;
+        return 5 * 60000;
     }
 
     @Override

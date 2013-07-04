@@ -23,34 +23,34 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class CopyStatusImplementationTest {
 
     @Test
-    public void test_getters_and_setters() { 
-        
-       Copy c = new CopyImplementation("NAME", "ID", null,  null); 
-        
-       CopyStatusImplementation csi = new CopyStatusImplementation(c, "STATE", true, false, 42, 64, null);
-  
-       assertTrue(c.equals(csi.getCopy()));
-       assertTrue("STATE".equals(csi.getState()));
-       assertTrue(csi.isRunning());
-       assertFalse(csi.isDone());
-       assertTrue(csi.bytesToCopy() == 42);
-       assertTrue(csi.bytesCopied() == 64);
-       assertFalse(csi.hasException());
+    public void test_getters_and_setters() {
 
-       assertNull(csi.getException());
-       
-       csi = new CopyStatusImplementation(c, "STATE", true, false, 42, 64, new Exception());
-       
-       assertTrue(csi.hasException());
+        Copy c = new CopyImplementation("NAME", "ID", null, null);
 
-       Exception e = csi.getException();
-       
-       assertNotNull(e);
+        CopyStatusImplementation csi = new CopyStatusImplementation(c, "STATE", true, false, 42, 64, null);
+
+        assertTrue(c.equals(csi.getCopy()));
+        assertTrue("STATE".equals(csi.getState()));
+        assertTrue(csi.isRunning());
+        assertFalse(csi.isDone());
+        assertTrue(csi.bytesToCopy() == 42);
+        assertTrue(csi.bytesCopied() == 64);
+        assertFalse(csi.hasException());
+
+        assertNull(csi.getException());
+
+        csi = new CopyStatusImplementation(c, "STATE", true, false, 42, 64, new Exception());
+
+        assertTrue(csi.hasException());
+
+        Exception e = csi.getException();
+
+        assertNotNull(e);
     }
-    
+
 }

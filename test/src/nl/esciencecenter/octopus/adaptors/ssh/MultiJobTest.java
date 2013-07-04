@@ -41,128 +41,128 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class MultiJobTest {
-  
-    private String readFully(InputStream in) throws IOException { 
-        
-        byte [] buffer = new byte[1024];
-         
+
+    private String readFully(InputStream in) throws IOException {
+
+        byte[] buffer = new byte[1024];
+
         int offset = 0;
-       
-        int tmp = in.read(buffer, 0, buffer.length-offset);
-        
+
+        int tmp = in.read(buffer, 0, buffer.length - offset);
+
         while (tmp != -1) {
-            
+
             offset += tmp;
-            
-            if (offset == buffer.length) { 
-                buffer = Arrays.copyOf(buffer, buffer.length*2);
+
+            if (offset == buffer.length) {
+                buffer = Arrays.copyOf(buffer, buffer.length * 2);
             }
-            
-            tmp = in.read(buffer, offset, buffer.length-offset);
+
+            tmp = in.read(buffer, offset, buffer.length - offset);
         }
-        
+
         in.close();
         return new String(buffer, 0, offset);
     }
-    
+
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
-        
+
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount + ")");
-    
+
         String TEST_ROOT = "octopus_test_SSH_" + System.currentTimeMillis();
         URI correctURI = new URI("ssh://test@localhost");
         URI correctFSURI = new URI("sftp://test@localhost");
-        
+
         Octopus octopus = OctopusFactory.newOctopus(null);
         Files files = octopus.files();
         Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
-        
+
         FileSystem filesystem = files.newFileSystem(correctFSURI, credentials.getDefaultCredential("sftp"), new Properties());
         Scheduler scheduler = jobs.newScheduler(correctURI, credentials.getDefaultCredential("ssh"), new Properties());
-        
+
         String workingDir = TEST_ROOT + "/" + testName;
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
-        AbsolutePath [] out = new AbsolutePath[jobCount]; 
-        AbsolutePath [] err = new AbsolutePath[jobCount]; 
-        
-        Job [] j = new Job[jobCount];
 
-        for (int i=0;i<j.length;i++) {            
-            
+        AbsolutePath[] out = new AbsolutePath[jobCount];
+        AbsolutePath[] err = new AbsolutePath[jobCount];
+
+        Job[] j = new Job[jobCount];
+
+        for (int i = 0; i < j.length; i++) {
+
             out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
             err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
-            
+
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
             description.setArguments("1");
             description.setWorkingDirectory(workingDir);
-            
+
             description.setQueueName(queueName);
             description.setInteractive(false);
             description.setStdin(null);
             description.setStdout("stdout" + i + ".txt");
             description.setStderr("stderr" + i + ".txt");
-    
+
             j[i] = jobs.submitJob(scheduler, description);
         }
-        
+
         // Bit hard to determine realistic deadline here ?
         long deadline = System.currentTimeMillis() + (60 * jobCount * 1000);
-        
+
         boolean done = false;
-        
-        while (!done) { 
-            JobStatus [] status = jobs.getJobStatuses(j);
+
+        while (!done) {
+            JobStatus[] status = jobs.getJobStatuses(j);
 
             int count = 0;
-            
-            for (int i=0;i<j.length;i++) { 
-                if (j[i] != null) {                    
-                    if (status[i].isDone()) {                         
-                        if (status[i].hasException()) { 
+
+            for (int i = 0; i < j.length; i++) {
+                if (j[i] != null) {
+                    if (status[i].isDone()) {
+                        if (status[i].hasException()) {
                             System.err.println("Job " + i + " failed!");
-                            throw new Exception("Job " + i + " failed" , status[i].getException()); 
+                            throw new Exception("Job " + i + " failed", status[i].getException());
                         }
-                        
+
                         System.err.println("Job " + i + " done.");
-                        j[i] = null;                        
+                        j[i] = null;
                     } else {
                         count++;
                     }
                 }
             }
-        
-            if (count == 0) { 
+
+            if (count == 0) {
                 done = true;
-            } else { 
+            } else {
                 Thread.sleep(1000);
-                
+
                 long now = System.currentTimeMillis();
-                
-                if (now > deadline) { 
+
+                if (now > deadline) {
                     throw new Exception("Job exceeded deadline!");
                 }
             }
         }
-        
-        for (int i=0;i<j.length;i++) {            
-            
+
+        for (int i = 0; i < j.length; i++) {
+
             String tmpout = readFully(files.newInputStream(out[i]));
             String tmperr = readFully(files.newInputStream(err[i]));
 
             assertTrue(tmpout != null);
             assertTrue(tmpout.length() == 0);
-            
+
             assertTrue(tmperr != null);
             assertTrue(tmperr.length() == 0);
-            
+
             files.delete(out[i]);
             files.delete(err[i]);
         }
@@ -175,7 +175,7 @@ public class MultiJobTest {
     }
 
     @org.junit.Test
-    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {               
-        submitToQueueWithPolling("test33a_unlimited", "unlimited", 100);    
+    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
+        submitToQueueWithPolling("test33a_unlimited", "unlimited", 100);
     }
 }

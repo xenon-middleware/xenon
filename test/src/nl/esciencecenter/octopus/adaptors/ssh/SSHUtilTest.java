@@ -25,43 +25,43 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class SSHUtilTest {
-    
+
     @org.junit.Test
     public void testConstructor() throws Exception {
         // Dummy test for coverage
         new SshUtil();
     }
-    
+
     @org.junit.Test
     public void testAllBits() throws Exception {
 
         Set<PosixFilePermission> tmp = EnumSet.allOf(PosixFilePermission.class);
-        
+
         int bits = SshUtil.permissionsToBits(tmp);
-        
+
         Set<PosixFilePermission> tmp2 = SshUtil.bitsToPermissions(bits);
-        
+
         assertEquals(tmp, tmp2);
-        
+
         assertTrue(SshUtil.isExecutable(bits));
         assertTrue(SshUtil.isReadable(bits));
         assertTrue(SshUtil.isWritable(bits));
     }
-        
+
     @org.junit.Test
     public void testNoBits() throws Exception {
 
         Set<PosixFilePermission> tmp = EnumSet.noneOf(PosixFilePermission.class);
-        
+
         int bits = SshUtil.permissionsToBits(tmp);
-        
+
         Set<PosixFilePermission> tmp2 = SshUtil.bitsToPermissions(bits);
-        
+
         assertEquals(tmp, tmp2);
-        
+
         assertFalse(SshUtil.isExecutable(bits));
         assertFalse(SshUtil.isReadable(bits));
         assertFalse(SshUtil.isWritable(bits));

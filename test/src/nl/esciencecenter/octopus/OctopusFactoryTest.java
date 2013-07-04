@@ -31,15 +31,15 @@ public class OctopusFactoryTest {
     @Test
     public void testNewOctopusFactory() throws OctopusException {
         // Test to satisfy coverage.
-        new OctopusFactory();        
+        new OctopusFactory();
     }
-    
+
     @Test
     public void testNewOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         assertTrue(octopus.getProperties().equals(new Properties()));
     }
-    
+
     @Test
     public void testEndOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
@@ -52,12 +52,12 @@ public class OctopusFactoryTest {
         OctopusFactory.endOctopus(octopus);
         OctopusFactory.endOctopus(octopus);
     }
-    
+
     @Test(expected = NoSuchOctopusException.class)
     public void testEndAll() throws OctopusException {
         Octopus octopus1 = OctopusFactory.newOctopus(null);
         Octopus octopus2 = OctopusFactory.newOctopus(null);
-        
+
         OctopusFactory.endAll();
         OctopusFactory.endOctopus(octopus1);
     }
