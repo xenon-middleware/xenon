@@ -18,30 +18,24 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
 
-public class GridEngineOutputParserTest {
+public class GridEngineParserTest {
 
     
     @Test
     public void testCheckVersion() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs.xml");
         
-        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
+        GridEngineParser parser = new GridEngineParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -50,7 +44,7 @@ public class GridEngineOutputParserTest {
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
-        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
+        GridEngineParser parser = new GridEngineParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -59,7 +53,7 @@ public class GridEngineOutputParserTest {
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
-        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
+        GridEngineParser parser = new GridEngineParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -68,7 +62,7 @@ public class GridEngineOutputParserTest {
     public void testCheckVersion_EmptyFile_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
 
-        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
+        GridEngineParser parser = new GridEngineParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -80,7 +74,7 @@ public class GridEngineOutputParserTest {
 
         String content = new String(encoded);
 
-        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
+        GridEngineParser parser = new GridEngineParser(false);
 
         Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
 
@@ -100,7 +94,7 @@ public class GridEngineOutputParserTest {
 
         System.err.println("parsing queue info from: " + content);
 
-        GridEngineSchedulerConnection parser = new GridEngineSchedulerConnection();
+        GridEngineParser parser = new GridEngineParser(false);
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(content);
 

@@ -113,5 +113,10 @@ public class LocalJobTestConfig extends JobTestConfig {
     @Override
     public long getDefaultCancelTimeout() {
         return 1000;
+    }
+
+    @Override
+    public boolean supportsParallelJobs() {
+        return false;
     }    
 }

@@ -30,6 +30,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
@@ -58,95 +59,93 @@ import org.junit.runners.MethodSorters;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericJobAdaptorTestParent {
-    
+
     private static String TEST_ROOT;
-    
+
     protected static JobTestConfig config;
-    
+
     protected Octopus octopus;
     protected Files files;
     protected Jobs jobs;
     protected Credentials credentials;
 
     protected AbsolutePath testDir;
-    
+
     // MUST be invoked by a @BeforeClass method of the subclass! 
-    public static void prepareClass(JobTestConfig testConfig) { 
+    public static void prepareClass(JobTestConfig testConfig) {
         config = testConfig;
         TEST_ROOT = "octopus_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
     }
 
     // MUST be invoked by a @AfterClass method of the subclass! 
-    public static void cleanupClass() throws Exception { 
-        
+    public static void cleanupClass() throws Exception {
+
         System.err.println("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
-        
+
         Octopus octopus = OctopusFactory.newOctopus(null);
-        
+
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
-        
+
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(TEST_ROOT));
-        
-        if (files.exists(root)) { 
+
+        if (files.exists(root)) {
             files.delete(root);
         }
 
         OctopusFactory.endOctopus(octopus);
     }
-    
+
     @Before
-    public void prepare() throws OctopusException { 
+    public void prepare() throws OctopusException {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
         jobs = octopus.jobs();
         credentials = octopus.credentials();
     }
-    
+
     @After
-    public void cleanup() throws OctopusException { 
+    public void cleanup() throws OctopusException {
         OctopusFactory.endOctopus(octopus);
     }
-    
-    protected String getWorkingDir(String testName) { 
+
+    protected String getWorkingDir(String testName) {
         return TEST_ROOT + "/" + testName;
     }
-    
-    
+
     // TEST: newScheduler
     //
     // location: null / valid URI / invalid URI 
     // credential: null / default / set / wrong
     // properties: null / empty / set / wrong
-    
-    
+
     @Test(expected = NullPointerException.class)
-    public void test00_newScheduler() throws Exception { 
+    public void test00_newScheduler() throws Exception {
         jobs.newScheduler(null, null, null);
-    } 
-    
+    }
+
     @Test
-    public void test01_newScheduler() throws Exception { 
+    public void test01_newScheduler() throws Exception {
         Scheduler s = jobs.newScheduler(config.getCorrectURI(), null, null);
         jobs.close(s);
     }
-    
+
     @Test(expected = OctopusException.class)
-    public void test02a_newScheduler() throws Exception { 
+    public void test02a_newScheduler() throws Exception {
         jobs.newScheduler(config.getURIWrongLocation(), null, null);
     }
 
     @Test(expected = OctopusException.class)
-    public void test02b_newScheduler() throws Exception { 
+    public void test02b_newScheduler() throws Exception {
         jobs.newScheduler(config.getURIWrongPath(), null, null);
     }
-    
+
     @Test
     public void test03_newScheduler() throws Exception {
         Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), null);
@@ -155,14 +154,14 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test04a_newScheduler() throws Exception {
-        if (config.supportsCredentials()) { 
+        if (config.supportsCredentials()) {
             try {
                 Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getInvalidCredential(credentials), null);
                 jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
             } catch (InvalidCredentialsException e) {
                 // expected
-            } catch (OctopusException e) { 
+            } catch (OctopusException e) {
                 // allowed
             }
         }
@@ -170,20 +169,20 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test04b_newScheduler() throws Exception {
-        if (!config.supportsCredentials()) { 
+        if (!config.supportsCredentials()) {
             try {
-                Credential c = new Credential() { 
+                Credential c = new Credential() {
                     @Override
                     public Properties getProperties() {
                         return null;
                     }
-                    
+
                     @Override
                     public String getAdaptorName() {
                         return "local";
                     }
                 };
-                
+
                 Scheduler s = jobs.newScheduler(config.getCorrectURI(), c, null);
                 jobs.close(s);
 
@@ -196,13 +195,14 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test04c_newScheduler() throws Exception {
-        if (config.supportsCredentials()) { 
-            Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials), 
-                    config.getDefaultProperties());
+        if (config.supportsCredentials()) {
+            Scheduler s =
+                    jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
+                            config.getDefaultProperties());
             jobs.close(s);
         }
     }
-    
+
     @Test
     public void test05_newScheduler() throws Exception {
         Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new Properties());
@@ -211,19 +211,19 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test06_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), 
-                config.getDefaultProperties());
+        Scheduler s =
+                jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), config.getDefaultProperties());
         jobs.close(s);
     }
-    
+
     @Test
     public void test07_newScheduler() throws Exception {
         if (config.supportsProperties()) {
-            
-            Properties [] tmp = config.getInvalidProperties();
-            
-            for (Properties p : tmp) { 
-                try { 
+
+            Properties[] tmp = config.getInvalidProperties();
+
+            for (Properties p : tmp) {
+                try {
                     Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                     jobs.close(s);
                     throw new Exception("newScheduler did NOT throw InvalidPropertyException");
@@ -236,10 +236,11 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test08_newScheduler() throws Exception {
-        if (config.supportsProperties()) { 
-            try { 
-                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), 
-                        config.getUnknownProperties());
+        if (config.supportsProperties()) {
+            try {
+                Scheduler s =
+                        jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
+                                config.getUnknownProperties());
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw UnknownPropertyException");
@@ -251,8 +252,8 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test09_newScheduler() throws Exception {
-        if (!config.supportsProperties()) { 
-            try { 
+        if (!config.supportsProperties()) {
+            try {
                 Properties p = new Properties();
                 p.put("aap", "noot");
                 Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
@@ -264,311 +265,305 @@ public abstract class GenericJobAdaptorTestParent {
             }
         }
     }
-    
+
     @Test
     public void test10_getLocalScheduler() throws Exception {
-        
-        Scheduler s = null; 
-        
-        try { 
+
+        Scheduler s = null;
+
+        try {
             s = jobs.getLocalScheduler();
             assertTrue(s != null);
             assertTrue(s.getAdaptorName().equals("local"));
-        } finally { 
-            if (s != null) { 
+        } finally {
+            if (s != null) {
                 jobs.close(s);
             }
         }
-    } 
-     
+    }
+
     @Test
     public void test11_open_close() throws Exception {
-        if (config.supportsClose()) { 
-            Scheduler s = config.getDefaultScheduler(jobs, credentials); 
-             
+        if (config.supportsClose()) {
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+
             assertTrue(jobs.isOpen(s));
-            
+
             jobs.close(s);
-            
+
             assertFalse(jobs.isOpen(s));
         }
     }
-    
+
     @Test
     public void test12_open_close() throws Exception {
-        if (!config.supportsClose()) { 
-            Scheduler s = config.getDefaultScheduler(jobs, credentials); 
-             
+        if (!config.supportsClose()) {
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+
             assertTrue(jobs.isOpen(s));
-            
+
             jobs.close(s);
-            
+
             assertTrue(jobs.isOpen(s));
         }
     }
 
     @Test
     public void test13_open_close() throws Exception {
-        if (config.supportsClose()) { 
-            Scheduler s = config.getDefaultScheduler(jobs, credentials); 
+        if (config.supportsClose()) {
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);
             jobs.close(s);
-            
-            try { 
+
+            try {
                 jobs.close(s);
                 throw new Exception("close did NOT throw NoSuchSchedulerException");
-            } catch (NoSuchSchedulerException e) { 
+            } catch (NoSuchSchedulerException e) {
                 // expected
             }
         }
     }
- 
+
     @Test
     public void test14a_getJobs() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
         jobs.getJobs(s, s.getQueueNames());
         jobs.close(s);
     }
-    
+
     @Test
     public void test14b_getJobs() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
         jobs.getJobs(s);
         jobs.close(s);
     }
-    
+
     @Test
     public void test15_getJobs() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
 
         try {
             jobs.getJobs(s, config.getInvalidQueueName());
             throw new Exception("close did NOT throw NoSuchQueueException");
-        } catch (NoSuchQueueException e) { 
+        } catch (NoSuchQueueException e) {
             // expected
-        } finally { 
+        } finally {
             jobs.close(s);
         }
     }
 
     @Test
     public void test16_getJobs() throws Exception {
-        
-        if (config.supportsClose()) { 
-        
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);        
+
+        if (config.supportsClose()) {
+
+            Scheduler s = config.getDefaultScheduler(jobs, credentials);
 
             jobs.close(s);
-            
+
             try {
                 jobs.getJobs(s, s.getQueueNames());
                 throw new Exception("close did NOT throw NoSuchSchedulerException");
-            } catch (NoSuchSchedulerException e) { 
+            } catch (NoSuchSchedulerException e) {
                 // expected
             }
         }
     }
-    
-    
+
     @Test
-    public void test17_getQueueStatus() throws Exception {        
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
+    public void test17_getQueueStatus() throws Exception {
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
         jobs.getQueueStatus(s, s.getQueueNames()[0]);
         jobs.close(s);
     }
-    
+
     @Test(expected = NoSuchQueueException.class)
-    public void test18a_getQueueStatus() throws Exception {        
+    public void test18a_getQueueStatus() throws Exception {
         Scheduler s = config.getDefaultScheduler(jobs, credentials);
-        try { 
+        try {
             jobs.getQueueStatus(s, config.getInvalidQueueName());
-        } finally { 
-            jobs.close(s);
-        }
-    }
-    
-    @Test
-    public void test18b_getQueueStatus() throws Exception {        
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
-        String queueName = config.getDefaultQueueName();
-        
-        try { 
-            jobs.getQueueStatus(s, queueName);
-        } finally { 
+        } finally {
             jobs.close(s);
         }
     }
 
-    
-    
+    @Test
+    public void test18b_getQueueStatus() throws Exception {
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        String queueName = config.getDefaultQueueName();
+
+        try {
+            jobs.getQueueStatus(s, queueName);
+        } finally {
+            jobs.close(s);
+        }
+    }
+
     @Test(expected = NullPointerException.class)
-    public void test19_getQueueStatus() throws Exception {        
-        jobs.getQueueStatus(null, null);        
+    public void test19_getQueueStatus() throws Exception {
+        jobs.getQueueStatus(null, null);
     }
 
     @Test
     public void test20_getQueueStatus() throws Exception {
-        
-        if (config.supportsClose()) { 
-        
+
+        if (config.supportsClose()) {
+
             Scheduler s = config.getDefaultScheduler(jobs, credentials);
             jobs.close(s);
-            
-            try { 
+
+            try {
                 jobs.getQueueStatus(s, s.getQueueNames()[0]);
                 throw new Exception("getQueueStatus did NOT throw NoSuchSchedulerException");
-            } catch (NoSuchSchedulerException e) { 
+            } catch (NoSuchSchedulerException e) {
                 // expected
             }
         }
     }
 
-    
     @Test
-    public void test21a_getQueueStatuses() throws Exception {        
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
-        QueueStatus [] tmp = jobs.getQueueStatuses(s, s.getQueueNames());
+    public void test21a_getQueueStatuses() throws Exception {
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        QueueStatus[] tmp = jobs.getQueueStatuses(s, s.getQueueNames());
         jobs.close(s);
 
-        String [] names = s.getQueueNames();
+        String[] names = s.getQueueNames();
 
         assertTrue(tmp != null);
         assertTrue(tmp.length == names.length);
-        
-        for (int i=0;i<tmp.length;i++) { 
+
+        for (int i = 0; i < tmp.length; i++) {
             assertTrue(tmp[i].getQueueName().equals(names[i]));
         }
     }
-    
+
     @Test
-    public void test21b_getQueueStatuses() throws Exception {        
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
-        QueueStatus [] tmp = jobs.getQueueStatuses(s);
+    public void test21b_getQueueStatuses() throws Exception {
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        QueueStatus[] tmp = jobs.getQueueStatuses(s);
         jobs.close(s);
-        
-        String [] names = s.getQueueNames();
+
+        String[] names = s.getQueueNames();
 
         assertTrue(tmp != null);
         assertTrue(tmp.length == names.length);
-        
-        for (int i=0;i<tmp.length;i++) { 
+
+        for (int i = 0; i < tmp.length; i++) {
             assertTrue(tmp[i].getQueueName().equals(names[i]));
         }
 
     }
-    
+
     @Test
-    public void test22a_getQueueStatuses() throws Exception {        
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);        
-        try { 
-            QueueStatus [] tmp = jobs.getQueueStatuses(s, config.getInvalidQueueName());
+    public void test22a_getQueueStatuses() throws Exception {
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        try {
+            QueueStatus[] tmp = jobs.getQueueStatuses(s, config.getInvalidQueueName());
 
             assertTrue(tmp != null);
             assertTrue(tmp.length == 1);
             assertTrue(tmp[0].hasException());
             assertTrue(tmp[0].getException() instanceof NoSuchQueueException);
 
-        } finally { 
+        } finally {
             jobs.close(s);
         }
     }
-    
+
     @Test(expected = NullPointerException.class)
-    public void test22b_getQueueStatuses() throws Exception {        
+    public void test22b_getQueueStatuses() throws Exception {
         jobs.getQueueStatuses(null, config.getDefaultQueueName());
     }
 
     @Test(expected = NullPointerException.class)
-    public void test22c_getQueueStatuses() throws Exception {    
-        Scheduler s = config.getDefaultScheduler(jobs, credentials); 
-        jobs.getQueueStatuses(s, (String []) null);
+    public void test22c_getQueueStatuses() throws Exception {
+        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        jobs.getQueueStatuses(s, (String[]) null);
     }
-    
+
     @Test(expected = NullPointerException.class)
-    public void test23_getQueueStatuses() throws Exception {        
+    public void test23_getQueueStatuses() throws Exception {
         jobs.getQueueStatuses(null);
     }
-    
+
     @Test
     public void test24_getQueueStatuses() throws Exception {
-        
-        if (config.supportsClose()) { 
+
+        if (config.supportsClose()) {
             Scheduler s = config.getDefaultScheduler(jobs, credentials);
             jobs.close(s);
-            
-            try { 
+
+            try {
                 jobs.getQueueStatuses(s, s.getQueueNames());
                 throw new Exception("getQueueStatuses did NOT throw NoSuchSchedulerException");
-            } catch (NoSuchSchedulerException e) { 
+            } catch (NoSuchSchedulerException e) {
                 // expected
             }
         }
     }
-    
+
     @Test
     public void test25a_getJobStatuses() throws Exception {
-        
+
         JobStatus[] tmp = jobs.getJobStatuses(new Job[0]);
-        
+
         assertTrue(tmp != null);
         assertTrue(tmp.length == 0);
     }
 
     @Test
     public void test25b_getJobStatuses() throws Exception {
-        
-        JobStatus[] tmp = jobs.getJobStatuses((Job []) null);
-        
+
+        JobStatus[] tmp = jobs.getJobStatuses((Job[]) null);
+
         assertTrue(tmp != null);
         assertTrue(tmp.length == 0);
     }
 
-    
     @Test
     public void test25c_getJobStatuses() throws Exception {
-        
+
         JobStatus[] tmp = jobs.getJobStatuses(new Job[1]);
-        
+
         assertTrue(tmp != null);
         assertTrue(tmp.length == 1);
         assertTrue(tmp[0] == null);
     }
-    
-    protected String readFully(InputStream in) throws IOException { 
-        
-        byte [] buffer = new byte[1024];
-         
+
+    protected String readFully(InputStream in) throws IOException {
+
+        byte[] buffer = new byte[1024];
+
         int offset = 0;
-       
-        int tmp = in.read(buffer, 0, buffer.length-offset);
-        
+
+        int tmp = in.read(buffer, 0, buffer.length - offset);
+
         while (tmp != -1) {
-            
+
             offset += tmp;
-            
-            if (offset == buffer.length) { 
-                buffer = Arrays.copyOf(buffer, buffer.length*2);
+
+            if (offset == buffer.length) {
+                buffer = Arrays.copyOf(buffer, buffer.length * 2);
             }
-            
-            tmp = in.read(buffer, offset, buffer.length-offset);
+
+            tmp = in.read(buffer, offset, buffer.length - offset);
         }
-        
+
         in.close();
         return new String(buffer, 0, offset);
     }
 
-    protected void writeFully(OutputStream out, String message) throws IOException { 
+    protected void writeFully(OutputStream out, String message) throws IOException {
         out.write(message.getBytes());
         out.close();
     }
 
-    
     @org.junit.Test
     public void test30_interactiveJobSubmit() throws Exception {
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
-        if (scheduler.isOnline()) { 
-        
+        if (scheduler.isOnline()) {
+
             String message = "Hello World! test30";
 
             JobDescription description = new JobDescription();
@@ -591,7 +586,7 @@ public abstract class GenericJobAdaptorTestParent {
             // NOTE: Job should already be done here!
             JobStatus status = jobs.waitUntilDone(job, 5000);
 
-            if (!status.isDone()) { 
+            if (!status.isDone()) {
                 throw new Exception("Job exceeded dealine!");
             }
 
@@ -602,19 +597,19 @@ public abstract class GenericJobAdaptorTestParent {
             assertTrue(out.equals(message));
             assertTrue(err.length() == 0);
         }
-        
+
         jobs.close(scheduler);
     }
-    
+
     @org.junit.Test
     public void test31_batchJobSubmitWithPolling() throws Exception {
-        
+
         String message = "Hello World! test31";
         String workingDir = getWorkingDir("test31");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
 
@@ -624,35 +619,35 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
-        
+
         long deadline = System.currentTimeMillis() + config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout();
         long pollDelay = (config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout()) / 10;
-        
+
         JobStatus status = jobs.getJobStatus(job);
-        
+
         while (!status.isDone()) {
             Thread.sleep(pollDelay);
-            
+
             long now = System.currentTimeMillis();
-            
-            if (now > deadline) { 
+
+            if (now > deadline) {
                 throw new Exception("Job exceeded deadline!");
             }
-            
+
             status = jobs.getJobStatus(job);
         }
 
         jobs.close(scheduler);
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
+
         AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
         AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
-        
+
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
@@ -661,10 +656,10 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(root);
 
         files.close(filesystem);
-        
+
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
-        
+
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
@@ -673,56 +668,56 @@ public abstract class GenericJobAdaptorTestParent {
 
     @org.junit.Test
     public void test32_batchJobSubmitWithWait() throws Exception {
-        
+
         String message = "Hello World! test32";
         String workingDir = getWorkingDir("test32");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-                
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/echo");
         description.setArguments("-n", message);
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
-        
+
         JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
-        
-        if (status.isRunning()) { 
+
+        if (status.isRunning()) {
             status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
         }
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
 
         jobs.close(scheduler);
-        
+
         AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
         AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
-        
+
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
         files.delete(out);
         files.delete(err);
         files.delete(root);
-        
+
         files.close(filesystem);
-        
+
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
-        
+
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
@@ -730,94 +725,95 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
-    
+
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount);
-        
+
         String workingDir = getWorkingDir(testName);
-        
+
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
-        AbsolutePath [] out = new AbsolutePath[jobCount]; 
-        AbsolutePath [] err = new AbsolutePath[jobCount]; 
-        
-        Jobs jobs = octopus.jobs();
-        
-        Job [] j = new Job[jobCount];
 
-        for (int i=0;i<j.length;i++) {            
-            
+        AbsolutePath[] out = new AbsolutePath[jobCount];
+        AbsolutePath[] err = new AbsolutePath[jobCount];
+
+        Jobs jobs = octopus.jobs();
+
+        Job[] j = new Job[jobCount];
+
+        for (int i = 0; i < j.length; i++) {
+
             out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
             err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
-            
+
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
             description.setArguments("1");
             description.setWorkingDirectory(workingDir);
-            
+
             description.setQueueName(queueName);
             description.setInteractive(false);
             description.setStdin(null);
             description.setStdout("stdout" + i + ".txt");
             description.setStderr("stderr" + i + ".txt");
-    
+
             j[i] = jobs.submitJob(scheduler, description);
         }
-        
+
         // Bit hard to determine realistic deadline here ?
-        long deadline = System.currentTimeMillis() + (60 * jobCount * config.getDefaultQueueWaitTimeout() + 
-                config.getDefaultShortJobTimeout());
-        
+        long deadline =
+                System.currentTimeMillis()
+                        + (60 * jobCount * config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());
+
         boolean done = false;
-        
-        while (!done) { 
-            JobStatus [] status = jobs.getJobStatuses(j);
+
+        while (!done) {
+            JobStatus[] status = jobs.getJobStatuses(j);
 
             int count = 0;
-            
-            for (int i=0;i<j.length;i++) { 
-                if (j[i] != null) {                    
-                    if (status[i].isDone()) {                         
-                        if (status[i].hasException()) { 
+
+            for (int i = 0; i < j.length; i++) {
+                if (j[i] != null) {
+                    if (status[i].isDone()) {
+                        if (status[i].hasException()) {
                             System.err.println("Job " + i + " failed!");
-                            throw new Exception("Job " + i + " failed" , status[i].getException()); 
+                            throw new Exception("Job " + i + " failed", status[i].getException());
                         }
-                        
+
                         System.err.println("Job " + i + " done.");
-                        j[i] = null;                        
+                        j[i] = null;
                     } else {
                         count++;
                     }
                 }
             }
-        
-            if (count == 0) { 
+
+            if (count == 0) {
                 done = true;
-            } else { 
+            } else {
                 Thread.sleep(1000);
-                
+
                 long now = System.currentTimeMillis();
-                
-                if (now > deadline) { 
+
+                if (now > deadline) {
                     throw new Exception("Job exceeded deadline!");
                 }
             }
         }
-        
-        for (int i=0;i<j.length;i++) {            
-            
+
+        for (int i = 0; i < j.length; i++) {
+
             String tmpout = readFully(files.newInputStream(out[i]));
             String tmperr = readFully(files.newInputStream(err[i]));
 
             assertTrue(tmpout != null);
             assertTrue(tmpout.length() == 0);
-            
+
             assertTrue(tmperr != null);
             assertTrue(tmperr.length() == 0);
-            
+
             files.delete(out[i]);
             files.delete(err[i]);
         }
@@ -826,180 +822,180 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(root);
         files.close(filesystem);
     }
-    
+
     @org.junit.Test
-    public void test33a_testMultiBatchJobSubmitWithPolling() throws Exception {               
-        for (String queue : config.getQueueNames()) { 
-            submitToQueueWithPolling("test33a_" + queue, queue, 1);    
+    public void test33a_testMultiBatchJobSubmitWithPolling() throws Exception {
+        for (String queue : config.getQueueNames()) {
+            submitToQueueWithPolling("test33a_" + queue, queue, 1);
         }
 
     }
 
     @org.junit.Test
-    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {    
-        
+    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
+
         System.err.println("STARTING TEST test33b");
-        
-        for (String queue : config.getQueueNames()) { 
-            submitToQueueWithPolling("test33b_" + queue, queue, 10);    
+
+        for (String queue : config.getQueueNames()) {
+            submitToQueueWithPolling("test33b_" + queue, queue, 10);
         }
     }
-    
+
     @org.junit.Test
     public void test34_batchJobSubmitWithKill() throws Exception {
-        
+
         String workingDir = getWorkingDir("test34");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("60");
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-        
+
         // We immediately kill the job. Hopefully it isn't running yet!
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.cancelJob(job);
 
         // Wait until the job is killed. We assume it takes less than a minute!
-        if (!status.isDone()) { 
+        if (!status.isDone()) {
             status = jobs.waitUntilDone(job, config.getDefaultCancelTimeout());
         }
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Failed to kill job!");
         }
-        
+
         jobs.close(scheduler);
-        
+
         AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
         AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
 
-        if (files.exists(out)) { 
+        if (files.exists(out)) {
             files.delete(out);
         }
-        
-        if (files.exists(err)) { 
+
+        if (files.exists(err)) {
             files.delete(err);
         }
-        
+
         files.delete(root);
         files.close(filesystem);
-        
-        assertTrue(status.hasException());
-        Exception e = status.getException(); 
 
-        if (!(e instanceof JobCanceledException)) { 
+        assertTrue(status.hasException());
+        Exception e = status.getException();
+
+        if (!(e instanceof JobCanceledException)) {
             throw new Exception("test34 expected JobCanceledException, not " + e.getMessage(), e);
         }
     }
 
     @org.junit.Test
     public void test35_batchJobSubmitWithKill2() throws Exception {
-        
+
         String workingDir = getWorkingDir("test35");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("60");
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
-        
+
         // Wait for job to run before killing it!
         JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
-        
+
         if (!status.isRunning()) {
             throw new Exception("Job failed to start!");
         }
-            
+
         status = jobs.cancelJob(job);
-            
+
         // Wait until the job is killed. We assume it takes less than a minute!
-        if (!status.isDone()) { 
+        if (!status.isDone()) {
             status = jobs.waitUntilDone(job, config.getDefaultCancelTimeout());
         }
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Failed to kill job!");
-        }   
-        
+        }
+
         jobs.close(scheduler);
-        
+
         AbsolutePath out = root.resolve(new RelativePath(description.getStdout()));
         AbsolutePath err = root.resolve(new RelativePath(description.getStderr()));
 
-        if (files.exists(out)) { 
+        if (files.exists(out)) {
             files.delete(out);
-        } 
-        
-        if (files.exists(err)) { 
+        }
+
+        if (files.exists(err)) {
             files.delete(err);
         }
-        
+
         files.delete(root);
         files.close(filesystem);
-        
+
         assertTrue(status.hasException());
-        Exception e = status.getException(); 
-        
+        Exception e = status.getException();
+
         assertTrue(e instanceof JobCanceledException);
     }
 
     @org.junit.Test
     public void test36a_batchJobSubmitWithInput() throws Exception {
-        
+
         String message = "Hello World! test36a";
         String workingDir = getWorkingDir("test36a");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
-        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
-        
+
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
-       
+
         Job job = jobs.submitJob(scheduler, description);
-        
-        JobStatus status = jobs.waitUntilDone(job, config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());      
-        
-        if (!status.isDone()) { 
+
+        JobStatus status = jobs.waitUntilDone(job, config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline! status = " + status);
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed! exception is = ", status.getException());
         }
-        
+
         jobs.close(scheduler);
 
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
         AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
-        
+
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
 
@@ -1008,82 +1004,82 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(stderr);
         files.delete(root);
         files.close(filesystem);
-        
+
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
-        
+
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
         assertTrue(tmperr.length() == 0);
     }
-    
+
     @org.junit.Test
     public void test36b_batchJobSubmitWithInput() throws Exception {
-        
+
         String message = "Hello World! test36b";
         String workingDir = getWorkingDir("test36b");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
-        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));        
-        
+
+        AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
+
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
-        writeFully(out, message);        
-        
+        writeFully(out, message);
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
-        
+
         JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
-        
-        if (status.isRunning()) { 
-            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());            
+
+        if (status.isRunning()) {
+            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
         }
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-       
+
         jobs.close(scheduler);
-        
+
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
         AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
-        
+
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
-        
+
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
-        
+
         files.delete(stdin);
         files.delete(stdout);
         files.delete(stderr);
         files.delete(root);
         files.close(filesystem);
-        
+
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
         assertTrue(tmperr.length() == 0);
-    }    
-    
+    }
+
     @org.junit.Test
     public void test37a_batchJobSubmitWithoutWorkDir() throws Exception {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-          
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("1");
@@ -1091,30 +1087,30 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(null);
         description.setStdout(null);
         description.setStderr(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
         jobs.close(scheduler);
     }
-    
+
     @org.junit.Test
     public void test37b_batchJobSubmitWithRelativeWorkDir() throws Exception {
         String workingDir = getWorkingDir("test37b");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("1");
@@ -1123,64 +1119,64 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStderr(null);
         //relative working dir name used
         description.setWorkingDirectory(workingDir);
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
-        files.delete(root); 
+
+        files.delete(root);
         jobs.close(scheduler);
         files.close(filesystem);
     }
-    
+
     @org.junit.Test
     public void test37c_batchJobSubmitWithAbsoluteWorkDir() throws Exception {
         String workingDir = getWorkingDir("test37c");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("1");
         description.setInteractive(false);
         description.setStdout(null);
         description.setStderr(null);
-        
+
         //absolute working dir name used
         description.setWorkingDirectory(root.getPath());
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
-        files.delete(root); 
+
+        files.delete(root);
         jobs.close(scheduler);
         files.close(filesystem);
     }
-    
+
     @org.junit.Test
     public void test37d_batchJobSubmitWithIncorrectWorkingDir() throws Exception {
         //note that we are _not_ creating this directory, making it invalid
         String workingDir = getWorkingDir("test37d");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         JobDescription description = new JobDescription();
@@ -1189,57 +1185,57 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setStdout(null);
         description.setStderr(null);
-        
+
         //incorrect working dir used
         description.setWorkingDirectory(workingDir);
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         assertTrue(status.hasException());
-        
+
         jobs.close(scheduler);
     }
-    
+
     //@org.junit.Test
     public void test38_multipleBatchJobSubmitWithInput() throws Exception {
         String message = "Hello World! test38";
         String workingDir = getWorkingDir("test38");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         AbsolutePath stdin = root.resolve(new RelativePath("stdin.txt"));
-        
+
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/cat");
         description.setInteractive(false);
         description.setProcessesPerNode(2);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-       
-        for (int i=0;i<2;i++) { 
+
+        for (int i = 0; i < 2; i++) {
 
             AbsolutePath stdoutTmp = root.resolve(new RelativePath("stdout.txt." + i));
             AbsolutePath stderrTmp = root.resolve(new RelativePath("stderr.txt." + i));
@@ -1249,157 +1245,157 @@ public abstract class GenericJobAdaptorTestParent {
 
             System.err.println("STDOUT: " + tmpout);
             System.err.println("STDERR: " + tmperr);
-            
+
             assertTrue(tmpout != null);
             assertTrue(tmpout.length() > 0);
             assertTrue(tmpout.equals(message));
             assertTrue(tmperr.length() == 0);
-            
+
             files.delete(stdoutTmp);
             files.delete(stderrTmp);
-        } 
+        }
 
-        files.delete(stdin);           
-        files.delete(root);        
-        
+        files.delete(stdin);
+        files.delete(root);
+
         jobs.close(scheduler);
         files.close(filesystem);
     }
-    
+
     @org.junit.Test
     public void test39_multipleBatchJobSubmitWithExceptions() throws Exception {
 
         // NOTE: This test assumes that an exception is thrown when the status of a job is requested twice after the job is done!
         //       This may not be true for all schedulers.
 
-        if (config.supportsStatusAfterDone()) { 
+        if (config.supportsStatusAfterDone()) {
             return;
         }
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("1");
         description.setInteractive(false);
         description.setWorkingDirectory(null);
-        
+
         Job[] j = new Job[2];
-        
+
         j[0] = jobs.submitJob(scheduler, description);
-        
+
         description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("2");
         description.setInteractive(false);
         description.setWorkingDirectory(null);
-        
+
         j[1] = jobs.submitJob(scheduler, description);
-        
+
         long now = System.currentTimeMillis();
         long deadline = now + 10000;
 
-        JobStatus [] s = null;
+        JobStatus[] s = null;
 
-        while (now < deadline) { 
-        
+        while (now < deadline) {
+
             s = jobs.getJobStatuses(j);
 
-            if (s[0].hasException() && s[1].hasException()) { 
+            if (s[0].hasException() && s[1].hasException()) {
                 break;
             }
-            
-            try { 
+
+            try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // ignored
             }
-            
-            now = System.currentTimeMillis();           
-        } 
-        
-        if (s == null || !(s[0].hasException() && s[1].hasException())) { 
+
+            now = System.currentTimeMillis();
+        }
+
+        if (s == null || !(s[0].hasException() && s[1].hasException())) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         jobs.close(scheduler);
     }
-    
+
     @org.junit.Test
     public void test40_batchJobSubmitWithExitcode() throws Exception {
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("1");
         description.setInteractive(false);
-        
+
         description.setWorkingDirectory(null);
         description.setStderr(null);
         description.setStdout(null);
         description.setStdin(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
+
         jobs.close(scheduler);
-        
+
         assertTrue(status.getExitCode() == 0);
     }
-    
+
     @org.junit.Test
     public void test40_batchJobSubmitWithNoneZeroExitcode() throws Exception {
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        
+
         //run an ls with a non existing file. This should make ls return exitcode 2
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/ls");
         description.setArguments("non.existing.file");
         description.setInteractive(false);
-        
+
         description.setWorkingDirectory(null);
         description.setStderr(null);
         description.setStdout(null);
         description.setStdin(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
+
         jobs.close(scheduler);
-        
+
         assertTrue(status.getExitCode() == 2);
     }
-    
+
     @org.junit.Test
     public void test41_batchJobSubmitWithEnvironmentVariable() throws Exception {
-        
-        if (!config.supportsEnvironmentVariables()) { 
+
+        if (!config.supportsEnvironmentVariables()) {
             return;
         }
-        
+
         String workingDir = getWorkingDir("test41");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
 
@@ -1408,69 +1404,98 @@ public abstract class GenericJobAdaptorTestParent {
         description.setExecutable("/usr/bin/printenv");
         description.setArguments("SOME_VARIABLE");
         description.setInteractive(false);
-        
+
         description.getEnvironment().put("SOME_VARIABLE", "some_value");
-        
+
         description.setWorkingDirectory(workingDir);
         description.setStderr(null);
         description.setStdin(null);
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
+
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
+
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        
+
         String stdoutContent = readFully(files.newInputStream(stdout));
-        
+
         assertTrue(stdoutContent.equals("some_value\n"));
-        
+
         files.delete(stdout);
         files.delete(root);
         files.close(filesystem);
     }
-    
+
     @org.junit.Test
     public void test41b_batchJobSubmitWithEnvironmentVariable() throws Exception {
-        
-        if (config.supportsEnvironmentVariables()) { 
+
+        if (config.supportsEnvironmentVariables()) {
             return;
         }
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-       
+
         // echo the given variable, to see if the va
         JobDescription description = new JobDescription();
         description.setExecutable("/usr/bin/printenv");
         description.setArguments("SOME_VARIABLE");
         description.setInteractive(false);
-        
+
         description.getEnvironment().put("SOME_VARIABLE", "some_value");
-        
+
         description.setWorkingDirectory(null);
         description.setStderr(null);
         description.setStdin(null);
 
         boolean gotException = false;
-        
-        try { 
+
+        try {
             Job job = jobs.submitJob(scheduler, description);
             jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
-        } catch (UnsupportedJobDescriptionException e) { 
+        } catch (UnsupportedJobDescriptionException e) {
             gotException = true;
         }
-                
+
         jobs.close(scheduler);
-        
-        if (!gotException) { 
+
+        if (!gotException) {
             throw new Exception("Submit did not throw exception, which was expected!");
         }
     }
+
+    @Test
+    public void ge_test04_batchJob_parallel_Exception() throws Exception {
+
+        if (config.supportsParallelJobs()) {
+            return;
+        }
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/echo");
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+
+        boolean gotException = false;
+        try {
+            Job job = jobs.submitJob(scheduler, description);
+        } catch (InvalidJobDescriptionException e) {
+            gotException = true;
+        } finally {
+            jobs.close(scheduler);
+        }
+        
+        if (!gotException) {
+            throw new Exception("Submit did not throw exception, which was expected!");
+        }
+    }
+
 }
