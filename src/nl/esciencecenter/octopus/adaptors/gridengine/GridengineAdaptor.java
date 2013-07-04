@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +22,6 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
@@ -37,17 +35,11 @@ public class GridengineAdaptor extends Adaptor {
 
     public static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
 
-    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + ADAPTOR_NAME + ".";
-
-    public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
-
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] validPropertiesList =
-            new String[][] { { IGNORE_VERSION_PROPERTY, "false",
-                    "Boolean: If true, the version check is skipped. WARNING: it is not recommended to use this setting in production environments" }, };
+    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. No properties exist for this adaptor.*/
+    private static final String[][] validPropertiesList = new String[0][0];
 
     private final GridEngineJobs jobsAdaptor;
-    
+
     private final GridEngineCredentials credentialsAdaptor;
 
     public GridengineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
@@ -56,8 +48,6 @@ public class GridengineAdaptor extends Adaptor {
         this.jobsAdaptor = new GridEngineJobs(getProperties(), octopusEngine);
         this.credentialsAdaptor = new GridEngineCredentials(octopusEngine);
     }
-
-    
 
     public GridEngineJobs jobsAdaptor() {
         return jobsAdaptor;

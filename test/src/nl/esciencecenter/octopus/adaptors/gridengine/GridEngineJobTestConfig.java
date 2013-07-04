@@ -217,4 +217,9 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public long getDefaultCancelTimeout() {
         return 60000;
     }
+
+    @Override
+    public boolean supportsParallelJobs() {
+        return false;
+    }
 }
