@@ -351,18 +351,64 @@ public class GridEngineParser {
 
         String lines[] = qacctOutput.split("\\r?\\n");
         for (String line : lines) {
-            String[] elements = line.split(" ", 2);
+            String[] elements = line.split("\\s+", 2);
 
             if (elements.length == 2) {
                 result.put(elements[0].trim(), elements[1].trim());
             } else if (line.equals(QACCT_HEADER)) {
                 //IGNORE first line
             } else {
-                logger.debug("found line " + line + " in output");
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Found line \"" + line + "\" in qacct output");
             }
         }
 
         return result;
 
+    }
+
+    public String[] parseQconfQueueList(String qconfOutput) throws OctopusIOException {
+        String[] lines = qconfOutput.split("\\r?\\n");
+        String[] result = new String[lines.length];
+
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].contains(" ")) {
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Invalid queue name found \"" + lines[i] + "\"");
+            }
+
+            result[i] = lines[i].trim();
+        }
+
+        return result;
+    }
+
+    public Map<String, Map<String, String>> parseQconfQueueInfo(String qconfQueueListOutput) throws OctopusIOException {
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+
+        String[] lines = qconfQueueListOutput.split("\\r?\\n");
+
+        Map<String, String> currentQueueMap = null;
+
+        for (String line : lines) {
+            String[] elements = line.split("\\s+", 2);
+
+            if (elements.length != 2) {
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Found line \"" + line + "\" in qconf output");
+            }
+
+            String key = elements[0];
+            String value = elements[1];
+
+            if (key.equals("qname")) {
+                //listing of a (new) cluster starts
+                currentQueueMap = new HashMap<String, String>();
+                result.put(value, currentQueueMap);
+            } else if (currentQueueMap == null) {
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Expecting qname on first line, got \"" + line
+                        + "\"");
+            } else {
+                currentQueueMap.put(key, value);
+            }
+        }
+        return result;
     }
 }

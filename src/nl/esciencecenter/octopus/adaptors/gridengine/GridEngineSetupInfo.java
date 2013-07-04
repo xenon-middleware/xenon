@@ -15,7 +15,11 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
+import java.util.Arrays;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -28,16 +32,58 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
  */
 public class GridEngineSetupInfo {
 
+    private static class PEInfo {
+        String name;
+    }
+
+    private static class QueueInfo {
+        final String name;
+        final int slots;
+        final String[] parallelEnvironments;
+
+        QueueInfo(String name, String slots, String parallelEnvironments) throws OctopusException {
+            this.name = name;
+
+            if (slots == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+            }
+
+            try {
+                this.slots = Integer.parseInt(slots);
+            } catch (NumberFormatException e) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue " + name + ", got "
+                        + slots, e);
+            }
+
+            if (parallelEnvironments == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+            }
+            this.parallelEnvironments = parallelEnvironments.split("\\s+");
+
+            
+            logger.debug("found queue details {} slots {} pe {}", this.name, this.slots, this.parallelEnvironments);
+        }
+        
+        
+
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(GridEngineSetupInfo.class);
+
     private final String[] queueNames;
+
+    //private final QueueInfo[] queues;
+
+    //    private final PEInfo parallelEnvironments;
 
     public GridEngineSetupInfo(SchedulerConnection schedulerConnection, GridEngineParser parser) throws OctopusIOException,
             OctopusException {
 
-        String qstatOutput = schedulerConnection.runCommand(null, "qstat", "-xml", "-g", "c");
+        String listOutput = schedulerConnection.runCommand(null, "qconf", "-sql");
 
-        Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
+        this.queueNames = parser.parseQconfQueueList(listOutput);
 
-        this.queueNames = allMap.keySet().toArray(new String[0]);
+        //this.queues = fetchQueueInfo(queueNames, schedulerConnection, parser);
 
         //FETCH Queue info
 
@@ -46,6 +92,38 @@ public class GridEngineSetupInfo {
 
     public String[] getQueueNames() {
         return queueNames;
+    }
+
+    private static QueueInfo[] fetchQueueInfo(String[] queueNames, SchedulerConnection schedulerConnection,
+            GridEngineParser parser) throws OctopusIOException, OctopusException {
+        QueueInfo[] result = new QueueInfo[queueNames.length];
+
+        logger.debug("queue names: {}", Arrays.asList(queueNames));
+
+        String queueList = null;
+        for (String queueName : queueNames) {
+            if (queueList == null) {
+                queueList = queueName;
+            } else {
+                queueList += "," + queueName;
+            }
+        }
+
+        String detailsOutput = schedulerConnection.runCommand(null, "qconf", "-sq", queueList);
+
+        Map<String, Map<String, String>> allQueueDetails = parser.parseQconfQueueInfo(detailsOutput);
+
+        for (int i = 0; i < queueNames.length; i++) {
+            Map<String, String> queueDetails = allQueueDetails.get(queueNames[i]);
+
+            if (queueDetails == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get queue details for queue " + queueNames[i]);
+            }
+
+            result[i] = new QueueInfo(queueNames[i], queueDetails.get("slots"), queueDetails.get("pe_list"));
+        }
+
+        return result;
     }
 
 }

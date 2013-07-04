@@ -29,6 +29,7 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -53,8 +54,10 @@ import org.slf4j.LoggerFactory;
 public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(GridEngineSchedulerConnection.class);
-
-    public static final String JOB_OPTION_SCRIPT = "ge.job.script";
+    
+    public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
+    
+    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     public static final int QACCT_GRACE_TIME = 60000; //ms, 1 minute
 
@@ -144,8 +147,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return false;
     }
 
-   
-
     private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws OctopusIOException,
             OctopusException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
@@ -194,8 +195,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         return result.toArray(new Job[result.size()]);
     }
-
-
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
@@ -248,18 +247,62 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
 
     }
+    
+    @Override
+    protected void verifyJobDescription(JobDescription description) throws OctopusException {
+        //check if all given job options make sense
+        //FIXME: this should be build on top of OctopusProperties, see #132
+        for(String option: description.getJobOptions().keySet()) {
+            boolean found = false;
+            for (String validOption: VALID_JOB_OPTIONS) {
+                if (validOption.equals(option)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Given Job option \"" + option + "\" not supported");
+            }
+        }
+        
+        if (description.isInteractive()) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
+        }
+        
+        //check for option that overrides job script completely.
+        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
+            //no remaining settings checked.
+            return;
+        }
+        
+        //perform standard checks.
+        super.verifyJobDescription(description);
+
+        //FIXME: temporary checks until we _do_ support parallel jobs
+
+        if (description.getNodeCount() != 1) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Parallel jobs not supported yet, illegal nodecount: "
+                    + description.getNodeCount());
+        }
+
+        if (description.getProcessesPerNode() != 1) {
+            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
+                    "Parallel jobs not supported yet, illegal processes per node count: " + description.getProcessesPerNode());
+        }
+
+        
+    }
 
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
         AbsolutePath fsEntryPath = getFsEntryPath();
 
+        verifyJobDescription(description);
+        
         //check for option that overrides job script completely.
-        String customScriptFile = description.getJobOptions().get(JOB_OPTION_SCRIPT);
+        String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
-            verifyJobDescription(description);
-
             String jobScript = JobScriptGenerator.generate(description, fsEntryPath);
 
             output = runCommand(jobScript, "qsub");
@@ -287,12 +330,12 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String qdelOutput = runCommand(null, "qdel", identifier);
 
         boolean deleted = parser.parseQdelOutput(identifier, qdelOutput);
-        
+
         //keep track of the deleted jobs.
         if (deleted) {
             setJobDeleted(identifier);
         }
-        
+
         return getJobStatus(job);
     }
 

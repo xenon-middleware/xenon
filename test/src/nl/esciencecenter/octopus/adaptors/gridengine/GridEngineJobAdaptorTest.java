@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -54,79 +55,90 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     public static void cleanupGridEngineJobAdaptorTest() throws Exception {
         GenericJobAdaptorTestParent.cleanupClass();
     }
-    
+
     @org.junit.Test
     public void ge_test01_jobWithCustomScript() throws Exception {
         String message = "Hello World! test01\n";
-        
+
         String workingDir = getWorkingDir("ge_test01");
-        
+
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        
+
         AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
         files.createDirectories(root);
-        
+
         AbsolutePath script = root.resolve(new RelativePath("script"));
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        
-        String scriptContent = "#!/bin/bash\n" +
-                "#$ -o " + stdout.getPath() + "\n"
-                + "#$ -e /dev/null\n"
-                + "echo " + message;
+
+        String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, scriptContent);
-        
+
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOptions("ge.job.script", script.getPath());
+        description.addJobOptions("job.script", script.getPath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);
-        
-        
+
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
-        
-        if (!status.isDone()) { 
+
+        if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job failed!", status.getException());
         }
-        
+
         String outputContent = readFully(files.newInputStream(stdout));
 
         files.delete(stdout);
-        files.delete(script);           
-        files.delete(root);        
-        
+        files.delete(script);
+        files.delete(root);
+
         jobs.close(scheduler);
         files.close(filesystem);
-        
+
         assertTrue(outputContent.equals(message));
     }
-    
+
     @Test
     public void ge_test02_newScheduler_pathWithSlash() throws Exception {
-        
+
         URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
-        
+
         Scheduler s = jobs.newScheduler(uriWithSlash, null, null);
         jobs.close(s);
     }
 
     @Test(expected = InvalidLocationException.class)
     public void ge_test03_newScheduler_pathWithFragment_Exception() throws Exception {
-        
+
         URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
-        
+
         Scheduler s = jobs.newScheduler(uriWithFragment, null, null);
         jobs.close(s);
     }
 
-    
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void ge_test04_batchJob_parallel_Exception() throws Exception {
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/echo");
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+
+        try {
+            Job job = jobs.submitJob(scheduler, description);
+        } finally {
+            jobs.close(scheduler);
+        }
+    }
 
 }

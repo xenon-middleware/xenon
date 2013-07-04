@@ -267,6 +267,8 @@ public abstract class SchedulerConnection {
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
         }
+
+       
     }
 
     protected AbsolutePath getFsEntryPath() {
