@@ -30,7 +30,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
- * BatchProcess wraps an {@link InteractiveProcess} to emulate a batch process. 
+ * BatchProcess wraps an {@link InteractiveProcess} to emulate a batch process.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -39,120 +39,121 @@ import nl.esciencecenter.octopus.jobs.Streams;
 class BatchProcess implements InteractiveProcess {
 
     private final InteractiveProcess process;
-    
+
     private StreamForwarder stdinForwarder;
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
 
-    private AbsolutePath processPath(Files files, AbsolutePath root, String path) throws OctopusIOException, OctopusException { 
-        
+    private AbsolutePath processPath(Files files, AbsolutePath root, String path) throws OctopusIOException, OctopusException {
+
         AbsolutePath result = null;
-        
-        if (path == null) { 
+
+        if (path == null) {
             result = root;
-        } else if (path.startsWith("/")) {  
+        } else if (path.startsWith("/")) {
             result = files.newPath(root.getFileSystem(), new RelativePath(path));
-        } else { 
+        } else {
             result = root.resolve(new RelativePath(path));
         }
 
         return result;
     }
-    
-    private OutputStream createOutputStream(Files files, AbsolutePath workdir, String filename) throws OctopusIOException, OctopusException {
-        
-        if (filename == null) { 
+
+    private OutputStream createOutputStream(Files files, AbsolutePath workdir, String filename) throws OctopusIOException,
+            OctopusException {
+
+        if (filename == null) {
             return null;
         }
-        
+
         AbsolutePath file = processPath(files, workdir, filename);
 
         // Create the files for the output stream. Will fail if the files already exist!
         files.createFile(file);
-        
+
         // Create the output stream and return it. 
         return files.newOutputStream(file, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE);
     }
-    
-    
-    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory) throws Exception { 
-        
+
+    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory)
+            throws Exception {
+
         JobDescription description = job.getJobDescription();
-        
+
         // Retrieve the filesystem that goes with the scheduler.
         AbsolutePath workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
-        
+
         if (!files.exists(workdir)) {
             throw new IOException("Working directory does not exist!");
         }
-        
-//        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
-//        AbsolutePath stderr = processPath(files, workdir, description.getStderr());
-//        
-//        // Create the files for stdout and stderr. Will fail if the files already exist!
-//        files.createFile(stdout);
-//        files.createFile(stderr);
-//        
+
+        //        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
+        //        AbsolutePath stderr = processPath(files, workdir, description.getStderr());
+        //        
+        //        // Create the files for stdout and stderr. Will fail if the files already exist!
+        //        files.createFile(stdout);
+        //        files.createFile(stderr);
+        //        
         // If needed create a file for stdin, and make sure it exists!
         AbsolutePath stdin = null;
-        
+
         if (description.getStdin() != null) {
             stdin = processPath(files, workdir, description.getStdin());
-            
-            if (!files.exists(stdin)) { 
+
+            if (!files.exists(stdin)) {
                 throw new IOException("Stdin cannot be redirected from " + stdin.getPath() + " (file does not exist!)");
             }
         }
-        
+
         OutputStream out = createOutputStream(files, workdir, description.getStdout());
         OutputStream err = createOutputStream(files, workdir, description.getStderr());
-        
+
         process = factory.createInteractiveProcess(job);
         Streams streams = process.getStreams();
-        
+
         stdoutForwarder = new StreamForwarder(streams.getStdout(), out);
         stderrForwarder = new StreamForwarder(streams.getStderr(), err);
-        
-        if (stdin == null) { 
+
+        if (stdin == null) {
             stdinForwarder = null;
             streams.getStdin().close();
-        } else { 
-            stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin()); 
+        } else {
+            stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin());
         }
     }
 
-    private synchronized void closeStreams() { 
-        
-        if (stdinForwarder != null) { 
+    private synchronized void closeStreams() {
+
+        if (stdinForwarder != null) {
             stdinForwarder.close();
             stdinForwarder = null;
         }
-        
-        if (stdoutForwarder != null) { 
+
+        if (stdoutForwarder != null) {
             stdoutForwarder.close();
             stdoutForwarder = null;
         }
-        
-        if (stderrForwarder != null) { 
+
+        if (stderrForwarder != null) {
             stderrForwarder.close();
             stderrForwarder = null;
         }
     }
-    
+
     public boolean isDone() {
-        
+
         if (process.isDone()) {
             closeStreams();
             return true;
         }
-        
+
         return false;
     }
-   
+
     public int getExitStatus() {
         return process.getExitStatus();
     }
-    
+
     public void destroy() {
         process.destroy();
         closeStreams();

@@ -22,30 +22,31 @@ import nl.esciencecenter.octopus.files.Files;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public abstract class FileTestConfig extends GenericTestConfig {
-    
-    protected FileTestConfig(String adaptorName) { 
+
+    protected FileTestConfig(String adaptorName) {
         super(adaptorName);
     }
-    
+
     public abstract FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception;
+
     public abstract void closeTestFileSystem(Files files, FileSystem fs) throws Exception;
-    
-    public boolean supportsClose() { 
+
+    public boolean supportsClose() {
         return false;
     }
-    
-    public boolean supportsLocalCWDFileSystem() { 
+
+    public boolean supportsLocalCWDFileSystem() {
         return false;
     }
-    
-    public boolean supportsLocalHomeFileSystem() { 
+
+    public boolean supportsLocalHomeFileSystem() {
         return false;
     }
-    
-    public boolean supportsNewByteChannel() { 
+
+    public boolean supportsNewByteChannel() {
         return false;
     }
 }

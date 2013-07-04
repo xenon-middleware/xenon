@@ -58,27 +58,27 @@ public class PathAttributesPairImplementation implements PathAttributesPair {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         PathAttributesPairImplementation other = (PathAttributesPairImplementation) obj;
-        
-        if (attributes == null) { 
+
+        if (attributes == null) {
             if (other.attributes != null) {
                 return false;
             }
-        } else if (!attributes.equals(other.attributes)) { 
+        } else if (!attributes.equals(other.attributes)) {
             return false;
         }
-        
+
         if (path == null) {
-            if (other.path != null) { 
+            if (other.path != null) {
                 return false;
             }
         } else if (!path.equals(other.path)) {
@@ -86,7 +86,5 @@ public class PathAttributesPairImplementation implements PathAttributesPair {
         }
         return true;
     }
-    
-    
-    
+
 }

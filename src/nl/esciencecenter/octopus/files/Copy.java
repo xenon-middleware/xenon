@@ -24,18 +24,18 @@ package nl.esciencecenter.octopus.files;
  * @since 1.0
  */
 public interface Copy {
-    
+
     /**
      * Retrieve the source path to copy from.
-     *  
+     * 
      * @return the source path to copy from.
      */
     public AbsolutePath getSource();
-    
+
     /**
      * Retrieve the target path to copy to.
-     *  
+     * 
      * @return the target path to copy to.
-     */    
+     */
     public AbsolutePath getTarget();
 }

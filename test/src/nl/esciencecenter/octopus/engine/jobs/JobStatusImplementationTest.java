@@ -29,78 +29,81 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class JobStatusImplementationTest {
-    
-    
+
     @org.junit.Test
     public void test_constructor0() throws Exception {
-        
+
         JobDescription desc = new JobDescription();
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         Job j = new JobImplementation(s, "id1", desc, true, true);
-        
+
         Exception e = new Exception("Test Exception");
-        
-        Map<String,String> info = new HashMap<>();
+
+        Map<String, String> info = new HashMap<>();
         info.put("key1", "value1");
-        
+
         new JobStatusImplementation(j, "STATE", 42, e, true, false, info);
     }
-        
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor1() throws Exception {
         new JobStatusImplementation(null, "STATE", 42, null, true, false, null);
     }
-    
+
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-                
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         Job j = new JobImplementation(s, "id1", desc, true, true);
-        
+
         Exception e = new Exception("Test Exception");
-        
-        Map<String,String> info = new HashMap<>();
+
+        Map<String, String> info = new HashMap<>();
         info.put("key1", "value1");
-        
+
         JobStatusImplementation jsi = new JobStatusImplementation(j, "STATE", 42, e, true, false, info);
-        
+
         assertEquals(j, jsi.getJob());
         assertEquals("STATE", jsi.getState());
         assertEquals(new Integer(42), jsi.getExitCode());
         assertEquals(e, jsi.getException());
         assertEquals(info, jsi.getSchedulerSpecficInformation());
         assertTrue(jsi.isRunning());
-        assertFalse(jsi.isDone());                
-    } 
-    
+        assertFalse(jsi.isDone());
+    }
+
     @org.junit.Test
     public void test_toString() throws Exception {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String [] { "testq" }, null, 
-                null, true, true, true);     
-        
+        Scheduler s =
+                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+                        true);
+
         Job j = new JobImplementation(s, "id1", desc, true, true);
-        
+
         Exception e = new Exception("Test Exception");
-        
-        Map<String,String> info = new HashMap<>();
+
+        Map<String, String> info = new HashMap<>();
         info.put("key1", "value1");
-        
+
         JobStatusImplementation jsi = new JobStatusImplementation(j, "STATE", 42, e, true, false, info);
-                    
-        assertTrue(jsi.toString().equals("JobStatusImplementation [job=" + j + ", state=STATE, exitCode=42, exception=" + e
-                + ", done=false, schedulerSpecificInformation=" + info + "]"));
+
+        assertTrue(jsi.toString().equals(
+                "JobStatusImplementation [job=" + j + ", state=STATE, exitCode=42, exception=" + e
+                        + ", done=false, schedulerSpecificInformation=" + info + "]"));
     }
 }

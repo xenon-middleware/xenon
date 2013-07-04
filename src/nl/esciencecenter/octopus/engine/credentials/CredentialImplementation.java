@@ -33,19 +33,19 @@ public abstract class CredentialImplementation implements Credential {
      * Must be char array for security!! (Strings end up in the constant pool, etc.)
      */
     private final char[] password;
-    
+
     protected final String adaptorName;
 
     protected final OctopusProperties properties;
 
-    protected CredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String username, 
-            char [] password) {
-        
+    protected CredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String username,
+            char[] password) {
+
         this.adaptorName = adaptorName;
         this.properties = properties;
         this.username = username;
         this.uniqueID = uniqueID;
-        
+
         this.password = password;
     }
 

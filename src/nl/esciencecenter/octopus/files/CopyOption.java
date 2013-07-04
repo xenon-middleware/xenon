@@ -17,7 +17,7 @@ package nl.esciencecenter.octopus.files;
 
 /**
  * CopyOption is an enumeration containing all possible options for copying a file.
- *
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
@@ -57,16 +57,18 @@ public enum CopyOption {
     /**
      * Perform the copy asynchronously.
      */
-    ASYNCHRONOUS,;
+    ASYNCHRONOUS, ;
 
     /**
      * Check if an array of <code>CopyOption</code> contains a specific option.
-     *
+     * 
      * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
-     *
-     * @param options the array to check.
-     * @param option the option to check for.
-     *
+     * 
+     * @param options
+     *            the array to check.
+     * @param option
+     *            the option to check for.
+     * 
      * @return if <code>options</code> contains <code>option<code>.
      */
     public static boolean contains(CopyOption toFind, CopyOption... options) {
@@ -75,7 +77,7 @@ public enum CopyOption {
             return false;
         }
 
-        for (int i=0;i<options.length;i++) {
+        for (int i = 0; i < options.length; i++) {
 
             if (options[i] != null && options[i] == toFind) {
                 return true;

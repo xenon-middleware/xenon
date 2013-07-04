@@ -22,7 +22,7 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public interface InteractiveProcessFactory {
     public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException;

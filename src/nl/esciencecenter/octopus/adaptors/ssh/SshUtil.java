@@ -39,59 +39,59 @@ public class SshUtil {
     static final int READ_OTHERS = 00004; // read by others
     static final int WRITE_OTHERS = 00002; // write by others
     static final int EXEC_OTHERS = 00001; // execute/search by others
-    
-    protected SshUtil() { 
+
+    protected SshUtil() {
         // do not use
     }
-    
-    static boolean equals(SftpATTRS a1, SftpATTRS a2) { 
+
+    static boolean equals(SftpATTRS a1, SftpATTRS a2) {
 
         // Handles case of aliased object + both null
-        if (a1 == a2) { 
+        if (a1 == a2) {
             return true;
         }
-        
+
         // Handle case of one of the two null
-        if (a1 == null || a2 == null) { 
+        if (a1 == null || a2 == null) {
             return false;
         }
-        
+
         // Test all fields
-        if (a1.getATime() != a2.getATime()) { 
+        if (a1.getATime() != a2.getATime()) {
             return false;
         }
-        
-        if (a1.getMTime() != a2.getMTime()) { 
+
+        if (a1.getMTime() != a2.getMTime()) {
             return false;
         }
-        
-        if (a1.getFlags() != a2.getFlags()) { 
+
+        if (a1.getFlags() != a2.getFlags()) {
             return false;
         }
-        
-        if (a1.getGId() != a2.getGId()) { 
+
+        if (a1.getGId() != a2.getGId()) {
             return false;
         }
-        
-        if (a1.getUId() != a2.getUId()) { 
+
+        if (a1.getUId() != a2.getUId()) {
             return false;
         }
-        
-        if (a1.getPermissions() != a2.getPermissions()) { 
+
+        if (a1.getPermissions() != a2.getPermissions()) {
             return false;
         }
-        
-        if (a1.getSize() != a2.getSize()) { 
+
+        if (a1.getSize() != a2.getSize()) {
             return false;
         }
 
         return true;
     }
-    
+
     static Set<PosixFilePermission> bitsToPermissions(int bit) {
-        
+
         HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();
-        
+
         if ((bit & READ_OWNER) != 0) {
             result.add(PosixFilePermission.OWNER_READ);
         }
@@ -121,60 +121,60 @@ public class SshUtil {
         if ((bit & EXEC_OTHERS) != 0) {
             result.add(PosixFilePermission.OTHERS_EXECUTE);
         }
-        
+
         return result;
     }
-    
-    static int permissionsToBits(Set<PosixFilePermission> permissions) {
-        
-        int bits = 0;
-        
-        for (PosixFilePermission p : permissions) { 
 
-            switch (p) { 
-            case OWNER_READ: 
+    static int permissionsToBits(Set<PosixFilePermission> permissions) {
+
+        int bits = 0;
+
+        for (PosixFilePermission p : permissions) {
+
+            switch (p) {
+            case OWNER_READ:
                 bits |= READ_OWNER;
                 break;
-            case OWNER_WRITE: 
+            case OWNER_WRITE:
                 bits |= WRITE_OWNER;
                 break;
-            case OWNER_EXECUTE: 
+            case OWNER_EXECUTE:
                 bits |= EXEC_OWNER;
                 break;
-            case GROUP_READ: 
+            case GROUP_READ:
                 bits |= READ_GROUP;
                 break;
-            case GROUP_WRITE: 
+            case GROUP_WRITE:
                 bits |= WRITE_GROUP;
                 break;
-            case GROUP_EXECUTE: 
+            case GROUP_EXECUTE:
                 bits |= EXEC_GROUP;
                 break;
-            case OTHERS_READ: 
+            case OTHERS_READ:
                 bits |= READ_OTHERS;
                 break;
-            case OTHERS_WRITE: 
+            case OTHERS_WRITE:
                 bits |= WRITE_OTHERS;
                 break;
-            case OTHERS_EXECUTE: 
+            case OTHERS_EXECUTE:
                 bits |= EXEC_OTHERS;
                 break;
             }
         }
-        
+
         return bits;
     }
 
     static boolean isExecutable(int permissions) {
         return (permissions & EXEC_OWNER) != 0;
     }
-    
+
     static boolean isReadable(int permissions) {
         return (permissions & READ_OWNER) != 0;
     }
-   
+
     static boolean isWritable(int permissions) {
         return (permissions & WRITE_OWNER) != 0;
     }
-    
+
 }

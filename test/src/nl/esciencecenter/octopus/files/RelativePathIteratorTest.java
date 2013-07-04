@@ -23,38 +23,37 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class RelativePathIteratorTest {
 
     @Test
     public void test_ok() {
-      
-        String [] s = new String [] { "aap", "noot", "mies" };
-        
+
+        String[] s = new String[] { "aap", "noot", "mies" };
+
         RelativePath path = new RelativePath(s);
-        
+
         Iterator<RelativePath> itt = path.iterator();
-        
-        int i=0;
-        
-        while (itt.hasNext()) { 
+
+        int i = 0;
+
+        while (itt.hasNext()) {
             RelativePath tmp = itt.next();
-            assert(s[i].equals(tmp.getPath()));
+            assert (s[i].equals(tmp.getPath()));
             i++;
         }
-        
-        assert(i == s.length);
+
+        assert (i == s.length);
     }
 
     @Test
     public void test_empy() {
         RelativePath path = new RelativePath(new String[0]);
         Iterator<RelativePath> itt = path.iterator();
-        assert(!itt.hasNext());
+        assert (!itt.hasNext());
     }
 
-    
     @Test
     public void test_ok2() {
         RelativePath path = new RelativePath("aap", "noot", "mies");
@@ -63,7 +62,7 @@ public class RelativePathIteratorTest {
         itt.next();
         itt.next();
     }
-    
+
     @Test(expected = UnsupportedOperationException.class)
     public void test_remove() {
         RelativePath path = new RelativePath("aap", "noot", "mies");

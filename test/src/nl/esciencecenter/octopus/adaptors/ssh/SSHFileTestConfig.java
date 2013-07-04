@@ -29,44 +29,44 @@ import nl.esciencecenter.octopus.files.Files;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class SSHFileTestConfig extends FileTestConfig {
 
     private String username;
-    private char [] passwd;
-    
+    private char[] passwd;
+
     private URI correctURI;
     private URI correctURIWithPath;
     private URI correctFSURI;
-    
+
     private URI wrongUserURI;
     private URI wrongLocationURI;
     private URI wrongPathURI;
-    
-    public SSHFileTestConfig(String configfile) throws Exception { 
-        
+
+    public SSHFileTestConfig(String configfile) throws Exception {
+
         super("ssh");
-        
-        if (configfile == null) { 
+
+        if (configfile == null) {
             configfile = System.getProperty("test.ssh.adaptor.config");
         }
-            
-        if (configfile == null) { 
+
+        if (configfile == null) {
             configfile = System.getProperty("user.home") + File.separator + "test_ssh.properties";
         }
-        
+
         Properties p = new Properties();
         p.load(new FileInputStream(configfile));
-        
+
         username = getPropertyOrFail(p, "test.ssh.user");
         passwd = getPropertyOrFail(p, "test.ssh.password").toCharArray();
-        
+
         String location = getPropertyOrFail(p, "test.ssh.location");
-        
+
         String wrongUser = getPropertyOrFail(p, "test.ssh.user.wrong");
         String wrongLocation = getPropertyOrFail(p, "test.ssh.location.wrong");
-        
+
         correctURI = new URI("ssh://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
         correctURIWithPath = new URI("ssh://" + username + "@" + location + "/");
@@ -74,37 +74,38 @@ public class SSHFileTestConfig extends FileTestConfig {
         wrongLocationURI = new URI("ssh://" + username + "@" + wrongLocation);
         wrongPathURI = new URI("ssh://" + username + "@" + location + "/aap/noot");
     }
-    
-    private String getPropertyOrFail(Properties p, String property) throws Exception { 
-        
+
+    private String getPropertyOrFail(Properties p, String property) throws Exception {
+
         String tmp = p.getProperty(property);
-        
-        if (tmp == null) { 
+
+        if (tmp == null) {
             throw new Exception("Failed to retireve property " + property);
         }
-        
+
         return tmp;
     }
-    
+
     @Override
     public URI getCorrectURI() throws Exception {
         return correctURI;
     }
+
     @Override
     public URI getCorrectURIWithPath() throws Exception {
         return correctURIWithPath;
     }
-    
+
     @Override
     public boolean supportURILocation() {
         return true;
     }
-    
+
     @Override
     public URI getURIWrongLocation() throws Exception {
         return wrongLocationURI;
     }
-    
+
     @Override
     public URI getURIWrongPath() throws Exception {
         return wrongPathURI;
@@ -124,7 +125,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     public boolean supportsCredentials() {
         return true;
     }
-    
+
     @Override
     public Credential getDefaultCredential(Credentials credentials) throws Exception {
         return credentials.getDefaultCredential("ssh");
@@ -134,7 +135,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
         return credentials.newPasswordCredential("ssh", new Properties(), username, passwd);
     }
-    
+
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
         return credentials.newPasswordCredential("ssh", new Properties(), username, "wrongpassword".toCharArray());
@@ -164,7 +165,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     public Properties getDefaultProperties() throws Exception {
         return null;
     }
-    
+
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
         return files.newFileSystem(correctFSURI, getDefaultCredential(credentials), null);

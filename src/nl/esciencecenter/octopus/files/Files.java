@@ -161,7 +161,7 @@ public interface Files {
     /**
      * Copy an existing source file or symbolic link to a target file.
      * 
-     * Both source and target must NOT be a directory. 
+     * Both source and target must NOT be a directory.
      * 
      * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
      * 
@@ -169,52 +169,52 @@ public interface Files {
      * 
      * (FIXME) If the source is a link, the link itself will be copied, not the path to which it refers. (FIXME)
      * 
-     * The <code>options</code> parameter determines how the copy is performed: 
+     * The <code>options</code> parameter determines how the copy is performed:
      * 
      * <li><code>CREATE</code> (default): Create a new target file and copy to it. Fail if the target already exists.</li>
      * 
-     * <li><code>REPLACE</code>: Replace target if it already exists. If the target does not exist it will be created. </li>
+     * <li><code>REPLACE</code>: Replace target if it already exists. If the target does not exist it will be created.</li>
      * 
-     * <li><code>IGNORE</code>: Ignore copy if the target already exists. If the target does not exist it will be created. </li>
+     * <li><code>IGNORE</code>: Ignore copy if the target already exists. If the target does not exist it will be created.</li>
      * 
      * <li><code>APPEND</code>: The data in source will appended to target. Fails if the target does not exist.</li>
      * 
-     * <li><code>RESUME</code>: A copy from source to target will be resumed. Fails if the target does not exist. 
-     * To resume a copy, the size of the target is used as the start position in the source. All data from the 
-     * source after this start position is  append to the target. For example, if the target contains 100 bytes (0-99) and the 
-     * source 200 bytes (0-199), the data at bytes 100-199 in the source will be append to target. By default, there is no 
-     * verification that the existing data in target corresponds to the data in source.</li> 
-     *
-     * Note that these four options are exclusive. Only one can be selected at a time. If more than one of these options is 
-     * provided, an exception will be thrown.     
-     *  
-     * The following additional options exist:     
-     *  
-     * <li><code>VERIFY</code> (can only be used in combination with <code>RESUME</code>): When resuming a copy, verify that the 
-     * existing data in target corresponds to the data in source.</li>   
+     * <li><code>RESUME</code>: A copy from source to target will be resumed. Fails if the target does not exist. To resume a
+     * copy, the size of the target is used as the start position in the source. All data from the source after this start
+     * position is append to the target. For example, if the target contains 100 bytes (0-99) and the source 200 bytes (0-199),
+     * the data at bytes 100-199 in the source will be append to target. By default, there is no verification that the existing
+     * data in target corresponds to the data in source.</li>
      * 
-     * <li><code>ASYNCHRONOUS</code>: Perform an asynchronous copy. Instead of blocking until the copy is complete, the call 
+     * Note that these four options are exclusive. Only one can be selected at a time. If more than one of these options is
+     * provided, an exception will be thrown.
+     * 
+     * The following additional options exist:
+     * 
+     * <li><code>VERIFY</code> (can only be used in combination with <code>RESUME</code>): When resuming a copy, verify that the
+     * existing data in target corresponds to the data in source.</li>
+     * 
+     * <li><code>ASYNCHRONOUS</code>: Perform an asynchronous copy. Instead of blocking until the copy is complete, the call
      * returns immediately and the copy is performed in the background.<li>
      * 
-     * If the <code>ASYNCHRONOUS</code> option is provided, a {@link Copy} is returned that can be used to retrieve the status of 
-     * the copy operation (in a {@link CopyStatus}) or cancel it. Any exceptions produced during the copy operation are also 
+     * If the <code>ASYNCHRONOUS</code> option is provided, a {@link Copy} is returned that can be used to retrieve the status of
+     * the copy operation (in a {@link CopyStatus}) or cancel it. Any exceptions produced during the copy operation are also
      * stored in the {@link CopyStatus}.
      * 
-     * If the <code>ASYNCHRONOUS</code> option is not provided, the copy will block until it is completed and <code>null</code> 
-     * will be returned.     
+     * If the <code>ASYNCHRONOUS</code> option is not provided, the copy will block until it is completed and <code>null</code>
+     * will be returned.
      * 
      * 
      * @param source
      *            the existing source file or link.
      * @param target
      *            the target path.
-     * @return a {@link CopyStatus} if the copy is asynchronous or <code>null</code> if it is blocking. 
+     * @return a {@link CopyStatus} if the copy is asynchronous or <code>null</code> if it is blocking.
      * 
      * @throws NoSuchFileException
-     *             If the source file does not exist, the target parent directory does not exist, or the target file does not 
+     *             If the source file does not exist, the target parent directory does not exist, or the target file does not
      *             exist and the <code>APPEND</code> or <code>RESUME</code> option is provided.
      * @throws FileAlreadyExistsException
-     *             If the target file already exists. 
+     *             If the target file already exists.
      * @throws IllegalSourcePathException
      *             If the source is a directory.
      * @throws IllegalTargetPathException
@@ -224,8 +224,8 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) 
-            throws UnsupportedOperationException, OctopusIOException;
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
+            OctopusIOException;
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -253,11 +253,12 @@ public interface Files {
      *             If the move failed.
      */
     public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
-    
+
     /**
-     * Retrieve the status of an asynchronous copy. 
-     *  
-     * @param copy the asynchronous copy for which to retrieve the status. 
+     * Retrieve the status of an asynchronous copy.
+     * 
+     * @param copy
+     *            the asynchronous copy for which to retrieve the status.
      * 
      * @return a {@link CopyStatus} containing the status of the asynchronous copy.
      * 
@@ -267,20 +268,22 @@ public interface Files {
      *             If an I/O error occurred.
      */
     public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException;
-    
+
     /**
-     * Cancel a copy operation.  
+     * Cancel a copy operation.
      * 
-     * @param copy the asynchronous copy which to cancel. 
-     * @param removeTarget should the (partially copied) remote target file be removed ?
-     *  
+     * @param copy
+     *            the asynchronous copy which to cancel.
+     * @param removeTarget
+     *            should the (partially copied) remote target file be removed ?
+     * 
      * @throws NoSuchCopyException
      *             If the copy is not known.
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
     public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
-    
+
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
      * 
@@ -379,14 +382,14 @@ public interface Files {
      *             If an I/O error occurred.
      */
     public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
-    
+
     /**
      * Return the size of a file in bytes.
      * 
      * @param path
      *            the path to the file.
      * 
-     * @return  the size of a file in bytes, or 0 if the file is a directory or symbolic link.
+     * @return the size of a file in bytes, or 0 if the file is a directory or symbolic link.
      * 
      * @throws NoSuchFileException
      *             If the path does not exists.
@@ -394,7 +397,7 @@ public interface Files {
      *             If an I/O error occurred.
      */
     public long size(AbsolutePath path) throws OctopusIOException;
-    
+
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
      * 
@@ -489,33 +492,33 @@ public interface Files {
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
      * 
-     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and 
-     * if the file should be written or read. 
+     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and
+     * if the file should be written or read.
      * 
-     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file
-     * already exists.
+     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file already
+     * exists.
      * 
-     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the 
-     * file does not exist. 
+     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the
+     * file does not exist.
      * 
-     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not 
-     * exist a new file will be created.  
+     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not
+     * exist a new file will be created.
      * 
-     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more 
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more
      * than one will result in an exception.
      * 
-     * If the <code>APPEND</code> option is specified, data will be added to the end of the file. No existing data will be 
-     * overwritten. 
+     * If the <code>APPEND</code> option is specified, data will be added to the end of the file. No existing data will be
+     * overwritten.
      * 
-     * If the <code>TRUNCATE</code> option is specified, any existing data in the file will be deleted (resulting in a file of 
+     * If the <code>TRUNCATE</code> option is specified, any existing data in the file will be deleted (resulting in a file of
      * size 0). The data will then be appended from the beginning of the file.
      * 
-     * Either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both will result in an exception. 
+     * Either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both will result in an exception.
      * 
      * The <code>READ</code> option must not be set. If it is set, an exception will be thrown.
-     *
-     * If the <code>WRITE</code> option is specified, the file is opened for writing. As this is the default behavior, the 
-     * <code>WRITE</code> option may be omitted.  
+     * 
+     * If the <code>WRITE</code> option is specified, the file is opened for writing. As this is the default behavior, the
+     * <code>WRITE</code> option may be omitted.
      * 
      * @param path
      *            the target file for the OutputStream.
@@ -534,41 +537,41 @@ public interface Files {
     /**
      * Open an file and return an {@link SeekableByteChannel} to read from or write to this file.
      * 
-     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and 
-     * if the file should be written or read. 
+     * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and
+     * if the file should be written or read.
      * 
-     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file
-     * already exists.
+     * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file already
+     * exists.
      * 
-     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the 
-     * file does not exist. 
+     * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the
+     * file does not exist.
      * 
-     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not 
-     * exist a new file will be created.  
+     * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not
+     * exist a new file will be created.
      * 
-     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more 
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more
      * than one will result in an exception.
      * 
-     * If the <code>READ</code> option is set the file is opened for reading. 
-     *
-     * If the <code>WRITE</code> option is specified, the file is opened for writing. 
+     * If the <code>READ</code> option is set the file is opened for reading.
+     * 
+     * If the <code>WRITE</code> option is specified, the file is opened for writing.
      * 
      * At least one of <code>READ</code> and <code>WRITE</code> must be set. These options may also be combined.
      * 
      * If the <code>APPEND</code> option is specified, and the <code>WRITE</code> option is set, data will be added to the end of
-     * the file. No existing data will be overwritten. If the <code>WRITE</code> is not set, an exception will be thrown. 
+     * the file. No existing data will be overwritten. If the <code>WRITE</code> is not set, an exception will be thrown.
      * 
-     * If the <code>TRUNCATE</code> option is specified, and the <code>WRITE</code> option is set, any existing data in the file 
-     * will be deleted (resulting in a file of size 0). The data will then be appended from the beginning of the file.  
-     * If the <code>WRITE</code> is not set, an exception will be thrown.
+     * If the <code>TRUNCATE</code> option is specified, and the <code>WRITE</code> option is set, any existing data in the file
+     * will be deleted (resulting in a file of size 0). The data will then be appended from the beginning of the file. If the
+     * <code>WRITE</code> is not set, an exception will be thrown.
      * 
-     * When only <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both 
-     * will result in an exception. 
+     * When only <code>WRITE</code> is set, either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both
+     * will result in an exception.
      * 
-     * When only <code>READ</code> is set, neither <code>APPEND</code> nor <code>TRUNCATE</code> may be specified, or an exception 
-     * will be thrown. 
+     * When only <code>READ</code> is set, neither <code>APPEND</code> nor <code>TRUNCATE</code> may be specified, or an exception
+     * will be thrown.
      * 
-     * When both <code>WRITE</code> and <code>READ</code> are set, only <code>TRUNCATE</code> may be used. If the 
+     * When both <code>WRITE</code> and <code>READ</code> are set, only <code>TRUNCATE</code> may be used. If the
      * <code>APPEND</code> option is specified, an exception will be thrown.
      * 
      * @param path
@@ -583,7 +586,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-   // public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
+    // public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     /**
      * Get the {@link FileAttributes} of an existing path.

@@ -22,50 +22,49 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class AdaptorStatusImplementationTest {
-    
+
     @Test
     public void testGetters() {
-        
-        AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
-                new String [] { "SCHEME1", "SCHEME2" }, null, null);
-        
-        
-        String name = a.getName();
-        
-        assert(name.equals("NAME"));
-        
-        String description = a.getDescription();
-        
-        assert(description.equals("DESCRIPTION"));
-        
-        String [] schemes = a.getSupportedSchemes();
-        
-        assert(schemes != null);
-        assert(schemes.length == 2);
-        assert(schemes[0].equals("SCHEME1"));
-        assert(schemes[1].equals("SCHEME2"));
-        
-        Map<String, String> props = a.getSupportedProperties();
-        
-        assert(props == null);
-        
-        props = a.getAdaptorSpecificInformation();
-        
-        assert(props == null);
-    }
 
+        AdaptorStatusImplementation a =
+                new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1", "SCHEME2" }, null, null);
+
+        String name = a.getName();
+
+        assert (name.equals("NAME"));
+
+        String description = a.getDescription();
+
+        assert (description.equals("DESCRIPTION"));
+
+        String[] schemes = a.getSupportedSchemes();
+
+        assert (schemes != null);
+        assert (schemes.length == 2);
+        assert (schemes[0].equals("SCHEME1"));
+        assert (schemes[1].equals("SCHEME2"));
+
+        Map<String, String> props = a.getSupportedProperties();
+
+        assert (props == null);
+
+        props = a.getAdaptorSpecificInformation();
+
+        assert (props == null);
+    }
 
     @Test
     public void testToString() {
-        
-        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
-                new String [] { "SCHEME1", "SCHEME2" }, null, null).toString();
-        
-        assert(tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, SCHEME2], supportedProperties=null, adaptorSpecificInformation=null]"));
+
+        String tmp =
+                new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1", "SCHEME2" }, null, null)
+                        .toString();
+
+        assert (tmp
+                .equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, SCHEME2], supportedProperties=null, adaptorSpecificInformation=null]"));
     }
 
-    
 }

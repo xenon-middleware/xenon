@@ -25,7 +25,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class LocalAdaptorTest {
 
@@ -33,17 +33,17 @@ public class LocalAdaptorTest {
     public void test_checkURI_null() throws OctopusException {
         new LocalAdaptor(null, null).checkURI(null);
     }
-    
+
     @org.junit.Test
     public void test_checkURI_empty() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI(""));
     }
-    
+
     @org.junit.Test(expected = OctopusException.class)
     public void test_checkURI_wrongScheme() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI("ssh:///"));
     }
-    
+
     @org.junit.Test
     public void test_checkURI_withPath() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI("local:///aap/noot/mies"));
@@ -53,7 +53,7 @@ public class LocalAdaptorTest {
     public void test_checkURI_withPath2() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI("/aap/noot/mies"));
     }
-    
+
     @org.junit.Test(expected = OctopusException.class)
     public void test_checkURI_wrongLocation() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI("file://google.com"));
@@ -63,42 +63,42 @@ public class LocalAdaptorTest {
     public void test_checkURI_correct1() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI("file:///"));
     }
-    
+
     @org.junit.Test
     public void test_checkURI_correct2() throws Exception {
         new LocalAdaptor(null, null).checkURI(new URI("file://localhost/"));
     }
-    
+
     @org.junit.Test
     public void test_supports_null() throws Exception {
         boolean value = new LocalAdaptor(null, null).supports(null);
-        assert(value);
+        assert (value);
     }
-    
+
     @org.junit.Test
     public void test_supports_wrong() throws Exception {
         boolean value = new LocalAdaptor(null, null).supports("ssh");
-        assert(!value);
+        assert (!value);
     }
-    
+
     @org.junit.Test
     public void test_supports_correct_file() throws Exception {
         boolean value = new LocalAdaptor(null, null).supports("file");
-        assert(value);
+        assert (value);
     }
-    
+
     @org.junit.Test
     public void test_supports_correct_local() throws Exception {
-        boolean value = new LocalAdaptor(null, null).supports("local");        
-        assert(value);
+        boolean value = new LocalAdaptor(null, null).supports("local");
+        assert (value);
     }
-    
+
     @org.junit.Test
     public void test_getSupportedProperties() throws Exception {
         Map<String, String> map = new LocalAdaptor(null, null).getSupportedProperties();
-        assert(map != null);
+        assert (map != null);
     }
-    
+
     @org.junit.Test(expected = OctopusException.class)
     public void test_credentialsAdaptor() throws Exception {
         new LocalAdaptor(null, null).credentialsAdaptor();
@@ -107,12 +107,12 @@ public class LocalAdaptorTest {
     @org.junit.Test
     public void test_filesAdaptor() throws Exception {
         Files files = new LocalAdaptor(null, null).filesAdaptor();
-        assert(files != null);
+        assert (files != null);
     }
 
     @org.junit.Test
     public void test_jobsAdaptor() throws Exception {
         Jobs jobs = new LocalAdaptor(null, null).jobsAdaptor();
-        assert(jobs != null);
+        assert (jobs != null);
     }
 }

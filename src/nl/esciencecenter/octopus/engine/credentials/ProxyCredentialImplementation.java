@@ -18,8 +18,8 @@ package nl.esciencecenter.octopus.engine.credentials;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 
 /**
- * Represents a {@link Credential} stored in a myproxy server. You need to specify a host, port, username and
- * password to the myproxy server.
+ * Represents a {@link Credential} stored in a myproxy server. You need to specify a host, port, username and password to the
+ * myproxy server.
  * 
  * @author rob
  */
@@ -47,8 +47,8 @@ public class ProxyCredentialImplementation extends CredentialImplementation {
      * @param password
      *            the password to use to connect to the myproxy server
      */
-    public ProxyCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String host, int port,
-            String username, char [] password) {
+    public ProxyCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String host,
+            int port, String username, char[] password) {
         super(adaptorName, uniqueID, properties, username, password);
         this.host = host;
         this.port = port;

@@ -23,17 +23,17 @@ import org.junit.BeforeClass;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class SSHJobAdaptorTest extends GenericJobAdaptorTestParent {
-    
+
     @BeforeClass
-    public static void prepareSSHJobAdaptorTest() throws Exception { 
+    public static void prepareSSHJobAdaptorTest() throws Exception {
         GenericJobAdaptorTestParent.prepareClass(new SSHJobTestConfig(null));
     }
 
     @AfterClass
-    public static void cleanupSSHJobAdaptorTest() throws Exception { 
+    public static void cleanupSSHJobAdaptorTest() throws Exception {
         GenericJobAdaptorTestParent.cleanupClass();
     }
 }

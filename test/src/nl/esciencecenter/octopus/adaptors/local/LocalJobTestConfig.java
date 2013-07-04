@@ -29,7 +29,7 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class LocalJobTestConfig extends JobTestConfig {
 
@@ -38,15 +38,15 @@ public class LocalJobTestConfig extends JobTestConfig {
     private final URI wrongPathURI;
     private final URI wrongLocationURI;
 
-    public LocalJobTestConfig() throws Exception { 
+    public LocalJobTestConfig() throws Exception {
         super("local");
-        
+
         correctURI = new URI("local:///");
         correctURIWithPath = new URI("local:////");
         wrongPathURI = new URI("local:///aap/noot/mies/");
-        wrongLocationURI = new URI("file://machine/");        
+        wrongLocationURI = new URI("file://machine/");
     }
-        
+
     @Override
     public Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception {
         return jobs.getLocalScheduler();
@@ -72,14 +72,14 @@ public class LocalJobTestConfig extends JobTestConfig {
         return correctURIWithPath;
     }
 
-    public boolean supportURILocation() { 
+    public boolean supportURILocation() {
         return true;
     }
-    
-    public URI getURIWrongLocation() throws Exception { 
+
+    public URI getURIWrongLocation() throws Exception {
         return wrongLocationURI;
     }
-    
+
     @Override
     public URI getURIWrongPath() throws Exception {
         return wrongPathURI;
@@ -118,5 +118,5 @@ public class LocalJobTestConfig extends JobTestConfig {
     @Override
     public boolean supportsParallelJobs() {
         return false;
-    }    
+    }
 }

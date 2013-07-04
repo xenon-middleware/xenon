@@ -27,20 +27,20 @@ public class JobImplementation implements Job {
 
     private final String identifier;
 
-    private final boolean interactive; 
-    
-    private final boolean online; 
-        
-    public JobImplementation(Scheduler scheduler, String identifier, boolean interactive, boolean online) {  
-                
-        if (scheduler == null) { 
+    private final boolean interactive;
+
+    private final boolean online;
+
+    public JobImplementation(Scheduler scheduler, String identifier, boolean interactive, boolean online) {
+
+        if (scheduler == null) {
             throw new IllegalArgumentException("Scheduler may not be null!");
         }
-        
-        if (identifier == null) { 
+
+        if (identifier == null) {
             throw new IllegalArgumentException("Identifier may not be null!");
         }
-        
+
         this.description = null;
         this.scheduler = scheduler;
         this.identifier = identifier;
@@ -48,18 +48,18 @@ public class JobImplementation implements Job {
         this.online = online;
     }
 
-    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description, boolean interactive, 
-            boolean online) {  
+    public JobImplementation(Scheduler scheduler, String identifier, JobDescription description, boolean interactive,
+            boolean online) {
 
         this(scheduler, identifier, interactive, online);
-        
-        if (description == null) { 
+
+        if (description == null) {
             throw new IllegalArgumentException("JobDescription may not be null!");
         }
-        
+
         this.description = description;
     }
-    
+
     @Override
     public JobDescription getJobDescription() {
         return description;
@@ -87,8 +87,8 @@ public class JobImplementation implements Job {
 
     @Override
     public String toString() {
-        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + 
-                ", description=" + description + ", isInteractive=" + isInteractive() + ", isOnline=" + online + "]";
+        return "JobImplementation [identifier=" + identifier + ", scheduler=" + scheduler + ", description=" + description
+                + ", isInteractive=" + isInteractive() + ", isOnline=" + online + "]";
     }
 
     @Override
@@ -101,17 +101,17 @@ public class JobImplementation implements Job {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         JobImplementation other = (JobImplementation) obj;
-        
-        return identifier.equals(other.identifier) && scheduler.equals(other.scheduler); 
+
+        return identifier.equals(other.identifier) && scheduler.equals(other.scheduler);
     }
 }

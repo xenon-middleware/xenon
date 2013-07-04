@@ -84,9 +84,9 @@ public class JobExecutor implements Runnable {
 
         killed = true;
 
-//        if (thread != null) {
-//            thread.interrupt();
-//        }
+        //        if (thread != null) {
+        //            thread.interrupt();
+        //        }
     }
 
     public synchronized boolean isDone() {
@@ -148,7 +148,7 @@ public class JobExecutor implements Runnable {
 
         long deadline = System.currentTimeMillis() + timeout;
         long leftover = timeout;
-        
+
         while (state.equals("PENDING")) {
             try {
                 // Note: will wait forever if leftover == 0.
@@ -156,16 +156,16 @@ public class JobExecutor implements Runnable {
             } catch (InterruptedException e) {
                 // ignored
             }
-            
+
             long now = System.currentTimeMillis();
 
             if (now >= deadline) {
                 break;
             }
 
-            leftover = deadline - now;            
+            leftover = deadline - now;
         }
-        
+
         return getStatus();
     }
 
@@ -209,7 +209,7 @@ public class JobExecutor implements Runnable {
             updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return;
         }
-        
+
         long endTime = 0;
         int maxTime = description.getMaxTime();
 
@@ -229,8 +229,8 @@ public class JobExecutor implements Runnable {
             return;
         }
 
-       // this.thread = Thread.currentThread();
-        
+        // this.thread = Thread.currentThread();
+
         updateState("RUNNING", -1, null);
 
         while (true) {

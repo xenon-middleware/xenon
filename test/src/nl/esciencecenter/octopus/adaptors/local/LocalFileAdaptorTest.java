@@ -23,17 +23,17 @@ import nl.esciencecenter.octopus.adaptors.GenericFileAdaptorTestParent;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     @BeforeClass
-    public static void prepareLocalFileAdaptorTest() throws Exception { 
+    public static void prepareLocalFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.prepareClass(new LocalFileTestConfig());
     }
 
     @AfterClass
-    public static void cleanupLocalFileAdaptorTest() throws Exception { 
+    public static void cleanupLocalFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.cleanupClass();
     }
 }

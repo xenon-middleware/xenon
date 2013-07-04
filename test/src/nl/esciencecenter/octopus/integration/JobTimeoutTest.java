@@ -27,13 +27,13 @@ import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class JobTimeoutTest {
-    
+
     @Test
-    public void test() throws Exception { 
-        
+    public void test() throws Exception {
+
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/sleep");
         description.setArguments("60s");
@@ -43,36 +43,36 @@ public class JobTimeoutTest {
 
         Octopus octopus = OctopusFactory.newOctopus(null);
         Jobs jobs = octopus.jobs();
-        
+
         Job job = jobs.submitJob(jobs.getLocalScheduler(), description);
-        
+
         long time = System.currentTimeMillis();
-        
+
         JobStatus status = jobs.getJobStatus(job);
-        
-        while (!status.isDone()) { 
-            
-            try { 
+
+        while (!status.isDone()) {
+
+            try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) { 
+            } catch (InterruptedException e) {
                 // ignored
             }
-            
+
             status = jobs.getJobStatus(job);
-       
-            if ((System.currentTimeMillis() - time) > 3*60*1000) { 
+
+            if ((System.currentTimeMillis() - time) > 3 * 60 * 1000) {
                 throw new Exception("Job failed to terminate within 3 minutes!");
             }
         }
-        
+
         long deltat = System.currentTimeMillis() - time;
 
-        System.out.println("Job terminated after " + (deltat/1000.0) + " sec.");
-        
-        if (deltat > 65*1000) {
-            throw new Exception("Job terminated after " + (deltat/1000.0) + " seconds (not 60)");
+        System.out.println("Job terminated after " + (deltat / 1000.0) + " sec.");
+
+        if (deltat > 65 * 1000) {
+            throw new Exception("Job terminated after " + (deltat / 1000.0) + " seconds (not 60)");
         }
-        
+
         OctopusFactory.endAll();
     }
 }

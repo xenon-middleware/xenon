@@ -24,16 +24,16 @@ import nl.esciencecenter.octopus.engine.util.InteractiveProcessFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
 
     private final SshSession session;
-    
+
     public SshInteractiveProcessFactory(SshSession session) {
         this.session = session;
     }
-    
+
     @Override
     public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
         return new SshInteractiveProcess(session, job);
