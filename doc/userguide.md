@@ -110,8 +110,7 @@ right adaptor.
 
 To perform this selection, the engine layer matches the *scheme* of the object 
 on which the operation needs to be performed, to the *schemes* supported by 
-each of the adaptors. When the schemes match, the adaptor is selected. This 
-will be explained in more detail below (_TODO_).
+each of the adaptors. When the schemes match, the adaptor is selected. 
 
 
 Interfaces and datatypes
@@ -150,13 +149,13 @@ any resources it has obtained.
 
 When creating an octopus using `newOctopus`, the `properties` parameter can be used to 
 configure the octopus instance. If no configuration is necessary, `null` can be used.
-Properties consist of a set of key-value pairs. In octopus all keys -must- start with 
+Properties consist of a set of key-value pairs. In octopus all keys __must__ start with 
 `"octopus."`. To configure the adaptors, properties of the form 
 `"octopus.adaptors.<name>.<property>"` can be used, where `<name>` is the name of the 
 adaptor (for example `local` or `ssh`) and `<property>` is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
-`octopus.adaptors.local.a.b.c`. The available properties can be found in the -Adaptors- 
-section below. 
+`octopus.adaptors.local.a.b.c`. The available properties can be found in the documentation 
+of the individual adaptors.
 
     public interface Octopus {
         Files files();
@@ -196,7 +195,7 @@ we will not explain these further.
 
 Finally, `getAdaptorSpecificInformation` can be used to retrieve status information from 
 the adaptor. Again, each key contains a property of the form described above. The possible
-returned properties can be found in the -Adaptor- section below.  
+returned properties can be found in the _Adaptor_ section below.  
 
 ### Credentials interface ###
 
@@ -221,13 +220,13 @@ octopus. The main entrypoint is `Credentials`:
     }
 
 The `Credentials` interface contains various methods for creating credtentials, based 
-on certificates, passwords and proxies. For each method, the desired -scheme- needs to be 
+on certificates, passwords and proxies. For each method, the desired _scheme_ needs to be 
 provided as a parameter. This allows octopus to forward the call to the correct adaptor.
 Note that some types of credentials may not be supported by all adaptors. An exception 
 will be thrown when an unsupported `new<Type>Credential` methods is invoked. 
 
 Additional configuration can also be provides using the `properties` parameter, which use 
-the same form as described in the -Octopus factory and interface- section above. If no 
+the same form as described in the _Octopus factory and interface_ section above. If no 
 additional configuration is needed, `null` can be used. The `getDefaultCredential` 
 returns the default credential for the given scheme. All adaptors are guarenteed to 
 support this method. 
@@ -489,7 +488,7 @@ To submit and manage jobs, the `Jobs` interface contains the following methods:
         JobStatus waitUntilDone(Job job, long timeout) throws ...
 
         JobStatus cancelJob(Job job) throws ...
-   }    
+    }    
 
 The `submitJob` method can be used to submit a job to a `Scheduler`. A `JobDescription` must be provided 
 as parameter. A `JobDescription` contains all necessary information on how to start the job, for example, 
@@ -535,6 +534,7 @@ octopus. See the Javadoc for the available exceptions.
 
 The `nl.esciencecenter.octopus.util` package contains various utility classes. 
 __This package is experimental and not yet ready for use!!__
+
 
 
 Examples
