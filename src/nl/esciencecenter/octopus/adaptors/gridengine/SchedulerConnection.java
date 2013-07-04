@@ -1,10 +1,29 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -16,7 +35,6 @@ import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -36,9 +54,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SchedulerConnection {
 
-    //FIXME: this should be a setting
-    public static final int POLL_DELAY = 100; //ms
-
     protected static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
 
     private static int schedulerID = 0;
@@ -46,29 +61,49 @@ public abstract class SchedulerConnection {
     protected static synchronized int getNextSchedulerID() {
         return schedulerID++;
     }
-
+    
     private final String adaptorName;
     private final String[] adaptorSchemes;
-    private final OctopusProperties properties;
     private final String id;
     private final OctopusEngine engine;
     private final Scheduler sshScheduler;
     private final FileSystem sshFileSystem;
+    
+    private final int pollDelay;
+
+    private final String[][] defaultProperties;
+
+    private final Map<String, String> supportedProperties;
+
+    private final OctopusProperties properties;
 
     protected SchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine,
-            String adaptorName, String[] adaptorSchemes) throws OctopusIOException, OctopusException {
+            String[][] defaultProperties, String adaptorName, String[] adaptorSchemes) throws OctopusIOException,
+            OctopusException {
         this.engine = engine;
-        this.properties = new OctopusProperties(properties);
         this.adaptorName = adaptorName;
         this.adaptorSchemes = adaptorSchemes;
 
-        if (properties != null && properties.size() > 0) {
-            throw new UnknownPropertyException(adaptorName, "scheduler does not support any property");
+        checkLocation(location);
+
+        //FIXME: duplicate from Adaptor class
+        
+        this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
+
+        Map<String, String> tmp = new HashMap<String, String>();
+
+        if (defaultProperties != null) {
+            for (int i = 0; i < defaultProperties.length; i++) {
+                tmp.put(defaultProperties[i][0], defaultProperties[i][2]);
+            }
         }
 
-        try {
-            checkLocation(location);
+        this.supportedProperties = Collections.unmodifiableMap(tmp);
+        this.properties = processProperties(properties);
 
+        this.pollDelay = this.properties.getIntProperty(GridEngineSchedulerConnection.POLL_DELAY_PROPERTY);
+        
+        try {
             id = adaptorName + "-" + getNextSchedulerID();
             URI actualLocation = new URI("ssh", location.getSchemeSpecificPart(), location.getFragment());
 
@@ -78,25 +113,40 @@ public abstract class SchedulerConnection {
             }
 
             logger.debug("creating ssh scheduler for {} adaptor at {}", adaptorName, actualLocation);
-            sshScheduler = engine.jobs().newScheduler(actualLocation, credential, this.properties);
+            sshScheduler = engine.jobs().newScheduler(actualLocation, credential, null);
 
             logger.debug("creating file system for {} adaptor at {}", adaptorName, actualLocation);
-            sshFileSystem = engine.files().newFileSystem(actualLocation, credential, this.properties);
+            sshFileSystem = engine.files().newFileSystem(actualLocation, credential, null);
 
         } catch (URISyntaxException e) {
             throw new OctopusException(adaptorName, "cannot create ssh uri from given location " + location, e);
         }
     }
 
-    //testing version
-    protected SchedulerConnection() {
-        adaptorName = null;
-        adaptorSchemes = null;
-        properties = null;
-        id = null;
-        engine = null;
-        sshScheduler = null;
-        sshFileSystem = null;
+    //FIXME:ALMOST duplicated from Adaptor, replace with generic properties handling, see #132
+    private OctopusProperties processProperties(Properties properties) throws OctopusException {
+
+        Set<String> validSet = new HashSet<String>();
+
+        for (int i = 0; i < defaultProperties.length; i++) {
+            validSet.add(defaultProperties[i][0]);
+        }
+
+        OctopusProperties p = null;
+
+        if (properties == null) {
+            p = new OctopusProperties();
+        } else {
+            p = new OctopusProperties(properties);
+        }
+
+        for (Map.Entry<Object, Object> entry : p.entrySet()) {
+            if (!validSet.contains(entry.getKey())) {
+                throw new OctopusException(adaptorName, "Unknown property " + entry);
+            }
+        }
+
+        return new OctopusProperties(defaultProperties, p);
     }
 
     void checkLocation(URI location) throws InvalidLocationException {
@@ -187,7 +237,7 @@ public abstract class SchedulerConnection {
             }
 
             try {
-                Thread.sleep(POLL_DELAY);
+                Thread.sleep(pollDelay);
             } catch (InterruptedException e) {
                 return status;
             }
@@ -214,7 +264,7 @@ public abstract class SchedulerConnection {
             }
 
             try {
-                Thread.sleep(POLL_DELAY);
+                Thread.sleep(pollDelay);
             } catch (InterruptedException e) {
                 return status;
             }
@@ -252,6 +302,7 @@ public abstract class SchedulerConnection {
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
         }
+
     }
 
     protected AbsolutePath getFsEntryPath() {
@@ -266,7 +317,7 @@ public abstract class SchedulerConnection {
     abstract Scheduler getScheduler();
 
     abstract String[] getQueueNames();
-
+    
     abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
 
     abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;

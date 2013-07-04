@@ -57,6 +57,6 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public abstract long getDefaultQueueWaitTimeout();
     public abstract long getDefaultShortJobTimeout();
     public abstract long getDefaultCancelTimeout();
-
-
+    
+    public abstract boolean supportsParallelJobs(); 
 }

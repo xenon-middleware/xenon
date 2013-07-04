@@ -206,4 +206,9 @@ public class SSHJobTestConfig extends JobTestConfig {
     public boolean supportsEnvironmentVariables() {
         return false;
     }
+
+    @Override
+    public boolean supportsParallelJobs() {
+        return false;
+    }
 }
