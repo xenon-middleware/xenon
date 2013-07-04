@@ -62,9 +62,36 @@ See the "LICENSE" and "NOTICE" files for more information.
 Third party libraries
 ---------------------
 
-This product includes the SLF4J library, which is Copyright (c) 2004-2013 QOS.ch
-See "notices/LICENSE.slf4j.txt" for the licence information of the SLF4J library. 
+This product includes the SLF4J library, which is Copyright (c) 2004-2013
+QOS.ch See "notices/LICENSE.slf4j.txt" for the licence information of
+the SLF4J library.
 
-This product includes the JSch library, which is Copyright (c) 2002-2012 Atsuhiko 
-Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the licence information 
-of the JSch library.
+This product includes the JSch library, which is Copyright (c) 2002-2012
+Atsuhiko Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the
+licence information of the JSch library.
+
+This product includes the APIviz library, which is Copyright (c) 2008,
+Red Hat Middleware LLC and contributers. See "notices/LICENSE.apiviz.txt"
+for the licence information of the apiviz library.
+
+This product includes the Logback library, which is Copyright (c)
+1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
+information of the Logback library.
+
+This product includes the Apache Commons IO library, which
+is Copyright (c) 2002-2012 The Apache Software Foundation. See
+"notices/LICENSE.commons-io.txt" for the licence information of the
+Apache Commons IO library.
+
+This product includes the JaCoCo library, which is Copyright
+(c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
+"notices/LICENSE.jacoco.txt" for the licence information of the JaCoCo
+library.
+
+This project includes the JUnit library. See "notices/LICENSE.junit.txt"
+for the licence information of the JUnit library.
+
+This project includes the Mockito library, which is Copyright (c) 2007
+Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
+information of the Mockito library.
+
