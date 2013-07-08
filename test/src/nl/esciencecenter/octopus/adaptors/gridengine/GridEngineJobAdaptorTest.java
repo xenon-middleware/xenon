@@ -38,6 +38,8 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Niels Drost <N.Drost@esciencecenter.nl>
@@ -45,6 +47,9 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
+    
+    
+    private static final Logger logger = LoggerFactory.getLogger(GridEngineJobAdaptorTest.class);
 
     @BeforeClass
     public static void prepareGridEngineJobAdaptorTest() throws Exception {
@@ -58,7 +63,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
     @org.junit.Test
     public void ge_test01_jobWithCustomScript() throws Exception {
-        String message = "Hello World! test01\n";
+        String message = "Hello World! test01";
 
         String workingDir = getWorkingDir("ge_test01");
 
@@ -124,20 +129,58 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         jobs.close(s);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void ge_test04_batchJob_parallel_Exception() throws Exception {
+    @Test
+    public void ge_test04_parallel_batchJob() throws Exception {
+        String message = "Hello World! Test GE 04";
+        
+        String workingDir = getWorkingDir("ge_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+
+        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
 
         JobDescription description = new JobDescription();
+        description.setWorkingDirectory(workingDir);
         description.setExecutable("/bin/echo");
+        description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
+        description.addJobOptions("parallel.environment", "prun");
+        description.setQueueName("all.q");
 
-        try {
-            Job job = jobs.submitJob(scheduler, description);
-        } finally {
-            jobs.close(scheduler);
+        Job job = jobs.submitJob(scheduler, description);
+
+        JobStatus status = jobs.waitUntilDone(job, config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());
+        
+        if (!status.isDone()) {
+            throw new Exception("Job not finished");
+        }
+        
+        if (status.hasException()) {
+            throw new Exception("Job did not finish properly", status.getException());
+        }
+        
+        String outputContent = readFully(files.newInputStream(stdout));
+
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
+
+        jobs.close(scheduler);
+        files.close(filesystem);
+        
+        logger.debug("got back result: {}", outputContent);
+
+        String[] lines = outputContent.split("\\r?\\n");
+        
+        assertTrue(lines.length == 4);
+        for (String line: lines) {
+            assertTrue(line.equals(message));
         }
     }
 

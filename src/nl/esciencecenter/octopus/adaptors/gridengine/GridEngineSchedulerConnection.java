@@ -82,8 +82,12 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     };
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
+    
+    public static final String JOB_OPTION_PARALLEL_ENVIRONMENT = "parallel.environment";
 
-    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    public static final String JOB_OPTION_PARALLEL_SLOTS = "parallel.slots";
+    
+    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT, JOB_OPTION_PARALLEL_SLOTS };
 
     private final int accountingGraceTime;
 
@@ -101,7 +105,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final GridEngineParser parser;
 
-    private final GridEngineSetupInfo setupInfo;
+    private final GridEngineSetup setupInfo;
 
     GridEngineSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
@@ -117,7 +121,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         deletedJobList = new ArrayList<String>();
 
         //will run a few commands to fetch info
-        setupInfo = new GridEngineSetupInfo(this, parser);
+        setupInfo = new GridEngineSetup(this, parser);
 
         scheduler =
                 new SchedulerImplementation(GridengineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
@@ -307,18 +311,17 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //perform standard checks.
         super.verifyJobDescription(description);
 
-        //FIXME: temporary checks until we _do_ support parallel jobs
-
+        //check if the parallel environment and queue are specified.
         if (description.getNodeCount() != 1) {
-            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
-                    "Parallel jobs not supported yet, illegal nodecount: " + description.getNodeCount());
+            if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
+                throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
+                        "Parallel job requested but mandatory parallel.environment option not specificied.");
+            }
+            if (description.getQueueName() == null && !description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_SLOTS)) {
+                throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
+                        "Parallel job requested but neither queue nor number of slots specificied (at least one is required)");
+            }
         }
-
-        if (description.getProcessesPerNode() != 1) {
-            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
-                    "Parallel jobs not supported yet, illegal processes per node count: " + description.getProcessesPerNode());
-        }
-
     }
 
     @Override
@@ -332,7 +335,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
-            String jobScript = JobScriptGenerator.generate(description, fsEntryPath);
+            String jobScript = JobScriptGenerator.generate(description, fsEntryPath, setupInfo);
 
             output = runCommand(jobScript, "qsub");
         } else {

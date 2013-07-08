@@ -18,8 +18,10 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -366,13 +368,18 @@ public class GridEngineParser {
 
     }
 
-    public String[] parseQconfQueueList(String qconfOutput) throws OctopusIOException {
+    /**
+     * Parses a list of identifiers (single string identifier per line).
+     * 
+     * @throws OctopusIOException
+     */
+    public String[] parseQconfList(String qconfOutput) throws OctopusIOException {
         String[] lines = qconfOutput.split("\\r?\\n");
         String[] result = new String[lines.length];
 
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].contains(" ")) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Invalid queue name found \"" + lines[i] + "\"");
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Invalid name found in line\"" + lines[i] + "\"");
             }
 
             result[i] = lines[i].trim();
@@ -381,34 +388,118 @@ public class GridEngineParser {
         return result;
     }
 
-    public Map<String, Map<String, String>> parseQconfQueueInfo(String qconfQueueListOutput) throws OctopusIOException {
-        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+    private List<Map<String, String>> parseQconfDetails(String output, String headerField) throws OctopusIOException {
 
-        String[] lines = qconfQueueListOutput.split("\\r?\\n");
+        ArrayList<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
-        Map<String, String> currentQueueMap = null;
+        String[] lines = output.split("\\r?\\n");
+
+        Map<String, String> currentMap = null;
 
         for (String line : lines) {
             String[] elements = line.split("\\s+", 2);
 
             if (elements.length != 2) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Found line \"" + line + "\" in qconf output");
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Expected two columns in qconf output, got \""
+                        + line + "\" in qconf output");
             }
 
             String key = elements[0];
             String value = elements[1];
 
-            if (key.equals("qname")) {
-                //listing of a (new) cluster starts
-                currentQueueMap = new HashMap<String, String>();
-                result.put(value, currentQueueMap);
-            } else if (currentQueueMap == null) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Expecting qname on first line, got \"" + line
-                        + "\"");
-            } else {
-                currentQueueMap.put(key, value);
+            if (key.equals(headerField)) {
+                //listing of a new item starts
+                currentMap = new HashMap<String, String>();
+                result.add(currentMap);
+            } else if (currentMap == null) {
+                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Expecting \"" + headerField
+                        + "\" on first line, got \"" + line + "\"");
             }
+
+            currentMap.put(key, value);
         }
         return result;
     }
+
+    public Map<String, QueueInfo> parseQconfQueueInfo(String qconfOutput) throws OctopusIOException, OctopusException {
+        List<Map<String, String>> maps = parseQconfDetails(qconfOutput, "qname");
+        Map<String, QueueInfo> result = new HashMap<String, QueueInfo>();
+
+        for (Map<String, String> map : maps) {
+            String name;
+            int slots;
+            String[] parallelEnvironments;
+
+            name = map.get("qname");
+
+            if (name == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
+            }
+
+            String slotsValue = map.get("slots");
+
+            if (slotsValue == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+            }
+
+            try {
+                slots = Integer.parseInt(slotsValue);
+            } catch (NumberFormatException e) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue " + name + ", got "
+                        + slotsValue, e);
+            }
+
+            String peValue = map.get("pe_list");
+
+            if (peValue == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+            }
+            parallelEnvironments = peValue.split("\\s+");
+
+            result.put(name, new QueueInfo(name, slots, parallelEnvironments));
+        }
+
+        return result;
+    }
+
+    public Map<String, ParallelEnvironmentInfo> parseQconfParallelEnvironementInfo(String qconfOutput) throws OctopusIOException,
+            OctopusException {
+        List<Map<String, String>> maps = parseQconfDetails(qconfOutput, "pe_name");
+        Map<String, ParallelEnvironmentInfo> result = new HashMap<String, ParallelEnvironmentInfo>();
+
+        for (Map<String, String> map : maps) {
+
+            String name = map.get("pe_name");
+
+            if (name == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME,
+                        "Cannot find name of parallel environment in qconf output");
+            }
+
+            String slotsValue = map.get("slots");
+
+            if (slotsValue == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for pe " + name);
+            }
+
+            int slots;
+            try {
+                slots = Integer.parseInt(slotsValue);
+            } catch (NumberFormatException e) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot parse slots for pe " + name + ", got "
+                        + slotsValue, e);
+            }
+
+            String allocationRule = map.get("allocation_rule");
+
+            if (allocationRule == null) {
+                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for pe " + name);
+            }
+
+            result.put(name, new ParallelEnvironmentInfo(name, slots, allocationRule));
+        }
+
+        return result;
+    }
+
 }

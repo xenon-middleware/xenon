@@ -22,7 +22,7 @@ import org.junit.Test;
 public class JobScriptGeneratorTest {
 
     @Test
-    public void testGenerate() {
+    public void testGenerate() throws Exception {
         //JobScriptGenerator generator = new JobScriptGenerator();
 
         JobDescription job = new JobDescription();
@@ -31,7 +31,7 @@ public class JobScriptGeneratorTest {
 
         job.setArguments("this", "and", "that");
 
-        System.out.println(JobScriptGenerator.generate(job, null));
+        System.out.println(JobScriptGenerator.generate(job, null, null));
     }
 
 }

@@ -221,6 +221,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public boolean supportsParallelJobs() {
-        return false;
+        return true;
     }
 }
