@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.adaptors.gridengine.GridengineAdaptor;
+import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credentials;
@@ -172,7 +172,7 @@ public class OctopusEngine implements Octopus {
 
         result[0] = new LocalAdaptor(octopusProperties, this);
         result[1] = new SshAdaptor(octopusProperties, this);
-        result[2] = new GridengineAdaptor(octopusProperties, this);
+        result[2] = new GridEngineAdaptor(octopusProperties, this);
 
         // TODO: Add properties to extend list later.  
         return result;

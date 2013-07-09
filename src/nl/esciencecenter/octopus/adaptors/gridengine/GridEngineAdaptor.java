@@ -18,6 +18,8 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.scripting.ForwardingCredentials;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingJobs;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -25,7 +27,7 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
-public class GridengineAdaptor extends Adaptor {
+public class GridEngineAdaptor extends Adaptor {
 
     public static final String ADAPTOR_NAME = "gridengine";
 
@@ -38,18 +40,20 @@ public class GridengineAdaptor extends Adaptor {
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. No properties exist for this adaptor. */
     private static final String[][] validPropertiesList = new String[0][0];
 
-    private final GridEngineJobs jobsAdaptor;
+    private final ScriptingJobs jobsAdaptor;
 
-    private final GridEngineCredentials credentialsAdaptor;
+    private final ForwardingCredentials credentialsAdaptor;
 
-    public GridengineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+    public GridEngineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, validPropertiesList, properties);
 
-        this.jobsAdaptor = new GridEngineJobs(getProperties(), octopusEngine);
-        this.credentialsAdaptor = new GridEngineCredentials(octopusEngine);
+        GridEngineSchedulerConnectionFactory factory = new GridEngineSchedulerConnectionFactory();
+
+        this.jobsAdaptor = new ScriptingJobs(getProperties(), octopusEngine, ADAPTOR_NAME, factory);
+        this.credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");
     }
 
-    public GridEngineJobs jobsAdaptor() {
+    public ScriptingJobs jobsAdaptor() {
         return jobsAdaptor;
     }
 

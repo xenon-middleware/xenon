@@ -1486,7 +1486,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         boolean gotException = false;
         try {
-            Job job = jobs.submitJob(scheduler, description);
+            jobs.submitJob(scheduler, description);
         } catch (InvalidJobDescriptionException e) {
             gotException = true;
         } finally {
@@ -1497,72 +1497,4 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Submit did not throw exception, which was expected!");
         }
     }
-    
-    @org.junit.Test
-    public void test42b_batchJob_parallel() throws Exception {
-        
-        if (!config.supportsParallelJobs()) {
-            return;
-        }
-
-        String message = "Hello World! test42b";
-        String workingDir = getWorkingDir("test42b");
-
-        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
-        files.createDirectories(root);
-
-        JobDescription description = new JobDescription();
-        description.setExecutable("/bin/echo");
-        description.setArguments("-n", message);
-        description.setInteractive(false);
-        description.setWorkingDirectory(workingDir);
-        description.setStdin(null);
-        
-        //sge specific options...
-        description.addJobOptions("parallel.environment", "javagat");
-        description.setQueueName("all.q");
-        
-        description.setNodeCount(2);
-        description.setProcessesPerNode(2);
-
-        Job job = jobs.submitJob(scheduler, description);
-
-        long timeout = config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout();
-        
-        JobStatus status = jobs.waitUntilDone(job, timeout);
-
-        jobs.close(scheduler);
-
-        if (!status.isDone()) {
-            throw new Exception("Job failed to complete!, still in state " + status.getState());
-        }
-        
-        if (status.hasException()) {
-            throw new Exception("Job failed!", status.getException());
-        }
-
-        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
-
-        String tmpout = readFully(files.newInputStream(out));
-        String tmperr = readFully(files.newInputStream(err));
-
-        files.delete(out);
-        files.delete(err);
-        files.delete(root);
-
-        files.close(filesystem);
-
-        System.err.println("STDOUT: " + tmpout);
-        System.err.println("STDERR: " + tmperr);
-
-        assertTrue(tmpout != null);
-        assertTrue(tmpout.length() > 0);
-        assertTrue(tmpout.equals(message));
-        assertTrue(tmperr.length() == 0);
-    }
-
 }

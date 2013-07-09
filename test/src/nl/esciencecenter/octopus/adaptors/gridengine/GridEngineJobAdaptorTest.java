@@ -63,7 +63,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
     @org.junit.Test
     public void ge_test01_jobWithCustomScript() throws Exception {
-        String message = "Hello World! test01";
+        String message = "Hello World! test01\n";
 
         String workingDir = getWorkingDir("ge_test01");
 
@@ -100,6 +100,8 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         }
 
         String outputContent = readFully(files.newInputStream(stdout));
+        
+        logger.debug("got output " + outputContent);
 
         files.delete(stdout);
         files.delete(script);

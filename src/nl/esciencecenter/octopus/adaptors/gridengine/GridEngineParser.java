@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
@@ -68,11 +69,11 @@ public class GridEngineParser {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
         }
     }
 
-    private void checkVersion(Document document) throws IncompatibleServerException {
+    private void checkVersion(Document document) throws IncompatibleVersionException {
         Element documentElement = document.getDocumentElement();
 
         if (documentElement == null || !documentElement.hasAttribute(SGE62_SCHEMA_ATTRIBUTE)
@@ -83,7 +84,7 @@ public class GridEngineParser {
                         + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY);
             } else {
 
-                throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME,
+                throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME,
                         "cannot determine version, version attribute not found. Use the "
                                 + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
@@ -100,7 +101,7 @@ public class GridEngineParser {
                         + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY);
             } else {
 
-                throw new IncompatibleServerException(GridengineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
+                throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
                         + schemaValue + ") incompatible with adaptor. Use the "
                         + GridEngineSchedulerConnection.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
@@ -125,7 +126,7 @@ public class GridEngineParser {
 
             checkVersion(result);
         } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         }
     }
 
@@ -139,7 +140,7 @@ public class GridEngineParser {
 
             return result;
         } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         }
     }
 
@@ -191,7 +192,7 @@ public class GridEngineParser {
                 String queueName = queueInfo.get("name");
 
                 if (queueName == null || queueName.length() == 0) {
-                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
 
                 result.put(queueName, queueInfo);
@@ -199,7 +200,7 @@ public class GridEngineParser {
         }
 
         if (result.size() == 0) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
         return result;
@@ -259,7 +260,7 @@ public class GridEngineParser {
                 String jobID = jobInfo.get("JB_job_number");
 
                 if (jobID == null || jobID.length() == 0) {
-                    throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
+                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
                 result.put(jobID, jobInfo);
@@ -280,7 +281,7 @@ public class GridEngineParser {
         String lines[] = output.split("\\r?\\n");
 
         if (lines.length == 0 || !lines[0].startsWith("Your job ") | lines[0].split(" ").length < 3) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: " + output);
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: " + output);
         }
 
         String jobID = lines[0].split(" ")[2];
@@ -290,7 +291,7 @@ public class GridEngineParser {
 
             logger.debug("found job id: " + jobIDInt);
         } catch (NumberFormatException e) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: \""
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: \""
                     + output + "\". Returned job id " + jobID + " does not seem to be a number", e);
         }
         return jobID;
@@ -314,7 +315,7 @@ public class GridEngineParser {
         logger.debug("Deleted job. Got back " + serverMessages);
 
         if (stdoutLines.length == 0 || stdoutLines[0].isEmpty()) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: "
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: "
                     + serverMessages);
         }
 
@@ -331,7 +332,7 @@ public class GridEngineParser {
         } else if (Arrays.equals(withoutUser, killedOutput)) {
             return false;
         } else {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: \""
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: \""
                     + serverMessages + "\"");
         }
     }
@@ -348,7 +349,7 @@ public class GridEngineParser {
         Map<String, String> result = new HashMap<String, String>();
 
         if (!qacctOutput.startsWith(QACCT_HEADER)) {
-            throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Qacct output is excepted to start with " + QACCT_HEADER);
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Qacct output is excepted to start with " + QACCT_HEADER);
         }
 
         String lines[] = qacctOutput.split("\\r?\\n");
@@ -360,7 +361,7 @@ public class GridEngineParser {
             } else if (line.equals(QACCT_HEADER)) {
                 //IGNORE first line
             } else {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Found line \"" + line + "\" in qacct output");
+                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Found line \"" + line + "\" in qacct output");
             }
         }
 
@@ -379,7 +380,7 @@ public class GridEngineParser {
 
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].contains(" ")) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Invalid name found in line\"" + lines[i] + "\"");
+                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Invalid name found in line\"" + lines[i] + "\"");
             }
 
             result[i] = lines[i].trim();
@@ -400,7 +401,7 @@ public class GridEngineParser {
             String[] elements = line.split("\\s+", 2);
 
             if (elements.length != 2) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Expected two columns in qconf output, got \""
+                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in qconf output, got \""
                         + line + "\" in qconf output");
             }
 
@@ -412,7 +413,7 @@ public class GridEngineParser {
                 currentMap = new HashMap<String, String>();
                 result.add(currentMap);
             } else if (currentMap == null) {
-                throw new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Expecting \"" + headerField
+                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + headerField
                         + "\" on first line, got \"" + line + "\"");
             }
 
@@ -433,26 +434,26 @@ public class GridEngineParser {
             name = map.get("qname");
 
             if (name == null) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
             }
 
             String slotsValue = map.get("slots");
 
             if (slotsValue == null) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
             }
 
             try {
                 slots = Integer.parseInt(slotsValue);
             } catch (NumberFormatException e) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue " + name + ", got "
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue " + name + ", got "
                         + slotsValue, e);
             }
 
             String peValue = map.get("pe_list");
 
             if (peValue == null) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
             }
             parallelEnvironments = peValue.split("\\s+");
 
@@ -472,28 +473,28 @@ public class GridEngineParser {
             String name = map.get("pe_name");
 
             if (name == null) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME,
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME,
                         "Cannot find name of parallel environment in qconf output");
             }
 
             String slotsValue = map.get("slots");
 
             if (slotsValue == null) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find slots for pe " + name);
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for pe " + name);
             }
 
             int slots;
             try {
                 slots = Integer.parseInt(slotsValue);
             } catch (NumberFormatException e) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot parse slots for pe " + name + ", got "
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for pe " + name + ", got "
                         + slotsValue, e);
             }
 
             String allocationRule = map.get("allocation_rule");
 
             if (allocationRule == null) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for pe " + name);
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for pe " + name);
             }
 
             result.put(name, new ParallelEnvironmentInfo(name, slots, allocationRule));

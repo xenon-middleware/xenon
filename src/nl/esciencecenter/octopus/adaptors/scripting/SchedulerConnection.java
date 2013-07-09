@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.scripting;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,7 +55,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SchedulerConnection {
 
-    protected static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
+    public static final String POLL_DELAY_PROPERTY = "poll.delay";
+
+    //Additional property generic for all connections.
+    private final String POLL_DELAY_DESCRIPTION = "Int: number of milliseconds between polling the status of a job";
+    private final int POLL_DELAY_DEFAULT = 1000;
+
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
 
     private static int schedulerID = 0;
 
@@ -86,22 +93,29 @@ public abstract class SchedulerConnection {
 
         checkLocation(location);
 
+        String pollProperty = OctopusEngine.ADAPTORS + adaptorName + "." + POLL_DELAY_PROPERTY;
+
         //FIXME: duplicate from Adaptor class
+        //FIXME: some trickery to add an additional (generic) property
 
-        this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
-
-        Map<String, String> tmp = new HashMap<String, String>();
-
+        ArrayList<String[]> combinedDefaultProperties = new ArrayList<String[]>();
+        combinedDefaultProperties.add(new String[] {pollProperty, Integer.toString(POLL_DELAY_DEFAULT), POLL_DELAY_DESCRIPTION});
         if (defaultProperties != null) {
-            for (int i = 0; i < defaultProperties.length; i++) {
-                tmp.put(defaultProperties[i][0], defaultProperties[i][2]);
+            combinedDefaultProperties.addAll(Arrays.asList(defaultProperties));
+        }
+        this.defaultProperties = combinedDefaultProperties.toArray(new String[combinedDefaultProperties.size()][3]);
+
+        Map<String, String> supportedProperties = new HashMap<String, String>();
+        if (combinedDefaultProperties != null) {
+            for (int i = 0; i < this.defaultProperties.length; i++) {
+                supportedProperties.put(this.defaultProperties[i][0], this.defaultProperties[i][2]);
             }
         }
 
-        this.supportedProperties = Collections.unmodifiableMap(tmp);
+        this.supportedProperties = Collections.unmodifiableMap(supportedProperties);
         this.properties = processProperties(properties);
 
-        this.pollDelay = this.properties.getIntProperty(GridEngineSchedulerConnection.POLL_DELAY_PROPERTY);
+        this.pollDelay = this.properties.getIntProperty(pollProperty, 100);
 
         try {
             id = adaptorName + "-" + getNextSchedulerID();
@@ -170,7 +184,7 @@ public abstract class SchedulerConnection {
         throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme: " + location.getScheme());
     }
 
-    String runCommand(String stdin, String executable, String... arguments) throws OctopusException, OctopusIOException {
+    public String runCommand(String stdin, String executable, String... arguments) throws OctopusException, OctopusIOException {
         JobDescription description = new JobDescription();
         description.setInteractive(true);
         description.setExecutable(executable);
@@ -314,22 +328,22 @@ public abstract class SchedulerConnection {
     /**
      * As the SchedulerImplementation contains the list of queues, the subclass is responsible of implementing this function
      */
-    abstract Scheduler getScheduler();
+    public abstract Scheduler getScheduler();
 
-    abstract String[] getQueueNames();
+    public abstract String[] getQueueNames();
 
-    abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
+    public abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
 
-    abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;
+    public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;
 
-    abstract Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException;
+    public abstract Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException;
 
-    abstract Job submitJob(JobDescription description) throws OctopusIOException, OctopusException;
+    public abstract Job submitJob(JobDescription description) throws OctopusIOException, OctopusException;
 
-    abstract JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException;
+    public abstract JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException;
 
-    abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
+    public abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
 
-    abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
+    public abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
 
 }

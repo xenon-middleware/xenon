@@ -196,7 +196,9 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Properties getDefaultProperties() throws Exception {
-        return null;
+        Properties result = new Properties();
+        result.put("octopus.adaptors.gridengine.poll.delay", "100");
+        return result;
     }
 
     @Override

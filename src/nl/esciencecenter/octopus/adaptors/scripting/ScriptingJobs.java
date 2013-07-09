@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.scripting;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -40,18 +40,23 @@ import nl.esciencecenter.octopus.jobs.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GridEngineJobs implements Jobs {
+public class ScriptingJobs implements Jobs {
 
-    private static final Logger logger = LoggerFactory.getLogger(GridEngineJobs.class);
+    private static final Logger logger = LoggerFactory.getLogger(ScriptingJobs.class);
 
     private final OctopusProperties properties;
     private final OctopusEngine octopusEngine;
+    private final String adaptorName;
+    private final SchedulerConnectionFactory connectionFactory;
 
     private final Map<String, SchedulerConnection> connections;
 
-    public GridEngineJobs(OctopusProperties properties, OctopusEngine octopusEngine) {
+    public ScriptingJobs(OctopusProperties properties, OctopusEngine octopusEngine, String adaptorName,
+            SchedulerConnectionFactory connectionFactory) {
         this.properties = properties;
         this.octopusEngine = octopusEngine;
+        this.adaptorName = adaptorName;
+        this.connectionFactory = connectionFactory;
 
         connections = new HashMap<String, SchedulerConnection>();
     }
@@ -59,14 +64,13 @@ public class GridEngineJobs implements Jobs {
     private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws OctopusRuntimeException,
             NoSuchSchedulerException {
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME, "scheduler " + scheduler.toString()
-                    + " not created by this adaptor");
+            throw new OctopusRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
         }
 
         String schedulerID = ((SchedulerImplementation) scheduler).getUniqueID();
 
         if (!connections.containsKey(schedulerID)) {
-            throw new NoSuchSchedulerException(GridengineAdaptor.ADAPTOR_NAME, "cannot find scheduler " + scheduler.toString()
+            throw new NoSuchSchedulerException(adaptorName, "cannot find scheduler " + scheduler.toString()
                     + " did you close it already?");
         }
 
@@ -84,8 +88,7 @@ public class GridEngineJobs implements Jobs {
     @Override
     public synchronized boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME, "scheduler " + scheduler.toString()
-                    + " not created by this adaptor");
+            throw new OctopusRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
         }
 
         String schedulerID = ((SchedulerImplementation) scheduler).getUniqueID();
@@ -97,7 +100,8 @@ public class GridEngineJobs implements Jobs {
     public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
             OctopusIOException {
 
-        SchedulerConnection connection = new GridEngineSchedulerConnection(location, credential, properties, octopusEngine);
+        SchedulerConnection connection =
+                connectionFactory.newSchedulerConnection(location, credential, properties, octopusEngine);
 
         addConnection(connection);
 
@@ -120,7 +124,7 @@ public class GridEngineJobs implements Jobs {
 
     @Override
     public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
-        throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME,
+        throw new OctopusRuntimeException(adaptorName,
                 "Error in engine: getLocalScheduler() should not be called in this adaptor");
     }
 
@@ -172,7 +176,7 @@ public class GridEngineJobs implements Jobs {
             if (job != null) {
                 Scheduler scheduler = job.getScheduler();
                 if (!(scheduler instanceof SchedulerImplementation)) {
-                    throw new OctopusRuntimeException(GridengineAdaptor.ADAPTOR_NAME, "scheduler " + scheduler.toString()
+                    throw new OctopusRuntimeException(adaptorName, "scheduler " + scheduler.toString()
                             + " not created by this adaptor");
                 }
 
@@ -272,7 +276,7 @@ public class GridEngineJobs implements Jobs {
 
     @Override
     public Streams getStreams(Job job) throws OctopusException {
-        throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Interactive jobs not supported");
+        throw new OctopusException(adaptorName, "Interactive jobs not supported");
     }
 
     @Override

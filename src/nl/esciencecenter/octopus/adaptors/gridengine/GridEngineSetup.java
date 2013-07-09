@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.ArrayList;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
@@ -98,26 +99,27 @@ public class GridEngineSetup {
         QueueInfo queue = queues.get(queueName);
 
         if (environment == null) {
-            throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "requested parallel environment \""
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "requested parallel environment \""
                     + parallelEnvironmentName + "\" cannot be found at server");
         }
 
         if (queue == null) {
-            throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "requested queue \"" + queueName
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "requested queue \"" + queueName
                     + "\" cannot be found at server");
         }
 
         String allocationRule = environment.getAllocationRule();
 
-        logger.debug("Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\" and allocation rule \"{}\"",
+        logger.debug(
+                "Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\" and allocation rule \"{}\"",
                 nodeCount, queueName, parallelEnvironmentName, allocationRule);
 
         if (allocationRule == null) {
-            throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME,
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME,
                     "Cannot determine allocation rule for parallel environment " + parallelEnvironmentName);
         } else if (allocationRule.equals("$pe_slots")) {
             if (nodeCount > 1) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Parallel envrironment " + parallelEnvironmentName
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel envrironment " + parallelEnvironmentName
                         + " only supports single node parallel jobs");
             }
             return 1;
@@ -136,7 +138,7 @@ public class GridEngineSetup {
                 //Multiply the number of nodes we require with the number of slots on each host.
                 return nodeCount * processesPerHost;
             } catch (NumberFormatException e) {
-                throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Illegal allocation rule \"" + allocationRule
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Illegal allocation rule \"" + allocationRule
                         + "\" in parallel environment \"" + parallelEnvironmentName + "\"");
             }
         }
