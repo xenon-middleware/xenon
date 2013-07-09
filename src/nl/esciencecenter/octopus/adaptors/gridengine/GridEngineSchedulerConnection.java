@@ -62,8 +62,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
     public static final String ACCOUNTING_GRACE_TIME_PROPERTY = PROPERTY_PREFIX + "accounting.grace.time";
 
-    //FIXME: last property should be defined in generic scheduler connection
-
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] validPropertiesList = new String[][] {
             {
@@ -77,8 +75,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
             { ACCOUNTING_GRACE_TIME_PROPERTY, "60000",
                     "Int: number of milliseconds a job is allowed to take going from the queue to the qacct output" },
-
-
 
     };
 
@@ -337,7 +333,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
-            String jobScript = JobScriptGenerator.generate(description, fsEntryPath, setupInfo);
+            String jobScript = GridEngineJobScriptGenerator.generate(description, fsEntryPath, setupInfo);
 
             output = runCommand(jobScript, "qsub");
         } else {

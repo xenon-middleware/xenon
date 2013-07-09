@@ -27,9 +27,9 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
-public class JobScriptGenerator {
+public class GridEngineJobScriptGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobScriptGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(GridEngineJobScriptGenerator.class);
 
     //taken from JavaGAT
     private static String protectAgainstShellMetas(String s) {
