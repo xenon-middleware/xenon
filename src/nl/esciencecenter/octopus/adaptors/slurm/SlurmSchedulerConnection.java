@@ -18,7 +18,9 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 import java.net.URI;
 import java.util.Properties;
 
+import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptUtils;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
@@ -49,7 +51,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
 
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
+    /** List of {NAME, DEFAULT_VALUE, DESCRIPTION} for properties. */
     private static final String[][] validPropertiesList = new String[0][0];
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
@@ -73,11 +75,17 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     private String[] fetchQueueNames() throws OctopusIOException, OctopusException {
-        String output = runCommand(null, "sinfo", "-h", "-o", "%P");
+        String output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%P");
 
         String[] queues = output.split(SlurmOutputParser.WHITESPACE_REGEX);
 
         return queues;
+    }
+
+    private boolean checkAccountingAvailable() throws OctopusIOException, OctopusException {
+        RemoteCommandRunner runner = runCommand(null, "sacct");
+
+        return runner.success();
     }
 
     @Override
@@ -121,8 +129,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         super.verifyJobDescription(description);
     }
 
-
-
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
@@ -136,7 +142,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         if (customScriptFile == null) {
             String jobScript = SlurmJobScriptGenerator.generate(description, fsEntryPath);
 
-            output = runCommand(jobScript, "sbatch");
+            output = runCheckedCommand(jobScript, "sbatch");
         } else {
             //the user gave us a job script. Pass it to sbatch as-is
 
@@ -146,9 +152,9 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 customScriptFile = scriptFile.getPath();
             }
 
-            output = runCommand(null, "sbatch", customScriptFile);
+            output = runCheckedCommand(null, "sbatch", customScriptFile);
         }
-        
+
         String identifier = SlurmOutputParser.parseSbatchOutput(output);
 
         return new JobImplementation(getScheduler(), identifier, description, false, false);
@@ -157,11 +163,36 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
         String identifier = job.getIdentifier();
-        String scancelOutput = runCommand(null, "scancel", identifier);
+        String scancelOutput = runCheckedCommand(null, "scancel", identifier);
 
         SlurmOutputParser.parseScancelOutput(identifier, scancelOutput);
 
         return getJobStatus(job);
+    }
+
+    @Override
+    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
+        String output;
+
+        if (queueNames == null || queueNames.length == 0) {
+            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i");
+        } else {
+            //add a list of all requested queues
+            output =
+                    runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
+                            "--partitions=" + ScriptUtils.asCSList(getQueueNames()));
+        }
+
+        //Job id's are on separate lines, on their own.
+        String[] jobIdentifiers = output.split(SlurmOutputParser.WHITESPACE_REGEX);
+
+        Job[] result = new Job[jobIdentifiers.length];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = new JobImplementation(scheduler, jobIdentifiers[i], false, false);
+        }
+
+        return result;
     }
 
     @Override
@@ -185,12 +216,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     @Override
     public QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
         // TODO Auto-generated method stub
         return null;
     }

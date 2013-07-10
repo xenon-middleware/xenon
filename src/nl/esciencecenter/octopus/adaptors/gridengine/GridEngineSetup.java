@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
@@ -33,22 +34,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GridEngineSetup {
 
-    /**
-     * Create a single comma separated string out of a list of strings
-     */
-    private static String asCSList(String[] values) {
-        String result = null;
-        for (String value : values) {
-            if (result == null) {
-                result = value;
-            } else {
-                result += "," + value;
-            }
-        }
-
-        return result;
-    }
-
     static final Logger logger = LoggerFactory.getLogger(GridEngineSetup.class);
 
     private final String[] queueNames;
@@ -60,15 +45,15 @@ public class GridEngineSetup {
     public GridEngineSetup(SchedulerConnection schedulerConnection, GridEngineParser parser) throws OctopusIOException,
             OctopusException {
 
-        String queueListOutput = schedulerConnection.runCommand(null, "qconf", "-sql");
+        String queueListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sql");
 
         this.queueNames = parser.parseQconfList(queueListOutput);
 
-        String queueDetailsOutput = schedulerConnection.runCommand(null, "qconf", "-sq", asCSList(queueNames));
+        String queueDetailsOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", ScriptUtils.asCSList(queueNames));
 
         this.queues = parser.parseQconfQueueInfo(queueDetailsOutput);
 
-        String peListOutput = schedulerConnection.runCommand(null, "qconf", "-spl");
+        String peListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-spl");
 
         String[] peNames = parser.parseQconfList(peListOutput);
 
@@ -79,7 +64,8 @@ public class GridEngineSetup {
             arguments.add(name);
         }
 
-        String peDetailsOutput = schedulerConnection.runCommand(null, "qconf", arguments.toArray(new String[arguments.size()]));
+        String peDetailsOutput =
+                schedulerConnection.runCheckedCommand(null, "qconf", arguments.toArray(new String[arguments.size()]));
 
         this.parallelEnvironments = parser.parseQconfParallelEnvironementInfo(peDetailsOutput);
 

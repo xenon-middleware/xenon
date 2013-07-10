@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.adaptors.scripting.CommandFailedException;
+import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -203,23 +203,21 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         ArrayList<Job> result = new ArrayList<Job>();
 
         if (queueNames == null || queueNames.length == 0) {
-            String statusOutput = runCommand(null, "qstat", "-xml");
+            String statusOutput = runCheckedCommand(null, "qstat", "-xml");
 
             jobsFromStatus(statusOutput, getScheduler(), result);
         } else {
             for (String queueName : queueNames) {
-                try {
-                    String statusOutput = runCommand(null, "qstat", "-xml", "-q", queueName);
+                RemoteCommandRunner runner = runCommand(null, "qstat", "-xml", "-q", queueName);
 
-                    jobsFromStatus(statusOutput, getScheduler(), result);
-                } catch (CommandFailedException e) {
+                if (runner.success()) {
+                    jobsFromStatus(runner.getStdout(), getScheduler(), result);
+                } else if (runner.getExitCode() == 1) {
                     //sge returns "1" as the exit code if there is something wrong with the queue, ignore
-                    if (e.getExitCode() != 1) {
-                        throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue "
-                                + queueName, e);
-                    } else {
-                        logger.debug("Failed to get queue status for queue " + queueName, e);
-                    }
+                    logger.warn("Failed to get queue status for queue " + runner);
+                } else {
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
+                            + queueName + "\": " + runner);
                 }
             }
         }
@@ -229,7 +227,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
-        String qstatOutput = runCommand(null, "qstat", "-xml", "-g", "c");
+        String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
@@ -251,7 +249,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         QueueStatus[] result = new QueueStatus[queueNames.length];
 
-        String qstatOutput = runCommand(null, "qstat", "-xml", "-g", "c");
+        String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
@@ -335,7 +333,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (customScriptFile == null) {
             String jobScript = GridEngineJobScriptGenerator.generate(description, fsEntryPath, setupInfo);
 
-            output = runCommand(jobScript, "qsub");
+            output = runCheckedCommand(jobScript, "qsub");
         } else {
             //the user gave us a job script. Pass it to qsub as-is
 
@@ -345,7 +343,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 customScriptFile = scriptFile.getPath();
             }
 
-            output = runCommand(null, "qsub", customScriptFile);
+            output = runCheckedCommand(null, "qsub", customScriptFile);
         }
 
         String identifier = parser.parseQsubOutput(output);
@@ -357,7 +355,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
         String identifier = job.getIdentifier();
-        String qdelOutput = runCommand(null, "qdel", identifier);
+        String qdelOutput = runCheckedCommand(null, "qdel", identifier);
 
         boolean deleted = parser.parseQdelOutput(identifier, qdelOutput);
 
@@ -442,7 +440,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
 
-        String statusOutput = runCommand(null, "qstat", "-xml");
+        String statusOutput = runCheckedCommand(null, "qstat", "-xml");
 
         Map<String, Map<String, String>> allMap = parser.parseJobInfos(statusOutput);
 
@@ -455,16 +453,16 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (status == null) {
             //this job cannot be found in the queue, or is reporting some sort of error.
             //to get some more information, run qacct
-            try {
-                String output = runCommand(null, "qacct", "-j", job.getIdentifier());
+            RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
+
+            if (runner.success()) {
                 clearJobSeen(job.getIdentifier());
 
-                Map<String, String> accountingInfo = parser.parseQacctOutput(output);
+                Map<String, String> accountingInfo = parser.parseQacctOutput(runner.getStdout());
 
                 status = qacctJobStatusFromMap(accountingInfo, job);
-            } catch (CommandFailedException e) {
-                logger.debug("qacct command failed", e);
-                exception = e;
+            } else {
+                logger.debug("could not get job {} accounting info: {}", job.getIdentifier(), runner);
             }
         }
 

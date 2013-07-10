@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -15,23 +16,6 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 public class SlurmJobScriptGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(SlurmJobScriptGenerator.class);
-
-    //taken from JavaGAT
-    private static String protectAgainstShellMetas(String s) {
-        char[] chars = s.toCharArray();
-        StringBuffer b = new StringBuffer();
-        b.append('\'');
-        for (char c : chars) {
-            if (c == '\'') {
-                b.append('\'');
-                b.append('\\');
-                b.append('\'');
-            }
-            b.append(c);
-        }
-        b.append('\'');
-        return b.toString();
-    }
 
     public static String generate(JobDescription description, AbsolutePath fsEntryPath) throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -59,10 +43,10 @@ public class SlurmJobScriptGenerator {
 
         //number of nodes
         script.format("#SBATCH --nodes=%d\n", description.getNodeCount());
-        
+
         //number of processer per node
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
-        
+
         //resulting number of tasks (redundant)
         //script.format("#SBATCH --ntasks=%d\n", description.getNodeCount() * description.getProcessesPerNode());
 
@@ -95,11 +79,11 @@ public class SlurmJobScriptGenerator {
 
         //run commands through srun
         script.format("srun ");
-        
+
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
-            script.format(" %s", protectAgainstShellMetas(argument));
+            script.format(" %s", ScriptUtils.protectAgainstShellMetas(argument));
         }
         script.format("\n");
 

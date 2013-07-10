@@ -29,7 +29,6 @@ import java.util.Set;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.util.RemoteCommandRunner;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
@@ -99,7 +98,8 @@ public abstract class SchedulerConnection {
         //FIXME: some trickery to add an additional (generic) property
 
         ArrayList<String[]> combinedDefaultProperties = new ArrayList<String[]>();
-        combinedDefaultProperties.add(new String[] {pollProperty, Integer.toString(POLL_DELAY_DEFAULT), POLL_DELAY_DESCRIPTION});
+        combinedDefaultProperties
+                .add(new String[] { pollProperty, Integer.toString(POLL_DELAY_DEFAULT), POLL_DELAY_DESCRIPTION });
         if (defaultProperties != null) {
             combinedDefaultProperties.addAll(Arrays.asList(defaultProperties));
         }
@@ -184,20 +184,25 @@ public abstract class SchedulerConnection {
         throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme: " + location.getScheme());
     }
 
-    public String runCommand(String stdin, String executable, String... arguments) throws OctopusException, OctopusIOException {
-        JobDescription description = new JobDescription();
-        description.setInteractive(true);
-        description.setExecutable(executable);
-        description.setArguments(arguments);
+    /**
+     * Run a command on the remote scheduler machine.
+     */
+    public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws OctopusException,
+            OctopusIOException {
+        return new RemoteCommandRunner(engine, sshScheduler, adaptorName, stdin, executable, arguments);
+    }
 
-        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, stdin, description);
+    /**
+     * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
+     */
+    public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException,
+            OctopusIOException {
+        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, adaptorName, stdin, executable, arguments);
 
-        String stderr = runner.getStderr();
-
-        if (runner.getExitCode() != 0 || !stderr.isEmpty()) {
-            throw new CommandFailedException(adaptorName, "could not run command \"" + executable + "\" with arguments \""
+        if (!runner.success()) {
+            throw new OctopusException(adaptorName, "could not run command \"" + executable + "\" with arguments \""
                     + Arrays.toString(arguments) + "\" at \"" + sshScheduler + "\". Exit code = " + runner.getExitCode()
-                    + " Error output: " + stderr, runner.getExitCode(), runner.getStderr());
+                    + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
         return runner.getStdout();

@@ -27,6 +27,12 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
+/**
+ * Adaptor for (Sun/Ocacle/Univa) Grid Engine scheduler.
+ * 
+ * @author Niels Drost
+ * 
+ */
 public class GridEngineAdaptor extends Adaptor {
 
     public static final String ADAPTOR_NAME = "gridengine";
