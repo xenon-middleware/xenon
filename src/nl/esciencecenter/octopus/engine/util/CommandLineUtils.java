@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.scripting;
+package nl.esciencecenter.octopus.engine.util;
 
 /**
  * Some simple utilities for handling and creating scripts and command lines.
@@ -21,7 +21,7 @@ package nl.esciencecenter.octopus.adaptors.scripting;
  * @author Niels Drost
  * 
  */
-public class ScriptUtils {
+public class CommandLineUtils {
 
     /**
      * Escapes and quotes command line arguments to keep shells from expanding/interpreting them.

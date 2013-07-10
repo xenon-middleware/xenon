@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
-import nl.esciencecenter.octopus.adaptors.scripting.ScriptUtils;
+import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
@@ -49,7 +49,7 @@ public class GridEngineSetup {
 
         this.queueNames = parser.parseQconfList(queueListOutput);
 
-        String queueDetailsOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", ScriptUtils.asCSList(queueNames));
+        String queueDetailsOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         this.queues = parser.parseQconfQueueInfo(queueDetailsOutput);
 

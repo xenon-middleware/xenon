@@ -336,6 +336,8 @@ public abstract class SchedulerConnection {
     public abstract Scheduler getScheduler();
 
     public abstract String[] getQueueNames();
+    
+    public abstract String getDefaultQueueName();
 
     public abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
 
@@ -350,5 +352,6 @@ public abstract class SchedulerConnection {
     public abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
 
     public abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
+
 
 }

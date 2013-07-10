@@ -37,7 +37,6 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 public class SlurmJobTestConfig extends JobTestConfig {
 
 
-
     private String username;
     private char[] passwd;
 
@@ -97,6 +96,31 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
         return tmp;
     }
+    
+    @Override
+    public String getAdaptorName() {
+        return "slurm";
+    }
+
+    @Override
+    public Properties getUnknownProperties() throws Exception {
+        Properties properties = new Properties();
+        
+        properties.put("some.key",  "some value");
+        
+        return properties;
+    }
+
+    @Override
+    public Properties[] getInvalidProperties() throws Exception {
+        return new Properties[0];
+    }
+
+    @Override
+    public Properties getCorrectProperties() throws Exception {
+        return new Properties();
+    }
+
 
     @Override
     public URI getCorrectURI() throws Exception {

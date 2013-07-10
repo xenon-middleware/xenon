@@ -135,6 +135,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public String[] getQueueNames() {
         return setupInfo.getQueueNames();
     }
+    
+    @Override
+    public String getDefaultQueueName() {
+        return null;
+    }
 
     private synchronized void markJobSeen(String identifier) {
         long current = System.currentTimeMillis();

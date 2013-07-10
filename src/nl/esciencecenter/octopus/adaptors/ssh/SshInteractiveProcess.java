@@ -23,6 +23,7 @@ import com.jcraft.jsch.ChannelExec;
 
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
+import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -53,7 +54,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
         String command = description.getExecutable();
 
         for (String s : description.getArguments()) {
-            command += " " + s;
+            command += " " + CommandLineUtils.protectAgainstShellMetas(s);
         }
 
         channel.setCommand(command);

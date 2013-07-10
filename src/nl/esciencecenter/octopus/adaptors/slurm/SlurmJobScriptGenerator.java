@@ -7,7 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.octopus.adaptors.scripting.ScriptUtils;
+import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -83,7 +83,7 @@ public class SlurmJobScriptGenerator {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
-            script.format(" %s", ScriptUtils.protectAgainstShellMetas(argument));
+            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
         }
         script.format("\n");
 

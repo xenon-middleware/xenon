@@ -117,7 +117,11 @@ public class ScriptingJobs implements Jobs {
 
     @Override
     public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
-        return null;
+        //find connection
+        SchedulerConnection connection = getConnection(scheduler);
+
+        //fetch and parse info
+        return connection.getDefaultQueueName();
     }
 
     @Override

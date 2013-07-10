@@ -16,16 +16,20 @@
 package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
-import nl.esciencecenter.octopus.adaptors.scripting.ScriptUtils;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
+import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
@@ -59,33 +63,59 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     private final String[] queueNames;
+    private final String defaultQueueName;
 
     private final Scheduler scheduler;
+
+    private final boolean accountingAvailable;
 
     SlurmSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
         super(location, credential, properties, engine, validPropertiesList, SlurmAdaptor.ADAPTOR_NAME,
                 SlurmAdaptor.ADAPTOR_SCHEMES);
 
-        queueNames = fetchQueueNames();
+        this.queueNames = fetchQueueNames();
+        this.defaultQueueName = findDefaultQueue();
+
+        this.accountingAvailable = checkAccountingAvailable();
 
         scheduler =
                 new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential,
                         getProperties(), false, false, true);
+
+        logger.debug("new slurm scheduler connection {}", scheduler);
     }
 
     private String[] fetchQueueNames() throws OctopusIOException, OctopusException {
-        String output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%P");
+        String output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%120P");
 
         String[] queues = output.split(SlurmOutputParser.WHITESPACE_REGEX);
 
         return queues;
     }
+    
+    private String findDefaultQueue()  {
+        for(int i = 0; i < queueNames.length; i++) {
+            String queueName = queueNames[i];
+            if (queueName.endsWith("*")) {
+                //cut "*" of queue name
+                queueNames[i] = queueName.substring(0, queueName.length() - 1);
+                return queueNames[i];
+            }
+        }
+        //no default queue found
+        return null;
+    }
+
 
     private boolean checkAccountingAvailable() throws OctopusIOException, OctopusException {
         RemoteCommandRunner runner = runCommand(null, "sacct");
 
-        return runner.success();
+        boolean result = runner.success();
+
+        logger.debug("accounting available {}, command output {}", result, runner);
+
+        return result;
     }
 
     @Override
@@ -95,7 +125,12 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     @Override
     public String[] getQueueNames() {
-        return queueNames;
+        return queueNames.clone();
+    }
+    
+    @Override
+    public String getDefaultQueueName() {
+        return defaultQueueName;
     }
 
     @Override
@@ -180,7 +215,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             //add a list of all requested queues
             output =
                     runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
-                            "--partitions=" + ScriptUtils.asCSList(getQueueNames()));
+                            "--partitions=" + CommandLineUtils.asCSList(getQueueNames()));
         }
 
         //Job id's are on separate lines, on their own.
@@ -197,6 +232,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
+
         // TODO Auto-generated method stub
         return null;
 
@@ -210,8 +246,30 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
-        // TODO Auto-generated method stub
-        return null;
+        String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D", "--partition=" + queueName);
+
+        List<Map<String, String>> infoMaps = SlurmOutputParser.parseSinfoOutput(output);
+
+        if (infoMaps.size() == 0) {
+            throw new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "cannot get status of requested queue: \"" + queueName + "\"");
+        }
+        
+        if (infoMaps.size() != 1) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Tried to get sinfo status of one partition, but got "
+                    + infoMaps.size());
+        }
+        
+        Map<String, String> infoMap = infoMaps.get(0);
+        
+        if (!infoMap.containsKey("PARTITION")) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "sinfo does not contain requested partition field");
+        }
+        
+        if (!infoMap.get("PARTITION").equals(queueName)) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "sinfo does not contain info on requested partition");
+        }
+
+        return new QueueStatusImplementation(getScheduler(), queueName, null, infoMap); 
     }
 
     @Override
@@ -219,5 +277,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         // TODO Auto-generated method stub
         return null;
     }
+
+
+
 
 }
