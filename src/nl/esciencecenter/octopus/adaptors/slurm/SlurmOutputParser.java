@@ -1,8 +1,6 @@
 package nl.esciencecenter.octopus.adaptors.slurm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -46,12 +44,13 @@ public class SlurmOutputParser {
 
     /**
      * @param output
-     *            the output of an sinfo command, including an header. The fields contained in the output will be dynamically
-     *            determined from the header line.
+     *            The output of an sinfo/squeue/etc command, including an header. The fields contained in the output will be
+     *            dynamically determined from the header line. The given "headerField" field is mandatory, and used as the key in
+     *            the result map.
      * @throws OctopusException
      */
-    public static List<Map<String, String>> parseSinfoOutput(String output) throws OctopusException {
-        ArrayList<Map<String, String>> result = new ArrayList<Map<String, String>>();
+    public static Map<String, Map<String, String>> parseInfoOutput(String output, String keyField) throws OctopusException {
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         String[] lines = output.split("\\r?\\n");
 
@@ -71,15 +70,39 @@ public class SlurmOutputParser {
             }
 
             Map<String, String> map = new HashMap<String, String>();
-            result.add(map);
-
             for (int j = 0; j < fields.length; j++) {
                 //remove status annotations
                 if (values[j].endsWith("*") || values[j].endsWith("~")) {
-                    values[j] = values[j].substring(0,  values[j].length() - 1);
+                    values[j] = values[j].substring(0, values[j].length() - 1);
                 }
                 map.put(fields[j], values[j]);
             }
+
+            if (!map.containsKey(keyField)) {
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "sinfo does not contain required field \"" + keyField
+                        + "\"");
+
+            }
+
+            result.put(map.get(keyField), map);
+        }
+
+        return result;
+    }
+
+    public static Map<String, String> parseScontrolOutput(String output) throws OctopusException {
+        Map<String, String> result = new HashMap<String, String>();
+
+        String[] pairs = output.split(WHITESPACE_REGEX);
+
+        for (String pair : pairs) {
+            String[] elements = pair.split("=", 2);
+
+            if (elements.length != 2) {
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got unknown key/value pair in scontrol output: " + pair);
+            }
+
+            result.put(elements[0], elements[1]);
         }
 
         return result;

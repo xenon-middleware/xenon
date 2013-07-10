@@ -76,7 +76,9 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         AbsolutePath script = root.resolve(new RelativePath("script"));
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
 
-        String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
+        String scriptContent = "#!/bin/bash\n" +
+        "#SBATCH -o " + stdout.getPath() + "\n" 
+                + "#SBATCH -e /dev/null\n" + "echo " + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, scriptContent);
