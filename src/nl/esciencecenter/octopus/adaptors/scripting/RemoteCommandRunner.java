@@ -68,7 +68,7 @@ public class RemoteCommandRunner {
     public RemoteCommandRunner(Octopus octopus, Scheduler scheduler, String adaptorName, String stdin, String executable,
             String... arguments) throws OctopusException, OctopusIOException {
         long start = System.currentTimeMillis();
-        
+
         JobDescription description = new JobDescription();
         description.setInteractive(true);
         description.setExecutable(executable);
@@ -91,7 +91,7 @@ public class RemoteCommandRunner {
         in.waitUntilFinished();
         out.waitUntilFinished();
         err.waitUntilFinished();
-        
+
         JobStatus status = octopus.jobs().waitUntilDone(job, 0);
 
         if (status.hasException()) {
@@ -103,9 +103,9 @@ public class RemoteCommandRunner {
         this.error = err.getResult();
 
         long runtime = System.currentTimeMillis() - start;
-        
-        logger.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}", runtime, executable,
-                arguments, exitCode, output, error);
+
+        logger.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}",
+                runtime, executable, arguments, exitCode, output, error);
     }
 
     public String getStdout() {

@@ -49,7 +49,8 @@ public class GridEngineSetup {
 
         this.queueNames = parser.parseQconfList(queueListOutput);
 
-        String queueDetailsOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
+        String queueDetailsOutput =
+                schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         this.queues = parser.parseQconfQueueInfo(queueDetailsOutput);
 

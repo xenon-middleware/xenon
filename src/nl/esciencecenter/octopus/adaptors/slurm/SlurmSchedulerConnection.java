@@ -56,17 +56,15 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private static final Logger logger = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
 
     public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
-    
+
     public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
 
     /** List of {NAME, DEFAULT_VALUE, DESCRIPTION} for properties. */
-    private static final String[][] validPropertiesList = new String[][] {
-        {
+    private static final String[][] validPropertiesList = new String[][] { {
             IGNORE_VERSION_PROPERTY,
             "false",
             "Boolean: If true, the version check is skipped when connecting to remote machines. "
-                    + "WARNING: it is not recommended to use this setting in production environments" },
-    };
+                    + "WARNING: it is not recommended to use this setting in production environments" }, };
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
@@ -85,9 +83,9 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 SlurmAdaptor.ADAPTOR_SCHEMES);
 
         boolean ignoreVersion = getProperties().getBooleanProperty(IGNORE_VERSION_PROPERTY);
-        
+
         this.config = fetchConfiguration(ignoreVersion);
-        
+
         this.queueNames = fetchQueueNames();
         this.defaultQueueName = findDefaultQueue();
 
@@ -97,7 +95,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         logger.debug("new slurm scheduler connection {}", scheduler);
     }
-    
+
     private SlurmConfig fetchConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
@@ -127,16 +125,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
         //no default queue found
         return null;
-    }
-
-    private boolean checkAccountingAvailable() throws OctopusIOException, OctopusException {
-        RemoteCommandRunner runner = runCommand(null, "sacct");
-
-        boolean result = runner.success();
-
-        logger.debug("accounting available {}, command output {}", result, runner);
-
-        return result;
     }
 
     @Override
@@ -217,8 +205,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobImplementation(getScheduler(), identifier, description, false, false);
     }
 
-
-
     @Override
     public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
         String identifier = job.getIdentifier();
@@ -227,7 +213,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         if (!output.isEmpty()) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got unexpected output on cancelling job: " + output);
         }
-        
+
         return getJobStatus(job);
     }
 
@@ -239,7 +225,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i");
         } else {
             checkQueueNames(queueNames);
-            
+
             //add a list of all requested queues
             output =
                     runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
@@ -262,7 +248,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
         String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D", "--partition=" + queueName);
 
-        Map<String, Map<String, String>> infoMaps = SlurmOutputParser.parseInfoOutput(output, "PARTITION");
+        Map<String, Map<String, String>> infoMaps =
+                SlurmOutputParser.parseInfoOutput(output, "PARTITION", SlurmOutputParser.WHITESPACE_REGEX);
 
         if (!infoMaps.containsKey(queueName)) {
             throw new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "cannot get status of requested queue: \"" + queueName
@@ -283,7 +270,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         //get all partitions, filter out requested statuses
         String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D");
 
-        Map<String, Map<String, String>> allMap = SlurmOutputParser.parseInfoOutput(output, "PARTITION");
+        Map<String, Map<String, String>> allMap =
+                SlurmOutputParser.parseInfoOutput(output, "PARTITION", SlurmOutputParser.WHITESPACE_REGEX);
 
         for (int i = 0; i < queueNames.length; i++) {
             if (queueNames[i] == null) {
@@ -313,7 +301,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     }
 
-    private JobStatus jobStatusFromSqueueMap(Map<String, String> info, Job job) {
+    private JobStatus getJobStatusFromSqueueMap(Map<String, String> info, Job job) {
         Exception exception = null;
 
         if (info == null || info.isEmpty()) {
@@ -324,15 +312,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         String state = info.get("STATE");
 
         return new JobStatusImplementation(job, state, null, exception, state.equals("RUNNING"), false, info);
-    }
-
-    /**
-     * @param job
-     * @return
-     */
-    private JobStatus getJobFromSAcct(Job job) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     //get an exit code from the scontrol "ExitCode" output field
@@ -358,10 +337,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return state.equals("COMPLETED") || state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL")
                 || state.equals("TIMEOUT") || state.equals("PREEMPTED");
     }
-    
+
     private static boolean isFailedState(String state) {
-        return state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL")
-                || state.equals("TIMEOUT") || state.equals("PREEMPTED");
+        return state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL") || state.equals("TIMEOUT")
+                || state.equals("PREEMPTED");
     }
 
     private JobStatus getJobFromSControl(Job job) throws OctopusIOException, OctopusException {
@@ -374,12 +353,31 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         Map<String, String> info = SlurmOutputParser.parseScontrolOutput(runner.getStdout());
 
-        if (!info.containsKey("JobId") || !info.get("JobId").equals(job.getIdentifier())) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol output. Returned jobid \""
+        return getJobStatusFromMap(info, job);
+    }
+
+    private JobStatus getJobStatusFromMap(Map<String, String> info, Job job) throws OctopusException {
+        if (info == null || info.isEmpty()) {
+            logger.debug("job {} not found in scontrol/sacct output", job.getIdentifier());
+            return null;
+        }
+
+        //compensate for two different cases for job id key
+        String jobID = info.get("JobId");
+        if (jobID == null) {
+            jobID = info.get("JobID");
+        }
+
+        if (jobID == null || !jobID.equals(job.getIdentifier())) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol/sacct output. Returned jobid \""
                     + info.get("JobId") + "\" does not match " + job.getIdentifier());
         }
 
+        //compensate for two different cases for job state key
         String state = info.get("JobState");
+        if (state == null) {
+            state = info.get("State");
+        }
 
         if (state == null) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol output. Output does not contain job state");
@@ -397,36 +395,50 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             }
         } else if (state.equals("CANCELLED")) {
             exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job canceled");
+        } else if (state.equals("FAILED") && exitcode != 0) {
+            //non zero exit code (but no reason, as in sacct output), ignore
+            exception = null;
         } else if (isFailedState(state)) {
             exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
-        
-        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), info);
 
-        logger.debug("Got job status from scontrol output {}", result);
-        
+        JobStatus result =
+                new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), info);
+
+        logger.debug("Got job status from scontrol/sacct output {}", result);
+
         return result;
     }
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
         //String output = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + job.getIdentifier());
-        String output = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R");
+        String sQueueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R");
 
-        Map<String, Map<String, String>> allMap = SlurmOutputParser.parseInfoOutput(output, "JOBID");
+        Map<String, Map<String, String>> sQueueMap =
+                SlurmOutputParser.parseInfoOutput(sQueueOutput, "JOBID", SlurmOutputParser.WHITESPACE_REGEX);
 
-        Map<String, String> info = allMap.get(job.getIdentifier());
+        Map<String, String> info = sQueueMap.get(job.getIdentifier());
 
-        JobStatus result = jobStatusFromSqueueMap(info, job);
+        JobStatus result = getJobStatusFromSqueueMap(info, job);
 
-        if (result == null) {
-            //this job is not in the queue, check scontrol next
-            result = getJobFromSControl(job);
+        //this job is not in the queue check sacct next (if available)
+        if (result == null && config.accountingAvailable()) {
+            //this job is not in the queue not scontrol, check sacct last (if available)
+            String sacctOutput =
+                    runCheckedCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+                            + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
+                            + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--job", job.getIdentifier());
+
+            Map<String, Map<String, String>> sacctMap =
+                    SlurmOutputParser.parseInfoOutput(sacctOutput, "JobID", SlurmOutputParser.BAR_REGEX);
+
+            result = getJobStatusFromMap(sacctMap.get(job.getIdentifier()), job);
         }
 
-        if (result == null && config.getAccountingAvailable()) {
-            //this job is not in the queue not scontrol, check sacct last (if available)
-            result = getJobFromSAcct(job);
+        //this job is not in the queue nor sacct, check scontrol last.
+        if (result == null) {
+            result = getJobFromSControl(job);
         }
 
         if (result == null) {
@@ -447,28 +459,42 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         //first attempt: see if it is in the queue
         //we get all jobs in one go, saving time
-        String output =
+        String squeueOutput =
                 runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R",
                         "--jobs=" + CommandLineUtils.asCSList(jobIdentifiers));
 
-        Map<String, Map<String, String>> allMap = SlurmOutputParser.parseInfoOutput(output, "JOBID");
+        Map<String, Map<String, String>> sQueueMap =
+                SlurmOutputParser.parseInfoOutput(squeueOutput, "JOBID", SlurmOutputParser.WHITESPACE_REGEX);
+
+        Map<String, Map<String, String>> sacctMap = null;
+
+        if (config.accountingAvailable()) {
+            String sacctOutput =
+                    runCheckedCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+                            + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
+                            + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--job",
+                            CommandLineUtils.asCSList(jobIdentifiers));
+
+            sacctMap = SlurmOutputParser.parseInfoOutput(sacctOutput, "JobID", SlurmOutputParser.BAR_REGEX);
+        }
 
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < jobs.length; i++) {
+            //job not requested at all
             if (jobs[i] == null) {
                 continue;
             }
-            result[i] = jobStatusFromSqueueMap(allMap.get(jobIdentifiers[i]), jobs[i]);
+            result[i] = getJobStatusFromSqueueMap(sQueueMap.get(jobIdentifiers[i]), jobs[i]);
 
-            if (result[i] == null) {
-                //this job is not in the queue, check scontrol next
-                result[i] = getJobFromSControl(jobs[i]);
+            //this job is not in the queue check sacct next (if available)
+            if (result[i] == null && sacctMap != null) {
+                result[i] = getJobStatusFromMap(sacctMap.get(jobIdentifiers[i]), jobs[i]);
             }
 
-            if (result[i] == null && config.getAccountingAvailable()) {
-                //this job is not in the queue not scontrol, check sacct last (if available)
-                result[i] = getJobFromSAcct(jobs[i]);
+            //this job is not in the queue nor sacct, check scontrol last.
+            if (result[i] == null) {
+                result[i] = getJobFromSControl(jobs[i]);
             }
 
             //job really does not seem to exist (anymore)

@@ -135,7 +135,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public String[] getQueueNames() {
         return setupInfo.getQueueNames();
     }
-    
+
     @Override
     public String getDefaultQueueName() {
         return null;

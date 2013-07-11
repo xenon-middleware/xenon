@@ -3,17 +3,23 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class SlurmOutputParser {
 
+    private static final Logger logger = LoggerFactory.getLogger(SlurmOutputParser.class);
+
     static final String WHITESPACE_REGEX = "\\s+";
-    
+
     static final String COMMA_REGEX = "\\s*,\\s*";
-    
+
+    static final String BAR_REGEX = "\\|";
+
     static final String NEW_LINE_REGEX = "\\r?\\n";
-    
+
     static final String KEY_EQUALS_VALUE_REGEX = "\\s*=\\s*";
 
     static String parseSbatchOutput(String output) throws OctopusException {
@@ -49,7 +55,8 @@ public class SlurmOutputParser {
      *            the result map.
      * @throws OctopusException
      */
-    public static Map<String, Map<String, String>> parseInfoOutput(String output, String keyField) throws OctopusException {
+    public static Map<String, Map<String, String>> parseInfoOutput(String output, String keyField, String seperatorRegEx)
+            throws OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         String[] lines = output.split("\\r?\\n");
@@ -59,14 +66,15 @@ public class SlurmOutputParser {
                     "Cannot parse sinfo output, Got empty output, expected at least a header");
         }
 
-        String[] fields = lines[0].split(WHITESPACE_REGEX);
+        String[] fields = lines[0].split(seperatorRegEx);
 
         for (int i = 1; i < lines.length; i++) {
-            String[] values = lines[i].split(WHITESPACE_REGEX);
+            String[] values = lines[i].split(seperatorRegEx);
 
             if (fields.length != values.length) {
+                logger.debug("fields = {}, values = {}", fields, values);
                 throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Expected " + fields.length
-                        + " field in sinfo output, got line with " + values.length + " values: " + lines[i]);
+                        + " fields in sinfo output, got line with " + values.length + " values: " + lines[i]);
             }
 
             Map<String, String> map = new HashMap<String, String>();
@@ -113,11 +121,10 @@ public class SlurmOutputParser {
         String[] lines = output.split(NEW_LINE_REGEX);
 
         if (lines.length == 0) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
-                    "Cannot parse sinfo config output, Got empty output.");
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Cannot parse sinfo config output, Got empty output.");
         }
 
-        for(String line: lines) {
+        for (String line : lines) {
             if (line.startsWith("Configuration data as of") || line.isEmpty() || line.startsWith("Slurmctld(primary/backup")) {
                 //ignore these lines
                 continue;
@@ -127,10 +134,10 @@ public class SlurmOutputParser {
             if (pair.length != 2) {
                 throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got invalid key/value pair in scontrol output: " + pair);
             }
-            
+
             result.put(pair[0], pair[1]);
         }
-        
+
         return result;
     }
 }
