@@ -3,11 +3,18 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class SlurmOutputParser {
 
     static final String WHITESPACE_REGEX = "\\s+";
+    
+    static final String COMMA_REGEX = "\\s*,\\s*";
+    
+    static final String NEW_LINE_REGEX = "\\r?\\n";
+    
+    static final String KEY_EQUALS_VALUE_REGEX = "\\s*=\\s*";
 
     static String parseSbatchOutput(String output) throws OctopusException {
         if (!(output.startsWith("Granted job allocation") || output.startsWith("Submitted batch job"))) {
@@ -33,13 +40,6 @@ public class SlurmOutputParser {
         }
 
         return identifier;
-    }
-
-    public static void parseScancelOutput(String identifier, String scancelOutput) throws OctopusException {
-        if (!scancelOutput.contains("scancel: Terminating job " + identifier)) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Did not get expected output on cancelling job. Got: "
-                    + scancelOutput);
-        }
     }
 
     /**
@@ -96,15 +96,41 @@ public class SlurmOutputParser {
         String[] pairs = output.split(WHITESPACE_REGEX);
 
         for (String pair : pairs) {
-            String[] elements = pair.split("=", 2);
+            String[] elements = pair.split(KEY_EQUALS_VALUE_REGEX, 2);
 
             if (elements.length != 2) {
-                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got unknown key/value pair in scontrol output: " + pair);
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got invalid key/value pair in scontrol output: " + pair);
             }
 
             result.put(elements[0], elements[1]);
         }
 
+        return result;
+    }
+
+    public static Map<String, String> parseScontrolConfigOutput(String output) throws OctopusException {
+        Map<String, String> result = new HashMap<String, String>();
+        String[] lines = output.split(NEW_LINE_REGEX);
+
+        if (lines.length == 0) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
+                    "Cannot parse sinfo config output, Got empty output.");
+        }
+
+        for(String line: lines) {
+            if (line.startsWith("Configuration data as of") || line.isEmpty() || line.startsWith("Slurmctld(primary/backup")) {
+                //ignore these lines
+                continue;
+            }
+            String[] pair = line.split(KEY_EQUALS_VALUE_REGEX, 2);
+
+            if (pair.length != 2) {
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got invalid key/value pair in scontrol output: " + pair);
+            }
+            
+            result.put(pair[0], pair[1]);
+        }
+        
         return result;
     }
 }

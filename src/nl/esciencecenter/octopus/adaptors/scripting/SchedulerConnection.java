@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -35,8 +36,10 @@ import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -156,7 +159,7 @@ public abstract class SchedulerConnection {
 
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             if (!validSet.contains(entry.getKey())) {
-                throw new OctopusException(adaptorName, "Unknown property " + entry);
+                throw new UnknownPropertyException(adaptorName, "Unknown property " + entry);
             }
         }
 
@@ -328,6 +331,29 @@ public abstract class SchedulerConnection {
         return sshFileSystem.getEntryPath();
     }
 
+    /**
+     * check if the given working directory exists. Useful for schedulers that do not check this (like slurm)
+     * 
+     * @param workingDirectory
+     *            the working directory (either absolute or relative) as given by the user.
+     */
+    protected void checkWorkingDirectory(String workingDirectory) throws OctopusIOException, OctopusException {
+        if (workingDirectory == null) {
+            return;
+        }
+
+        AbsolutePath path;
+        if (workingDirectory.startsWith("/")) {
+            path = engine.files().newPath(sshFileSystem, new RelativePath(workingDirectory));
+        } else {
+            //make relative path absolute
+            path = getFsEntryPath().resolve(new RelativePath(workingDirectory));
+        }
+        if (!engine.files().exists(path)) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
+        }
+    }
+
     //implemented by sub-class
 
     /**
@@ -336,7 +362,7 @@ public abstract class SchedulerConnection {
     public abstract Scheduler getScheduler();
 
     public abstract String[] getQueueNames();
-    
+
     public abstract String getDefaultQueueName();
 
     public abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
@@ -352,6 +378,5 @@ public abstract class SchedulerConnection {
     public abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
 
     public abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
-
 
 }

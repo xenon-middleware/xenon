@@ -16,11 +16,9 @@
 package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -31,6 +29,7 @@ import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -57,9 +56,17 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private static final Logger logger = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
 
     public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
+    
+    public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
 
     /** List of {NAME, DEFAULT_VALUE, DESCRIPTION} for properties. */
-    private static final String[][] validPropertiesList = new String[0][0];
+    private static final String[][] validPropertiesList = new String[][] {
+        {
+            IGNORE_VERSION_PROPERTY,
+            "false",
+            "Boolean: If true, the version check is skipped when connecting to remote machines. "
+                    + "WARNING: it is not recommended to use this setting in production environments" },
+    };
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
@@ -70,17 +77,19 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final Scheduler scheduler;
 
-    private final boolean accountingAvailable;
+    private final SlurmConfig config;
 
     SlurmSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
         super(location, credential, properties, engine, validPropertiesList, SlurmAdaptor.ADAPTOR_NAME,
                 SlurmAdaptor.ADAPTOR_SCHEMES);
 
+        boolean ignoreVersion = getProperties().getBooleanProperty(IGNORE_VERSION_PROPERTY);
+        
+        this.config = fetchConfiguration(ignoreVersion);
+        
         this.queueNames = fetchQueueNames();
         this.defaultQueueName = findDefaultQueue();
-
-        this.accountingAvailable = checkAccountingAvailable();
 
         scheduler =
                 new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential,
@@ -88,8 +97,18 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         logger.debug("new slurm scheduler connection {}", scheduler);
     }
+    
+    private SlurmConfig fetchConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
+        String output = runCheckedCommand(null, "scontrol", "show", "config");
+
+        Map<String, String> info = SlurmOutputParser.parseScontrolConfigOutput(output);
+
+        return new SlurmConfig(info, ignoreVersion);
+    }
 
     private String[] fetchQueueNames() throws OctopusIOException, OctopusException {
+        //Very wide partition format to compensate for bug in slurm 2.3.
+        //If the size of the column is not specified the default partition does not get listed with a "*"
         String output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%120P");
 
         String[] queues = output.split(SlurmOutputParser.WHITESPACE_REGEX);
@@ -177,6 +196,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
+            checkWorkingDirectory(description.getWorkingDirectory());
             String jobScript = SlurmJobScriptGenerator.generate(description, fsEntryPath);
 
             output = runCheckedCommand(jobScript, "sbatch");
@@ -197,13 +217,17 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobImplementation(getScheduler(), identifier, description, false, false);
     }
 
+
+
     @Override
     public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
         String identifier = job.getIdentifier();
-        String scancelOutput = runCheckedCommand(null, "scancel", identifier);
+        String output = runCheckedCommand(null, "scancel", identifier);
 
-        SlurmOutputParser.parseScancelOutput(identifier, scancelOutput);
-
+        if (!output.isEmpty()) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got unexpected output on cancelling job: " + output);
+        }
+        
         return getJobStatus(job);
     }
 
@@ -214,6 +238,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         if (queueNames == null || queueNames.length == 0) {
             output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i");
         } else {
+            checkQueueNames(queueNames);
+            
             //add a list of all requested queues
             output =
                     runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
@@ -260,6 +286,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         Map<String, Map<String, String>> allMap = SlurmOutputParser.parseInfoOutput(output, "PARTITION");
 
         for (int i = 0; i < queueNames.length; i++) {
+            if (queueNames[i] == null) {
+                //skip null values
+                continue;
+            }
             if (allMap == null || allMap.isEmpty()) {
                 Exception exception =
                         new OctopusIOException(SlurmAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
@@ -287,7 +317,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         Exception exception = null;
 
         if (info == null || info.isEmpty()) {
-            logger.debug("job state not in map");
+            logger.debug("job {} not found in queue", job.getIdentifier());
             return null;
         }
 
@@ -328,6 +358,11 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return state.equals("COMPLETED") || state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL")
                 || state.equals("TIMEOUT") || state.equals("PREEMPTED");
     }
+    
+    private static boolean isFailedState(String state) {
+        return state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL")
+                || state.equals("TIMEOUT") || state.equals("PREEMPTED");
+    }
 
     private JobStatus getJobFromSControl(Job job) throws OctopusIOException, OctopusException {
         RemoteCommandRunner runner = runCommand(null, "scontrol", "-o", "show", "job", job.getIdentifier());
@@ -356,10 +391,21 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         Exception exception = null;
         if (reason != null && !reason.equalsIgnoreCase("none")) {
-            exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm reported error reason: " + reason);
+            //exclude non zero exit code from errors
+            if (!reason.equals("NonZeroExitCode")) {
+                exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm reported error reason: " + reason);
+            }
+        } else if (state.equals("CANCELLED")) {
+            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job canceled");
+        } else if (isFailedState(state)) {
+            exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
+        
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), info);
 
-        return new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), info);
+        logger.debug("Got job status from scontrol output {}", result);
+        
+        return result;
     }
 
     @Override
@@ -378,7 +424,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             result = getJobFromSControl(job);
         }
 
-        if (result == null && accountingAvailable) {
+        if (result == null && config.getAccountingAvailable()) {
             //this job is not in the queue not scontrol, check sacct last (if available)
             result = getJobFromSAcct(job);
         }
@@ -394,7 +440,9 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     public JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException {
         String[] jobIdentifiers = new String[jobs.length];
         for (int i = 0; i < jobIdentifiers.length; i++) {
-            jobIdentifiers[i] = jobs[i].getIdentifier();
+            if (jobs[i] != null) {
+                jobIdentifiers[i] = jobs[i].getIdentifier();
+            }
         }
 
         //first attempt: see if it is in the queue
@@ -408,22 +456,23 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < jobs.length; i++) {
-            Map<String, String> info = allMap.get(jobIdentifiers[i]);
-
-            result[i] = jobStatusFromSqueueMap(info, jobs[i]);
+            if (jobs[i] == null) {
+                continue;
+            }
+            result[i] = jobStatusFromSqueueMap(allMap.get(jobIdentifiers[i]), jobs[i]);
 
             if (result[i] == null) {
                 //this job is not in the queue, check scontrol next
                 result[i] = getJobFromSControl(jobs[i]);
             }
 
-            if (result[i] == null && accountingAvailable) {
+            if (result[i] == null && config.getAccountingAvailable()) {
                 //this job is not in the queue not scontrol, check sacct last (if available)
                 result[i] = getJobFromSAcct(jobs[i]);
             }
 
             //job really does not seem to exist (anymore)
-            if (info == null) {
+            if (result[i] == null) {
                 NoSuchJobException exception =
                         new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: " + jobIdentifiers[i]);
                 result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);

@@ -47,7 +47,7 @@ public class CommandLineUtils {
     }
 
     /**
-     * Create a single comma separated string out of a list of strings.
+     * Create a single comma separated string out of a list of strings. Will ignore null values
      * 
      * @param values
      *            an array of values.
@@ -56,10 +56,12 @@ public class CommandLineUtils {
     public static String asCSList(String[] values) {
         String result = null;
         for (String value : values) {
-            if (result == null) {
-                result = value;
-            } else {
-                result += "," + value;
+            if (value != null) {
+                if (result == null) {
+                    result = value;
+                } else {
+                    result += "," + value;
+                }
             }
         }
 

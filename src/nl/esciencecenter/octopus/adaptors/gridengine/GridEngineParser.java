@@ -457,7 +457,6 @@ public class GridEngineParser {
             }
             parallelEnvironments = peValue.split("\\s+");
 
-            result.put(name, new QueueInfo(name, slots, parallelEnvironments));
         }
 
         return result;

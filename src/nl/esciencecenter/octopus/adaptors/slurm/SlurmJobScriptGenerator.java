@@ -29,16 +29,16 @@ public class SlurmJobScriptGenerator {
         //set working directory
         if (description.getWorkingDirectory() != null) {
             if (description.getWorkingDirectory().startsWith("/")) {
-                script.format("#SBATCH -D %s\n", description.getWorkingDirectory());
+                script.format("#SBATCH --workdir=%s\n", description.getWorkingDirectory());
             } else {
                 //make relative path absolute
                 AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
-                script.format("#SBATCH -D %s\n", workingDirectory.getPath());
+                script.format("#SBATCH --workdir=%s\n", workingDirectory.getPath());
             }
         }
 
         if (description.getQueueName() != null) {
-            script.format("#SBATCH --partition %s\n", description.getQueueName());
+            script.format("#SBATCH --partition=%s\n", description.getQueueName());
         }
 
         //number of nodes
@@ -51,22 +51,22 @@ public class SlurmJobScriptGenerator {
         //script.format("#SBATCH --ntasks=%d\n", description.getNodeCount() * description.getProcessesPerNode());
 
         //add maximum runtime
-        script.format("#SBATCH -t %d\n", description.getMaxTime());
+        script.format("#SBATCH --time=%d\n", description.getMaxTime());
 
         if (description.getStdin() != null) {
-            script.format("#SBATCH -i %s\n", description.getStdin());
+            script.format("#SBATCH --input=%s\n", description.getStdin());
         }
 
         if (description.getStdout() == null) {
-            script.format("#SBATCH -o /dev/null\n");
+            script.format("#SBATCH --output=/dev/null\n");
         } else {
-            script.format("#SBATCH -o %s\n", description.getStdout());
+            script.format("#SBATCH --output=%s\n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
-            script.format("#SBATCH -e /dev/null\n");
+            script.format("#SBATCH --error=/dev/null\n");
         } else {
-            script.format("#SBATCH -e %s\n", description.getStderr());
+            script.format("#SBATCH --error=%s\n", description.getStderr());
         }
 
         if (description.getEnvironment() != null) {
