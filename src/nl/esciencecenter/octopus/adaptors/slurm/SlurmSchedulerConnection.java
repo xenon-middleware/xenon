@@ -425,13 +425,21 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         //this job is not in the queue check sacct next (if available)
         if (result == null && config.accountingAvailable()) {
             //this job is not in the queue not scontrol, check sacct last (if available)
-            String sacctOutput =
-                    runCheckedCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+            RemoteCommandRunner runner = 
+                    runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
                             + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
-                            + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--job", job.getIdentifier());
-
+                            + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + job.getIdentifier());
+            
+            if (runner.getExitCode() != 0) {
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
+            }
+            
+            if (!runner.getStderr().isEmpty()) {
+                logger.warn("Sacct produced error output: " + runner.getStderr());
+            }
+            
             Map<String, Map<String, String>> sacctMap =
-                    SlurmOutputParser.parseInfoOutput(sacctOutput, "JobID", SlurmOutputParser.BAR_REGEX);
+                    SlurmOutputParser.parseInfoOutput(runner.getStdout(), "JobID", SlurmOutputParser.BAR_REGEX);
 
             result = getJobStatusFromMap(sacctMap.get(job.getIdentifier()), job);
         }
@@ -469,13 +477,21 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         Map<String, Map<String, String>> sacctMap = null;
 
         if (config.accountingAvailable()) {
-            String sacctOutput =
-                    runCheckedCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+            RemoteCommandRunner runner = 
+                    runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
                             + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
-                            + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--job",
+                            + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority","--jobs=" +
                             CommandLineUtils.asCSList(jobIdentifiers));
+            
+            if (runner.getExitCode() != 0) {
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
+            }
+            
+            if (!runner.getStderr().isEmpty()) {
+                logger.warn("Sacct produced error output: " + runner.getStderr());
+            }
 
-            sacctMap = SlurmOutputParser.parseInfoOutput(sacctOutput, "JobID", SlurmOutputParser.BAR_REGEX);
+            sacctMap = SlurmOutputParser.parseInfoOutput(runner.getStdout(), "JobID", SlurmOutputParser.BAR_REGEX);
         }
 
         JobStatus[] result = new JobStatus[jobs.length];
