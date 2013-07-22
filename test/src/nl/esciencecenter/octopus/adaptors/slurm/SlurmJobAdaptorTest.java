@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.slurm;
 
 import static org.junit.Assert.assertTrue;
 
@@ -46,14 +46,14 @@ import org.slf4j.LoggerFactory;
  * 
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
+public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
     
     
-    private static final Logger logger = LoggerFactory.getLogger(GridEngineJobAdaptorTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(SlurmJobAdaptorTest.class);
 
     @BeforeClass
     public static void prepareGridEngineJobAdaptorTest() throws Exception {
-        GenericJobAdaptorTestParent.prepareClass(new GridEngineJobTestConfig(null));
+        GenericJobAdaptorTestParent.prepareClass(new SlurmJobTestConfig(null));
     }
 
     @AfterClass
@@ -62,10 +62,10 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void ge_test01_jobWithCustomScript() throws Exception {
+    public void slurm_test01_jobWithCustomScript() throws Exception {
         String message = "Hello World! test01\n";
 
-        String workingDir = getWorkingDir("ge_test01");
+        String workingDir = getWorkingDir("slurm_test01");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
@@ -76,7 +76,9 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         AbsolutePath script = root.resolve(new RelativePath("script"));
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
 
-        String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
+        String scriptContent = "#!/bin/bash\n" +
+        "#SBATCH -o " + stdout.getPath() + "\n" 
+                + "#SBATCH -e /dev/null\n" + "echo " + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, scriptContent);
@@ -114,7 +116,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     }
 
     @Test
-    public void ge_test02_newScheduler_pathWithSlash() throws Exception {
+    public void slurm_test02_newScheduler_pathWithSlash() throws Exception {
 
         URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
 
@@ -123,7 +125,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     }
 
     @Test(expected = InvalidLocationException.class)
-    public void ge_test03_newScheduler_pathWithFragment_Exception() throws Exception {
+    public void slurm_test03_newScheduler_pathWithFragment_Exception() throws Exception {
 
         URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
 
@@ -132,10 +134,10 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     }
 
     @Test
-    public void ge_test04_parallel_batchJob() throws Exception {
-        String message = "Hello World! Test GE 04";
+    public void slurm_test04_parallel_batchJob() throws Exception {
+        String message = "Hello World! Test Slurm 04";
         
-        String workingDir = getWorkingDir("ge_test04");
+        String workingDir = getWorkingDir("slurm_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
@@ -152,8 +154,6 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.addJobOptions("parallel.environment", "prun");
-        description.setQueueName("all.q");
 
         Job job = jobs.submitJob(scheduler, description);
 

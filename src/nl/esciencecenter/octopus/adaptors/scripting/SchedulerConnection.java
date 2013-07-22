@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.scripting;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,18 +26,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.util.RemoteCommandRunner;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -54,7 +57,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SchedulerConnection {
 
-    protected static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
+    public static final String POLL_DELAY_PROPERTY = "poll.delay";
+
+    //Additional property generic for all connections.
+    private final String POLL_DELAY_DESCRIPTION = "Int: number of milliseconds between polling the status of a job";
+    private final int POLL_DELAY_DEFAULT = 1000;
+
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
 
     private static int schedulerID = 0;
 
@@ -86,22 +95,30 @@ public abstract class SchedulerConnection {
 
         checkLocation(location);
 
+        String pollProperty = OctopusEngine.ADAPTORS + adaptorName + "." + POLL_DELAY_PROPERTY;
+
         //FIXME: duplicate from Adaptor class
+        //FIXME: some trickery to add an additional (generic) property
 
-        this.defaultProperties = (defaultProperties == null ? new String[0][0] : defaultProperties);
-
-        Map<String, String> tmp = new HashMap<String, String>();
-
+        ArrayList<String[]> combinedDefaultProperties = new ArrayList<String[]>();
+        combinedDefaultProperties
+                .add(new String[] { pollProperty, Integer.toString(POLL_DELAY_DEFAULT), POLL_DELAY_DESCRIPTION });
         if (defaultProperties != null) {
-            for (int i = 0; i < defaultProperties.length; i++) {
-                tmp.put(defaultProperties[i][0], defaultProperties[i][2]);
+            combinedDefaultProperties.addAll(Arrays.asList(defaultProperties));
+        }
+        this.defaultProperties = combinedDefaultProperties.toArray(new String[combinedDefaultProperties.size()][3]);
+
+        Map<String, String> supportedProperties = new HashMap<String, String>();
+        if (combinedDefaultProperties != null) {
+            for (int i = 0; i < this.defaultProperties.length; i++) {
+                supportedProperties.put(this.defaultProperties[i][0], this.defaultProperties[i][2]);
             }
         }
 
-        this.supportedProperties = Collections.unmodifiableMap(tmp);
+        this.supportedProperties = Collections.unmodifiableMap(supportedProperties);
         this.properties = processProperties(properties);
 
-        this.pollDelay = this.properties.getIntProperty(GridEngineSchedulerConnection.POLL_DELAY_PROPERTY);
+        this.pollDelay = this.properties.getIntProperty(pollProperty, 100);
 
         try {
             id = adaptorName + "-" + getNextSchedulerID();
@@ -142,7 +159,7 @@ public abstract class SchedulerConnection {
 
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             if (!validSet.contains(entry.getKey())) {
-                throw new OctopusException(adaptorName, "Unknown property " + entry);
+                throw new UnknownPropertyException(adaptorName, "Unknown property " + entry);
             }
         }
 
@@ -170,20 +187,25 @@ public abstract class SchedulerConnection {
         throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme: " + location.getScheme());
     }
 
-    String runCommand(String stdin, String executable, String... arguments) throws OctopusException, OctopusIOException {
-        JobDescription description = new JobDescription();
-        description.setInteractive(true);
-        description.setExecutable(executable);
-        description.setArguments(arguments);
+    /**
+     * Run a command on the remote scheduler machine.
+     */
+    public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws OctopusException,
+            OctopusIOException {
+        return new RemoteCommandRunner(engine, sshScheduler, adaptorName, stdin, executable, arguments);
+    }
 
-        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, stdin, description);
+    /**
+     * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
+     */
+    public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException,
+            OctopusIOException {
+        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, adaptorName, stdin, executable, arguments);
 
-        String stderr = runner.getStderr();
-
-        if (runner.getExitCode() != 0 || !stderr.isEmpty()) {
-            throw new CommandFailedException(adaptorName, "could not run command \"" + executable + "\" with arguments \""
+        if (!runner.success()) {
+            throw new OctopusException(adaptorName, "could not run command \"" + executable + "\" with arguments \""
                     + Arrays.toString(arguments) + "\" at \"" + sshScheduler + "\". Exit code = " + runner.getExitCode()
-                    + " Error output: " + stderr, runner.getExitCode(), runner.getStderr());
+                    + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
         return runner.getStdout();
@@ -309,27 +331,52 @@ public abstract class SchedulerConnection {
         return sshFileSystem.getEntryPath();
     }
 
+    /**
+     * check if the given working directory exists. Useful for schedulers that do not check this (like slurm)
+     * 
+     * @param workingDirectory
+     *            the working directory (either absolute or relative) as given by the user.
+     */
+    protected void checkWorkingDirectory(String workingDirectory) throws OctopusIOException, OctopusException {
+        if (workingDirectory == null) {
+            return;
+        }
+
+        AbsolutePath path;
+        if (workingDirectory.startsWith("/")) {
+            path = engine.files().newPath(sshFileSystem, new RelativePath(workingDirectory));
+        } else {
+            //make relative path absolute
+            path = getFsEntryPath().resolve(new RelativePath(workingDirectory));
+        }
+        if (!engine.files().exists(path)) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
+        }
+    }
+
     //implemented by sub-class
 
     /**
      * As the SchedulerImplementation contains the list of queues, the subclass is responsible of implementing this function
      */
-    abstract Scheduler getScheduler();
+    public abstract Scheduler getScheduler();
 
-    abstract String[] getQueueNames();
+    public abstract String[] getQueueNames();
 
-    abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
+    public abstract String getDefaultQueueName();
 
-    abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;
+    public abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
 
-    abstract Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException;
+    public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;
 
-    abstract Job submitJob(JobDescription description) throws OctopusIOException, OctopusException;
+    public abstract Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException;
 
-    abstract JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException;
+    public abstract Job submitJob(JobDescription description) throws OctopusIOException, OctopusException;
 
-    abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
+    public abstract JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException;
 
-    abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
+    public abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
+
+    public abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
 
 }

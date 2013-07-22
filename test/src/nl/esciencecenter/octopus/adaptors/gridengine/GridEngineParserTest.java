@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class GridEngineParserTest {
         parser.checkVersion(testFile);
     }
 
-    @Test(expected = IncompatibleServerException.class)
+    @Test(expected = IncompatibleVersionException.class)
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
@@ -48,7 +49,7 @@ public class GridEngineParserTest {
         parser.checkVersion(testFile);
     }
 
-    @Test(expected = IncompatibleServerException.class)
+    @Test(expected = IncompatibleVersionException.class)
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 

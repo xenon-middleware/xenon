@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
@@ -104,7 +105,12 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Before
     public void prepare() throws OctopusException {
-        octopus = OctopusFactory.newOctopus(null);
+        //FIXME: this should be a scheduler option, not an adaptor option...
+        //FIXME: we should be able to pass properties to the test via the JobTestConfig...
+        Properties properties = new Properties();
+        properties.put(SshAdaptor.POLLING_DELAY, "100");
+
+        octopus = OctopusFactory.newOctopus(properties);
         files = octopus.files();
         jobs = octopus.jobs();
         credentials = octopus.credentials();
@@ -343,7 +349,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         try {
             jobs.getJobs(s, config.getInvalidQueueName());
-            throw new Exception("close did NOT throw NoSuchQueueException");
+            throw new Exception("getJobs did NOT throw NoSuchQueueException");
         } catch (NoSuchQueueException e) {
             // expected
         } finally {
@@ -1471,7 +1477,7 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     @Test
-    public void ge_test04_batchJob_parallel_Exception() throws Exception {
+    public void test42a_batchJob_parallel_Exception() throws Exception {
 
         if (config.supportsParallelJobs()) {
             return;
@@ -1486,7 +1492,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         boolean gotException = false;
         try {
-            Job job = jobs.submitJob(scheduler, description);
+            jobs.submitJob(scheduler, description);
         } catch (InvalidJobDescriptionException e) {
             gotException = true;
         } finally {
@@ -1497,5 +1503,4 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Submit did not throw exception, which was expected!");
         }
     }
-
 }

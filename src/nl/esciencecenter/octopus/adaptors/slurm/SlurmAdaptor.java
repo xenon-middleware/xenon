@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.scripting.ForwardingCredentials;
+import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnectionFactory;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingJobs;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -25,31 +28,33 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
-public class GridengineAdaptor extends Adaptor {
+public class SlurmAdaptor extends Adaptor {
 
-    public static final String ADAPTOR_NAME = "gridengine";
+    public static final String ADAPTOR_NAME = "slurm";
 
     private static final String ADAPTOR_DESCRIPTION =
-            "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
+            "The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local "
                     + "or the ssh adaptor to gain access to the scheduler machine.";
 
-    public static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
+    public static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. No properties exist for this adaptor. */
     private static final String[][] validPropertiesList = new String[0][0];
 
-    private final GridEngineJobs jobsAdaptor;
+    private final ScriptingJobs jobsAdaptor;
 
-    private final GridEngineCredentials credentialsAdaptor;
+    private final ForwardingCredentials credentialsAdaptor;
 
-    public GridengineAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
+    public SlurmAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, validPropertiesList, properties);
 
-        this.jobsAdaptor = new GridEngineJobs(getProperties(), octopusEngine);
-        this.credentialsAdaptor = new GridEngineCredentials(octopusEngine);
+        SchedulerConnectionFactory factory = new SlurmSchedulerConnectionFactory();
+
+        this.jobsAdaptor = new ScriptingJobs(getProperties(), octopusEngine, ADAPTOR_NAME, factory);
+        this.credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");
     }
 
-    public GridEngineJobs jobsAdaptor() {
+    public ScriptingJobs jobsAdaptor() {
         return jobsAdaptor;
     }
 
