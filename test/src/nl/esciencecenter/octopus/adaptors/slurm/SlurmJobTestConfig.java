@@ -228,7 +228,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     @Override
     public Properties getDefaultProperties() throws Exception {
         Properties result = new Properties();
-        result.put("octopus.adaptors.slurm.poll.delay", "100");
+        //result.put("octopus.adaptors.slurm.poll.delay", "100");
         return result;
     }
 
@@ -244,12 +244,12 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public long getDefaultShortJobTimeout() {
-        return 60000;
+        return 120000;
     }
 
     @Override
     public long getDefaultCancelTimeout() {
-        return 60000;
+        return 120000;
     }
 
     @Override

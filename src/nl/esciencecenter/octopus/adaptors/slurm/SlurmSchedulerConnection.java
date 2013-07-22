@@ -334,12 +334,12 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     private static boolean isDoneState(String state) {
-        return state.equals("COMPLETED") || state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL")
+        return state.equals("COMPLETED") || state.equals("FAILED") || state.startsWith("CANCELLED") || state.equals("NODE_FAIL")
                 || state.equals("TIMEOUT") || state.equals("PREEMPTED");
     }
 
     private static boolean isFailedState(String state) {
-        return state.equals("FAILED") || state.equals("CANCELLED") || state.equals("NODE_FAIL") || state.equals("TIMEOUT")
+        return state.equals("FAILED") || state.startsWith("CANCELLED") || state.equals("NODE_FAIL") || state.equals("TIMEOUT")
                 || state.equals("PREEMPTED");
     }
 
@@ -393,8 +393,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             if (!reason.equals("NonZeroExitCode")) {
                 exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm reported error reason: " + reason);
             }
-        } else if (state.equals("CANCELLED")) {
-            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job canceled");
+        } else if (state.startsWith("CANCELLED")) {
+            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase());
         } else if (state.equals("FAILED") && exitcode != 0) {
             //non zero exit code (but no reason, as in sacct output), ignore
             exception = null;
@@ -413,7 +413,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
         //String output = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + job.getIdentifier());
-        String sQueueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R");
+        String sQueueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + job.getIdentifier());
 
         Map<String, Map<String, String>> sQueueMap =
                 SlurmOutputParser.parseInfoOutput(sQueueOutput, "JOBID", SlurmOutputParser.WHITESPACE_REGEX);
