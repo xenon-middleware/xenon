@@ -65,7 +65,7 @@ public class JobDescription {
     private int processesPerNode = 1;
 
     /** The maximum run time in minutes. */
-    private int maxTime = 30;
+    private int maxTime = 15;
 
     /** Is this an interactive job ? */
     private boolean interactive = false;

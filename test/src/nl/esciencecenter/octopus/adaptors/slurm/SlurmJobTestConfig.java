@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +34,8 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * 
  */
-public class GridEngineJobTestConfig extends JobTestConfig {
+public class SlurmJobTestConfig extends JobTestConfig {
+
 
     private String username;
     private char[] passwd;
@@ -50,39 +51,39 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     private String defaultQueue;
     private String[] queues;
 
-    public GridEngineJobTestConfig(String configfile) throws Exception {
+    public SlurmJobTestConfig(String configfile) throws Exception {
 
-        super("gridengine");
+        super("slurm");
 
         if (configfile == null) {
-            configfile = System.getProperty("test.gridengine.adaptor.config");
+            configfile = System.getProperty("test.slurm.adaptor.config");
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "test_gridengine.properties";
+            configfile = System.getProperty("user.home") + File.separator + "test_slurm.properties";
         }
 
         Properties p = new Properties();
         p.load(new FileInputStream(configfile));
 
-        username = getPropertyOrFail(p, "test.gridengine.user");
-        passwd = getPropertyOrFail(p, "test.gridengine.password").toCharArray();
+        username = getPropertyOrFail(p, "test.slurm.user");
+        passwd = getPropertyOrFail(p, "test.slurm.password").toCharArray();
 
-        String location = getPropertyOrFail(p, "test.gridengine.location");
+        String location = getPropertyOrFail(p, "test.slurm.location");
 
-        String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
-        String wrongLocation = getPropertyOrFail(p, "test.gridengine.location.wrong");
+        String wrongUser = getPropertyOrFail(p, "test.slurm.user.wrong");
+        String wrongLocation = getPropertyOrFail(p, "test.slurm.location.wrong");
 
-        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
-        String queueList = getPropertyOrFail(p, "test.gridengine.queues");
+        defaultQueue = getPropertyOrFail(p, "test.slurm.default.queue");
+        String queueList = getPropertyOrFail(p, "test.slurm.queues");
         queues = queueList.split("\\s*,\\s*");
 
-        correctURI = new URI("ge://" + username + "@" + location);
+        correctURI = new URI("slurm://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
-        correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
-        wrongUserURI = new URI("ge://" + wrongUser + "@" + location);
-        wrongLocationURI = new URI("ge://" + username + "@" + wrongLocation);
-        wrongPathURI = new URI("ge://" + username + "@" + location + "/aap/noot");
+        correctURIWithPath = new URI("slurm://" + username + "@" + location + "/");
+        wrongUserURI = new URI("slurm://" + wrongUser + "@" + location);
+        wrongLocationURI = new URI("slurm://" + username + "@" + wrongLocation);
+        wrongPathURI = new URI("slurm://" + username + "@" + location + "/aap/noot");
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
@@ -95,6 +96,31 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         return tmp;
     }
+    
+    @Override
+    public String getAdaptorName() {
+        return "slurm";
+    }
+
+    @Override
+    public Properties getUnknownProperties() throws Exception {
+        Properties properties = new Properties();
+        
+        properties.put("some.key",  "some value");
+        
+        return properties;
+    }
+
+    @Override
+    public Properties[] getInvalidProperties() throws Exception {
+        return new Properties[0];
+    }
+
+    @Override
+    public Properties getCorrectProperties() throws Exception {
+        return new Properties();
+    }
+
 
     @Override
     public URI getCorrectURI() throws Exception {
@@ -137,18 +163,23 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     @Override
+    public boolean supportsProperties() throws Exception {
+        return true;
+    }
+
+    @Override
     public Credential getDefaultCredential(Credentials credentials) throws Exception {
-        return credentials.getDefaultCredential("ge");
+        return credentials.getDefaultCredential("slurm");
     }
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new Properties(), username, passwd);
+        return credentials.newPasswordCredential("slurm", new Properties(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new Properties(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("slurm", new Properties(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -193,16 +224,11 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public String getInvalidQueueName() throws Exception {
         return "aap";
     }
-    
-    public boolean supportsProperties() throws Exception {
-        return true;
-    }
-
 
     @Override
     public Properties getDefaultProperties() throws Exception {
         Properties result = new Properties();
-        result.put("octopus.adaptors.gridengine.poll.delay", "100");
+        //result.put("octopus.adaptors.slurm.poll.delay", "100");
         return result;
     }
 
@@ -218,16 +244,21 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public long getDefaultShortJobTimeout() {
-        return 60000;
+        return 120000;
     }
 
     @Override
     public long getDefaultCancelTimeout() {
-        return 60000;
+        return 120000;
     }
 
     @Override
     public boolean supportsParallelJobs() {
+        return true;
+    }
+    
+    @Override
+    public boolean supportsEnvironmentVariables() {
         return true;
     }
 }

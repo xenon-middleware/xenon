@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.octopus.adaptors.gridengine;
+package nl.esciencecenter.octopus.adaptors.scripting;
 
 import java.util.Properties;
 
@@ -24,40 +24,43 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * 
- * GridEngine credentials implementation. As GridEngine uses ssh for interacting with the scheduler, actually creates ssh
- * credentials by forwarding the request to the engine again, after replacing the scheme.
+ * Credentials implementation which forwards all requests to another adaptor by replacing the scheme with the given target, and
+ * forwarding the request to the engine again.
  * 
  * @author Niels Drost
  * 
  */
-public class GridEngineCredentials implements Credentials {
+public class ForwardingCredentials implements Credentials {
 
     private final OctopusEngine octopusEngine;
+    private final String targetScheme;
 
-    public GridEngineCredentials(OctopusEngine octopusEngine) {
+    public ForwardingCredentials(OctopusEngine octopusEngine, String targetScheme) {
         this.octopusEngine = octopusEngine;
+        this.targetScheme = targetScheme;
     }
 
     @Override
     public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
             String username, char[] password) throws OctopusException {
-        return octopusEngine.credentials().newCertificateCredential("ssh", properties, keyfile, certfile, username, password);
+        return octopusEngine.credentials().newCertificateCredential(targetScheme, properties, keyfile, certfile, username,
+                password);
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, Properties properties, String username, char[] password)
             throws OctopusException {
-        return octopusEngine.credentials().newPasswordCredential("ssh", properties, username, password);
+        return octopusEngine.credentials().newPasswordCredential(targetScheme, properties, username, password);
     }
 
     @Override
     public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
             char[] password) throws OctopusException {
-        return octopusEngine.credentials().newProxyCredential("ssh", properties, host, port, username, password);
+        return octopusEngine.credentials().newProxyCredential(targetScheme, properties, host, port, username, password);
     }
 
     @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
-        return octopusEngine.credentials().getDefaultCredential("ssh");
+        return octopusEngine.credentials().getDefaultCredential(targetScheme);
     }
 }

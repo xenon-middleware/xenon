@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
+import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
@@ -55,13 +57,10 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(GridEngineSchedulerConnection.class);
 
-    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + GridengineAdaptor.ADAPTOR_NAME + ".";
+    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + GridEngineAdaptor.ADAPTOR_NAME + ".";
 
     public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
     public static final String ACCOUNTING_GRACE_TIME_PROPERTY = PROPERTY_PREFIX + "accounting.grace.time";
-    public static final String POLL_DELAY_PROPERTY = PROPERTY_PREFIX + "poll.delay";
-
-    //FIXME: last property should be defined in generic scheduler connection
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
     private static final String[][] validPropertiesList = new String[][] {
@@ -77,13 +76,16 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             { ACCOUNTING_GRACE_TIME_PROPERTY, "60000",
                     "Int: number of milliseconds a job is allowed to take going from the queue to the qacct output" },
 
-            { POLL_DELAY_PROPERTY, "100", "Int: number of milliseconds between polling the status of a job" },
-
     };
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
-    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    public static final String JOB_OPTION_PARALLEL_ENVIRONMENT = "parallel.environment";
+
+    public static final String JOB_OPTION_PARALLEL_SLOTS = "parallel.slots";
+
+    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
+            JOB_OPTION_PARALLEL_SLOTS };
 
     private final int accountingGraceTime;
 
@@ -101,12 +103,12 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final GridEngineParser parser;
 
-    private final GridEngineSetupInfo setupInfo;
+    private final GridEngineSetup setupInfo;
 
     GridEngineSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
             throws OctopusIOException, OctopusException {
-        super(location, credential, properties, engine, validPropertiesList, GridengineAdaptor.ADAPTOR_NAME,
-                GridengineAdaptor.ADAPTOR_SCHEMES);
+        super(location, credential, properties, engine, validPropertiesList, GridEngineAdaptor.ADAPTOR_NAME,
+                GridEngineAdaptor.ADAPTOR_SCHEMES);
 
         boolean ignoreVersion = getProperties().getBooleanProperty(IGNORE_VERSION_PROPERTY);
         accountingGraceTime = getProperties().getIntProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
@@ -117,21 +119,26 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         deletedJobList = new ArrayList<String>();
 
         //will run a few commands to fetch info
-        setupInfo = new GridEngineSetupInfo(this, parser);
+        setupInfo = new GridEngineSetup(this, parser);
 
         scheduler =
-                new SchedulerImplementation(GridengineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
+                new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
                         credential, getProperties(), false, false, true);
     }
 
     @Override
-    Scheduler getScheduler() {
+    public Scheduler getScheduler() {
         return scheduler;
     }
 
     @Override
-    String[] getQueueNames() {
+    public String[] getQueueNames() {
         return setupInfo.getQueueNames();
+    }
+
+    @Override
+    public String getDefaultQueueName() {
+        return null;
     }
 
     private synchronized void markJobSeen(String identifier) {
@@ -201,23 +208,21 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         ArrayList<Job> result = new ArrayList<Job>();
 
         if (queueNames == null || queueNames.length == 0) {
-            String statusOutput = runCommand(null, "qstat", "-xml");
+            String statusOutput = runCheckedCommand(null, "qstat", "-xml");
 
             jobsFromStatus(statusOutput, getScheduler(), result);
         } else {
             for (String queueName : queueNames) {
-                try {
-                    String statusOutput = runCommand(null, "qstat", "-xml", "-q", queueName);
+                RemoteCommandRunner runner = runCommand(null, "qstat", "-xml", "-q", queueName);
 
-                    jobsFromStatus(statusOutput, getScheduler(), result);
-                } catch (CommandFailedException e) {
+                if (runner.success()) {
+                    jobsFromStatus(runner.getStdout(), getScheduler(), result);
+                } else if (runner.getExitCode() == 1) {
                     //sge returns "1" as the exit code if there is something wrong with the queue, ignore
-                    if (e.getExitCode() != 1) {
-                        throw new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue "
-                                + queueName, e);
-                    } else {
-                        logger.debug("Failed to get queue status for queue " + queueName, e);
-                    }
+                    logger.warn("Failed to get queue status for queue " + runner);
+                } else {
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
+                            + queueName + "\": " + runner);
                 }
             }
         }
@@ -227,14 +232,14 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
-        String qstatOutput = runCommand(null, "qstat", "-xml", "-g", "c");
+        String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
         Map<String, String> map = allMap.get(queueName);
 
         if (map == null || map.isEmpty()) {
-            throw new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueName
+            throw new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueName
                     + " from server, perhaps it does not exist?");
         }
 
@@ -249,14 +254,14 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         QueueStatus[] result = new QueueStatus[queueNames.length];
 
-        String qstatOutput = runCommand(null, "qstat", "-xml", "-g", "c");
+        String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
         for (int i = 0; i < queueNames.length; i++) {
             if (allMap == null || allMap.isEmpty()) {
                 Exception exception =
-                        new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
+                        new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
                 result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
             } else {
                 //state for only the requested queue
@@ -264,7 +269,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
                 if (map == null || map.isEmpty()) {
                     Exception exception =
-                            new NoSuchQueueException(GridengineAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
+                            new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
                                     + queueNames[i] + " from server");
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
                 } else {
@@ -289,13 +294,13 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 }
             }
             if (!found) {
-                throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Given Job option \"" + option
+                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Given Job option \"" + option
                         + "\" not supported");
             }
         }
 
         if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
+            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
         }
 
         //check for option that overrides job script completely.
@@ -307,18 +312,17 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //perform standard checks.
         super.verifyJobDescription(description);
 
-        //FIXME: temporary checks until we _do_ support parallel jobs
-
+        //check if the parallel environment and queue are specified.
         if (description.getNodeCount() != 1) {
-            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
-                    "Parallel jobs not supported yet, illegal nodecount: " + description.getNodeCount());
+            if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
+                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
+                        "Parallel job requested but mandatory parallel.environment option not specificied.");
+            }
+            if (description.getQueueName() == null && !description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_SLOTS)) {
+                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
+                        "Parallel job requested but neither queue nor number of slots specificied (at least one is required)");
+            }
         }
-
-        if (description.getProcessesPerNode() != 1) {
-            throw new InvalidJobDescriptionException(GridengineAdaptor.ADAPTOR_NAME,
-                    "Parallel jobs not supported yet, illegal processes per node count: " + description.getProcessesPerNode());
-        }
-
     }
 
     @Override
@@ -332,9 +336,9 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
-            String jobScript = JobScriptGenerator.generate(description, fsEntryPath);
+            String jobScript = GridEngineJobScriptGenerator.generate(description, fsEntryPath, setupInfo);
 
-            output = runCommand(jobScript, "qsub");
+            output = runCheckedCommand(jobScript, "qsub");
         } else {
             //the user gave us a job script. Pass it to qsub as-is
 
@@ -344,7 +348,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 customScriptFile = scriptFile.getPath();
             }
 
-            output = runCommand(null, "qsub", customScriptFile);
+            output = runCheckedCommand(null, "qsub", customScriptFile);
         }
 
         String identifier = parser.parseQsubOutput(output);
@@ -356,7 +360,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
         String identifier = job.getIdentifier();
-        String qdelOutput = runCommand(null, "qdel", identifier);
+        String qdelOutput = runCheckedCommand(null, "qdel", identifier);
 
         boolean deleted = parser.parseQdelOutput(identifier, qdelOutput);
 
@@ -379,7 +383,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String longState = info.get("long_state");
         if (longState == null || longState.length() == 0) {
             exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
+                    new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
                             + " not found on server");
         }
 
@@ -419,7 +423,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             }
         } catch (NumberFormatException e) {
             exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
+                    new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
                             + " from string " + exitCodeString, e);
 
         }
@@ -429,9 +433,9 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (failedString != null && !failedString.equals("0")) {
             if (failedString.startsWith("100")) {
                 //error code for killed jobs
-                exception = new JobCanceledException(GridengineAdaptor.ADAPTOR_NAME, "Job killed by signal");
+                exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job killed by signal");
             } else {
-                exception = new OctopusException(GridengineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
+                exception = new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
             }
         }
 
@@ -441,7 +445,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
 
-        String statusOutput = runCommand(null, "qstat", "-xml");
+        String statusOutput = runCheckedCommand(null, "qstat", "-xml");
 
         Map<String, Map<String, String>> allMap = parser.parseJobInfos(statusOutput);
 
@@ -454,16 +458,16 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (status == null) {
             //this job cannot be found in the queue, or is reporting some sort of error.
             //to get some more information, run qacct
-            try {
-                String output = runCommand(null, "qacct", "-j", job.getIdentifier());
+            RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
+
+            if (runner.success()) {
                 clearJobSeen(job.getIdentifier());
 
-                Map<String, String> accountingInfo = parser.parseQacctOutput(output);
+                Map<String, String> accountingInfo = parser.parseQacctOutput(runner.getStdout());
 
                 status = qacctJobStatusFromMap(accountingInfo, job);
-            } catch (CommandFailedException e) {
-                logger.debug("qacct command failed", e);
-                exception = e;
+            } else {
+                logger.debug("could not get job {} accounting info: {}", job.getIdentifier(), runner);
             }
         }
 
@@ -476,7 +480,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //qstat/qacct output completely
         if (getJobDeleted(job.getIdentifier())) {
             exception =
-                    new JobCanceledException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
                             + " deleted by user while still pending", exception);
             status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
         }
@@ -485,7 +489,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (status == null) {
 
             exception =
-                    new OctopusIOException(GridengineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server",
+                    new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server",
                             exception);
             status = new JobStatusImplementation(job, null, null, exception, false, false, null);
         }
