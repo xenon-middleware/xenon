@@ -237,4 +237,66 @@ public class JavaJobDescription extends JobDescription {
         this.javaClassPath.addAll(Arrays.asList(javaClasspath));
     }
 
+    @Override
+    public String toString() {
+        return "JavaJobDescription [javaOptions=" + javaOptions + ", javaSystemProperties=" + javaSystemProperties
+                + ", javaMain=" + javaMain + ", javaArguments=" + javaArguments + ", javaClassPath=" + javaClassPath
+                + ", queueName=" + getQueueName() + ", executable=" + getExecutable() + ", stdin=" + getStdin()
+                + ", stdout=" + getStdout() + ", stderr=" + getStderr() + ", workingDirectory=" + getWorkingDirectory() + ", environment="
+                + getEnvironment() + ", jobOptions=" + getJobOptions() + ", nodeCount=" + getNodeCount() + ", processesPerNode="
+                + getProcessesPerNode() + ", maxTime=" + getMaxTime() + ", interactive=" + isInteractive() + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((javaArguments == null) ? 0 : javaArguments.hashCode());
+        result = prime * result + ((javaClassPath == null) ? 0 : javaClassPath.hashCode());
+        result = prime * result + ((javaMain == null) ? 0 : javaMain.hashCode());
+        result = prime * result + ((javaOptions == null) ? 0 : javaOptions.hashCode());
+        result = prime * result + ((javaSystemProperties == null) ? 0 : javaSystemProperties.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        JavaJobDescription other = (JavaJobDescription) obj;
+        if (javaArguments == null) {
+            if (other.javaArguments != null)
+                return false;
+        } else if (!javaArguments.equals(other.javaArguments))
+            return false;
+        if (javaClassPath == null) {
+            if (other.javaClassPath != null)
+                return false;
+        } else if (!javaClassPath.equals(other.javaClassPath))
+            return false;
+        if (javaMain == null) {
+            if (other.javaMain != null)
+                return false;
+        } else if (!javaMain.equals(other.javaMain))
+            return false;
+        if (javaOptions == null) {
+            if (other.javaOptions != null)
+                return false;
+        } else if (!javaOptions.equals(other.javaOptions))
+            return false;
+        if (javaSystemProperties == null) {
+            if (other.javaSystemProperties != null)
+                return false;
+        } else if (!javaSystemProperties.equals(other.javaSystemProperties))
+            return false;
+        return true;
+    }
+    
+    
+    
+
 }
