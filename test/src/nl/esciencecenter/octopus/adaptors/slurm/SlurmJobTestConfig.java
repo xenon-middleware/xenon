@@ -225,7 +225,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem(correctFSURI, getDefaultCredential(credentials), getDefaultProperties());
+        return files.newFileSystem(correctFSURI, getDefaultCredential(credentials), null);
     }
 
     @Override
