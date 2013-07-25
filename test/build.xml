@@ -45,7 +45,7 @@
         <mkdir dir="reports/jacoco" />
 
 		<jacoco:coverage destfile="reports/jacoco/jacoco.exec">
-			<junit printsummary="yes" fork="yes">
+			<junit printsummary="yes" fork="yes" clonevm="true">
 				<classpath refid="default.classpath" />
 
 				<batchtest fork="yes" todir="reports">
