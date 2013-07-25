@@ -19,6 +19,8 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
@@ -103,22 +105,22 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Properties getUnknownProperties() throws Exception {
-        Properties properties = new Properties();
-        
+    public Map<String,String> getUnknownProperties() throws Exception {
+        Map<String,String> properties = new HashMap<>();
         properties.put("some.key",  "some value");
         
         return properties;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Properties[] getInvalidProperties() throws Exception {
-        return new Properties[0];
+    public Map<String,String>[] getInvalidProperties() throws Exception {
+        return new Map[0];
     }
 
     @Override
-    public Properties getCorrectProperties() throws Exception {
-        return new Properties();
+    public Map<String,String> getCorrectProperties() throws Exception {
+        return new HashMap<String,String>();
     }
 
 
@@ -174,12 +176,12 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", new Properties(), username, passwd);
+        return credentials.newPasswordCredential("slurm", new HashMap<String,String>(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", new Properties(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("slurm", new HashMap<String,String>(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -226,10 +228,8 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Properties getDefaultProperties() throws Exception {
-        Properties result = new Properties();
-        //result.put("octopus.adaptors.slurm.poll.delay", "100");
-        return result;
+    public Map<String,String> getDefaultProperties() throws Exception {
+        return new HashMap<>();
     }
 
     @Override

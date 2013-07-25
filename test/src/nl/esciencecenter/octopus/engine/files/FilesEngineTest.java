@@ -18,10 +18,9 @@ package nl.esciencecenter.octopus.engine.files;
 import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.HashMap;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
@@ -75,7 +74,7 @@ public class FilesEngineTest {
     @Test
     public void testFilesEngine() throws OctopusException {
 
-        OctopusEngine oe = new OctopusEngine(new Properties());
+        OctopusEngine oe = new OctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
         String tmp = engine.toString();
         assertNotNull(tmp);
@@ -84,7 +83,7 @@ public class FilesEngineTest {
     @Test(expected = OctopusRuntimeException.class)
     public void testUnknownFileSystem() throws Exception {
 
-        OctopusEngine oe = new OctopusEngine(new Properties());
+        OctopusEngine oe = new OctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
         FileSystemImplementation fsi =
@@ -97,7 +96,7 @@ public class FilesEngineTest {
     @Test(expected = OctopusIOException.class)
     public void testInterSchemeCopy() throws Exception {
 
-        OctopusEngine oe = new OctopusEngine(new Properties());
+        OctopusEngine oe = new OctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
         FileSystemImplementation fs1 =

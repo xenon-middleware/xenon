@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -37,7 +38,7 @@ public class ProxyCredentialImplementationTest {
         assertEquals(pwc.getUsername(), "username");
         assertEquals(pwc.getHost(), "host");
         assertEquals(pwc.getPort(), 42);
-        assertEquals(pwc.getProperties(), null);
+        assertEquals(pwc.getProperties(), new HashMap<String,String>());
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
         assertTrue(pwc.toString().equals(

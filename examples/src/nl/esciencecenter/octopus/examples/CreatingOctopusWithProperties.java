@@ -16,7 +16,8 @@
 
 package nl.esciencecenter.octopus.examples;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
@@ -37,7 +38,7 @@ public class CreatingOctopusWithProperties {
             // We create some properties here to configure octopus. In this example 
             // we set the polling delay of the local adaptor to 1000ms. We also set 
             // the strictHostKeyChecking property of the ssh adaptor to true. 
-            Properties p = new Properties();
+            Map<String,String> p = new HashMap<>();
             p.put("octopus.adaptors.local.queue.pollingDelay", "1000");
             p.put("octopus.adaptors.ssh.strictHostKeyChecking", "true");
             

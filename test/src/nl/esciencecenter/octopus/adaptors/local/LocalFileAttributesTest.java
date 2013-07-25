@@ -16,11 +16,10 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.HashSet;
-import java.util.Set;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;

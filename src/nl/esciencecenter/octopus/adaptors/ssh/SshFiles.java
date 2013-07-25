@@ -24,10 +24,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -106,16 +106,12 @@ public class SshFiles implements Files {
 
     private final OctopusEngine octopusEngine;
     private final SshAdaptor adaptor;
-    @SuppressWarnings("unused")
-    // no properties yet
-    private final Properties properties;
-
+    
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     public SshFiles(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
-        this.properties = properties;
     }
 
     protected FileSystem newFileSystem(SshSession session, URI location, Credential credential, OctopusProperties properties)
@@ -150,12 +146,12 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException {
 
         adaptor.checkPath(location, "filesystem");
 
-        OctopusProperties octopusProperties = new OctopusProperties(properties);
+        OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Level.FILESYSTEM), properties);
 
         SshSession session = adaptor.createNewSession(location, credential, octopusProperties);
 

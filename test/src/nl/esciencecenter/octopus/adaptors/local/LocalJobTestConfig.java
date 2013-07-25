@@ -17,7 +17,7 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -91,7 +91,7 @@ public class LocalJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Properties getDefaultProperties() throws Exception {
+    public Map<String,String> getDefaultProperties() throws Exception {
         return null;
     }
 

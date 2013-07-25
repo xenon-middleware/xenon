@@ -20,13 +20,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
@@ -57,27 +58,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(GridEngineSchedulerConnection.class);
 
-    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + GridEngineAdaptor.ADAPTOR_NAME + ".";
-
-    public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
-    public static final String ACCOUNTING_GRACE_TIME_PROPERTY = PROPERTY_PREFIX + "accounting.grace.time";
-
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] validPropertiesList = new String[][] {
-            {
-                    IGNORE_VERSION_PROPERTY,
-                    "false",
-                    "Boolean: If true, the version check is skipped when connecting to remote machines. "
-                            + "WARNING: it is not recommended to use this setting in production environments" },
-
-            { ACCOUNTING_GRACE_TIME_PROPERTY, "60000",
-                    "Int: number of milliseconds a job is allowed to take going from the queue to the qacct output" },
-
-            { ACCOUNTING_GRACE_TIME_PROPERTY, "60000",
-                    "Int: number of milliseconds a job is allowed to take going from the queue to the qacct output" },
-
-    };
-
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
     public static final String JOB_OPTION_PARALLEL_ENVIRONMENT = "parallel.environment";
@@ -105,13 +85,14 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final GridEngineSetup setupInfo;
 
-    GridEngineSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
-            throws OctopusIOException, OctopusException {
-        super(location, credential, properties, engine, validPropertiesList, GridEngineAdaptor.ADAPTOR_NAME,
-                GridEngineAdaptor.ADAPTOR_SCHEMES);
+    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
+            OctopusEngine engine) throws OctopusIOException, OctopusException {
+        
+        super(adaptor, location, credential, properties, engine, 
+                properties.getIntegerProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
 
-        boolean ignoreVersion = getProperties().getBooleanProperty(IGNORE_VERSION_PROPERTY);
-        accountingGraceTime = getProperties().getIntProperty(ACCOUNTING_GRACE_TIME_PROPERTY);
+        boolean ignoreVersion = properties.getBooleanProperty(GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
+        accountingGraceTime = properties.getIntegerProperty(GridEngineAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY);
 
         parser = new GridEngineParser(ignoreVersion);
 
@@ -121,9 +102,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //will run a few commands to fetch info
         setupInfo = new GridEngineSetup(this, parser);
 
-        scheduler =
-                new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
-                        credential, getProperties(), false, false, true);
+        scheduler = new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
+                 credential, getProperties(), false, false, true);
     }
 
     @Override

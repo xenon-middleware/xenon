@@ -27,8 +27,10 @@ import java.net.URI;
 //import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -358,7 +360,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(URI uri, Credential c, Properties p, boolean mustFail) throws Exception {
+    private void test00_newFileSystem(URI uri, Credential c, Map<String,String> p, boolean mustFail) throws Exception {
 
         try {
             FileSystem fs = files.newFileSystem(uri, c, p);
@@ -419,7 +421,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         // test with correct URI with default credential and with empty properties
-        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), new Properties(), false);
+        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String,String>(), false);
 
         // test with correct URI with default credential and with correct properties
         if (config.supportsProperties()) {

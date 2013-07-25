@@ -48,11 +48,11 @@ public interface AdaptorStatus {
     public String getDescription();
 
     /**
-     * Returns a map containing supported properties and a short description for each.
+     * Returns an array containing all properties this adaptor supports.
      * 
-     * @return a map containing supported properties and a short description for each.
+     * @return an array containing all properties this adaptor supports.
      */
-    public Map<String, String> getSupportedProperties();
+    public OctopusPropertyDescription [] getSupportedProperties();
 
     /**
      * Returns a map containing scheduler specific status information.

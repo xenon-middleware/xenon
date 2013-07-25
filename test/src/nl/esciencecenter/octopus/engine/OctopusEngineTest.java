@@ -17,13 +17,15 @@ package nl.esciencecenter.octopus.engine;
 
 import static org.junit.Assert.*;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 import org.junit.Test;
 
@@ -32,29 +34,20 @@ public class OctopusEngineTest {
     @Test
     public void testNewEngineWithNulls() throws OctopusException {
         Octopus octopus = OctopusEngine.newOctopus(null);
-        assertEquals(new Properties(), octopus.getProperties());
+        assertEquals(new HashMap<String,String>(), octopus.getProperties());
     }
 
-    @Test
+    @Test(expected = UnknownPropertyException.class)
     public void testNewEngineWithWithProperties() throws OctopusException {
-        Properties properties = new Properties();
-        properties.setProperty("key", "value");
-        Octopus octopus = OctopusEngine.newOctopus(properties);
-        assertEquals(properties, octopus.getProperties());
-    }
-
-    public OctopusEngine getEngineWithOnlyLocalAdaptor() throws OctopusException {
-        Properties properties = new Properties();
-        properties.setProperty("octopus.adaptors.load", "local");
-        Octopus octopus = null;
-        octopus = OctopusEngine.newOctopus(properties);
-        return (OctopusEngine) octopus;
+        Map<String,String> properties = new HashMap<>();
+        properties.put("key", "value");
+        OctopusEngine.newOctopus(properties);
     }
 
     @Test
     public void testGetAdaptorInfo() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
-        AdaptorStatus adaptorInfo = octopus.getAdaptorInfo("local");
+        AdaptorStatus adaptorInfo = octopus.getAdaptorStatus("local");
         assertEquals("local", adaptorInfo.getName());
     }
 
@@ -62,7 +55,7 @@ public class OctopusEngineTest {
     public void testGetAdaptorInfo_UnknownAdaptor() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         try {
-            octopus.getAdaptorInfo("hupsefluts");
+            octopus.getAdaptorStatus("hupsefluts");
             fail();
         } catch (OctopusException e) {
             assertEquals("engine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
@@ -119,7 +112,7 @@ public class OctopusEngineTest {
     public void testGetAdaptorInfos() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
 
-        AdaptorStatus[] tmp = octopus.getAdaptorInfos();
+        AdaptorStatus[] tmp = octopus.getAdaptorStatuses();
 
         assert (tmp != null);
         assert (tmp.length == 3);

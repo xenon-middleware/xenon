@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.files;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -68,7 +68,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException;
 
     /**

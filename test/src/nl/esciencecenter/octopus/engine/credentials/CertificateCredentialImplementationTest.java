@@ -19,6 +19,7 @@ package nl.esciencecenter.octopus.engine.credentials;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -37,7 +38,7 @@ public class CertificateCredentialImplementationTest {
         assertEquals(pwc.getUsername(), "username");
         assertEquals(pwc.getKeyfile(), "keyfile");
         assertEquals(pwc.getCertfile(), "certfile");
-        assertEquals(pwc.getProperties(), null);
+        assertEquals(pwc.getProperties(), new HashMap<String,String>());
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
         assertTrue(pwc.toString().equals(

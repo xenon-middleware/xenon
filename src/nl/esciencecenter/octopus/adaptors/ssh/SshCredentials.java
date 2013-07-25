@@ -16,8 +16,9 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -49,24 +50,31 @@ public class SshCredentials implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
             String username, char[] password) throws OctopusException {
-        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), new OctopusProperties(properties),
-                keyfile, certfile, username, password);
+        
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
+        
+        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, keyfile, certfile, username, 
+                password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, Map<String,String> properties, String username, char[] password)
             throws OctopusException {
-        return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(), new OctopusProperties(properties),
-                username, password);
+        
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
+        
+        return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, username, password);
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
+    public Credential newProxyCredential(String scheme, Map<String,String> properties, String host, int port, String username,
             char[] password) throws OctopusException {
-        return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), new OctopusProperties(properties), host,
-                port, username, password);
+        
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
+        
+        return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, host, port, username, password);
     }
 
     @Override
@@ -90,7 +98,7 @@ public class SshCredentials implements Credentials {
         if (keyFile.exists() && certFile.exists()) {
             // logger.info("Using default credential: "+ keyFile.getPath());
             return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
-                    new OctopusProperties(properties), keyFile.getPath(), certFile.getPath(), user, null);
+                    properties, keyFile.getPath(), certFile.getPath(), user, null);
         }
 
         File keyFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
@@ -99,7 +107,7 @@ public class SshCredentials implements Credentials {
         if (keyFile2.exists() && certFile2.exists()) {
             // logger.info("Using default credential: "+ keyFile2.getPath());
             return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
-                    new OctopusProperties(properties), keyFile2.getPath(), certFile2.getPath(), user, null);
+                    properties, keyFile2.getPath(), certFile2.getPath(), user, null);
         }
 
         throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried "

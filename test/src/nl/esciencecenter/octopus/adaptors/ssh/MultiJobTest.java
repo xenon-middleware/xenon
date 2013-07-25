@@ -16,15 +16,13 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Properties;
-
-import org.junit.BeforeClass;
-
-import static org.junit.Assert.assertTrue;
+import java.util.HashMap;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
@@ -81,8 +79,8 @@ public class MultiJobTest {
         Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
 
-        FileSystem filesystem = files.newFileSystem(correctFSURI, credentials.getDefaultCredential("sftp"), new Properties());
-        Scheduler scheduler = jobs.newScheduler(correctURI, credentials.getDefaultCredential("ssh"), new Properties());
+        FileSystem filesystem = files.newFileSystem(correctFSURI, credentials.getDefaultCredential("sftp"), new HashMap<String,String>());
+        Scheduler scheduler = jobs.newScheduler(correctURI, credentials.getDefaultCredential("ssh"), new HashMap<String,String>());
 
         String workingDir = TEST_ROOT + "/" + testName;
 

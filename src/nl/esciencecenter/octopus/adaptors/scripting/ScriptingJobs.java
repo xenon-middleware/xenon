@@ -18,8 +18,8 @@ package nl.esciencecenter.octopus.adaptors.scripting;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -51,18 +51,17 @@ public class ScriptingJobs implements Jobs {
 
     private static final Logger logger = LoggerFactory.getLogger(ScriptingJobs.class);
 
-    private final OctopusProperties properties;
+    private final ScriptingAdaptor adaptor;
     private final OctopusEngine octopusEngine;
     private final String adaptorName;
     private final SchedulerConnectionFactory connectionFactory;
 
     private final Map<String, SchedulerConnection> connections;
 
-    public ScriptingJobs(OctopusProperties properties, OctopusEngine octopusEngine, String adaptorName,
-            SchedulerConnectionFactory connectionFactory) {
-        this.properties = properties;
+    public ScriptingJobs(ScriptingAdaptor adaptor, OctopusEngine octopusEngine, SchedulerConnectionFactory connectionFactory) {
+        this.adaptor = adaptor;
         this.octopusEngine = octopusEngine;
-        this.adaptorName = adaptorName;
+        this.adaptorName = adaptor.getName();
         this.connectionFactory = connectionFactory;
 
         connections = new HashMap<String, SchedulerConnection>();
@@ -104,11 +103,13 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
 
-        SchedulerConnection connection =
-                connectionFactory.newSchedulerConnection(location, credential, properties, octopusEngine);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
+        
+        SchedulerConnection connection = 
+                connectionFactory.newSchedulerConnection(adaptor, location, credential, p, octopusEngine);
 
         addConnection(connection);
 

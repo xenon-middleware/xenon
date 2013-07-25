@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.engine.files;
 
 import java.net.URI;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -57,7 +58,12 @@ public class FileSystemImplementation implements FileSystem {
         this.uri = uri;
         this.entryPath = entryPath;
         this.credential = credential;
-        this.properties = properties;
+        
+        if (properties == null) { 
+            this.properties = new OctopusProperties();
+        } else { 
+            this.properties = properties;
+        }        
     }
 
     public Credential getCredential() {
@@ -79,8 +85,8 @@ public class FileSystemImplementation implements FileSystem {
     }
 
     @Override
-    public OctopusProperties getProperties() {
-        return properties;
+    public Map<String,String> getProperties() {
+        return properties.toMap();
     }
 
     @Override

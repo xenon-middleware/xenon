@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus;
 
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -54,7 +54,7 @@ public class OctopusFactory {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public static Octopus newOctopus(Properties properties) throws OctopusException {
+    public static Octopus newOctopus(Map<String,String> properties) throws OctopusException {
         return OctopusEngine.newOctopus(properties);
     }
 

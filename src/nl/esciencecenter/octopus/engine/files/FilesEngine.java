@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.engine.files;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -79,7 +79,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
         return adaptor.filesAdaptor().newFileSystem(location, credential, properties);

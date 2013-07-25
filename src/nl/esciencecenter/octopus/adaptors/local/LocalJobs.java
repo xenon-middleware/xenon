@@ -17,7 +17,7 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -65,8 +65,6 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
     private final JobQueues jobQueues;
 
-    // private final String defaultWorkingDirectory;
-
     public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, FileSystem cwd, OctopusEngine octopusEngine)
             throws OctopusException {
 
@@ -75,13 +73,12 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
         URI uri = LocalUtils.getLocalJobURI();
 
-        localScheduler =
-                new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, new String[] { "single", "multi",
-                        "unlimited" }, null, properties, true, true, true);
+        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
+                new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
 
         int processors = Runtime.getRuntime().availableProcessors();
-        int multiQThreads = properties.getIntProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
-        int pollingDelay = properties.getIntProperty(LocalAdaptor.POLLING_DELAY);
+        int multiQThreads = properties.getIntegerProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
+        int pollingDelay = properties.getIntegerProperty(LocalAdaptor.POLLING_DELAY);
 
         jobQueues =
                 new JobQueues(LocalAdaptor.ADAPTOR_NAME, octopusEngine, localScheduler, cwd, this, multiQThreads, pollingDelay);
@@ -93,7 +90,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
 
         localAdaptor.checkURI(location);

@@ -16,7 +16,7 @@
 package nl.esciencecenter.octopus.files;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
@@ -46,7 +46,7 @@ public interface FileSystem {
      * 
      * @return the properties used to create this FileSystem.
      */
-    public Properties getProperties();
+    public Map<String,String> getProperties();
 
     /**
      * Get the entry path of this file system.

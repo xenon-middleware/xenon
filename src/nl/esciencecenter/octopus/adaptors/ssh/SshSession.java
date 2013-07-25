@@ -341,13 +341,7 @@ class SshSession {
             logger.debug("SSHSESSION: Strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
         }
-
-        if (properties.getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
-            String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
-            logger.debug("SSHSESSION: Setting ssh known hosts file to: " + knownHosts);
-            setKnownHostsFile(knownHosts);
-        }
-
+       
         try {
             session.connect();
         } catch (JSchException e) {
@@ -355,28 +349,6 @@ class SshSession {
         }
 
         return storeSession(session);
-    }
-
-    private void setKnownHostsFile(String knownHostsFile) throws OctopusException {
-        try {
-            jsch.setKnownHosts(knownHostsFile);
-        } catch (JSchException e) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
-        }
-
-        if (logger.isDebugEnabled()) {
-            HostKeyRepository hkr = jsch.getHostKeyRepository();
-            HostKey[] hks = hkr.getHostKey();
-            if (hks != null) {
-                logger.debug("SSHSESSION: Host keys in " + hkr.getKnownHostsRepositoryID());
-                for (HostKey hk : hks) {
-                    logger.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
-                }
-                logger.debug("");
-            } else {
-                logger.debug("SSHSESSION: No keys in " + knownHostsFile);
-            }
-        }
     }
 
     /**

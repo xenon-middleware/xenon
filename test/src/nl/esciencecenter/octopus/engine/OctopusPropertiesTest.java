@@ -15,186 +15,231 @@
  */
 package nl.esciencecenter.octopus.engine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
 import java.util.Properties;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
+import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
+import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 
 public class OctopusPropertiesTest {
 
     @Test
-    public void testClear_Unsupported() {
-        OctopusProperties octprop = new OctopusProperties();
-        try {
-            octprop.clear();
-        } catch (UnsupportedOperationException e) {
-            assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
-        }
-    }
+    public void testOctopusProperties_fromProperties() throws Exception {
+        
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Level.OCTOPUS), "bla", "test property")
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "value");
 
-    @Test
-    public void testOctopusProperties_fromProperties() {
-        Properties props = new Properties();
-        props.setProperty("key", "value");
-
-        OctopusProperties octprop = new OctopusProperties(props);
+        OctopusProperties octprop = new OctopusProperties(valid, props);
 
         assertEquals(octprop.toString(), "OctopusProperties [properties={key=value}]");
     }
+    
+    @Test(expected = UnknownPropertyException.class)
+    public void testOctopusProperties_fromDefaultsAndProperties_noOverlap() throws Exception {
+        OctopusPropertyDescription [] supportedProperties = new OctopusPropertyDescription [] { 
+                new OctopusPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Level.OCTOPUS), 
+                        "value", "test property"), 
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key2", "value2");
+        
+        new OctopusProperties(supportedProperties, props);
+    }
 
     @Test
-    public void testOctopusProperties_fromMultipleProperties_noOverlap() {
-        Properties props = new Properties();
-        props.setProperty("key", "value");
-        Properties props2 = new Properties();
-        props2.setProperty("key2", "value2");
-
-        OctopusProperties octprop = new OctopusProperties(props, props2);
-
+    public void testOctopusProperties_fromDefaultsAndProperties_withOverlap() throws Exception {
+        OctopusPropertyDescription [] supportedProperties = new OctopusPropertyDescription [] { 
+                new OctopusPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Level.OCTOPUS), 
+                        "value", "test property"), 
+                new OctopusPropertyDescriptionImplementation("key2", Type.STRING, EnumSet.of(Level.OCTOPUS), 
+                        "value", "test property"), 
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key2", "value2");
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props);
+        
         assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, key2=value2}]");
     }
 
     @Test
-    public void testOctopusProperties_fromMultipleProperties_withOverlap() {
-        Properties props = new Properties();
-        props.setProperty("key", "value");
-        Properties props2 = new Properties();
-        props2.setProperty("key", "value2");
-
-        OctopusProperties octprop = new OctopusProperties(props, props2);
-
-        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value2}]");
-    }
-
-    @Test
-    public void testOctopusProperties_fromDefaultsAndProperties_noOverlap() {
-        String[][] defaults = new String[][] { { "key", "value" } };
-        Properties props = new Properties();
-        props.setProperty("key2", "value2");
-
-        OctopusProperties octprop = new OctopusProperties(defaults, props);
-
-        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, key2=value2}]");
-    }
-
-    @Test
-    public void testOctopusProperties_fromDefaultsAndProperties_withOverlap() {
-        String[][] defaults = new String[][] { { "key", "value" } };
-        Properties props = new Properties();
-        props.setProperty("key", "value2");
-
-        OctopusProperties octprop = new OctopusProperties(defaults, props);
-
-        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value2}]");
+    public void testOctopusProperties_fromDefaultsAndProperties_Filter() throws Exception {
+        OctopusPropertyDescription [] supportedProperties = new OctopusPropertyDescription [] { 
+                new OctopusPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Level.OCTOPUS), 
+                        "value", "test property"), 
+                new OctopusPropertyDescriptionImplementation("key2", Type.STRING, EnumSet.of(Level.SCHEDULER), 
+                        "value", "test property"), 
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key2", "value2");
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).filter(Level.OCTOPUS);
+        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value}]");
     }
 
     //    @Test
-    //    public void testLoadFromClassPath() {
+    //    public void testLoadFromClassPath() throws Exception {
     //        fail("Not yet implemented");
     //    }
     //
     //    @Test
-    //    public void testLoadFromFile() {
+    //    public void testLoadFromFile() throws Exception {
     //        fail("Not yet implemented");
     //    }
     //
     //    @Test
-    //    public void testLoadFromHomeFile() {
+    //    public void testLoadFromHomeFile() throws Exception {
     //        fail("Not yet implemented");
     //    }
 
     @Test
-    public void testGetBooleanProperty_1_True() {
-        Properties props = new Properties();
-        props.setProperty("key", "1");
-        OctopusProperties octprop = new OctopusProperties(props);
+    public void testGetBooleanProperty_true() throws Exception {
+        
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Level.OCTOPUS), "true", "test property")
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "true");
+        OctopusProperties octprop = new OctopusProperties(valid, props);
 
         assertTrue(octprop.getBooleanProperty("key"));
     }
 
     @Test
-    public void testGetBooleanProperty_on_True() {
-        Properties props = new Properties();
-        props.setProperty("key", "on");
-        OctopusProperties octprop = new OctopusProperties(props);
-
-        assertTrue(octprop.getBooleanProperty("key"));
-    }
-
-    @Test
-    public void testGetBooleanProperty_true_True() {
-        Properties props = new Properties();
-        props.setProperty("key", "true");
-        OctopusProperties octprop = new OctopusProperties(props);
-
-        assertTrue(octprop.getBooleanProperty("key"));
-    }
-
-    @Test
-    public void testGetBooleanProperty_True_True() {
-        Properties props = new Properties();
-        props.setProperty("key", "True");
-        OctopusProperties octprop = new OctopusProperties(props);
-
-        assertTrue(octprop.getBooleanProperty("key"));
-    }
-
-    @Test
-    public void testGetBooleanProperty_yes_True() {
-        Properties props = new Properties();
-        props.setProperty("key", "yes");
-        OctopusProperties octprop = new OctopusProperties(props);
-
-        assertTrue(octprop.getBooleanProperty("key"));
-    }
-
-    @Test
-    public void testGetBooleanProperty_emptyString_False() {
-        Properties props = new Properties();
-        props.setProperty("key", "");
-        OctopusProperties octprop = new OctopusProperties(props);
+    public void testGetBooleanProperty_false() throws Exception {
+        
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Level.OCTOPUS), "true", "test property")
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "false");
+        OctopusProperties octprop = new OctopusProperties(valid, props);
 
         assertFalse(octprop.getBooleanProperty("key"));
     }
 
     @Test
-    public void testGetBooleanProperty_false_False() {
-        Properties props = new Properties();
-        props.setProperty("key", "false");
-        OctopusProperties octprop = new OctopusProperties(props);
+    public void testGetBooleanProperty_default() throws Exception {
+        
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Level.OCTOPUS), "true", "test property")
+        };
+        
+        
+        Map<String,String> props = new HashMap<>();
+        OctopusProperties octprop = new OctopusProperties(valid, props);
 
-        assertFalse(octprop.getBooleanProperty("key"));
+        assertTrue(octprop.getBooleanProperty("key"));
+    }
+
+    @Test(expected = InvalidPropertyException.class) 
+    public void testGetBooleanProperty_emptyString_False() throws Exception {
+
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Level.OCTOPUS), "true", "test property")
+        };
+
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "bla");
+        new OctopusProperties(valid, props);
+    }
+
+
+    
+    
+    @Test
+    public void testGetIntProperty_1() throws Exception {
+        
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.OCTOPUS), "42", "test property")
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "1");
+        OctopusProperties octprop = new OctopusProperties(valid, props);
+
+        assertTrue(octprop.getIntegerProperty("key") == 1);
     }
 
     @Test
-    public void testGetBooleanProperty_unset() {
-        OctopusProperties octprop = new OctopusProperties();
-        boolean v = octprop.getBooleanProperty("key");
-        assertFalse(v);
+    public void testGetIntProperty_default() throws Exception {
+        
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.OCTOPUS), "42", "test property")
+        };
+        
+        Map<String,String> props = new HashMap<>();
+        OctopusProperties octprop = new OctopusProperties(valid, props);
+
+        assertTrue(octprop.getIntegerProperty("key") == 42);
+    }
+    
+/*
+ * FIXME!!!
+ * 
+    @Test(expected = InvalidPropertyException.class) 
+    public void testGetIntegerProperty_emptyString_False() throws Exception {
+
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.OCTOPUS), "42", "test property")
+        };
+
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "bla");
+        new OctopusProperties(valid, props);
     }
 
-    @Test
-    public void testGetBooleanProperty_unset2() {
-        OctopusProperties octprop = new OctopusProperties();
-        boolean v = octprop.getBooleanProperty("key", true);
-        assertTrue(v);
+    @Test(expected = PropertyTypeException.class) 
+    public void testGetIntegerProperty_emptyString_False() throws Exception {
+
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.OCTOPUS), "42", "test property")
+        };
+
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "bla");
+        new OctopusProperties(valid, props);
     }
 
+    
+    
+    
+    
+    
+    
+    
     @Test
-    public void testGetIntProperty_int_int() {
-        Properties props = new Properties();
-        props.setProperty("key", "42");
+    public void testGetIntProperty_int_int() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "42");
         OctopusProperties octprop = new OctopusProperties(props);
 
         int result = octprop.getIntProperty("key");
@@ -203,8 +248,8 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetIntProperty_null_UndefinedException() {
-        Properties props = new Properties();
+    public void testGetIntProperty_null_UndefinedException() throws Exception {
+        Map<String,String> props = new HashMap<>();
         OctopusProperties octprop = new OctopusProperties(props);
 
         try {
@@ -216,25 +261,25 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetIntProperty_null_IntParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetIntProperty_null_IntParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getIntProperty("key");
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetIntProperty_null_IntParseException2() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetIntProperty_null_IntParseException2() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getIntProperty("key", 42);
     }
 
     @Test
-    public void testGetIntProperty_withDefault2() {
-        Properties props = new Properties();
-        props.setProperty("key", "33");
+    public void testGetIntProperty_withDefault2() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "33");
         OctopusProperties octprop = new OctopusProperties(props);
 
         int result = octprop.getIntProperty("key", 42);
@@ -243,7 +288,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetIntProperty_withDefault() {
+    public void testGetIntProperty_withDefault() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
 
         int result = octprop.getIntProperty("key", 42);
@@ -252,9 +297,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetIntProperty_SetAndDefault_returnsSet() {
-        Properties props = new Properties();
-        props.setProperty("key", "13");
+    public void testGetIntProperty_SetAndDefault_returnsSet() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "13");
         OctopusProperties octprop = new OctopusProperties(props);
 
         int result = octprop.getIntProperty("key", 42);
@@ -263,9 +308,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetLongProperty_long_long() {
-        Properties props = new Properties();
-        props.setProperty("key", "42");
+    public void testGetLongProperty_long_long() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "42");
         OctopusProperties octprop = new OctopusProperties(props);
 
         long result = octprop.getLongProperty("key");
@@ -274,8 +319,8 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetLongProperty_null_UndefinedException() {
-        Properties props = new Properties();
+    public void testGetLongProperty_null_UndefinedException() throws Exception {
+        Map<String,String> props = new HashMap<>();
         OctopusProperties octprop = new OctopusProperties(props);
 
         try {
@@ -287,23 +332,23 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetLongProperty_null_LongParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetLongProperty_null_LongParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getLongProperty("key");
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetLongProperty_null_LongParseException2() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetLongProperty_null_LongParseException2() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getLongProperty("key", 42L);
     }
 
     @Test
-    public void testGetLongProperty_withDefault() {
+    public void testGetLongProperty_withDefault() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
 
         long result = octprop.getLongProperty("key", 42);
@@ -312,9 +357,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetLongProperty_SetAndDefault_returnsSet() {
-        Properties props = new Properties();
-        props.setProperty("key", "13");
+    public void testGetLongProperty_SetAndDefault_returnsSet() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "13");
         OctopusProperties octprop = new OctopusProperties(props);
 
         long result = octprop.getLongProperty("key", 42);
@@ -323,9 +368,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetShortProperty_short_short() {
-        Properties props = new Properties();
-        props.setProperty("key", "42");
+    public void testGetShortProperty_short_short() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "42");
         OctopusProperties octprop = new OctopusProperties(props);
 
         short result = octprop.getShortProperty("key");
@@ -335,8 +380,8 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetShortProperty_null_UndefinedException() {
-        Properties props = new Properties();
+    public void testGetShortProperty_null_UndefinedException() throws Exception {
+        Map<String,String> props = new HashMap<>();
         OctopusProperties octprop = new OctopusProperties(props);
 
         try {
@@ -348,23 +393,23 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetShortProperty_null_ShortParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetShortProperty_null_ShortParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getShortProperty("key");
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetShortProperty_null_ShortParseException2() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetShortProperty_null_ShortParseException2() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getShortProperty("key", (short) 42);
     }
 
     @Test
-    public void testGetShortProperty_withDefault() {
+    public void testGetShortProperty_withDefault() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         short default_value = 42;
 
@@ -374,9 +419,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetShortProperty_SetAndDefault_returnsSet() {
-        Properties props = new Properties();
-        props.setProperty("key", "13");
+    public void testGetShortProperty_SetAndDefault_returnsSet() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "13");
         OctopusProperties octprop = new OctopusProperties(props);
 
         short default_value = 42;
@@ -386,9 +431,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetDoubleProperty_double_double() {
-        Properties props = new Properties();
-        props.setProperty("key", "42.123");
+    public void testGetDoubleProperty_double_double() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "42.123");
         OctopusProperties octprop = new OctopusProperties(props);
 
         double result = octprop.getDoubleProperty("key");
@@ -397,8 +442,8 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetDoubleProperty_null_UndefinedException() {
-        Properties props = new Properties();
+    public void testGetDoubleProperty_null_UndefinedException() throws Exception {
+        Map<String,String> props = new HashMap<>();
         OctopusProperties octprop = new OctopusProperties(props);
 
         try {
@@ -410,15 +455,15 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetDoubleProperty_null_DoubleParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetDoubleProperty_null_DoubleParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getDoubleProperty("key");
     }
 
     @Test
-    public void testGetDoubleProperty_withDefault() {
+    public void testGetDoubleProperty_withDefault() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         double default_value = 42.123;
 
@@ -428,17 +473,17 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetDoubleProperty_withDefault_DoubleParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetDoubleProperty_withDefault_DoubleParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         OctopusProperties octprop = new OctopusProperties(props);
         octprop.getDoubleProperty("key", 42.0);
     }
 
     @Test
-    public void testGetDoubleProperty_SetAndDefault_returnsSet() {
-        Properties props = new Properties();
-        props.setProperty("key", "13.456");
+    public void testGetDoubleProperty_SetAndDefault_returnsSet() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "13.456");
         OctopusProperties octprop = new OctopusProperties(props);
 
         double default_value = 42.123;
@@ -448,9 +493,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetFloatProperty_float_float() {
-        Properties props = new Properties();
-        props.setProperty("key", "42.123f");
+    public void testGetFloatProperty_float_float() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "42.123f");
         OctopusProperties octprop = new OctopusProperties(props);
 
         float result = octprop.getFloatProperty("key");
@@ -459,21 +504,21 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetFloatProperty_null_UndefinedException() {
-        Properties props = new Properties();
+    public void testGetFloatProperty_null_UndefinedException() throws Exception {
+        Map<String,String> props = new HashMap<>();
         new OctopusProperties(props).getFloatProperty("key");
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetFloatProperty_null_FloatParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetFloatProperty_null_FloatParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         new OctopusProperties(props).getFloatProperty("key");
 
     }
 
     @Test
-    public void testGetFloatProperty_withDefault() {
+    public void testGetFloatProperty_withDefault() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         float default_value = 42.123f;
 
@@ -483,16 +528,16 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetFloatProperty_withDefault_FloatParseException() {
-        Properties props = new Properties();
-        props.setProperty("key", "foo");
+    public void testGetFloatProperty_withDefault_FloatParseException() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "foo");
         new OctopusProperties(props).getFloatProperty("key", 42.0f);
     }
 
     @Test
-    public void testGetFloatProperty_SetAndDefault_returnsSet() {
-        Properties props = new Properties();
-        props.setProperty("key", "13.456f");
+    public void testGetFloatProperty_SetAndDefault_returnsSet() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "13.456f");
         OctopusProperties octprop = new OctopusProperties(props);
 
         float default_value = 42.123f;
@@ -502,13 +547,13 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetSizeProperty() {
+    public void testGetSizeProperty() throws Exception {
 
-        Properties props = new Properties();
-        props.setProperty("B", "100");
-        props.setProperty("K", "100K");
-        props.setProperty("M", "100M");
-        props.setProperty("G", "100G");
+        Map<String,String> props = new HashMap<>();
+        props.put("B", "100");
+        props.put("K", "100K");
+        props.put("M", "100M");
+        props.put("G", "100G");
 
         OctopusProperties octprop = new OctopusProperties(props);
 
@@ -530,13 +575,13 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetSizeProperty1() {
+    public void testGetSizeProperty1() throws Exception {
 
-        Properties props = new Properties();
-        props.setProperty("B", "100");
-        props.setProperty("K", "100k");
-        props.setProperty("M", "100m");
-        props.setProperty("G", "100g");
+        Map<String,String> props = new HashMap<>();
+        props.put("B", "100");
+        props.put("K", "100k");
+        props.put("M", "100m");
+        props.put("G", "100g");
 
         OctopusProperties octprop = new OctopusProperties(props);
 
@@ -558,10 +603,10 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetSizeProperty2() {
+    public void testGetSizeProperty2() throws Exception {
 
-        Properties props = new Properties();
-        props.setProperty("K", "100Q");
+        Map<String,String> props = new HashMap<>();
+        props.put("K", "100Q");
 
         OctopusProperties octprop = new OctopusProperties(props);
 
@@ -569,19 +614,19 @@ public class OctopusPropertiesTest {
     }
 
     @Test(expected = NumberFormatException.class)
-    public void testGetSizeProperty3() {
+    public void testGetSizeProperty3() throws Exception {
 
-        Properties props = new Properties();
+        Map<String,String> props = new HashMap<>();
         OctopusProperties octprop = new OctopusProperties(props);
 
         octprop.getSizeProperty("K");
     }
 
     @Test
-    public void testGetSizePropertyStringLong() {
+    public void testGetSizePropertyStringLong() throws Exception {
 
-        Properties props = new Properties();
-        props.setProperty("B", "100");
+        Map<String,String> props = new HashMap<>();
+        props.put("B", "100");
 
         OctopusProperties octprop = new OctopusProperties(props);
 
@@ -595,7 +640,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetStringList_emptyValue_emptyList() {
+    public void testGetStringList_emptyValue_emptyList() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
 
         String[] result = octprop.getStringList("key");
@@ -604,7 +649,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetStringList_emptyValue_Defaults() {
+    public void testGetStringList_emptyValue_Defaults() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         String[] defaults = new String[] { "value1", "value2", "value3" };
         String[] result = octprop.getStringList("key", ", ", defaults);
@@ -614,9 +659,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetString_withDefaultDelimiter() {
-        Properties props = new Properties();
-        props.setProperty("key", "value1, value2, value3");
+    public void testGetString_withDefaultDelimiter() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "value1, value2, value3");
         OctopusProperties octprop = new OctopusProperties(props);
 
         String[] result = octprop.getStringList("key");
@@ -626,9 +671,9 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testGetString_withDelimiter() {
-        Properties props = new Properties();
-        props.setProperty("key", "value1, value2, value3");
+    public void testGetString_withDelimiter() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "value1, value2, value3");
         OctopusProperties octprop = new OctopusProperties(props);
 
         String[] result = octprop.getStringList("key", ", ");
@@ -638,7 +683,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testFilter_filledWithKeyAndItem_returnsKey() {
+    public void testFilter_filledWithKeyAndItem_returnsKey() throws Exception {
         OctopusProperties octprop = getSample();
 
         OctopusProperties noctprop = octprop.filter("k");
@@ -647,14 +692,14 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testFilter_null() {
+    public void testFilter_null() throws Exception {
         OctopusProperties octprop = getSample();
         OctopusProperties noctprop = octprop.filter(null);
         assertEquals(noctprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
     }
 
     @Test
-    public void testFilter_emptyPrefix_returnsSame() {
+    public void testFilter_emptyPrefix_returnsSame() throws Exception {
         OctopusProperties octprop = getSample();
 
         OctopusProperties noctprop = octprop.filter("");
@@ -663,11 +708,11 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testPrintProperties() {
+    public void testPrintProperties() throws Exception {
 
-        Properties props = new Properties();
-        props.setProperty("key", "value");
-        props.setProperty("item", "value2");
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "value");
+        props.put("item", "value2");
         OctopusProperties octprop = new OctopusProperties(props);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -700,22 +745,22 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testToString() {
+    public void testToString() throws Exception {
         OctopusProperties octprop = getSample();
 
         assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
     }
 
-    public OctopusProperties getSample() {
-        Properties props = new Properties();
-        props.setProperty("key", "value");
-        props.setProperty("item", "value2");
+    public OctopusProperties getSample() throws Exception {
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "value");
+        props.put("item", "value2");
         OctopusProperties octprop = new OctopusProperties(props);
         return octprop;
     }
 
     @Test
-    public void testGetPropertyNames() {
+    public void testGetPropertyNames() throws Exception {
         OctopusProperties octprop = getSample();
         String[] names = octprop.getPropertyNames();
         String[] expected_names = new String[] { "item", "key" };
@@ -723,7 +768,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testEqualsObject() {
+    public void testEqualsObject() throws Exception {
 
         OctopusProperties octprop1 = getSample();
 
@@ -737,8 +782,8 @@ public class OctopusPropertiesTest {
 
         assertTrue(b);
 
-        Properties props = new Properties();
-        props.setProperty("key", "value");
+        Map<String,String> props = new HashMap<>();
+        props.put("key", "value");
 
         OctopusProperties octprop3 = new OctopusProperties(props);
         b = octprop1.equals(octprop3);
@@ -747,7 +792,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testSetProperty_Unsupported() {
+    public void testSetProperty_Unsupported() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         try {
             octprop.setProperty("key", "value");
@@ -757,7 +802,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testPutObject_Unsupported() {
+    public void testPutObject_Unsupported() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         try {
             octprop.put("key", "value");
@@ -767,7 +812,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testRemove_Unsupported() {
+    public void testRemove_Unsupported() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         try {
             octprop.remove("key");
@@ -777,7 +822,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testPutAllMapOfQextendsObjectQextendsObject() {
+    public void testPutAllMapOfQextendsObjectQextendsObject() throws Exception {
 
         OctopusProperties octprop = new OctopusProperties();
 
@@ -792,7 +837,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testLoad_Reader_Unsupported() throws IOException {
+    public void testLoad_Reader_Unsupported() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         try {
             octprop.load(mock(Reader.class));
@@ -802,7 +847,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testLoad_InputStream_Unsupported() throws IOException {
+    public void testLoad_InputStream_Unsupported() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         try {
             octprop.load(mock(InputStream.class));
@@ -812,7 +857,7 @@ public class OctopusPropertiesTest {
     }
 
     @Test
-    public void testLoadFromXML_Unsupported() throws InvalidPropertiesFormatException, IOException {
+    public void testLoadFromXML_Unsupported() throws Exception {
         OctopusProperties octprop = new OctopusProperties();
         try {
             octprop.loadFromXML(mock(InputStream.class));
@@ -820,4 +865,7 @@ public class OctopusPropertiesTest {
             assertTrue(e.getMessage().equals("setting properties unsupported in ImmutableTypedProperties"));
         }
     }
+
+*
+*/
 }

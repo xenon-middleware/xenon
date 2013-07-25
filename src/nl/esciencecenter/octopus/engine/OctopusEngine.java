@@ -17,7 +17,9 @@ package nl.esciencecenter.octopus.engine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
@@ -63,8 +65,8 @@ public class OctopusEngine implements Octopus {
     public static final String LOAD = ADAPTORS + "load";
 
     /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-    private static final String[][] VALID_PROPERTIES = new String[][] { { LOAD, null,
-            "List: comma separated list of the adaptors to load." } };
+//    private static final String[][] VALID_PROPERTIES = new String[][] { { LOAD, null,
+//            "List: comma separated list of the adaptors to load." } };
 
     private static final Logger logger = LoggerFactory.getLogger(OctopusEngine.class);
 
@@ -85,7 +87,7 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public static synchronized Octopus newOctopus(Properties properties) throws OctopusException {
+    public static synchronized Octopus newOctopus(Map<String,String> properties) throws OctopusException {
         OctopusEngine result = new OctopusEngine(properties);
         octopusEngines.add(result);
         return result;
@@ -123,7 +125,7 @@ public class OctopusEngine implements Octopus {
 
     private boolean ended = false;
 
-    private OctopusProperties octopusProperties;
+    private final Map<String,String> properties;
 
     private final FilesEngine filesEngine;
 
@@ -134,7 +136,7 @@ public class OctopusEngine implements Octopus {
     private final Adaptor[] adaptors;
 
     private final CopyEngine copyEngine;
-
+    
     /**
      * Constructs a OctopusEngine.
      * 
@@ -148,13 +150,16 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public OctopusEngine(Properties properties) throws OctopusException {
-
-        octopusProperties = new OctopusProperties(VALID_PROPERTIES, properties);
-
-        // adaptors = AdaptorLoader.loadAdaptors(octopusProperties, this);
-
-        adaptors = loadAdaptors();
+    public OctopusEngine(Map<String,String> properties) throws OctopusException {
+        
+        // Store the properties for later reference.
+        if (properties == null) { 
+            this.properties = Collections.unmodifiableMap(new HashMap<String, String>());
+        } else { 
+            this.properties = Collections.unmodifiableMap(new HashMap<String, String>(properties));
+        }
+        
+        adaptors = loadAdaptors(this.properties);
 
         filesEngine = new FilesEngine(this);
 
@@ -167,23 +172,43 @@ public class OctopusEngine implements Octopus {
         logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
-    private Adaptor[] loadAdaptors() throws OctopusException {
+    private Adaptor[] loadAdaptors(Map<String,String> properties) throws OctopusException {
 
+        // Copy the map so we can manipulate it. 
+        HashMap<String,String> tmp = new HashMap<>(properties);
+        
         Adaptor[] result = new Adaptor[4];
 
-        result[0] = new LocalAdaptor(octopusProperties, this);
-        result[1] = new SshAdaptor(octopusProperties, this);
-        result[2] = new GridEngineAdaptor(octopusProperties, this);
-        result[3] = new SlurmAdaptor(octopusProperties, this);
+        result[0] = new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX));
+        result[1] = new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX));
+        result[2] = new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX));
+        result[3] = new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX));
 
-        // TODO: Add properties to extend list later.  
+        // Check if there are any properties left. If so, this is a problem. 
+        if (tmp.size() != 0) { 
+            throw new UnknownPropertyException("OctopusEngine", "Unknown properties: " + tmp);
+        }
+                
         return result;
     }
 
+    private Map<String,String> extract(Map<String,String> source, String prefix) { 
+
+        HashMap<String,String> tmp = new HashMap<>();
+        
+        for (String key : source.keySet()) { 
+            if (key.startsWith(prefix)) { 
+                tmp.put(key, source.remove(key));
+            }
+        }
+        
+        return tmp;
+    }
+    
     // ************** Octopus Interface Implementation ***************\\
 
     @Override
-    public AdaptorStatus[] getAdaptorInfos() {
+    public AdaptorStatus[] getAdaptorStatuses() {
 
         AdaptorStatus[] status = new AdaptorStatus[adaptors.length];
 
@@ -195,7 +220,7 @@ public class OctopusEngine implements Octopus {
     }
 
     @Override
-    public AdaptorStatus getAdaptorInfo(String adaptorName) throws OctopusException {
+    public AdaptorStatus getAdaptorStatus(String adaptorName) throws OctopusException {
         return getAdaptor(adaptorName).getAdaptorStatus();
     }
 
@@ -231,8 +256,8 @@ public class OctopusEngine implements Octopus {
     }
 
     @Override
-    public synchronized Properties getProperties() {
-        return octopusProperties;
+    public synchronized Map<String,String> getProperties() {
+        return properties;
     }
 
     @Override
@@ -277,7 +302,7 @@ public class OctopusEngine implements Octopus {
 
     @Override
     public String toString() {
-        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " octopusProperties=" + octopusProperties + ",  + ended="
+        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended="
                 + ended + "]";
     }
 }

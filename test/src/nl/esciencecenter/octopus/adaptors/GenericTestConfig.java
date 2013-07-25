@@ -17,6 +17,7 @@
 package nl.esciencecenter.octopus.adaptors;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -90,17 +91,17 @@ public abstract class GenericTestConfig {
         return false;
     }
 
-    public abstract Properties getDefaultProperties() throws Exception;
+    public abstract Map<String,String> getDefaultProperties() throws Exception;
 
-    public Properties getUnknownProperties() throws Exception {
+    public Map<String,String> getUnknownProperties() throws Exception {
         throw new Exception("Adaptor " + adaptorName + " does not support unknown properties!");
     }
 
-    public Properties[] getInvalidProperties() throws Exception {
+    public Map<String,String>[] getInvalidProperties() throws Exception {
         throw new Exception("Adaptor " + adaptorName + " does not support invalid properties!");
     }
 
-    public Properties getCorrectProperties() throws Exception {
+    public Map<String,String> getCorrectProperties() throws Exception {
         throw new Exception("Adaptor " + adaptorName + " does not support properties!");
     }
 }

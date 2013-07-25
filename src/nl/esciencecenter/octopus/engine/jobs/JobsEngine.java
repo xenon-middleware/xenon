@@ -17,7 +17,7 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
 import java.util.HashSet;
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.Adaptor;
@@ -44,7 +44,7 @@ public class JobsEngine implements Jobs {
         return octopusEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
-    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
 
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());

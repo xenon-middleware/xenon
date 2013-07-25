@@ -19,10 +19,17 @@ package nl.esciencecenter.octopus.engine.files;
 import static org.junit.Assert.*;
 
 import java.net.URI;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
@@ -80,7 +87,7 @@ public class FileSystemImplementationTest {
         Credential c = new Credential() {
 
             @Override
-            public Properties getProperties() {
+            public Map<String,String> getProperties() {
                 return null;
             }
 
@@ -110,15 +117,19 @@ public class FileSystemImplementationTest {
     @org.junit.Test
     public void test_properties_ok() throws Exception {
 
-        Properties tmp = new Properties();
+        Map<String,String> tmp = new HashMap<>();
         tmp.put("test", "test");
 
-        OctopusProperties p = new OctopusProperties(tmp);
+        OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
+             new OctopusPropertyDescriptionImplementation("test", Type.STRING, EnumSet.of(Level.OCTOPUS), "test", "test property")
+        };
+        
+        OctopusProperties p = new OctopusProperties(valid, tmp);
 
         FileSystemImplementation fi =
                 new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new RelativePath("aap"), null, p);
 
-        OctopusProperties p2 = fi.getProperties();
+        Map<String,String> p2 = fi.getProperties();
 
         if (p != p2) {
             assert ("test".equals((String) p2.get("test")));

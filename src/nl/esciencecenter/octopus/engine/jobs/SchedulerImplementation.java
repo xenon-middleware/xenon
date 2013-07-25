@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -51,11 +52,16 @@ public class SchedulerImplementation implements Scheduler {
         this.uniqueID = uniqueID;
         this.uri = uri;
         this.queueNames = queueNames;
-        this.properties = properties;
         this.credential = credential;
         this.isOnline = isOnline;
         this.supportsInteractive = supportsInteractive;
         this.supportsBatch = supportsBatch;
+        
+        if (properties == null) { 
+            this.properties = new OctopusProperties();
+        } else { 
+            this.properties = properties;
+        }        
     }
 
     public Credential getCredential() {
@@ -72,8 +78,8 @@ public class SchedulerImplementation implements Scheduler {
     }
 
     @Override
-    public OctopusProperties getProperties() {
-        return properties;
+    public Map<String,String> getProperties() {
+        return properties.toMap();
     }
 
     @Override

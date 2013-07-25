@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus.engine.credentials;
 
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
@@ -31,21 +31,21 @@ public class CredentialsEngineImplementation implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
             String username, char[] password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, properties, keyfile, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, Map<String,String> properties, String username, char[] password)
             throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, properties, username, password);
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
+    public Credential newProxyCredential(String scheme, Map<String,String> properties, String host, int port, String username,
             char[] password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newProxyCredential(scheme, properties, host, port, username, password);

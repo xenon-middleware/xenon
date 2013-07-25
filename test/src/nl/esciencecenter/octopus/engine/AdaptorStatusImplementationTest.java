@@ -18,6 +18,8 @@ package nl.esciencecenter.octopus.engine;
 
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
+
 import org.junit.Test;
 
 /**
@@ -47,13 +49,13 @@ public class AdaptorStatusImplementationTest {
         assert (schemes[0].equals("SCHEME1"));
         assert (schemes[1].equals("SCHEME2"));
 
-        Map<String, String> props = a.getSupportedProperties();
+        OctopusPropertyDescription [] props = a.getSupportedProperties();
 
         assert (props == null);
 
-        props = a.getAdaptorSpecificInformation();
+        Map<String, String> info = a.getAdaptorSpecificInformation();
 
-        assert (props == null);
+        assert (info == null);
     }
 
     @Test

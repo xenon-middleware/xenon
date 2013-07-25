@@ -15,440 +15,347 @@
  */
 package nl.esciencecenter.octopus.engine;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.InvalidPropertiesFormatException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
+
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
+import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
+import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
  */
-public class OctopusProperties extends Properties {
+public class OctopusProperties {
 
-    private static final long serialVersionUID = 1L;
+    /** Contains a description of all properties this OctopusProperties should accept, including their type, default, etc. */
+    private final HashMap<String, OctopusPropertyDescription> supportedProperties;
+       
+    /** The properties that are actually set. */
+    private final HashMap<String, String> properties;
+    
+    /** 
+     * Private constructor for OctopusProperties using in copying and filtering. The <code>properties</code> parameter is assumed
+     * to only contain valid supported properties and have values of the correct type.   
+     * 
+     * @param supportedProperties a map containing a description of all supported properties. 
+     * @param properties a map containing valid properties and their values. 
+     */    
+    private OctopusProperties(HashMap<String, OctopusPropertyDescription> supportedProperties, HashMap<String,String> properties) { 
+        this.supportedProperties = supportedProperties;
+        this.properties = properties;
+    } 
 
-    /** Constructs a properties object. */
-    public OctopusProperties(Properties... content) {
-        super();
-        for (Properties properties : content) {
-            addProperties(properties);
-        }
+    /** 
+     * Creates an empty OctopusProperties.
+     */
+    public OctopusProperties() {
+        supportedProperties = new HashMap<>();
+        properties = new HashMap<>();
     }
-
-    /** Constructs a properties object. */
-    public OctopusProperties(String[][] defaults, Properties... content) {
+    
+    public OctopusProperties(OctopusPropertyDescription [] supportedProperties, Map<String,String> properties) 
+            throws UnknownPropertyException, InvalidPropertyException {
+        
         super();
-
-        for (String[] element : defaults) {
-
-            if (element[1] != null) {
-                //    System.out.println("Adding property: " + element[0]  + " " + element[1]);
-                super.put(element[0], element[1]);
-            }
+        
+        this.supportedProperties = new HashMap<>();
+        this.properties = new HashMap<>();
+        
+        for (OctopusPropertyDescription d : supportedProperties) {
+            this.supportedProperties.put(d.getName(), d);
         }
-
-        for (Properties properties : content) {
-            addProperties(properties);
-        }
+        
+        addProperties(properties);
     }
-
+    
+    
     /**
-     * Adds the specified properties to the current ones.
+     * Adds the specified properties to the current ones and checks if their names and types are correct.
      * 
      * @param properties
      *            the properties to add.
+     * @throws UnknownPropertyException 
+     * @throws InvalidPropertyException 
      */
-    private void addProperties(Properties properties) {
+    private void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
+        
         if (properties == null) {
             return;
         }
 
-        for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-            String value = properties.getProperty(key);
+        for (Entry<String,String> e : properties.entrySet()) { 
+            
+            String key = e.getKey();
 
-            // System.out.println("** Adding property: " + key  + " " + value);
+            OctopusPropertyDescription d = supportedProperties.get(key);
+            
+            if (d == null) { 
+                throw new UnknownPropertyException("OctopusProperties", "Unknown property " + key); 
+            }
 
-            super.put(key, value);
+            String value = e.getValue();
+            
+            checkType(d, key, value);
+            
+            properties.put(key, value);
+        }
+    }
+    
+    private void checkType(OctopusPropertyDescription description, String key, String value) throws InvalidPropertyException { 
+        
+        Type t = description.getType();
+        
+        try { 
+            switch (t) { 
+            case BOOLEAN:
+                Boolean.valueOf(value);
+                break;            
+            case INTEGER:
+                Integer.valueOf(value);
+                break;            
+            case DOUBLE:
+                Double.valueOf(value);
+                break;
+            case LONG:
+                Long.valueOf(value);
+                break;
+            case STRING:
+                break;
+            }
+        } catch (Exception e) { 
+            throw new InvalidPropertyException("OctopusProperties", "Property " + key + " has invalid value: " + value + 
+                    " (expected " + t + ")", e);            
+        }        
+    }
+    
+    /**
+     * Check if this OctopusProperties supports a property with the given name.
+     *   
+     * @param name the name of the property.
+     * @return <code>true</code> if this OctopusProperties supports a property with the given name, <code>false</code> otherwise.
+     */
+    public boolean supportsProperty(String name) {
+        return supportedProperties.containsKey(name);
+    }
+
+    /**
+     * Check if the property with the given name is set. 
+     *   
+     * @param name the name of the property.
+     * @return <code>true</code> if the property with the given name is set, <code>false</code> otherwise.
+     * @throws UnknownPropertyException if the given name is not a supported property.  
+     */
+    public boolean propertySet(String name) throws UnknownPropertyException { 
+        
+        if (!supportedProperties.containsKey(name)) { 
+            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+        }
+        
+        return properties.containsKey(name);
+    }
+    
+    /** 
+     * Retrieves the value of a property with the given name without checking its type. 
+     * 
+     * If the property is not set, its default value will be returned. That the type of the value is not checked. Instead its 
+     * <code>String</code> representation is always returned.
+     * 
+     * @param name the name of the property.
+     * @return the value of the property with the given name or its default value if it is not set. 
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     */
+    public String getProperty(String name) throws UnknownPropertyException {
+
+        OctopusPropertyDescription d = supportedProperties.get(name);
+        
+        if (d == null) {
+            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+        }
+        
+        String value = d.getDefaultValue();
+        
+        if (properties.containsKey(name)) { 
+            value = properties.get(name);
+        }
+        
+        return value;
+    }
+    
+    private String getProperty(String name, Type type) throws UnknownPropertyException, PropertyTypeException { 
+
+        OctopusPropertyDescription d = supportedProperties.get(name);
+        
+        if (d == null) {
+            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+        }
+        
+        if (d.getType() != type) { 
+            throw new PropertyTypeException("OctopusProperties", "Property " + name + " is of type " + d.getType() + 
+                    " not " + type);
+        }
+        
+        String value = d.getDefaultValue();
+        
+        if (properties.containsKey(name)) { 
+            value = properties.get(name);
+        }
+
+        return value;        
+    }
+    
+    
+    /**
+     * Retrieves the value of a boolean property with the given name.
+     * 
+     * @return the value of a boolean property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type boolean.
+     * @throws InvalidPropertyException if the property value cannot be converted into a boolean. 
+     */
+    public boolean getBooleanProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
+        
+        String value = getProperty(name, Type.BOOLEAN);
+
+        try { 
+            return Boolean.parseBoolean(value);
+        } catch (Exception e) { 
+            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+                    " (expected BOOLEAN)", e); 
         }
     }
 
     /**
-     * Loads properties from a properties file on the classpath.
+     * Retrieves the value of an integer property with the given name.
      * 
-     * @param resourceName
-     *            the name of the resource to load properties from.
+     * @return the value of an integer property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type integer.
+     * @throws InvalidPropertyException if the property value cannot be converted into a integer. 
      */
-    //    public static Properties loadFromClassPath(String resourceName) throws OctopusException {
-    //        Properties result = new Properties();
-    //
-    //        ClassLoader classLoader = result.getClass().getClassLoader();
-    //        try (InputStream inputStream = classLoader.getResourceAsStream(resourceName)) {
-    //            if (inputStream == null) {
-    //                throw new OctopusException("cannot find resource " + resourceName, null, null);
-    //            }
-    //
-    //            result.load(inputStream);
-    //        } catch (IOException e) {
-    //            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
-    //        }
-    //
-    //        return new Properties(result);
-    //    }
-    //
-    /**
-     * Loads ImmutableTypedProperties from a file.
-     * 
-     * @param fileName
-     *            name of file to load from.
-     */
-    //    public static Properties loadFromFile(String fileName) throws OctopusException {
-    //        Properties result = new Properties();
-    //
-    //        try (FileInputStream inputStream = new FileInputStream(fileName)) {
-    //            result.load(inputStream);
-    //        } catch (IOException e) {
-    //            throw new OctopusException("OctopusProperties", "cannot load properties from stream", e);
-    //        }
-    //
-    //        return new Properties(result);
-    //    }
+    public int getIntegerProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
-    /**
-     * Tries to load properties from a file, which is located relative to the users home directory. Does not throw any exceptions
-     * if unsuccessful.
-     * 
-     * @param fileName
-     *            name of file to load from.
-     */
-    //    public static void loadFromHomeFile(String fileName) throws OctopusException {
-    //        loadFromFile(System.getProperty("user.home") + File.separator + fileName);
-    //    }
+        String value = getProperty(name, Type.INTEGER);
 
-    /**
-     * Returns true if property <code>name</code> is defined and has a value that is conventionally associated with 'true' (as in
-     * Ant): any of 1, on, true, yes, or nothing.
-     * 
-     * @return true if property is defined and set
-     * @param name
-     *            property name
-     */
-    public boolean getBooleanProperty(String name) {
-        return getBooleanProperty(name, false);
-    }
-
-    /**
-     * Returns true if property <code>name</code> has a value that is conventionally associated with 'true' (as in Ant): any of 1,
-     * on, true, yes, or nothing. If the property is not defined, return the specified default value.
-     * 
-     * @return true if property is defined and set
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            the value that is returned if the property is absent
-     */
-    public boolean getBooleanProperty(String key, boolean defaultValue) {
-        String value = getProperty(key);
-
-        if (value != null) {
-            return value.equals("1") || value.equalsIgnoreCase("on") || value.equalsIgnoreCase("true")
-                    || value.equalsIgnoreCase("yes");
-        }
-
-        return defaultValue;
-    }
-
-    /**
-     * Returns the integer value of property.
-     * 
-     * @return the integer value of property
-     * @param key
-     *            property name
-     * @throws NumberFormatException
-     *             if the property is undefined or not an integer
-     */
-    public int getIntProperty(String key) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            throw new NumberFormatException("property undefined: " + key);
-        }
-
-        try {
+        try { 
             return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Integer expected for property " + key + ", not \"" + value + "\"");
+        } catch (Exception e) { 
+            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+                    " (expected INTEGER)", e); 
         }
     }
 
     /**
-     * Returns the integer value of property.
+     * Retrieves the value of an integer property with the given name.
      * 
-     * @return the integer value of property
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            default value if the property is undefined
-     * @throws NumberFormatException
-     *             if the property defined and not an integer
+     * @return the value of an integer property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type integer.
+     * @throws InvalidPropertyException if the property value cannot be converted into a integer. 
      */
-    public int getIntProperty(String key, int defaultValue) {
+    public int getIntegerProperty(String name, int defaultValue) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
-        String value = getProperty(key);
+        String value = getProperty(name, Type.INTEGER);
 
-        if (value == null) {
+        if (value == null || value.length() == 0) { 
             return defaultValue;
         }
-
-        try {
+            
+        try { 
             return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Integer expected for property " + key + ", not \"" + value + "\"");
+        } catch (Exception e) { 
+            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+                    " (expected INTEGER)", e); 
         }
     }
-
+    
     /**
-     * Returns the long value of property.
+     * Retrieves the value of an long property with the given name.
      * 
-     * @return the long value of property
-     * @param key
-     *            property name
-     * @throws NumberFormatException
-     *             if the property is undefined or not an long
+     * @return the value of an long property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type long.
+     * @throws InvalidPropertyException if the property value cannot be converted into a long. 
      */
-    public long getLongProperty(String key) {
-        String value = getProperty(key);
+    public long getLongProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
+        
+        String value = getProperty(name, Type.LONG);
 
-        if (value == null) {
-            throw new NumberFormatException("property undefined: " + key);
-        }
-
-        try {
+        try { 
             return Long.parseLong(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Long expected for property " + key + ", not \"" + value + "\"");
+        } catch (Exception e) { 
+            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+                    " (expected LONG)", e); 
         }
     }
-
+    
     /**
-     * Returns the long value of property.
+     * Retrieves the value of an double property with the given name.
      * 
-     * @return the long value of property
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            default value if the property is undefined
-     * @throws NumberFormatException
-     *             if the property defined and not an Long
+     * @return the value of an double property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type double.
+     * @throws InvalidPropertyException if the property value cannot be converted into a double. 
      */
-    public long getLongProperty(String key, long defaultValue) {
-        String value = getProperty(key);
+    public double getDoubleProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
-        if (value == null) {
-            return defaultValue;
-        }
+        String value = getProperty(name, Type.DOUBLE);
 
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Long expected for property " + key + ", not \"" + value + "\"");
-        }
-    }
-
-    /**
-     * Returns the short value of property.
-     * 
-     * @return the short value of property
-     * @param key
-     *            property name
-     * @throws NumberFormatException
-     *             if the property is undefined or not an short
-     */
-    public short getShortProperty(String key) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            throw new NumberFormatException("property undefined: " + key);
-        }
-
-        try {
-            return Short.parseShort(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Short expected for property " + key + ", not \"" + value + "\"");
-        }
-    }
-
-    /**
-     * Returns the short value of property.
-     * 
-     * @return the short value of property
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            default value if the property is undefined
-     * @throws NumberFormatException
-     *             if the property defined and not an Short
-     */
-    public short getShortProperty(String key, short defaultValue) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        try {
-            return Short.parseShort(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Short expected for property " + key + ", not \"" + value + "\"");
-        }
-    }
-
-    /**
-     * Returns the double value of property.
-     * 
-     * @return the double value of property
-     * @param key
-     *            property name
-     * @throws NumberFormatException
-     *             if the property is undefined or not an double
-     */
-    public double getDoubleProperty(String key) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            throw new NumberFormatException("property undefined: " + key);
-        }
-
-        try {
+        try { 
             return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Double expected for property " + key + ", not \"" + value + "\"");
+        } catch (Exception e) { 
+            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+                    " (expected DOUBLE)", e); 
         }
     }
 
     /**
-     * Returns the double value of property.
+     * Retrieves the value of a string property with the given name.
      * 
-     * @return the double value of property
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            default value if the property is undefined
-     * @throws NumberFormatException
-     *             if the property defined and not an Double
+     * @return the value of an string property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type string.
      */
-    public double getDoubleProperty(String key, double defaultValue) {
-        String value = getProperty(key);
+    public String getStringProperty(String name) throws UnknownPropertyException, PropertyTypeException {
+        return getProperty(name, Type.STRING);
+    }
 
-        if (value == null) {
-            return defaultValue;
-        }
+    /**
+     * Retrieves the value of a size property with the given name.
+     * 
+     * Valid values for the property are a long or a long a long followed by either a K, M or G. These size modifiers multiply 
+     * the value by 1024, 1024^2 and 1024^3 respectively.
+     * 
+     * @return the value of an size property with the given name.
+     * @param name the name of the property
+     *            
+     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @throws PropertyTypeException if the property is not of type size.
+     * @throws InvalidPropertyException if the property value cannot be converted into a long. 
+     */
+    public long getSizeProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
+        
+        String value = getProperty(name, Type.SIZE);
 
         try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Double expected for property " + key + ", not \"" + value + "\"");
-        }
-    }
-
-    /**
-     * Returns the float value of property.
-     * 
-     * @return the float value of property
-     * @param key
-     *            property name
-     * @throws NumberFormatException
-     *             if the property is undefined or not an float
-     */
-    public float getFloatProperty(String key) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            throw new NumberFormatException("property undefined: " + key);
-        }
-
-        try {
-            return Float.parseFloat(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Float expected for property " + key + ", not \"" + value + "\"");
-        }
-    }
-
-    /**
-     * Returns the float value of property.
-     * 
-     * @return the float value of property
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            default value if the property is undefined
-     * @throws NumberFormatException
-     *             if the property defined and not an Float
-     */
-    public float getFloatProperty(String key, float defaultValue) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        try {
-            return Float.parseFloat(value);
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Float expected for property " + key + ", not \"" + value + "\"");
-        }
-    }
-
-    /**
-     * Returns the long value of a size property. Valid values for the property are a long, a long followed by K, a long followed
-     * by M or a long followed by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3 respectively.
-     * 
-     * @return the size value of property
-     * @param key
-     *            property name
-     * @throws NumberFormatException
-     *             if the property is undefined or not a valid size
-     */
-    public long getSizeProperty(String key) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            throw new NumberFormatException("property undefined: " + key);
-        }
-
-        return getSizeProperty(key, 0);
-    }
-
-    /**
-     * Returns the long value of a size property. Valid values for the property are a long, a long followed by K, a long followed
-     * by M or a long followed by G. Size modifiers multiply the value by 1024, 1024^2 and 1024^3 respectively. Returns the
-     * default value if the property is undefined.
-     * 
-     * @return the size value of property
-     * @param key
-     *            property name
-     * @param defaultValue
-     *            the default value
-     * @throws NumberFormatException
-     *             if the property is not a valid size
-     */
-    public long getSizeProperty(String key, long defaultValue) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        try {
-
             if (value.endsWith("G") || value.endsWith("g")) {
                 return Long.parseLong(value.substring(0, value.length() - 1)) * 1024 * 1024 * 1024;
             }
@@ -464,10 +371,11 @@ public class OctopusProperties extends Properties {
             return Long.parseLong(value);
 
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("Long[G|g|M|m|K|k] expected for property " + key + ", not \"" + value + "\"");
+            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+                    " (expected SIZE)", e); 
         }
     }
-
+    
     /**
      * Returns the split-up value of a string property. The value is supposed to be a comma-separated string, with each comma
      * preceded and followed by any amount of whitespace. See {@link java.lang.String#split(String)} for details of the splitting.
@@ -477,9 +385,9 @@ public class OctopusProperties extends Properties {
      *            the property name
      * @return the split-up property value.
      */
-    public String[] getStringList(String key) {
-        return getStringList(key, "\\s*,\\s*", new String[0]);
-    }
+//    public String[] getStringList(String key) {
+//        return getStringList(key, "\\s*,\\s*", new String[0]);
+//    }
 
     /**
      * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
@@ -492,9 +400,9 @@ public class OctopusProperties extends Properties {
      *            the delimiter
      * @return the split-up property value.
      */
-    public String[] getStringList(String key, String delim) {
-        return getStringList(key, delim, new String[0]);
-    }
+//    public String[] getStringList(String key, String delim) {
+//        return getStringList(key, delim, new String[0]);
+//    }
 
     /**
      * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
@@ -509,122 +417,92 @@ public class OctopusProperties extends Properties {
      *            the default value
      * @return the split-up property value.
      */
-    public String[] getStringList(String key, String delim, String[] defaultValue) {
-        String value = getProperty(key);
-
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return value.split(delim);
-    }
-
-    /**
-     * Returns true if the given element is a member of the given list.
-     * 
-     * @param list
-     *            the given list.
-     * @param element
-     *            the given element.
-     * @return true if the given element is a member of the given list.
-     */
-    //    private static boolean contains(String[] list, String element) {
-    //        if (list == null) {
-    //            return false;
-    //        }
-    //        for (int i = 0; i < list.length; i++) {
-    //            if (element.equalsIgnoreCase(list[i])) {
-    //                return true;
-    //            }
-    //        }
-    //        return false;
-    //    }
+//    public String[] getStringList(String key, String delim, String[] defaultValue) {
+//        String value = getProperty(key);
+//
+//        if (value == null) {
+//            return defaultValue;
+//        }
+//
+//        return value.split(delim);
+//    }
 
     /**
-     * Returns true if the given string starts with one of the given prefixes.
+     * Returns a new OctopusProperties that contains only the properties whose key start with a certain prefix.
      * 
-     * @param string
-     *            the given string.
-     * @param prefixes
-     *            the given prefixes.
-     * @return true if the given string starts with one of the given prefixes.
-     */
-    //    private static boolean startsWith(String string, String[] prefixes) {
-    //        if (prefixes == null) {
-    //            return false;
-    //        }
-    //        for (int i = 0; i < prefixes.length; i++) {
-    //            if (string.startsWith(prefixes[i])) {
-    //                return true;
-    //            }
-    //        }
-    //        return false;
-    //    }
-
-    /**
-     * Checks all properties with the given prefix for validity.
-     * 
-     * @return a Property object containing all unrecognized properties.
-     * @param prefix
-     *            the prefix that should be checked
-     * @param validKeys
-     *            the set of valid keys (all with the prefix).
-     * @param validSubPrefixes
-     *            if a property starts with one of these prefixes, it is declared valid
-     * @param printWarning
-     *            if true, a warning is printed to standard error for each unknown property
-     */
-    //    private Properties checkProperties(String prefix, String[] validKeys, String[] validSubPrefixes, boolean printWarning) {
-    //
-    //        Properties result = new Properties();
-    //
-    //        if (prefix == null) {
-    //            prefix = "";
-    //        }
-    //
-    //        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-    //            String key = (String) e.nextElement();
-    //
-    //            if (key.startsWith(prefix)) {
-    //                String suffix = key.substring(prefix.length());
-    //                String value = getProperty(key);
-    //
-    //                if (!startsWith(suffix, validSubPrefixes) && !contains(validKeys, key)) {
-    //                    if (printWarning) {
-    //                        System.err.println("Warning, unknown property: " + key + " with value: " + value);
-    //                    }
-    //                    result.put(key, value);
-    //                }
-    //            }
-    //        }
-    //
-    //        return result;
-    //    }
-
-    /**
-     * Returns all properties who's key start with a certain prefix.
-     * 
-     * @return a Property object containing all matching properties.
-     * @param prefix
-     *            the desired prefix
+     * @return an OctopusProperties containing only the matching properties.
+     * @param prefix the desired prefix
      */
     public OctopusProperties filter(String prefix) {
-
-        Properties result = new Properties();
 
         if (prefix == null) {
             prefix = "";
         }
-
-        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-
-            if (key.startsWith(prefix)) {
-                result.put(key, getProperty(key));
+        
+        HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
+        
+        for (String key : supportedProperties.keySet()) { 
+            if (key.startsWith(prefix)) { 
+                remaining.put(key, supportedProperties.get(key));
+                
+                if (properties.containsKey(key)) { 
+                    p.put(key, properties.get(key));
+                }               
             }
         }
 
-        return new OctopusProperties(result);
+        return new OctopusProperties(remaining, p);
+    }
+      
+    public OctopusProperties filter(Level level) {
+
+        HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
+        
+        for (OctopusPropertyDescription d : supportedProperties.values()) {
+            
+            if (d.getLevels().contains(level)) { 
+                
+                String key = d.getName();
+                remaining.put(key, d);
+   
+                if (properties.containsKey(key)) { 
+                    p.put(key, properties.get(key));
+                }               
+            }
+        }
+
+        return new OctopusProperties(remaining, p);
+    }    
+
+    /**
+     * Returns the descriptions of all supported properties.
+     * 
+     * @return the descriptions of all supported properties. 
+     */
+    public OctopusPropertyDescription [] getSupportedProperties() { 
+        return supportedProperties.values().toArray(new OctopusPropertyDescription[0]);
+    }
+    
+    /**
+     * Returns a sorted list of all supported property names.
+     * 
+     * @return Sorted list of supported property names.
+     */
+    public String[] getPropertyNames() {
+        ArrayList<String> list = new ArrayList<String>(supportedProperties.keySet()); 
+        Collections.sort(list);
+        return list.toArray(new String[list.size()]);
+    }
+    
+    /**
+     * Returns all properties that are set in a Map.  
+     *  
+     * @return all properties that are set in a Map.  
+     */
+    public Map<String,String> toMap() { 
+       return Collections.unmodifiableMap(properties);
     }
 
     /**
@@ -636,129 +514,59 @@ public class OctopusProperties extends Properties {
      *            Only print properties which start with the given prefix. If null, will print all properties
      */
     public void printProperties(PrintStream out, String prefix) {
+        
         if (prefix == null) {
             prefix = "";
         }
+        
+        prefix = prefix.toLowerCase();
+        
+        for (OctopusPropertyDescription d : supportedProperties.values()) {
+        
+            String key = d.getName();
+            
+            if (key.toLowerCase().startsWith(prefix)) {
+            
+                String value = d.getDefaultValue();
 
-        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-            String value = getProperty(key);
-
-            if (key.toLowerCase().startsWith(prefix.toLowerCase())) {
+                if (properties.containsKey(key)) { 
+                    value = properties.get(key);
+                }
+            
                 out.println(key + " = " + value);
             }
         }
     }
 
-    /**
-     * @return Sorted list of property names.
-     */
-    String[] getPropertyNames() {
-        ArrayList<String> list = new ArrayList<String>();
-        for (Enumeration<?> e = propertyNames(); e.hasMoreElements();) {
-            String key = (String) e.nextElement();
-            list.add(key);
-        }
-        String[] result = list.toArray(new String[list.size()]);
-        Arrays.sort(result);
-        return result;
-    }
-
-    /**
-     * Compares this object to the specified object. They are equal if they have the same property names and values.
-     * 
-     * @param object
-     *            object to compare to.
-     * @return <code>true</code> if equal.
-     */
-    //
-    //    public boolean equals(Object object) {
-    //        if (!(object instanceof Properties)) {
-    //            return false;
-    //        }
-    //
-    //        Properties other = (Properties) object;
-    //
-    //        if (other.size() != size()) {
-    //            return false;
-    //        }
-    //
-    //        for (Map.Entry<Object, Object> entry : entrySet()) {
-    //            if (!other.containsKey(entry.getKey())) {
-    //                return false;
-    //            }
-    //
-    //            Object value = entry.getValue();
-    //            Object otherValue = other.get(entry.getKey());
-    //
-    //            if (value == null && otherValue != null | value != null && otherValue == null || value != null
-    //                    && !value.equals(otherValue)) {
-    //                return false;
-    //            }
-    //        }
-    //        return true;
-    //    }
-
-    // Override all functions that change the content of this object.
-
-    @Override
-    public Object setProperty(String key, String value) {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public Object put(Object key, Object value) {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public Object remove(Object key) {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public void putAll(Map<? extends Object, ? extends Object> t) {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public void load(Reader reader) throws IOException {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public void load(InputStream inStream) throws IOException {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
-    @Override
-    public void loadFromXML(InputStream in) throws IOException, InvalidPropertiesFormatException {
-        throw new UnsupportedOperationException("setting properties unsupported in ImmutableTypedProperties");
-    }
-
     @Override
     public String toString() {
 
-        StringBuilder sb = new StringBuilder("OctopusProperties [properties={");
-
-        Set<Entry<Object, Object>> tmp = entrySet();
+        StringBuilder sb = new StringBuilder("{");
 
         String comma = "";
 
-        for (Entry<Object, Object> e : tmp) {
+        for (OctopusPropertyDescription d : supportedProperties.values()) {
+
             sb.append(comma);
-            sb.append(e.getKey().toString());
-            sb.append("=");
-            sb.append(e.getValue().toString());
+
+            String key = d.getName();
+
+            if (properties.containsKey(d.getName())) { 
+                sb.append(key);
+                sb.append("=");
+                sb.append(properties.get(key));
+            } else { 
+                sb.append("<<");
+                sb.append(key);
+                sb.append("=");
+                sb.append(d.getDefaultValue());
+                sb.append(">>");
+            }
             comma = ", ";
         }
 
-        sb.append("}]");
+        sb.append("}");
+        
         return sb.toString();
     }
 

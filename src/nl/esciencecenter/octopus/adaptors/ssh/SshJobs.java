@@ -17,8 +17,9 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Properties;
+import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -85,8 +86,8 @@ public class SshJobs implements Jobs {
         this.adaptor = sshAdaptor;
         this.properties = properties;
 
-        multiQThreads = properties.getIntProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT, 1);
-        pollingDelay = properties.getIntProperty(SshAdaptor.POLLING_DELAY);
+        multiQThreads = properties.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT, 1);
+        pollingDelay = properties.getIntegerProperty(SshAdaptor.POLLING_DELAY);
 
         if (multiQThreads <= 1) {
             throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
@@ -99,7 +100,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
 
         //adaptor.checkURI(location);
@@ -114,9 +115,10 @@ public class SshJobs implements Jobs {
 
         SshSession session = adaptor.createNewSession(location, credential, this.properties);
 
-        SchedulerImplementation scheduler =
-                new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, new String[] { "single", "multi",
-                        "unlimited" }, credential, new OctopusProperties(properties), true, true, true);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
+        
+        SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
+                new String[] { "single", "multi", "unlimited" }, credential, p, true, true, true);
 
         SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(session);
 

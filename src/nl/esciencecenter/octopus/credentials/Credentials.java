@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus.credentials;
 
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
@@ -46,7 +46,7 @@ public interface Credentials {
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
             String username, char[] password) throws OctopusException;
 
     /**
@@ -59,7 +59,7 @@ public interface Credentials {
      * @param password
      *            the password.
      */
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, Map<String,String> properties, String username, char[] password)
             throws OctopusException;
 
     /**
@@ -74,7 +74,7 @@ public interface Credentials {
      * @param password
      *            the password to use to connect to the proxy server
      */
-    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
+    public Credential newProxyCredential(String scheme, Map<String,String> properties, String host, int port, String username,
             char[] password) throws OctopusException;
 
     /**

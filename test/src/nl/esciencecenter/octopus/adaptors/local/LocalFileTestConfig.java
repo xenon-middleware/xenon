@@ -17,7 +17,7 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.FileTestConfig;
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -84,7 +84,7 @@ public class LocalFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Properties getDefaultProperties() throws Exception {
+    public Map<String,String> getDefaultProperties() throws Exception {
         return null;
     }
 

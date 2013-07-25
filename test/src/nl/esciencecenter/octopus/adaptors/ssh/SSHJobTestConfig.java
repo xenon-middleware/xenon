@@ -19,6 +19,8 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
@@ -135,12 +137,12 @@ public class SSHJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", new Properties(), username, passwd);
+        return credentials.newPasswordCredential("ssh", new HashMap<String,String>(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", new Properties(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("ssh", new HashMap<String,String>(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -179,7 +181,7 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Properties getDefaultProperties() throws Exception {
+    public Map<String,String> getDefaultProperties() throws Exception {
         return null;
     }
 

@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;

@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
@@ -41,20 +41,20 @@ public class ForwardingCredentials implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Properties properties, String keyfile, String certfile,
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
             String username, char[] password) throws OctopusException {
         return octopusEngine.credentials().newCertificateCredential(targetScheme, properties, keyfile, certfile, username,
                 password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Properties properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, Map<String,String> properties, String username, char[] password)
             throws OctopusException {
         return octopusEngine.credentials().newPasswordCredential(targetScheme, properties, username, password);
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Properties properties, String host, int port, String username,
+    public Credential newProxyCredential(String scheme, Map<String,String>  properties, String host, int port, String username,
             char[] password) throws OctopusException {
         return octopusEngine.credentials().newProxyCredential(targetScheme, properties, host, port, username, password);
     }

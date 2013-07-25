@@ -16,7 +16,8 @@
 package nl.esciencecenter.octopus.engine;
 
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -35,9 +36,8 @@ public class BasicTests {
     @org.junit.Test
     public void test2() throws Exception {
 
-        Properties properties = new Properties();
-
-        properties.setProperty("some.key", "some.value");
+        Map<String,String> properties = new HashMap<>();
+        properties.put("some.key", "some.value");
 
         Octopus octopus = OctopusFactory.newOctopus(properties);
 
@@ -53,7 +53,7 @@ public class BasicTests {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         //test if the local adaptor exists
-        AdaptorStatus localInfo = octopus.getAdaptorInfo("local");
+        AdaptorStatus localInfo = octopus.getAdaptorStatus("local");
 
         System.out.println(localInfo.getName());
         System.out.println(localInfo.getDescription());

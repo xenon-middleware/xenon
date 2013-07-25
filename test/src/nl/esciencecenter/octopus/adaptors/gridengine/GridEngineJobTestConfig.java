@@ -19,6 +19,8 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
@@ -143,12 +145,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new Properties(), username, passwd);
+        return credentials.newPasswordCredential("ge", new HashMap<String,String>(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new Properties(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("ge", new HashMap<String,String>(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -200,8 +202,8 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
 
     @Override
-    public Properties getDefaultProperties() throws Exception {
-        Properties result = new Properties();
+    public Map<String,String> getDefaultProperties() throws Exception {
+        Map<String,String> result = new HashMap<String,String>();
         result.put("octopus.adaptors.gridengine.poll.delay", "100");
         return result;
     }

@@ -15,67 +15,73 @@
  */
 package nl.esciencecenter.octopus.adaptors.slurm;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.adaptors.scripting.ForwardingCredentials;
-import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnectionFactory;
-import nl.esciencecenter.octopus.adaptors.scripting.ScriptingJobs;
-import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.engine.Adaptor;
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Files;
 
-public class SlurmAdaptor extends Adaptor {
+/**
+ * Adaptor for Slurm scheduler.
+ * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
+ */
+public class SlurmAdaptor extends ScriptingAdaptor {
 
+    /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "slurm";
 
-    private static final String ADAPTOR_DESCRIPTION =
-            "The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local "
-                    + "or the ssh adaptor to gain access to the scheduler machine.";
-
+    /** The prefix used by all properties related to this adaptor */      
+    public static final String PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
+    
+    /** The schemes supported by this adaptor */
     public static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
 
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. No properties exist for this adaptor. */
-    private static final String[][] validPropertiesList = new String[0][0];
+    /** Should the slurm version on the target machine be ignored ? */
+    public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
-    private final ScriptingJobs jobsAdaptor;
-
-    private final ForwardingCredentials credentialsAdaptor;
-
-    public SlurmAdaptor(OctopusProperties properties, OctopusEngine octopusEngine) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, validPropertiesList, properties);
-
-        SchedulerConnectionFactory factory = new SlurmSchedulerConnectionFactory();
-
-        this.jobsAdaptor = new ScriptingJobs(getProperties(), octopusEngine, ADAPTOR_NAME, factory);
-        this.credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");
-    }
-
-    public ScriptingJobs jobsAdaptor() {
-        return jobsAdaptor;
-    }
-
-    @Override
-    public void end() {
-        jobsAdaptor.end();
-    }
-
-    @Override
-    public Files filesAdaptor() throws OctopusException {
-        throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support files.");
-    }
-
-    @Override
-    public Credentials credentialsAdaptor() throws OctopusException {
-        return credentialsAdaptor;
+    /** Polling delay for jobs started by this adaptor. */
+    public static final String POLL_DELAY_PROPERTY = PREFIX + "poll.delay";
+    
+    /** Human readable description of this adaptor */
+    public static final String ADAPTOR_DESCRIPTION =
+            "The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local "
+                    + "or the ssh adaptor to gain access to the scheduler machine.";
+    
+    /** List of all properties supported by this adaptor */
+    private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
+        new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER), 
+                "false", "Skip version check is skipped when connecting to remote machines. " + 
+                        "WARNING: it is not recommended to use this setting in production environments!"),
+        
+        new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), 
+                "1000", "Number of milliseconds between polling the status of a job."),
+    };
+         
+    /**
+     * Create a new SlurmAdaptor.
+     * 
+     * @param properties the properties to use when creating the adaptor. 
+     * @param octopusEngine the engine to which this adaptor belongs. 
+     * @throws OctopusException if the adaptor creation fails.
+     */
+    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {    
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, 
+                new OctopusProperties(VALID_PROPERTIES, properties), new SlurmSchedulerConnectionFactory());
     }
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         return new HashMap<String, String>();
     }
-
 }

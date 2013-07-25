@@ -16,7 +16,7 @@
 package nl.esciencecenter.octopus.jobs;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
@@ -72,7 +72,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Scheduler newScheduler(URI location, Credential credential, Properties properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException;
 
     /**

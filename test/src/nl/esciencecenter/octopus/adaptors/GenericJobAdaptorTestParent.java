@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
@@ -107,7 +108,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void prepare() throws OctopusException {
         //FIXME: this should be a scheduler option, not an adaptor option...
         //FIXME: we should be able to pass properties to the test via the JobTestConfig...
-        Properties properties = new Properties();
+        Map<String,String> properties = new HashMap<>();
         properties.put(SshAdaptor.POLLING_DELAY, "100");
 
         octopus = OctopusFactory.newOctopus(properties);
@@ -179,7 +180,7 @@ public abstract class GenericJobAdaptorTestParent {
             try {
                 Credential c = new Credential() {
                     @Override
-                    public Properties getProperties() {
+                    public Map<String,String> getProperties() {
                         return null;
                     }
 
@@ -202,8 +203,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test04c_newScheduler() throws Exception {
         if (config.supportsCredentials()) {
-            Scheduler s =
-                    jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
+            Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
                             config.getDefaultProperties());
             jobs.close(s);
         }
@@ -211,7 +211,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test05_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new Properties());
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String,String>());
         jobs.close(s);
     }
 
@@ -226,9 +226,9 @@ public abstract class GenericJobAdaptorTestParent {
     public void test07_newScheduler() throws Exception {
         if (config.supportsProperties()) {
 
-            Properties[] tmp = config.getInvalidProperties();
+            Map<String,String>[] tmp = config.getInvalidProperties();
 
-            for (Properties p : tmp) {
+            for (Map<String,String> p : tmp) {
                 try {
                     Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                     jobs.close(s);
@@ -260,7 +260,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void test09_newScheduler() throws Exception {
         if (!config.supportsProperties()) {
             try {
-                Properties p = new Properties();
+                Map<String,String> p = new HashMap<>();
                 p.put("aap", "noot");
                 Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                 jobs.close(s);

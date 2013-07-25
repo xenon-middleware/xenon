@@ -16,7 +16,7 @@
 package nl.esciencecenter.octopus.jobs;
 
 import java.net.URI;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.
@@ -46,7 +46,7 @@ public interface Scheduler {
      * 
      * @return the properties used to create this Scheduler.
      */
-    public Properties getProperties();
+    public Map<String,String> getProperties();
 
     /**
      * Get the queue names supported by this Scheduler.

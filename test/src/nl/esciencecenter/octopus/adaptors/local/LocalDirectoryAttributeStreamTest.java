@@ -16,16 +16,16 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -123,8 +123,8 @@ public class LocalDirectoryAttributeStreamTest {
     public void prepareTest() throws OctopusIOException, OctopusException {
 
         octopus = new OctopusEngine(null);
-        localAdaptor = new LocalAdaptor(null, octopus);
-        localFiles = new LocalFiles(new OctopusProperties(), localAdaptor, octopus);
+        localAdaptor = new LocalAdaptor(octopus, new HashMap<String,String>());
+        localFiles = new LocalFiles(localAdaptor, octopus);
         fs = localFiles.getLocalCWDFileSystem();
         root = fs.getEntryPath();
         testDir = root.resolve(new RelativePath(TEST_DIR));

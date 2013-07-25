@@ -17,8 +17,8 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
-import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -95,8 +95,8 @@ public class LocalAdaptorTest {
 
     @org.junit.Test
     public void test_getSupportedProperties() throws Exception {
-        Map<String, String> map = new LocalAdaptor(null, null).getSupportedProperties();
-        assert (map != null);
+        OctopusPropertyDescription [] p = new LocalAdaptor(null, null).getSupportedProperties();
+        assert (p != null);
     }
 
     @org.junit.Test

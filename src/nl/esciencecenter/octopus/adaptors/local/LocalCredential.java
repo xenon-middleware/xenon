@@ -16,12 +16,13 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 
 /**
- * A dummy Credetial for local use.
+ * A dummy Credential for local use.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -35,7 +36,7 @@ public class LocalCredential implements Credential {
     }
 
     @Override
-    public Properties getProperties() {
-        return new Properties();
+    public Map<String,String> getProperties() {
+        return new HashMap<String, String>();
     }
 }

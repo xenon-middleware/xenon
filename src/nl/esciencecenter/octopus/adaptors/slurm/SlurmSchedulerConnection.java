@@ -17,12 +17,13 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
@@ -48,24 +49,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
  * 
- * @author Niels Drost
- * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @version 1.0
+ * @since 1.0
  */
 public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final Logger logger = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
-
-    public static final String PROPERTY_PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
-
-    public static final String IGNORE_VERSION_PROPERTY = PROPERTY_PREFIX + "ignore.version";
-
-    /** List of {NAME, DEFAULT_VALUE, DESCRIPTION} for properties. */
-    private static final String[][] validPropertiesList = new String[][] { {
-            IGNORE_VERSION_PROPERTY,
-            "false",
-            "Boolean: If true, the version check is skipped when connecting to remote machines. "
-                    + "WARNING: it is not recommended to use this setting in production environments" }, };
-
+   
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
     public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
@@ -77,21 +68,20 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final SlurmConfig config;
 
-    SlurmSchedulerConnection(URI location, Credential credential, Properties properties, OctopusEngine engine)
-            throws OctopusIOException, OctopusException {
-        super(location, credential, properties, engine, validPropertiesList, SlurmAdaptor.ADAPTOR_NAME,
-                SlurmAdaptor.ADAPTOR_SCHEMES);
+    SlurmSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
+            OctopusEngine engine) throws OctopusIOException, OctopusException {
+        
+        super(adaptor, location, credential, properties, engine, properties.getIntegerProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
 
-        boolean ignoreVersion = getProperties().getBooleanProperty(IGNORE_VERSION_PROPERTY);
+        boolean ignoreVersion = getProperties().getBooleanProperty(SlurmAdaptor.IGNORE_VERSION_PROPERTY);
 
         this.config = fetchConfiguration(ignoreVersion);
 
         this.queueNames = fetchQueueNames();
         this.defaultQueueName = findDefaultQueue();
 
-        scheduler =
-                new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential,
-                        getProperties(), false, false, true);
+        scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential, 
+                getProperties(), false, false, true);
 
         logger.debug("new slurm scheduler connection {}", scheduler);
     }

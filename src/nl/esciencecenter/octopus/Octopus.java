@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus;
 
-import java.util.Properties;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -38,7 +38,7 @@ public interface Octopus {
      * 
      * @return the properties used to create this Octopus.
      */
-    public Properties getProperties();
+    public Map<String,String> getProperties();
 
     /**
      * Returns information about the specified adaptor.
@@ -49,14 +49,14 @@ public interface Octopus {
      * @throws OctopusException
      *             when the adaptor does not exist, or no information could be retrieved.
      */
-    public AdaptorStatus getAdaptorInfo(String adaptorName) throws OctopusException;
+    public AdaptorStatus getAdaptorStatus(String adaptorName) throws OctopusException;
 
     /**
      * Returns information on all adaptors available to this Octopus.
      * 
      * @return information on all adaptors.
      */
-    public AdaptorStatus[] getAdaptorInfos();
+    public AdaptorStatus[] getAdaptorStatuses();
 
     /**
      * Get a reference to the Files package interface.

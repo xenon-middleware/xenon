@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus.credentials;
 
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * Credential represents a user credential uses to gain access to a resource.
@@ -38,5 +38,5 @@ public interface Credential {
      * 
      * @return the properties used to create this Credential.
      */
-    public Properties getProperties();
+    public Map<String,String> getProperties();
 }

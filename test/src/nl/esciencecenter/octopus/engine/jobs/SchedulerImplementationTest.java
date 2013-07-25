@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -55,7 +56,7 @@ public class SchedulerImplementationTest {
         assertEquals("test", si.getAdaptorName());
         assertEquals("id1", si.getUniqueID());
         assertEquals(null, si.getCredential());
-        assertEquals(null, si.getProperties());
+        assertEquals(new HashMap<String,String>(), si.getProperties());
         assertEquals(new URI("test:///"), si.getUri());
 
         assertTrue(Arrays.equals(new String[] { "aap", "noot" }, si.getQueueNames()));
@@ -75,7 +76,7 @@ public class SchedulerImplementationTest {
         System.err.println("SI: " + si.toString());
 
         assertTrue(si.toString().equals(
-                "SchedulerImplementation [uniqueID=id1, adaptorName=test, uri=test:///, properties=null,"
+                "SchedulerImplementation [uniqueID=id1, adaptorName=test, uri=test:///, properties={},"
                         + " queueNames=[aap, noot], isOnline=true, supportsInteractive=true, supportsBatch=true]"));
     }
 

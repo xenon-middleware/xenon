@@ -19,17 +19,18 @@ import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
 
 public class AdaptorStatusImplementation implements AdaptorStatus {
 
     private final String name;
     private final String description;
     private final String[] supportedSchemes;
-    private final Map<String, String> supportedProperties;
+    private final OctopusPropertyDescription [] supportedProperties;
     private final Map<String, String> adaptorSpecificInformation;
 
     public AdaptorStatusImplementation(String name, String description, String[] supportedSchemes,
-            Map<String, String> supportedProperties, Map<String, String> adaptorSpecificInformation) {
+            OctopusPropertyDescription [] supportedProperties, Map<String, String> adaptorSpecificInformation) {
 
         super();
         this.name = name;
@@ -55,7 +56,7 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     }
 
     @Override
-    public Map<String, String> getSupportedProperties() {
+    public OctopusPropertyDescription [] getSupportedProperties() {
         return supportedProperties;
     }
 

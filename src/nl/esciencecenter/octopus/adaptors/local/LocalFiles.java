@@ -19,13 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -84,80 +83,25 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return fsID++;
     }
 
-    //    class OpenOptions { 
-    //
-    //        public OpenOption openMode;
-    //        public OpenOption appendMode;
-    //        public OpenOption readMode;
-    //        public OpenOption writeMode;
-    //        
-    //        public OpenOption getOpenMode() {
-    //            return openMode;
-    //        }
-    //
-    //        public void setOpenMode(OpenOption openMode) throws InvalidOpenOptionsException {
-    //                        
-    //            if (this.openMode != null && openMode != this.openMode) { 
-    //                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Conflicting open options: " + openMode 
-    //                        + " and " + this.openMode);
-    //            }
-    //            
-    //            this.openMode = openMode;
-    //        }
-    //        
-    //        public OpenOption getAppendMode() {
-    //            return appendMode;
-    //        }
-    //        
-    //        public void setAppendMode(OpenOption appendMode) throws InvalidOpenOptionsException {
-    //            
-    //            if (this.appendMode != null && appendMode != this.appendMode) { 
-    //                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Conflicting append options: " + appendMode 
-    //                        + " and " + this.appendMode);
-    //            }
-    //            
-    //            
-    //            this.appendMode = appendMode;
-    //        }
-    //        
-    //        public OpenOption getReadMode() {
-    //            return readMode;
-    //        }
-    //        
-    //        public void setReadMode(OpenOption readMode) {
-    //            this.readMode = readMode;
-    //        }
-    //        
-    //        public OpenOption getWriteMode() {
-    //            return writeMode;
-    //        }
-    //        
-    //        public void setWriteMode(OpenOption writeMode) {
-    //            this.writeMode = writeMode;
-    //        }
-    //    }
-
     private final FileSystem cwd;
     private final FileSystem home;
 
-    public LocalFiles(OctopusProperties properties, LocalAdaptor localAdaptor, OctopusEngine octopusEngine)
-            throws OctopusException {
+    public LocalFiles(LocalAdaptor localAdaptor, OctopusEngine octopusEngine) throws OctopusException {
+        
         this.localAdaptor = localAdaptor;
         this.octopusEngine = octopusEngine;
+        
+//        if (logger.isDebugEnabled()) {
+//            Set<String> attributeViews = FileSystems.getDefault().supportedFileAttributeViews();
+//
+//            logger.debug(Arrays.toString(attributeViews.toArray()));
+//        }
 
-        if (logger.isDebugEnabled()) {
-            Set<String> attributeViews = FileSystems.getDefault().supportedFileAttributeViews();
+        cwd = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
+                new RelativePath(LocalUtils.getCWD()), null, null);
 
-            logger.debug(Arrays.toString(attributeViews.toArray()));
-        }
-
-        cwd =
-                new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
-                        new RelativePath(LocalUtils.getCWD()), null, null);
-
-        home =
-                new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
-                        new RelativePath(LocalUtils.getHome()), null, null);
+        home = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
+                new RelativePath(LocalUtils.getHome()), null, null);
     }
 
     /**
@@ -378,7 +322,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Properties properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException {
 
         localAdaptor.checkURI(location);
@@ -390,8 +334,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local file system with path!");
         }
 
+        OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Level.FILESYSTEM), properties);
+        
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, new RelativePath(
-                LocalUtils.getCWD()), credential, new OctopusProperties(properties));
+                LocalUtils.getCWD()), credential, p);
     }
 
     @Override

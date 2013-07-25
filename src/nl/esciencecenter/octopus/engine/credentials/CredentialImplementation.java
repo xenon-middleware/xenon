@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.octopus.engine.credentials;
 
+import java.util.Map;
+
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 
@@ -42,11 +44,15 @@ public abstract class CredentialImplementation implements Credential {
             char[] password) {
 
         this.adaptorName = adaptorName;
-        this.properties = properties;
         this.username = username;
         this.uniqueID = uniqueID;
-
         this.password = password;
+
+        if (properties == null) { 
+            this.properties = new OctopusProperties();
+        } else { 
+            this.properties = properties;
+        }
     }
 
     public String getUniqueID() {
@@ -72,8 +78,8 @@ public abstract class CredentialImplementation implements Credential {
     }
 
     @Override
-    public OctopusProperties getProperties() {
-        return properties;
+    public Map<String,String> getProperties() {
+        return properties.toMap();
     }
 
     @Override
