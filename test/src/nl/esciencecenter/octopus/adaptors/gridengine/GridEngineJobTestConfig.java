@@ -55,11 +55,11 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         super("gridengine");
 
         if (configfile == null) {
-            configfile = System.getProperty("test.gridengine.adaptor.config");
+            configfile = System.getProperty("test.config");
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "test_gridengine.properties";
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
         }
 
         Properties p = new Properties();

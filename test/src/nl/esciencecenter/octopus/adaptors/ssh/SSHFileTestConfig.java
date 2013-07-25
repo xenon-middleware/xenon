@@ -49,11 +49,11 @@ public class SSHFileTestConfig extends FileTestConfig {
         super("ssh");
 
         if (configfile == null) {
-            configfile = System.getProperty("test.ssh.adaptor.config");
+            configfile = System.getProperty("test.config");
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "test_ssh.properties";
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
         }
 
         Properties p = new Properties();
