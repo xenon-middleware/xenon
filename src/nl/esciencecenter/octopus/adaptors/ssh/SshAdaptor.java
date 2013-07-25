@@ -92,15 +92,7 @@ public class SshAdaptor extends Adaptor {
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-//    private static final String[][] VALID_PROPERTIES = new String[][] {
-//            { AUTOMATICALLY_ADD_HOST_KEY, "true", "Boolean: automatically add unknown host keys to known_hosts." },
-//            { STRICT_HOST_KEY_CHECKING, "true", "Boolean: enable strict host key checking." },
-//            { LOAD_STANDARD_KNOWN_HOSTS, "true", "Boolean: load the standard known_hosts file." },
-//            { POLLING_DELAY, "1000", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
-//            { MULTIQ_MAX_CONCURRENT, "4", "Int: the maximum number of concurrent jobs in the multiq." } };
-
-    
+    /** List of properties supported by SSH adaptor */
     private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
         new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, 
                 EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."), 

@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.engine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;

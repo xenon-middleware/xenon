@@ -66,30 +66,6 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
         this.filesystem = filesystem;
         this.relativePath = relativePath;
-
-        //        String pathString = location.getPath();
-        //
-        //        if (pathString == null) {
-        //            root = null;
-        //            elements = new String[0];
-        //        } else if (isLocal() && OSUtils.isWindows()) {
-        //            if (location.getPath().matches("^/[a-zA-Z]:/")) {
-        //                root = pathString.substring(0, 4);
-        //                pathString = pathString.substring(4);
-        //            } else {
-        //                root = null;
-        //            }
-        //            this.elements = pathString.split("/+");
-        //        } else {
-        //            if (pathString.startsWith("/")) {
-        //                root = "/";
-        //                pathString = pathString.substring(1);
-        //            } else {
-        //                root = null;
-        //            }
-        //            this.elements = pathString.split("/+");
-        //        }
-
     }
 
     public AbsolutePathImplementation(FileSystem filesystem, RelativePath... relativePaths) {

@@ -42,8 +42,6 @@ import nl.esciencecenter.octopus.jobs.Streams;
 
 public class SshJobs implements Jobs {
 
-    //private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
-
     private static int currentID = 1;
 
     private static synchronized String getNewUniqueID() {

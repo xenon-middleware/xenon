@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.HostKey;
-import com.jcraft.jsch.HostKeyRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -266,11 +264,6 @@ class SshSession {
         }
 
         String credentialUserName = ((CredentialImplementation) credential).getUsername();
-
-        //        if (user != null && credentialUserName != null && !user.equals(credentialUserName)) {
-        //            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
-        //                    "If a user name is given in the URI, it must match the one in the credential");
-        //        }
 
         if (user == null) {
             user = credentialUserName;

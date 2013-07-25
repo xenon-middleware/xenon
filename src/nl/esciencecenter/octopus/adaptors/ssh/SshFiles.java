@@ -41,7 +41,6 @@ import nl.esciencecenter.octopus.engine.util.CopyInfo;
 import nl.esciencecenter.octopus.engine.util.OpenOptions;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
-import nl.esciencecenter.octopus.exceptions.IllegalSourcePathException;
 import nl.esciencecenter.octopus.exceptions.InvalidOpenOptionsException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -194,112 +193,6 @@ public class SshFiles implements Files {
         return (fileSystems.get(fs.getUniqueID()) != null);
     }
 
-    /**
-     * Copy an existing source file or link to a non-existing target path.
-     * 
-     * The source must NOT be a directory.
-     * 
-     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
-     * 
-     * If the source is a link, the link itself will be copied, not the path to which it refers.
-     * 
-     * @param source
-     *            the existing source file or link.
-     * @param target
-     *            the non existing target path.
-     * @return the target path.
-     * 
-     * @throws NoSuchFileException
-     *             If the source file does not exist or the target parent directory does not exist.
-     * @throws FileAlreadyExistsException
-     *             If the target file already exists.
-     * @throws IllegalSourcePathException
-     *             If the source is a directory.
-     * @throws OctopusIOException
-     *             If the copy failed.
-     */
-    //  @Override
-    //    public AbsolutePath copy(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-    //
-    //        if (!octopusEngine.files().exists(source)) {
-    //            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
-    //        }
-    //
-    //        if (octopusEngine.files().isDirectory(source)) {
-    //            throw new IllegalSourcePathException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " is a directory");
-    //        }
-    //
-    //        if (octopusEngine.files().exists(target)) {
-    //            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
-    //        }
-    //
-    //        if (!octopusEngine.files().exists(target.getParent())) {
-    //            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath()
-    //                    + " does not exist!");
-    //        }
-    //
-    //        if (source.normalize().equals(target.normalize())) {
-    //            return target;
-    //        }
-    //
-    //        logger.debug("ssh copy");
-    //        // two cases: remote -> local and local -> remote
-    //
-    //        FileSystem sourcefs = source.getFileSystem();
-    //        FileSystem targetfs = target.getFileSystem();
-    //
-    //        if (source.isLocal()) {
-    //            if (target.isLocal()) {
-    //                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot copy local files.");
-    //            }
-    //
-    //            if (!targetfs.getAdaptorName().equals("ssh")) {
-    //                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME,
-    //                        "Can only copy between local and an ssh locations (or vice-versa).");
-    //            }
-    //
-    //            // Ok, here, source is local, target is ssh.
-    //
-    //            ChannelSftp channel = getChannel(target);
-    //
-    //            try {
-    //                logger.debug("copy from " + source.getPath() + " to " + target.getPath());
-    //                channel.put(source.getPath(), target.getPath());
-    //            } catch (SftpException e) {
-    //                throw adaptor.sftpExceptionToOctopusException(e);
-    //            } finally {
-    //                channel.disconnect();
-    //            }
-    //        } else if (target.isLocal()) {
-    //            if (source.isLocal()) {
-    //                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot copy local files.");
-    //            }
-    //
-    //            if (!sourcefs.getAdaptorName().equals("ssh")) {
-    //                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME,
-    //                        "Can only copy between local and an ssh locations (or vice-versa).");
-    //            }
-    //
-    //            // Ok, here, target is local, source is ssh.
-    //
-    //            ChannelSftp channel = getChannel(source);
-    //
-    //            try {
-    //                logger.debug("copy from " + source.getPath() + " to " + target.getPath());
-    //                channel.get(source.getPath(), target.getPath());
-    //            } catch (SftpException e) {
-    //                throw adaptor.sftpExceptionToOctopusException(e);
-    //            } finally {
-    //                channel.disconnect();
-    //            }
-    //        } else {
-    //            // both remote
-    //            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot copy files between two different remote filesystems!");
-    //        }
-    //
-    //        return target;
-    //    }
-
     @Override
     public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException {
 
@@ -404,58 +297,6 @@ public class SshFiles implements Files {
 
         session.releaseSftpChannel(channel);
     }
-
-    /**
-     * Move or rename an existing source path to a non-existing target path.
-     * 
-     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
-     * 
-     * If the source is a link, the link itself will be moved, not the path to which it refers. If the source is a directory, it
-     * will be renamed to the target. This implies that a moving a directory between physical locations may fail.
-     * 
-     * @param source
-     *            the existing source path.
-     * @param target
-     *            the non existing target path.
-     * @return the target path.
-     * 
-     * @throws NoSuchFileException
-     *             If the source file does not exist or the target parent directory does not exist.
-     * @throws FileAlreadyExistsException
-     *             If the target file already exists.
-     * @throws OctopusIOException
-     *             If the move failed.
-     */
-    /*    @Override
-        public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
-
-            if (!exists(source)) { 
-                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
-            }
-            
-            if (exists(target)) { 
-                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
-            }
-            
-            if (!exists(target.getParent())) { 
-                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath() + 
-                        " does not exist!");
-            }
-            
-            if (source.normalize().equals(target.normalize())) {
-                return target;
-            }
-
-            try {
-                Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target)); 
-            } catch (IOException e) {
-                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to move " + source.getPath() + " to " + 
-                        target.getPath(), e);
-            }
-
-            return target;
-        }
-         */
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -619,20 +460,6 @@ public class SshFiles implements Files {
                 throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
             }
         }
-        //        
-        //        
-        //        if (exists(path) && isDirectory(path)) {
-        //            throw new OctopusIOException(getClass().getName(), "Cannot create input stream, path is a directory");
-        //        }
-        //
-        //        if (OpenOption.contains(OpenOption.READ, options)) {
-        //            throw new IllegalArgumentException("Cannot open an output stream for reading");
-        //        }
-        //
-        //        if (OpenOption.contains(OpenOption.CREATE, options) && exists(path)) {
-        //            throw new FileAlreadyExistsException(getClass().getName(),
-        //                    "Cannot create file, as it already exists, and you specified the CREATE option.");
-        //        }
 
         int mode = ChannelSftp.OVERWRITE;
 
@@ -717,56 +544,6 @@ public class SshFiles implements Files {
 
         session.releaseSftpChannel(channel);
     }
-
-    //    @Override
-    //    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-    //        
-    //        OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
-    //
-    //        boolean read = tmp.getReadMode() != null;
-    //        boolean write = tmp.getWriteMode() != null;        
-    //        boolean append = false;
-    //        
-    //        if (!read && !write) {
-    //            throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");
-    //            
-    //        } else if (write && !read) { 
-    //            
-    //            if (tmp.getAppendMode() == null) {
-    //                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
-    //            }
-    //            
-    //            append = (tmp.getAppendMode() == OpenOption.APPEND);
-    //            
-    //        } else if (read && !write) { 
-    //            if (tmp.getAppendMode() != null) {
-    //                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading a file!");
-    //            }            
-    //        } else { // read and write 
-    //            if (tmp.getAppendMode() != null) {
-    //                throw new InvalidOpenOptionsException(SshAdaptor.ADAPTOR_NAME, "Cannot set APPEND mode when reading and writing a file!");
-    //            }
-    //        }
-    //        
-    //        if (tmp.getOpenMode() == OpenOption.CREATE) { 
-    //            if (exists(path)) { 
-    //                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
-    //            }
-    //        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
-    //            if (!exists(path)) { 
-    //                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
-    //            }
-    //        }
-    //        
-    //        ChannelSftp channel = getChannel(path);
-    //        
-    //        try { 
-    //            return new SSHSeekableByteChannel(channel, path.getPath(), read, write, append);
-    //        } catch (IOException e) {
-    //            channel.disconnect();
-    //            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to open channel!", e);
-    //        }
-    //    }
 
     private SftpATTRS stat(AbsolutePath path) throws OctopusIOException {
 

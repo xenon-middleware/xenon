@@ -141,8 +141,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
-            OctopusIOException {
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();

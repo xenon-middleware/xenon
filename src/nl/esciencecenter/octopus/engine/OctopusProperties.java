@@ -126,6 +126,9 @@ public class OctopusProperties {
             case LONG:
                 Long.valueOf(value);
                 break;
+            case SIZE:
+                getSizeProperty(value);
+                break;
             case STRING:
                 break;
             }

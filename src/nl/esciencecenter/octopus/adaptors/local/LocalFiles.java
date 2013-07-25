@@ -53,9 +53,6 @@ import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * LocalFiles implements an Octopus <code>Files</code> adaptor for local file operations.
  * 
@@ -68,7 +65,7 @@ import org.slf4j.LoggerFactory;
 public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     /** A logger for this class */
-    private static final Logger logger = LoggerFactory.getLogger(LocalFiles.class);
+    // private static final Logger logger = LoggerFactory.getLogger(LocalFiles.class);
 
     /** The parent adaptor */
     private final LocalAdaptor localAdaptor;
@@ -426,38 +423,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
-    //    @Override
-    //    public SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
-    //
-    //        OpenOptions tmp = OpenOptions.processOptions(LocalAdaptor.ADAPTOR_NAME, options);
-    //
-    //        if (tmp.getReadMode() != null && tmp.getAppendMode() == OpenOption.APPEND) { 
-    //            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Cannot set append mode when reading a file!");
-    //        }
-    //        
-    //        if (tmp.getWriteMode() == null) { 
-    //            if (tmp.getReadMode() == null) { 
-    //                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set either READ or WRITE, or both!");        
-    //            } 
-    //        } else { 
-    //            if (tmp.getAppendMode() == null) {
-    //                throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Must set append mode when writing a file!");
-    //            }
-    //        }
-    //        
-    //        if (tmp.getOpenMode() == OpenOption.CREATE) { 
-    //            if (exists(path)) { 
-    //                throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
-    //            }
-    //        } else if (tmp.getOpenMode() == OpenOption.OPEN) { 
-    //            if (!exists(path)) { 
-    //                throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
-    //            }
-    //        }
-    // 
-    //        return LocalUtils.newByteChannel(path, options);
-    //    }
-
     @Override
     public FileSystem getLocalCWDFileSystem() throws OctopusException {
         return cwd;
@@ -493,8 +458,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
-            OctopusIOException {
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
 
         boolean async = false;
         boolean verify = false;
