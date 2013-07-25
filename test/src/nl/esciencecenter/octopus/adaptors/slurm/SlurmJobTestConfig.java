@@ -58,11 +58,11 @@ public class SlurmJobTestConfig extends JobTestConfig {
         super("slurm");
 
         if (configfile == null) {
-            configfile = System.getProperty("test.slurm.adaptor.config");
+            configfile = System.getProperty("test.config");
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "test_slurm.properties";
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
         }
 
         Properties p = new Properties();

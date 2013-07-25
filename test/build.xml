@@ -7,6 +7,8 @@
 
 	<property name="build.sysclasspath" value="ignore" />
 
+	<propertyset id="test.sysproperties" negate="true"/>
+
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 		<classpath path="lib/jacocoant.jar" />
 	</taskdef>
@@ -47,8 +49,9 @@
 		<jacoco:coverage destfile="reports/jacoco/jacoco.exec">
 			<junit printsummary="yes" fork="yes">
 				<classpath refid="default.classpath" />
+				<syspropertyset refid="test.sysproperties"/>
 
-				<batchtest fork="yes" todir="reports">
+				<batchtest todir="reports">
 					<formatter type="xml" />
 					<formatter type="plain" />
 					<fileset dir="src">
@@ -82,8 +85,9 @@
 
 	<target name="test-integration" description="run integration tests" depends="build">
 		<mkdir dir="it-reports" />
-		<junit printsummary="yes">
+		<junit printsummary="yes" fork="yes">
 			<classpath refid="default.classpath" />
+			<syspropertyset refid="test.sysproperties"/>
 
 			<batchtest fork="yes" todir="it-reports">
 				<formatter type="xml" />
