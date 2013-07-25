@@ -71,7 +71,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     SlurmSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
             OctopusEngine engine) throws OctopusIOException, OctopusException {
         
-        super(adaptor, location, credential, properties, engine, properties.getIntegerProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
+        super(adaptor, location, credential, properties, engine, properties.getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
 
         boolean ignoreVersion = getProperties().getBooleanProperty(SlurmAdaptor.IGNORE_VERSION_PROPERTY);
 

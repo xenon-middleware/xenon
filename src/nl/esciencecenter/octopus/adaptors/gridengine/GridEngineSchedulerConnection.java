@@ -67,7 +67,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
             JOB_OPTION_PARALLEL_SLOTS };
 
-    private final int accountingGraceTime;
+    private final long accountingGraceTime;
 
     /**
      * Map with the last seen time of jobs. There is a short but noticeable delay between jobs disappearing from the qstat queue
@@ -89,10 +89,10 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             OctopusEngine engine) throws OctopusIOException, OctopusException {
         
         super(adaptor, location, credential, properties, engine, 
-                properties.getIntegerProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
+                properties.getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
 
         boolean ignoreVersion = properties.getBooleanProperty(GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
-        accountingGraceTime = properties.getIntegerProperty(GridEngineAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY);
+        accountingGraceTime = properties.getLongProperty(GridEngineAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY);
 
         parser = new GridEngineParser(ignoreVersion);
 

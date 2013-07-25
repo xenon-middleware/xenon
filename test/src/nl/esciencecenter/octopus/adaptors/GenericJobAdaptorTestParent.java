@@ -628,8 +628,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        long deadline = System.currentTimeMillis() + config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout();
-        long pollDelay = (config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout()) / 10;
+        long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + config.getUpdateTime();
+        long pollDelay = (config.getQueueWaitTime() + config.getUpdateTime()) / 10;
 
         JobStatus status = jobs.getJobStatus(job);
 
@@ -693,10 +693,10 @@ public abstract class GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
+        JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
 
         if (status.isRunning()) {
-            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
+            status = jobs.waitUntilDone(job, config.getUpdateTime());
         }
 
         if (!status.isDone()) {
@@ -769,9 +769,8 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         // Bit hard to determine realistic deadline here ?
-        long deadline =
-                System.currentTimeMillis()
-                        + (60 * jobCount * config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());
+        long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + 
+                (jobCount * config.getUpdateTime());
 
         boolean done = false;
 
@@ -871,7 +870,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         // Wait until the job is killed. We assume it takes less than a minute!
         if (!status.isDone()) {
-            status = jobs.waitUntilDone(job, config.getDefaultCancelTimeout());
+            status = jobs.waitUntilDone(job, config.getUpdateTime());
         }
 
         if (!status.isDone()) {
@@ -923,7 +922,7 @@ public abstract class GenericJobAdaptorTestParent {
         Job job = jobs.submitJob(scheduler, description);
 
         // Wait for job to run before killing it!
-        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
+        JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
 
         if (!status.isRunning()) {
             throw new Exception("Job failed to start!");
@@ -933,7 +932,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         // Wait until the job is killed. We assume it takes less than a minute!
         if (!status.isDone()) {
-            status = jobs.waitUntilDone(job, config.getDefaultCancelTimeout());
+            status = jobs.waitUntilDone(job, config.getUpdateTime());
         }
 
         if (!status.isDone()) {
@@ -987,7 +986,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());
+        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline! status = " + status);
@@ -1045,10 +1044,10 @@ public abstract class GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilRunning(job, config.getDefaultQueueWaitTimeout());
+        JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
 
         if (status.isRunning()) {
-            status = jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
+            status = jobs.waitUntilDone(job, config.getUpdateTime());
         }
 
         if (!status.isDone()) {
@@ -1464,7 +1463,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         try {
             Job job = jobs.submitJob(scheduler, description);
-            jobs.waitUntilDone(job, config.getDefaultShortJobTimeout());
+            jobs.waitUntilDone(job, config.getUpdateTime());
         } catch (UnsupportedJobDescriptionException e) {
             gotException = true;
         }

@@ -51,7 +51,10 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     private String defaultQueue;
     private String[] queues;
-
+    
+    private long queueWaitTime;
+    private long updateTime;
+    
     public GridEngineJobTestConfig(String configfile) throws Exception {
 
         super("gridengine");
@@ -75,10 +78,13 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
         String wrongLocation = getPropertyOrFail(p, "test.gridengine.location.wrong");
 
-        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
+        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");        
         String queueList = getPropertyOrFail(p, "test.gridengine.queues");
         queues = queueList.split("\\s*,\\s*");
 
+        queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.queue.wait.time"));
+        updateTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.update.time"));
+        
         correctURI = new URI("ge://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
         correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
@@ -214,18 +220,13 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public long getDefaultQueueWaitTimeout() {
-        return 5 * 60000;
+    public long getQueueWaitTime() {
+        return queueWaitTime;
     }
 
     @Override
-    public long getDefaultShortJobTimeout() {
-        return 60000;
-    }
-
-    @Override
-    public long getDefaultCancelTimeout() {
-        return 60000;
+    public long getUpdateTime() {
+        return updateTime;
     }
 
     @Override

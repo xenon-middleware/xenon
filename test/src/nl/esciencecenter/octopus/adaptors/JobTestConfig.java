@@ -56,11 +56,9 @@ public abstract class JobTestConfig extends GenericTestConfig {
 
     public abstract String getInvalidQueueName() throws Exception;
 
-    public abstract long getDefaultQueueWaitTimeout();
+    public abstract long getQueueWaitTime();
 
-    public abstract long getDefaultShortJobTimeout();
-
-    public abstract long getDefaultCancelTimeout();
-
+    public abstract long getUpdateTime();
+    
     public abstract boolean supportsParallelJobs();
 }

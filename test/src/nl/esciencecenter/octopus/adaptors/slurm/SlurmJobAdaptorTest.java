@@ -156,7 +156,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getDefaultQueueWaitTimeout() + config.getDefaultShortJobTimeout());
+        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
         
         if (!status.isDone()) {
             throw new Exception("Job not finished");

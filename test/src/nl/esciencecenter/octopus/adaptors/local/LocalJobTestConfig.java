@@ -101,17 +101,12 @@ public class LocalJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public long getDefaultQueueWaitTimeout() {
+    public long getQueueWaitTime() {
         return 1000;
     }
 
     @Override
-    public long getDefaultShortJobTimeout() {
-        return 1000;
-    }
-
-    @Override
-    public long getDefaultCancelTimeout() {
+    public long getUpdateTime() {
         return 1000;
     }
 

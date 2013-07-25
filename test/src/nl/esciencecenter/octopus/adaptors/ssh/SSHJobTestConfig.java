@@ -191,17 +191,12 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public long getDefaultQueueWaitTimeout() {
+    public long getQueueWaitTime() {
         return 5000;
     }
 
     @Override
-    public long getDefaultShortJobTimeout() {
-        return 5000;
-    }
-
-    @Override
-    public long getDefaultCancelTimeout() {
+    public long getUpdateTime() {
         return 5000;
     }
 

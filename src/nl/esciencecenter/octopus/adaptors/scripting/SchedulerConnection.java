@@ -65,10 +65,10 @@ public abstract class SchedulerConnection {
     
     private final OctopusProperties properties;
 
-    private final int pollDelay;
+    private final long pollDelay;
     
     protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
-            OctopusEngine engine, int pollDelay) throws OctopusIOException, OctopusException {
+            OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
     
         this.adaptor = adaptor;
         this.engine = engine;

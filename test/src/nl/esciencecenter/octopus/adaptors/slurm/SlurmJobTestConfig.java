@@ -53,6 +53,9 @@ public class SlurmJobTestConfig extends JobTestConfig {
     private String defaultQueue;
     private String[] queues;
 
+    private long queueWaitTime;
+    private long updateTime;
+    
     public SlurmJobTestConfig(String configfile) throws Exception {
 
         super("slurm");
@@ -80,6 +83,9 @@ public class SlurmJobTestConfig extends JobTestConfig {
         String queueList = getPropertyOrFail(p, "test.slurm.queues");
         queues = queueList.split("\\s*,\\s*");
 
+        queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.queue.wait.time"));
+        updateTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.update.time"));
+        
         correctURI = new URI("slurm://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
         correctURIWithPath = new URI("slurm://" + username + "@" + location + "/");
@@ -238,18 +244,13 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public long getDefaultQueueWaitTimeout() {
-        return 5 * 60000;
+    public long getQueueWaitTime() {
+        return queueWaitTime;
     }
 
     @Override
-    public long getDefaultShortJobTimeout() {
-        return 120000;
-    }
-
-    @Override
-    public long getDefaultCancelTimeout() {
-        return 120000;
+    public long getUpdateTime() {
+        return updateTime;
     }
 
     @Override
