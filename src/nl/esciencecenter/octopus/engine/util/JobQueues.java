@@ -70,16 +70,16 @@ public class JobQueues {
 
     private final ExecutorService unlimitedExecutor;
 
-    private final int pollingDelay;
+    private final long pollingDelay;
 
     private final InteractiveProcessFactory factory;
 
     private int jobID = 0;
 
     public JobQueues(String adaptorName, Octopus myOctopus, Scheduler myScheduler, FileSystem myFileSystem,
-            InteractiveProcessFactory factory, int multiQThreads, int pollingDelay) throws BadParameterException {
+            InteractiveProcessFactory factory, int multiQThreads, long pollingDelay) throws BadParameterException {
 
-        logger.debug("{}: Creating JobQueues for Adaptor {} with multiQThreads: {}, maxQSize: {} and pollingDelay: {}",
+        logger.debug("Creating JobQueues for Adaptor {} with multiQThreads: {} and pollingDelay: {}",
                 adaptorName, multiQThreads, pollingDelay);
 
         this.adaptorName = adaptorName;
