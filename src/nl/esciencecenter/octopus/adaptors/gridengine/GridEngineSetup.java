@@ -66,7 +66,7 @@ public class GridEngineSetup {
         RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
         
         //Qconf returns an error if there are no parallel environments
-        if (runner.getExitCode() == 1 && runner.getStderr().equals("no parallel environment defined")) {
+        if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
             return new HashMap<String, ParallelEnvironmentInfo>();
         }
         
