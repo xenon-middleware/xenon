@@ -58,7 +58,7 @@ public class GridEngineSetup {
 
         this.parallelEnvironments = fetchParallelEnvironments(schedulerConnection, parser);
 
-        logger.debug("Created setup info, queues = {}, parallel environments = {}", queues, parallelEnvironments);
+        logger.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
 
     private Map<String, ParallelEnvironmentInfo> fetchParallelEnvironments(SchedulerConnection schedulerConnection,
