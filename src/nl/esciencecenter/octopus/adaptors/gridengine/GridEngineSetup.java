@@ -16,8 +16,10 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -54,9 +56,25 @@ public class GridEngineSetup {
 
         this.queues = parser.parseQconfQueueInfo(queueDetailsOutput);
 
-        String peListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-spl");
+        this.parallelEnvironments = fetchParallelEnvironments(schedulerConnection, parser);
 
-        String[] peNames = parser.parseQconfList(peListOutput);
+        logger.debug("Created setup info, queues = {}, parallel environments = {}", queues, parallelEnvironments);
+    }
+
+    private Map<String, ParallelEnvironmentInfo> fetchParallelEnvironments(SchedulerConnection schedulerConnection,
+            GridEngineParser parser) throws OctopusIOException, OctopusException {
+        RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
+        
+        //Qconf returns an error if there are no parallel environments
+        if (runner.getExitCode() == 1 && runner.getStderr().equals("no parallel environment defined")) {
+            return new HashMap<String, ParallelEnvironmentInfo>();
+        }
+        
+        if (!runner.success()) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Could not get parallel environment info from scheduler: " + runner);
+        }
+
+        String[] peNames = parser.parseQconfList(runner.getStdout());
 
         //build arguments for qconf to list parallel environments
         ArrayList<String> arguments = new ArrayList<String>();
@@ -68,9 +86,7 @@ public class GridEngineSetup {
         String peDetailsOutput =
                 schedulerConnection.runCheckedCommand(null, "qconf", arguments.toArray(new String[arguments.size()]));
 
-        this.parallelEnvironments = parser.parseQconfParallelEnvironementInfo(peDetailsOutput);
-
-        logger.debug("Created setup info, queues = {}, parallel environments = {}", queues, parallelEnvironments);
+        return parser.parseQconfParallelEnvironementInfo(peDetailsOutput);
     }
 
     public String[] getQueueNames() {
