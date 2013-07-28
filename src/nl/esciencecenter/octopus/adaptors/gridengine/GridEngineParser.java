@@ -432,6 +432,8 @@ public class GridEngineParser {
             String[] parallelEnvironments;
 
             name = map.get("qname");
+            
+            logger.debug("parsing queueconf output for {}", name);
 
             if (name == null) {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
@@ -453,10 +455,11 @@ public class GridEngineParser {
             String peValue = map.get("pe_list");
 
             if (peValue == null) {
-                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue " + name);
             }
             parallelEnvironments = peValue.split("\\s+");
-
+            
+            result.put(name, new QueueInfo(name, slots, parallelEnvironments));
         }
 
         return result;

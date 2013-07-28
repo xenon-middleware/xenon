@@ -213,6 +213,27 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         result.put("octopus.adaptors.gridengine.poll.delay", "100");
         return result;
     }
+    
+    public Map<String,String> getUnknownProperties() throws Exception {
+        Map<String,String> result = new HashMap<String,String>();
+        result.put("octopus.adaptors.gridengine.unknown.property", "some.value");
+        return result;
+    }
+
+    public Map<String,String>[] getInvalidProperties() throws Exception {
+        Map[] result = new Map[1];
+        
+        result[0] = new HashMap<String,String>();
+        
+        result[0].put("octopus.adaptors.gridengine.poll.delay", "AAP");
+        return result;
+    }
+
+    public Map<String,String> getCorrectProperties() throws Exception {
+        Map<String,String> result = new HashMap<String,String>();
+        result.put("octopus.adaptors.gridengine.poll.delay", "100");
+        return result;
+    }
 
     @Override
     public boolean supportsStatusAfterDone() {

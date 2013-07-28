@@ -100,7 +100,7 @@ public class SshAdaptor extends Adaptor {
                 EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), "true", "Enable strict host key checking."), 
         new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, 
                 EnumSet.of(Level.OCTOPUS), "true", "Load the standard known_hosts file."),
-        new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, 
+        new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, 
                 EnumSet.of(Level.SCHEDULER), "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
         new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, 
                 EnumSet.of(Level.SCHEDULER), "4", "The maximum number of concurrent jobs in the multiq.."),

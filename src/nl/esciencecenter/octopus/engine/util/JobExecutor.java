@@ -38,7 +38,7 @@ public class JobExecutor implements Runnable {
 
     private final InteractiveProcessFactory factory;
 
-    private final int pollingDelay;
+    private final long pollingDelay;
 
     private final String adaptorName;
 
@@ -60,7 +60,7 @@ public class JobExecutor implements Runnable {
     private Exception error;
 
     public JobExecutor(String adaptorName, Files files, FileSystem filesytem, InteractiveProcessFactory factory,
-            JobImplementation job, int pollingDelay) throws BadParameterException {
+            JobImplementation job, long pollingDelay) throws BadParameterException {
 
         this.adaptorName = adaptorName;
         this.files = files;
