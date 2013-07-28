@@ -26,7 +26,6 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -40,8 +39,13 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-public class SshJobs implements Jobs {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class SshJobs implements Jobs {
+    
+    private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
+    
     private static int currentID = 1;
 
     private static synchronized String getNewUniqueID() {
@@ -74,27 +78,12 @@ public class SshJobs implements Jobs {
 
     private final OctopusProperties properties;
 
-    private final int pollingDelay;
-    private final int multiQThreads;
-
     private HashMap<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
     public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
-
-        multiQThreads = properties.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT, 1);
-        pollingDelay = properties.getIntegerProperty(SshAdaptor.POLLING_DELAY);
-
-        if (multiQThreads <= 1) {
-            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME,
-                    "Number of slots for the multi queue cannot be smaller than one!");
-        }
-
-        if (pollingDelay < 100 || pollingDelay > 60000) {
-            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "Polling delay must be between 100 and 60000!");
-        }
     }
 
     @Override
@@ -104,15 +93,12 @@ public class SshJobs implements Jobs {
         //adaptor.checkURI(location);
         adaptor.checkPath(location, "scheduler");
 
-        // FIXME: Why can't we add scheduler specific properties ?
-        if (properties != null && properties.size() > 0) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot create ssh scheduler with additional properties!");
-        }
-
         String uniqueID = getNewUniqueID();
 
         SshSession session = adaptor.createNewSession(location, credential, this.properties);
 
+        logger.debug("Starting ssh scheduler with properties {}", properties);
+        
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
         
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
@@ -124,6 +110,9 @@ public class SshJobs implements Jobs {
         SshFiles files = (SshFiles) adaptor.filesAdaptor();
         FileSystem fs = files.newFileSystem(session, location, credential, this.properties);
 
+        long pollingDelay = p.getLongProperty(SshAdaptor.POLLING_DELAY);
+        int multiQThreads = p.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT);
+        
         JobQueues jobQueues =
                 new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, multiQThreads, pollingDelay);
 

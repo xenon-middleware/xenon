@@ -104,7 +104,7 @@ public class OctopusProperties {
             
             checkType(d, key, value);
             
-            properties.put(key, value);
+            this.properties.put(key, value);
         }
     }
     
