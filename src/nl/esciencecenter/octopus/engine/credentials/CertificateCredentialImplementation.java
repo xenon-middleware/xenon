@@ -28,15 +28,12 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
     /**
      * This member variables holds the URI of the keyfile of the SecurityContext
      */
-    private String keyfile = null;
     private String certfile = null;
 
     /**
      * Constructs a {@link CertificateCredentialImplementation} out of a {@link URI} pointing to the private key, a {@link URI}
      * pointing to the certificate, a username and a password.
      * 
-     * @param keyfile
-     *            the private key file (for example userkey.pem)
      * @param certfile
      *            the certificate file (for example usercert.pem)
      * @param username
@@ -44,21 +41,11 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String keyfile,
-            String certfile, String username, char[] password) {
+    public CertificateCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String certfile,
+            String username, char[] password) {
 
         super(adaptorName, uniqueID, properties, username, password);
-        this.keyfile = keyfile;
         this.certfile = certfile;
-    }
-
-    /**
-     * Returns the location of the keyfile associated with the context.
-     * 
-     * @return The location of the keyfile associated with the context.
-     */
-    public String getKeyfile() {
-        return keyfile;
     }
 
     /**
@@ -72,7 +59,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
 
     @Override
     public String toString() {
-        return "CertificateCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", keyfile="
-                + keyfile + ", certfile=" + certfile + "]";
+        return "CertificateCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", certfile=" + 
+                certfile + "]";
     }
 }

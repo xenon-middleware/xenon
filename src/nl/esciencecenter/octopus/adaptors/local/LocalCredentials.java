@@ -36,8 +36,8 @@ public class LocalCredentials implements Credentials {
     private final LocalCredential credential = new LocalCredential();
 
     @Override
-    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
-            String username, char[] password) throws OctopusException {
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String certfile, String username, 
+            char[] password) throws OctopusException {
         throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "CertificateCredential not supported!");
     }
 

@@ -50,12 +50,12 @@ public class SshCredentials implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String certfile,
             String username, char[] password) throws OctopusException {
         
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
         
-        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, keyfile, certfile, username, 
+        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, certfile, username, 
                 password);
     }
 
@@ -92,25 +92,23 @@ public class SshCredentials implements Credentials {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
         }
 
-        File keyFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
-        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa.pub");
+        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
 
-        if (keyFile.exists() && certFile.exists()) {
+        if (certFile.exists()) {
             // logger.info("Using default credential: "+ keyFile.getPath());
             return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
-                    properties, keyFile.getPath(), certFile.getPath(), user, null);
+                    properties, certFile.getPath(), user, null);
         }
 
-        File keyFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
-        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa.pub");
+        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
 
-        if (keyFile2.exists() && certFile2.exists()) {
+        if (certFile2.exists()) {
             // logger.info("Using default credential: "+ keyFile2.getPath());
             return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
-                    properties, keyFile2.getPath(), certFile2.getPath(), user, null);
+                    properties, certFile2.getPath(), user, null);
         }
 
         throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried "
-                + keyFile.getPath() + " and " + keyFile2.getPath());
+                + certFile.getPath() + " and " + certFile2.getPath());
     }
 }

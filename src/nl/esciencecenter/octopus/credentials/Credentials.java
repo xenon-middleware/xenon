@@ -33,21 +33,18 @@ public interface Credentials {
     /**
      * Constructs a certificate Credential.
      * 
-     * A certificate Credential is created out of a <code>keyfile</code> pointing to the private key, a <code>certfile</code>
-     * pointing to the certificate, a username and a password.
+     * A certificate Credential is created out of a <code>certfile</code> pointing to the certificate, a username and a password.
      * 
-     * @param keyfile
-     *            the private key file (for example userkey.pem)
      * @param certfile
-     *            the certificate file (for example usercert.pem)
+     *            the certificate file (for example userkey.pem or id_dsa)
      * @param username
      *            the username
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String keyfile, String certfile,
-            String username, char[] password) throws OctopusException;
+    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String certfile, String username, 
+            char[] password) throws OctopusException;
 
     /**
      * Constructs a password credential.

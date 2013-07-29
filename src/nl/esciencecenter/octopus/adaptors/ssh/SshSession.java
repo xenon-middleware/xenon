@@ -245,7 +245,7 @@ class SshSession {
         if (credential instanceof CertificateCredentialImplementation) {
             CertificateCredentialImplementation certificate = (CertificateCredentialImplementation) credential;
             try {
-                jsch.addIdentity(certificate.getKeyfile(), Arrays.toString(certificate.getPassword()));
+                jsch.addIdentity(certificate.getCertfile(), Arrays.toString(certificate.getPassword()));
             } catch (JSchException e) {
                 throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
             }

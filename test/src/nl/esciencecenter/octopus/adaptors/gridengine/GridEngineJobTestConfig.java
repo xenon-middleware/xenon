@@ -206,7 +206,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         return true;
     }
 
-
     @Override
     public Map<String,String> getDefaultProperties() throws Exception {
         Map<String,String> result = new HashMap<String,String>();
