@@ -53,7 +53,13 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
+import org.junit.internal.AssumptionViolatedException;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -61,7 +67,9 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericFileAdaptorTestParent {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(GenericFileAdaptorTestParent.class);
+    
     protected static String TEST_ROOT;
 
     public static FileTestConfig config;
@@ -73,6 +81,31 @@ public abstract class GenericFileAdaptorTestParent {
     protected AbsolutePath testDir;
 
     private long counter = 0;
+    
+    @Rule
+    public TestWatcher watcher = new TestWatcher() {
+
+        @Override
+        public void starting(Description description) {
+            logger.info("Running test {}", description.getMethodName());
+        }
+
+        @Override
+        public void failed(Throwable reason, Description description) {
+            logger.info("Test {} failed due to exception", description.getMethodName(), reason);
+        }
+        
+        @Override
+        public void succeeded(Description description) {
+            logger.info("Test {} succeeded", description.getMethodName());
+        }
+        
+        @Override
+        public void skipped(AssumptionViolatedException reason, Description description) {
+            logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);
+        }
+
+    };
 
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(FileTestConfig testConfig) throws Exception {

@@ -56,8 +56,14 @@ import nl.esciencecenter.octopus.jobs.Streams;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.internal.AssumptionViolatedException;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -65,6 +71,8 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericJobAdaptorTestParent {
+
+    private static final Logger logger = LoggerFactory.getLogger(GenericJobAdaptorTestParent.class);
 
     private static String TEST_ROOT;
 
@@ -76,6 +84,31 @@ public abstract class GenericJobAdaptorTestParent {
     protected Credentials credentials;
 
     protected AbsolutePath testDir;
+
+    @Rule
+    public TestWatcher watcher = new TestWatcher() {
+
+        @Override
+        public void starting(Description description) {
+            logger.info("Running test {}", description.getMethodName());
+        }
+
+        @Override
+        public void failed(Throwable reason, Description description) {
+            logger.info("Test {} failed due to exception", description.getMethodName(), reason);
+        }
+        
+        @Override
+        public void succeeded(Description description) {
+            logger.info("Test {} succeeded", description.getMethodName());
+        }
+        
+        @Override
+        public void skipped(AssumptionViolatedException reason, Description description) {
+            logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);
+        }
+
+    };
 
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(JobTestConfig testConfig) {
@@ -108,7 +141,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void prepare() throws OctopusException {
         //FIXME: this should be a scheduler option, not an adaptor option...
         //FIXME: we should be able to pass properties to the test via the JobTestConfig...
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         properties.put(SshAdaptor.POLLING_DELAY, "100");
 
         octopus = OctopusFactory.newOctopus(properties);
@@ -180,7 +213,7 @@ public abstract class GenericJobAdaptorTestParent {
             try {
                 Credential c = new Credential() {
                     @Override
-                    public Map<String,String> getProperties() {
+                    public Map<String, String> getProperties() {
                         return null;
                     }
 
@@ -203,7 +236,8 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test04c_newScheduler() throws Exception {
         if (config.supportsCredentials()) {
-            Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
+            Scheduler s =
+                    jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
                             config.getDefaultProperties());
             jobs.close(s);
         }
@@ -211,7 +245,8 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test05_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String,String>());
+        Scheduler s =
+                jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String, String>());
         jobs.close(s);
     }
 
@@ -226,9 +261,9 @@ public abstract class GenericJobAdaptorTestParent {
     public void test07_newScheduler() throws Exception {
         if (config.supportsProperties()) {
 
-            Map<String,String>[] tmp = config.getInvalidProperties();
+            Map<String, String>[] tmp = config.getInvalidProperties();
 
-            for (Map<String,String> p : tmp) {
+            for (Map<String, String> p : tmp) {
                 try {
                     Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                     jobs.close(s);
@@ -260,7 +295,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void test09_newScheduler() throws Exception {
         if (!config.supportsProperties()) {
             try {
-                Map<String,String> p = new HashMap<>();
+                Map<String, String> p = new HashMap<>();
                 p.put("aap", "noot");
                 Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
                 jobs.close(s);
@@ -769,8 +804,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         // Bit hard to determine realistic deadline here ?
-        long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + 
-                (jobCount * config.getUpdateTime());
+        long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + (jobCount * config.getUpdateTime());
 
         boolean done = false;
 
