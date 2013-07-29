@@ -154,7 +154,9 @@ public class JobQueues {
                 }
             }
         }
-
+        
+        logger.debug("{}: getJobs for queues {} returns {}", adaptorName, queueNames, out);
+        
         return out.toArray(new Job[out.size()]);
     }
 
@@ -365,7 +367,7 @@ public class JobQueues {
 
         String queueName = description.getQueueName();
 
-        logger.debug("{}: Submitting job to queue ", adaptorName, queueName);
+        logger.debug("{}: Submitting job to queue {}", adaptorName, queueName);
 
         // NOTE: the verifyJobDescription ensures that the queueName has a valid value!
         if (queueName.equals("unlimited")) {

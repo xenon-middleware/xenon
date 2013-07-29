@@ -230,8 +230,6 @@ public class JobExecutor implements Runnable {
             return;
         }
 
-        // this.thread = Thread.currentThread();
-
         updateState("RUNNING", -1, null);
 
         while (true) {

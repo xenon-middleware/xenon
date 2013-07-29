@@ -87,12 +87,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         
         this.localAdaptor = localAdaptor;
         this.octopusEngine = octopusEngine;
-        
-//        if (logger.isDebugEnabled()) {
-//            Set<String> attributeViews = FileSystems.getDefault().supportedFileAttributeViews();
-//
-//            logger.debug(Arrays.toString(attributeViews.toArray()));
-//        }
 
         cwd = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
                 new RelativePath(LocalUtils.getCWD()), null, null);

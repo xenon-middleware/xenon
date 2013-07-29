@@ -115,11 +115,6 @@ public class FilesEngine implements Files {
         return getFilesAdaptor(path).createFile(path);
     }
 
-    //    @Override
-    //    public AbsolutePath createSymbolicLink(AbsolutePath link, AbsolutePath target) throws OctopusIOException {
-    //        return getFilesAdaptor(link).createSymbolicLink(link, target);
-    //    }
-
     @Override
     public void delete(AbsolutePath path) throws OctopusIOException {
         getFilesAdaptor(path).delete(path);
