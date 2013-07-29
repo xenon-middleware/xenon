@@ -107,7 +107,7 @@ public class LocalJobTestConfig extends JobTestConfig {
 
     @Override
     public long getUpdateTime() {
-        return 1000;
+        return 3000;
     }
 
     @Override
