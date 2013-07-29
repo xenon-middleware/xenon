@@ -18,9 +18,12 @@ package nl.esciencecenter.octopus.adaptors.scripting;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
+import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -92,7 +95,10 @@ public abstract class SchedulerConnection {
             }
 
             logger.debug("creating ssh scheduler for {} adaptor at {}", adaptor.getName(), actualLocation);
-            sshScheduler = engine.jobs().newScheduler(actualLocation, credential, null);
+            Map<String, String> sshProperties = new HashMap<String, String>();
+            //FIXME: compensating for ssh performance bug #143
+            sshProperties.put(SshAdaptor.POLLING_DELAY, "100");
+            sshScheduler = engine.jobs().newScheduler(actualLocation, credential, sshProperties);
 
             logger.debug("creating file system for {} adaptor at {}", adaptor.getName(), actualLocation);
             sshFileSystem = engine.files().newFileSystem(actualLocation, credential, null);
