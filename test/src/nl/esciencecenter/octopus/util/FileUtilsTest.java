@@ -40,7 +40,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import org.junit.Test;
 
 public class FileUtilsTest {
-
+/*
     @Test
     public void testCopyOctopusInputStreamAbsolutePathCopyOptionArray() throws OctopusException {
         fail("Not yet implemented");
@@ -410,5 +410,5 @@ public class FileUtilsTest {
     public void testRecursiveWipe() {
         fail("Not yet implemented");
     }
-
+*/
 }
