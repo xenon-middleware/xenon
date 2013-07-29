@@ -84,16 +84,9 @@ class BatchProcess implements InteractiveProcess {
         AbsolutePath workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
 
         if (!files.exists(workdir)) {
-            throw new IOException("Working directory does not exist!");
+            throw new IOException("Working directory " + workdir + " does not exist!");
         }
 
-        //        AbsolutePath stdout = processPath(files, workdir, description.getStdout());
-        //        AbsolutePath stderr = processPath(files, workdir, description.getStderr());
-        //        
-        //        // Create the files for stdout and stderr. Will fail if the files already exist!
-        //        files.createFile(stdout);
-        //        files.createFile(stderr);
-        //        
         // If needed create a file for stdin, and make sure it exists!
         AbsolutePath stdin = null;
 

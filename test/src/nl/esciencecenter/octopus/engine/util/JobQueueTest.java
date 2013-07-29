@@ -16,25 +16,27 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.engine.Adaptor;
+import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -135,11 +137,9 @@ public class JobQueueTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-
-        octopus = mock(Octopus.class);
-        scheduler = mock(Scheduler.class);
-        filesystem = mock(FileSystem.class);
-
+        octopus = OctopusFactory.newOctopus(null);
+        scheduler = octopus.jobs().getLocalScheduler();
+        filesystem = octopus.files().getLocalCWDFileSystem();
         myFactory = new MyFactory();
         jobQueue = new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, POLLING_DELAY);
     }
@@ -157,7 +157,7 @@ public class JobQueueTest {
                 System.err.println("   " + jobs[i]);
             }
 
-            throw new Exception("There are jobs sutck in the queue!");
+            throw new Exception("There are jobs stuck in the queue!");
         }
     }
 

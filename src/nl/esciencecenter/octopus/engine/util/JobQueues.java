@@ -400,14 +400,21 @@ public class JobQueues {
         LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
 
         JobExecutor e = findJob(queue, job);
-        e.kill();
-        JobStatus status = e.waitUntilDone(pollingDelay);
+        
+        boolean killed = e.kill();
+        
+        JobStatus status = null;
+        
+        if (killed) {
+            status = e.getStatus();
+        } else { 
+            status = e.waitUntilDone(pollingDelay);
+        }
 
         if (status.isDone()) {
             cleanupJob(queue, job);
         }
-
-        // FIXME: Should throw exception if the cancel fails ??
+        
         return status;
     }
 
