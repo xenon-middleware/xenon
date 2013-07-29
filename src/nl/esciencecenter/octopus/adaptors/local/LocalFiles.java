@@ -178,7 +178,9 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException {
 
-        if (!isDirectory(dir)) {
+        FileAttributes att = getAttributes(dir);
+        
+        if (!att.isDirectory()) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
@@ -191,9 +193,12 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+
             throws OctopusIOException {
 
-        if (!isDirectory(dir)) {
+        FileAttributes att = getAttributes(dir);
+        
+        if (!att.isDirectory()) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
@@ -211,7 +216,9 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
         }
 
-        if (isDirectory(path)) {
+        FileAttributes att = getAttributes(path);
+        
+        if (att.isDirectory()) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }
 
@@ -297,11 +304,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public boolean exists(AbsolutePath path) throws OctopusIOException {
         return Files.exists(LocalUtils.javaPath(path));
-    }
-
-    @Override
-    public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        return Files.isDirectory(LocalUtils.javaPath(path));
     }
 
     @Override
@@ -431,30 +433,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public FileSystem getLocalHomeFileSystem() throws OctopusException {
         return home;
-    }
-
-    @Override
-    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        try {
-            return Files.isSymbolicLink(LocalUtils.javaPath(path));
-        } catch (Exception e) {
-            // We should return false if the check fails. 
-            return false;
-        }
-    }
-
-    @Override
-    public long size(AbsolutePath path) throws OctopusIOException {
-
-        if (!exists(path)) {
-            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.toString() + " does not exist!");
-        }
-
-        if (isDirectory(path) || isSymbolicLink(path)) {
-            return 0;
-        }
-
-        return LocalUtils.size(path);
     }
 
     @Override

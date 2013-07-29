@@ -40,6 +40,7 @@ import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
+import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 
@@ -203,11 +204,13 @@ public class CopyEngine {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
         }
 
-        if (owner.isDirectory(source)) {
+        FileAttributes sourceAtt = owner.getAttributes(source);
+        
+        if (sourceAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }
 
-        if (owner.isSymbolicLink(source)) {
+        if (sourceAtt.isSymbolicLink()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a link");
         }
 
@@ -215,11 +218,13 @@ public class CopyEngine {
             throw new NoSuchFileException("CopyEngine", "Target " + target.getPath() + " does not exist!");
         }
 
-        if (owner.isDirectory(target)) {
+        FileAttributes targetAtt = owner.getAttributes(target);
+        
+        if (targetAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Target " + target.getPath() + " is a directory");
         }
 
-        if (owner.isSymbolicLink(source)) {
+        if (targetAtt.isSymbolicLink()) {
             throw new IllegalSourcePathException("CopyEngine", "Target " + target.getPath() + " is a link");
         }
 
@@ -244,8 +249,8 @@ public class CopyEngine {
             }
         }
 
-        long targetSize = owner.size(target);
-        long sourceSize = owner.size(source);
+        long targetSize = targetAtt.size();
+        long sourceSize = sourceAtt.size();
 
         logger.debug("Resuming copy from {} to {} ? ", source.getPath(), target.getPath(), (sourceSize < targetSize));
 
@@ -284,24 +289,28 @@ public class CopyEngine {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
         }
 
-        if (owner.isDirectory(source)) {
+        FileAttributes sourceAtt = owner.getAttributes(source);
+        
+        if (sourceAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }
 
         if (!owner.exists(target)) {
             throw new NoSuchFileException("CopyEngine", "Target " + target.getPath() + " does not exist!");
         }
-
-        if (owner.isDirectory(target)) {
+        
+        FileAttributes targetAtt = owner.getAttributes(target);
+        
+        if (targetAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Target " + target.getPath() + " is a directory");
         }
-
+        
         if (source.normalize().equals(target.normalize())) {
             throw new IllegalTargetPathException("CopyEngine", "Can not append a file to itself (source " + source.getPath()
                     + " equals target " + target.getPath() + ")");
         }
 
-        ac.setBytesToCopy(owner.size(source));
+        ac.setBytesToCopy(sourceAtt.size());
         append(source, 0, target, ac);
     }
 
@@ -323,8 +332,10 @@ public class CopyEngine {
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
         }
-
-        if (owner.isDirectory(source)) {
+        
+        FileAttributes sourceAtt = owner.getAttributes(source);
+        
+        if (sourceAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }
 
@@ -345,7 +356,7 @@ public class CopyEngine {
             throw new NoSuchFileException("CopyEngine", "Target directory " + target.getParent().getPath() + " does not exist!");
         }
 
-        ac.setBytesToCopy(owner.size(source));
+        ac.setBytesToCopy(sourceAtt.size());
 
         InputStream in = null;
         OutputStream out = null;

@@ -278,9 +278,11 @@ public class SshFiles implements Files {
 
         SshSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
-
+        
+        FileAttributes att = getAttributes(path);
+        
         try {
-            if (isDirectory(path)) {
+            if (att.isDirectory()) {
                 if (newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
                     throw new DirectoryNotEmptyException(SshAdaptor.ADAPTOR_NAME, "cannot delete dir " + path
                             + " as it is not empty");
@@ -366,7 +368,9 @@ public class SshFiles implements Files {
     @SuppressWarnings("unchecked")
     private Vector<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException {
 
-        if (!isDirectory(path)) {
+        FileAttributes att = getAttributes(path);
+        
+        if (!att.isDirectory()) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
@@ -418,7 +422,9 @@ public class SshFiles implements Files {
             throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
         }
 
-        if (isDirectory(path)) {
+        FileAttributes att = getAttributes(path);
+        
+        if (att.isDirectory()) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }
 
@@ -566,42 +572,6 @@ public class SshFiles implements Files {
     @Override
     public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {
         return new SshFileAttributes(stat(path), path);
-    }
-
-    @Override
-    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-
-        try {
-            SftpATTRS s = stat(path);
-            // System.err.println("SSH isLink " + path.getPath() + " " + s.getPermissionsString() + " " + s.isLink());
-            return s.isLink();
-        } catch (NoSuchFileException e) {
-            // We should return false if the operation fails.
-            //  System.err.println("SSH isLink " + path.getPath() + " FAILED");
-            return false;
-        }
-    }
-
-    @Override
-    public long size(AbsolutePath path) throws OctopusIOException {
-
-        SftpATTRS tmp = stat(path);
-
-        if (tmp.isDir() || tmp.isLink()) {
-            return 0;
-        } else {
-            return tmp.getSize();
-        }
-    }
-
-    @Override
-    public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        try {
-            return stat(path).isDir();
-        } catch (NoSuchFileException e) {
-            // We should return false if the operation fails. 
-            return false;
-        }
     }
 
     @Override

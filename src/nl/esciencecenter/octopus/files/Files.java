@@ -355,47 +355,6 @@ public interface Files {
     public boolean exists(AbsolutePath path) throws OctopusIOException;
 
     /**
-     * Test if a path represents a directory.
-     * 
-     * @param path
-     *            the path to test.
-     * 
-     * @return If the path represents a directory.
-     * 
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    public boolean isDirectory(AbsolutePath path) throws OctopusIOException;
-
-    /**
-     * Test if a path represents a symbolic link.
-     * 
-     * @param path
-     *            the path to test.
-     * 
-     * @return If the path represents a symbolic link.
-     * 
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
-
-    /**
-     * Return the size of a file in bytes.
-     * 
-     * @param path
-     *            the path to the file.
-     * 
-     * @return the size of a file in bytes, or 0 if the file is a directory or symbolic link.
-     * 
-     * @throws NoSuchFileException
-     *             If the path does not exists.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
-     */
-    public long size(AbsolutePath path) throws OctopusIOException;
-
-    /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
      * 
      * @param dir

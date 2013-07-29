@@ -41,8 +41,7 @@ public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
 
         Credentials creds = octopus.credentials();
         String user = getTestUser();
-        Credential cred =
-                creds.newCertificateCredential("ssh", null, userHome + "/.ssh/id_rsa", userHome + "/.ssh/id_rsa.pub", user, null);
+        Credential cred = creds.newCertificateCredential("ssh", null, userHome + "/.ssh/id_rsa", user, null);
         return cred;
     }
 

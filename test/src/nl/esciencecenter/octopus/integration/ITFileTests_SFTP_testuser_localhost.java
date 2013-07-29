@@ -42,7 +42,7 @@ public class ITFileTests_SFTP_testuser_localhost extends AbstractFileTests {
         Credentials creds = octopus.credentials();
         String testUser = getTestUser();
         Credential cred =
-                creds.newCertificateCredential("ssh", null, userHome + "/.ssh/id_rsa", userHome + "/.ssh/id_rsa.pub", testUser,
+                creds.newCertificateCredential("ssh", null, userHome + "/.ssh/id_rsa", testUser,
                         null);
 
         return cred;

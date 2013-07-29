@@ -271,7 +271,9 @@ public abstract class GenericFileAdaptorTestParent {
             throw new Exception("Cannot delete non-existing file: " + file);
         }
 
-        if (files.isDirectory(file)) {
+        FileAttributes att = files.getAttributes(file);
+        
+        if (att.isDirectory()) {
             throw new Exception("Cannot delete directory: " + file);
         }
 
@@ -285,7 +287,9 @@ public abstract class GenericFileAdaptorTestParent {
             throw new Exception("Cannot delete non-existing dir: " + dir);
         }
 
-        if (!files.isDirectory(dir)) {
+        FileAttributes att = files.getAttributes(dir);
+        
+        if (!att.isDirectory()) {
             throw new Exception("Cannot delete file: " + dir);
         }
 
@@ -696,7 +700,10 @@ public abstract class GenericFileAdaptorTestParent {
             files.createDirectories(path);
 
             assert (files.exists(path));
-            assert (files.isDirectory(path));
+            
+            FileAttributes att = files.getAttributes(path);
+            
+            assert (att.isDirectory());
 
         } catch (Exception e) {
 

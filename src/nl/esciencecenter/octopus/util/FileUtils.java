@@ -330,7 +330,9 @@ public class FileUtils {
             throw new UnsupportedOperationException("FileUtils", "Can not replace and ignore existing files at the same time");
         }
 
-        boolean srcIsDir = octopus.files().isDirectory(source);
+        FileAttributes att = octopus.files().getAttributes(source);
+        boolean srcIsDir = att.isDirectory();
+        
         if (srcIsDir) {
             if (exist) {
                 if (ignore) {
@@ -375,7 +377,10 @@ public class FileUtils {
      * @throws OctopusIOException
      */
     public static void recursiveDelete(Octopus octopus, AbsolutePath path) throws OctopusIOException {
-        if (octopus.files().isDirectory(path)) {
+        
+        FileAttributes att = octopus.files().getAttributes(path);
+        
+        if (att.isDirectory()) {
             for (AbsolutePath f : octopus.files().newDirectoryStream(path)) {
                 FileUtils.recursiveDelete(octopus, f);
             }

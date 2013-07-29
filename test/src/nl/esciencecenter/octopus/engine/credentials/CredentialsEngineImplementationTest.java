@@ -59,7 +59,7 @@ public class CredentialsEngineImplementationTest {
     public void testCertificate() throws Exception {
 
         CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
-        Credential c = ce.newCertificateCredential("ssh", null, "keyfile", "certfile", "username", "password".toCharArray());
+        Credential c = ce.newCertificateCredential("ssh", null, "certfile", "username", "password".toCharArray());
 
         assertTrue(c instanceof CertificateCredentialImplementation);
 
@@ -67,7 +67,6 @@ public class CredentialsEngineImplementationTest {
 
         assertEquals("ssh", cci.getAdaptorName());
         assertEquals("username", cci.getUsername());
-        assertEquals("keyfile", cci.getKeyfile());
         assertEquals("certfile", cci.getCertfile());
         assertEquals(new HashMap<String,String>(), cci.getProperties());
 

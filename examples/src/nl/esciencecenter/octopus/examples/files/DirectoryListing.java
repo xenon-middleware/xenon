@@ -22,6 +22,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -67,8 +68,11 @@ public class DirectoryListing {
             // We now create an AbsolutePath representing the directory we want to list.
             AbsolutePath path = files.newPath(fs, new RelativePath(filepath));
             
-            // Retrieve the attributes of the file
-            if (files.isDirectory(path)) { 
+            // Retrieve the attributes of the file.
+            FileAttributes att = files.getAttributes(path);
+            
+            // Retrieve the attributes of the files in the directory.
+            if (att.isDirectory()) { 
                 
                 System.out.println("Directory " + uri + " exists and contains the following:");
                 

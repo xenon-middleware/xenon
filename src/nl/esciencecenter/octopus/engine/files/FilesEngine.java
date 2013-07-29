@@ -131,16 +131,6 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public boolean isDirectory(AbsolutePath path) throws OctopusIOException {
-        return getFilesAdaptor(path).isDirectory(path);
-    }
-
-    @Override
-    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException {
-        return getFilesAdaptor(path).isSymbolicLink(path);
-    }
-
-    @Override
     public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
 
         FileSystem sourcefs = source.getFileSystem();
@@ -246,10 +236,5 @@ public class FilesEngine implements Files {
     @Override
     public String toString() {
         return "FilesEngine [octopusEngine=" + octopusEngine + "]";
-    }
-
-    @Override
-    public long size(AbsolutePath path) throws OctopusIOException {
-        return getFilesAdaptor(path).size(path);
     }
 }
