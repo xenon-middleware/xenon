@@ -170,33 +170,14 @@ public class GridEngineParser extends ScriptingParser {
             Node clusterNode = clusterNodes.item(i);
 
             if (clusterNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) clusterNode;
-
-                NodeList tagNodes = element.getChildNodes();
-
-                Map<String, String> queueInfo = new HashMap<String, String>();
-
-                //fetch tags from the list of tag nodes. Ignores empty values
-                for (int j = 0; j < tagNodes.getLength(); j++) {
-                    Node tagNode = tagNodes.item(j);
-                    if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
-                        String key = tagNode.getNodeName();
-                        if (key != null && key.length() > 0) {
-                            NodeList children = tagNode.getChildNodes();
-                            if (children.getLength() > 0) {
-                                String value = tagNode.getChildNodes().item(0).getNodeValue();
-                                queueInfo.put(key, value);
-                            }
-                        }
-                    }
-                }
+                Map<String, String> queueInfo = parseInfoMap((Element) clusterNode);
 
                 String queueName = queueInfo.get("name");
 
                 if (queueName == null || queueName.length() == 0) {
                     throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
-
+                
                 result.put(queueName, queueInfo);
             }
         }
@@ -205,6 +186,29 @@ public class GridEngineParser extends ScriptingParser {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
+        return result;
+    }
+
+    private Map<String, String> parseInfoMap(Element clusterNode) throws OctopusIOException {
+        Map<String, String> result = new HashMap<String, String>();
+
+        NodeList tagNodes = clusterNode.getChildNodes();
+
+        //fetch tags from the list of tag nodes. Ignores empty values
+        for (int j = 0; j < tagNodes.getLength(); j++) {
+            Node tagNode = tagNodes.item(j);
+            if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
+                String key = tagNode.getNodeName();
+                if (key != null && key.length() > 0) {
+                    NodeList children = tagNode.getChildNodes();
+                    if (children.getLength() > 0) {
+                        String value = tagNode.getChildNodes().item(0).getNodeValue();
+                        result.put(key, value);
+                    }
+                }
+            }
+        }
+        
         return result;
     }
 
@@ -233,26 +237,9 @@ public class GridEngineParser extends ScriptingParser {
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
-
-                NodeList tagNodes = element.getChildNodes();
-
-                Map<String, String> jobInfo = new HashMap<String, String>();
-
-                //fetch tags from the list of tag nodes. Ignores empty values
-                for (int j = 0; j < tagNodes.getLength(); j++) {
-                    Node tagNode = tagNodes.item(j);
-                    if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
-                        String key = tagNode.getNodeName();
-                        if (key != null && key.length() > 0) {
-                            NodeList children = tagNode.getChildNodes();
-                            if (children.getLength() > 0) {
-                                String value = tagNode.getChildNodes().item(0).getNodeValue();
-                                jobInfo.put(key, value);
-                            }
-                        }
-                    }
-                }
-
+                
+                Map<String, String> jobInfo = parseInfoMap(element);
+                
                 String state = element.getAttribute("state");
 
                 if (state != null && state.length() > 0) {

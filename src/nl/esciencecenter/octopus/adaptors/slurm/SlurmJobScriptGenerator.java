@@ -15,7 +15,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 
 public final class SlurmJobScriptGenerator {
     
-    private static final Logger logger = LoggerFactory.getLogger(SlurmJobScriptGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmJobScriptGenerator.class);
     
     private SlurmJobScriptGenerator() {
         //DO NOT USE
@@ -95,7 +95,7 @@ public final class SlurmJobScriptGenerator {
 
         script.close();
 
-        logger.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:\n{}", stringBuilder);
 
         return stringBuilder.toString();
     }

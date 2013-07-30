@@ -36,14 +36,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Niels Drost
  * 
  */
+@SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 public final class GridEngineJobScriptGenerator {
-    
+
     private GridEngineJobScriptGenerator() {
         //DO NOT USE
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineJobScriptGenerator.class);
-    
+
     private static final int MINUTES_PER_HOUR = 60;
 
     private static int parseIntOption(String string) throws OctopusException {
@@ -54,9 +55,6 @@ public final class GridEngineJobScriptGenerator {
         }
     }
 
-    @SuppressFBWarnings(
-            value="VA_FORMAT_STRING_USES_NEWLINE", 
-            justification="Script generated is a Unix script.")
     private static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setupInfo,
             Formatter script) throws OctopusException {
         Map<String, String> options = description.getJobOptions();
@@ -74,9 +72,6 @@ public final class GridEngineJobScriptGenerator {
         script.format("#$ -pe %s %d\n", pe, slots);
     }
 
-    @SuppressFBWarnings(
-            value="VA_FORMAT_STRING_USES_NEWLINE", 
-            justification="Script generated is a Unix script.")
     public static String generate(JobDescription description, AbsolutePath fsEntryPath, GridEngineSetup setup)
             throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -111,7 +106,8 @@ public final class GridEngineJobScriptGenerator {
         }
 
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime() % MINUTES_PER_HOUR);
+        script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime()
+                % MINUTES_PER_HOUR);
 
         if (description.getStdin() != null) {
             script.format("#$ -i %s\n", description.getStdin());
@@ -138,14 +134,7 @@ public final class GridEngineJobScriptGenerator {
         script.format("\n");
 
         if (description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) {
-
-            script.format("%s", description.getExecutable());
-
-            for (String argument : description.getArguments()) {
-                script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
-            }
-            script.format("\n");
-
+            generateSerialScriptContent(description, script);
         } else {
             generateParallelScriptContent(description, script);
         }
@@ -157,7 +146,16 @@ public final class GridEngineJobScriptGenerator {
         return stringBuilder.toString();
     }
 
-    @SuppressWarnings("all")
+    private static void generateSerialScriptContent(JobDescription description, Formatter script) {
+        script.format("%s", description.getExecutable());
+
+        for (String argument : description.getArguments()) {
+            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+        }
+        script.format("\n");
+    }
+
+    
     private static void generateParallelScriptContent(JobDescription description, Formatter script) {
         script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
 

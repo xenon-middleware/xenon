@@ -9,35 +9,39 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-public class SlurmOutputParser extends ScriptingParser {
+public final class SlurmOutputParser extends ScriptingParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(SlurmOutputParser.class);
-    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmOutputParser.class);
+
+    //Message followed by identifier
+    private static final String SBATCH_MESSAGE = "Submitted batch job ";
+    //Message followed by identifier
+    private static final String SBATCH_ALTERNATE_MESSAGE = "Granted job allocation "; 
+
     private SlurmOutputParser() {
         //DO NOT USE
     }
 
     static String parseSbatchOutput(String output) throws OctopusException {
-        if (!(output.startsWith("Granted job allocation") || output.startsWith("Submitted batch job"))) {
+        int identifierOffset;
+
+        if (output.startsWith(SBATCH_MESSAGE)) {
+            identifierOffset = SBATCH_MESSAGE.length();
+        } else if (output.startsWith(SBATCH_ALTERNATE_MESSAGE)) {
+            identifierOffset = SBATCH_ALTERNATE_MESSAGE.length();
+        } else {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
                     "Failed to obtain job ID from sbatch output, output format not recognized: " + output);
         }
-
-        String[] elements = output.split(WHITESPACE_REGEX);
-
-        if (elements.length != 4) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
-                    "Failed to obtain job ID from sbatch output, output format not recognized: " + output);
-        }
-
-        String identifier = elements[3];
+        
+        String identifier = output.substring(identifierOffset).trim();
 
         //check if the job ID we found is a number.
         try {
             Long.parseLong(identifier);
         } catch (NumberFormatException e) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
-                    "Failed to obtain job ID from sbatch output, job ID is not a number: " + identifier);
+                    "Failed to obtain job ID from sbatch output, job ID is not a number: " + identifier, e);
         }
 
         return identifier;
@@ -67,7 +71,7 @@ public class SlurmOutputParser extends ScriptingParser {
             String[] values = lines[i].split(seperatorRegEx);
 
             if (fields.length != values.length) {
-                logger.debug("fields = {}, values = {}", fields, values);
+                LOGGER.debug("fields = {}, values = {}", fields, values);
                 throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Expected " + fields.length
                         + " fields in sinfo output, got line with " + values.length + " values: " + lines[i]);
             }
@@ -127,7 +131,7 @@ public class SlurmOutputParser extends ScriptingParser {
             String[] pair = line.split(KEY_EQUALS_VALUE_REGEX, 2);
 
             if (pair.length != 2) {
-                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got invalid key/value pair in scontrol output: " + pair);
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got invalid key/value pair in scontrol output: " + line);
             }
 
             result.put(pair[0], pair[1]);

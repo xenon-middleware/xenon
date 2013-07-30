@@ -55,12 +55,16 @@ import org.slf4j.LoggerFactory;
  */
 public class SlurmSchedulerConnection extends SchedulerConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
    
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
-    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    
+    private static final String[] FAILED_STATES = new String[] {"FAILED", "CANCELLED", "NODE_FAIL","TIMEOUT", "PREEMPTED" };
 
+    private static final String DONE_STATE = "COMPLETED";
+    
     private final String[] queueNames;
     private final String defaultQueueName;
 
@@ -83,7 +87,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential, 
                 getProperties(), false, false, true);
 
-        logger.debug("new slurm scheduler connection {}", scheduler);
+        LOGGER.debug("new slurm scheduler connection {}", scheduler);
     }
 
     private SlurmConfig fetchConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
@@ -295,7 +299,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         Exception exception = null;
 
         if (info == null || info.isEmpty()) {
-            logger.debug("job {} not found in queue", job.getIdentifier());
+            LOGGER.debug("job {} not found in queue", job.getIdentifier());
             return null;
         }
 
@@ -322,22 +326,26 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
 
     }
-
-    private static boolean isDoneState(String state) {
-        return state.equals("COMPLETED") || state.equals("FAILED") || state.startsWith("CANCELLED") || state.equals("NODE_FAIL")
-                || state.equals("TIMEOUT") || state.equals("PREEMPTED");
-    }
-
+    
     private static boolean isFailedState(String state) {
-        return state.equals("FAILED") || state.startsWith("CANCELLED") || state.equals("NODE_FAIL") || state.equals("TIMEOUT")
-                || state.equals("PREEMPTED");
+        for(String validState: FAILED_STATES) {
+            if (state.startsWith(validState)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    //failed also implies done
+    private static boolean isDoneState(String state) {
+        return state.equals(DONE_STATE) || isFailedState(state);
     }
 
     private JobStatus getJobFromSControl(Job job) throws OctopusIOException, OctopusException {
         RemoteCommandRunner runner = runCommand(null, "scontrol", "-o", "show", "job", job.getIdentifier());
 
         if (!runner.success()) {
-            logger.debug("failed to get job status {}", runner);
+            LOGGER.debug("failed to get job status {}", runner);
             return null;
         }
 
@@ -348,7 +356,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private JobStatus getJobStatusFromMap(Map<String, String> info, Job job) throws OctopusException {
         if (info == null || info.isEmpty()) {
-            logger.debug("job {} not found in scontrol/sacct output", job.getIdentifier());
+            LOGGER.debug("job {} not found in scontrol/sacct output", job.getIdentifier());
             return null;
         }
 
@@ -395,7 +403,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         JobStatus result =
                 new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), info);
 
-        logger.debug("Got job status from scontrol/sacct output {}", result);
+        LOGGER.debug("Got job status from scontrol/sacct output {}", result);
 
         return result;
     }
@@ -424,7 +432,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             }
             
             if (!runner.getStderr().isEmpty()) {
-                logger.warn("Sacct produced error output: " + runner.getStderr());
+                LOGGER.warn("Sacct produced error output: " + runner.getStderr());
             }
             
             Map<String, Map<String, String>> sacctMap =
@@ -477,7 +485,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             }
             
             if (!runner.getStderr().isEmpty()) {
-                logger.warn("Sacct produced error output: " + runner.getStderr());
+                LOGGER.warn("Sacct produced error output: " + runner.getStderr());
             }
 
             sacctMap = SlurmOutputParser.parseInfoOutput(runner.getStdout(), "JobID", SlurmOutputParser.BAR_REGEX);

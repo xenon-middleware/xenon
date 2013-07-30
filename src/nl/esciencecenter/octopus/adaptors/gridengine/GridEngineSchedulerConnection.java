@@ -261,12 +261,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
 
     }
-
-    @Override
-    protected void verifyJobDescription(JobDescription description) throws OctopusException {
+    
+    private static void checkJobOptions(Map<String, String> options) throws InvalidJobDescriptionException {
         //check if all given job options make sense
         //TODO: this should be build on top of OctopusProperties, see #132
-        for (String option : description.getJobOptions().keySet()) {
+        for (String option :options.keySet()) {
             boolean found = false;
             for (String validOption : VALID_JOB_OPTIONS) {
                 if (validOption.equals(option)) {
@@ -278,6 +277,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                         + "\" not supported");
             }
         }
+    }
+
+    @Override
+    protected void verifyJobDescription(JobDescription description) throws OctopusException {
+        checkJobOptions(description.getJobOptions());
 
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
