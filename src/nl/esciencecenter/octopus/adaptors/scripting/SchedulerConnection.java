@@ -83,10 +83,10 @@ public abstract class SchedulerConnection {
         
         try {
             id = adaptor.getName() + "-" + getNextSchedulerID();
+            //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
             URI actualLocation = new URI("ssh", location.getSchemeSpecificPart(), location.getFragment());
 
             if (location.getHost() == null || location.getHost().length() == 0) {
-                //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
                 actualLocation = new URI("local:///");
             }
 

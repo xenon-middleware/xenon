@@ -19,14 +19,16 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Generator for GridEngine job script.
@@ -52,6 +54,9 @@ public final class GridEngineJobScriptGenerator {
         }
     }
 
+    @SuppressFBWarnings(
+            value="VA_FORMAT_STRING_USES_NEWLINE", 
+            justification="Script generated is a Unix script.")
     private static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setupInfo,
             Formatter script) throws OctopusException {
         Map<String, String> options = description.getJobOptions();
@@ -66,12 +71,12 @@ public final class GridEngineJobScriptGenerator {
             slots = setupInfo.calculateSlots(pe, description.getQueueName(), description.getNodeCount());
         }
 
-        //Stop sonar from complaining about %n vs \n. As these scripts get copied to a unix machine, the newline must be a \n
-        script.format("#$ -pe %s %d\n", pe, slots);//NOSONAR
+        script.format("#$ -pe %s %d\n", pe, slots);
     }
 
-    //Stop sonar from complaining about %n vs \n. As these scripts get copied to a unix machine, the newline must be a \n
-    @SuppressWarnings("all")
+    @SuppressFBWarnings(
+            value="VA_FORMAT_STRING_USES_NEWLINE", 
+            justification="Script generated is a Unix script.")
     public static String generate(JobDescription description, AbsolutePath fsEntryPath, GridEngineSetup setup)
             throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();

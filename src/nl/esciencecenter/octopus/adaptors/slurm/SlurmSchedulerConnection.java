@@ -402,7 +402,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     @Override
     public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
-        //String output = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + job.getIdentifier());
         String sQueueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + job.getIdentifier());
 
         Map<String, Map<String, String>> sQueueMap =
