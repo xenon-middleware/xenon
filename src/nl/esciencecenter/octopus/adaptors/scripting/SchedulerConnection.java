@@ -269,7 +269,7 @@ public abstract class SchedulerConnection {
             path = getFsEntryPath().resolve(new RelativePath(workingDirectory));
         }
         if (!engine.files().exists(path)) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
+            throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
         }
     }
 

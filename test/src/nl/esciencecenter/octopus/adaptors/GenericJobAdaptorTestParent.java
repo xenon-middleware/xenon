@@ -16,8 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -908,7 +907,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         if (!status.isDone()) {
-            throw new Exception("Failed to kill job!");
+            throw new Exception("Failed to kill job! Expected status done, but job status is " + status);
         }
 
         jobs.close(scheduler);
@@ -959,7 +958,7 @@ public abstract class GenericJobAdaptorTestParent {
         JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
 
         if (!status.isRunning()) {
-            throw new Exception("Job failed to start!");
+            throw new Exception("Job failed to start! Expected status running, but job status is " + status);
         }
 
         status = jobs.cancelJob(job);
@@ -970,7 +969,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         if (!status.isDone()) {
-            throw new Exception("Failed to kill job!");
+            throw new Exception("Failed to kill job! Expected status done, but job status is " + status);
         }
 
         jobs.close(scheduler);
@@ -1228,15 +1227,27 @@ public abstract class GenericJobAdaptorTestParent {
         //incorrect working dir used
         description.setWorkingDirectory(workingDir);
 
-        Job job = jobs.submitJob(scheduler, description);
+        //submitting this job will either:
+        // 1) throw an InvalidJobDescription when we submit the job
+        // 2) produce an error when the job is run.
+
+        Job job = null;
+        try {
+            job = jobs.submitJob(scheduler, description);
+        } catch (InvalidJobDescriptionException e) {
+            //Submit failed, as expected (1)
+            jobs.close(scheduler);
+            return;
+        }
+
         JobStatus status = jobs.waitUntilDone(job, 60000);
 
         if (!status.isDone()) {
-            throw new Exception("Job exceeded deadline!");
+            fail("Job exceeded deadline! Expected status done, got " + status);
         }
 
+        //option (2)
         assertTrue(status.hasException());
-
         jobs.close(scheduler);
     }
 

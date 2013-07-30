@@ -7,12 +7,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
+@SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 public final class SlurmJobScriptGenerator {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmJobScriptGenerator.class);
@@ -22,7 +25,7 @@ public final class SlurmJobScriptGenerator {
     }
 
     //Stop sonar from complaining about %n vs \n. As these scripts get copied to a unix machine, the newline must be a \n
-    @SuppressWarnings("all")
+    
     public static String generate(JobDescription description, AbsolutePath fsEntryPath) throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
