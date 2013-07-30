@@ -60,7 +60,7 @@ public class InputWriter extends Thread {
         while (!finished) {
             try {
                 wait();
-            } catch (Throwable t) {
+            } catch (InterruptedException e) {
                 // Ignore.
             }
         }

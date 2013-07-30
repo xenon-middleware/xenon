@@ -16,26 +16,35 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.engine.Adaptor;
+import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
+import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
+import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,18 +60,23 @@ public class JobQueueTest {
     static class MyProcessWrapper implements InteractiveProcess {
 
         final JobImplementation job;
-
+        final byte [] output;
+        final byte [] error;
+        
         boolean destoyed = false;
         boolean done = false;
         int exit = -1;
 
-        public MyProcessWrapper(JobImplementation job) {
+        public MyProcessWrapper(JobImplementation job, byte [] output, byte [] error) {
             this.job = job;
+            this.output = output;
+            this.error = error;
         }
 
         @Override
         public Streams getStreams() {
-            return null;
+            return new StreamsImplementation(job, new ByteArrayInputStream(output), new ByteArrayOutputStream(), 
+                    new ByteArrayInputStream(error));
         }
 
         public synchronized void setDone() {
@@ -109,7 +123,7 @@ public class JobQueueTest {
                 throw new IOException("Failed to create process!");
             }
 
-            MyProcessWrapper wrapper = new MyProcessWrapper(job);
+            MyProcessWrapper wrapper = new MyProcessWrapper(job, new byte[0], new byte[0]);
 
             setCurrentWrapper(wrapper);
 
@@ -119,6 +133,7 @@ public class JobQueueTest {
 
     public static Scheduler scheduler;
     public static Octopus octopus;
+    public static Files files;
     public static FileSystem filesystem;
     public static JobQueues jobQueue;
     public static MyFactory myFactory;
@@ -135,11 +150,10 @@ public class JobQueueTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-
-        octopus = mock(Octopus.class);
-        scheduler = mock(Scheduler.class);
-        filesystem = mock(FileSystem.class);
-
+        octopus = OctopusFactory.newOctopus(null);
+        scheduler = octopus.jobs().getLocalScheduler();
+        files = octopus.files();
+        filesystem = files.getLocalCWDFileSystem();
         myFactory = new MyFactory();
         jobQueue = new JobQueues("test", octopus, scheduler, filesystem, myFactory, 2, POLLING_DELAY);
     }
@@ -157,10 +171,26 @@ public class JobQueueTest {
                 System.err.println("   " + jobs[i]);
             }
 
-            throw new Exception("There are jobs sutck in the queue!");
+            throw new Exception("There are jobs stuck in the queue!");
         }
     }
 
+    @After
+    public void cleanupTest() throws Exception {
+        
+        AbsolutePath p = filesystem.getEntryPath().resolve(new RelativePath("stderr.txt"));
+        
+        if (files.exists(p)) { 
+            files.delete(p);
+        }
+        
+        p = filesystem.getEntryPath().resolve(new RelativePath("stdout.txt"));
+        
+        if (files.exists(p)) { 
+            files.delete(p);
+        }
+    }
+    
     @Test(expected = BadParameterException.class)
     public void test_constructor2() throws Exception {
         // throws exception
@@ -242,21 +272,21 @@ public class JobQueueTest {
         jobQueue.submitJob(d);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test_invalidJobDescription8() throws Exception {
-        JobDescription d = new JobDescription();
-        d.setExecutable("exec_invalidJobDescription8");
-        d.setStdout(null);
-        jobQueue.submitJob(d);
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test_invalidJobDescription9() throws Exception {
-        JobDescription d = new JobDescription();
-        d.setExecutable("exec_invalidJobDescription9");
-        d.setStderr(null);
-        jobQueue.submitJob(d);
-    }
+//    @Test(expected = InvalidJobDescriptionException.class)
+//    public void test_invalidJobDescription8() throws Exception {
+//        JobDescription d = new JobDescription();
+//        d.setExecutable("exec_invalidJobDescription8");
+//        d.setStdout(null);
+//        jobQueue.submitJob(d);
+//    }
+//
+//    @Test(expected = InvalidJobDescriptionException.class)
+//    public void test_invalidJobDescription9() throws Exception {
+//        JobDescription d = new JobDescription();
+//        d.setExecutable("exec_invalidJobDescription9");
+//        d.setStderr(null);
+//        jobQueue.submitJob(d);
+//    }
 
     @Test(expected = OctopusException.class)
     public void test_failingInteractiveJob1() throws Exception {

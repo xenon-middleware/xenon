@@ -49,8 +49,7 @@ public class JobExecutor implements Runnable {
 
     private Integer exitStatus;
 
-    // private Thread thread = null;
-
+    private boolean isRunning = false;
     private boolean killed = false;
     private boolean done = false;
     private boolean hasRun = false;
@@ -74,17 +73,20 @@ public class JobExecutor implements Runnable {
         return hasRun;
     }
 
-    public synchronized void kill() throws OctopusException {
-
+    public synchronized boolean kill() throws OctopusException {
+        
         if (done) {
-            return;
+            return true;
         }
 
         killed = true;
 
-        //        if (thread != null) {
-        //            thread.interrupt();
-        //        }
+        if (!isRunning) { 
+            updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
+            return true;
+        }
+    
+        return false;
     }
 
     public synchronized boolean isDone() {
@@ -126,6 +128,7 @@ public class JobExecutor implements Runnable {
     }
 
     private synchronized boolean getKilled() {
+        isRunning = true;
         return killed;
     }
 
@@ -226,8 +229,6 @@ public class JobExecutor implements Runnable {
             updateState("ERROR", -1, e);
             return;
         }
-
-        // this.thread = Thread.currentThread();
 
         updateState("RUNNING", -1, null);
 

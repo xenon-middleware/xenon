@@ -154,7 +154,9 @@ public class JobQueues {
                 }
             }
         }
-
+        
+        logger.debug("{}: getJobs for queues {} returns {}", adaptorName, queueNames, out);
+        
         return out.toArray(new Job[out.size()]);
     }
 
@@ -365,7 +367,7 @@ public class JobQueues {
 
         String queueName = description.getQueueName();
 
-        logger.debug("{}: Submitting job to queue ", adaptorName, queueName);
+        logger.debug("{}: Submitting job to queue {}", adaptorName, queueName);
 
         // NOTE: the verifyJobDescription ensures that the queueName has a valid value!
         if (queueName.equals("unlimited")) {
@@ -400,14 +402,21 @@ public class JobQueues {
         LinkedList<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
 
         JobExecutor e = findJob(queue, job);
-        e.kill();
-        JobStatus status = e.waitUntilDone(pollingDelay);
+        
+        boolean killed = e.kill();
+        
+        JobStatus status = null;
+        
+        if (killed) {
+            status = e.getStatus();
+        } else { 
+            status = e.waitUntilDone(pollingDelay);
+        }
 
         if (status.isDone()) {
             cleanupJob(queue, job);
         }
-
-        // FIXME: Should throw exception if the cancel fails ??
+        
         return status;
     }
 

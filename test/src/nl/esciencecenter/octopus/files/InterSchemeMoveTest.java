@@ -20,7 +20,7 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class InterSchemeMoveTest {
 
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test_move() throws Exception {
 
         Octopus octopus = OctopusEngine.newOctopus(null);

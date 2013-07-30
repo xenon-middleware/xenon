@@ -366,9 +366,7 @@ public class CopyEngine {
 
             if (replace) {
                 out = owner.newOutputStream(target, OpenOption.OPEN_OR_CREATE, OpenOption.TRUNCATE);
-                //out = Files.newOutputStream(LocalUtils.javaPath(target), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
             } else {
-                // out = Files.newOutputStream(LocalUtils.javaPath(target), StandardOpenOption.WRITE, StandardOpenOption.CREATE_NEW);
                 out = owner.newOutputStream(target, OpenOption.CREATE, OpenOption.APPEND);
             }
 
@@ -444,15 +442,11 @@ public class CopyEngine {
 
         while (!done && pending.size() == 0) {
             try {
-                //System.err.println("Copy engine " + done + " " + pending.size());
-
                 wait(1000);
             } catch (InterruptedException e) {
                 // ignore ?
             }
         }
-
-        //System.err.println("Copy engine EXIT " + done + " " + pending.size());
 
         if (done) {
             logger.debug("CopyEngine received termination signal with {} pending copies.", pending.size());

@@ -202,10 +202,4 @@ public class LocalFileAttributes implements FileAttributes {
         //        
         return true;
     }
-
-    //    @Override
-    //    public List<AclEntry> getAcl() throws AttributeNotSupportedException {
-    //        throw new UnsupportedOperationException("Local adaptor cannot handle ACLs yet");
-    //    }
-
 }

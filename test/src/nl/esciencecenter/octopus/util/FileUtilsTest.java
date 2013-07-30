@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.octopus.util;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
@@ -33,6 +33,7 @@ import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -40,56 +41,56 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import org.junit.Test;
 
 public class FileUtilsTest {
-/*
-    @Test
-    public void testCopyOctopusInputStreamAbsolutePathCopyOptionArray() throws OctopusException {
-        fail("Not yet implemented");
-    }
 
-    @Test
-    public void testCopyOctopusAbsolutePathOutputStream() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewBufferedReader() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testNewBufferedWriter() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testReadAllBytes() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testReadAllLines() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testWriteOctopusAbsolutePathByteArrayOpenOptionArray() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testWriteOctopusAbsolutePathIterableOfQextendsCharSequenceCharsetOpenOptionArray() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testWalkFileTreeOctopusAbsolutePathFileVisitor() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testWalkFileTreeOctopusAbsolutePathBooleanIntFileVisitor() {
-        fail("Not yet implemented");
-    }
+//    @Test
+//    public void testCopyOctopusInputStreamAbsolutePathCopyOptionArray() throws OctopusException {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testCopyOctopusAbsolutePathOutputStream() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewBufferedReader() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testNewBufferedWriter() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testReadAllBytes() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testReadAllLines() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testWriteOctopusAbsolutePathByteArrayOpenOptionArray() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testWriteOctopusAbsolutePathIterableOfQextendsCharSequenceCharsetOpenOptionArray() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testWalkFileTreeOctopusAbsolutePathFileVisitor() {
+//        fail("Not yet implemented");
+//    }
+//
+//    @Test
+//    public void testWalkFileTreeOctopusAbsolutePathBooleanIntFileVisitor() {
+//        fail("Not yet implemented");
+//    }
 
     @Test
     public void testRecursiveCopy_SingleFile_CopiedFile() throws OctopusIOException,
@@ -99,8 +100,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcFile = mock(AbsolutePath.class);
         AbsolutePath dstFile = mock(AbsolutePath.class);
-        when(files.isDirectory(srcFile)).thenReturn(false);
-        when(files.isDirectory(dstFile)).thenReturn(false);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(false);
+        when(files.getAttributes(srcFile)).thenReturn(attributes);
+        when(files.getAttributes(dstFile)).thenReturn(attributes);
+        
+//        when(files.isDirectory(srcFile)).thenReturn(false);
+//        when(files.isDirectory(dstFile)).thenReturn(false);
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(false);
 
@@ -117,8 +124,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcDir = mock(AbsolutePath.class);
         AbsolutePath dstDir = mock(AbsolutePath.class);
-        when(files.isDirectory(srcDir)).thenReturn(true);
-        when(files.isDirectory(dstDir)).thenReturn(true);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(srcDir)).thenReturn(attributes);
+        when(files.getAttributes(dstDir)).thenReturn(attributes);
+        
+//        when(files.isDirectory(srcDir)).thenReturn(true);
+//        when(files.isDirectory(dstDir)).thenReturn(true);
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(false);
         @SuppressWarnings("unchecked")
@@ -141,14 +154,25 @@ public class FileUtilsTest {
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcDir = mock(AbsolutePath.class); // foo
-        AbsolutePath srcFile = mock(AbsolutePath.class); // foo/myfile
-        when(srcFile.getFileName()).thenReturn("myfile");
+        AbsolutePath srcFile = mock(AbsolutePath.class); // foo/myfile        
+        when(srcFile.getFileName()).thenReturn("myfile");        
         AbsolutePath dstDir = mock(AbsolutePath.class); // bar
-        AbsolutePath dstFile = mock(AbsolutePath.class); // bar/myfile
+        AbsolutePath dstFile = mock(AbsolutePath.class); // bar/myfile        
         RelativePath relSrcFile = new RelativePath("myfile");
         when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
-        when(files.isDirectory(srcDir)).thenReturn(true);
-        when(files.isDirectory(dstDir)).thenReturn(true);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(srcDir)).thenReturn(attributes);
+        when(files.getAttributes(dstDir)).thenReturn(attributes);
+             
+        FileAttributes attributes2 = mock(FileAttributes.class);
+        when(attributes2.isDirectory()).thenReturn(false);
+        when(files.getAttributes(srcFile)).thenReturn(attributes2);
+        when(files.getAttributes(dstFile)).thenReturn(attributes2);
+        
+//        when(files.isDirectory(srcDir)).thenReturn(true);
+//        when(files.isDirectory(dstDir)).thenReturn(true);
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(false);
         when(files.exists(srcFile)).thenReturn(true);
@@ -176,8 +200,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcFile = mock(AbsolutePath.class);
         AbsolutePath dstFile = mock(AbsolutePath.class);
-        when(files.isDirectory(srcFile)).thenReturn(false);
-        when(files.isDirectory(dstFile)).thenReturn(false);
+
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(false);
+        when(files.getAttributes(srcFile)).thenReturn(attributes);
+        when(files.getAttributes(dstFile)).thenReturn(attributes);
+        
+//        when(files.isDirectory(srcFile)).thenReturn(false);
+//        when(files.isDirectory(dstFile)).thenReturn(false);
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(true);
         when(dstFile.getPath()).thenReturn("foo");
@@ -189,7 +219,7 @@ public class FileUtilsTest {
             FileUtils.recursiveCopy(octopus, srcFile, dstFile);
             fail("FileAlreadyExistsException not thrown");
         } catch (FileAlreadyExistsException e) {
-            assertThat(e.getMessage(), is("ssh adaptor: Target foo already exists!"));
+            assertEquals(e.getMessage(), "ssh adaptor: Target foo already exists!");
         }
     }
 
@@ -201,8 +231,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcDir = mock(AbsolutePath.class);
         AbsolutePath dstDir = mock(AbsolutePath.class);
-        when(files.isDirectory(srcDir)).thenReturn(true);
-        when(files.isDirectory(dstDir)).thenReturn(true);
+
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(srcDir)).thenReturn(attributes);
+        when(files.getAttributes(dstDir)).thenReturn(attributes);
+        
+//        when(files.isDirectory(srcDir)).thenReturn(true);
+//        when(files.isDirectory(dstDir)).thenReturn(true);
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(true);
         @SuppressWarnings("unchecked")
@@ -221,7 +257,7 @@ public class FileUtilsTest {
             FileUtils.recursiveCopy(octopus, srcDir, dstDir);
             fail("FileAlreadyExistsException not thrown");
         } catch (FileAlreadyExistsException e) {
-            assertThat(e.getMessage(), is("ssh adaptor: Target foo already exists!"));
+            assertEquals(e.getMessage(), "ssh adaptor: Target foo already exists!");
         }
     }
 
@@ -238,8 +274,19 @@ public class FileUtilsTest {
         AbsolutePath dstFile = mock(AbsolutePath.class); // bar/myfile
         RelativePath relSrcFile = new RelativePath("myfile");
         when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
-        when(files.isDirectory(srcDir)).thenReturn(true);
-        when(files.isDirectory(dstDir)).thenReturn(true);
+
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(srcDir)).thenReturn(attributes);
+        when(files.getAttributes(dstDir)).thenReturn(attributes);
+
+        FileAttributes attributes2 = mock(FileAttributes.class);
+        when(attributes2.isDirectory()).thenReturn(true);
+        when(files.getAttributes(srcFile)).thenReturn(attributes2);
+        when(files.getAttributes(dstFile)).thenReturn(attributes2);
+        
+//        when(files.isDirectory(srcDir)).thenReturn(true);
+//        when(files.isDirectory(dstDir)).thenReturn(true);
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(false);
         when(files.exists(srcFile)).thenReturn(true);
@@ -262,7 +309,7 @@ public class FileUtilsTest {
             verify(files).createDirectories(dstDir);
             fail("FileAlreadyExistsException not thrown");
         } catch (FileAlreadyExistsException e) {
-            assertThat(e.getMessage(), is("ssh adaptor: Target myfile already exists!"));
+            assertEquals(e.getMessage(), "ssh adaptor: Target myfile already exists!");
         }
     }
 
@@ -274,8 +321,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcDir = mock(AbsolutePath.class);
         AbsolutePath dstDir = mock(AbsolutePath.class);
-        when(files.isDirectory(srcDir)).thenReturn(true);
-        when(files.isDirectory(dstDir)).thenReturn(true);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(srcDir)).thenReturn(attributes);
+        when(files.getAttributes(dstDir)).thenReturn(attributes);
+        
+//        when(files.isDirectory(srcDir)).thenReturn(true);
+//        when(files.isDirectory(dstDir)).thenReturn(true);
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(true);
         when(dstDir.getPath()).thenReturn("foo");
@@ -303,8 +356,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcFile = mock(AbsolutePath.class);
         AbsolutePath dstFile = mock(AbsolutePath.class);
-        when(files.isDirectory(srcFile)).thenReturn(false);
-        when(files.isDirectory(dstFile)).thenReturn(false);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(false);
+        when(files.getAttributes(srcFile)).thenReturn(attributes);
+        when(files.getAttributes(dstFile)).thenReturn(attributes);
+                
+//        when(files.isDirectory(srcFile)).thenReturn(false);
+//        when(files.isDirectory(dstFile)).thenReturn(false);
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(true);
         when(dstFile.getPath()).thenReturn("foo");
@@ -329,7 +388,7 @@ public class FileUtilsTest {
             FileUtils.recursiveCopy(octopus, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
             fail("UnsupportedOperationException not thrown");
         } catch (UnsupportedOperationException e) {
-            assertThat(e.getMessage(), is("FileUtils adaptor: Can not replace and ignore existing files at the same time"));
+            assertEquals(e.getMessage(), "FileUtils adaptor: Can not replace and ignore existing files at the same time");
         }
     }
 
@@ -340,8 +399,14 @@ public class FileUtilsTest {
         when(octopus.files()).thenReturn(files);
         AbsolutePath srcFile = mock(AbsolutePath.class);
         AbsolutePath dstFile = mock(AbsolutePath.class);
-        when(files.isDirectory(srcFile)).thenReturn(false);
-        when(files.isDirectory(dstFile)).thenReturn(false);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(false);
+        when(files.getAttributes(srcFile)).thenReturn(attributes);
+        when(files.getAttributes(dstFile)).thenReturn(attributes);
+        
+//        when(files.isDirectory(srcFile)).thenReturn(false);
+//        when(files.isDirectory(dstFile)).thenReturn(false);
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(true);
 
@@ -356,7 +421,12 @@ public class FileUtilsTest {
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
         AbsolutePath directory = mock(AbsolutePath.class);
-        when(files.isDirectory(directory)).thenReturn(true);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(directory)).thenReturn(attributes);        
+        
+//        when(files.isDirectory(directory)).thenReturn(true);
         @SuppressWarnings("unchecked")
         DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
@@ -375,9 +445,19 @@ public class FileUtilsTest {
         Files files = mock(Files.class);
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
+        
         AbsolutePath directory = mock(AbsolutePath.class);
         AbsolutePath myfile = mock(AbsolutePath.class);
-        when(files.isDirectory(directory)).thenReturn(true);
+        
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(true);
+        when(files.getAttributes(directory)).thenReturn(attributes);        
+        
+        FileAttributes attributes2 = mock(FileAttributes.class);
+        when(attributes2.isDirectory()).thenReturn(false);
+        when(files.getAttributes(myfile)).thenReturn(attributes2);        
+        
+//        when(files.isDirectory(directory)).thenReturn(true);
         @SuppressWarnings("unchecked")
         DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
@@ -399,16 +479,20 @@ public class FileUtilsTest {
         Octopus octopus = mock(Octopus.class);
         when(octopus.files()).thenReturn(files);
         AbsolutePath myfile = mock(AbsolutePath.class);
-        when(files.isDirectory(myfile)).thenReturn(false);
+
+        FileAttributes attributes = mock(FileAttributes.class);
+        when(attributes.isDirectory()).thenReturn(false);
+        when(files.getAttributes(myfile)).thenReturn(attributes);        
+        
+        //        when(files.isDirectory(myfile)).thenReturn(false);
 
         FileUtils.recursiveDelete(octopus, myfile);
 
         verify(files).delete(myfile);
     }
 
-    @Test
-    public void testRecursiveWipe() {
-        fail("Not yet implemented");
-    }
-*/
+//    @Test
+//    public void testRecursiveWipe() {
+//        fail("Not yet implemented");
+//    }
 }

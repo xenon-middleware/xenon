@@ -164,8 +164,7 @@ public class JobDescriptionTest {
         result = prime * result + new HashMap<String, String>().hashCode();
         result = prime * result + 0;
         result = prime * result + 1237;
-        result = prime * result + 30;
-        result = prime * result + 1231;
+        result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
         result = prime * result + 0;
@@ -212,8 +211,7 @@ public class JobDescriptionTest {
         result = prime * result + opt.hashCode();
         result = prime * result + "exec".hashCode();
         result = prime * result + 1231;
-        result = prime * result + 30;
-        result = prime * result + 1237;
+        result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
         result = prime * result + "noot".hashCode();
@@ -243,7 +241,7 @@ public class JobDescriptionTest {
 
         other.setMaxTime(42);
         assertFalse(j.equals(other));
-        other.setMaxTime(30);
+        other.setMaxTime(15);
 
         other.setNodeCount(2);
         assertFalse(j.equals(other));
@@ -263,7 +261,6 @@ public class JobDescriptionTest {
         other.setExecutable("aap");
         assertFalse(j.equals(other));
 
-        other.setExecutable("aap");
         j.setExecutable("aap");
         assertTrue(j.equals(other));
 
@@ -314,7 +311,7 @@ public class JobDescriptionTest {
 
         String expected =
                 "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], nodeCount=1,"
-                        + " processesPerNode=1, maxTime=30, mergeOutput=false, interactive=true, stdin=stdin.txt,"
+                        + " processesPerNode=1, maxTime=15, interactive=true, stdin=stdin.txt,"
                         + " stdout=stdout.txt, stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1, ENV2=ARG2},"
                         + " jobOptions={OPT1=ARG1, OPT2=ARG2}]";
 

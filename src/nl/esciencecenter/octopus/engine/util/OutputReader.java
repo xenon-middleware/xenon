@@ -55,7 +55,7 @@ public class OutputReader extends Thread {
         while (!finished) {
             try {
                 wait();
-            } catch (Throwable t) {
+            } catch (InterruptedException t) {
                 // Ignore.
             }
         }
@@ -91,12 +91,12 @@ public class OutputReader extends Thread {
 
                 addToBuffer(bytes, readCount);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             setFinished();
         } finally {
             try {
                 source.close();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // ignore
             }
         }

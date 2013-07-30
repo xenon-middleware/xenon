@@ -54,7 +54,7 @@ public class OctopusPropertiesTest {
 
         OctopusProperties octprop = new OctopusProperties(valid, props);
 
-        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value}]");
+        assertEquals("{key=value}", octprop.toString());
     }
     
     @Test(expected = UnknownPropertyException.class)
@@ -84,7 +84,7 @@ public class OctopusPropertiesTest {
         
         OctopusProperties octprop = new OctopusProperties(supportedProperties, props);
         
-        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value, key2=value2}]");
+        assertEquals("{key=value, key2=value2}", octprop.toString());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class OctopusPropertiesTest {
         props.put("key2", "value2");
         
         OctopusProperties octprop = new OctopusProperties(supportedProperties, props).filter(Level.OCTOPUS);
-        assertEquals(octprop.toString(), "OctopusProperties [properties={key=value}]");
+        assertEquals("{key=value}", octprop.toString());
     }
 
     //    @Test

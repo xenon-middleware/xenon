@@ -55,8 +55,6 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
             this.filter = filter;
-            //this.readAhead = new LinkedList<AbsolutePath>();
-
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir.getPath(), e);
         }

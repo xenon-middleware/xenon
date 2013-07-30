@@ -420,6 +420,23 @@ public class JobDescription {
                 + ", interactive=" + interactive + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr
                 + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions + "]";
     }
+    
+    private boolean compare(Object a, Object b) {
+
+        if (a == null) {
+            if (b == null) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        if (b == null) {
+            return false;
+        }
+
+        return a.equals(b);
+    }
 
     /* Generated */
     @Override
@@ -441,24 +458,7 @@ public class JobDescription {
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
         return result;
     }
-
-    private boolean compare(Object a, Object b) {
-
-        if (a == null) {
-            if (b == null) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        if (b == null) {
-            return false;
-        }
-
-        return a.equals(b);
-    }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

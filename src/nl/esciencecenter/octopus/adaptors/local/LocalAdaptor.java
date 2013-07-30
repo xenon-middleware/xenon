@@ -71,11 +71,6 @@ public class LocalAdaptor extends Adaptor {
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-//    private static final String[][] VALID_PROPERTIES = new String[][] {
-//            { POLLING_DELAY, "500", "Int: the polling delay for monitoring running jobs (in milliseconds)." },
-//            { MULTIQ_MAX_CONCURRENT, null, "Int: the maximum number of concurrent jobs in the multiq." } };
-
     private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
         new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.SCHEDULER), 
                 "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
