@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -196,9 +197,15 @@ public class OctopusEngine implements Octopus {
 
         HashMap<String,String> tmp = new HashMap<>();
         
-        for (String key : source.keySet()) { 
+        Iterator<String> itt = source.keySet().iterator();
+        
+        while (itt.hasNext()) { 
+            
+            String key = itt.next();
+
             if (key.startsWith(prefix)) { 
-                tmp.put(key, source.remove(key));
+                tmp.put(key, source.get(key));
+                itt.remove();
             }
         }
         
