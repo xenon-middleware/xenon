@@ -18,8 +18,6 @@ package nl.esciencecenter.octopus.adaptors.scripting;
 
 import java.net.URI;
 
-import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
-import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;

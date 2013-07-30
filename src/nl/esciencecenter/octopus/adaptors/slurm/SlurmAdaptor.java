@@ -45,7 +45,7 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
     
     /** The schemes supported by this adaptor */
-    public static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
+    private static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
 
     /** Should the slurm version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";

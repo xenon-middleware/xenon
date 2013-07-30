@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
  */
 public class GridEngineParser extends ScriptingParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(GridEngineParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineParser.class);
 
     //Tag containing version of xml schema used in qstat -xml output
     public static final String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
@@ -82,7 +82,7 @@ public class GridEngineParser extends ScriptingParser {
                 || documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) == null) {
 
             if (ignoreVersion) {
-                logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
+                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
                         + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
 
@@ -94,12 +94,12 @@ public class GridEngineParser extends ScriptingParser {
 
         String schemaValue = documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE);
 
-        logger.debug("found schema value " + schemaValue);
+        LOGGER.debug("found schema value " + schemaValue);
 
         //schemaValue == null checked above
         if (!SGE62_SCHEMA_VALUE.equals(schemaValue)) {
             if (ignoreVersion) {
-                logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
+                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
                         + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
 
@@ -163,7 +163,7 @@ public class GridEngineParser extends ScriptingParser {
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
-        logger.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
+        LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
         NodeList clusterNodes = document.getElementsByTagName("cluster_queue_summary");
 
         for (int i = 0; i < clusterNodes.getLength(); i++) {
@@ -225,7 +225,7 @@ public class GridEngineParser extends ScriptingParser {
 
         Document document = parseDocument(data);
 
-        logger.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
+        LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
         NodeList nodes = document.getElementsByTagName("job_list");
 
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -291,7 +291,7 @@ public class GridEngineParser extends ScriptingParser {
         try {
             int jobIDInt = Integer.parseInt(jobID);
 
-            logger.debug("found job id: " + jobIDInt);
+            LOGGER.debug("found job id: " + jobIDInt);
         } catch (NumberFormatException e) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: \""
                     + output + "\". Returned job id " + jobID + " does not seem to be a number", e);
@@ -314,7 +314,7 @@ public class GridEngineParser extends ScriptingParser {
 
         String serverMessages = "output: " + Arrays.toString(stdoutLines);
 
-        logger.debug("Deleted job. Got back " + serverMessages);
+        LOGGER.debug("Deleted job. Got back " + serverMessages);
 
         if (stdoutLines.length == 0 || stdoutLines[0].isEmpty()) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: "
@@ -435,7 +435,7 @@ public class GridEngineParser extends ScriptingParser {
 
             name = map.get("qname");
 
-            logger.debug("parsing queueconf output for {}", name);
+            LOGGER.debug("parsing queueconf output for {}", name);
 
             if (name == null) {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");

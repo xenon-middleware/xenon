@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
 public abstract class SchedulerConnection {
     
 
-    private static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerConnection.class);
     
     private static int schedulerID = 0;
 
@@ -81,11 +81,6 @@ public abstract class SchedulerConnection {
         
         adaptor.checkLocation(location);
         
-        // Create a new octopus properties, checking if property names are valid and setting defaults for all missing values.  
-        // this.properties = new OctopusProperties(adaptor.getSupportedProperties(Level.OCTOPUS), properties);        
-        
-        // pollDelay = this.properties.getIntegerProperty(adaptor.POLL_DELAY_PROPERTY);
-
         try {
             id = adaptor.getName() + "-" + getNextSchedulerID();
             URI actualLocation = new URI("ssh", location.getSchemeSpecificPart(), location.getFragment());
@@ -95,13 +90,13 @@ public abstract class SchedulerConnection {
                 actualLocation = new URI("local:///");
             }
 
-            logger.debug("creating ssh scheduler for {} adaptor at {}", adaptor.getName(), actualLocation);
+            LOGGER.debug("creating ssh scheduler for {} adaptor at {}", adaptor.getName(), actualLocation);
             Map<String, String> sshProperties = new HashMap<String, String>();
             //FIXME: compensating for ssh performance bug #143
             sshProperties.put(SshAdaptor.POLLING_DELAY, "100");
             sshScheduler = engine.jobs().newScheduler(actualLocation, credential, sshProperties);
 
-            logger.debug("creating file system for {} adaptor at {}", adaptor.getName(), actualLocation);
+            LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), actualLocation);
             sshFileSystem = engine.files().newFileSystem(actualLocation, credential, null);
 
         } catch (URISyntaxException e) {

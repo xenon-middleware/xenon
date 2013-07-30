@@ -265,7 +265,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     protected void verifyJobDescription(JobDescription description) throws OctopusException {
         //check if all given job options make sense
-        //FIXME: this should be build on top of OctopusProperties, see #132
+        //TODO: this should be build on top of OctopusProperties, see #132
         for (String option : description.getJobOptions().keySet()) {
             boolean found = false;
             for (String validOption : VALID_JOB_OPTIONS) {
