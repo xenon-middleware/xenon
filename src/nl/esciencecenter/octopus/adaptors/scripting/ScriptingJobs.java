@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ScriptingJobs implements Jobs {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScriptingJobs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptingJobs.class);
 
     private final ScriptingAdaptor adaptor;
     private final OctopusEngine octopusEngine;
@@ -67,8 +67,7 @@ public class ScriptingJobs implements Jobs {
         connections = new HashMap<String, SchedulerConnection>();
     }
 
-    private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws OctopusRuntimeException,
-            NoSuchSchedulerException {
+    private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws NoSuchSchedulerException {
         if (!(scheduler instanceof SchedulerImplementation)) {
             throw new OctopusRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
         }
@@ -103,12 +102,12 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
-        
-        SchedulerConnection connection = 
+
+        SchedulerConnection connection =
                 connectionFactory.newSchedulerConnection(adaptor, location, credential, p, octopusEngine);
 
         addConnection(connection);
@@ -239,14 +238,14 @@ public class ScriptingJobs implements Jobs {
         //implementation inspired by / copy pasted from JobsEngine.getJobStatuses()
 
         // If we have more than one job, we first collect all connections
-        SchedulerConnection[] connections = getConnections(jobs);
+        SchedulerConnection[] connectionsCopy = getConnections(jobs);
 
         JobStatus[] result = new JobStatus[jobs.length];
         Job[] tmp = new Job[jobs.length];
 
         // Next we iterate over the connections, and get the JobStatus for each scheduler individually, merging the result into
         // the overall result on the fly.
-        for (SchedulerConnection connection : connections) {
+        for (SchedulerConnection connection : connectionsCopy) {
             selectJobs(connection, jobs, tmp);
             getJobStatus(connection, tmp, result);
         }
@@ -270,18 +269,18 @@ public class ScriptingJobs implements Jobs {
     }
 
     public void end() {
-        SchedulerConnection[] connections;
+        SchedulerConnection[] currentConnections;
 
         synchronized (this) {
-            connections = this.connections.values().toArray(new SchedulerConnection[0]);
+            currentConnections = connections.values().toArray(new SchedulerConnection[0]);
         }
 
-        for (SchedulerConnection connection : connections) {
+        for (SchedulerConnection connection : currentConnections) {
             try {
                 connection.close();
             } catch (OctopusIOException | OctopusException e) {
                 //FIXME: do something with this error, perhaps?
-                logger.error("Error on closing connection to server", e);
+                LOGGER.error("Error on closing connection to server", e);
             }
         }
     }
