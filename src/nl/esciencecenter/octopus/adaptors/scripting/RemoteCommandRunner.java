@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import javax.annotation.Generated;
-
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.util.InputWriter;
 import nl.esciencecenter.octopus.engine.util.OutputReader;
@@ -39,7 +37,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RemoteCommandRunner {
 
-    @Generated("Eclipse")
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteCommandRunner.class);
 
     private final int exitCode;
