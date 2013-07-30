@@ -35,8 +35,12 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
  * 
  */
 public class GridEngineJobScriptGenerator {
+    
+    private GridEngineJobScriptGenerator() {
+        //DO NOT USE
+    }
 
-    private static final Logger logger = LoggerFactory.getLogger(GridEngineJobScriptGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineJobScriptGenerator.class);
 
     private static int parseIntOption(String string) throws OctopusException {
         try {
@@ -138,7 +142,7 @@ public class GridEngineJobScriptGenerator {
 
         script.close();
 
-        logger.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:\n{}", stringBuilder);
 
         return stringBuilder.toString();
     }

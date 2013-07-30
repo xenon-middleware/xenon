@@ -97,12 +97,12 @@ public abstract class GenericJobAdaptorTestParent {
         public void failed(Throwable reason, Description description) {
             logger.info("Test {} failed due to exception", description.getMethodName(), reason);
         }
-        
+
         @Override
         public void succeeded(Description description) {
             logger.info("Test {} succeeded", description.getMethodName());
         }
-        
+
         @Override
         public void skipped(AssumptionViolatedException reason, Description description) {
             logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);

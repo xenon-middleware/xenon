@@ -67,9 +67,9 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericFileAdaptorTestParent {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(GenericFileAdaptorTestParent.class);
-    
+
     protected static String TEST_ROOT;
 
     public static FileTestConfig config;
@@ -81,7 +81,7 @@ public abstract class GenericFileAdaptorTestParent {
     protected AbsolutePath testDir;
 
     private long counter = 0;
-    
+
     @Rule
     public TestWatcher watcher = new TestWatcher() {
 
@@ -94,12 +94,12 @@ public abstract class GenericFileAdaptorTestParent {
         public void failed(Throwable reason, Description description) {
             logger.info("Test {} failed due to exception", description.getMethodName(), reason);
         }
-        
+
         @Override
         public void succeeded(Description description) {
             logger.info("Test {} succeeded", description.getMethodName());
         }
-        
+
         @Override
         public void skipped(AssumptionViolatedException reason, Description description) {
             logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);
@@ -305,7 +305,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         FileAttributes att = files.getAttributes(file);
-        
+
         if (att.isDirectory()) {
             throw new Exception("Cannot delete directory: " + file);
         }
@@ -321,7 +321,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         FileAttributes att = files.getAttributes(dir);
-        
+
         if (!att.isDirectory()) {
             throw new Exception("Cannot delete file: " + dir);
         }
@@ -397,7 +397,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(URI uri, Credential c, Map<String,String> p, boolean mustFail) throws Exception {
+    private void test00_newFileSystem(URI uri, Credential c, Map<String, String> p, boolean mustFail) throws Exception {
 
         try {
             FileSystem fs = files.newFileSystem(uri, c, p);
@@ -458,7 +458,8 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         // test with correct URI with default credential and with empty properties
-        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String,String>(), false);
+        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String, String>(),
+                false);
 
         // test with correct URI with default credential and with correct properties
         if (config.supportsProperties()) {
@@ -733,9 +734,9 @@ public abstract class GenericFileAdaptorTestParent {
             files.createDirectories(path);
 
             assert (files.exists(path));
-            
+
             FileAttributes att = files.getAttributes(path);
-            
+
             assert (att.isDirectory());
 
         } catch (Exception e) {
@@ -814,67 +815,67 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile] 
     //             [closeTestFileSystem]
-//
-//    private void test06_isDirectory(AbsolutePath path, boolean expected, boolean mustFail) throws Exception {
-//
-//        boolean result = false;
-//
-//        try {
-//            result = files.isDirectory(path);
-//        } catch (Exception e) {
-//
-//            if (mustFail) {
-//                // expected
-//                return;
-//            }
-//
-//            throwUnexpected("test06_isDirectory", e);
-//        }
-//
-//        if (mustFail) {
-//            throwExpected("test06_isDirectory");
-//        }
-//
-//        if (result != expected) {
-//            throwWrong("test06_isDirectory", "" + expected, "" + result);
-//        }
-//    }
-//
-//    @org.junit.Test
-//    public void test06_isDirectory() throws Exception {
-//
-//        prepare();
-//
-//        // prepare
-//        FileSystem fs = config.getTestFileSystem(files, credentials);
-//        prepareTestDir(fs, "test06_isDirectory");
-//
-//        // test with null        
-//        test06_isDirectory(null, false, true);
-//
-//        // test with non-existing file
-//        AbsolutePath file0 = createNewTestFileName(testDir);
-//        test06_isDirectory(file0, false, false);
-//
-//        // test with existing file
-//        AbsolutePath file1 = createTestFile(testDir, null);
-//        test06_isDirectory(file1, false, false);
-//        deleteTestFile(file1);
-//
-//        // test with existing dir
-//        test06_isDirectory(testDir, true, false);
-//
-//        // cleanup        
-//        deleteTestDir(testDir);
-//        config.closeTestFileSystem(files, fs);
-//
-//        if (config.supportsClose()) {
-//            // test with closed filesystem
-//            test06_isDirectory(testDir, true, true);
-//        }
-//
-//        cleanup();
-//    }
+    //
+    //    private void test06_isDirectory(AbsolutePath path, boolean expected, boolean mustFail) throws Exception {
+    //
+    //        boolean result = false;
+    //
+    //        try {
+    //            result = files.isDirectory(path);
+    //        } catch (Exception e) {
+    //
+    //            if (mustFail) {
+    //                // expected
+    //                return;
+    //            }
+    //
+    //            throwUnexpected("test06_isDirectory", e);
+    //        }
+    //
+    //        if (mustFail) {
+    //            throwExpected("test06_isDirectory");
+    //        }
+    //
+    //        if (result != expected) {
+    //            throwWrong("test06_isDirectory", "" + expected, "" + result);
+    //        }
+    //    }
+    //
+    //    @org.junit.Test
+    //    public void test06_isDirectory() throws Exception {
+    //
+    //        prepare();
+    //
+    //        // prepare
+    //        FileSystem fs = config.getTestFileSystem(files, credentials);
+    //        prepareTestDir(fs, "test06_isDirectory");
+    //
+    //        // test with null        
+    //        test06_isDirectory(null, false, true);
+    //
+    //        // test with non-existing file
+    //        AbsolutePath file0 = createNewTestFileName(testDir);
+    //        test06_isDirectory(file0, false, false);
+    //
+    //        // test with existing file
+    //        AbsolutePath file1 = createTestFile(testDir, null);
+    //        test06_isDirectory(file1, false, false);
+    //        deleteTestFile(file1);
+    //
+    //        // test with existing dir
+    //        test06_isDirectory(testDir, true, false);
+    //
+    //        // cleanup        
+    //        deleteTestDir(testDir);
+    //        config.closeTestFileSystem(files, fs);
+    //
+    //        if (config.supportsClose()) {
+    //            // test with closed filesystem
+    //            test06_isDirectory(testDir, true, true);
+    //        }
+    //
+    //        cleanup();
+    //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: createFile
@@ -1111,70 +1112,70 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile], 
     //             [deleteTestDir], [closeTestFileSystem], size, close  
 
-//    private void test10_size(AbsolutePath path, long expected, boolean mustFail) throws Exception {
-//
-//        long result = -1;
-//
-//        try {
-//            result = files.size(path);
-//        } catch (Exception e) {
-//
-//            if (mustFail) {
-//                // expected
-//                return;
-//            }
-//
-//            throwUnexpected("test10_size", e);
-//        }
-//
-//        if (mustFail) {
-//            throwExpected("test10_size");
-//        }
-//
-//        if (result != expected) {
-//            throwWrong("test10_size", "" + expected, "" + result);
-//        }
-//    }
-//
-//    @org.junit.Test
-//    public void test10_size() throws Exception {
-//
-//        prepare();
-//
-//        // test with null parameter 
-//        test10_size(null, -1, true);
-//
-//        FileSystem fs = config.getTestFileSystem(files, credentials);
-//        prepareTestDir(fs, "test10_size");
-//
-//        // test with non existing file
-//        AbsolutePath file1 = createNewTestFileName(testDir);
-//        test10_size(file1, -1, true);
-//
-//        // test with existing empty file
-//        AbsolutePath file2 = createTestFile(testDir, new byte[0]);
-//        test10_size(file2, 0, false);
-//        deleteTestFile(file2);
-//
-//        // test with existing filled file
-//        AbsolutePath file3 = createTestFile(testDir, new byte[13]);
-//        test10_size(file3, 13, false);
-//        deleteTestFile(file3);
-//
-//        // test with dir
-//        AbsolutePath dir0 = createTestDir(testDir);
-//        test10_size(dir0, 0, false);
-//        deleteTestDir(dir0);
-//        deleteTestDir(testDir);
-//
-//        // test with closed filesystem
-//        if (config.supportsClose()) {
-//            config.closeTestFileSystem(files, fs);
-//            test10_size(file1, 0, true);
-//        }
-//
-//        cleanup();
-//    }
+    //    private void test10_size(AbsolutePath path, long expected, boolean mustFail) throws Exception {
+    //
+    //        long result = -1;
+    //
+    //        try {
+    //            result = files.size(path);
+    //        } catch (Exception e) {
+    //
+    //            if (mustFail) {
+    //                // expected
+    //                return;
+    //            }
+    //
+    //            throwUnexpected("test10_size", e);
+    //        }
+    //
+    //        if (mustFail) {
+    //            throwExpected("test10_size");
+    //        }
+    //
+    //        if (result != expected) {
+    //            throwWrong("test10_size", "" + expected, "" + result);
+    //        }
+    //    }
+    //
+    //    @org.junit.Test
+    //    public void test10_size() throws Exception {
+    //
+    //        prepare();
+    //
+    //        // test with null parameter 
+    //        test10_size(null, -1, true);
+    //
+    //        FileSystem fs = config.getTestFileSystem(files, credentials);
+    //        prepareTestDir(fs, "test10_size");
+    //
+    //        // test with non existing file
+    //        AbsolutePath file1 = createNewTestFileName(testDir);
+    //        test10_size(file1, -1, true);
+    //
+    //        // test with existing empty file
+    //        AbsolutePath file2 = createTestFile(testDir, new byte[0]);
+    //        test10_size(file2, 0, false);
+    //        deleteTestFile(file2);
+    //
+    //        // test with existing filled file
+    //        AbsolutePath file3 = createTestFile(testDir, new byte[13]);
+    //        test10_size(file3, 13, false);
+    //        deleteTestFile(file3);
+    //
+    //        // test with dir
+    //        AbsolutePath dir0 = createTestDir(testDir);
+    //        test10_size(dir0, 0, false);
+    //        deleteTestDir(dir0);
+    //        deleteTestDir(testDir);
+    //
+    //        // test with closed filesystem
+    //        if (config.supportsClose()) {
+    //            config.closeTestFileSystem(files, fs);
+    //            test10_size(file1, 0, true);
+    //        }
+    //
+    //        cleanup();
+    //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: newDirectoryStream 
@@ -2857,32 +2858,32 @@ public abstract class GenericFileAdaptorTestParent {
         cleanup();
     }
 
-//    @org.junit.Test
-//    public void test30_isSymbolicLink() throws Exception {
-//
-//        prepare();
-//
-//        FileSystem fs = config.getTestFileSystem(files, credentials);
-//
-//        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-//        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
-//
-//        if (!files.exists(root)) {
-//            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
-//        }
-//
-//        // prepare the test files
-//        boolean v = files.isSymbolicLink(root.resolve(new RelativePath("file0")));
-//        assertFalse(v);
-//
-//        v = files.isSymbolicLink(root.resolve(new RelativePath("link0")));
-//        assertTrue(v);
-//
-//        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
-//        assertFalse(v);
-//
-//        cleanup();
-//    }
+    //    @org.junit.Test
+    //    public void test30_isSymbolicLink() throws Exception {
+    //
+    //        prepare();
+    //
+    //        FileSystem fs = config.getTestFileSystem(files, credentials);
+    //
+    //        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
+    //        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+    //
+    //        if (!files.exists(root)) {
+    //            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+    //        }
+    //
+    //        // prepare the test files
+    //        boolean v = files.isSymbolicLink(root.resolve(new RelativePath("file0")));
+    //        assertFalse(v);
+    //
+    //        v = files.isSymbolicLink(root.resolve(new RelativePath("link0")));
+    //        assertTrue(v);
+    //
+    //        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
+    //        assertFalse(v);
+    //
+    //        cleanup();
+    //    }
 
     @org.junit.Test
     public void test31_newDirectoryStreamWithBrokenLinks() throws Exception {
