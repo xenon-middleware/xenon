@@ -6,21 +6,16 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-public class SlurmOutputParser {
+public class SlurmOutputParser extends ScriptingParser {
 
     private static final Logger logger = LoggerFactory.getLogger(SlurmOutputParser.class);
-
-    static final String WHITESPACE_REGEX = "\\s+";
-
-    static final String COMMA_REGEX = "\\s*,\\s*";
-
-    static final String BAR_REGEX = "\\|";
-
-    static final String NEW_LINE_REGEX = "\\r?\\n";
-
-    static final String KEY_EQUALS_VALUE_REGEX = "\\s*=\\s*";
+    
+    private SlurmOutputParser() {
+        //DO NOT USE
+    }
 
     static String parseSbatchOutput(String output) throws OctopusException {
         if (!(output.startsWith("Granted job allocation") || output.startsWith("Submitted batch job"))) {
@@ -59,7 +54,7 @@ public class SlurmOutputParser {
             throws OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
-        String[] lines = output.split("\\r?\\n");
+        String[] lines = output.split(NEWLINE_REGEX);
 
         if (lines.length == 0) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
@@ -118,7 +113,7 @@ public class SlurmOutputParser {
 
     public static Map<String, String> parseScontrolConfigOutput(String output) throws OctopusException {
         Map<String, String> result = new HashMap<String, String>();
-        String[] lines = output.split(NEW_LINE_REGEX);
+        String[] lines = output.split(NEWLINE_REGEX);
 
         if (lines.length == 0) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Cannot parse sinfo config output, Got empty output.");

@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SchedulerConnection {
     
+
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
     
     private static int schedulerID = 0;

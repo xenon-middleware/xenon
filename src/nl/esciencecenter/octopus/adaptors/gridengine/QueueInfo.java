@@ -33,7 +33,7 @@ class QueueInfo {
     QueueInfo(String name, int slots, String[] parallelEnvironments) throws OctopusException {
         this.name = name;
         this.slots = slots;
-        this.parallelEnvironments = parallelEnvironments;
+        this.parallelEnvironments = parallelEnvironments.clone();
     }
 
     @Override

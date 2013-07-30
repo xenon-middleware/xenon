@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GridEngineSchedulerConnection extends SchedulerConnection {
 
-    private static final Logger logger = LoggerFactory.getLogger(GridEngineSchedulerConnection.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineSchedulerConnection.class);
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
@@ -64,7 +64,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     public static final String JOB_OPTION_PARALLEL_SLOTS = "parallel.slots";
 
-    public static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
             JOB_OPTION_PARALLEL_SLOTS };
 
     private final long accountingGraceTime;
@@ -74,10 +74,10 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
      * output, and information about this job appearing in the qacct output. Instead of throwing an exception, we allow for a
      * certain grace time. Jobs will report the status "pending" during this time.
      */
-    private final HashMap<String, Long> lastSeenMap;
+    private final Map<String, Long> lastSeenMap;
 
     //list of jobs we have killed before they even started. These will not end up in qacct, so we keep them here.
-    private final ArrayList<String> deletedJobList;
+    private final List<String> deletedJobList;
 
     private final Scheduler scheduler;
 
@@ -199,7 +199,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                     jobsFromStatus(runner.getStdout(), getScheduler(), result);
                 } else if (runner.getExitCode() == 1) {
                     //sge returns "1" as the exit code if there is something wrong with the queue, ignore
-                    logger.warn("Failed to get queue status for queue " + runner);
+                    LOGGER.warn("Failed to get queue status for queue " + runner);
                 } else {
                     throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);
@@ -356,7 +356,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         Exception exception = null;
 
         if (info == null || info.isEmpty()) {
-            logger.debug("job state not in map");
+            LOGGER.debug("job state not in map");
             return null;
         }
 
@@ -369,11 +369,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         String stateCode = info.get("state");
         if (stateCode != null && stateCode.contains("E")) {
-            logger.debug("job is in error state, try to cancel job, pick up status from qacct");
+            LOGGER.debug("job is in error state, try to cancel job, pick up status from qacct");
             try {
                 runCommand(null, "qdel", job.getIdentifier());
             } catch (OctopusIOException | OctopusException e) {
-                logger.error("Failed to cancel job in error state", e);
+                LOGGER.error("Failed to cancel job in error state", e);
             }
             return null;
         }
@@ -447,7 +447,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
                 status = qacctJobStatusFromMap(accountingInfo, job);
             } else {
-                logger.debug("could not get job {} accounting info: {}", job.getIdentifier(), runner);
+                LOGGER.debug("could not get job {} accounting info: {}", job.getIdentifier(), runner);
             }
         }
 
@@ -474,7 +474,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             status = new JobStatusImplementation(job, null, null, exception, false, false, null);
         }
 
-        logger.debug("got job status {}", status);
+        LOGGER.debug("got job status {}", status);
 
         return status;
     }

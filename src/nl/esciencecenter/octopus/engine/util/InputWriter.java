@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
  */
 public class InputWriter extends Thread {
 
-    static final Logger logger = LoggerFactory.getLogger(StreamForwarder.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
 
-    private final byte[] bytes;
+    private final String content;
 
     private final OutputStream destination;
 
@@ -40,7 +40,7 @@ public class InputWriter extends Thread {
     public InputWriter(String content, OutputStream destination) {
         this.destination = destination;
 
-        this.bytes = content.getBytes();
+        this.content = content;
 
         setDaemon(true);
         setName("Input Writer");
@@ -68,14 +68,16 @@ public class InputWriter extends Thread {
 
     public void run() {
         try {
-            destination.write(bytes);
+            if (content != null) {
+                destination.write(content.getBytes());
+            }
         } catch (IOException e) {
-            logger.error("Cannot write content to stream", e);
+            LOGGER.error("Cannot write content to stream", e);
         } finally {
             try {
                 destination.close();
             } catch (IOException e) {
-                logger.error("Cannot close input stream", e);
+                LOGGER.error("Cannot close input stream", e);
             }
             setFinished();
         }
