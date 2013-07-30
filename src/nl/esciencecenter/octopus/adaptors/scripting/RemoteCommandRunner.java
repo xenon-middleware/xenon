@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
+import javax.annotation.Generated;
+
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.util.InputWriter;
 import nl.esciencecenter.octopus.engine.util.OutputReader;
@@ -37,7 +39,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RemoteCommandRunner {
 
-    protected static Logger logger = LoggerFactory.getLogger(RemoteCommandRunner.class);
+    @Generated("Eclipse")
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteCommandRunner.class);
 
     private final int exitCode;
 
@@ -78,10 +81,6 @@ public class RemoteCommandRunner {
 
         Streams streams = octopus.jobs().getStreams(job);
 
-        //write given content to stdin of process
-        if (stdin == null) {
-            stdin = "";
-        }
         InputWriter in = new InputWriter(stdin, streams.getStdin());
 
         // we must always read the output and error streams to avoid deadlocks
@@ -104,7 +103,7 @@ public class RemoteCommandRunner {
 
         long runtime = System.currentTimeMillis() - start;
 
-        logger.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}",
+        LOGGER.debug("CommandRunner took {} ms, executable = {}, arguments = {}, exitcode = {}, stdout:\n{}\nstderr:\n{}",
                 runtime, executable, arguments, exitCode, output, error);
     }
 
