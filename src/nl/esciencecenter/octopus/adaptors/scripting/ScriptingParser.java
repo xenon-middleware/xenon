@@ -15,22 +15,24 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.net.URI;
-
-import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-
 /**
- * Factory interface for scheduling connections. Implemented by adaptors.
- * 
  * @author Niels Drost
- * 
+ *
  */
-public interface SchedulerConnectionFactory {
+public class ScriptingParser {
+    
+    public static final String WHITESPACE_REGEX = "\\s+";
 
-    SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, 
-            OctopusProperties properties, OctopusEngine engine) throws OctopusIOException, OctopusException;
+    public static final String COMMA_REGEX = "\\s*,\\s*";
+
+    public static final String BAR_REGEX = "\\|";
+
+    public static final String NEWLINE_REGEX = "\\r?\\n";
+
+    public static final String KEY_EQUALS_VALUE_REGEX = "\\s*=\\s*";
+
+    protected ScriptingParser() {
+        //DO NOT USE
+    }
+    
 }

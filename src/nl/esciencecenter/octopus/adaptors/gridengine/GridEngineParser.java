@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -46,14 +48,14 @@ import org.xml.sax.SAXException;
  * @author Niels Drost
  * 
  */
-public class GridEngineParser {
+public class GridEngineParser extends ScriptingParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(GridEngineParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineParser.class);
 
     //Tag containing version of xml schema used in qstat -xml output
-    public static String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
+    public static final String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
 
-    public static String SGE62_SCHEMA_VALUE =
+    public static final String SGE62_SCHEMA_VALUE =
             "http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11";
 
     private final DocumentBuilder documentBuilder;
@@ -80,7 +82,7 @@ public class GridEngineParser {
                 || documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) == null) {
 
             if (ignoreVersion) {
-                logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
+                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
                         + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
 
@@ -92,18 +94,18 @@ public class GridEngineParser {
 
         String schemaValue = documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE);
 
-        logger.debug("found schema value " + schemaValue);
+        LOGGER.debug("found schema value " + schemaValue);
 
         //schemaValue == null checked above
         if (!SGE62_SCHEMA_VALUE.equals(schemaValue)) {
             if (ignoreVersion) {
-                logger.warn("cannot determine version, version attribute not found. Ignoring as requested by "
+                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
                         + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
 
                 throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
-                        + schemaValue + ") incompatible with adaptor. Use the "
-                        + GridEngineAdaptor.IGNORE_VERSION_PROPERTY + " property to ignore this error");
+                        + schemaValue + ") incompatible with adaptor. Use the " + GridEngineAdaptor.IGNORE_VERSION_PROPERTY
+                        + " property to ignore this error");
             }
         }
 
@@ -132,7 +134,7 @@ public class GridEngineParser {
 
     private Document parseDocument(String data) throws OctopusException, OctopusIOException {
         try {
-            ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes());
+            ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
             result.normalize();
 
@@ -161,40 +163,21 @@ public class GridEngineParser {
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
-        logger.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
+        LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
         NodeList clusterNodes = document.getElementsByTagName("cluster_queue_summary");
 
         for (int i = 0; i < clusterNodes.getLength(); i++) {
             Node clusterNode = clusterNodes.item(i);
 
             if (clusterNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) clusterNode;
-
-                NodeList tagNodes = element.getChildNodes();
-
-                Map<String, String> queueInfo = new HashMap<String, String>();
-
-                //fetch tags from the list of tag nodes. Ignores empty values
-                for (int j = 0; j < tagNodes.getLength(); j++) {
-                    Node tagNode = tagNodes.item(j);
-                    if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
-                        String key = tagNode.getNodeName();
-                        if (key != null && key.length() > 0) {
-                            NodeList children = tagNode.getChildNodes();
-                            if (children.getLength() > 0) {
-                                String value = tagNode.getChildNodes().item(0).getNodeValue();
-                                queueInfo.put(key, value);
-                            }
-                        }
-                    }
-                }
+                Map<String, String> queueInfo = parseInfoMap((Element) clusterNode);
 
                 String queueName = queueInfo.get("name");
 
                 if (queueName == null || queueName.length() == 0) {
                     throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
-
+                
                 result.put(queueName, queueInfo);
             }
         }
@@ -203,6 +186,29 @@ public class GridEngineParser {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
+        return result;
+    }
+
+    private Map<String, String> parseInfoMap(Element clusterNode) throws OctopusIOException {
+        Map<String, String> result = new HashMap<String, String>();
+
+        NodeList tagNodes = clusterNode.getChildNodes();
+
+        //fetch tags from the list of tag nodes. Ignores empty values
+        for (int j = 0; j < tagNodes.getLength(); j++) {
+            Node tagNode = tagNodes.item(j);
+            if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
+                String key = tagNode.getNodeName();
+                if (key != null && key.length() > 0) {
+                    NodeList children = tagNode.getChildNodes();
+                    if (children.getLength() > 0) {
+                        String value = tagNode.getChildNodes().item(0).getNodeValue();
+                        result.put(key, value);
+                    }
+                }
+            }
+        }
+        
         return result;
     }
 
@@ -223,7 +229,7 @@ public class GridEngineParser {
 
         Document document = parseDocument(data);
 
-        logger.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
+        LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
         NodeList nodes = document.getElementsByTagName("job_list");
 
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -231,26 +237,9 @@ public class GridEngineParser {
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
-
-                NodeList tagNodes = element.getChildNodes();
-
-                Map<String, String> jobInfo = new HashMap<String, String>();
-
-                //fetch tags from the list of tag nodes. Ignores empty values
-                for (int j = 0; j < tagNodes.getLength(); j++) {
-                    Node tagNode = tagNodes.item(j);
-                    if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
-                        String key = tagNode.getNodeName();
-                        if (key != null && key.length() > 0) {
-                            NodeList children = tagNode.getChildNodes();
-                            if (children.getLength() > 0) {
-                                String value = tagNode.getChildNodes().item(0).getNodeValue();
-                                jobInfo.put(key, value);
-                            }
-                        }
-                    }
-                }
-
+                
+                Map<String, String> jobInfo = parseInfoMap(element);
+                
                 String state = element.getAttribute("state");
 
                 if (state != null && state.length() > 0) {
@@ -278,9 +267,9 @@ public class GridEngineParser {
      * @throws OctopusIOException
      */
     String parseQsubOutput(String output) throws OctopusIOException {
-        String lines[] = output.split("\\r?\\n");
+        String lines[] = output.split(NEWLINE_REGEX);
 
-        if (lines.length == 0 || !lines[0].startsWith("Your job ") | lines[0].split(" ").length < 3) {
+        if (lines.length == 0 || !lines[0].startsWith("Your job ") || lines[0].split(" ").length < 3) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: " + output);
         }
 
@@ -289,7 +278,7 @@ public class GridEngineParser {
         try {
             int jobIDInt = Integer.parseInt(jobID);
 
-            logger.debug("found job id: " + jobIDInt);
+            LOGGER.debug("found job id: " + jobIDInt);
         } catch (NumberFormatException e) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job id from qsub status message: \""
                     + output + "\". Returned job id " + jobID + " does not seem to be a number", e);
@@ -308,11 +297,11 @@ public class GridEngineParser {
      * @throws OctopusIOException
      */
     boolean parseQdelOutput(String identifier, String qdelOutput) throws OctopusIOException {
-        String[] stdoutLines = qdelOutput.split("\\r?\\n");
+        String[] stdoutLines = qdelOutput.split(NEWLINE_REGEX);
 
         String serverMessages = "output: " + Arrays.toString(stdoutLines);
 
-        logger.debug("Deleted job. Got back " + serverMessages);
+        LOGGER.debug("Deleted job. Got back " + serverMessages);
 
         if (stdoutLines.length == 0 || stdoutLines[0].isEmpty()) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get job delete status from qdel message: "
@@ -348,21 +337,21 @@ public class GridEngineParser {
     Map<String, String> parseQacctOutput(String qacctOutput) throws OctopusIOException {
         Map<String, String> result = new HashMap<String, String>();
 
-        if (!qacctOutput.startsWith(QACCT_HEADER)) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Qacct output is excepted to start with " + QACCT_HEADER);
+        String lines[] = qacctOutput.split(NEWLINE_REGEX);
+        
+        if (!lines[0].equals(QACCT_HEADER)) {
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Qacct output is excepted to start with header: " + QACCT_HEADER);
         }
 
-        String lines[] = qacctOutput.split("\\r?\\n");
-        for (String line : lines) {
-            String[] elements = line.split("\\s+", 2);
+        //skip first line
+        for (int i = 1; i < lines.length; i++) {
+            String[] elements = lines[i].split("\\s+", 2);
 
-            if (elements.length == 2) {
-                result.put(elements[0].trim(), elements[1].trim());
-            } else if (line.equals(QACCT_HEADER)) {
-                //IGNORE first line
-            } else {
-                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Found line \"" + line + "\" in qacct output");
+            if (elements.length != 2) {
+                throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Found line \"" + lines[i] + "\" in qacct output");
             }
+
+            result.put(elements[0].trim(), elements[1].trim());
         }
 
         return result;
@@ -375,7 +364,7 @@ public class GridEngineParser {
      * @throws OctopusIOException
      */
     public String[] parseQconfList(String qconfOutput) throws OctopusIOException {
-        String[] lines = qconfOutput.split("\\r?\\n");
+        String[] lines = qconfOutput.split(NEWLINE_REGEX);
         String[] result = new String[lines.length];
 
         for (int i = 0; i < lines.length; i++) {
@@ -393,7 +382,7 @@ public class GridEngineParser {
 
         ArrayList<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
-        String[] lines = output.split("\\r?\\n");
+        String[] lines = output.split(NEWLINE_REGEX);
 
         Map<String, String> currentMap = null;
 
@@ -432,8 +421,8 @@ public class GridEngineParser {
             String[] parallelEnvironments;
 
             name = map.get("qname");
-            
-            logger.debug("parsing queueconf output for {}", name);
+
+            LOGGER.debug("parsing queueconf output for {}", name);
 
             if (name == null) {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
@@ -458,7 +447,7 @@ public class GridEngineParser {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue " + name);
             }
             parallelEnvironments = peValue.split("\\s+");
-            
+
             result.put(name, new QueueInfo(name, slots, parallelEnvironments));
         }
 

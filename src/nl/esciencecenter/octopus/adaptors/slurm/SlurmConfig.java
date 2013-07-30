@@ -30,9 +30,9 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  */
 public class SlurmConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(SlurmConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmConfig.class);
 
-    private static final String[] supportedVersions = { "2.3", "2.5" };
+    private static final String[] SUPPORTED_VERSIONS = { "2.3", "2.5" };
 
     private final boolean accountingAvailable;
     private final String version;
@@ -53,11 +53,11 @@ public class SlurmConfig {
         }
         accountingAvailable = !accountingType.equals("accounting_storage/none");
 
-        logger.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
+        LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
     }
 
     private void checkVersion(boolean throwException) throws IncompatibleVersionException {
-        for (String supportedVersion : supportedVersions) {
+        for (String supportedVersion : SUPPORTED_VERSIONS) {
             if (version.startsWith(supportedVersion)) {
                 return;
             }
@@ -66,7 +66,7 @@ public class SlurmConfig {
             throw new IncompatibleVersionException(SlurmAdaptor.ADAPTOR_NAME, "Slurm version " + version
                     + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + "to ignore");
         } else {
-            logger.warn("Slurm version {} not supported by Slurm Adaptor. Ignoring as requested by {} property", version,
+            LOGGER.warn("Slurm version {} not supported by Slurm Adaptor. Ignoring as requested by {} property", version,
                     SlurmAdaptor.IGNORE_VERSION_PROPERTY);
         }
     }

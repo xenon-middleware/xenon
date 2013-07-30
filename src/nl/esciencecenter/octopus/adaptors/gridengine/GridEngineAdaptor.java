@@ -45,7 +45,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = OctopusEngine.ADAPTORS + GridEngineAdaptor.ADAPTOR_NAME + ".";
     
     /** The schemes supported by this adaptor */
-    public static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
+    private static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
     
     /** Should the grid engine version on the target machine be ignored ? */ 
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";

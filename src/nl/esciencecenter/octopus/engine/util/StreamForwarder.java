@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StreamForwarder extends Thread {
 
-    static final Logger logger = LoggerFactory.getLogger(StreamForwarder.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
 
     public static final int BUFFER_SIZE = 1024;
 
@@ -56,7 +56,7 @@ public class StreamForwarder extends Thread {
             c.close();
         } catch (Exception e) {
             if (error != null) {
-                logger.error(error, e);
+                LOGGER.error(error, e);
             }
         }
     }
@@ -80,7 +80,7 @@ public class StreamForwarder extends Thread {
                 }
             }
         } catch (IOException e) {
-            logger.error("Cannot forward stream", e);
+            LOGGER.error("Cannot forward stream", e);
         } finally {
             close(in, null);
 
