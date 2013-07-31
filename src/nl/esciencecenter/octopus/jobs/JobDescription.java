@@ -43,11 +43,11 @@ public class JobDescription {
     /** The location file from which to redirect stdin. (optional) */
     private String stdin = null;
 
-    /** The location file which to redirect stdout to. (default: stdout.txt) */
-    private String stdout = "stdout.txt";
+    /** The location file which to redirect stdout to. (optional) */
+    private String stdout = null;
 
-    /** The location file which to redirect stderr to. (default: stderr.txt) */
-    private String stderr = "stderr.txt";
+    /** The location file which to redirect stderr to. (optional) */
+    private String stderr = null;
 
     /** The working directory for the job. */
     private String workingDirectory = null;
@@ -61,7 +61,7 @@ public class JobDescription {
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
 
-    /** The number of presesses to start per node. */
+    /** The number of processes to start per node. */
     private int processesPerNode = 1;
 
     /** The maximum run time in minutes. */

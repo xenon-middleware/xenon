@@ -39,9 +39,6 @@ import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * LocalFiles implements an Octopus <code>Jobs</code> adaptor for local job operations.
  * 
@@ -53,11 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
-
-    @SuppressWarnings("unused")
-    private final OctopusEngine octopusEngine;
+//    private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
 
     private final LocalAdaptor localAdaptor;
 
@@ -68,7 +61,6 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, FileSystem cwd, OctopusEngine octopusEngine)
             throws OctopusException {
 
-        this.octopusEngine = octopusEngine;
         this.localAdaptor = localAdaptor;
 
         URI uri = LocalUtils.getLocalJobURI();

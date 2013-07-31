@@ -625,7 +625,9 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
         Job job = jobs.submitJob(scheduler, description);
 
         long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + config.getUpdateTime();
@@ -690,7 +692,9 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
@@ -863,7 +867,9 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
         // We immediately kill the job. Hopefully it isn't running yet!
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.cancelJob(job);
@@ -918,7 +924,9 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
-
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
         Job job = jobs.submitJob(scheduler, description);
 
         // Wait for job to run before killing it!
@@ -983,7 +991,9 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
-
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
@@ -1041,7 +1051,9 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
-
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
@@ -1414,6 +1426,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         description.setWorkingDirectory(workingDir);
         description.setStderr(null);
+        description.setStdout("stdout.txt");
         description.setStdin(null);
 
         Job job = jobs.submitJob(scheduler, description);

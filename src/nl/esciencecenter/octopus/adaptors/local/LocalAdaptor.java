@@ -53,9 +53,6 @@ public class LocalAdaptor extends Adaptor {
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
             + " standard java classes such as java.lang.Process and java.nio.file.Files.";
 
-    /** The schemes supported by the adaptor */
-    public static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
-    
     /** Local queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
 
@@ -71,6 +68,10 @@ public class LocalAdaptor extends Adaptor {
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
+    /** The schemes supported by the adaptor */
+    private static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
+    
+    /** The properties supported by this adaptor */
     private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
         new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.SCHEDULER), 
                 "1000", "The polling delay for monitoring running jobs (in milliseconds)."),

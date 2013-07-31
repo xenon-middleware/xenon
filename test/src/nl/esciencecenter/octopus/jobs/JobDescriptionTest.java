@@ -168,9 +168,9 @@ public class JobDescriptionTest {
         result = prime * result + 1;
         result = prime * result + 1;
         result = prime * result + 0;
-        result = prime * result + "stderr.txt".hashCode();
         result = prime * result + 0;
-        result = prime * result + "stdout.txt".hashCode();
+        result = prime * result + 0;
+        result = prime * result + 0;
         result = prime * result + 0;
 
         assertTrue(hash == result);
@@ -276,13 +276,13 @@ public class JobDescriptionTest {
         assertFalse(j.equals(other));
         j.setStdin("noot");
 
-        other.setStdout(null);
+        other.setStdout("stdout.txt");
         assertFalse(j.equals(other));
-        j.setStdout(null);
+        j.setStdout("stdout.txt");
 
-        other.setStderr(null);
+        other.setStderr("stderr.txt");
         assertFalse(j.equals(other));
-        j.setStderr(null);
+        j.setStderr("stderr.txt");
 
         String[] args = new String[] { "a", "b", "c" };
         other.setArguments(args);
@@ -319,6 +319,8 @@ public class JobDescriptionTest {
         j.setInteractive(true);
         j.setWorkingDirectory("aap");
         j.setQueueName("noot");
+        j.setStdout("stdout.txt");
+        j.setStderr("stderr.txt");
         j.setStdin("stdin.txt");
         j.setExecutable("exec");
 

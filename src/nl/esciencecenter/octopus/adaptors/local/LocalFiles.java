@@ -147,11 +147,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         try {
             java.nio.file.Path path = LocalUtils.javaPath(link);
             java.nio.file.Path target = Files.readSymbolicLink(path);
-
-            //            This works, but throws an exception if the target does not exist!              
-            //            java.nio.file.Path tmp = LocalUtils.javaPath(link);
-            //            java.nio.file.Path target = tmp.toRealPath();
-
+        
             AbsolutePath parent = link.getParent();
 
             if (parent == null || target.isAbsolute()) {
@@ -159,10 +155,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             }
 
             return parent.resolve(new RelativePath(target.toString()));
-            //            System.err.println("FOLLOW link " + tmp.toString() + " realpath " + target.toString() + " readsymbolic " + target2.toString());
-
-            // FIXME: No clue if this is correct!!
-            //            return new AbsolutePathImplementation(link.getFileSystem(), new RelativePath(target.toAbsolutePath().toString()));
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }
@@ -218,43 +210,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         return LocalUtils.newInputStream(path);
     }
-
-    //    private OpenOptions processOptions(OpenOption... options) throws InvalidOpenOptionsException { 
-    //        
-    //        if (options == null || options.length == 0) { 
-    //            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "Missing open options!");
-    //        }
-    //        
-    //        OpenOptions result = new OpenOptions();
-    //        
-    //        for (OpenOption opt : options) {             
-    //            switch (opt) { 
-    //            case CREATE:
-    //            case OPEN:
-    //            case OPEN_OR_CREATE:
-    //                result.setOpenMode(opt);
-    //                break;
-    //                
-    //            case APPEND:
-    //            case TRUNCATE:
-    //                result.setAppendMode(opt);
-    //                break;
-    //                
-    //            case WRITE:
-    //                result.setWriteMode(opt);
-    //                break;     
-    //            case READ:
-    //                result.setReadMode(opt);
-    //                break;
-    //            }
-    //        }
-    //        
-    //        if (result.getOpenMode() == null) { 
-    //            throw new InvalidOpenOptionsException(LocalAdaptor.ADAPTOR_NAME, "No open mode provided!");
-    //        }
-    //        
-    //        return result;
-    //    }
 
     @Override
     public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
