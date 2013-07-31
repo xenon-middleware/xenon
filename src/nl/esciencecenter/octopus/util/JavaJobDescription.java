@@ -293,11 +293,11 @@ public class JavaJobDescription extends JobDescription {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((javaArguments == null) ? 0 : javaArguments.hashCode());
-        result = prime * result + ((javaClasspath == null) ? 0 : javaClasspath.hashCode());
+        result = prime * result + javaArguments.hashCode();
+        result = prime * result + javaClasspath.hashCode();
         result = prime * result + ((javaMain == null) ? 0 : javaMain.hashCode());
-        result = prime * result + ((javaOptions == null) ? 0 : javaOptions.hashCode());
-        result = prime * result + ((javaSystemProperties == null) ? 0 : javaSystemProperties.hashCode());
+        result = prime * result + javaOptions.hashCode();
+        result = prime * result + javaSystemProperties.hashCode();
         return result;
     }
 
@@ -306,25 +306,24 @@ public class JavaJobDescription extends JobDescription {
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
+        
+        if (obj == null) {
             return false;
         }
+        
         if (getClass() != obj.getClass()) {
             return false;
         }
-        JavaJobDescription other = (JavaJobDescription) obj;
-        if (javaArguments == null) {
-            if (other.javaArguments != null) {
-                return false;
-            }
-        } else if (!javaArguments.equals(other.javaArguments)) {
+        
+        if (!super.equals(obj)) {
             return false;
         }
-        if (javaClasspath == null) {
-            if (other.javaClasspath != null) {
-                return false;
-            }
-        } else if (!javaClasspath.equals(other.javaClasspath)) {
+        
+        JavaJobDescription other = (JavaJobDescription) obj;
+        if (!javaArguments.equals(other.javaArguments)) {
+            return false;
+        }
+        if (!javaClasspath.equals(other.javaClasspath)) {
             return false;
         }
         if (javaMain == null) {
@@ -334,18 +333,10 @@ public class JavaJobDescription extends JobDescription {
         } else if (!javaMain.equals(other.javaMain)) {
             return false;
         }
-        if (javaOptions == null) {
-            if (other.javaOptions != null) {
-                return false;
-            }
-        } else if (!javaOptions.equals(other.javaOptions)) {
+        if (!javaOptions.equals(other.javaOptions)) {
             return false;
         }
-        if (javaSystemProperties == null) {
-            if (other.javaSystemProperties != null) {
-                return false;
-            }
-        } else if (!javaSystemProperties.equals(other.javaSystemProperties)) {
+        if (!javaSystemProperties.equals(other.javaSystemProperties)) {
             return false;
         }
         return true;
