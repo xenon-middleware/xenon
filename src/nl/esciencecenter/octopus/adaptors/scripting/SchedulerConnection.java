@@ -52,7 +52,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class SchedulerConnection {
     
-    private static final Logger logger = LoggerFactory.getLogger(SchedulerConnection.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerConnection.class);
     
     private static int schedulerID = 0;
 
@@ -80,27 +81,22 @@ public abstract class SchedulerConnection {
         
         adaptor.checkLocation(location);
         
-        // Create a new octopus properties, checking if property names are valid and setting defaults for all missing values.  
-        // this.properties = new OctopusProperties(adaptor.getSupportedProperties(Level.OCTOPUS), properties);        
-        
-        // pollDelay = this.properties.getIntegerProperty(adaptor.POLL_DELAY_PROPERTY);
-
         try {
             id = adaptor.getName() + "-" + getNextSchedulerID();
+            //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
             URI actualLocation = new URI("ssh", location.getSchemeSpecificPart(), location.getFragment());
 
             if (location.getHost() == null || location.getHost().length() == 0) {
-                //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
                 actualLocation = new URI("local:///");
             }
 
-            logger.debug("creating ssh scheduler for {} adaptor at {}", adaptor.getName(), actualLocation);
+            LOGGER.debug("creating ssh scheduler for {} adaptor at {}", adaptor.getName(), actualLocation);
             Map<String, String> sshProperties = new HashMap<String, String>();
             //FIXME: compensating for ssh performance bug #143
             sshProperties.put(SshAdaptor.POLLING_DELAY, "100");
             sshScheduler = engine.jobs().newScheduler(actualLocation, credential, sshProperties);
 
-            logger.debug("creating file system for {} adaptor at {}", adaptor.getName(), actualLocation);
+            LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), actualLocation);
             sshFileSystem = engine.files().newFileSystem(actualLocation, credential, null);
 
         } catch (URISyntaxException e) {
@@ -273,7 +269,7 @@ public abstract class SchedulerConnection {
             path = getFsEntryPath().resolve(new RelativePath(workingDirectory));
         }
         if (!engine.files().exists(path)) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
+            throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
         }
     }
 

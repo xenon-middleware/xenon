@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GridEngineSetup {
 
-    static final Logger logger = LoggerFactory.getLogger(GridEngineSetup.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(GridEngineSetup.class);
 
     private final String[] queueNames;
 
@@ -58,7 +58,7 @@ public class GridEngineSetup {
 
         this.parallelEnvironments = fetchParallelEnvironments(schedulerConnection, parser);
 
-        logger.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
+        LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
 
     private Map<String, ParallelEnvironmentInfo> fetchParallelEnvironments(SchedulerConnection schedulerConnection,
@@ -90,7 +90,7 @@ public class GridEngineSetup {
     }
 
     public String[] getQueueNames() {
-        return queueNames;
+        return queueNames.clone();
     }
 
     /**
@@ -113,7 +113,7 @@ public class GridEngineSetup {
 
         String allocationRule = environment.getAllocationRule();
 
-        logger.debug(
+        LOGGER.debug(
                 "Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\" and allocation rule \"{}\"",
                 nodeCount, queueName, parallelEnvironmentName, allocationRule);
 
@@ -142,7 +142,7 @@ public class GridEngineSetup {
                 return nodeCount * processesPerHost;
             } catch (NumberFormatException e) {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Illegal allocation rule \"" + allocationRule
-                        + "\" in parallel environment \"" + parallelEnvironmentName + "\"");
+                        + "\" in parallel environment \"" + parallelEnvironmentName + "\"", e);
             }
         }
 

@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Reads output from a stream, buffers it, and makes it available as a string when the stream reaches EndOfStream.
@@ -25,17 +26,20 @@ import java.nio.ByteBuffer;
  * 
  */
 public class OutputReader extends Thread {
+    
+    public static int BUFFER_SIZE = 1024;
 
     private final InputStream source;
 
     private ByteBuffer buffer;
 
-    boolean finished = false; // reached eof or got exception.
+    //Reached End Of File or got exception.
+    private boolean finished = false;
 
     public OutputReader(InputStream source) {
         this.source = source;
 
-        buffer = ByteBuffer.allocate(1024);
+        buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
         setDaemon(true);
         setName("Output reader");
@@ -77,7 +81,7 @@ public class OutputReader extends Thread {
     }
 
     public void run() {
-        byte[] bytes = new byte[1024];
+        byte[] bytes = new byte[BUFFER_SIZE];
 
         try {
             while (true) {
@@ -105,6 +109,6 @@ public class OutputReader extends Thread {
     public synchronized String getResult() {
         waitUntilFinished();
 
-        return new String(buffer.array(), 0, buffer.position());
+        return new String(buffer.array(), 0, buffer.position(), StandardCharsets.UTF_8);
     }
 }
