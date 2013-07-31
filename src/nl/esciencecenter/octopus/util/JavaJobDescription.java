@@ -188,12 +188,24 @@ public class JavaJobDescription extends JobDescription {
      */
     @Override
     public List<String> getArguments() {
-        ArrayList<String> result = new ArrayList<String>();
-        if (getJavaOptions() != null) {
-            for (String option : getJavaOptions()) {
-                result.add(option);
-            }
+        return getArguments(':');
+    }
+
+    /**
+     * Constructs the command line arguments from the class path, the jvm options, the system properties, the main and the java
+     * arguments.
+     * 
+     * @param pathSeperator
+     *            the seperator to use in the classpath. Defaults to the unix path seperator ':'
+     * 
+     * @return the command line arguments
+     */
+    public List<String> getArguments(char pathSeperator) {
+        List<String> result = new ArrayList<String>();
+        for (String option : getJavaOptions()) {
+            result.add(option);
         }
+
         if (!getJavaClasspath().isEmpty()) {
             result.add("-classpath");
             String classpath = null;
@@ -202,29 +214,23 @@ public class JavaJobDescription extends JobDescription {
                 if (classpath == null) {
                     classpath = element;
                 } else {
-                    classpath = classpath + ":" + element;
+                    classpath = classpath + pathSeperator + element;
                 }
             }
             result.add(classpath);
         }
 
-        if (getJavaSystemProperties() != null) {
-            Map<String, String> properties = getJavaSystemProperties();
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                result.add("-D" + entry.getKey() + "=" + properties.get(entry.getValue()));
-            }
+        Map<String, String> properties = getJavaSystemProperties();
+        for (Map.Entry<String, String> entry : properties.entrySet()) {
+            result.add("-D" + entry.getKey() + "=" + entry.getValue());
         }
 
         if (getJavaMain() != null) {
             result.add(getJavaMain());
-        } else {
-            return null;
         }
 
-        if (getJavaArguments() != null) {
-            for (String javaArgument : getJavaArguments()) {
-                result.add(javaArgument);
-            }
+        for (String javaArgument : getJavaArguments()) {
+            result.add(javaArgument);
         }
         return result;
     }

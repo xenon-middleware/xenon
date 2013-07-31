@@ -15,9 +15,9 @@
  */
 package nl.esciencecenter.octopus.util;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 
 /**
  * @author Niels Drost
- *
+ * 
  */
 public class JavaJobDescriptionTest {
 
@@ -35,70 +35,62 @@ public class JavaJobDescriptionTest {
         new JavaJobDescription();
     }
 
-    
-//    private final List<String> javaOptions = new ArrayList<String>();
-//
-//    private final Map<String, String> javaSystemProperties = new HashMap<String, String>();
-//
-//    private String javaMain = null;
-//
-//    private final List<String> javaArguments = new ArrayList<String>();
-//
-//    private final List<String> javaClassPath = new ArrayList<String>();
-    
+    //    private final List<String> javaOptions = new ArrayList<String>();
+    //
+    //    private final Map<String, String> javaSystemProperties = new HashMap<String, String>();
+    //
+    //    private String javaMain = null;
+    //
+    //    private final List<String> javaArguments = new ArrayList<String>();
+    //
+    //    private final List<String> javaClassPath = new ArrayList<String>();
+
     @org.junit.Test
     public void test_setters_getters() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
 
         //options
-        
+
         j.setJavaOptions("a", "b", "c");
         j.addJavaOption("d");
         List<String> optionsList = j.getJavaOptions();
-        assertTrue(optionsList != null);
-        assertTrue(optionsList.size() == 4);
-        assertTrue(Arrays.equals(optionsList.toArray(new String[4]), new String[] { "a", "b", "c", "d" }));
-        
+        assertArrayEquals(new String[] { "a", "b", "c", "d" }, optionsList.toArray(new String[4]));
+
         //system properties
-        
-        Map<String, String> inMap = new HashMap<String, String>();
-        inMap.put("some.key",  "some.value");
-        j.setJavaSystemProperties(inMap);
+
+        Map<String, String> in = new HashMap<String, String>();
+        in.put("some.key", "some.value");
+        j.setJavaSystemProperties(in);
         j.addJavaSystemProperty("other.key", "other.value");
 
-        //make input map equal to expected output map
-        inMap.put("other.key",  "other.value");
-        
-        Map<String, String> outMap = j.getJavaSystemProperties();
-        assertTrue(outMap != null);
-        assertTrue(outMap.size() == 2);
-        assertTrue(inMap.equals(outMap));
-        
+        Map<String, String> expected = new HashMap<String, String>();
+        expected.put("some.key", "some.value");
+        expected.put("other.key", "other.value");
+
+        Map<String, String> out = j.getJavaSystemProperties();
+        assertEquals(expected, out);
+
         //main class
-        
+
         j.setJavaMain("aap");
         String main = j.getJavaMain();
-        assertTrue(main.equals("aap"));
-        
+        assertEquals("aap", main);
+
         //arguments
-        
+
         j.setJavaArguments("d", "e", "f");
         j.addJavaArgument("g");
         List<String> argumentList = j.getJavaArguments();
-        assertTrue(argumentList != null);
-        assertTrue(argumentList.size() == 4);
-        assertTrue(Arrays.equals(argumentList.toArray(new String[4]), new String[] { "d", "e", "f", "g" }));
+        assertArrayEquals(new String[] { "d", "e", "f", "g" }, argumentList.toArray(new String[0]));
 
         //class path
-        
+
         j.setJavaClasspath("h", "i", "j");
         j.addJavaClasspathElement("k");
         List<String> classpathList = j.getJavaClasspath();
-        assertTrue(classpathList != null);
-        assertTrue(classpathList.size() == 4);
-        assertTrue(Arrays.equals(classpathList.toArray(new String[4]), new String[] { "h", "i", "j", "k" }));
+        assertArrayEquals(new String[] { "h", "i", "j", "k" }, classpathList.toArray(new String[0]));
     }
-    
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_addOption_Null_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
@@ -110,7 +102,7 @@ public class JavaJobDescriptionTest {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaOption("");
     }
-    
+
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_addArgument_Null_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
@@ -123,26 +115,103 @@ public class JavaJobDescriptionTest {
         j.addJavaArgument("");
     }
 
-
     @org.junit.Test(expected = IllegalArgumentException.class)
-    public void test_addClasspath_Null_Exception() throws Exception {
+    public void test_addClasspathElement_Null_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaClasspathElement(null);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
-    public void test_addClasspath_Empty_Exception() throws Exception {
+    public void test_addClasspathElement_Empty_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaClasspathElement("");
     }
-    
-    @org.junit.Test(expected = OctopusRuntimeException.class)
-    public void test_setArguments_Exception() throws Exception {
-        JavaJobDescription j = new JavaJobDescription();
-        j.setArguments("some","arguments");
-    }
-    
-    
 
-    
+    @org.junit.Test(expected = OctopusRuntimeException.class)
+    public void test_setArguments_AnyArgument_Exception() throws Exception {
+        JavaJobDescription j = new JavaJobDescription();
+        j.setArguments("some", "arguments");
+    }
+
+    @org.junit.Test
+    public void test_setExecutable_Null_Java() throws Exception {
+        JavaJobDescription j = new JavaJobDescription();
+        j.setExecutable(null);
+
+        String executable = j.getExecutable();
+
+        assertEquals("java", executable);
+    }
+
+    @org.junit.Test
+    public void test_setExecutable_Something_Something() throws Exception {
+        JavaJobDescription j = new JavaJobDescription();
+        j.setExecutable("something");
+
+        String executable = j.getExecutable();
+
+        assertEquals("something", executable);
+    }
+
+    @org.junit.Test
+    public void test_getArguments() throws Exception {
+        JavaJobDescription j = new JavaJobDescription();
+
+        j.setJavaArguments("argument");
+        j.addJavaSystemProperty("property.key", "property.value");
+        j.setJavaMain("nl.esciencecenter.main.class");
+        j.setJavaOptions("-Xtesting=true");
+        j.setJavaClasspath("element1", "element2", "element3");
+
+        //use a strange path separator to test if this is properly handled
+        List<String> arguments = j.getArguments('_');
+
+        String[] expected =
+                new String[] { "-Xtesting=true", "-classpath", "element1_element2_element3", "-Dproperty.key=property.value",
+                        "nl.esciencecenter.main.class", "argument" };
+
+        assertArrayEquals(expected, arguments.toArray(new String[0]));
+    }
+
+    @org.junit.Test
+    public void test_getArguments_NoMain() throws Exception {
+        JavaJobDescription j = new JavaJobDescription();
+
+        j.setJavaMain(null);
+        j.setJavaOptions("-jar", "somefile.jar");
+
+        //use a strange path separator to test if this is properly handled
+        List<String> arguments = j.getArguments();
+
+        String[] expected = new String[] { "-jar", "somefile.jar" };
+
+        assertArrayEquals(expected, arguments.toArray(new String[0]));
+    }
+
+    @org.junit.Test
+    public void test_toString() throws Exception {
+        JavaJobDescription j = new JavaJobDescription();
+        
+        j.setJavaArguments("argument");
+        j.addJavaSystemProperty("property.key", "property.value");
+        j.setJavaMain("nl.esciencecenter.main.class");
+        j.setJavaOptions("-Xtesting=true");
+        j.setJavaClasspath("element1", "element2", "element3");
+
+        j.setInteractive(true);
+        j.setWorkingDirectory("aap");
+        j.setQueueName("noot");
+        j.setStdin(null);
+        j.setStdout("stdout");
+        j.setStderr("stderr");
+        j.setExecutable("exec");
+        
+        String expected = "JavaJobDescription [javaOptions=[-Xtesting=true], javaSystemProperties={property.key=property.value},"
+                + " javaMain=nl.esciencecenter.main.class, javaArguments=[argument], javaClassPath=[element1, element2, element3],"
+                + " queueName=noot, executable=exec, stdin=null, stdout=stdout, stderr=stderr, workingDirectory=aap,"
+                + " environment={}, jobOptions={}, nodeCount=1, processesPerNode=1, maxTime=15, interactive=true]";
+
+        assertEquals(expected, j.toString());
+    }
+
 }
