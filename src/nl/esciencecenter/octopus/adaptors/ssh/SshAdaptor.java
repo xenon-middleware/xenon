@@ -52,14 +52,18 @@ import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshFiles.class);
 
+    /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "ssh";
 
-    protected static final int DEFAULT_PORT = 22; // The default ssh port.
+    /** The default SSH port */
+    protected static final int DEFAULT_PORT = 22; 
 
+    /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
 
+    /** The schemes supported by this adaptor */
     private static final String[] ADAPTOR_SCHEME = new String[] { "ssh", "sftp" };
 
     /** All our own properties start with this prefix. */
@@ -92,7 +96,7 @@ public class SshAdaptor extends Adaptor {
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
-    /** List of properties supported by SSH adaptor */
+    /** List of properties supported by this SSH adaptor */
     private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
         new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, 
                 EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."), 
@@ -131,7 +135,7 @@ public class SshAdaptor extends Adaptor {
         
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
             String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
-            logger.debug("Setting ssh known hosts file to: " + knownHosts);
+            LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
             setKnownHostsFile(knownHosts);
         }
     }
@@ -143,17 +147,17 @@ public class SshAdaptor extends Adaptor {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
         }
 
-        if (logger.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             HostKeyRepository hkr = jsch.getHostKeyRepository();
             HostKey[] hks = hkr.getHostKey();
             if (hks != null) {
-                logger.debug("Host keys in " + hkr.getKnownHostsRepositoryID());
+                LOGGER.debug("Host keys in " + hkr.getKnownHostsRepositoryID());
                 for (HostKey hk : hks) {
-                    logger.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
+                    LOGGER.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
                 }
-                logger.debug("");
+                LOGGER.debug("");
             } else {
-                logger.debug("No keys in " + knownHostsFile);
+                LOGGER.debug("No keys in " + knownHostsFile);
             }
         }
     }
