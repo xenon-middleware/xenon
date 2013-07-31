@@ -153,6 +153,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
 
         Job job = jobs.submitJob(scheduler, description);
 
