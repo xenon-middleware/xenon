@@ -62,7 +62,7 @@ public final class SlurmOutputParser extends ScriptingParser {
 
         if (lines.length == 0) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME,
-                    "Cannot parse sinfo output, Got empty output, expected at least a header");
+                    "Cannot parse slurm command output, Got empty output, expected at least a header");
         }
 
         String[] fields = lines[0].split(seperatorRegEx);
@@ -73,7 +73,7 @@ public final class SlurmOutputParser extends ScriptingParser {
             if (fields.length != values.length) {
                 LOGGER.debug("fields = {}, values = {}", fields, values);
                 throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Expected " + fields.length
-                        + " fields in sinfo output, got line with " + values.length + " values: " + lines[i]);
+                        + " fields in output, got line with " + values.length + " values: " + lines[i]);
             }
 
             Map<String, String> map = new HashMap<String, String>();
@@ -86,7 +86,7 @@ public final class SlurmOutputParser extends ScriptingParser {
             }
 
             if (!map.containsKey(keyField)) {
-                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "sinfo does not contain required field \"" + keyField
+                throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm command output does not contain required field \"" + keyField
                         + "\"");
 
             }
