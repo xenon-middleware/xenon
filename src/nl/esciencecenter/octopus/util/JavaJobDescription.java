@@ -41,7 +41,7 @@ public class JavaJobDescription extends JobDescription {
 
     private final List<String> javaArguments = new ArrayList<String>();
 
-    private final List<String> javaClassPath = new ArrayList<String>();
+    private final List<String> javaClasspath = new ArrayList<String>();
 
     /**
      * Create a {@link JavaJobDescription}, which describes the java application.
@@ -67,7 +67,24 @@ public class JavaJobDescription extends JobDescription {
      */
     public void setJavaOptions(String... options) {
         this.javaOptions.clear();
-        this.javaOptions.addAll(Arrays.asList(options));
+
+        for (String option : options) {
+            addJavaOption(option);
+        }
+    }
+
+    /**
+     * Adds a jvm options.
+     * 
+     * @param options
+     *            the jvm options.
+     */
+    public void addJavaOption(String option) {
+        if (option == null || option.length() == 0) {
+            throw new IllegalArgumentException("Option may not be null or empty!");
+        }
+
+        javaOptions.add(option);
     }
 
     /**
@@ -88,6 +105,7 @@ public class JavaJobDescription extends JobDescription {
      */
     public void setJavaSystemProperties(Map<String, String> systemProperties) {
         this.javaSystemProperties.clear();
+
         this.javaSystemProperties.putAll(systemProperties);
     }
 
@@ -142,10 +160,19 @@ public class JavaJobDescription extends JobDescription {
         this.javaArguments.addAll(Arrays.asList(javaArguments));
     }
 
+    public void addJavaArgument(String javaArgument) {
+        if (javaArgument == null || javaArgument.length() == 0) {
+            throw new IllegalArgumentException("javaArgument may not be null or empty!");
+        }
+
+        javaArguments.add(javaArgument);
+    }
+
     /**
-     * <b>This method should not be used</b>. This method will ignore all arguments. The methods {@link #setJavaClassPath(String)}
-     * , {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)}, {@link #setJavaMain(String)} and
-     * {@link #setJavaArguments(String[])} should be used to construct the command line arguments.
+     * <b>This method should not be used</b>. This method will throw an runtime exception when used. The methods
+     * {@link #setJavaClasspath(String)} , {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)},
+     * {@link #setJavaMain(String)} and {@link #setJavaArguments(String[])} should be used to construct the command line
+     * arguments.
      * 
      * @param arguments
      */
@@ -159,7 +186,8 @@ public class JavaJobDescription extends JobDescription {
      * 
      * @return the command line arguments
      */
-    public ArrayList<String> getArguments() {
+    @Override
+    public List<String> getArguments() {
         ArrayList<String> result = new ArrayList<String>();
         if (getJavaOptions() != null) {
             for (String option : getJavaOptions()) {
@@ -182,11 +210,8 @@ public class JavaJobDescription extends JobDescription {
 
         if (getJavaSystemProperties() != null) {
             Map<String, String> properties = getJavaSystemProperties();
-            for (String key : properties.keySet()) {
-                // null values ignored
-                if (properties.get(key) != null) {
-                    result.add("-D" + key + "=" + properties.get(key));
-                }
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                result.add("-D" + entry.getKey() + "=" + properties.get(entry.getValue()));
             }
         }
 
@@ -223,26 +248,37 @@ public class JavaJobDescription extends JobDescription {
      * @return the java class path.
      */
     public List<String> getJavaClasspath() {
-        return javaClassPath;
+        return javaClasspath;
     }
 
     /**
      * Sets the java class path. Will automatically add separators when multiple elements are given.
      * 
-     * @param javaClassPath
+     * @param javaClasspath
      *            the class path to be set.
      */
-    public void setJavaClassPath(String... javaClasspath) {
-        this.javaClassPath.clear();
-        this.javaClassPath.addAll(Arrays.asList(javaClasspath));
+    public void setJavaClasspath(String... javaClasspath) {
+        this.javaClasspath.clear();
+
+        for (String element : javaClasspath) {
+            addJavaClasspathElement(element);
+        }
+    }
+
+    public void addJavaClasspathElement(String element) {
+        if (element == null || element.length() == 0) {
+            throw new IllegalArgumentException("java classpath element may not be null or empty!");
+        }
+
+        javaClasspath.add(element);
     }
 
     @Override
     public String toString() {
         return "JavaJobDescription [javaOptions=" + javaOptions + ", javaSystemProperties=" + javaSystemProperties
-                + ", javaMain=" + javaMain + ", javaArguments=" + javaArguments + ", javaClassPath=" + javaClassPath
-                + ", queueName=" + getQueueName() + ", executable=" + getExecutable() + ", stdin=" + getStdin()
-                + ", stdout=" + getStdout() + ", stderr=" + getStderr() + ", workingDirectory=" + getWorkingDirectory() + ", environment="
+                + ", javaMain=" + javaMain + ", javaArguments=" + javaArguments + ", javaClassPath=" + javaClasspath
+                + ", queueName=" + getQueueName() + ", executable=" + getExecutable() + ", stdin=" + getStdin() + ", stdout="
+                + getStdout() + ", stderr=" + getStderr() + ", workingDirectory=" + getWorkingDirectory() + ", environment="
                 + getEnvironment() + ", jobOptions=" + getJobOptions() + ", nodeCount=" + getNodeCount() + ", processesPerNode="
                 + getProcessesPerNode() + ", maxTime=" + getMaxTime() + ", interactive=" + isInteractive() + "]";
     }
@@ -252,7 +288,7 @@ public class JavaJobDescription extends JobDescription {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((javaArguments == null) ? 0 : javaArguments.hashCode());
-        result = prime * result + ((javaClassPath == null) ? 0 : javaClassPath.hashCode());
+        result = prime * result + ((javaClasspath == null) ? 0 : javaClasspath.hashCode());
         result = prime * result + ((javaMain == null) ? 0 : javaMain.hashCode());
         result = prime * result + ((javaOptions == null) ? 0 : javaOptions.hashCode());
         result = prime * result + ((javaSystemProperties == null) ? 0 : javaSystemProperties.hashCode());
@@ -261,42 +297,52 @@ public class JavaJobDescription extends JobDescription {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         JavaJobDescription other = (JavaJobDescription) obj;
         if (javaArguments == null) {
-            if (other.javaArguments != null)
+            if (other.javaArguments != null) {
                 return false;
-        } else if (!javaArguments.equals(other.javaArguments))
+            }
+        } else if (!javaArguments.equals(other.javaArguments)) {
             return false;
-        if (javaClassPath == null) {
-            if (other.javaClassPath != null)
+        }
+        if (javaClasspath == null) {
+            if (other.javaClasspath != null) {
                 return false;
-        } else if (!javaClassPath.equals(other.javaClassPath))
+            }
+        } else if (!javaClasspath.equals(other.javaClasspath)) {
             return false;
+        }
         if (javaMain == null) {
-            if (other.javaMain != null)
+            if (other.javaMain != null) {
                 return false;
-        } else if (!javaMain.equals(other.javaMain))
+            }
+        } else if (!javaMain.equals(other.javaMain)) {
             return false;
+        }
         if (javaOptions == null) {
-            if (other.javaOptions != null)
+            if (other.javaOptions != null) {
                 return false;
-        } else if (!javaOptions.equals(other.javaOptions))
+            }
+        } else if (!javaOptions.equals(other.javaOptions)) {
             return false;
+        }
         if (javaSystemProperties == null) {
-            if (other.javaSystemProperties != null)
+            if (other.javaSystemProperties != null) {
                 return false;
-        } else if (!javaSystemProperties.equals(other.javaSystemProperties))
+            }
+        } else if (!javaSystemProperties.equals(other.javaSystemProperties)) {
             return false;
+        }
         return true;
     }
-    
-    
-    
 
 }

@@ -125,10 +125,8 @@ public final class GridEngineJobScriptGenerator {
             script.format("#$ -e %s\n", description.getStderr());
         }
 
-        if (description.getEnvironment() != null) {
-            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
-            }
+        for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
         }
 
         script.format("\n");
@@ -155,7 +153,6 @@ public final class GridEngineJobScriptGenerator {
         script.format("\n");
     }
 
-    
     private static void generateParallelScriptContent(JobDescription description, Formatter script) {
         script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
 
