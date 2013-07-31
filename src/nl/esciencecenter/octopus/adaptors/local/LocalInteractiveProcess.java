@@ -15,13 +15,16 @@
  */
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.util.JavaJobDescription;
 
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
@@ -46,7 +49,18 @@ class LocalInteractiveProcess implements InteractiveProcess {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(description.getExecutable());
-        builder.command().addAll(description.getArguments());
+        
+        //We need to special case for the java job description here,
+        //as it needs to be told the path separator in case the target is a windows machine.
+        List<String> arguments;
+        if (description instanceof JavaJobDescription) {
+            JavaJobDescription javaDescription = (JavaJobDescription) description;
+            arguments = javaDescription.getArguments(File.pathSeparatorChar);
+        } else {
+            arguments = description.getArguments();
+        }
+        
+        builder.command().addAll(arguments);
         builder.environment().putAll(description.getEnvironment());
 
         String workingDirectory = description.getWorkingDirectory();
