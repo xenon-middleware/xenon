@@ -129,25 +129,25 @@ public class JobDescriptionTest {
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionKeyEmpty() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions("", "value");
+        j.addJobOption("", "value");
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionKeyNull() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions(null, "value");
+        j.addJobOption(null, "value");
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionValueEmpty() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions("key", "");
+        j.addJobOption("key", "");
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionValueNull() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions("key", null);
+        j.addJobOption("key", null);
     }
 
     @org.junit.Test

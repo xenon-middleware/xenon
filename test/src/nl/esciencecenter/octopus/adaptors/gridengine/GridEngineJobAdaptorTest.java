@@ -82,7 +82,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOptions("job.script", script.getPath());
+        description.addJobOption("job.script", script.getPath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);
@@ -151,7 +151,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.addJobOptions("parallel.environment", "prun");
+        description.addJobOption("parallel.environment", "prun");
         description.setQueueName("all.q");
 
         Job job = jobs.submitJob(scheduler, description);

@@ -289,7 +289,7 @@ public class JobDescription {
 
         if (options != null) {
             for (Entry<String, String> entry : options.entrySet()) {
-                addJobOptions(entry.getKey(), entry.getValue());
+                addJobOption(entry.getKey(), entry.getValue());
             }
         }
     }
@@ -304,7 +304,7 @@ public class JobDescription {
      * @param options
      *            job options of the job.
      */
-    public void addJobOptions(String key, String value) {
+    public void addJobOption(String key, String value) {
 
         if (key == null || key.length() == 0) {
             throw new IllegalArgumentException("Job option key may not be null or empty!");

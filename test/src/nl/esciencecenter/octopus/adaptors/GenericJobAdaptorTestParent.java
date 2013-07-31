@@ -1185,6 +1185,7 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.close(scheduler);
         files.close(filesystem);
     }
+    
 
     @org.junit.Test
     public void test37c_batchJobSubmitWithAbsoluteWorkDir() throws Exception {
@@ -1262,6 +1263,43 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(status.hasException());
         jobs.close(scheduler);
     }
+    
+    @org.junit.Test
+    public void test37e_batchJobSubmitWithWorkDirWithSpaces() throws Exception {
+        //note the space in the path
+        String workingDir = getWorkingDir("test 37b");
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/sleep");
+        description.setArguments("1");
+        description.setInteractive(false);
+        description.setStdout(null);
+        description.setStderr(null);
+        //relative working dir name used
+        description.setWorkingDirectory(workingDir);
+
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
+
+        if (!status.isDone()) {
+            throw new Exception("Job exceeded deadline!");
+        }
+
+        if (status.hasException()) {
+            throw new Exception("Job failed!", status.getException());
+        }
+
+        files.delete(root);
+        jobs.close(scheduler);
+        files.close(filesystem);
+    }
+
 
     //@org.junit.Test
     public void test38_multipleBatchJobSubmitWithInput() throws Exception {

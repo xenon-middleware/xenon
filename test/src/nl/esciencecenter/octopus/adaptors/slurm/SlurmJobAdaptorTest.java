@@ -84,7 +84,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOptions("job.script", script.getPath());
+        description.addJobOption("job.script", script.getPath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);
