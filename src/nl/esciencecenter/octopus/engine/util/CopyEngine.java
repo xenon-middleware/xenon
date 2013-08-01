@@ -20,9 +20,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,8 +78,8 @@ public class CopyEngine {
     private final Files owner;
     private final CopyThread thread;
 
-    private LinkedList<CopyInfo> pending = new LinkedList<>();
-    private LinkedHashMap<String, CopyInfo> finished = new LinkedHashMap<>();
+    private Deque<CopyInfo> pending = new LinkedList<>();
+    private Map<String, CopyInfo> finished = new LinkedHashMap<>();
     private CopyInfo running;
 
     private long nextID = 0;

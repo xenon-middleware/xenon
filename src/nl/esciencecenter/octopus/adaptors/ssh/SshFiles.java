@@ -23,9 +23,9 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
@@ -366,7 +366,7 @@ public class SshFiles implements Files {
     }
 
     @SuppressWarnings("unchecked")
-    private Vector<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException {
+    private List<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException {
 
         FileAttributes att = getAttributes(path);
         
@@ -381,7 +381,7 @@ public class SshFiles implements Files {
         SshSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        Vector<LsEntry> result = null;
+        List<LsEntry> result = null;
 
         try {
             result = channel.ls(path.getPath());

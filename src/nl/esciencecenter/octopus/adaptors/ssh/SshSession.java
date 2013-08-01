@@ -19,6 +19,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -186,7 +187,7 @@ class SshSession {
 
     private int nextSessionID = 0;
 
-    private ArrayList<SessionInfo> sessions = new ArrayList<>();
+    private List<SessionInfo> sessions = new ArrayList<>();
 
     static class Robot implements UserInfo {
 

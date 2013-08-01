@@ -46,7 +46,7 @@ public abstract class CredentialImplementation implements Credential {
         this.adaptorName = adaptorName;
         this.username = username;
         this.uniqueID = uniqueID;
-        this.password = password;
+        this.password = password.clone();
 
         if (properties == null) { 
             this.properties = new OctopusProperties();

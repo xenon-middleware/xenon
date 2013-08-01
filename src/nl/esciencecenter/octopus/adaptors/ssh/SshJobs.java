@@ -78,7 +78,7 @@ public class SshJobs implements Jobs {
 
     private final OctopusProperties properties;
 
-    private HashMap<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
+    private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
     public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;

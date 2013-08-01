@@ -47,7 +47,7 @@ public class OctopusProperties {
      * @param supportedProperties a map containing a description of all supported properties. 
      * @param properties a map containing valid properties and their values. 
      */    
-    private OctopusProperties(HashMap<String, OctopusPropertyDescription> supportedProperties, Map<String,String> properties) { 
+    private OctopusProperties(Map<String, OctopusPropertyDescription> supportedProperties, Map<String,String> properties) { 
         this.supportedProperties = supportedProperties;
         this.properties = properties;
     } 
