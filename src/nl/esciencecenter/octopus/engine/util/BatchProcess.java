@@ -75,8 +75,8 @@ class BatchProcess implements InteractiveProcess {
         return files.newOutputStream(file, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE);
     }
 
-    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory)
-            throws Exception {
+    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory) 
+            throws OctopusException, IOException { 
 
         JobDescription description = job.getJobDescription();
 

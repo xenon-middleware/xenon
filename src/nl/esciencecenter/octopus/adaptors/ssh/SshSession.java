@@ -52,7 +52,7 @@ class SshSession {
 
     private static final int MAX_OPEN_CHANNELS = 7;
 
-    class SessionInfo {
+    static class SessionInfo {
 
         private final int sessionID;
         private final Session session;

@@ -59,7 +59,7 @@ public class SchedulerImplementation implements Scheduler {
         if (queueNames == null) { 
             this.queueNames = new String[0];
         } else { 
-            this.queueNames = queueNames;
+            this.queueNames = queueNames.clone();
         }
         
         if (properties == null) { 

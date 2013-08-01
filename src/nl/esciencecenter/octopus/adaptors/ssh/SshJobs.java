@@ -57,7 +57,7 @@ public class SshJobs implements Jobs {
     /**
      * Used to store all state attached to a scheduler. This way, SchedulerImplementation is immutable.
      */
-    class SchedulerInfo {
+    static class SchedulerInfo {
 
         final SchedulerImplementation impl;
         final SshSession session;
@@ -199,8 +199,7 @@ public class SshJobs implements Jobs {
     }
 
     public void end() {
-        // FIXME!
-        // singleExecutor.shutdownNow();
+        // FIXME singleExecutor.shutdownNow();
     }
 
     @Override

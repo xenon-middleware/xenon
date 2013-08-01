@@ -427,11 +427,7 @@ public class JobDescription {
     private boolean compare(Object a, Object b) {
 
         if (a == null) {
-            if (b == null) {
-                return true;
-            } else {
-                return false;
-            }
+            return (b == null);
         }
 
         if (b == null) {

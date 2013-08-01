@@ -97,7 +97,6 @@ public class SshCredentials implements Credentials {
         File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
 
         if (certFile.exists()) {
-            // logger.info("Using default credential: "+ keyFile.getPath());
             return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
                     properties, certFile.getPath(), user, null);
         }
@@ -105,7 +104,6 @@ public class SshCredentials implements Credentials {
         File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
 
         if (certFile2.exists()) {
-            // logger.info("Using default credential: "+ keyFile2.getPath());
             return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(),
                     properties, certFile2.getPath(), user, null);
         }
