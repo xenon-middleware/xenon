@@ -51,7 +51,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
  */
 public class FilesEngine implements Files {
 
-    public final static DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
+    public static final DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
         public boolean accept(AbsolutePath file) {
             return true;
         }

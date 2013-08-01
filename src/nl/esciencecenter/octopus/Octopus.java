@@ -79,12 +79,4 @@ public interface Octopus {
      */
     Credentials credentials();
 
-    //Future extension: clouds
-    //public Clouds clouds();
-
-    //Future extension: bandwidth on demand
-    //public Networks networks();
-
-    //public ??
-
 }

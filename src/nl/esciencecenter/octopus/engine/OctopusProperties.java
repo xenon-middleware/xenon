@@ -33,7 +33,18 @@ import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
  */
 public class OctopusProperties {
+    
+    private static final String NAME = "OctopusProperties";
 
+    /** One kilo is 1024 */
+    private static final int KILO = 1024;
+    
+    /** One mega is a kilo*kilo */
+    private static final int MEGA = KILO*KILO;
+    
+    /** One giga is a kilo*kilo*kilo */
+    private static final int GIGA = KILO*MEGA; 
+    
     /** Contains a description of all properties this OctopusProperties should accept, including their type, default, etc. */
     private final Map<String, OctopusPropertyDescription> supportedProperties;
        
@@ -84,7 +95,7 @@ public class OctopusProperties {
      * @throws UnknownPropertyException 
      * @throws InvalidPropertyException 
      */
-    private final void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
+    private void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
         
         if (properties == null) {
             return;
@@ -97,7 +108,7 @@ public class OctopusProperties {
             OctopusPropertyDescription d = supportedProperties.get(key);
             
             if (d == null) { 
-                throw new UnknownPropertyException("OctopusProperties", "Unknown property " + key); 
+                throw new UnknownPropertyException(NAME, "Unknown property " + key); 
             }
 
             String value = e.getValue();
@@ -108,7 +119,7 @@ public class OctopusProperties {
         }
     }
     
-    private final void checkType(OctopusPropertyDescription description, String key, String value) 
+    private void checkType(OctopusPropertyDescription description, String key, String value) 
             throws InvalidPropertyException { 
         
         Type t = description.getType();
@@ -134,7 +145,7 @@ public class OctopusProperties {
                 break;
             }
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + key + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + key + " has invalid value: " + value + 
                     " (expected " + t + ")", e);            
         }        
     }
@@ -159,7 +170,7 @@ public class OctopusProperties {
     public boolean propertySet(String name) throws UnknownPropertyException { 
         
         if (!supportedProperties.containsKey(name)) { 
-            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+            throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
         
         return properties.containsKey(name);
@@ -180,7 +191,7 @@ public class OctopusProperties {
         OctopusPropertyDescription d = supportedProperties.get(name);
         
         if (d == null) {
-            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+            throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
         
         String value = d.getDefaultValue();
@@ -197,11 +208,11 @@ public class OctopusProperties {
         OctopusPropertyDescription d = supportedProperties.get(name);
         
         if (d == null) {
-            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+            throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
         
         if (d.getType() != type) { 
-            throw new PropertyTypeException("OctopusProperties", "Property " + name + " is of type " + d.getType() + 
+            throw new PropertyTypeException(NAME, "Property " + name + " is of type " + d.getType() + 
                     " not " + type);
         }
         
@@ -232,7 +243,7 @@ public class OctopusProperties {
         try { 
             return Boolean.parseBoolean(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected BOOLEAN)", e); 
         }
     }
@@ -254,7 +265,7 @@ public class OctopusProperties {
         try { 
             return Integer.parseInt(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected INTEGER)", e); 
         }
     }
@@ -280,7 +291,7 @@ public class OctopusProperties {
         try { 
             return Integer.parseInt(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected INTEGER)", e); 
         }
     }
@@ -302,7 +313,7 @@ public class OctopusProperties {
         try { 
             return Long.parseLong(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected LONG)", e); 
         }
     }
@@ -324,7 +335,7 @@ public class OctopusProperties {
         try { 
             return Double.parseDouble(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected DOUBLE)", e); 
         }
     }
@@ -361,21 +372,21 @@ public class OctopusProperties {
 
         try {
             if (value.endsWith("G") || value.endsWith("g")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * 1024 * 1024 * 1024;
+                return Long.parseLong(value.substring(0, value.length() - 1)) * GIGA;
             }
 
             if (value.endsWith("M") || value.endsWith("m")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * 1024 * 1024;
+                return Long.parseLong(value.substring(0, value.length() - 1)) * MEGA;
             }
 
             if (value.endsWith("K") || value.endsWith("k")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * 1024;
+                return Long.parseLong(value.substring(0, value.length() - 1)) * KILO;
             }
 
             return Long.parseLong(value);
 
         } catch (NumberFormatException e) {
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected SIZE)", e); 
         }
     }

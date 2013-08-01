@@ -71,25 +71,31 @@ public class CopyEngine {
 
     /** The polling delay */
     private static final int POLLING_DELAY = 1000;
-    
+
     /** The default buffer size */
     private static final int BUFFER_SIZE = 4 * 1024;
 
+    /** A Files used to access the files that need to be copied. */
     private final Files owner;
-    private final CopyThread thread;
 
+    /** Pending copies */
     private Deque<CopyInfo> pending = new LinkedList<>();
+    
+    /** Finished copies */
     private Map<String, CopyInfo> finished = new LinkedHashMap<>();
+    
+    /** Running copy */
     private CopyInfo running;
 
+    /** Current Copy ID */
     private long nextID = 0;
 
+    /** Should we terminate ? */
     private boolean done = false;
-
+    
     public CopyEngine(Files owner) {
         this.owner = owner;
-        this.thread = new CopyThread();
-        thread.start();
+        new CopyThread().start();
     }
 
     private void close(Closeable c) {
@@ -142,19 +148,19 @@ public class CopyEngine {
         OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND);
 
         long skipped = 0;
-       
+
         try {
-            
-            while (skipped < fromOffset) { 
+
+            while (skipped < fromOffset) {
                 long tmp = in.skip(fromOffset);
-            
-                if (tmp <= 0) { 
+
+                if (tmp <= 0) {
                     throw new OctopusIOException("CopyEngine", "Failed to seek file " + source.getPath() + " to " + fromOffset);
                 }
-                
+
                 skipped += tmp;
             }
-            
+
             streamCopy(in, out, ac);
         } catch (IOException e) {
             throw new OctopusIOException("CopyEngine", "Failed to copy " + source.getPath() + ":" + fromOffset + " to target "
@@ -165,29 +171,28 @@ public class CopyEngine {
         }
     }
 
-    private int readFully(InputStream in, byte [] buffer) throws IOException { 
-        
+    private int readFully(InputStream in, byte[] buffer) throws IOException {
+
         int offset = 0;
-        
-        while (offset < buffer.length) { 
-            int tmp = in.read(buffer, offset, buffer.length-offset);
-        
-            if (tmp <= 0) { 
+
+        while (offset < buffer.length) {
+            int tmp = in.read(buffer, offset, buffer.length - offset);
+
+            if (tmp <= 0) {
                 break;
             }
-            
+
             offset += tmp;
         }
-        
-        if (offset == 0) { 
+
+        if (offset == 0) {
             return -1;
         }
-        
+
         return offset;
     }
-    
-    
-    private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws OctopusIOException, IOException {
+
+    private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws IOException {
 
         LOGGER.debug("Compare head of {} to {}", target.getPath(), source.getPath());
 
@@ -244,7 +249,7 @@ public class CopyEngine {
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
-        
+
         if (sourceAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }
@@ -258,7 +263,7 @@ public class CopyEngine {
         }
 
         FileAttributes targetAtt = owner.getAttributes(target);
-        
+
         if (targetAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Target " + target.getPath() + " is a directory");
         }
@@ -329,7 +334,7 @@ public class CopyEngine {
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
-        
+
         if (sourceAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }
@@ -337,13 +342,13 @@ public class CopyEngine {
         if (!owner.exists(target)) {
             throw new NoSuchFileException("CopyEngine", "Target " + target.getPath() + " does not exist!");
         }
-        
+
         FileAttributes targetAtt = owner.getAttributes(target);
-        
+
         if (targetAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Target " + target.getPath() + " is a directory");
         }
-        
+
         if (source.normalize().equals(target.normalize())) {
             throw new IllegalTargetPathException("CopyEngine", "Can not append a file to itself (source " + source.getPath()
                     + " equals target " + target.getPath() + ")");
@@ -371,9 +376,9 @@ public class CopyEngine {
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
         }
-        
+
         FileAttributes sourceAtt = owner.getAttributes(source);
-        
+
         if (sourceAtt.isDirectory()) {
             throw new IllegalSourcePathException("CopyEngine", "Source " + source.getPath() + " is a directory");
         }

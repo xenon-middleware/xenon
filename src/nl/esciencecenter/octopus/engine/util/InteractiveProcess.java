@@ -24,11 +24,11 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public interface InteractiveProcess {
 
-    public Streams getStreams();
+    Streams getStreams();
 
-    public boolean isDone();
+    boolean isDone();
 
-    public int getExitStatus();
+    int getExitStatus();
 
-    public void destroy();
+    void destroy();
 }

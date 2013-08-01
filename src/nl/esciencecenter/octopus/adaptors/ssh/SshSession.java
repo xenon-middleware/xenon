@@ -54,14 +54,14 @@ class SshSession {
 
     class SessionInfo {
 
-        final int ID;
-        final Session session;
-        ChannelSftp sftpChannel;
-        int openChannels = 0;
+        private final int sessionID;
+        private final Session session;
+        private ChannelSftp sftpChannel;
+        private int openChannels = 0;
 
-        SessionInfo(Session session, int ID) {
+        SessionInfo(Session session, int sessionID) {
             this.session = session;
-            this.ID = ID;
+            this.sessionID = sessionID;
         }
 
         boolean incOpenChannels(String info) {
@@ -71,13 +71,13 @@ class SshSession {
             }
 
             openChannels++;
-            LOGGER.debug("SSHSESSION-{}: ++Open channels: {} {}", ID, openChannels, info);
+            LOGGER.debug("SSHSESSION-{}: ++Open channels: {} {}", sessionID, openChannels, info);
             return true;
         }
 
         void decOpenChannels(String info) {
             openChannels--;
-            LOGGER.debug("SSHSESSION-{}: --Open channels: {} {}", ID, openChannels, info);
+            LOGGER.debug("SSHSESSION-{}: --Open channels: {} {}", sessionID, openChannels, info);
         }
 
         ChannelSftp getSftpChannelFromCache() {
@@ -96,19 +96,19 @@ class SshSession {
         }
 
         void releaseExecChannel(ChannelExec channel) {
-            LOGGER.debug("SSHSESSION-{}: Releasing EXEC channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing EXEC channel", sessionID);
             channel.disconnect();
             decOpenChannels("EXEC");
         }
 
         void failedExecChannel(ChannelExec channel) {
-            LOGGER.debug("SSHSESSION-{}: Releasing FAILED EXEC channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing FAILED EXEC channel", sessionID);
             channel.disconnect();
             decOpenChannels("FAILED EXEC");
         }
 
         void releaseSftpChannel(ChannelSftp channel) {
-            LOGGER.debug("SSHSESSION-{}: Releasing SFTP channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing SFTP channel", sessionID);
 
             if (!putSftpChannelInCache(channel)) {
                 channel.disconnect();
@@ -117,7 +117,7 @@ class SshSession {
         }
 
         void failedSftpChannel(ChannelSftp channel) {
-            LOGGER.debug("SSHSESSION-{}: Releasing FAILED SFTP channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing FAILED SFTP channel", sessionID);
             channel.disconnect();
             decOpenChannels("FAILED SFTP");
         }
@@ -139,10 +139,10 @@ class SshSession {
             ChannelExec channel = null;
 
             try {
-                LOGGER.debug("SSHSESSION-{}: Creating EXEC channel {}", ID, openChannels);
+                LOGGER.debug("SSHSESSION-{}: Creating EXEC channel {}", sessionID, openChannels);
                 channel = (ChannelExec) session.openChannel("exec");
             } catch (JSchException e) {
-                LOGGER.debug("SSHSESSION-{}: Failed to create EXEC channel {}", ID, openChannels, e);
+                LOGGER.debug("SSHSESSION-{}: Failed to create EXEC channel {}", sessionID, openChannels, e);
                 throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
 
@@ -155,7 +155,7 @@ class SshSession {
             ChannelSftp channel = getSftpChannelFromCache();
 
             if (channel != null) {
-                LOGGER.debug("SSHSESSION-{}: Reusing SFTP channel {}", ID, openChannels);
+                LOGGER.debug("SSHSESSION-{}: Reusing SFTP channel {}", sessionID, openChannels);
                 return channel;
             }
 
@@ -164,11 +164,11 @@ class SshSession {
             }
 
             try {
-                LOGGER.debug("SSHSESSION-{}: Creating SFTP channel {}", ID, openChannels);
+                LOGGER.debug("SSHSESSION-{}: Creating SFTP channel {}", sessionID, openChannels);
                 channel = (ChannelSftp) session.openChannel("sftp");
                 channel.connect();
             } catch (JSchException e) {
-                LOGGER.debug("SSHSESSION-{}: Failed to create SFTP channel {}", ID, openChannels, e);
+                LOGGER.debug("SSHSESSION-{}: Failed to create SFTP channel {}", sessionID, openChannels, e);
                 throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
 

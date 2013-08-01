@@ -34,7 +34,7 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class JobExecutor implements Runnable {
 
-    private final static long MILLISECONDS_IN_MINUTE = 60*1000;
+    private static final long MILLISECONDS_IN_MINUTE = 60*1000;
     
     private final JobImplementation job;
 

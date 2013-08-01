@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.engine.credentials;
 
-import java.net.URI;
-
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 
 /**

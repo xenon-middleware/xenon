@@ -99,7 +99,7 @@ public abstract class Adaptor {
     }
 
     public String[] getSupportedSchemes() {
-        return supportedSchemes;
+        return supportedSchemes.clone();
     }
 
     @Override

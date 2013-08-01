@@ -19,18 +19,8 @@ import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
-import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
-import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
-import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 
 /**
  * Jobs represents the Jobs interface of Octopus.

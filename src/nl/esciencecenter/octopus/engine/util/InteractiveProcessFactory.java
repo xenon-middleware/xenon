@@ -25,5 +25,5 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
  * 
  */
 public interface InteractiveProcessFactory {
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException;
+    InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException;
 }

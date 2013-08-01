@@ -26,6 +26,9 @@ import com.jcraft.jsch.SftpATTRS;
 
 public class SshFileAttributes implements FileAttributes {
 
+    private final static int MILLISECONDS_PER_SECOND = 1000;
+    
+    
     /** Bitset to set user ID on execution */
     static final int SUID = 04000; 
  
@@ -70,12 +73,12 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public long lastAccessTime() throws AttributeNotSupportedException {
-        return (long) attributes.getATime() * 1000;
+        return (long) attributes.getATime() * MILLISECONDS_PER_SECOND;
     }
 
     @Override
     public long lastModifiedTime() throws AttributeNotSupportedException {
-        return (long) attributes.getMTime() * 1000;
+        return (long) attributes.getMTime() * MILLISECONDS_PER_SECOND;
     }
 
     @Override

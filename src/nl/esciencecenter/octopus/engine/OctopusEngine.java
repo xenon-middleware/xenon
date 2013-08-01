@@ -35,9 +35,9 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementat
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
+import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -69,7 +69,7 @@ public class OctopusEngine implements Octopus {
     public static final String LOAD = ADAPTORS + "load";
 
     /** All OctopusEngines created so far */
-    private static final List<OctopusEngine> octopusEngines = new ArrayList<OctopusEngine>();
+    private static final List<OctopusEngine> OCTOPUS_ENGINES = new ArrayList<OctopusEngine>();
 
     /**
      * Create a new Octopus using the given properties.
@@ -87,7 +87,7 @@ public class OctopusEngine implements Octopus {
      */
     public static synchronized Octopus newOctopus(Map<String,String> properties) throws OctopusException {
         OctopusEngine result = new OctopusEngine(properties);
-        octopusEngines.add(result);
+        OCTOPUS_ENGINES.add(result);
         return result;
     }
 
@@ -95,9 +95,9 @@ public class OctopusEngine implements Octopus {
 
         OctopusEngine result = null;
 
-        for (int i = 0; i < octopusEngines.size(); i++) {
-            if (octopusEngines.get(i) == engine) {
-                result = octopusEngines.remove(i);
+        for (int i = 0; i < OCTOPUS_ENGINES.size(); i++) {
+            if (OCTOPUS_ENGINES.get(i) == engine) {
+                result = OCTOPUS_ENGINES.remove(i);
                 break;
             }
         }
@@ -114,11 +114,11 @@ public class OctopusEngine implements Octopus {
     }
 
     public static synchronized void endAll() {
-        for (int i = 0; i < octopusEngines.size(); i++) {
-            octopusEngines.get(i).end();
+        for (int i = 0; i < OCTOPUS_ENGINES.size(); i++) {
+            OCTOPUS_ENGINES.get(i).end();
         }
 
-        octopusEngines.clear();
+        OCTOPUS_ENGINES.clear();
     }
 
     private boolean ended = false;
@@ -173,7 +173,7 @@ public class OctopusEngine implements Octopus {
     private Adaptor[] loadAdaptors(Map<String,String> properties) throws OctopusException {
 
         // Copy the map so we can manipulate it. 
-        HashMap<String,String> tmp = new HashMap<>(properties);
+        Map<String,String> tmp = new HashMap<>(properties);
         
         Adaptor[] result = new Adaptor[4];
 

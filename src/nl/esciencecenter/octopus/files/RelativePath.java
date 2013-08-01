@@ -468,7 +468,7 @@ public class RelativePath {
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    public RelativePath relativize(RelativePath other) throws IllegalArgumentException {
+    public RelativePath relativize(RelativePath other) {
 
         if (isEmpty()) {
             return other;
