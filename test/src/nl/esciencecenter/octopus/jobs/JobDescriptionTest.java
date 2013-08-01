@@ -234,43 +234,48 @@ public class JobDescriptionTest {
 
         JobDescription other = new JobDescription();
         assertTrue(j.equals(other));
-
+        
         other.setInteractive(true);
         assertFalse(j.equals(other));
         other.setInteractive(false);
+        assertTrue(j.equals(other));
 
         other.setMaxTime(42);
         assertFalse(j.equals(other));
         other.setMaxTime(15);
+        assertTrue(j.equals(other));
 
         other.setNodeCount(2);
         assertFalse(j.equals(other));
         other.setNodeCount(1);
+        assertTrue(j.equals(other));
 
         other.setProcessesPerNode(2);
         assertFalse(j.equals(other));
         other.setProcessesPerNode(1);
+        assertTrue(j.equals(other));
 
         other.setExecutable("aap");
         assertFalse(j.equals(other));
         other.setExecutable(null);
+        assertTrue(j.equals(other));
 
         j.setExecutable("noot");
         assertFalse(j.equals(other));
-
         other.setExecutable("aap");
         assertFalse(j.equals(other));
-
         j.setExecutable("aap");
         assertTrue(j.equals(other));
 
         other.setWorkingDirectory("noot");
         assertFalse(j.equals(other));
         j.setWorkingDirectory("noot");
+        assertTrue(j.equals(other));
 
         other.setQueueName("noot");
         assertFalse(j.equals(other));
         j.setQueueName("noot");
+        assertTrue(j.equals(other));
 
         other.setStdin("noot");
         assertFalse(j.equals(other));
@@ -278,6 +283,8 @@ public class JobDescriptionTest {
 
         other.setStdout("stdout.txt");
         assertFalse(j.equals(other));
+        j.setStdout("stdout.txt");
+        assertTrue(j.equals(other));
         j.setStdout("stdout.txt");
 
         other.setStderr("stderr.txt");
@@ -295,6 +302,7 @@ public class JobDescriptionTest {
         other.setEnvironment(env);
         assertFalse(j.equals(other));
         other.setEnvironment(null);
+        assertTrue(j.equals(other));
 
         Map<String, String> opt = new HashMap<>();
         opt.put("OPT1", "ARG1");
