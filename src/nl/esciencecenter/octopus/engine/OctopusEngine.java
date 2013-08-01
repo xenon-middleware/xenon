@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,6 +54,8 @@ import org.slf4j.LoggerFactory;
  */
 public class OctopusEngine implements Octopus {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OctopusEngine.class);
+    
     /** The local adaptor is a special case, therefore we publish its name here. */
     public static final String LOCAL_ADAPTOR_NAME = "local";
 
@@ -65,14 +68,8 @@ public class OctopusEngine implements Octopus {
     /** All our own queue properties start with this prefix. */
     public static final String LOAD = ADAPTORS + "load";
 
-    /** List of {NAME, DESCRIPTION, DEFAULT_VALUE} for properties. */
-//    private static final String[][] VALID_PROPERTIES = new String[][] { { LOAD, null,
-//            "List: comma separated list of the adaptors to load." } };
-
-    private static final Logger logger = LoggerFactory.getLogger(OctopusEngine.class);
-
     /** All OctopusEngines created so far */
-    private static final ArrayList<OctopusEngine> octopusEngines = new ArrayList<OctopusEngine>();
+    private static final List<OctopusEngine> octopusEngines = new ArrayList<OctopusEngine>();
 
     /**
      * Create a new Octopus using the given properties.
@@ -170,7 +167,7 @@ public class OctopusEngine implements Octopus {
 
         copyEngine = new CopyEngine(filesEngine);
 
-        logger.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
+        LOGGER.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
     private Adaptor[] loadAdaptors(Map<String,String> properties) throws OctopusException {
@@ -258,9 +255,9 @@ public class OctopusEngine implements Octopus {
         throw new OctopusException("engine", "Could not find adaptor named " + name);
     }
 
-    public Adaptor[] getAdaptors() {
-        return adaptors;
-    }
+//    public Adaptor[] getAdaptors() {
+//        return adaptors;
+//    }
 
     @Override
     public synchronized Map<String,String> getProperties() {

@@ -52,7 +52,7 @@ import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SshFiles.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshAdaptor.class);
 
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "ssh";

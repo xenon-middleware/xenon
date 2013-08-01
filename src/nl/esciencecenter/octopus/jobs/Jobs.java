@@ -72,7 +72,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
+    Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException;
 
     /**
@@ -92,7 +92,7 @@ public interface Jobs {
      * @throws OctopusException
      *             If the creation of the Scheduler failed.
      */
-    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
+    Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
 
     /**
      * Close a Scheduler.
@@ -107,7 +107,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException;
+    void close(Scheduler scheduler) throws OctopusException, OctopusIOException;
 
     /**
      * Test is a Scheduler is open.
@@ -120,7 +120,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
+    boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException;
 
     /**
      * Get the name of the default queue for the <code>scheduler</code>.
@@ -137,7 +137,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException;
+    String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException;
 
     /**
      * Get all jobs currently in (one ore more) queues of <code>scheduler</code>.
@@ -162,7 +162,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException;
+    Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException;
 
     /**
      * Get the status of the <code>queue</code> of <code>scheduler</code>.
@@ -183,7 +183,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
+    QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException;
 
     /**
      * Get the status of all <code>queues</code> of <code>scheduler</code>.
@@ -207,7 +207,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException;
+    QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException;
 
     /**
      * Submit a job to a Scheduler.
@@ -232,7 +232,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException;
+    Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException;
 
     /**
      * Get the status of a Job.
@@ -249,7 +249,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
+    JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
 
     /**
      * Get the status of all specified <code>jobs</code>.
@@ -270,7 +270,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public JobStatus[] getJobStatuses(Job... jobs);
+    JobStatus[] getJobStatuses(Job... jobs);
 
     /**
      * Returns the standard streams of a job.
@@ -284,7 +284,7 @@ public interface Jobs {
      * @throws OctopusException
      *             if the job is not interactive.
      */
-    public Streams getStreams(Job job) throws OctopusException;
+    Streams getStreams(Job job) throws OctopusException;
 
     /**
      * Cancel a job.
@@ -307,7 +307,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
+    JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException;
 
     /**
      * Wait until a job is done or until a timeout expires.
@@ -332,7 +332,7 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
+    JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException;
 
     /**
      * Wait for as long a job is waiting in a queue, or until a timeout expires.
@@ -358,5 +358,5 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException;
+    JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException;
 }

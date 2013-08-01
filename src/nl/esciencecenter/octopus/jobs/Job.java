@@ -30,28 +30,28 @@ public interface Job {
      * 
      * @return the JobDescription that belongs to this Job
      */
-    public JobDescription getJobDescription();
+    JobDescription getJobDescription();
 
     /**
      * Returns the {@link Scheduler} that was used to create this Job.
      * 
      * @return the Scheduler used to create this job.
      */
-    public Scheduler getScheduler();
+    Scheduler getScheduler();
 
     /**
      * Returns the identifier that was assigned to this job by the scheduler.
      * 
      * @return the identifier that was assigned to this job by the scheduler.
      */
-    public String getIdentifier();
+    String getIdentifier();
 
     /**
      * Returns if this is an interactive job.
      * 
      * @return if this is an interactive job.
      */
-    public boolean isInteractive();
+    boolean isInteractive();
 
     /**
      * Returns if this is an online job.
@@ -63,5 +63,5 @@ public interface Job {
      * 
      * @return if this is an online job.
      */
-    public boolean isOnline();
+    boolean isOnline();
 }

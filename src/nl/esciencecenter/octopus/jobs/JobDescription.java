@@ -30,7 +30,10 @@ import java.util.Map.Entry;
  * @since 1.0
  */
 public class JobDescription {
-
+    
+    /** The default maximum run time */
+    public static final int DEFAULT_MAX_RUN_TIME = 15;
+    
     /** The queue to submit to. */
     private String queueName = null;
 
@@ -65,7 +68,7 @@ public class JobDescription {
     private int processesPerNode = 1;
 
     /** The maximum run time in minutes. */
-    private int maxTime = 15;
+    private int maxTime = DEFAULT_MAX_RUN_TIME;
 
     /** Is this an interactive job ? */
     private boolean interactive = false;

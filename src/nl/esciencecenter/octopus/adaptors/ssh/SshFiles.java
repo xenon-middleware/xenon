@@ -70,7 +70,7 @@ import com.jcraft.jsch.SftpException;
 
 public class SshFiles implements Files {
 
-    private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshFiles.class);
 
     private static int currentID = 1;
 
@@ -134,7 +134,7 @@ public class SshFiles implements Files {
 
         RelativePath entryPath = new RelativePath(wd);
 
-        logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
+        LOGGER.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
         FileSystemImplementation result =
                 new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath, credential, properties);
@@ -354,7 +354,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            logger.debug("move from " + source.getPath() + " to " + target.getPath());
+            LOGGER.debug("move from " + source.getPath() + " to " + target.getPath());
             channel.rename(source.getPath(), target.getPath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -511,7 +511,7 @@ public class SshFiles implements Files {
     }
 
     public void end() {
-        logger.debug("end called, closing all file systems");
+        LOGGER.debug("end called, closing all file systems");
         while (fileSystems.size() > 0) {
             Set<String> keys = fileSystems.keySet();
             String first = keys.iterator().next();

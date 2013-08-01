@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 public class SshJobs implements Jobs {
     
-    private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshJobs.class);
     
     private static int currentID = 1;
 
@@ -97,7 +97,7 @@ public class SshJobs implements Jobs {
 
         SshSession session = adaptor.createNewSession(location, credential, this.properties);
 
-        logger.debug("Starting ssh scheduler with properties {}", properties);
+        LOGGER.debug("Starting ssh scheduler with properties {}", properties);
         
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
         

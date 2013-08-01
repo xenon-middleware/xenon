@@ -29,12 +29,12 @@ public interface PathAttributesPair {
      * 
      * @return the AbsolutePath.
      */
-    public AbsolutePath path();
+    AbsolutePath path();
 
     /**
      * Get the FileAttributes in this PathAttributesPair.
      * 
      * @return the FileAttributes.
      */
-    public FileAttributes attributes();
+    FileAttributes attributes();
 }

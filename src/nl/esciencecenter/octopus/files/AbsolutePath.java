@@ -31,49 +31,49 @@ public interface AbsolutePath {
      * 
      * @return the FileSystem.
      */
-    public FileSystem getFileSystem();
+    FileSystem getFileSystem();
 
     /**
      * Get the RelativePath on the FileSystem.
      * 
      * @return the RelativePath.
      */
-    public RelativePath getRelativePath();
+    RelativePath getRelativePath();
 
     /**
      * Is this AbsolutePath created by the local adaptor ?
      * 
      * @return If this AbsolutePath is created by the local adaptor ?
      */
-    public boolean isLocal();
+    boolean isLocal();
 
     /**
      * Get the file name, or <code>null</code> if the AbsolutePath is empty.
      * 
      * @return the resulting file name or <code>null</code>.
      */
-    public String getFileName();
+    String getFileName();
 
     /**
      * Get the parent path, or <code>null</code> if this path does not have a parent.
      * 
      * @return a path representing the path's parent.
      */
-    public AbsolutePath getParent();
+    AbsolutePath getParent();
 
     /**
      * Get the number of name elements in the path.
      * 
      * @return the number of elements in the path, or 0 if this is empty.
      */
-    public int getNameCount();
+    int getNameCount();
 
     /**
      * Get the number of name elements in the path.
      * 
      * @return the number of elements in the path, or 0 if this path is empty.
      */
-    public String[] getNames();
+    String[] getNames();
 
     /**
      * Get a name element of this path.
@@ -86,7 +86,7 @@ public interface AbsolutePath {
      * @throws IllegalArgumentException
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
-    public String getName(int index);
+    String getName(int index);
 
     /**
      * Returns a relative Path that is a subsequence of the name elements of this path.
@@ -102,7 +102,7 @@ public interface AbsolutePath {
      *             If the beginIndex or endIndex is negative or greater or equal to the number of elements in the path, or if
      *             beginIndex is larger that or equal to the endIndex.
      */
-    public AbsolutePath subpath(int beginIndex, int endIndex);
+    AbsolutePath subpath(int beginIndex, int endIndex);
 
     /**
      * Tests if this path starts with the given path.
@@ -112,7 +112,7 @@ public interface AbsolutePath {
      * 
      * @return If this paths start with the other path.
      */
-    public boolean startsWith(RelativePath other);
+    boolean startsWith(RelativePath other);
 
     /**
      * Tests if this path ends with the given path.
@@ -122,7 +122,7 @@ public interface AbsolutePath {
      * 
      * @return If this paths ends with the other path.
      */
-    public boolean endsWith(RelativePath other);
+    boolean endsWith(RelativePath other);
 
     /**
      * Resolve a RelativePath against this AbsolutePath by appending all path elements in the RelativePath to the path elements in
@@ -133,7 +133,7 @@ public interface AbsolutePath {
      * 
      * @return the resulting AbsolutePath.
      */
-    public AbsolutePath resolve(RelativePath other);
+    AbsolutePath resolve(RelativePath other);
 
     /**
      * Normalize this AbsolutePath by removing as many redundant path elements as possible.
@@ -145,7 +145,7 @@ public interface AbsolutePath {
      * 
      * @return the normalize path.
      */
-    public AbsolutePath normalize();
+    AbsolutePath normalize();
 
     /**
      * Resolves the given path to this paths parent path, thereby creating a sibling to this path.
@@ -158,7 +158,7 @@ public interface AbsolutePath {
      * @throws IllegalArgumentException
      *             If the path can not be resolved as a sibling to this path.
      */
-    public AbsolutePath resolveSibling(RelativePath other);
+    AbsolutePath resolveSibling(RelativePath other);
 
     /**
      * Create a relative path between the given path and this path.
@@ -173,7 +173,7 @@ public interface AbsolutePath {
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    public RelativePath relativize(RelativePath other);
+    RelativePath relativize(RelativePath other);
 
     /**
      * Create an {@link Iterator} that returns all possible sub paths of this path, in order of increasing length.
@@ -182,12 +182,12 @@ public interface AbsolutePath {
      * 
      * @return
      */
-    public Iterator<AbsolutePath> iterator();
+    Iterator<AbsolutePath> iterator();
 
     /**
      * Get a string representation of this path.
      * 
      * @return a string representation of this path.
      */
-    public String getPath();
+    String getPath();
 }

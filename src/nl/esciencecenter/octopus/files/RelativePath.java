@@ -21,8 +21,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import javax.annotation.Generated;
-
 /**
  * RelativePath contains a sequence of path elements separated by a separator.
  * 

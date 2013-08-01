@@ -32,21 +32,21 @@ public interface FileSystem {
      * 
      * @return the name of the adaptor.
      */
-    public String getAdaptorName();
+    String getAdaptorName();
 
     /**
      * Get the URI representing the location of the FileSystem.
      * 
      * @return the location of the FileSystem.
      */
-    public URI getUri();
+    URI getUri();
 
     /**
      * Get the properties used to create this FileSystem.
      * 
      * @return the properties used to create this FileSystem.
      */
-    public Map<String,String> getProperties();
+    Map<String,String> getProperties();
 
     /**
      * Get the entry path of this file system.
@@ -55,5 +55,5 @@ public interface FileSystem {
      * 
      * @return the entry path of this file system.
      */
-    public AbsolutePath getEntryPath();
+    AbsolutePath getEntryPath();
 }

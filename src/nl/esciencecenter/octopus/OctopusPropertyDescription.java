@@ -57,33 +57,33 @@ public interface OctopusPropertyDescription {
      * 
      * @return the name of the property.
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns the type of the property. 
      * 
      * @return the type of the property.
      */
-    public Type getType();
+    Type getType();
     
     /**
      * Return a set containing all levels at which this property can be set. 
      * 
      * @return  a set containing all levels at which this property can be set.
      */
-    public Set<Level> getLevels();
+    Set<Level> getLevels();
 
     /** 
      * Returns the default value for this property. 
      * 
      * @return the default value for this property or <code>null</code> is no default is set.
      */
-    public String getDefaultValue();
+    String getDefaultValue();
     
     /** 
      * Returns a human readable description of this property.
      *  
      * @return a human readable description of this property.
      */
-    public String getDescription();
+    String getDescription();
 }

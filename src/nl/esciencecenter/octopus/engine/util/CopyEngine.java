@@ -65,8 +65,12 @@ public class CopyEngine {
     }
 
     /** A logger for this class */
-    private static final Logger logger = LoggerFactory.getLogger(CopyEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyEngine.class);
 
+    /** The polling delay */
+    private static final int POLLING_DELAY = 1000;
+    
+    /** The default buffer size */
     private static final int BUFFER_SIZE = 4 * 1024;
 
     private final Files owner;
@@ -104,7 +108,7 @@ public class CopyEngine {
         byte[] buffer = new byte[BUFFER_SIZE];
 
         if (ac.isCancelled()) {
-            logger.debug("Copy killed by user!");
+            LOGGER.debug("Copy killed by user!");
             ac.setException(new IOException("Copy killed by user"));
             return;
         }
@@ -118,7 +122,7 @@ public class CopyEngine {
             ac.setBytesCopied(total);
 
             if (ac.isCancelled()) {
-                logger.debug("Copy killed by user!");
+                LOGGER.debug("Copy killed by user!");
                 ac.setException(new IOException("Copy killed by user"));
                 return;
             }
@@ -131,7 +135,7 @@ public class CopyEngine {
 
         // We need to append some bytes from source to target. 
 
-        logger.debug("Appending from {} to {} starting at {}", source.getPath(), target.getPath(), fromOffset);
+        LOGGER.debug("Appending from {} to {} starting at {}", source.getPath(), target.getPath(), fromOffset);
 
         InputStream in = owner.newInputStream(source);
         OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND);
@@ -150,10 +154,10 @@ public class CopyEngine {
 
     private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws OctopusIOException, IOException {
 
-        logger.debug("Compare head of {} to {}", target.getPath(), source.getPath());
+        LOGGER.debug("Compare head of {} to {}", target.getPath(), source.getPath());
 
-        byte[] buf1 = new byte[4 * 1024];
-        byte[] buf2 = new byte[4 * 1024];
+        byte[] buf1 = new byte[BUFFER_SIZE];
+        byte[] buf2 = new byte[BUFFER_SIZE];
 
         InputStream in1 = owner.newInputStream(target);
         InputStream in2 = owner.newInputStream(source);
@@ -198,7 +202,7 @@ public class CopyEngine {
         AbsolutePath source = ac.copy.getSource();
         AbsolutePath target = ac.copy.getTarget();
 
-        logger.debug("Resume copy from {} to {} verify={}", source.getPath(), target.getPath(), ac.verify);
+        LOGGER.debug("Resume copy from {} to {} verify={}", source.getPath(), target.getPath(), ac.verify);
 
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
@@ -252,7 +256,7 @@ public class CopyEngine {
         long targetSize = targetAtt.size();
         long sourceSize = sourceAtt.size();
 
-        logger.debug("Resuming copy from {} to {} ? ", source.getPath(), target.getPath(), (sourceSize < targetSize));
+        LOGGER.debug("Resuming copy from {} to {} ? ", source.getPath(), target.getPath(), (sourceSize < targetSize));
 
         // If target is larger than source, they cannot be the same file.
         if (targetSize > sourceSize) {
@@ -283,7 +287,7 @@ public class CopyEngine {
         AbsolutePath source = ac.copy.getSource();
         AbsolutePath target = ac.copy.getTarget();
 
-        logger.debug("Append from {} to {} verify={}", source.getPath(), target.getPath());
+        LOGGER.debug("Append from {} to {} verify={}", source.getPath(), target.getPath());
 
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
@@ -327,7 +331,7 @@ public class CopyEngine {
         boolean replace = (ac.mode == CopyOption.REPLACE);
         boolean ignore = (ac.mode == CopyOption.IGNORE);
 
-        logger.debug("Copy from {} to {} replace={} ignore={}", source.getPath(), target.getPath(), replace, ignore);
+        LOGGER.debug("Copy from {} to {} replace={} ignore={}", source.getPath(), target.getPath(), replace, ignore);
 
         if (!owner.exists(source)) {
             throw new NoSuchFileException("CopyEngine", "Source " + source.getPath() + " does not exist!");
@@ -382,7 +386,7 @@ public class CopyEngine {
 
     private void copy(CopyInfo info) {
 
-        logger.debug("Start copy: {}", info);
+        LOGGER.debug("Start copy: {}", info);
 
         try {
             switch (info.mode) {
@@ -405,7 +409,7 @@ public class CopyEngine {
             info.setException(e);
         }
 
-        logger.debug("Finished copy: {}", info);
+        LOGGER.debug("Finished copy: {}", info);
     }
 
     public void copy(CopyInfo info, boolean asynchronous) {
@@ -417,14 +421,14 @@ public class CopyEngine {
     }
 
     public synchronized void done() {
-        logger.debug("Sending CopyEngine termination signal");
+        LOGGER.debug("Sending CopyEngine termination signal");
         done = true;
         notifyAll();
     }
 
     private synchronized void enqueue(CopyInfo info) {
 
-        logger.debug("CopyEngine queueing copy: {}", info);
+        LOGGER.debug("CopyEngine queueing copy: {}", info);
 
         pending.addLast(info);
         notifyAll();
@@ -432,7 +436,7 @@ public class CopyEngine {
 
     private synchronized CopyInfo dequeue() {
 
-        logger.debug("CopyEngine dequeueing copy");
+        LOGGER.debug("CopyEngine dequeueing copy");
 
         if (running != null) {
             finished.put(running.copy.getUniqueID(), running);
@@ -442,14 +446,14 @@ public class CopyEngine {
 
         while (!done && pending.size() == 0) {
             try {
-                wait(1000);
+                wait(POLLING_DELAY);
             } catch (InterruptedException e) {
                 // ignore ?
             }
         }
 
         if (done) {
-            logger.debug("CopyEngine received termination signal with {} pending copies.", pending.size());
+            LOGGER.debug("CopyEngine received termination signal with {} pending copies.", pending.size());
             return null;
         }
 
@@ -459,11 +463,11 @@ public class CopyEngine {
 
     private synchronized void waitUntilCancelled(String ID) {
 
-        logger.debug("Waiting until copy {} is cancelled.", ID);
+        LOGGER.debug("Waiting until copy {} is cancelled.", ID);
 
         while (running != null && ID.equals(running.copy.getUniqueID())) {
             try {
-                wait(500);
+                wait(POLLING_DELAY);
             } catch (InterruptedException e) {
                 // ignored.
             }
@@ -480,10 +484,10 @@ public class CopyEngine {
 
         String ID = tmp.getUniqueID();
 
-        logger.debug("Attempting to cancel copy {}.", ID);
+        LOGGER.debug("Attempting to cancel copy {}.", ID);
 
         if (running != null && ID.equals(running.copy.getUniqueID())) {
-            logger.debug("Canceled copy {} is running,", ID);
+            LOGGER.debug("Canceled copy {} is running,", ID);
             running.cancel();
 
             // We should now wait until the running copy is indeed cancelled. Otherwise, we are in an inconsistent state when 
@@ -494,7 +498,7 @@ public class CopyEngine {
         CopyInfo ac = finished.remove(ID);
 
         if (ac != null) {
-            logger.debug("Canceled copy {} was already finished.", ID);
+            LOGGER.debug("Canceled copy {} was already finished.", ID);
             // Already finished
             return new CopyStatusImplementation(copy, "DONE", false, true, ac.getBytesToCopy(), ac.getBytesCopied(),
                     ac.getException());
@@ -508,7 +512,7 @@ public class CopyEngine {
 
             if (c.copy.getUniqueID().equals(ID)) {
                 it.remove();
-                logger.debug("Canceled copy {} was queued.", ID);
+                LOGGER.debug("Canceled copy {} was queued.", ID);
                 return new CopyStatusImplementation(copy, "KILLED", false, false, c.getBytesToCopy(), 0, new IOException(
                         "Copy killed by user"));
             }
@@ -527,7 +531,7 @@ public class CopyEngine {
 
         String ID = tmp.getUniqueID();
 
-        logger.debug("Retrieving status of copy {}.", ID);
+        LOGGER.debug("Retrieving status of copy {}.", ID);
 
         String state = null;
         CopyInfo ac = null;

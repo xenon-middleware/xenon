@@ -47,8 +47,8 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
     }
 
     @Override
-    public Iterator<T> iterator();
+    Iterator<T> iterator();
 
     @Override
-    public void close() throws OctopusIOException;
+    void close() throws OctopusIOException;
 }

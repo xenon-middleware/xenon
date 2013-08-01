@@ -47,7 +47,7 @@ import com.jcraft.jsch.UserInfo;
  */
 class SshSession {
 
-    private static final Logger logger = LoggerFactory.getLogger(SshSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshSession.class);
 
     private static final int MAX_OPEN_CHANNELS = 7;
 
@@ -70,13 +70,13 @@ class SshSession {
             }
 
             openChannels++;
-            logger.debug("SSHSESSION-{}: ++Open channels: {} {}", ID, openChannels, info);
+            LOGGER.debug("SSHSESSION-{}: ++Open channels: {} {}", ID, openChannels, info);
             return true;
         }
 
         void decOpenChannels(String info) {
             openChannels--;
-            logger.debug("SSHSESSION-{}: --Open channels: {} {}", ID, openChannels, info);
+            LOGGER.debug("SSHSESSION-{}: --Open channels: {} {}", ID, openChannels, info);
         }
 
         ChannelSftp getSftpChannelFromCache() {
@@ -95,19 +95,19 @@ class SshSession {
         }
 
         void releaseExecChannel(ChannelExec channel) {
-            logger.debug("SSHSESSION-{}: Releasing EXEC channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing EXEC channel", ID);
             channel.disconnect();
             decOpenChannels("EXEC");
         }
 
         void failedExecChannel(ChannelExec channel) {
-            logger.debug("SSHSESSION-{}: Releasing FAILED EXEC channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing FAILED EXEC channel", ID);
             channel.disconnect();
             decOpenChannels("FAILED EXEC");
         }
 
         void releaseSftpChannel(ChannelSftp channel) {
-            logger.debug("SSHSESSION-{}: Releasing SFTP channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing SFTP channel", ID);
 
             if (!putSftpChannelInCache(channel)) {
                 channel.disconnect();
@@ -116,7 +116,7 @@ class SshSession {
         }
 
         void failedSftpChannel(ChannelSftp channel) {
-            logger.debug("SSHSESSION-{}: Releasing FAILED SFTP channel", ID);
+            LOGGER.debug("SSHSESSION-{}: Releasing FAILED SFTP channel", ID);
             channel.disconnect();
             decOpenChannels("FAILED SFTP");
         }
@@ -138,10 +138,10 @@ class SshSession {
             ChannelExec channel = null;
 
             try {
-                logger.debug("SSHSESSION-{}: Creating EXEC channel {}", ID, openChannels);
+                LOGGER.debug("SSHSESSION-{}: Creating EXEC channel {}", ID, openChannels);
                 channel = (ChannelExec) session.openChannel("exec");
             } catch (JSchException e) {
-                logger.debug("SSHSESSION-{}: Failed to create EXEC channel {}", ID, openChannels, e);
+                LOGGER.debug("SSHSESSION-{}: Failed to create EXEC channel {}", ID, openChannels, e);
                 throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
 
@@ -154,7 +154,7 @@ class SshSession {
             ChannelSftp channel = getSftpChannelFromCache();
 
             if (channel != null) {
-                logger.debug("SSHSESSION-{}: Reusing SFTP channel {}", ID, openChannels);
+                LOGGER.debug("SSHSESSION-{}: Reusing SFTP channel {}", ID, openChannels);
                 return channel;
             }
 
@@ -163,11 +163,11 @@ class SshSession {
             }
 
             try {
-                logger.debug("SSHSESSION-{}: Creating SFTP channel {}", ID, openChannels);
+                LOGGER.debug("SSHSESSION-{}: Creating SFTP channel {}", ID, openChannels);
                 channel = (ChannelSftp) session.openChannel("sftp");
                 channel.connect();
             } catch (JSchException e) {
-                logger.debug("SSHSESSION-{}: Failed to create SFTP channel {}", ID, openChannels, e);
+                LOGGER.debug("SSHSESSION-{}: Failed to create SFTP channel {}", ID, openChannels, e);
                 throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
 
@@ -305,7 +305,7 @@ class SshSession {
 
     private SessionInfo createSession() throws OctopusException {
 
-        logger.debug("SSHSESSION: Creating new session to " + user + "@" + host + ":" + port);
+        LOGGER.debug("SSHSESSION: Creating new session to " + user + "@" + host + ":" + port);
 
         Session session = null;
 
@@ -321,17 +321,17 @@ class SshSession {
         }
 
         if (properties.getBooleanProperty(SshAdaptor.STRICT_HOST_KEY_CHECKING)) {
-            logger.debug("SSHSESSION: Strict host key checking enabled");
+            LOGGER.debug("SSHSESSION: Strict host key checking enabled");
 
             if (properties.getBooleanProperty(SshAdaptor.AUTOMATICALLY_ADD_HOST_KEY)) {
-                logger.debug("SSHSESSION: Automatically add host key to known_hosts");
+                LOGGER.debug("SSHSESSION: Automatically add host key to known_hosts");
                 session.setConfig("StrictHostKeyChecking", "ask");
                 session.setUserInfo(new Robot(true));
             } else {
                 session.setConfig("StrictHostKeyChecking", "yes");
             }
         } else {
-            logger.debug("SSHSESSION: Strict host key checking disabled");
+            LOGGER.debug("SSHSESSION: Strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
         }
        

@@ -32,28 +32,28 @@ public interface Scheduler {
      * 
      * @return the name of the adaptor.
      */
-    public String getAdaptorName();
+    String getAdaptorName();
 
     /**
      * Get the URI representing the location of the Scheduler.
      * 
      * @return the location of the Scheduler.
      */
-    public URI getUri();
+    URI getUri();
 
     /**
      * Get the properties used to create this Scheduler.
      * 
      * @return the properties used to create this Scheduler.
      */
-    public Map<String,String> getProperties();
+    Map<String,String> getProperties();
 
     /**
      * Get the queue names supported by this Scheduler.
      * 
      * @return the queue names supported by this Scheduler.
      */
-    public String[] getQueueNames();
+    String[] getQueueNames();
 
     /**
      * Does this Scheduler supports the submission of interactive jobs ?
@@ -63,7 +63,7 @@ public interface Scheduler {
      * 
      * @return if this scheduler supports the submission of interactive jobs ?
      */
-    public boolean supportsInteractive();
+    boolean supportsInteractive();
 
     /**
      * Does this Scheduler support the submission of batch jobs ?
@@ -72,7 +72,7 @@ public interface Scheduler {
      * 
      * @return if this scheduler supports the submission of batch jobs ?
      */
-    public boolean supportsBatch();
+    boolean supportsBatch();
 
     /**
      * Is this an online scheduler ?
@@ -90,5 +90,5 @@ public interface Scheduler {
      * 
      * @return if this scheduler is online.
      */
-    public boolean isOnline();
+    boolean isOnline();
 }

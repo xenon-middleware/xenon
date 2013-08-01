@@ -35,10 +35,10 @@ import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 public class OctopusProperties {
 
     /** Contains a description of all properties this OctopusProperties should accept, including their type, default, etc. */
-    private final HashMap<String, OctopusPropertyDescription> supportedProperties;
+    private final Map<String, OctopusPropertyDescription> supportedProperties;
        
     /** The properties that are actually set. */
-    private final HashMap<String, String> properties;
+    private final Map<String, String> properties;
     
     /** 
      * Private constructor for OctopusProperties using in copying and filtering. The <code>properties</code> parameter is assumed
@@ -47,7 +47,7 @@ public class OctopusProperties {
      * @param supportedProperties a map containing a description of all supported properties. 
      * @param properties a map containing valid properties and their values. 
      */    
-    private OctopusProperties(HashMap<String, OctopusPropertyDescription> supportedProperties, HashMap<String,String> properties) { 
+    private OctopusProperties(HashMap<String, OctopusPropertyDescription> supportedProperties, Map<String,String> properties) { 
         this.supportedProperties = supportedProperties;
         this.properties = properties;
     } 
@@ -84,7 +84,7 @@ public class OctopusProperties {
      * @throws UnknownPropertyException 
      * @throws InvalidPropertyException 
      */
-    private void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
+    private final void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
         
         if (properties == null) {
             return;
@@ -108,7 +108,8 @@ public class OctopusProperties {
         }
     }
     
-    private void checkType(OctopusPropertyDescription description, String key, String value) throws InvalidPropertyException { 
+    private final void checkType(OctopusPropertyDescription description, String key, String value) 
+            throws InvalidPropertyException { 
         
         Type t = description.getType();
         
@@ -378,75 +379,26 @@ public class OctopusProperties {
                     " (expected SIZE)", e); 
         }
     }
-    
-    /**
-     * Returns the split-up value of a string property. The value is supposed to be a comma-separated string, with each comma
-     * preceded and followed by any amount of whitespace. See {@link java.lang.String#split(String)} for details of the splitting.
-     * If the property is not defined, an empty array of strings is returned.
-     * 
-     * @param key
-     *            the property name
-     * @return the split-up property value.
-     */
-//    public String[] getStringList(String key) {
-//        return getStringList(key, "\\s*,\\s*", new String[0]);
-//    }
-
-    /**
-     * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
-     * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, an empty array of
-     * strings is returned.
-     * 
-     * @param key
-     *            the property name
-     * @param delim
-     *            the delimiter
-     * @return the split-up property value.
-     */
-//    public String[] getStringList(String key, String delim) {
-//        return getStringList(key, delim, new String[0]);
-//    }
-
-    /**
-     * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
-     * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, the specified default
-     * value is returned.
-     * 
-     * @param key
-     *            the property name
-     * @param delim
-     *            the delimiter
-     * @param defaultValue
-     *            the default value
-     * @return the split-up property value.
-     */
-//    public String[] getStringList(String key, String delim, String[] defaultValue) {
-//        String value = getProperty(key);
-//
-//        if (value == null) {
-//            return defaultValue;
-//        }
-//
-//        return value.split(delim);
-//    }
 
     /**
      * Returns a new OctopusProperties that contains only the properties whose key start with a certain prefix.
      * 
      * @return an OctopusProperties containing only the matching properties.
-     * @param prefix the desired prefix
+     * @param tmp the desired prefix
      */
     public OctopusProperties filter(String prefix) {
 
-        if (prefix == null) {
-            prefix = "";
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
         }
         
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();
         
         for (String key : supportedProperties.keySet()) { 
-            if (key.startsWith(prefix)) { 
+            if (key.startsWith(tmp)) { 
                 remaining.put(key, supportedProperties.get(key));
                 
                 if (properties.containsKey(key)) { 
@@ -513,22 +465,24 @@ public class OctopusProperties {
      * 
      * @param out
      *            The stream to write output to.
-     * @param prefix
+     * @param tmp
      *            Only print properties which start with the given prefix. If null, will print all properties
      */
     public void printProperties(PrintStream out, String prefix) {
         
-        if (prefix == null) {
-            prefix = "";
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
         }
         
-        prefix = prefix.toLowerCase();
+        tmp = tmp.toLowerCase();
         
         for (OctopusPropertyDescription d : supportedProperties.values()) {
         
             String key = d.getName();
             
-            if (key.toLowerCase().startsWith(prefix)) {
+            if (key.toLowerCase().startsWith(tmp)) {
             
                 String value = d.getDefaultValue();
 
