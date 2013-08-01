@@ -59,16 +59,25 @@ public class SshJobs implements Jobs {
      */
     static class SchedulerInfo {
 
-        final SchedulerImplementation impl;
-        final SshSession session;
-        final FileSystem filesystem;
-        final JobQueues jobQueues;
+        private final SshSession session;
+        private final JobQueues jobQueues;
 
-        SchedulerInfo(SchedulerImplementation impl, FileSystem fs, SshSession session, JobQueues jobQueues) {
-            this.impl = impl;
-            this.filesystem = fs;
+        SchedulerInfo(SshSession session, JobQueues jobQueues) {
             this.session = session;
             this.jobQueues = jobQueues;
+        }
+        
+        SshSession getSession() { 
+            return session;
+        }
+        
+        JobQueues getJobQueues() { 
+            return jobQueues;
+        }
+        
+        void end() { 
+            jobQueues.end();
+            session.disconnect();
         }
     }
 
@@ -116,7 +125,7 @@ public class SshJobs implements Jobs {
                 new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, multiQThreads, pollingDelay);
 
         synchronized (this) {
-            schedulers.put(uniqueID, new SchedulerInfo(scheduler, fs, session, jobQueues));
+            schedulers.put(uniqueID, new SchedulerInfo(session, jobQueues));
         }
 
         return scheduler;
@@ -141,7 +150,7 @@ public class SshJobs implements Jobs {
             throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
         }
 
-        return info.jobQueues;
+        return info.getJobQueues();
     }
 
     @Override
@@ -231,8 +240,7 @@ public class SshJobs implements Jobs {
             }
         }
 
-        info.jobQueues.end();
-        info.session.disconnect();
+        info.end();
     }
 
     @Override

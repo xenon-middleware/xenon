@@ -228,12 +228,12 @@ class SshSession {
         }
     }
 
-    SshSession(SshAdaptor adaptor, JSch jsch, URI location, Credential credential, OctopusProperties properties)
+    SshSession(SshAdaptor adaptor, JSch jsch, URI location, Credential cred, OctopusProperties properties)
             throws OctopusException {
 
         this.jsch = jsch;
         this.properties = properties;
-        this.credential = credential;
+        credential = cred;
 
         user = location.getUserInfo();
         host = location.getHost();
@@ -355,8 +355,6 @@ class SshSession {
      * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
      * connecting.
      * 
-     * @param session
-     *            The authenticated session.
      * @return the channel
      * @throws OctopusIOException
      */
@@ -391,8 +389,6 @@ class SshSession {
     /**
      * Get a connected channel for doing sftp operations.
      * 
-     * @param session
-     *            The authenticated session.
      * @return the channel
      * @throws OctopusIOException
      */
