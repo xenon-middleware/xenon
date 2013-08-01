@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.files.CopyOption;
  * @version 1.0
  * @since 1.0
  */
-class CopyInfo {
+public class CopyInfo {
 
     public final CopyImplementation copy;
     public final CopyOption mode;
