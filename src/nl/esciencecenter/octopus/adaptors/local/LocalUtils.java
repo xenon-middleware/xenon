@@ -128,11 +128,7 @@ class LocalUtils {
         }
 
         for (PosixFilePermission permission : permissions) {
-            //try {
             result.add(java.nio.file.attribute.PosixFilePermission.valueOf(permission.toString()));
-            //} catch (IllegalArgumentException e) {
-            //  throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
-            //}
         }
 
         return result;
@@ -146,11 +142,7 @@ class LocalUtils {
         Set<PosixFilePermission> result = new HashSet<PosixFilePermission>();
 
         for (java.nio.file.attribute.PosixFilePermission permission : permissions) {
-            //try {
             result.add(PosixFilePermission.valueOf(permission.toString()));
-            //} catch (IllegalArgumentException e) {
-            //  throw new UnsupportedOperationException("Posix permission " + permission + " not recognized by Local adaptor");
-            //}
         }
 
         return result;

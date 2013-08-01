@@ -136,14 +136,25 @@ public class CopyEngine {
     private void append(AbsolutePath source, long fromOffset, AbsolutePath target, CopyInfo ac) throws OctopusIOException {
 
         // We need to append some bytes from source to target. 
-
         LOGGER.debug("Appending from {} to {} starting at {}", source.getPath(), target.getPath(), fromOffset);
 
         InputStream in = owner.newInputStream(source);
         OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND);
 
+        long skipped = 0;
+       
         try {
-            in.skip(fromOffset);
+            
+            while (skipped < fromOffset) { 
+                long tmp = in.skip(fromOffset);
+            
+                if (tmp <= 0) { 
+                    throw new OctopusIOException("CopyEngine", "Failed to seek file " + source.getPath() + " to " + fromOffset);
+                }
+                
+                skipped += tmp;
+            }
+            
             streamCopy(in, out, ac);
         } catch (IOException e) {
             throw new OctopusIOException("CopyEngine", "Failed to copy " + source.getPath() + ":" + fromOffset + " to target "
@@ -154,6 +165,24 @@ public class CopyEngine {
         }
     }
 
+    private int readFully(InputStream in, byte [] buffer) throws IOException { 
+        
+        int offset = 0;
+        
+        while (offset < buffer.length) { 
+            int tmp = in.read(buffer, offset, buffer.length-offset);
+        
+            if (tmp < 0) { 
+                break;
+            }
+            
+            offset += tmp;
+        }
+        
+        return offset;
+    }
+    
+    
     private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws OctopusIOException, IOException {
 
         LOGGER.debug("Compare head of {} to {}", target.getPath(), source.getPath());
@@ -171,8 +200,8 @@ public class CopyEngine {
                     throw new IOException("Copy killed by user");
                 }
 
-                int size1 = in1.read(buf1);
-                int size2 = in2.read(buf2);
+                int size1 = readFully(in1, buf1);
+                int size2 = readFully(in2, buf2);
 
                 if (size1 > size2) {
                     return false;

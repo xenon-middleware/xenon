@@ -128,7 +128,7 @@ public class SshAdaptor extends Adaptor {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME,
                 new OctopusProperties(VALID_PROPERTIES, properties));
 
-        this.filesAdaptor = new SshFiles(getProperties(), this, octopusEngine);
+        this.filesAdaptor = new SshFiles(this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
         this.credentialsAdaptor = new SshCredentials(getProperties(), this);
         this.jsch = jsch;

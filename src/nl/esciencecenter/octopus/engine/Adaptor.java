@@ -38,10 +38,8 @@ public abstract class Adaptor {
     private final String name;
     private final String description;
     private final String[] supportedSchemes;
-
-    protected final OctopusEngine octopusEngine;
-
     private final OctopusProperties properties;
+    private final OctopusEngine octopusEngine;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
             OctopusProperties properties) throws OctopusException {
@@ -49,13 +47,17 @@ public abstract class Adaptor {
         super();
 
         this.octopusEngine = octopusEngine;
-
         this.name = name;
         this.description = description;
-        this.supportedSchemes = supportedSchemes;
         this.properties = properties;
+        this.supportedSchemes = supportedSchemes;
+
     }
 
+    protected OctopusEngine getOctopusEngine() { 
+        return octopusEngine;
+    }
+    
     public OctopusProperties getProperties() {
         return properties;
     }

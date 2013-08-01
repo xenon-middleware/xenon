@@ -90,7 +90,6 @@ public class SshJobs implements Jobs {
     public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
 
-        //adaptor.checkURI(location);
         adaptor.checkPath(location, "scheduler");
 
         String uniqueID = getNewUniqueID();

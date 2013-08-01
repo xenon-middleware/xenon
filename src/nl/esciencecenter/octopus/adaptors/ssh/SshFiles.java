@@ -82,11 +82,10 @@ public class SshFiles implements Files {
 
     /**
      * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
-     * 
      */
-    class FileSystemInfo {
-        FileSystemImplementation impl;
-        SshSession session;
+    static class FileSystemInfo {
+        private final FileSystemImplementation impl;
+        private final SshSession session;
 
         public FileSystemInfo(FileSystemImplementation impl, SshSession session) {
             super();
@@ -108,7 +107,7 @@ public class SshFiles implements Files {
     
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
-    public SshFiles(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
+    public SshFiles(SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
     }
@@ -203,10 +202,6 @@ public class SshFiles implements Files {
         if (!exists(dir.getParent())) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Parent directory " + dir.getParent() + " does not exist!");
         }
-
-        //        if (exists(dir)) {
-        //            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
-        //        }
 
         SshSession session = getSession(dir);
         ChannelSftp channel = session.getSftpChannel();

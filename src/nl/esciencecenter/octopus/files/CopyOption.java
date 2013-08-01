@@ -78,7 +78,6 @@ public enum CopyOption {
         }
 
         for (int i = 0; i < options.length; i++) {
-
             if (options[i] != null && options[i] == toFind) {
                 return true;
             }

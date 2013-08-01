@@ -26,12 +26,17 @@ import com.jcraft.jsch.SftpATTRS;
 
 public class SshFileAttributes implements FileAttributes {
 
-    static final int SUID = 04000; // set user ID on execution
-    static final int SGID = 02000; // set group ID on execution
-    static final int SVTX = 01000; // sticky bit   ****** NOT DOCUMENTED *****
+    /** Bitset to set user ID on execution */
+    static final int SUID = 04000; 
+ 
+    /** Bitset to set group ID on execution */
+    static final int SGID = 02000;
+    
+    /** Bitset to set sticky bit   ****** NOT DOCUMENTED *****/
+    static final int SVTX = 01000; 
 
-    SftpATTRS attributes;
-    AbsolutePath path;
+    private final SftpATTRS attributes;
+    private final AbsolutePath path;
 
     public SshFileAttributes(SftpATTRS attributes, AbsolutePath path) {
         this.attributes = attributes;
@@ -45,8 +50,7 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean isOther() throws AttributeNotSupportedException {
-        return attributes.isBlk() || attributes.isChr() || attributes.isDir() || attributes.isFifo() || attributes.isLink()
-                || attributes.isSock();
+        return attributes.isBlk() || attributes.isChr() || attributes.isFifo() || attributes.isSock();
     }
 
     @Override
@@ -158,5 +162,4 @@ public class SshFileAttributes implements FileAttributes {
 
         return true;
     }
-
 }

@@ -255,10 +255,6 @@ public class OctopusEngine implements Octopus {
         throw new OctopusException("engine", "Could not find adaptor named " + name);
     }
 
-//    public Adaptor[] getAdaptors() {
-//        return adaptors;
-//    }
-
     @Override
     public synchronized Map<String,String> getProperties() {
         return properties;
