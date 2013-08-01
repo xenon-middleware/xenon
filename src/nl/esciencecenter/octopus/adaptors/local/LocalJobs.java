@@ -50,8 +50,6 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
-//    private static final Logger logger = LoggerFactory.getLogger(LocalJobs.class);
-
     private final LocalAdaptor localAdaptor;
 
     private final Scheduler localScheduler;

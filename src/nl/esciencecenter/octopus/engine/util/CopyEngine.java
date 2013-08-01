@@ -172,11 +172,15 @@ public class CopyEngine {
         while (offset < buffer.length) { 
             int tmp = in.read(buffer, offset, buffer.length-offset);
         
-            if (tmp < 0) { 
+            if (tmp <= 0) { 
                 break;
             }
             
             offset += tmp;
+        }
+        
+        if (offset == 0) { 
+            return -1;
         }
         
         return offset;

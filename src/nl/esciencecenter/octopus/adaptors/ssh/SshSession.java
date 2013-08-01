@@ -321,6 +321,12 @@ class SshSession {
             session.setPassword(new String(passwordCredential.getPassword()));
         }
 
+        if (properties.propertySet(SshAdaptor.GATEWAY)) {
+
+            String gateway = properties.getStringProperty(SshAdaptor.GATEWAY);
+            // TODO: implement!
+        }
+        
         if (properties.getBooleanProperty(SshAdaptor.STRICT_HOST_KEY_CHECKING)) {
             LOGGER.debug("SSHSESSION: Strict host key checking enabled");
 

@@ -94,11 +94,11 @@ public class SshJobs implements Jobs {
 
         String uniqueID = getNewUniqueID();
 
-        SshSession session = adaptor.createNewSession(location, credential, this.properties);
-
         LOGGER.debug("Starting ssh scheduler with properties {}", properties);
         
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
+        
+        SshSession session = adaptor.createNewSession(location, credential, p);
         
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, p, true, true, true);

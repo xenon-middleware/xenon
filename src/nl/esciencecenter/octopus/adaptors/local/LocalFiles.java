@@ -64,9 +64,6 @@ import nl.esciencecenter.octopus.files.RelativePath;
  */
 public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
-    /** A logger for this class */
-    // private static final Logger logger = LoggerFactory.getLogger(LocalFiles.class);
-
     /** The parent adaptor */
     private final LocalAdaptor localAdaptor;
 
