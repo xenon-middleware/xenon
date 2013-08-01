@@ -84,7 +84,7 @@ public class JobDescriptionTest {
         assertTrue(list != null);
         assertTrue(list.size() == 3);
         assertTrue(Arrays.equals(list.toArray(new String[3]), new String[] { "a", "b", "c" }));
-
+        
         Map<String, String> env = new HashMap<>();
         env.put("ENV1", "ARG1");
         env.put("ENV2", "ARG2");

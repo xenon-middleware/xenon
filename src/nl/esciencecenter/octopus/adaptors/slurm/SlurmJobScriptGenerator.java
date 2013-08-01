@@ -57,9 +57,6 @@ public final class SlurmJobScriptGenerator {
         //number of processer per node
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
-        //resulting number of tasks (redundant)
-        //script.format("#SBATCH --ntasks=%d\n", description.getNodeCount() * description.getProcessesPerNode());
-
         //add maximum runtime
         script.format("#SBATCH --time=%d\n", description.getMaxTime());
 
