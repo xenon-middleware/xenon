@@ -21,7 +21,6 @@ import java.util.Map;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
@@ -39,14 +38,17 @@ public class SshCredentials implements Credentials {
         return res;
     }
 
-    OctopusProperties properties;
-    SshAdaptor adaptor;
-    OctopusEngine octopusEngine;
+    private final OctopusProperties properties;
+    private final SshAdaptor adaptor;
 
-    public SshCredentials(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
+    public SshCredentials(OctopusProperties properties, SshAdaptor sshAdaptor) {
         this.properties = properties;
+        
+        if (sshAdaptor == null) { 
+            throw new IllegalArgumentException("Adaptor can not be null!");
+        }
+        
         this.adaptor = sshAdaptor;
-        this.octopusEngine = octopusEngine;
     }
 
     @Override

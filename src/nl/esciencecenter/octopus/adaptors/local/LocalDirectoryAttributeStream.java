@@ -31,9 +31,7 @@ import nl.esciencecenter.octopus.files.PathAttributesPair;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
- */
-
-// FIXME: use localdistream ? 
+ */ 
 class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
 
     /** LocalFiles to retrieve the attributes of a file */

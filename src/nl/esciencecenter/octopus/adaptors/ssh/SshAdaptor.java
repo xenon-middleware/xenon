@@ -130,7 +130,7 @@ public class SshAdaptor extends Adaptor {
 
         this.filesAdaptor = new SshFiles(getProperties(), this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
-        this.credentialsAdaptor = new SshCredentials(getProperties(), this, octopusEngine);
+        this.credentialsAdaptor = new SshCredentials(getProperties(), this);
         this.jsch = jsch;
         
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {

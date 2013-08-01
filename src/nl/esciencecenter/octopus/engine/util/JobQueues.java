@@ -343,17 +343,6 @@ public class JobQueues {
             if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
                 throw new InvalidJobDescriptionException(adaptorName, "Illegal stderr redirect for interactive job!");
             }
-        } else {
-            //            
-            //            if (description.getStdout() == null) { 
-            //                throw new InvalidJobDescriptionException(adaptorName, 
-            //                        "Missing stdout redirect for batch job!");            
-            //            }
-            //            
-            //            if (description.getStderr() == null) { 
-            //                throw new InvalidJobDescriptionException(adaptorName, 
-            //                        "Missing stderr redirect for batch job!");            
-            //            }            
         }
     }
 
