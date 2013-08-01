@@ -26,16 +26,16 @@ import nl.esciencecenter.octopus.files.CopyOption;
  * @version 1.0
  * @since 1.0
  */
-public class CopyInfo {
+class CopyInfo {
 
-    final CopyImplementation copy;
-    final CopyOption mode;
-    final boolean verify;
+    public final CopyImplementation copy;
+    public final CopyOption mode;
+    public final boolean verify;
 
-    Exception exception;
-    boolean cancel = false;
-    long bytesToCopy = -1;
-    long bytesCopied = 0;
+    private Exception exception;
+    private boolean cancel = false;
+    private long bytesToCopy = -1;
+    private long bytesCopied = 0;
 
     public CopyInfo(CopyImplementation copy, CopyOption mode, boolean verify) {
         super();
