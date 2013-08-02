@@ -146,6 +146,8 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
 
         JobDescription description = new JobDescription();
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
         description.setWorkingDirectory(workingDir);
         description.setExecutable("/bin/echo");
         description.setArguments(message);
