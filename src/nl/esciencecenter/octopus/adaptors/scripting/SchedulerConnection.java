@@ -51,10 +51,9 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public abstract class SchedulerConnection {
-    
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerConnection.class);
-    
+
     private static int schedulerID = 0;
 
     protected static synchronized int getNextSchedulerID() {
@@ -66,21 +65,21 @@ public abstract class SchedulerConnection {
     private final OctopusEngine engine;
     private final Scheduler sshScheduler;
     private final FileSystem sshFileSystem;
-    
+
     private final OctopusProperties properties;
 
     private final long pollDelay;
-    
-    protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
+
+    protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
             OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
-    
+
         this.adaptor = adaptor;
         this.engine = engine;
         this.properties = properties;
         this.pollDelay = pollDelay;
-        
+
         adaptor.checkLocation(location);
-        
+
         try {
             id = adaptor.getName() + "-" + getNextSchedulerID();
             //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
@@ -103,9 +102,7 @@ public abstract class SchedulerConnection {
             throw new OctopusException(adaptor.getName(), "Cannot create SSH URI from location " + location, e);
         }
     }
-
-   
-
+    
     /**
      * Run a command on the remote scheduler machine.
      */
@@ -119,7 +116,8 @@ public abstract class SchedulerConnection {
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException,
             OctopusIOException {
-        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, adaptor.getName(), stdin, executable, arguments);
+        RemoteCommandRunner runner =
+                new RemoteCommandRunner(engine, sshScheduler, adaptor.getName(), stdin, executable, arguments);
 
         if (!runner.success()) {
             throw new OctopusException(adaptor.getName(), "could not run command \"" + executable + "\" with arguments \""
@@ -214,34 +212,45 @@ public abstract class SchedulerConnection {
         return status;
     }
 
-    //do some checks on the job description. subclass could perform additional checks
-    protected void verifyJobDescription(JobDescription description) throws OctopusException {
+    /**
+     * Do some checks on a job description.
+     * 
+     * @param description
+     *            the job description to check
+     * @param adaptorName
+     *            the name of the adaptor. Used when an exception is thrown
+     * @throws IncompleteJobDescription
+     *             if the description is missing a mandatory value.
+     * @throws InvalidJobDescription
+     *             if the description contains illegal values.
+     */
+    public static void verifyJobDescription(JobDescription description, String adaptorName) throws OctopusException {
         String executable = description.getExecutable();
 
         if (executable == null) {
-            throw new IncompleteJobDescriptionException(adaptor.getName(), "Executable missing in JobDescription!");
+            throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
         }
 
         int nodeCount = description.getNodeCount();
 
         if (nodeCount < 1) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal node count: " + nodeCount);
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
         }
 
         int processesPerNode = description.getProcessesPerNode();
 
         if (processesPerNode < 1) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal processes per node count: " + processesPerNode);
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
         }
 
         int maxTime = description.getMaxTime();
 
         if (maxTime <= 0) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal maximum runtime: " + maxTime);
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 
         if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Adaptor does not support interactive jobs");
+            throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
         }
 
     }

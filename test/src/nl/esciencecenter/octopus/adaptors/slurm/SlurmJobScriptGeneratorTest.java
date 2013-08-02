@@ -42,6 +42,10 @@ public class SlurmJobScriptGeneratorTest {
     }
 
     @Test
+    /**
+     * Check to see if the output is _exactly_ what we expect, and not a single char different.
+     * @throws OctopusException
+     */
     public void testFilledDescription() throws OctopusException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
@@ -63,9 +67,9 @@ public class SlurmJobScriptGeneratorTest {
         String expected =
                 "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --workdir='/some/working/directory'\n"
                         + "#SBATCH --partition=the.queue\n" + "#SBATCH --nodes=5\n" + "#SBATCH --ntasks-per-node=55\n"
-                        + "#SBATCH --time=100\n" + "#SBATCH --input=stdin.file\n" + "#SBATCH --output='stdout.file'\n"
+                        + "#SBATCH --time=100\n" + "#SBATCH --input='stdin.file'\n" + "#SBATCH --output='stdout.file'\n"
                         + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
-                        + "export some=\"environment.value\"\n";
+                        + "export some=\"environment.value\"\n\n" + "srun /bin/executable 'some' 'arguments'\n";
 
         System.out.println(result);
 

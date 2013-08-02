@@ -61,7 +61,7 @@ public final class SlurmJobScriptGenerator {
         script.format("#SBATCH --time=%d\n", description.getMaxTime());
 
         if (description.getStdin() != null) {
-            script.format("#SBATCH --input=%s\n", description.getStdin());
+            script.format("#SBATCH --input='%s'\n", description.getStdin());
         }
 
         if (description.getStdout() == null) {

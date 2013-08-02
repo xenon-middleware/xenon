@@ -345,7 +345,7 @@ public class GridEngineParser extends ScriptingParser {
 
         //skip first line
         for (int i = 1; i < lines.length; i++) {
-            String[] elements = lines[i].split("\\s+", 2);
+            String[] elements = lines[i].split(WHITESPACE_REGEX, 2);
 
             if (elements.length != 2) {
                 throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Found line \"" + lines[i] + "\" in qacct output");
@@ -387,7 +387,7 @@ public class GridEngineParser extends ScriptingParser {
         Map<String, String> currentMap = null;
 
         for (String line : lines) {
-            String[] elements = line.split("\\s+", 2);
+            String[] elements = line.split(WHITESPACE_REGEX, 2);
 
             if (elements.length != 2) {
                 throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in qconf output, got \""

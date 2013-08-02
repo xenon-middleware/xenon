@@ -279,8 +279,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         }
     }
 
-    @Override
-    protected void verifyJobDescription(JobDescription description) throws OctopusException {
+    private static void verifyJobDescription(JobDescription description) throws OctopusException {
         checkJobOptions(description.getJobOptions());
 
         if (description.isInteractive()) {
@@ -294,7 +293,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         }
 
         //perform standard checks.
-        super.verifyJobDescription(description);
+        SchedulerConnection.verifyJobDescription(description, GridEngineAdaptor.ADAPTOR_NAME);
 
         //check if the parallel environment and queue are specified.
         if (description.getNodeCount() != 1) {
