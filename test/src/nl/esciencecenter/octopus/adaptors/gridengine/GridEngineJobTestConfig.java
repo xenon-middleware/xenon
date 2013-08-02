@@ -55,6 +55,8 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     private long queueWaitTime;
     private long updateTime;
     
+    private String parallelEnvironment;
+    
     public GridEngineJobTestConfig(String configfile) throws Exception {
 
         super("gridengine");
@@ -84,6 +86,8 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.queue.wait.time"));
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.update.time"));
+        
+        parallelEnvironment = getPropertyOrFail(p, "test.gridengine.parallel.environment");
         
         correctURI = new URI("ge://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
@@ -252,5 +256,9 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     @Override
     public boolean supportsParallelJobs() {
         return true;
+    }
+    
+    public String getParallelEnvironment() {
+        return parallelEnvironment;
     }
 }
