@@ -83,6 +83,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
 
     }
+
     private static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
@@ -298,7 +299,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private SlurmConfig fetchConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
-        Map<String, String> info = SlurmOutputParser.parseScontrolConfigOutput(output);
+        //Parse output. Ignore some header and footer lines.
+        Map<String, String> info =
+                ScriptingParser.parseKeyValueLines(output, SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of",
+                        "Slurmctld(primary/backup) at");
 
         return new SlurmConfig(info, ignoreVersion);
     }
@@ -409,7 +413,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        Map<String, String> info = SlurmOutputParser.parseScontrolOutput(runner.getStdout());
+        Map<String, String> info = ScriptingParser.parseKeyValuePairs(runner.getStdout(), SlurmAdaptor.ADAPTOR_NAME);
 
         return getJobStatusFromScontrolInfo(info, job);
     }
@@ -485,7 +489,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             LOGGER.warn("Sacct produced error output: " + runner.getStderr());
         }
 
-        return SlurmOutputParser.parseInfoOutput(runner.getStdout(), "JobID", ScriptingParser.BAR_REGEX);
+        return ScriptingParser.parseTable(runner.getStdout(), "JobID", ScriptingParser.BAR_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
+                "~");
     }
 
     @Override
@@ -493,19 +498,30 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return scheduler;
     }
 
+    String cleanValue(String value) {
+        //remove status annotations
+        if (value.endsWith("*") || value.endsWith("~")) {
+            return value.substring(0, value.length() - 1);
+        } else {
+            return value;
+        }
+    }
+
     private Map<String, Map<String, String>> getSinfo(String... partitions) throws OctopusIOException, OctopusException {
         String output =
                 runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
                         "--partition=" + CommandLineUtils.asCSList(partitions));
 
-        return SlurmOutputParser.parseInfoOutput(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX);
+        return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
+                "~");
     }
 
     private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException, OctopusIOException {
         String squeueOutput =
                 runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + identifiersAsCSList(jobs));
 
-        return SlurmOutputParser.parseInfoOutput(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX);
+        return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
+                "*", "~");
     }
 
     @Override
@@ -535,9 +551,11 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "sbatch", customScriptFile);
         }
 
-        String identifier = SlurmOutputParser.parseSbatchOutput(output);
+        long jobID =
+                ScriptingParser.parseJobIDFromLine(output, SlurmAdaptor.ADAPTOR_NAME, "Submitted batch job",
+                        "Granted job allocation");
 
-        return new JobImplementation(getScheduler(), identifier, description, false, false);
+        return new JobImplementation(getScheduler(), Long.toString(jobID), description, false, false);
     }
 
 }
