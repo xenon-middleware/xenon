@@ -35,7 +35,7 @@ public class GridEngineParserTest {
     public void testCheckVersion() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -44,7 +44,7 @@ public class GridEngineParserTest {
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -53,7 +53,7 @@ public class GridEngineParserTest {
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -62,7 +62,7 @@ public class GridEngineParserTest {
     public void testCheckVersion_EmptyFile_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -74,7 +74,7 @@ public class GridEngineParserTest {
 
         String content = new String(encoded);
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
 
@@ -94,7 +94,7 @@ public class GridEngineParserTest {
 
         System.err.println("parsing queue info from: " + content);
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(content);
 

@@ -117,8 +117,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result =
-                new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"),
+                isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
 
@@ -164,8 +164,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result =
-                new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"), isDoneState(state), jobInfo);
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"),
+                isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
 
@@ -257,13 +257,13 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         boolean ignoreVersion = getProperties().getBooleanProperty(SlurmAdaptor.IGNORE_VERSION_PROPERTY);
 
-        this.config = fetchConfiguration(ignoreVersion);
+        this.config = getConfiguration(ignoreVersion);
 
         //Very wide partition format to compensate for bug in slurm 2.3.
         //If the size of the column is not specified the default partition does not get listed with a "*"
         String output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%120P");
 
-        String[] queueNames = output.split(ScriptingParser.WHITESPACE_REGEX);
+        String[] queueNames = ScriptingParser.parseList(output);
 
         String defaultQueueName = null;
         for (int i = 0; i < queueNames.length; i++) {
@@ -277,9 +277,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         this.queueNames = queueNames;
         this.defaultQueueName = defaultQueueName;
 
-        scheduler =
-                new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential,
-                        getProperties(), false, false, true);
+        scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential,
+                getProperties(), false, false, true);
 
         LOGGER.debug("new slurm scheduler connection {}", scheduler);
     }
@@ -296,13 +295,12 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return getJobStatus(job);
     }
 
-    private SlurmConfig fetchConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
+    private SlurmConfig getConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
         //Parse output. Ignore some header and footer lines.
-        Map<String, String> info =
-                ScriptingParser.parseKeyValueLines(output, SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of",
-                        "Slurmctld(primary/backup) at");
+        Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX,
+                SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of", "Slurmctld(primary/backup) at");
 
         return new SlurmConfig(info, ignoreVersion);
     }
@@ -322,9 +320,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             checkQueueNames(queueNames);
 
             //add a list of all requested queues
-            output =
-                    runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
-                            "--partitions=" + CommandLineUtils.asCSList(getQueueNames()));
+            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
+                    "--partitions=" + CommandLineUtils.asCSList(getQueueNames()));
         }
 
         //Job id's are on separate lines, on their own.
@@ -396,8 +393,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
                 //job really does not seem to exist (anymore)
                 if (result[i] == null) {
-                    NoSuchJobException exception =
-                            new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: " + jobs[i].getIdentifier());
+                    NoSuchJobException exception = new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: "
+                            + jobs[i].getIdentifier());
                     result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
                 }
             }
@@ -457,9 +454,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 Map<String, String> queueInfo = info.get(queueNames[i]);
 
                 if (queueInfo == null || queueInfo.isEmpty()) {
-                    Exception exception =
-                            new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueNames[i]
-                                    + " from server");
+                    Exception exception = new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
+                            + queueNames[i] + " from server");
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
                 } else {
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, queueInfo);
@@ -476,10 +472,9 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
 
         //this command will not complain if the job given does not exist
-        RemoteCommandRunner runner =
-                runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
-                        + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
-                        + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + identifiersAsCSList(jobs));
+        RemoteCommandRunner runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+                + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
+                + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + identifiersAsCSList(jobs));
 
         if (runner.getExitCode() != 0) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
@@ -508,17 +503,16 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     private Map<String, Map<String, String>> getSinfo(String... partitions) throws OctopusIOException, OctopusException {
-        String output =
-                runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
-                        "--partition=" + CommandLineUtils.asCSList(partitions));
+        String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
+                "--partition=" + CommandLineUtils.asCSList(partitions));
 
         return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
                 "~");
     }
 
     private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException, OctopusIOException {
-        String squeueOutput =
-                runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs=" + identifiersAsCSList(jobs));
+        String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs="
+                + identifiersAsCSList(jobs));
 
         return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
                 "*", "~");
@@ -551,9 +545,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "sbatch", customScriptFile);
         }
 
-        long jobID =
-                ScriptingParser.parseJobIDFromLine(output, SlurmAdaptor.ADAPTOR_NAME, "Submitted batch job",
-                        "Granted job allocation");
+        long jobID = ScriptingParser.parseJobIDFromLine(output, SlurmAdaptor.ADAPTOR_NAME, "Submitted batch job",
+                "Granted job allocation");
 
         return new JobImplementation(getScheduler(), Long.toString(jobID), description, false, false);
     }

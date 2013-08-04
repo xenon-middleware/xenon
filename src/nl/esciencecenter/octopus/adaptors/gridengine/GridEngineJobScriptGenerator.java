@@ -61,7 +61,7 @@ public final class GridEngineJobScriptGenerator {
 
         String pe = options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT);
 
-        //determine the number of slots we need. Can be overriden by the user
+        //determine the number of slots we need. Can be overridden by the user
         int slots;
         if (options.containsKey(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS)) {
             slots = parseIntOption(options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS));

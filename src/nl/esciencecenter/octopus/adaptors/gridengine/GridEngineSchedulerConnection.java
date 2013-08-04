@@ -25,6 +25,8 @@ import java.util.Set;
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
+import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -67,6 +69,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
             JOB_OPTION_PARALLEL_SLOTS };
 
+    private static final String QACCT_HEADER = "==============================================================";
+
     private final long accountingGraceTime;
 
     /**
@@ -81,20 +85,20 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final Scheduler scheduler;
 
-    private final GridEngineParser parser;
+    private final GridEngineXmlParser parser;
 
     private final GridEngineSetup setupInfo;
 
-    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
+    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
             OctopusEngine engine) throws OctopusIOException, OctopusException {
-        
-        super(adaptor, location, credential, properties, engine, 
-                properties.getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
+
+        super(adaptor, location, credential, properties, engine, properties
+                .getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
 
         boolean ignoreVersion = properties.getBooleanProperty(GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
         accountingGraceTime = properties.getLongProperty(GridEngineAdaptor.ACCOUNTING_GRACE_TIME_PROPERTY);
 
-        parser = new GridEngineParser(ignoreVersion);
+        parser = new GridEngineXmlParser(ignoreVersion);
 
         lastSeenMap = new HashMap<String, Long>();
         deletedJobList = new ArrayList<String>();
@@ -103,7 +107,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         setupInfo = new GridEngineSetup(this, parser);
 
         scheduler = new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
-                 credential, getProperties(), false, false, true);
+                credential, getProperties(), false, false, true);
     }
 
     @Override
@@ -240,17 +244,16 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         for (int i = 0; i < queueNames.length; i++) {
             if (allMap == null || allMap.isEmpty()) {
-                Exception exception =
-                        new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get status of queues on server");
+                Exception exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME,
+                        "Failed to get status of queues on server");
                 result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
             } else {
                 //state for only the requested queue
                 Map<String, String> map = allMap.get(queueNames[i]);
 
                 if (map == null || map.isEmpty()) {
-                    Exception exception =
-                            new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
-                                    + queueNames[i] + " from server");
+                    Exception exception = new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
+                            + queueNames[i] + " from server");
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
                 } else {
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, map);
@@ -261,11 +264,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
 
     }
-    
+
     private static void checkJobOptions(Map<String, String> options) throws InvalidJobDescriptionException {
         //check if all given job options make sense
         //TODO: this should be build on top of OctopusProperties, see #132
-        for (String option :options.keySet()) {
+        for (String option : options.keySet()) {
             boolean found = false;
             for (String validOption : VALID_JOB_OPTIONS) {
                 if (validOption.equals(option)) {
@@ -334,7 +337,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "qsub", customScriptFile);
         }
 
-        String identifier = parser.parseQsubOutput(output);
+        String identifier = Long.toString(ScriptingParser.parseJobIDFromLine(output, GridEngineAdaptor.ADAPTOR_NAME, "Your job"));
 
         markJobSeen(identifier);
         return new JobImplementation(getScheduler(), identifier, description, false, false);
@@ -345,10 +348,13 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String identifier = job.getIdentifier();
         String qdelOutput = runCheckedCommand(null, "qdel", identifier);
 
-        boolean deleted = parser.parseQdelOutput(identifier, qdelOutput);
+        String killedOutput = "has registered the job " + identifier + "for deletion";
+        String deletedOutput = "has deleted job " + identifier;
+
+        int matched = ScriptingParser.contains(qdelOutput, GridEngineAdaptor.ADAPTOR_NAME, killedOutput, deletedOutput);
 
         //keep track of the deleted jobs.
-        if (deleted) {
+        if (matched == 1) {
             setJobDeleted(identifier);
         }
 
@@ -365,9 +371,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         String longState = info.get("long_state");
         if (longState == null || longState.length() == 0) {
-            exception =
-                    new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
-                            + " not found on server");
+            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
+                    + " not found on server");
         }
 
         String stateCode = info.get("state");
@@ -384,6 +389,20 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), false, info);
     }
 
+    private JobStatus getJobStatusFromQacct(Job job) throws OctopusException, OctopusIOException {
+        RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
+
+        if (!runner.success()) {
+            LOGGER.debug("failed to get job status {}", runner);
+            return null;
+        }
+
+        Map<String, String> info = ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.EQUALS_REGEX,
+                GridEngineAdaptor.ADAPTOR_NAME, QACCT_HEADER);
+
+        return getJobStatusFromQacctInfo(info, job);
+    }
+
     /**
      * Creates a JobStatus from qacct output. For more info on the output, see the "N1 Grid Engine 6 User's Guide". Retrieved
      * from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
@@ -394,7 +413,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
      *            the job to get the info for.
      * @return the current status of the job.
      */
-    private JobStatus qacctJobStatusFromMap(Map<String, String> info, Job job) {
+    private JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) {
         Integer exitCode = null;
         Exception exception = null;
         String state = "done";
@@ -405,9 +424,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 exitCode = Integer.parseInt(exitCodeString);
             }
         } catch (NumberFormatException e) {
-            exception =
-                    new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
-                            + " from string " + exitCodeString, e);
+            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
+                    + job.getIdentifier() + " from string " + exitCodeString, e);
 
         }
 
@@ -439,19 +457,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         Exception exception = null;
         if (status == null) {
-            //this job cannot be found in the queue, or is reporting some sort of error.
-            //to get some more information, run qacct
-            RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
-
-            if (runner.success()) {
-                clearJobSeen(job.getIdentifier());
-
-                Map<String, String> accountingInfo = parser.parseQacctOutput(runner.getStdout());
-
-                status = qacctJobStatusFromMap(accountingInfo, job);
-            } else {
-                LOGGER.debug("could not get job {} accounting info: {}", job.getIdentifier(), runner);
-            }
+            status = getJobStatusFromQacct(job);
         }
 
         //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
@@ -459,21 +465,19 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             status = new JobStatusImplementation(job, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
-        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it dissapear from
+        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
         //qstat/qacct output completely
         if (getJobDeleted(job.getIdentifier())) {
-            exception =
-                    new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
-                            + " deleted by user while still pending", exception);
+            exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    + " deleted by user while still pending", exception);
             status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
         }
 
         //this job really does not exist. set it to an error state. List qacct exception as cause (if set)
         if (status == null) {
 
-            exception =
-                    new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier() + " not found on server",
-                            exception);
+            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    + " not found on server", exception);
             status = new JobStatusImplementation(job, null, null, exception, false, false, null);
         }
 
@@ -496,4 +500,5 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
+  
 }

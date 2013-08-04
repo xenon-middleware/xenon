@@ -16,9 +16,11 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import javax.annotation.Generated;
 
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
@@ -32,10 +34,32 @@ class QueueInfo {
     private final int slots;
     private final String[] parallelEnvironments;
 
-    QueueInfo(String name, int slots, String[] parallelEnvironments) throws OctopusException {
-        this.name = name;
-        this.slots = slots;
-        this.parallelEnvironments = parallelEnvironments.clone();
+    QueueInfo(Map<String, String> info) throws OctopusException {
+        name = info.get("qname");
+
+        if (name == null) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
+        }
+
+        String slotsValue = info.get("slots");
+
+        if (slotsValue == null) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+        }
+
+        try {
+            slots = Integer.parseInt(slotsValue);
+        } catch (NumberFormatException e) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue " + name + ", got "
+                    + slotsValue, e);
+        }
+
+        String peValue = info.get("pe_list");
+
+        if (peValue == null) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue " + name);
+        }
+        parallelEnvironments = peValue.split(ScriptingParser.WHITESPACE_REGEX);
     }
 
     @Override
@@ -95,6 +119,5 @@ class QueueInfo {
         }
         return true;
     }
-    
-    
+
 }

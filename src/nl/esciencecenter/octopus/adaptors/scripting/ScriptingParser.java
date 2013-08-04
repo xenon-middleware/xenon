@@ -15,11 +15,15 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * @author Niels Drost
@@ -31,11 +35,11 @@ public class ScriptingParser {
 
     public static final String COMMA_REGEX = "\\s*,\\s*";
 
-    public static final String BAR_REGEX = "\\|";
+    public static final String BAR_REGEX = "\\s*\\|\\s*";
 
     public static final String NEWLINE_REGEX = "\\r?\\n";
 
-    public static final String KEY_EQUALS_VALUE_REGEX = "\\s*=\\s*";
+    public static final String EQUALS_REGEX = "\\s*=\\s*";
 
     protected ScriptingParser() {
         //DO NOT USE
@@ -59,7 +63,7 @@ public class ScriptingParser {
         String[] pairs = input.split(WHITESPACE_REGEX);
 
         for (String pair : pairs) {
-            String[] elements = pair.split(KEY_EQUALS_VALUE_REGEX, 2);
+            String[] elements = pair.split(EQUALS_REGEX, 2);
 
             if (elements.length != 2) {
                 throw new OctopusException(adaptorName, "Got invalid key/value pair in output: " + pair);
@@ -82,10 +86,13 @@ public class ScriptingParser {
     }
 
     /**
-     * Parses lines containing key/value pairs separated by a '=', possibly surrounded by whitespace. Will ignore empty lines.
+     * Parses lines containing key/value pairs separated by the given separator possibly surrounded by whitespace. Will ignore
+     * empty lines.
      * 
      * @param input
      *            the input to parse
+     * @param separatorRegEx
+     *            a regular expression for the separator between key and value
      * @param adaptorName
      *            the adaptor name to report in case parsing failed
      * @param ignoredLines
@@ -94,15 +101,15 @@ public class ScriptingParser {
      * @throws OctopusException
      *             if the input cannot be parsed
      */
-    public static Map<String, String> parseKeyValueLines(String input, String adaptorName, String... ignoredLines)
-            throws OctopusException {
+    public static Map<String, String> parseKeyValueLines(String input, String separatorRegEx, String adaptorName,
+            String... ignoredLines) throws OctopusException {
         Map<String, String> result = new HashMap<String, String>();
 
         String[] lines = input.split(NEWLINE_REGEX);
 
         for (String line : lines) {
             if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
-                String[] elements = line.split(KEY_EQUALS_VALUE_REGEX, 2);
+                String[] elements = line.split(separatorRegEx, 2);
 
                 if (elements.length != 2) {
                     throw new OctopusException(adaptorName, "Got invalid key/value pair in output: " + line);
@@ -174,7 +181,7 @@ public class ScriptingParser {
      * @param keyField
      *            the field to use as the key in the result map. This field is mandatory in the output.
      * 
-     * @param fieldSeperatorRegEx
+     * @param fieldSeparatorRegEx
      *            a regular expression of the separator between fields. Usually whitespace.
      * 
      * @param adaptorName
@@ -186,7 +193,7 @@ public class ScriptingParser {
      * 
      * @return a map containing key/value maps of all records.
      */
-    public static Map<String, Map<String, String>> parseTable(String input, String keyField, String fieldSeperatorRegEx,
+    public static Map<String, Map<String, String>> parseTable(String input, String keyField, String fieldSeparatorRegEx,
             String adaptorName, String... valueSuffixes) throws OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
@@ -197,10 +204,10 @@ public class ScriptingParser {
         }
 
         //the first line will contain the fields
-        String[] fields = lines[0].split(fieldSeperatorRegEx);
+        String[] fields = lines[0].split(fieldSeparatorRegEx);
 
         for (int i = 1; i < lines.length; i++) {
-            String[] values = lines[i].split(fieldSeperatorRegEx);
+            String[] values = lines[i].split(fieldSeparatorRegEx);
 
             if (fields.length != values.length) {
                 throw new OctopusException(adaptorName, "Expected " + fields.length + " fields in output, got line with "
@@ -222,4 +229,88 @@ public class ScriptingParser {
 
         return result;
     }
+
+    /**
+     * Checks if the given text contains any of the given options. Returns which option it contains.
+     * 
+     * @param input
+     *            the input text to check
+     * @param adaptorName
+     *            the adaptor name to report in case no match was found
+     * @param options
+     *            all possible options the input could contain
+     * @return the index of the matching option
+     * @throws OctopusIOException
+     *             in case the input does not contain any of the options given.
+     */
+    public static int contains(String input, String adaptorName, String... options) throws OctopusIOException {
+        for (int i = 0; i < options.length; i++) {
+            if (input.contains(options[i])) {
+                return i;
+            }
+        }
+        throw new OctopusIOException(adaptorName, "Output does not contain expected string: " + Arrays.toString(options));
+    }
+
+    /**
+     * Parses a list of strings, separated by whitespace (including newlines)
+     * 
+     * @param input
+     *            the input to parse
+     */
+    public static String[] parseList(String input) {
+        return input.split(WHITESPACE_REGEX);
+    }
+
+    /**
+     * Parses multiple key value records. A new record begins when the given key field is found. Each line contains a single
+     * key/value pair, separated by the given separator.
+     * 
+     * @param input
+     *            the input to parse.
+     * @param separatorRegEx
+     *            a regular expression for the separator between key and value
+     * @param adaptorName
+     *            the adaptor name to report in case parsing failed
+     * @param ignoredLines
+     *            lines containing any of the given strings will be ignored.
+     * @param keyField
+     *            the header field which triggers a new record. the first line of the output must contain this key
+     * @return a map with all records found. The value of the key field is used as a key.
+     * @throws OctopusIOException
+     */
+    public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, String separatorRegEx,
+            String adaptorName, String... ignoredLines) throws OctopusIOException {
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+
+        String[] lines = input.split(NEWLINE_REGEX);
+
+        Map<String, String> currentMap = null;
+
+        for (String line : lines) {
+            if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
+                String[] elements = line.split(separatorRegEx, 2);
+
+                if (elements.length != 2) {
+                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in qconf output, got \""
+                            + line + "\" in qconf output");
+                }
+
+                String key = elements[0];
+                String value = elements[1];
+
+                if (key.equals(keyField)) {
+                    //listing of a new item starts
+                    currentMap = new HashMap<String, String>();
+                    result.put(value, currentMap);
+                } else if (currentMap == null) {
+                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + keyField
+                            + "\" on first line, got \"" + line + "\"");
+                }
+                currentMap.put(key, value);
+            }
+        }
+        return result;
+    }
+
 }
