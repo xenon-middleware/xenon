@@ -88,18 +88,23 @@ public abstract class SchedulerConnection {
         }
 
         //only null or "/" are allowed as paths
-        if (!(location.getPath() == null || location.getPath().length() == 0 || location.getPath().equals("/"))) {
+        if (location.getPath() != null && location.getPath().length() != 0 && !location.getPath().equals("/")) {
             throw new InvalidLocationException(adaptorName, "Paths are not allowed in a uri for this scheduler, uri given: "
                     + location);
         }
 
-        if (location.getFragment() != null && location.getFragment().length() > 0) {
+        if (location.getFragment() != null) {
             throw new InvalidLocationException(adaptorName, "Fragments are not allowed in a uri for this scheduler, uri given: "
+                    + location);
+        }
+        
+        if (location.getQuery() != null) {
+            throw new InvalidLocationException(adaptorName, "Queries are not allowed in a uri for this scheduler, uri given: "
                     + location);
         }
 
         try {
-            if (location.getHost() == null || location.getHost().length() == 0) {
+            if (location.getHost() == null) {
                 return new URI("local:///");
             }
 
