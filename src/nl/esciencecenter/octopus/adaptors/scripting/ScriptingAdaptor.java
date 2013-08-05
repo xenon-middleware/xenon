@@ -16,13 +16,10 @@
 
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.net.URI;
-
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
@@ -50,27 +47,6 @@ public abstract class ScriptingAdaptor extends Adaptor {
 
         jobsAdaptor = new ScriptingJobs(this, octopusEngine, factory);
         credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");
-    }
-    
-    public void checkLocation(URI location) throws InvalidLocationException {
-        //only null or "/" are allowed as paths
-        if (!(location.getPath() == null || location.getPath().length() == 0 || location.getPath().equals("/"))) {
-            throw new InvalidLocationException(getName(), "Paths are not allowed in a uri for this scheduler, uri given: "
-                    + location);
-        }
-
-        if (location.getFragment() != null && location.getFragment().length() > 0) {
-            throw new InvalidLocationException(getName(), "Fragments are not allowed in a uri for this scheduler, uri given: "
-                    + location);
-        }
-
-        for (String scheme : getSupportedSchemes()) {
-            if (scheme.equals(location.getScheme())) {
-                //alls-well
-                return;
-            }
-        }
-        throw new InvalidLocationException(getName(), "Adaptor does not support scheme: " + location.getScheme());
     }
     
     @Override

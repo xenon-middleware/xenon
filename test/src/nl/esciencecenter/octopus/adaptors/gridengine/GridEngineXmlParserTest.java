@@ -29,7 +29,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
 
-public class GridEngineParserTest {
+public class GridEngineXmlParserTest {
 
     @Test
     public void testCheckVersion() throws Throwable {
@@ -99,7 +99,6 @@ public class GridEngineParserTest {
         Map<String, Map<String, String>> result = parser.parseJobInfos(content);
 
         //FIXME: check equality fully, not only if there are info's at all...
-        System.out.println(result);
         assertEquals(9, result.size());
 
     }

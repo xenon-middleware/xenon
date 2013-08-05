@@ -41,7 +41,7 @@ public class ScriptingParser {
 
     public static final String EQUALS_REGEX = "\\s*=\\s*";
 
-    protected ScriptingParser() {
+    private ScriptingParser() {
         //DO NOT USE
     }
 
