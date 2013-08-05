@@ -51,6 +51,7 @@ public class JobExecutor implements Runnable {
 
     private Integer exitStatus;
 
+    private boolean updateSignal = false;    
     private boolean isRunning = false;
     private boolean killed = false;
     private boolean done = false;
@@ -98,8 +99,14 @@ public class JobExecutor implements Runnable {
     public Job getJob() {
         return job;
     }
-
+    
     public synchronized JobStatus getStatus() {
+        
+        if (!done) { 
+            triggerStatusUpdate();
+            waitForStatusUpdate(pollingDelay);
+        }
+        
         return new JobStatusImplementation(job, state, exitStatus, error, state.equals("RUNNING"), done, null);
     }
 
@@ -126,7 +133,7 @@ public class JobExecutor implements Runnable {
         }
 
         this.state = state;
-        notifyAll();
+        clearUpdateRequest();
     }
 
     private synchronized boolean getKilled() {
@@ -152,14 +159,16 @@ public class JobExecutor implements Runnable {
         long deadline = System.currentTimeMillis() + timeout;
         long leftover = timeout;
 
+        triggerStatusUpdate();
+        
         while (state.equals("PENDING")) {
-            try {
-                // Note: will wait forever if leftover == 0.
+            // Note: will wait forever if leftover == 0.
+            try { 
                 wait(leftover);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e) { 
                 // ignored
             }
-
+            
             long now = System.currentTimeMillis();
 
             if (now >= deadline) {
@@ -181,11 +190,17 @@ public class JobExecutor implements Runnable {
         long deadline = System.currentTimeMillis() + timeout;
         long leftover = timeout;
 
+        triggerStatusUpdate();
+        
         while (!done) {
-            try {
-                // Note: will wait forever if leftover == 0.
+            
+            if (leftover <= 0) {
+                break;
+            }
+
+            try { 
                 wait(leftover);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e) { 
                 // ignored
             }
 
@@ -201,6 +216,70 @@ public class JobExecutor implements Runnable {
         return getStatus();
     }
 
+    /** 
+     * Signal the polling thread to produce a status update.
+     */
+    private synchronized void triggerStatusUpdate() { 
+
+        if (done) { 
+            return;
+        }
+        
+        updateSignal = true;            
+        notifyAll();
+    }
+        
+    /** 
+     * Wait for a certain amount of time for an update.
+     *  
+     * @param maxDelay the maximum time to wait
+     */
+    private synchronized void waitForStatusUpdate(long maxDelay) { 
+        
+        if (done || !updateSignal) { 
+            return;
+        }
+
+        try { 
+            wait(maxDelay);
+        } catch (InterruptedException e) { 
+            // ignored
+        }            
+    }
+
+    /** 
+     * Clear the update signal and wake up any waiting threads
+     */
+    private synchronized void clearUpdateRequest() { 
+        updateSignal = false;            
+        notifyAll();
+    }
+    
+    /** 
+     * Sleep for a certain amount of time, provide the job is not done, and no one requested an update.  
+     * 
+     * @param pollingDelay the maximum amount of time to wait
+     */
+    private synchronized void sleep(long pollingDelay) {
+        
+        if (done || updateSignal) {
+            return;
+        }
+
+        long time = System.currentTimeMillis();
+        
+        try { 
+            wait(pollingDelay);
+        } catch (InterruptedException e) { 
+            // ignored
+        }
+        
+        long deltaT = System.currentTimeMillis() - time;
+        
+        System.err.println("XXXXXXXXXX JobeExecutor woke up after " + deltaT + " ms. of " + pollingDelay + " ms. done=" + done + 
+                " updateSignal = " + updateSignal);
+    }
+    
     @Override
     public void run() {
 
@@ -253,11 +332,9 @@ public class JobExecutor implements Runnable {
                 return;
             }
 
-            try {
-                Thread.sleep(pollingDelay);
-            } catch (InterruptedException e) {
-                // ignored
-            }
+            clearUpdateRequest();
+            
+            sleep(pollingDelay);
         }
     }
 

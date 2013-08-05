@@ -29,11 +29,8 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
-import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
