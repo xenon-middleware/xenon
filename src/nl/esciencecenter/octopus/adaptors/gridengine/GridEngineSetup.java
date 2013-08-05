@@ -63,8 +63,8 @@ public class GridEngineSetup {
         String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
-                
-                ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
+
+        ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
 
         Map<String, QueueInfo> result = new HashMap<String, QueueInfo>();
 
@@ -129,8 +129,8 @@ public class GridEngineSetup {
     }
 
     /**
-     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need
-     * to give is dependent on the parallel environment settings.
+     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
+     * give is dependent on the parallel environment settings.
      */
     int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws OctopusException {
         ParallelEnvironmentInfo environment = parallelEnvironments.get(parallelEnvironmentName);

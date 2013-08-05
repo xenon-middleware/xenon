@@ -467,7 +467,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                     + " deleted by user while still pending");
             status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
         }
-        
+
         //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(job.getIdentifier())) {
             status = new JobStatusImplementation(job, "unknown", null, null, false, false, new HashMap<String, String>());

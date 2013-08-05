@@ -41,9 +41,9 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "slurm";
 
-    /** The prefix used by all properties related to this adaptor */      
+    /** The prefix used by all properties related to this adaptor */
     public static final String PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
-    
+
     /** The schemes supported by this adaptor */
     private static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
 
@@ -52,32 +52,33 @@ public class SlurmAdaptor extends ScriptingAdaptor {
 
     /** Polling delay for jobs started by this adaptor. */
     public static final String POLL_DELAY_PROPERTY = PREFIX + "poll.delay";
-    
+
     /** Human readable description of this adaptor */
-    public static final String ADAPTOR_DESCRIPTION =
-            "The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local "
-                    + "or the ssh adaptor to gain access to the scheduler machine.";
-    
+    public static final String ADAPTOR_DESCRIPTION = "The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local "
+            + "or the ssh adaptor to gain access to the scheduler machine.";
+
     /** List of all properties supported by this adaptor */
-    private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
-        new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER), 
-                "false", "Skip version check is skipped when connecting to remote machines. " + 
-                        "WARNING: it is not recommended to use this setting in production environments!"),
-        
-        new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), 
-                "1000", "Number of milliseconds between polling the status of a job."),
-    };
-         
+    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+            new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+                    "false", "Skip version check is skipped when connecting to remote machines. "
+                            + "WARNING: it is not recommended to use this setting in production environments!"),
+
+            new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+                    "Number of milliseconds between polling the status of a job."), };
+
     /**
      * Create a new SlurmAdaptor.
      * 
-     * @param properties the properties to use when creating the adaptor. 
-     * @param octopusEngine the engine to which this adaptor belongs. 
-     * @throws OctopusException if the adaptor creation fails.
+     * @param properties
+     *            the properties to use when creating the adaptor.
+     * @param octopusEngine
+     *            the engine to which this adaptor belongs.
+     * @throws OctopusException
+     *             if the adaptor creation fails.
      */
-    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {    
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, 
-                new OctopusProperties(VALID_PROPERTIES, properties), new SlurmSchedulerConnectionFactory());
+    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, new OctopusProperties(VALID_PROPERTIES,
+                properties), new SlurmSchedulerConnectionFactory());
     }
 
     @Override

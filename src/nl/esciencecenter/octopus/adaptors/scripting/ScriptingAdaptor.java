@@ -24,8 +24,8 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
 /**
- * ScriptingAdaptor is a generic adaptor implementation. It server as a parent class for adaptors that are based on running 
- * scripts over an SSH connection.     
+ * ScriptingAdaptor is a generic adaptor implementation. It server as a parent class for adaptors that are based on running
+ * scripts over an SSH connection.
  * 
  * @see GridEngineAdaptor
  * @see SlurmAdaptor
@@ -36,19 +36,19 @@ import nl.esciencecenter.octopus.files.Files;
  * 
  */
 public abstract class ScriptingAdaptor extends Adaptor {
-   
+
     private final ScriptingJobs jobsAdaptor;
     private final ForwardingCredentials credentialsAdaptor;
 
     protected ScriptingAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusProperties properties, SchedulerConnectionFactory factory) throws OctopusException {  
+            OctopusProperties properties, SchedulerConnectionFactory factory) throws OctopusException {
 
         super(octopusEngine, name, description, supportedSchemes, properties);
 
         jobsAdaptor = new ScriptingJobs(this, octopusEngine, factory);
         credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");
     }
-    
+
     @Override
     public ScriptingJobs jobsAdaptor() {
         return jobsAdaptor;
@@ -68,4 +68,4 @@ public abstract class ScriptingAdaptor extends Adaptor {
     public Credentials credentialsAdaptor() throws OctopusException {
         return credentialsAdaptor;
     }
-} 
+}

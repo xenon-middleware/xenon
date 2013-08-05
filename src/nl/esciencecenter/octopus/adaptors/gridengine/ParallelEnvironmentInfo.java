@@ -33,11 +33,11 @@ class ParallelEnvironmentInfo {
 
     public ParallelEnvironmentInfo(Map<String, String> info) throws OctopusException {
         name = info.get("pe_name");
-        
+
         if (name == null) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name for parallel environment"); 
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name for parallel environment");
         }
-        
+
         String slotsValue = info.get("slots");
 
         if (slotsValue == null) {
@@ -47,14 +47,15 @@ class ParallelEnvironmentInfo {
         try {
             slots = Integer.parseInt(slotsValue);
         } catch (NumberFormatException e) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for parallel environment " + name + ", got "
-                    + slotsValue, e);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for parallel environment " + name
+                    + ", got " + slotsValue, e);
         }
 
         allocationRule = info.get("allocation_rule");
 
         if (allocationRule == null) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for parallel environment " + name);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for parallel environment "
+                    + name);
         }
     }
 
