@@ -69,7 +69,7 @@ public class ScriptingParser {
                 throw new OctopusException(adaptorName, "Got invalid key/value pair in output: " + pair);
             }
 
-            result.put(elements[0], elements[1]);
+            result.put(elements[0].trim(), elements[1].trim());
         }
 
         return result;
@@ -115,7 +115,7 @@ public class ScriptingParser {
                     throw new OctopusException(adaptorName, "Got invalid key/value pair in output: " + line);
                 }
 
-                result.put(elements[0], elements[1]);
+                result.put(elements[0].trim(), elements[1].trim());
             }
         }
 
@@ -166,10 +166,10 @@ public class ScriptingParser {
     private static String cleanValue(String value, String[] suffixes) {
         for (String suffix : suffixes) {
             if (value.endsWith(suffix)) {
-                return value.substring(0, value.length() - suffix.length());
+                return value.substring(0, value.length() - suffix.length()).trim();
             }
         }
-        return value;
+        return value.trim();
     }
 
     /**
@@ -296,8 +296,8 @@ public class ScriptingParser {
                             + line + "\" in qconf output");
                 }
 
-                String key = elements[0];
-                String value = elements[1];
+                String key = elements[0].trim();
+                String value = elements[1].trim();
 
                 if (key.equals(keyField)) {
                     //listing of a new item starts

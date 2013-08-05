@@ -15,9 +15,7 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
@@ -65,6 +63,7 @@ public class GridEngineSetup {
         String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
+                
                 ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
 
         Map<String, QueueInfo> result = new HashMap<String, QueueInfo>();

@@ -26,7 +26,6 @@ import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
-import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -348,7 +347,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String identifier = job.getIdentifier();
         String qdelOutput = runCheckedCommand(null, "qdel", identifier);
 
-        String killedOutput = "has registered the job " + identifier + "for deletion";
+        String killedOutput = "has registered the job " + identifier + " for deletion";
         String deletedOutput = "has deleted job " + identifier;
 
         int matched = ScriptingParser.contains(qdelOutput, GridEngineAdaptor.ADAPTOR_NAME, killedOutput, deletedOutput);
@@ -361,21 +360,23 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return getJobStatus(job);
     }
 
-    private JobStatus qstatJobStatusFromMap(Map<String, String> info, Job job) {
+    private JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) {
         Exception exception = null;
 
-        if (info == null || info.isEmpty()) {
+        Map<String, String> jobInfo = info.get(job.getIdentifier());
+
+        if (jobInfo == null || jobInfo.isEmpty()) {
             LOGGER.debug("job state not in map");
             return null;
         }
 
-        String longState = info.get("long_state");
+        String longState = jobInfo.get("long_state");
         if (longState == null || longState.length() == 0) {
             exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "State for job " + job.getIdentifier()
                     + " not found on server");
         }
 
-        String stateCode = info.get("state");
+        String stateCode = jobInfo.get("state");
         if (stateCode != null && stateCode.contains("E")) {
             LOGGER.debug("job is in error state, try to cancel job, pick up status from qacct");
             try {
@@ -386,7 +387,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), false, info);
+        return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), false, jobInfo);
     }
 
     private JobStatus getJobStatusFromQacct(Job job) throws OctopusException, OctopusIOException {
@@ -397,7 +398,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        Map<String, String> info = ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.EQUALS_REGEX,
+        Map<String, String> info = ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.WHITESPACE_REGEX,
                 GridEngineAdaptor.ADAPTOR_NAME, QACCT_HEADER);
 
         return getJobStatusFromQacctInfo(info, job);
@@ -448,36 +449,34 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         String statusOutput = runCheckedCommand(null, "qstat", "-xml");
 
-        Map<String, Map<String, String>> allMap = parser.parseJobInfos(statusOutput);
+        Map<String, Map<String, String>> info = parser.parseJobInfos(statusOutput);
 
         //mark all jobs in this map as recently seen
-        markJobsSeen(allMap.keySet());
+        markJobsSeen(info.keySet());
 
-        JobStatus status = qstatJobStatusFromMap(allMap.get(job.getIdentifier()), job);
+        JobStatus status = getJobStatusFromQstatInfo(info, job);
 
-        Exception exception = null;
         if (status == null) {
             status = getJobStatusFromQacct(job);
         }
 
+        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
+        //qstat/qacct output completely
+        if (status == null && getJobDeleted(job.getIdentifier())) {
+            Exception exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    + " deleted by user while still pending");
+            status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
+        }
+        
         //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(job.getIdentifier())) {
             status = new JobStatusImplementation(job, "unknown", null, null, false, false, new HashMap<String, String>());
         }
 
-        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
-        //qstat/qacct output completely
-        if (getJobDeleted(job.getIdentifier())) {
-            exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
-                    + " deleted by user while still pending", exception);
-            status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
-        }
-
         //this job really does not exist. set it to an error state. List qacct exception as cause (if set)
         if (status == null) {
-
-            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
-                    + " not found on server", exception);
+            Exception exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    + " not found on server");
             status = new JobStatusImplementation(job, null, null, exception, false, false, null);
         }
 
@@ -500,5 +499,4 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-  
 }
