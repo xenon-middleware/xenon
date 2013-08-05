@@ -31,21 +31,21 @@ public interface JobStatus {
      * 
      * @return the Job.
      */
-    public Job getJob();
+    Job getJob();
 
     /**
      * Get the state of the Job.
      * 
      * @return the state of the Job.
      */
-    public String getState();
+    String getState();
 
     /**
      * Get the exit code for the Job.
      * 
      * @return the exit code for the Job.
      */
-    public Integer getExitCode();
+    Integer getExitCode();
 
     /**
      * Get the exception produced by the Job or while retrieving the status. If a job was canceled, will return a
@@ -53,33 +53,33 @@ public interface JobStatus {
      * 
      * @return the exception.
      */
-    public Exception getException();
+    Exception getException();
 
     /**
      * Is the Job running.
      * 
      * @return if the Job is running.
      */
-    public boolean isRunning();
+    boolean isRunning();
 
     /**
      * Is the Job done.
      * 
      * @return if the Job is done.
      */
-    public boolean isDone();
+    boolean isDone();
 
     /**
      * Has the Job or job retrieval produced a exception ?
      * 
      * @return if the Job has an exception.
      */
-    public boolean hasException();
+    boolean hasException();
 
     /**
      * Get scheduler specific information on the Job.
      * 
      * @return scheduler specific information on the Job.
      */
-    public Map<String, String> getSchedulerSpecficInformation();
+    Map<String, String> getSchedulerSpecficInformation();
 }

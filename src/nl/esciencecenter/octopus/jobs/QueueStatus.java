@@ -31,33 +31,33 @@ public interface QueueStatus {
      * 
      * @return the Scheduler.
      */
-    public Scheduler getScheduler();
+    Scheduler getScheduler();
 
     /**
      * Get the queue name.
      * 
      * @return the queue name.
      */
-    public String getQueueName();
+    String getQueueName();
 
     /**
      * Did the queue produce an exception ?
      * 
      * @return if the queue produced an exception ?
      */
-    public boolean hasException();
+    boolean hasException();
 
     /**
      * Get the exception produced by the queue, or <code>null</code> if <code>hasEsception()</code> returns <code>false</code>.
      * 
      * @return the exception.
      */
-    public Exception getException();
+    Exception getException();
 
     /**
      * Get scheduler specific information on the queue.
      * 
      * @return cheduler specific information on the queue.
      */
-    public Map<String, String> getSchedulerSpecficInformation();
+    Map<String, String> getSchedulerSpecficInformation();
 }

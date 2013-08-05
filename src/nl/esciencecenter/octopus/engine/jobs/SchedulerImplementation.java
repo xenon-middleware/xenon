@@ -51,11 +51,16 @@ public class SchedulerImplementation implements Scheduler {
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
         this.uri = uri;
-        this.queueNames = queueNames;
         this.credential = credential;
         this.isOnline = isOnline;
         this.supportsInteractive = supportsInteractive;
         this.supportsBatch = supportsBatch;
+
+        if (queueNames == null) { 
+            this.queueNames = new String[0];
+        } else { 
+            this.queueNames = queueNames.clone();
+        }
         
         if (properties == null) { 
             this.properties = new OctopusProperties();
@@ -112,7 +117,6 @@ public class SchedulerImplementation implements Scheduler {
         return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
                 + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames) + ", isOnline=" + isOnline
                 + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" + supportsBatch + "]";
-        // + ", localStandardStreams=" + localStandardStreams + ", hasDetachedJobs=" + hasDetachedJobs + "]";
     }
 
     @Override

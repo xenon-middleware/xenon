@@ -31,33 +31,33 @@ public interface AdaptorStatus {
      * 
      * @return the schemes supported by this adaptor.
      */
-    public String[] getSupportedSchemes();
+    String[] getSupportedSchemes();
 
     /**
      * Get the name of the adaptor.
      * 
      * @return the name of the adaptor.
      */
-    public String getName();
+    String getName();
 
     /**
      * Get the description of the adaptor.
      * 
      * @return the description of the adaptor.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * Returns an array containing all properties this adaptor supports.
      * 
      * @return an array containing all properties this adaptor supports.
      */
-    public OctopusPropertyDescription [] getSupportedProperties();
+    OctopusPropertyDescription [] getSupportedProperties();
 
     /**
      * Returns a map containing scheduler specific status information.
      * 
      * @return a map containing scheduler specific status information.
      */
-    public Map<String, String> getAdaptorSpecificInformation();
+    Map<String, String> getAdaptorSpecificInformation();
 }

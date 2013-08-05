@@ -132,7 +132,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
         try {
             channel.sendSignal("KILL");
         } catch (Exception e) {
-            // logger.debug("Failed to kill remote process!", e);
+            // LOGGER.debug("Failed to kill remote process!", e);
         }
 
         cleanup();

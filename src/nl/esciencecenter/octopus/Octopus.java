@@ -38,7 +38,7 @@ public interface Octopus {
      * 
      * @return the properties used to create this Octopus.
      */
-    public Map<String,String> getProperties();
+    Map<String,String> getProperties();
 
     /**
      * Returns information about the specified adaptor.
@@ -49,42 +49,34 @@ public interface Octopus {
      * @throws OctopusException
      *             when the adaptor does not exist, or no information could be retrieved.
      */
-    public AdaptorStatus getAdaptorStatus(String adaptorName) throws OctopusException;
+    AdaptorStatus getAdaptorStatus(String adaptorName) throws OctopusException;
 
     /**
      * Returns information on all adaptors available to this Octopus.
      * 
      * @return information on all adaptors.
      */
-    public AdaptorStatus[] getAdaptorStatuses();
+    AdaptorStatus[] getAdaptorStatuses();
 
     /**
      * Get a reference to the Files package interface.
      * 
      * @return a reference to the Files interface.
      */
-    public Files files();
+    Files files();
 
     /**
      * Get a reference to the Jobs package interface.
      * 
      * @return a reference to the Files package interface.
      */
-    public Jobs jobs();
+    Jobs jobs();
 
     /**
      * Get a reference to the Credentials package interface.
      * 
      * @return a reference to the Credentials package interface.
      */
-    public Credentials credentials();
-
-    //Future extension: clouds
-    //public Clouds clouds();
-
-    //Future extension: bandwidth on demand
-    //public Networks networks();
-
-    //public ??
+    Credentials credentials();
 
 }

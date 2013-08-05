@@ -31,12 +31,12 @@ public interface Credential {
      * 
      * @return the name of the adaptor.
      */
-    public String getAdaptorName();
+    String getAdaptorName();
 
     /**
      * Get the properties used to create this Credential.
      * 
      * @return the properties used to create this Credential.
      */
-    public Map<String,String> getProperties();
+    Map<String,String> getProperties();
 }

@@ -33,12 +33,23 @@ import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
  */
 public class OctopusProperties {
+    
+    private static final String NAME = "OctopusProperties";
 
+    /** One kilo is 1024 */
+    private static final int KILO = 1024;
+    
+    /** One mega is a kilo*kilo */
+    private static final int MEGA = KILO*KILO;
+    
+    /** One giga is a kilo*kilo*kilo */
+    private static final int GIGA = KILO*MEGA; 
+    
     /** Contains a description of all properties this OctopusProperties should accept, including their type, default, etc. */
-    private final HashMap<String, OctopusPropertyDescription> supportedProperties;
+    private final Map<String, OctopusPropertyDescription> supportedProperties;
        
     /** The properties that are actually set. */
-    private final HashMap<String, String> properties;
+    private final Map<String, String> properties;
     
     /** 
      * Private constructor for OctopusProperties using in copying and filtering. The <code>properties</code> parameter is assumed
@@ -47,7 +58,7 @@ public class OctopusProperties {
      * @param supportedProperties a map containing a description of all supported properties. 
      * @param properties a map containing valid properties and their values. 
      */    
-    private OctopusProperties(HashMap<String, OctopusPropertyDescription> supportedProperties, HashMap<String,String> properties) { 
+    private OctopusProperties(Map<String, OctopusPropertyDescription> supportedProperties, Map<String,String> properties) { 
         this.supportedProperties = supportedProperties;
         this.properties = properties;
     } 
@@ -97,7 +108,7 @@ public class OctopusProperties {
             OctopusPropertyDescription d = supportedProperties.get(key);
             
             if (d == null) { 
-                throw new UnknownPropertyException("OctopusProperties", "Unknown property " + key); 
+                throw new UnknownPropertyException(NAME, "Unknown property " + key); 
             }
 
             String value = e.getValue();
@@ -108,7 +119,8 @@ public class OctopusProperties {
         }
     }
     
-    private void checkType(OctopusPropertyDescription description, String key, String value) throws InvalidPropertyException { 
+    private void checkType(OctopusPropertyDescription description, String key, String value) 
+            throws InvalidPropertyException { 
         
         Type t = description.getType();
         
@@ -133,7 +145,7 @@ public class OctopusProperties {
                 break;
             }
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + key + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + key + " has invalid value: " + value + 
                     " (expected " + t + ")", e);            
         }        
     }
@@ -158,7 +170,7 @@ public class OctopusProperties {
     public boolean propertySet(String name) throws UnknownPropertyException { 
         
         if (!supportedProperties.containsKey(name)) { 
-            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+            throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
         
         return properties.containsKey(name);
@@ -179,7 +191,7 @@ public class OctopusProperties {
         OctopusPropertyDescription d = supportedProperties.get(name);
         
         if (d == null) {
-            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+            throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
         
         String value = d.getDefaultValue();
@@ -196,11 +208,11 @@ public class OctopusProperties {
         OctopusPropertyDescription d = supportedProperties.get(name);
         
         if (d == null) {
-            throw new UnknownPropertyException("OctopusProperties", "No such property: " + name);
+            throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
         
         if (d.getType() != type) { 
-            throw new PropertyTypeException("OctopusProperties", "Property " + name + " is of type " + d.getType() + 
+            throw new PropertyTypeException(NAME, "Property " + name + " is of type " + d.getType() + 
                     " not " + type);
         }
         
@@ -231,7 +243,7 @@ public class OctopusProperties {
         try { 
             return Boolean.parseBoolean(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected BOOLEAN)", e); 
         }
     }
@@ -253,7 +265,7 @@ public class OctopusProperties {
         try { 
             return Integer.parseInt(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected INTEGER)", e); 
         }
     }
@@ -279,7 +291,7 @@ public class OctopusProperties {
         try { 
             return Integer.parseInt(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected INTEGER)", e); 
         }
     }
@@ -301,7 +313,7 @@ public class OctopusProperties {
         try { 
             return Long.parseLong(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected LONG)", e); 
         }
     }
@@ -323,7 +335,7 @@ public class OctopusProperties {
         try { 
             return Double.parseDouble(value);
         } catch (Exception e) { 
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected DOUBLE)", e); 
         }
     }
@@ -360,93 +372,44 @@ public class OctopusProperties {
 
         try {
             if (value.endsWith("G") || value.endsWith("g")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * 1024 * 1024 * 1024;
+                return Long.parseLong(value.substring(0, value.length() - 1)) * GIGA;
             }
 
             if (value.endsWith("M") || value.endsWith("m")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * 1024 * 1024;
+                return Long.parseLong(value.substring(0, value.length() - 1)) * MEGA;
             }
 
             if (value.endsWith("K") || value.endsWith("k")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * 1024;
+                return Long.parseLong(value.substring(0, value.length() - 1)) * KILO;
             }
 
             return Long.parseLong(value);
 
         } catch (NumberFormatException e) {
-            throw new InvalidPropertyException("OctopusProperties", "Property " + name + " has invalid value: " + value + 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
                     " (expected SIZE)", e); 
         }
     }
-    
-    /**
-     * Returns the split-up value of a string property. The value is supposed to be a comma-separated string, with each comma
-     * preceded and followed by any amount of whitespace. See {@link java.lang.String#split(String)} for details of the splitting.
-     * If the property is not defined, an empty array of strings is returned.
-     * 
-     * @param key
-     *            the property name
-     * @return the split-up property value.
-     */
-//    public String[] getStringList(String key) {
-//        return getStringList(key, "\\s*,\\s*", new String[0]);
-//    }
-
-    /**
-     * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
-     * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, an empty array of
-     * strings is returned.
-     * 
-     * @param key
-     *            the property name
-     * @param delim
-     *            the delimiter
-     * @return the split-up property value.
-     */
-//    public String[] getStringList(String key, String delim) {
-//        return getStringList(key, delim, new String[0]);
-//    }
-
-    /**
-     * Returns the split-up value of a string property. The value is split up according to the specified delimiter. See
-     * {@link java.lang.String#split(String)} for details of the splitting. If the property is not defined, the specified default
-     * value is returned.
-     * 
-     * @param key
-     *            the property name
-     * @param delim
-     *            the delimiter
-     * @param defaultValue
-     *            the default value
-     * @return the split-up property value.
-     */
-//    public String[] getStringList(String key, String delim, String[] defaultValue) {
-//        String value = getProperty(key);
-//
-//        if (value == null) {
-//            return defaultValue;
-//        }
-//
-//        return value.split(delim);
-//    }
 
     /**
      * Returns a new OctopusProperties that contains only the properties whose key start with a certain prefix.
      * 
      * @return an OctopusProperties containing only the matching properties.
-     * @param prefix the desired prefix
+     * @param tmp the desired prefix
      */
     public OctopusProperties filter(String prefix) {
 
-        if (prefix == null) {
-            prefix = "";
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
         }
         
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();
         
         for (String key : supportedProperties.keySet()) { 
-            if (key.startsWith(prefix)) { 
+            if (key.startsWith(tmp)) { 
                 remaining.put(key, supportedProperties.get(key));
                 
                 if (properties.containsKey(key)) { 
@@ -458,6 +421,12 @@ public class OctopusProperties {
         return new OctopusProperties(remaining, p);
     }
       
+    /**
+     * Returns a new OctopusProperties that contains only the properties with a given level.
+     * 
+     * @return an OctopusProperties containing only the properties with the matching level.
+     * @param tmp the desired prefix
+     */
     public OctopusProperties filter(Level level) {
 
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
@@ -478,7 +447,72 @@ public class OctopusProperties {
 
         return new OctopusProperties(remaining, p);
     }    
+    
+    /**
+     * Returns a copy of this OctopusProperties that contains all properties except the properties that start with the given 
+     * prefix. Note that these properties are also removed from the supported properties set.   
+     *  
+     * @param prefix the prefix of the properties to exclude
+     * @return an OctopusProperties containing all properties except the properties with the given prefix.
+     */
+    public OctopusProperties exclude(String prefix) {
 
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
+        }
+        
+        HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
+      
+        for (String key : supportedProperties.keySet()) { 
+            if (!key.startsWith(tmp)) { 
+                remaining.put(key, supportedProperties.get(key));
+                
+                if (properties.containsKey(key)) { 
+                    p.put(key, properties.get(key));
+                }               
+            }
+        }
+
+        return new OctopusProperties(remaining, p);
+    }
+
+    /**
+     * Returns a copy of this OctopusProperties that contains all properties but clears the properties that start with the given 
+     * prefix. Note that these properties are not removed from the supported properties set. 
+     *  
+     * @param prefix the prefix of the properties to exclude
+     * @return an OctopusProperties containing all properties except the properties with the given prefix.
+     */
+    public OctopusProperties clear(String prefix) {
+
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
+        }
+        
+        HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
+      
+        for (String key : supportedProperties.keySet()) { 
+            remaining.put(key, supportedProperties.get(key));
+            
+            if (!key.startsWith(tmp)) { 
+                if (properties.containsKey(key)) { 
+                    p.put(key, properties.get(key));
+                }               
+            }
+        }
+
+        return new OctopusProperties(remaining, p);
+    }
+
+    
+    
+    
     /**
      * Returns the descriptions of all supported properties.
      * 
@@ -513,22 +547,24 @@ public class OctopusProperties {
      * 
      * @param out
      *            The stream to write output to.
-     * @param prefix
+     * @param tmp
      *            Only print properties which start with the given prefix. If null, will print all properties
      */
     public void printProperties(PrintStream out, String prefix) {
         
-        if (prefix == null) {
-            prefix = "";
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
         }
         
-        prefix = prefix.toLowerCase();
+        tmp = tmp.toLowerCase();
         
         for (OctopusPropertyDescription d : supportedProperties.values()) {
         
             String key = d.getName();
             
-            if (key.toLowerCase().startsWith(prefix)) {
+            if (key.toLowerCase().startsWith(tmp)) {
             
                 String value = d.getDefaultValue();
 
@@ -572,5 +608,6 @@ public class OctopusProperties {
         
         return sb.toString();
     }
+
 
 }

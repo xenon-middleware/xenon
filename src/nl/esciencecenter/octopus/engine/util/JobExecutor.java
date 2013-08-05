@@ -34,6 +34,8 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class JobExecutor implements Runnable {
 
+    private static final long MILLISECONDS_IN_MINUTE = 60*1000;
+    
     private final JobImplementation job;
 
     private final InteractiveProcessFactory factory;
@@ -215,7 +217,7 @@ public class JobExecutor implements Runnable {
         int maxTime = description.getMaxTime();
 
         if (maxTime > 0) {
-            endTime = System.currentTimeMillis() + maxTime * 60 * 1000;
+            endTime = System.currentTimeMillis() + maxTime * MILLISECONDS_IN_MINUTE;
         }
 
         try {

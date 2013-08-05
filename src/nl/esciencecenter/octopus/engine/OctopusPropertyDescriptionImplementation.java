@@ -39,19 +39,19 @@ public class OctopusPropertyDescriptionImplementation implements OctopusProperty
     public OctopusPropertyDescriptionImplementation(String name, Type type, Set<Level> levels, String defaultValue, String description) {
         
         if (name == null) { 
-            throw new NullPointerException("Name is null!");
+            throw new IllegalArgumentException("Name is null!");
         }
         
         this.name = name;
         
         if (type == null) { 
-            throw new NullPointerException("Type is null!");
+            throw new IllegalArgumentException("Type is null!");
         }
         
         this.type = type;
         
         if (levels == null) { 
-            throw new NullPointerException("Levels is null!");
+            throw new IllegalArgumentException("Levels is null!");
         }
         
         if (levels.size() == 0) { 
@@ -63,7 +63,7 @@ public class OctopusPropertyDescriptionImplementation implements OctopusProperty
         this.defaultValue = defaultValue;
         
         if (description == null) { 
-            throw new NullPointerException("Description is null!");
+            throw new IllegalArgumentException("Description is null!");
         }
         
         this.description = description;

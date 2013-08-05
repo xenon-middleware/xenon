@@ -30,12 +30,12 @@ public interface Copy {
      * 
      * @return the source path to copy from.
      */
-    public AbsolutePath getSource();
+    AbsolutePath getSource();
 
     /**
      * Retrieve the target path to copy to.
      * 
      * @return the target path to copy to.
      */
-    public AbsolutePath getTarget();
+    AbsolutePath getTarget();
 }

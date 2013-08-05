@@ -33,7 +33,7 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
     /**
      * A filter use to decides if the given directory entry should be accepted.
      */
-    public interface Filter {
+    interface Filter {
 
         /**
          * Decide if the AbsolutePath entry should be accepted.
@@ -47,8 +47,8 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
     }
 
     @Override
-    public Iterator<T> iterator();
+    Iterator<T> iterator();
 
     @Override
-    public void close() throws OctopusIOException;
+    void close() throws OctopusIOException;
 }

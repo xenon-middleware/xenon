@@ -52,7 +52,7 @@ import com.jcraft.jsch.SftpException;
 
 public class SshAdaptor extends Adaptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SshFiles.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshAdaptor.class);
 
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "ssh";
@@ -128,9 +128,9 @@ public class SshAdaptor extends Adaptor {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME,
                 new OctopusProperties(VALID_PROPERTIES, properties));
 
-        this.filesAdaptor = new SshFiles(getProperties(), this, octopusEngine);
+        this.filesAdaptor = new SshFiles(this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
-        this.credentialsAdaptor = new SshCredentials(getProperties(), this, octopusEngine);
+        this.credentialsAdaptor = new SshCredentials(getProperties(), this);
         this.jsch = jsch;
         
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
@@ -269,7 +269,7 @@ public class SshAdaptor extends Adaptor {
     }
 
     protected SshSession createNewSession(URI location, Credential credential, OctopusProperties properties)
-            throws OctopusException {
+            throws OctopusException, OctopusIOException {
         return new SshSession(this, jsch, location, credential, properties);
     }
 

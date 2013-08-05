@@ -15,10 +15,11 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -30,9 +31,9 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
 
-    private final LinkedList<AbsolutePath> stream;
+    private final Deque<AbsolutePath> stream;
 
-    SshDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter, Vector<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
 
         stream = new LinkedList<AbsolutePath>();
 

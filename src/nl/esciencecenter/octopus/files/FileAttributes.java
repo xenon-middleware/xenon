@@ -37,7 +37,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isDirectory() throws AttributeNotSupportedException;
+    boolean isDirectory() throws AttributeNotSupportedException;
 
     /**
      * Is the path not a file, link or directory ?
@@ -47,7 +47,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isOther() throws AttributeNotSupportedException;
+    boolean isOther() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to a regular file ?
@@ -57,7 +57,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isRegularFile() throws AttributeNotSupportedException;
+    boolean isRegularFile() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to a symbolic link ?
@@ -67,7 +67,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isSymbolicLink() throws AttributeNotSupportedException;
+    boolean isSymbolicLink() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to an executable file ?
@@ -77,7 +77,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isExecutable() throws AttributeNotSupportedException;
+    boolean isExecutable() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to an hidden file ?
@@ -87,7 +87,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isHidden() throws AttributeNotSupportedException;
+    boolean isHidden() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to an readable file ?
@@ -97,7 +97,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isReadable() throws AttributeNotSupportedException;
+    boolean isReadable() throws AttributeNotSupportedException;
 
     /**
      * Does the path refer to a writable file ?
@@ -107,7 +107,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public boolean isWritable() throws AttributeNotSupportedException;
+    boolean isWritable() throws AttributeNotSupportedException;
 
     /**
      * Get the creation time for this file.
@@ -117,7 +117,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public long creationTime() throws AttributeNotSupportedException;
+    long creationTime() throws AttributeNotSupportedException;
 
     /**
      * Get the last access time for this file.
@@ -127,7 +127,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public long lastAccessTime() throws AttributeNotSupportedException;
+    long lastAccessTime() throws AttributeNotSupportedException;
 
     /**
      * Get the last modified time for this file.
@@ -137,7 +137,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public long lastModifiedTime() throws AttributeNotSupportedException;
+    long lastModifiedTime() throws AttributeNotSupportedException;
 
     /**
      * Get the size of this file.
@@ -147,7 +147,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public long size() throws AttributeNotSupportedException;
+    long size() throws AttributeNotSupportedException;
 
     /**
      * Get the group of this file.
@@ -157,7 +157,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public String group() throws AttributeNotSupportedException;
+    String group() throws AttributeNotSupportedException;
 
     /**
      * Get the owner of this file.
@@ -167,7 +167,7 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public String owner() throws AttributeNotSupportedException;
+    String owner() throws AttributeNotSupportedException;
 
     /**
      * Get the permissions of this file.
@@ -177,5 +177,5 @@ public interface FileAttributes {
      * @throws AttributeNotSupportedException
      *             If the attribute is not supported by the adaptor.
      */
-    public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException;
+    Set<PosixFilePermission> permissions() throws AttributeNotSupportedException;
 }

@@ -21,8 +21,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import javax.annotation.Generated;
-
 /**
  * RelativePath contains a sequence of path elements separated by a separator.
  * 
@@ -470,7 +468,7 @@ public class RelativePath {
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    public RelativePath relativize(RelativePath other) throws IllegalArgumentException {
+    public RelativePath relativize(RelativePath other) {
 
         if (isEmpty()) {
             return other;

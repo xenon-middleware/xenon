@@ -30,54 +30,54 @@ public interface CopyStatus {
      * 
      * @return the Copy.
      */
-    public Copy getCopy();
+    Copy getCopy();
 
     /**
      * Get the state of the Job.
      * 
      * @return the state of the Job.
      */
-    public String getState();
+    String getState();
 
     /**
      * Get the exception produced by the Copy or while retrieving the status.
      * 
      * @return the exception.
      */
-    public Exception getException();
+    Exception getException();
 
     /**
      * Is the Copy still running.
      * 
      * @return if the Copy is running.
      */
-    public boolean isRunning();
+    boolean isRunning();
 
     /**
      * Is the Copy done.
      * 
      * @return if the Copy is done.
      */
-    public boolean isDone();
+    boolean isDone();
 
     /**
      * Has the Copy or status retrieval produced a exception ?
      * 
      * @return if the Copy has an exception.
      */
-    public boolean hasException();
+    boolean hasException();
 
     /**
      * Get the number of bytes that need to be copied.
      * 
      * @return the number of bytes that need to be copied.
      */
-    public long bytesToCopy();
+    long bytesToCopy();
 
     /**
      * Get the number of bytes that have been copied.
      * 
      * @return the number of bytes that have been copied.
      */
-    public long bytesCopied();
+    long bytesCopied();
 }

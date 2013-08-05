@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;

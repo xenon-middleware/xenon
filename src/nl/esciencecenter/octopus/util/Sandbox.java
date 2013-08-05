@@ -192,7 +192,7 @@ public class Sandbox {
      */
     public void addUploadFile(AbsolutePath src, String dest) {
         if (src == null) {
-            throw new NullPointerException("the source path cannot be null when adding a preStaged file");
+            throw new IllegalArgumentException("the source path cannot be null when adding a preStaged file");
         }
         if (dest == null) {
             dest = src.getFileName();
@@ -218,7 +218,7 @@ public class Sandbox {
      */
     public void addDownloadFile(String src, AbsolutePath dest) {
         if (dest == null) {
-            throw new NullPointerException("the destination path cannot be null when adding a postStaged file");
+            throw new IllegalArgumentException("the destination path cannot be null when adding a postStaged file");
         }
         if (src == null) {
             src = dest.getFileName();

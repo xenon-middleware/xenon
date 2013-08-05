@@ -46,7 +46,12 @@ public abstract class CredentialImplementation implements Credential {
         this.adaptorName = adaptorName;
         this.username = username;
         this.uniqueID = uniqueID;
-        this.password = password;
+        
+        if (password != null) { 
+            this.password = password.clone();
+        } else { 
+            this.password = null;
+        }
 
         if (properties == null) { 
             this.properties = new OctopusProperties();
@@ -74,7 +79,12 @@ public abstract class CredentialImplementation implements Credential {
      * @return the password
      */
     public char[] getPassword() {
-        return password;
+        
+        if (password == null) { 
+            return null;
+        }
+        
+        return password.clone();
     }
 
     @Override

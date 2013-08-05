@@ -23,9 +23,9 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
@@ -70,7 +70,7 @@ import com.jcraft.jsch.SftpException;
 
 public class SshFiles implements Files {
 
-    private static final Logger logger = LoggerFactory.getLogger(SshFiles.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshFiles.class);
 
     private static int currentID = 1;
 
@@ -82,11 +82,10 @@ public class SshFiles implements Files {
 
     /**
      * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
-     * 
      */
-    class FileSystemInfo {
-        FileSystemImplementation impl;
-        SshSession session;
+    static class FileSystemInfo {
+        private final FileSystemImplementation impl;
+        private final SshSession session;
 
         public FileSystemInfo(FileSystemImplementation impl, SshSession session) {
             super();
@@ -108,7 +107,7 @@ public class SshFiles implements Files {
     
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
-    public SshFiles(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
+    public SshFiles(SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
         this.octopusEngine = octopusEngine;
         this.adaptor = sshAdaptor;
     }
@@ -134,7 +133,7 @@ public class SshFiles implements Files {
 
         RelativePath entryPath = new RelativePath(wd);
 
-        logger.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
+        LOGGER.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
         FileSystemImplementation result =
                 new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath, credential, properties);
@@ -203,10 +202,6 @@ public class SshFiles implements Files {
         if (!exists(dir.getParent())) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Parent directory " + dir.getParent() + " does not exist!");
         }
-
-        //        if (exists(dir)) {
-        //            throw new FileAlreadyExistsException(getClass().getName(), "Cannot create directory, as it already exists.");
-        //        }
 
         SshSession session = getSession(dir);
         ChannelSftp channel = session.getSftpChannel();
@@ -354,7 +349,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            logger.debug("move from " + source.getPath() + " to " + target.getPath());
+            LOGGER.debug("move from " + source.getPath() + " to " + target.getPath());
             channel.rename(source.getPath(), target.getPath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -366,7 +361,7 @@ public class SshFiles implements Files {
     }
 
     @SuppressWarnings("unchecked")
-    private Vector<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException {
+    private List<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException {
 
         FileAttributes att = getAttributes(path);
         
@@ -381,7 +376,7 @@ public class SshFiles implements Files {
         SshSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        Vector<LsEntry> result = null;
+        List<LsEntry> result = null;
 
         try {
             result = channel.ls(path.getPath());
@@ -511,7 +506,7 @@ public class SshFiles implements Files {
     }
 
     public void end() {
-        logger.debug("end called, closing all file systems");
+        LOGGER.debug("end called, closing all file systems");
         while (fileSystems.size() > 0) {
             Set<String> keys = fileSystems.keySet();
             String first = keys.iterator().next();

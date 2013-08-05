@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommandRunner {
 
-    protected static Logger logger = LoggerFactory.getLogger(CommandRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandRunner.class);
 
     private final int exitCode;
 
@@ -77,8 +77,8 @@ public class CommandRunner {
 
         // expand command using path
         command[0] = getExeFile(command[0]);
-        if (logger.isDebugEnabled()) {
-            logger.debug("CommandRunner running: " + Arrays.toString(command));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("CommandRunner running: " + Arrays.toString(command));
         }
         ProcessBuilder builder = new ProcessBuilder(command);
         if (workingDir != null) {
@@ -92,32 +92,30 @@ public class CommandRunner {
                     + Arrays.toString(command), e);
         }
 
-        if (stdin == null) {
-            stdin = "";
-        }
-
         //write given content to stdin of process
-        new InputWriter(stdin, p.getOutputStream());
+        new InputWriter((stdin == null ? "" : stdin), p.getOutputStream());
 
         // we must always read the output and error streams to avoid deadlocks
         out = new OutputReader(p.getInputStream());
         err = new OutputReader(p.getErrorStream());
 
-        int exitCode = 0;
+        int exit = 0;
+        
         try {
-            exitCode = p.waitFor();
+            exit = p.waitFor();
 
             out.waitUntilFinished();
             err.waitUntilFinished();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("CommandRunner out: " + out.getResult() + "\n" + "CommandRunner err: " + err.getResult());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("CommandRunner out: " + out.getResult() + "\n" + "CommandRunner err: " + err.getResult());
             }
 
         } catch (InterruptedException e) {
             // IGNORE
         }
-        this.exitCode = exitCode;
+        
+        exitCode = exit;
     }
 
     public String getStdout() {

@@ -65,7 +65,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public FileSystem newFileSystem(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
+    FileSystem newFileSystem(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException;
 
     /**
@@ -86,7 +86,7 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    public FileSystem getLocalCWDFileSystem() throws OctopusException;
+    FileSystem getLocalCWDFileSystem() throws OctopusException;
 
     /**
      * Get a FileSystem that represents the local home directory of the current user.
@@ -106,7 +106,7 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    public FileSystem getLocalHomeFileSystem() throws OctopusException;
+    FileSystem getLocalHomeFileSystem() throws OctopusException;
 
     /**
      * Create a new AbsolutePath that represents a (possibly non existing) location on <code>filesystem.</code>
@@ -125,7 +125,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException;
+    AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException;
 
     /**
      * Close a FileSystem.
@@ -140,7 +140,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void close(FileSystem filesystem) throws OctopusException, OctopusIOException;
+    void close(FileSystem filesystem) throws OctopusException, OctopusIOException;
 
     /**
      * Test is a FileSystem is open.
@@ -153,7 +153,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException;
+    boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException;
 
     /**
      * Copy an existing source file or symbolic link to a target file.
@@ -221,7 +221,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
+    Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
             OctopusIOException;
 
     /**
@@ -249,7 +249,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If the move failed.
      */
-    public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
+    AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException;
 
     /**
      * Retrieve the status of an asynchronous copy.
@@ -264,7 +264,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException;
+    CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException;
 
     /**
      * Cancel a copy operation.
@@ -279,7 +279,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
+    CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
 
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
@@ -294,7 +294,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException;
+    AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Creates a new directory, failing if the directory already exists.
@@ -309,7 +309,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException;
+    AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Creates a new empty file, failing if the file already exists.
@@ -324,7 +324,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
+    AbsolutePath createFile(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Deletes an existing path.
@@ -339,7 +339,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void delete(AbsolutePath path) throws OctopusIOException;
+    void delete(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Tests if a path exists.
@@ -352,7 +352,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public boolean exists(AbsolutePath path) throws OctopusIOException;
+    boolean exists(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
@@ -368,7 +368,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException;
+    DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code> that are accepted by the filter.
@@ -387,7 +387,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
     /**
@@ -405,7 +405,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
+    DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException;
 
     /**
      * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code> that are
@@ -425,7 +425,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
             throws OctopusIOException;
 
     /**
@@ -443,7 +443,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public InputStream newInputStream(AbsolutePath path) throws OctopusIOException;
+    InputStream newInputStream(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
@@ -488,7 +488,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
+    OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException;
 
     /**
      * Get the {@link FileAttributes} of an existing path.
@@ -503,7 +503,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException;
+    FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException;
 
     /**
      * Reads the target of a symbolic link (optional operation).
@@ -520,7 +520,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
+    AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
 
     /**
      * Sets the POSIX permissions of a path.
@@ -535,6 +535,6 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException;
+    void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException;
 
 }

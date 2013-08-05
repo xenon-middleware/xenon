@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 
 public class SshJobs implements Jobs {
     
-    private static final Logger logger = LoggerFactory.getLogger(SshJobs.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshJobs.class);
     
     private static int currentID = 1;
 
@@ -57,18 +57,27 @@ public class SshJobs implements Jobs {
     /**
      * Used to store all state attached to a scheduler. This way, SchedulerImplementation is immutable.
      */
-    class SchedulerInfo {
+    static class SchedulerInfo {
 
-        final SchedulerImplementation impl;
-        final SshSession session;
-        final FileSystem filesystem;
-        final JobQueues jobQueues;
+        private final SshSession session;
+        private final JobQueues jobQueues;
 
-        SchedulerInfo(SchedulerImplementation impl, FileSystem fs, SshSession session, JobQueues jobQueues) {
-            this.impl = impl;
-            this.filesystem = fs;
+        SchedulerInfo(SshSession session, JobQueues jobQueues) {
             this.session = session;
             this.jobQueues = jobQueues;
+        }
+        
+        SshSession getSession() { 
+            return session;
+        }
+        
+        JobQueues getJobQueues() { 
+            return jobQueues;
+        }
+        
+        void end() { 
+            jobQueues.end();
+            session.disconnect();
         }
     }
 
@@ -78,7 +87,7 @@ public class SshJobs implements Jobs {
 
     private final OctopusProperties properties;
 
-    private HashMap<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
+    private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
     public SshJobs(OctopusProperties properties, SshAdaptor sshAdaptor, OctopusEngine octopusEngine) throws OctopusException {
         this.octopusEngine = octopusEngine;
@@ -90,16 +99,15 @@ public class SshJobs implements Jobs {
     public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
             OctopusIOException {
 
-        //adaptor.checkURI(location);
         adaptor.checkPath(location, "scheduler");
 
         String uniqueID = getNewUniqueID();
 
-        SshSession session = adaptor.createNewSession(location, credential, this.properties);
-
-        logger.debug("Starting ssh scheduler with properties {}", properties);
+        LOGGER.debug("Starting ssh scheduler with properties {}", properties);
         
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
+        
+        SshSession session = adaptor.createNewSession(location, credential, p);
         
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, p, true, true, true);
@@ -117,7 +125,7 @@ public class SshJobs implements Jobs {
                 new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, multiQThreads, pollingDelay);
 
         synchronized (this) {
-            schedulers.put(uniqueID, new SchedulerInfo(scheduler, fs, session, jobQueues));
+            schedulers.put(uniqueID, new SchedulerInfo(session, jobQueues));
         }
 
         return scheduler;
@@ -142,7 +150,7 @@ public class SshJobs implements Jobs {
             throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
         }
 
-        return info.jobQueues;
+        return info.getJobQueues();
     }
 
     @Override
@@ -200,8 +208,7 @@ public class SshJobs implements Jobs {
     }
 
     public void end() {
-        // FIXME!
-        // singleExecutor.shutdownNow();
+        // FIXME singleExecutor.shutdownNow();
     }
 
     @Override
@@ -233,8 +240,7 @@ public class SshJobs implements Jobs {
             }
         }
 
-        info.jobQueues.end();
-        info.session.disconnect();
+        info.end();
     }
 
     @Override

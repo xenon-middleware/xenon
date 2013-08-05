@@ -31,26 +31,26 @@ public interface Streams {
      * 
      * @return the Job.
      */
-    public Job getJob();
+    Job getJob();
 
     /**
      * Returns the standard output stream of job.
      * 
      * @return the standard output stream of job.
      */
-    public InputStream getStdout();
+    InputStream getStdout();
 
     /**
      * Returns the standard error stream of job.
      * 
      * @return the standard error stream of job.
      */
-    public InputStream getStderr();
+    InputStream getStderr();
 
     /**
      * Returns the standard input stream of job.
      * 
      * @return the standard input stream of this job.
      */
-    public OutputStream getStdin();
+    OutputStream getStdin();
 }
