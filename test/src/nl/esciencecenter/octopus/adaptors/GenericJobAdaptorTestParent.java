@@ -551,7 +551,7 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     @Test
-    public void test25b_getJobStatuses() throws Exception {
+    public void test25b_getJobStatuses_Null_EmptyResult() throws Exception {
 
         JobStatus[] tmp = jobs.getJobStatuses((Job[]) null);
 
@@ -560,7 +560,7 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     @Test
-    public void test25c_getJobStatuses() throws Exception {
+    public void test25c_getJobStatuses_NullJob_NullResult() throws Exception {
 
         JobStatus[] tmp = jobs.getJobStatuses(new Job[1]);
 

@@ -71,7 +71,22 @@ public abstract class SchedulerConnection {
 
     private final long pollDelay;
 
-    protected static URI subSchedulerLocation(URI location, String adaptorName) throws InvalidLocationException {
+    private static boolean supportsScheme(String scheme, String[] supportedSchemes) {
+        for (String validScheme : supportedSchemes) {
+            if (validScheme.equalsIgnoreCase(scheme)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected static URI getSubSchedulerLocation(URI location, String adaptorName, String... supportedSchemes)
+            throws InvalidLocationException {
+        if (!supportsScheme(location.getScheme(), supportedSchemes)) {
+            throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme \"" + location.getScheme() + "\"");
+        }
+
         //only null or "/" are allowed as paths
         if (!(location.getPath() == null || location.getPath().length() == 0 || location.getPath().equals("/"))) {
             throw new InvalidLocationException(adaptorName, "Paths are not allowed in a uri for this scheduler, uri given: "
@@ -134,7 +149,6 @@ public abstract class SchedulerConnection {
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
         }
-
     }
 
     protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
@@ -147,7 +161,7 @@ public abstract class SchedulerConnection {
 
         id = adaptor.getName() + "-" + getNextSchedulerID();
 
-        URI subSchedulerLocation = subSchedulerLocation(location, adaptor.getName());
+        URI subSchedulerLocation = getSubSchedulerLocation(location, adaptor.getName(), adaptor.getSupportedSchemes());
 
         LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), subSchedulerLocation);
         Map<String, String> subSchedulerProperties = new HashMap<String, String>();
