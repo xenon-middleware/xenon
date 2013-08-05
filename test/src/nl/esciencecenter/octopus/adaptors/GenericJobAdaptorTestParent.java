@@ -514,7 +514,7 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.getQueueStatuses(null, config.getDefaultQueueName());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test22c_getQueueStatuses() throws Exception {
         Scheduler s = config.getDefaultScheduler(jobs, credentials);
         jobs.getQueueStatuses(s, (String[]) null);

@@ -269,7 +269,7 @@ public class SshAdaptor extends Adaptor {
     }
 
     protected SshSession createNewSession(URI location, Credential credential, OctopusProperties properties)
-            throws OctopusException {
+            throws OctopusException, OctopusIOException {
         return new SshSession(this, jsch, location, credential, properties);
     }
 

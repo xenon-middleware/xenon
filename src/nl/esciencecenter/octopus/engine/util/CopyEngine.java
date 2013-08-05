@@ -504,11 +504,11 @@ public class CopyEngine {
         return running;
     }
 
-    private synchronized void waitUntilCancelled(String ID) {
+    private synchronized void waitUntilCancelled(String copyID) {
 
-        LOGGER.debug("Waiting until copy {} is cancelled.", ID);
+        LOGGER.debug("Waiting until copy {} is cancelled.", copyID);
 
-        while (running != null && ID.equals(running.copy.getUniqueID())) {
+        while (running != null && copyID.equals(running.copy.getUniqueID())) {
             try {
                 wait(POLLING_DELAY);
             } catch (InterruptedException e) {
@@ -525,23 +525,23 @@ public class CopyEngine {
 
         CopyImplementation tmp = (CopyImplementation) copy;
 
-        String ID = tmp.getUniqueID();
+        String copyID = tmp.getUniqueID();
 
-        LOGGER.debug("Attempting to cancel copy {}.", ID);
+        LOGGER.debug("Attempting to cancel copy {}.", copyID);
 
-        if (running != null && ID.equals(running.copy.getUniqueID())) {
-            LOGGER.debug("Canceled copy {} is running,", ID);
+        if (running != null && copyID.equals(running.copy.getUniqueID())) {
+            LOGGER.debug("Canceled copy {} is running,", copyID);
             running.cancel();
 
             // We should now wait until the running copy is indeed cancelled. Otherwise, we are in an inconsistent state when 
             // we return.            
-            waitUntilCancelled(ID);
+            waitUntilCancelled(copyID);
         }
 
-        CopyInfo ac = finished.remove(ID);
+        CopyInfo ac = finished.remove(copyID);
 
         if (ac != null) {
-            LOGGER.debug("Canceled copy {} was already finished.", ID);
+            LOGGER.debug("Canceled copy {} was already finished.", copyID);
             // Already finished
             return new CopyStatusImplementation(copy, "DONE", false, true, ac.getBytesToCopy(), ac.getBytesCopied(),
                     ac.getException());
@@ -553,15 +553,15 @@ public class CopyEngine {
 
             CopyInfo c = it.next();
 
-            if (c.copy.getUniqueID().equals(ID)) {
+            if (c.copy.getUniqueID().equals(copyID)) {
                 it.remove();
-                LOGGER.debug("Canceled copy {} was queued.", ID);
+                LOGGER.debug("Canceled copy {} was queued.", copyID);
                 return new CopyStatusImplementation(copy, "KILLED", false, false, c.getBytesToCopy(), 0, new IOException(
                         "Copy killed by user"));
             }
         }
 
-        throw new NoSuchCopyException(NAME, "No such copy " + ID);
+        throw new NoSuchCopyException(NAME, "No such copy " + copyID);
     }
 
     public synchronized CopyStatus getStatus(Copy copy) throws NoSuchCopyException {
@@ -572,23 +572,23 @@ public class CopyEngine {
 
         CopyImplementation tmp = (CopyImplementation) copy;
 
-        String ID = tmp.getUniqueID();
+        String copyID = tmp.getUniqueID();
 
-        LOGGER.debug("Retrieving status of copy {}.", ID);
+        LOGGER.debug("Retrieving status of copy {}.", copyID);
 
         String state = null;
         CopyInfo ac = null;
         boolean isRunning = false;
         boolean isDone = false;
 
-        if (running != null && ID.equals(running.copy.getUniqueID())) {
+        if (running != null && copyID.equals(running.copy.getUniqueID())) {
             state = "RUNNING";
             ac = running;
             isRunning = true;
         }
 
         if (ac == null) {
-            ac = finished.remove(ID);
+            ac = finished.remove(copyID);
 
             if (ac != null) {
                 state = "DONE";
@@ -598,7 +598,7 @@ public class CopyEngine {
 
         if (ac == null) {
             for (CopyInfo c : pending) {
-                if (c.copy.getUniqueID().equals(ID)) {
+                if (c.copy.getUniqueID().equals(copyID)) {
                     ac = c;
                     state = "PENDING";
                     break;
@@ -607,7 +607,7 @@ public class CopyEngine {
         }
 
         if (ac == null) {
-            throw new NoSuchCopyException(NAME, "No such copy " + ID);
+            throw new NoSuchCopyException(NAME, "No such copy " + copyID);
         }
 
         return new CopyStatusImplementation(copy, state, isRunning, isDone, ac.getBytesToCopy(), ac.getBytesCopied(),

@@ -17,6 +17,7 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,8 +29,11 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
+import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +60,9 @@ class SshSession {
 
         private final int sessionID;
         private final Session session;
-        private ChannelSftp sftpChannel;
+        private ChannelSftp sftpChannelCache;
         private int openChannels = 0;
+        private int tunnelPort = -1; 
 
         SessionInfo(Session session, int sessionID) {
             this.session = session;
@@ -81,17 +86,17 @@ class SshSession {
         }
 
         ChannelSftp getSftpChannelFromCache() {
-            ChannelSftp channel = sftpChannel;
-            sftpChannel = null;
+            ChannelSftp channel = sftpChannelCache;
+            sftpChannelCache = null;
             return channel;
         }
 
         boolean putSftpChannelInCache(ChannelSftp channel) {
-            if (sftpChannel != null) {
+            if (sftpChannelCache != null) {
                 return false;
             }
 
-            sftpChannel = channel;
+            sftpChannelCache = channel;
             return true;
         }
 
@@ -123,8 +128,8 @@ class SshSession {
         }
 
         void disconnect() {
-            if (sftpChannel != null) {
-                sftpChannel.disconnect();
+            if (sftpChannelCache != null) {
+                sftpChannelCache.disconnect();
             }
 
             session.disconnect();
@@ -175,16 +180,60 @@ class SshSession {
             incOpenChannels("SFTP");
             return channel;
         }
+        
+        int addTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException { 
+
+            LOGGER.debug("SSHSESSION-{}: Creating tunnel from localhost:{} via {}:{} to {}:{}", sessionID, localPort, 
+                    session.getHost(), session.getPort(), targetHost, targetPort);
+            
+            if (tunnelPort > 0) { 
+                LOGGER.debug("SSHSESSION-{}: Tunnel already in used for this session!", sessionID);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Tunnel already in use!");
+            }
+            
+            try {
+                tunnelPort = session.setPortForwardingL(0, targetHost, targetPort);
+            } catch (JSchException e) {
+                LOGGER.debug("SSHSESSION-{}: Failed to create tunnel to {}:{}", sessionID, targetHost, targetPort, e);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            }
+            
+            return tunnelPort;
+        }
+
+        void removeTunnel(int localPort) throws OctopusIOException {
+            
+            LOGGER.debug("SSHSESSION-{}: Removing tunnel at localhost:{}", sessionID, localPort);
+            
+            if (localPort != tunnelPort) { 
+                LOGGER.debug("SSHSESSION-{}: Tunnel is not at port {} but at port {}!", sessionID, localPort, tunnelPort);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Tunnel is not at port " + localPort + " but at port " 
+                        + tunnelPort + "!");                
+            }
+            
+            try {
+                tunnelPort = -1;
+                session.delPortForwardingL(localPort);
+            } catch (JSchException e) {
+                LOGGER.debug("SSHSESSION-{}: Failed to remove tunnel at localhost:{}", sessionID, localPort, e);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            }
+        }
     }
 
     private final JSch jsch;
     private final OctopusProperties properties;
 
     private Credential credential;
+    
     private String user;
     private String host;
     private int port;
 
+    private SshSession gatewaySession;
+    private URI gatewayURI;
+    private int localTunnelPort;
+    
     private int nextSessionID = 0;
 
     private List<SessionInfo> sessions = new ArrayList<>();
@@ -229,8 +278,10 @@ class SshSession {
     }
 
     SshSession(SshAdaptor adaptor, JSch jsch, URI location, Credential cred, OctopusProperties properties)
-            throws OctopusException {
+            throws OctopusException, OctopusIOException {
 
+        LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
+        
         this.jsch = jsch;
         this.properties = properties;
         credential = cred;
@@ -238,7 +289,7 @@ class SshSession {
         user = location.getUserInfo();
         host = location.getHost();
         port = location.getPort();
-
+        
         if (credential == null) {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");
         }
@@ -274,6 +325,17 @@ class SshSession {
             throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in URI or credential.");
         }
 
+        LOGGER.debug("Checking property: " + SshAdaptor.GATEWAY);
+        
+        if (properties.propertySet(SshAdaptor.GATEWAY)) {
+            try {
+                gatewayURI = new URI(properties.getStringProperty(SshAdaptor.GATEWAY));
+                gatewaySession = new SshSession(adaptor, jsch, gatewayURI, cred, properties.clear(SshAdaptor.GATEWAY));
+            } catch (URISyntaxException e) {
+                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to create gateway!", e);
+            }
+        }
+        
         createSession();
     }
 
@@ -304,27 +366,33 @@ class SshSession {
         throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH Session not found!");
     }
 
-    private SessionInfo createSession() throws OctopusException {
+    private SessionInfo createSession() throws OctopusIOException, OctopusException {
 
+        String sessionHost = host;
+        int sessionPort = port;
+        
         LOGGER.debug("SSHSESSION: Creating new session to " + user + "@" + host + ":" + port);
-
+        
+        if (gatewaySession != null) { 
+            LOGGER.debug("SSHSESSION: Using tunnel " + gatewayURI);
+    
+            sessionPort = gatewaySession.createTunnel(0, host, port);
+            sessionHost = "localhost";
+        
+            LOGGER.debug("SSHSESSION: Rerouting session via " + user + "@" + sessionHost + ":" + sessionPort);
+        }
+        
         Session session = null;
-
+        
         try {
-            session = jsch.getSession(user, host, port);
+            session = jsch.getSession(user, sessionHost, sessionPort);
         } catch (JSchException e) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
         }
 
         if (credential instanceof PasswordCredentialImplementation) {
             PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
             session.setPassword(new String(passwordCredential.getPassword()));
-        }
-
-        if (properties.propertySet(SshAdaptor.GATEWAY)) {
-
-            String gateway = properties.getStringProperty(SshAdaptor.GATEWAY);
-            // TODO: implement!
         }
         
         if (properties.getBooleanProperty(SshAdaptor.STRICT_HOST_KEY_CHECKING)) {
@@ -420,6 +488,40 @@ class SshSession {
         findSession(channel).failedSftpChannel(channel);
     }
 
+    synchronized int createTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException {
+
+        for (int i = 0; i < sessions.size(); i++) {
+            SessionInfo s = sessions.get(i);
+
+            int resultPort = s.addTunnel(localPort, targetHost, targetPort);
+
+            if (resultPort > 0) { 
+                return resultPort;
+            }
+        }
+
+        try {
+            SessionInfo s = createSession();
+            return s.addTunnel(localPort, targetHost, targetPort);
+        } catch (OctopusException e) {
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
+        }
+    }
+
+    synchronized void removeTunnel(int localPort) throws OctopusIOException {
+
+        for (int i = 0; i < sessions.size(); i++) {
+            SessionInfo s = sessions.get(i);
+            
+            if (s.tunnelPort == localPort) { 
+                s.removeTunnel(localPort);
+                return;
+            } 
+        }
+
+        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to find tunnel at !" + localPort);
+    }
+    
     synchronized void disconnect() {
 
         while (sessions.size() > 0) {

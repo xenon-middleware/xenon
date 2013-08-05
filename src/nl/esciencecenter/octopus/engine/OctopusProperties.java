@@ -421,6 +421,12 @@ public class OctopusProperties {
         return new OctopusProperties(remaining, p);
     }
       
+    /**
+     * Returns a new OctopusProperties that contains only the properties with a given level.
+     * 
+     * @return an OctopusProperties containing only the properties with the matching level.
+     * @param tmp the desired prefix
+     */
     public OctopusProperties filter(Level level) {
 
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
@@ -441,7 +447,72 @@ public class OctopusProperties {
 
         return new OctopusProperties(remaining, p);
     }    
+    
+    /**
+     * Returns a copy of this OctopusProperties that contains all properties except the properties that start with the given 
+     * prefix. Note that these properties are also removed from the supported properties set.   
+     *  
+     * @param prefix the prefix of the properties to exclude
+     * @return an OctopusProperties containing all properties except the properties with the given prefix.
+     */
+    public OctopusProperties exclude(String prefix) {
 
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
+        }
+        
+        HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
+      
+        for (String key : supportedProperties.keySet()) { 
+            if (!key.startsWith(tmp)) { 
+                remaining.put(key, supportedProperties.get(key));
+                
+                if (properties.containsKey(key)) { 
+                    p.put(key, properties.get(key));
+                }               
+            }
+        }
+
+        return new OctopusProperties(remaining, p);
+    }
+
+    /**
+     * Returns a copy of this OctopusProperties that contains all properties but clears the properties that start with the given 
+     * prefix. Note that these properties are not removed from the supported properties set. 
+     *  
+     * @param prefix the prefix of the properties to exclude
+     * @return an OctopusProperties containing all properties except the properties with the given prefix.
+     */
+    public OctopusProperties clear(String prefix) {
+
+        String tmp = prefix;
+        
+        if (tmp == null) {
+            tmp = "";
+        }
+        
+        HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
+        HashMap<String, String> p = new HashMap<>();
+      
+        for (String key : supportedProperties.keySet()) { 
+            remaining.put(key, supportedProperties.get(key));
+            
+            if (!key.startsWith(tmp)) { 
+                if (properties.containsKey(key)) { 
+                    p.put(key, properties.get(key));
+                }               
+            }
+        }
+
+        return new OctopusProperties(remaining, p);
+    }
+
+    
+    
+    
     /**
      * Returns the descriptions of all supported properties.
      * 
@@ -537,5 +608,6 @@ public class OctopusProperties {
         
         return sb.toString();
     }
+
 
 }
