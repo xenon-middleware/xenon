@@ -16,6 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors.scripting;
 
+import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -41,9 +42,10 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ForwardingCredentials credentialsAdaptor;
 
     protected ScriptingAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusProperties properties, SchedulerConnectionFactory factory) throws OctopusException {
+            OctopusPropertyDescription [] validProperties, OctopusProperties properties, SchedulerConnectionFactory factory) 
+                    throws OctopusException {  
 
-        super(octopusEngine, name, description, supportedSchemes, properties);
+        super(octopusEngine, name, description, supportedSchemes, validProperties, properties);
 
         jobsAdaptor = new ScriptingJobs(this, octopusEngine, factory);
         credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");

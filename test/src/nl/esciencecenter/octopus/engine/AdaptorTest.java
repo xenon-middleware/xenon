@@ -21,7 +21,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
@@ -44,9 +43,9 @@ public class AdaptorTest {
     class TestAdaptor extends Adaptor {
 
         public TestAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-                OctopusProperties p) throws OctopusException {
+                OctopusPropertyDescription [] validProperties, OctopusProperties p) throws OctopusException {
             
-            super(octopusEngine, name, description, supportedSchemes, p);
+            super(octopusEngine, name, description, supportedSchemes, validProperties, p);
         }
 
         @Override
@@ -80,7 +79,8 @@ public class AdaptorTest {
 
         String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
 
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, new OctopusProperties());
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, new OctopusPropertyDescription[0], 
+                new OctopusProperties());
 
         String[] tmp = t.getSupportedSchemes();
 
@@ -102,7 +102,7 @@ public class AdaptorTest {
         };
         
         OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String,String>());
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, prop);
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
 
         OctopusPropertyDescription [] p = t.getSupportedProperties();
 
@@ -132,7 +132,7 @@ public class AdaptorTest {
         m.put("octopus.adaptors.test.p2", "zus");
         
         OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String,String>());
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, prop);
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
 
         OctopusPropertyDescription [] p = t.getSupportedProperties();
 
@@ -162,7 +162,7 @@ public class AdaptorTest {
         
         OctopusProperties prop = new OctopusProperties(supportedProperties, p);
 
-        new TestAdaptor(null, "test", "DESCRIPTION", schemes, prop);
+        new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
     }
 
 }

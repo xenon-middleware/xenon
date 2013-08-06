@@ -76,9 +76,9 @@ public class SlurmAdaptor extends ScriptingAdaptor {
      * @throws OctopusException
      *             if the adaptor creation fails.
      */
-    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, new OctopusProperties(VALID_PROPERTIES, 
-                properties), new SlurmSchedulerConnectionFactory());
+    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {    
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, 
+                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties), new SlurmSchedulerConnectionFactory());
     }
 
     @Override
