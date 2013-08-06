@@ -44,8 +44,8 @@ public class ScriptingParser {
     }
 
     /**
-     * Parses a output with key=value pairs separated by whitespace (including newlines). This function fails if there is any
-     * whitespace between the key and value.
+     * Parses a output with key=value pairs separated by whitespace, on one or more lines. This function fails if there is any
+     * whitespace between the key and value, or whitespace inside the values.
      * 
      * @param input
      *            the text to parse.
@@ -55,19 +55,26 @@ public class ScriptingParser {
      * @throws OctopusException
      *             if the input cannot be parsed.
      */
-    public static Map<String, String> parseKeyValuePairs(String input, String adaptorName) throws OctopusException {
+    public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines)
+            throws OctopusException {
         Map<String, String> result = new HashMap<String, String>();
 
-        String[] pairs = input.split(WHITESPACE_REGEX);
+        String[] lines = input.split(NEWLINE_REGEX);
 
-        for (String pair : pairs) {
-            String[] elements = pair.split(EQUALS_REGEX, 2);
+        for (String line : lines) {
+            if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
+                String[] pairs = line.trim().split(WHITESPACE_REGEX);
 
-            if (elements.length != 2) {
-                throw new OctopusException(adaptorName, "Got invalid key/value pair in output: " + pair);
+                for (String pair : pairs) {
+                    String[] elements = pair.split(EQUALS_REGEX, 2);
+
+                    if (elements.length != 2) {
+                        throw new OctopusException(adaptorName, "Got invalid key/value pair in output: \"" + pair + "\"");
+                    }
+
+                    result.put(elements[0].trim(), elements[1].trim());
+                }
             }
-
-            result.put(elements[0].trim(), elements[1].trim());
         }
 
         return result;
@@ -84,7 +91,7 @@ public class ScriptingParser {
     }
 
     /**
-     * Parses lines containing key/value pairs separated by the given separator possibly surrounded by whitespace. Will ignore
+     * Parses lines containing single key/value pairs separated by the given separator, possibly surrounded by whitespace. Will ignore
      * empty lines.
      * 
      * @param input

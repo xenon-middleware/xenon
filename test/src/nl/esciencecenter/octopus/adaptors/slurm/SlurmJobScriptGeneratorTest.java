@@ -16,6 +16,11 @@
 package nl.esciencecenter.octopus.adaptors.slurm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
@@ -26,6 +31,15 @@ import org.junit.Test;
  * 
  */
 public class SlurmJobScriptGeneratorTest {
+    
+    @Test
+    public void test00_constructorIsPrivate() throws Throwable {
+        Constructor<SlurmJobScriptGeneratorTest> constructor = SlurmJobScriptGeneratorTest.class.getDeclaredConstructor();
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+        constructor.setAccessible(true);
+        constructor.newInstance();
+        constructor.setAccessible(false);
+    }
 
     @Test
     public void testEmptyDescription() throws OctopusException {

@@ -185,6 +185,18 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
     }
 
+    private static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName,
+            Scheduler scheduler) {
+        Map<String, String> queueInfo = info.get(queueName);
+
+        if (queueInfo == null) {
+            LOGGER.debug("queue {} not found", queueName);
+            return null;
+        }
+
+        return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
+    }
+
     private static String identifiersAsCSList(Job[] jobs) {
         String result = null;
         for (Job job : jobs) {
@@ -284,15 +296,18 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
-        String identifier = job.getIdentifier();
-        String output = runCheckedCommand(null, "scancel", identifier);
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
 
-        if (!output.isEmpty()) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got unexpected output on cancelling job: " + output);
-        }
+    @Override
+    public String[] getQueueNames() {
+        return queueNames.clone();
+    }
 
-        return getJobStatus(job);
+    @Override
+    public String getDefaultQueueName() {
+        return defaultQueueName;
     }
 
     private SlurmConfig getConfiguration(boolean ignoreVersion) throws OctopusIOException, OctopusException {
@@ -303,219 +318,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of", "Slurmctld(primary/backup) at");
 
         return new SlurmConfig(info, ignoreVersion);
-    }
-
-    @Override
-    public String getDefaultQueueName() {
-        return defaultQueueName;
-    }
-
-    @Override
-    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
-        String output;
-
-        if (queueNames == null || queueNames.length == 0) {
-            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i");
-        } else {
-            checkQueueNames(queueNames);
-
-            //add a list of all requested queues
-            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
-                    "--partitions=" + CommandLineUtils.asCSList(getQueueNames()));
-        }
-
-        //Job id's are on separate lines, on their own.
-        String[] jobIdentifiers = output.split(ScriptingParser.WHITESPACE_REGEX);
-
-        Job[] result = new Job[jobIdentifiers.length];
-
-        for (int i = 0; i < result.length; i++) {
-            result[i] = new JobImplementation(scheduler, jobIdentifiers[i], false, false);
-        }
-
-        return result;
-    }
-
-    @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
-
-        //try the queue first
-        Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(job);
-        JobStatus result = getJobStatusFromSqueueInfo(sQueueInfo, job);
-
-        //try the accounting next (if available)
-        if (result == null) {
-            Map<String, Map<String, String>> sacctInfo = getSacctInfo(job);
-            result = getJobStatusFromSacctInfo(sacctInfo, job);
-        }
-
-        //check scontrol last
-        if (result == null) {
-            result = getJobStatusFromSControl(job);
-        }
-
-        //job not found anywhere, give up
-        if (result == null) {
-            throw new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: " + job);
-        }
-
-        return result;
-    }
-
-    @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException {
-        JobStatus[] result = new JobStatus[jobs.length];
-
-        //fetch queue info for all jobs in one go
-        Map<String, Map<String, String>> squeueInfo = getSqueueInfo(jobs);
-
-        //fetch accounting info for all jobs in one go
-        Map<String, Map<String, String>> sacctInfo = getSacctInfo(jobs);
-
-        //loop over all jobs looking for status in info maps
-        for (int i = 0; i < jobs.length; i++) {
-            //job not requested at all
-            if (jobs[i] == null) {
-                result[i] = null;
-            } else {
-                result[i] = getJobStatusFromSqueueInfo(squeueInfo, jobs[i]);
-
-                //this job is not in the queue check sacct next (if available)
-                if (result[i] == null) {
-                    result[i] = getJobStatusFromSacctInfo(sacctInfo, jobs[i]);
-                }
-
-                //this job is not in the queue nor sacct, check scontrol last.
-                //will run an additional command
-                if (result[i] == null) {
-                    result[i] = getJobStatusFromSControl(jobs[i]);
-                }
-
-                //job really does not seem to exist (anymore)
-                if (result[i] == null) {
-                    NoSuchJobException exception = new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: "
-                            + jobs[i].getIdentifier());
-                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
-                }
-            }
-        }
-        return result;
-    }
-
-    private JobStatus getJobStatusFromSControl(Job job) throws OctopusIOException, OctopusException {
-        RemoteCommandRunner runner = runCommand(null, "scontrol", "-o", "show", "job", job.getIdentifier());
-
-        if (!runner.success()) {
-            LOGGER.debug("failed to get job status {}", runner);
-            return null;
-        }
-
-        Map<String, String> info = ScriptingParser.parseKeyValuePairs(runner.getStdout(), SlurmAdaptor.ADAPTOR_NAME);
-
-        return getJobStatusFromScontrolInfo(info, job);
-    }
-
-    @Override
-    public String[] getQueueNames() {
-        return queueNames.clone();
-    }
-
-    @Override
-    public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
-
-        Map<String, Map<String, String>> info = getSinfo(queueName);
-
-        if (!info.containsKey(queueName)) {
-            throw new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "cannot get status of requested queue: \"" + queueName
-                    + "\"");
-        }
-
-        return new QueueStatusImplementation(getScheduler(), queueName, null, info.get(queueName));
-    }
-
-    @Override
-    public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws OctopusIOException, OctopusException {
-        String[] queueNames;
-
-        if (requestedQueueNames.length == 0) {
-            queueNames = getQueueNames();
-        } else {
-            queueNames = requestedQueueNames;
-        }
-
-        Map<String, Map<String, String>> info = getSinfo(queueNames);
-
-        QueueStatus[] result = new QueueStatus[queueNames.length];
-
-        for (int i = 0; i < queueNames.length; i++) {
-            if (queueNames[i] == null) {
-                result[i] = null;
-            } else {
-                Map<String, String> queueInfo = info.get(queueNames[i]);
-
-                if (queueInfo == null || queueInfo.isEmpty()) {
-                    Exception exception = new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
-                            + queueNames[i] + " from server");
-                    result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
-                } else {
-                    result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, queueInfo);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws OctopusException, OctopusIOException {
-        if (!config.accountingAvailable()) {
-            return new HashMap<String, Map<String, String>>();
-        }
-
-        //this command will not complain if the job given does not exist
-        RemoteCommandRunner runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
-                + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
-                + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + identifiersAsCSList(jobs));
-
-        if (runner.getExitCode() != 0) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
-        }
-
-        if (!runner.getStderr().isEmpty()) {
-            LOGGER.warn("Sacct produced error output: " + runner.getStderr());
-        }
-
-        return ScriptingParser.parseTable(runner.getStdout(), "JobID", ScriptingParser.BAR_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
-                "~");
-    }
-
-    @Override
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
-    String cleanValue(String value) {
-        //remove status annotations
-        if (value.endsWith("*") || value.endsWith("~")) {
-            return value.substring(0, value.length() - 1);
-        } else {
-            return value;
-        }
-    }
-
-    private Map<String, Map<String, String>> getSinfo(String... partitions) throws OctopusIOException, OctopusException {
-        String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
-                "--partition=" + CommandLineUtils.asCSList(partitions));
-
-        return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
-                "~");
-    }
-
-    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException, OctopusIOException {
-        String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs="
-                + identifiersAsCSList(jobs));
-
-        return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
-                "*", "~");
     }
 
     @Override
@@ -549,6 +351,210 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 "Granted job allocation");
 
         return new JobImplementation(getScheduler(), Long.toString(jobID), description, false, false);
+    }
+
+    @Override
+    public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
+        String identifier = job.getIdentifier();
+        String output = runCheckedCommand(null, "scancel", identifier);
+
+        if (!output.isEmpty()) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Got unexpected output on cancelling job: " + output);
+        }
+
+        return getJobStatus(job);
+    }
+
+    @Override
+    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
+        String output;
+
+        if (queueNames == null || queueNames.length == 0) {
+            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i");
+        } else {
+            checkQueueNames(queueNames);
+
+            //add a list of all requested queues
+            output = runCheckedCommand(null, "squeue", "--noheader", "--format=%i",
+                    "--partitions=" + CommandLineUtils.asCSList(getQueueNames()));
+        }
+
+        //Job id's are on separate lines, on their own.
+        String[] jobIdentifiers = ScriptingParser.parseList(output);
+
+        Job[] result = new Job[jobIdentifiers.length];
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = new JobImplementation(scheduler, jobIdentifiers[i], false, false);
+        }
+
+        return result;
+    }
+
+    private Map<String, String> getSControlInfo(Job job) throws OctopusIOException, OctopusException {
+        RemoteCommandRunner runner = runCommand(null, "scontrol", "show", "job", job.getIdentifier());
+
+        if (!runner.success()) {
+            LOGGER.debug("failed to get job status {}", runner);
+            return null;
+        }
+
+        //tell parser to ignore lines with the WorkDir and Command, as any spaces in the working dir value will confuse the parser
+        return ScriptingParser.parseKeyValuePairs(runner.getStdout(), SlurmAdaptor.ADAPTOR_NAME, "WorkDir=", "Command=");
+    }
+
+    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException, OctopusIOException {
+        String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs="
+                + identifiersAsCSList(jobs));
+
+        return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
+                "*", "~");
+    }
+
+    private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws OctopusIOException, OctopusException {
+        String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
+                "--partition=" + CommandLineUtils.asCSList(partitions));
+
+        return ScriptingParser.parseTable(output, "PARTITION", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
+                "~");
+    }
+
+    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws OctopusException, OctopusIOException {
+        if (!config.accountingAvailable()) {
+            return new HashMap<String, Map<String, String>>();
+        }
+
+        //this command will not complain if the job given does not exist
+        //but it may produce output on stderr when it finds non-standard lines in the accounting log
+        RemoteCommandRunner runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+                + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
+                + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + identifiersAsCSList(jobs));
+
+        if (runner.getExitCode() != 0) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
+        }
+
+        if (!runner.getStderr().isEmpty()) {
+            LOGGER.warn("Sacct produced error output: " + runner.getStderr());
+        }
+
+        return ScriptingParser.parseTable(runner.getStdout(), "JobID", ScriptingParser.BAR_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
+                "~");
+    }
+
+    @Override
+    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
+
+        //try the queue first
+        Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(job);
+        JobStatus result = getJobStatusFromSqueueInfo(sQueueInfo, job);
+
+        //try the accounting (if available)
+        if (result == null) {
+            Map<String, Map<String, String>> sacctInfo = getSacctInfo(job);
+            result = getJobStatusFromSacctInfo(sacctInfo, job);
+        }
+        
+        //check scontrol.
+        if (result == null) {
+            Map<String, String> scontrolInfo = getSControlInfo(job);
+            result = getJobStatusFromScontrolInfo(scontrolInfo, job);
+        }
+
+        //job not found anywhere, give up
+        if (result == null) {
+            throw new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: " + job);
+        }
+
+        return result;
+    }
+
+    @Override
+    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException {
+        JobStatus[] result = new JobStatus[jobs.length];
+
+        //fetch queue info for all jobs in one go
+        Map<String, Map<String, String>> squeueInfo = getSqueueInfo(jobs);
+
+        //fetch accounting info for all jobs in one go
+        Map<String, Map<String, String>> sacctInfo = getSacctInfo(jobs);
+
+        //loop over all jobs looking for status in info maps
+        for (int i = 0; i < jobs.length; i++) {
+            //job not requested at all
+            if (jobs[i] == null) {
+                result[i] = null;
+            } else {
+                //Check the squeue info.
+                result[i] = getJobStatusFromSqueueInfo(squeueInfo, jobs[i]);
+
+                //Check sacct info. (if available)
+                if (result[i] == null) {
+                    result[i] = getJobStatusFromSacctInfo(sacctInfo, jobs[i]);
+                }
+                
+                //Check scontrol. Will run an additional command.
+                if (result[i] == null) {
+                    Map<String, String> scontrolInfo = getSControlInfo(jobs[i]);
+                    result[i] = getJobStatusFromScontrolInfo(scontrolInfo, jobs[i]);
+                }
+
+                //job really does not seem to exist (anymore)
+                if (result[i] == null) {
+                    NoSuchJobException exception = new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job: "
+                            + jobs[i].getIdentifier());
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
+        Map<String, Map<String, String>> info = getSinfoInfo(queueName);
+
+        QueueStatus result = getQueueStatusFromSInfo(info, queueName, getScheduler());
+
+        if (result == null) {
+            throw new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "cannot get status of queue \"" + queueName
+                    + "\" from server");
+        }
+
+        return result;
+    }
+
+    @Override
+    public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws OctopusIOException, OctopusException {
+        String[] queueNames;
+
+        if (requestedQueueNames == null) {
+            throw new IllegalArgumentException("list of queue names cannot be null");
+        } else if (requestedQueueNames.length == 0) {
+            queueNames = getQueueNames();
+        } else {
+            queueNames = requestedQueueNames;
+        }
+
+        Map<String, Map<String, String>> info = getSinfoInfo(queueNames);
+
+        QueueStatus[] result = new QueueStatus[queueNames.length];
+
+        for (int i = 0; i < queueNames.length; i++) {
+            if (queueNames[i] == null) {
+                result[i] = null;
+            } else {
+                result[i] = getQueueStatusFromSInfo(info, queueNames[i], getScheduler());
+
+                if (result[i] == null) {
+                    Exception exception = new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "Cannot get status of queue \""
+                            + queueNames[i] + "\" from server");
+                    result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
+                }
+            }
+        }
+        return result;
+
     }
 
 }
