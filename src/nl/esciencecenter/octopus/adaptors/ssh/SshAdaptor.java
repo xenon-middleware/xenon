@@ -126,7 +126,7 @@ public class SshAdaptor extends Adaptor {
 
     public SshAdaptor(OctopusEngine octopusEngine, JSch jsch, Map<String,String> properties) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME,
-                new OctopusProperties(VALID_PROPERTIES, properties));
+                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties));
 
         this.filesAdaptor = new SshFiles(this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
@@ -268,9 +268,9 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected SshSession createNewSession(URI location, Credential credential, OctopusProperties properties)
+    protected SshMultiplexedSession createNewSession(URI location, Credential credential, OctopusProperties properties)
             throws OctopusException, OctopusIOException {
-        return new SshSession(this, jsch, location, credential, properties);
+        return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
 
     @Override

@@ -73,9 +73,9 @@ public class LocalAdaptor extends Adaptor {
     
     /** The properties supported by this adaptor */
     private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
-        new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.SCHEDULER), 
+        new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
                 "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-        new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.SCHEDULER), 
+        new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
                 "4", "The maximum number of concurrent jobs in the multiq.."),
     };
     
@@ -90,9 +90,9 @@ public class LocalAdaptor extends Adaptor {
 
     public LocalAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, 
-                new OctopusProperties(VALID_PROPERTIES, properties));
+                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties));
 
-        localFiles = new LocalFiles(this, octopusEngine);
+        localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
         localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWDFileSystem(), octopusEngine);
         localCredentials = new LocalCredentials();
     }

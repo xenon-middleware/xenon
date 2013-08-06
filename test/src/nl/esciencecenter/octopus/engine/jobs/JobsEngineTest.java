@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.net.URI;
 import java.util.HashMap;
 
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -34,9 +35,9 @@ import org.junit.Test;
 public class JobsEngineTest {
 
     @Test
-    public void testToString() throws OctopusException {
+    public void testToString() throws Exception {
 
-        OctopusEngine oe = new OctopusEngine(new HashMap<String,String>());
+        OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         assertTrue(je.toString().equals("JobsEngine [octopusEngine=" + oe + "]"));
@@ -45,7 +46,7 @@ public class JobsEngineTest {
     @Test
     public void testGetJobStatusesWithException() throws Exception {
 
-        OctopusEngine oe = new OctopusEngine(new HashMap<String,String>());
+        OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         JobDescription desc = new JobDescription();
@@ -67,7 +68,7 @@ public class JobsEngineTest {
     @Test
     public void testGetJobStatusesWithException2() throws Exception {
 
-        OctopusEngine oe = new OctopusEngine(new HashMap<String,String>());
+        OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         JobDescription desc = new JobDescription();

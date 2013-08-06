@@ -173,7 +173,7 @@ public class MultiJobTest {
     }
 
     @org.junit.Test
-    public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
-        submitToQueueWithPolling("test33a_unlimited", "unlimited", 100);
+    public void testMultiBatchJobSubmitWithPolling() throws Exception {
+        submitToQueueWithPolling("testMultiBatchJobSubmitWithPolling", "unlimited", 100);
     }
 }

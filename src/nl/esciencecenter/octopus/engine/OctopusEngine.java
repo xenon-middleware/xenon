@@ -65,9 +65,6 @@ public class OctopusEngine implements Octopus {
     /** All our own queue properties start with this prefix. */
     public static final String ADAPTORS = PREFIX + "adaptors.";
 
-    /** All our own queue properties start with this prefix. */
-    public static final String LOAD = ADAPTORS + "load";
-
     /** All OctopusEngines created so far */
     private static final List<OctopusEngine> OCTOPUS_ENGINES = new ArrayList<OctopusEngine>();
 
@@ -148,7 +145,7 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public OctopusEngine(Map<String,String> properties) throws OctopusException {
+    private OctopusEngine(Map<String,String> properties) throws OctopusException {
         
         // Store the properties for later reference.
         if (properties == null) { 
@@ -156,16 +153,14 @@ public class OctopusEngine implements Octopus {
         } else { 
             this.properties = Collections.unmodifiableMap(new HashMap<String, String>(properties));
         }
+
+        // NOTE: Order is important here! We initialize the abstract engines first, as the adaptors may want to use them!
+        filesEngine = new FilesEngine(this);
+        jobsEngine = new JobsEngine(this);
+        credentialsEngine = new CredentialsEngineImplementation(this);
+        copyEngine = new CopyEngine(filesEngine);
         
         adaptors = loadAdaptors(this.properties);
-
-        filesEngine = new FilesEngine(this);
-
-        jobsEngine = new JobsEngine(this);
-
-        credentialsEngine = new CredentialsEngineImplementation(this);
-
-        copyEngine = new CopyEngine(filesEngine);
 
         LOGGER.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
@@ -291,7 +286,7 @@ public class OctopusEngine implements Octopus {
         return true;
     }
 
-    public void end() {
+    private void end() {
         if (setEnd()) {
             copyEngine.done();
             for (Adaptor adaptor : adaptors) {

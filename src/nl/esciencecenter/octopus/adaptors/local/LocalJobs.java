@@ -31,6 +31,7 @@ import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -56,7 +57,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
     private final JobQueues jobQueues;
 
-    public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, FileSystem cwd, OctopusEngine octopusEngine)
+    public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, FileSystem cwd, OctopusEngine engine)
             throws OctopusException {
 
         this.localAdaptor = localAdaptor;
@@ -70,8 +71,8 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
         int multiQThreads = properties.getIntegerProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         int pollingDelay = properties.getIntegerProperty(LocalAdaptor.POLLING_DELAY);
 
-        jobQueues =
-                new JobQueues(LocalAdaptor.ADAPTOR_NAME, octopusEngine, localScheduler, cwd, this, multiQThreads, pollingDelay);
+        jobQueues = new JobQueues(LocalAdaptor.ADAPTOR_NAME, engine.files(), localScheduler, cwd, this, multiQThreads, 
+                pollingDelay);
     }
 
     @Override

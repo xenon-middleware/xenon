@@ -59,15 +59,15 @@ public class SshJobs implements Jobs {
      */
     static class SchedulerInfo {
 
-        private final SshSession session;
+        private final SshMultiplexedSession session;
         private final JobQueues jobQueues;
 
-        SchedulerInfo(SshSession session, JobQueues jobQueues) {
+        SchedulerInfo(SshMultiplexedSession session, JobQueues jobQueues) {
             this.session = session;
             this.jobQueues = jobQueues;
         }
         
-        SshSession getSession() { 
+        SshMultiplexedSession getSession() { 
             return session;
         }
         
@@ -107,7 +107,7 @@ public class SshJobs implements Jobs {
         
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
         
-        SshSession session = adaptor.createNewSession(location, credential, p);
+        SshMultiplexedSession session = adaptor.createNewSession(location, credential, p);
         
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, 
                 new String[] { "single", "multi", "unlimited" }, credential, p, true, true, true);
@@ -121,8 +121,8 @@ public class SshJobs implements Jobs {
         long pollingDelay = p.getLongProperty(SshAdaptor.POLLING_DELAY);
         int multiQThreads = p.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT);
         
-        JobQueues jobQueues =
-                new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, multiQThreads, pollingDelay);
+        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine.files(), scheduler, fs, factory, multiQThreads,
+                pollingDelay);
 
         synchronized (this) {
             schedulers.put(uniqueID, new SchedulerInfo(session, jobQueues));

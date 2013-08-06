@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
@@ -33,6 +32,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -59,7 +59,7 @@ public class JobQueues {
     
     private final String adaptorName;
 
-    private final Octopus myOctopus;
+    private final Files myFiles;
 
     private final Scheduler myScheduler;
 
@@ -83,14 +83,14 @@ public class JobQueues {
 
     private int jobID = 0;
 
-    public JobQueues(String adaptorName, Octopus myOctopus, Scheduler myScheduler, FileSystem myFileSystem,
+    public JobQueues(String adaptorName, Files myFiles, Scheduler myScheduler, FileSystem myFileSystem,
             InteractiveProcessFactory factory, int multiQThreads, long pollingDelay) throws BadParameterException {
 
         LOGGER.debug("Creating JobQueues for Adaptor {} with multiQThreads: {} and pollingDelay: {}",
                 adaptorName, multiQThreads, pollingDelay);
 
         this.adaptorName = adaptorName;
-        this.myOctopus = myOctopus;
+        this.myFiles = myFiles;
         this.myScheduler = myScheduler;
         this.myFileSystem = myFileSystem;
         this.factory = factory;
@@ -360,7 +360,7 @@ public class JobQueues {
 
         LOGGER.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
 
-        JobExecutor executor = new JobExecutor(adaptorName, myOctopus.files(), myFileSystem, factory, result, pollingDelay);
+        JobExecutor executor = new JobExecutor(adaptorName, myFiles, myFileSystem, factory, result, pollingDelay);
 
         String queueName = description.getQueueName();
 
