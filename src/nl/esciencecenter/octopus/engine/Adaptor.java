@@ -38,20 +38,21 @@ public abstract class Adaptor {
     private final String name;
     private final String description;
     private final String[] supportedSchemes;
+    private final OctopusPropertyDescription [] validProperties;
     private final OctopusProperties properties;
     private final OctopusEngine octopusEngine;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusProperties properties) throws OctopusException {
+            OctopusPropertyDescription [] validProperties, OctopusProperties properties) throws OctopusException {
 
         super();
 
         this.octopusEngine = octopusEngine;
         this.name = name;
         this.description = description;
-        this.properties = properties;
         this.supportedSchemes = supportedSchemes;
-
+        this.validProperties = validProperties;
+        this.properties = properties;
     }
 
     protected OctopusEngine getOctopusEngine() { 
@@ -78,13 +79,17 @@ public abstract class Adaptor {
     }
 
     public OctopusPropertyDescription [] getSupportedProperties() {
-        return properties.getSupportedProperties();
+        return validProperties.clone();
     }
     
     public OctopusPropertyDescription [] getSupportedProperties(Level level) {
+        
         ArrayList<OctopusPropertyDescription> tmp = new ArrayList<>();
         
-        for (OctopusPropertyDescription d : getSupportedProperties()) { 
+        for (int i=0;i<validProperties.length;i++) { 
+
+            OctopusPropertyDescription d = validProperties[i];
+            
             if (d.getLevels().contains(level)) { 
                 tmp.add(d);
             }

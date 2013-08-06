@@ -89,7 +89,7 @@ public class LocalAdaptor extends Adaptor {
     private final LocalCredentials localCredentials;
 
     public LocalAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, 
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, 
                 new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
