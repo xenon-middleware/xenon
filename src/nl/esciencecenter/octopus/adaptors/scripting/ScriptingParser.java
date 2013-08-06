@@ -36,7 +36,7 @@ public class ScriptingParser {
     public static final String BAR_REGEX = "\\s*\\|\\s*";
 
     public static final String NEWLINE_REGEX = "\\r?\\n";
-
+    
     public static final String EQUALS_REGEX = "\\s*=\\s*";
 
     private ScriptingParser() {
@@ -73,9 +73,9 @@ public class ScriptingParser {
         return result;
     }
 
-    //returns if the given input matches ant of the expressions given
-    private static boolean containsAny(String input, String[] ignoredSequences) {
-        for (String string : ignoredSequences) {
+    //returns if the given input contains any of the expressions given
+    protected static boolean containsAny(String input, String... options) {
+        for (String string : options) {
             if (input.contains(string)) {
                 return true;
             }
@@ -143,7 +143,8 @@ public class ScriptingParser {
 
                 //see if anything remains
                 if (jobId.length() == 0) {
-                    throw new OctopusException(adaptorName, "failed to get jobID from line: \"" + input + "\"");
+                    throw new OctopusException(adaptorName, "failed to get jobID from line: \"" + input
+                            + "\" Line did not contain job ID.");
                 }
 
                 //cut of anything after the job id
@@ -161,13 +162,24 @@ public class ScriptingParser {
                 + "\" Line does not match expected prefixes: " + Arrays.toString(possiblePrefixes));
     }
 
-    private static String cleanValue(String value, String[] suffixes) {
+    /**
+     * Trims value, remove suffixes if present. Only supports removing a single suffix.
+     * 
+     * @param value
+     *            the value to clean
+     * @param suffixes
+     *            the possible suffixes to remove
+     * @return
+     */
+    protected static String cleanValue(String value, String... suffixes) {
+        String trimmed = value.trim();
+
         for (String suffix : suffixes) {
-            if (value.endsWith(suffix)) {
-                return value.substring(0, value.length() - suffix.length()).trim();
+            if (trimmed.endsWith(suffix)) {
+                return trimmed.substring(0, trimmed.length() - suffix.length());
             }
         }
-        return value.trim();
+        return trimmed;
     }
 
     /**
@@ -195,14 +207,22 @@ public class ScriptingParser {
             String adaptorName, String... valueSuffixes) throws OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
-        String[] lines = input.split(NEWLINE_REGEX);
-
-        if (lines.length == 0) {
+        if (input.isEmpty()) {
             throw new OctopusException(adaptorName, "Cannot parse table, Got no input, expected at least a header");
         }
 
+        String[] lines = input.split(NEWLINE_REGEX);
+
         //the first line will contain the fields
         String[] fields = lines[0].split(fieldSeparatorRegEx);
+
+        for (int i = 0; i < fields.length; i++) {
+            fields[i] = fields[i].trim();
+            
+            if (fields[i].isEmpty()) {
+                throw new OctopusException(adaptorName, "Output contains empty field name in line \"" + lines[0] + "\"");
+            }
+        }
 
         for (int i = 1; i < lines.length; i++) {
             String[] values = lines[i].split(fieldSeparatorRegEx);
@@ -229,7 +249,8 @@ public class ScriptingParser {
     }
 
     /**
-     * Checks if the given text contains any of the given options. Returns which option it contains.
+     * Checks if the given text contains any of the given options. Returns which option it contains, throws an exception if it
+     * doesn't.
      * 
      * @param input
      *            the input text to check
@@ -241,13 +262,13 @@ public class ScriptingParser {
      * @throws OctopusIOException
      *             in case the input does not contain any of the options given.
      */
-    public static int contains(String input, String adaptorName, String... options) throws OctopusIOException {
+    public static int checkIfContains(String input, String adaptorName, String... options) throws OctopusException {
         for (int i = 0; i < options.length; i++) {
             if (input.contains(options[i])) {
                 return i;
             }
         }
-        throw new OctopusIOException(adaptorName, "Output does not contain expected string: " + Arrays.toString(options));
+        throw new OctopusException(adaptorName, "Output does not contain expected string: " + Arrays.toString(options));
     }
 
     /**
@@ -278,7 +299,7 @@ public class ScriptingParser {
      * @throws OctopusIOException
      */
     public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, String separatorRegEx,
-            String adaptorName, String... ignoredLines) throws OctopusIOException {
+            String adaptorName, String... ignoredLines) throws OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         String[] lines = input.split(NEWLINE_REGEX);
@@ -290,8 +311,8 @@ public class ScriptingParser {
                 String[] elements = line.split(separatorRegEx, 2);
 
                 if (elements.length != 2) {
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in qconf output, got \""
-                            + line + "\" in qconf output");
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in output, got \""
+                            + line + "\"");
                 }
 
                 String key = elements[0].trim();
@@ -302,7 +323,7 @@ public class ScriptingParser {
                     currentMap = new HashMap<String, String>();
                     result.put(value, currentMap);
                 } else if (currentMap == null) {
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + keyField
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + keyField
                             + "\" on first line, got \"" + line + "\"");
                 }
                 currentMap.put(key, value);

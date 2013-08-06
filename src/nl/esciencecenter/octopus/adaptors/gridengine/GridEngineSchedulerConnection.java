@@ -350,7 +350,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         String killedOutput = "has registered the job " + identifier + " for deletion";
         String deletedOutput = "has deleted job " + identifier;
 
-        int matched = ScriptingParser.contains(qdelOutput, GridEngineAdaptor.ADAPTOR_NAME, killedOutput, deletedOutput);
+        int matched = ScriptingParser.checkIfContains(qdelOutput, GridEngineAdaptor.ADAPTOR_NAME, killedOutput, deletedOutput);
 
         //keep track of the deleted jobs.
         if (matched == 1) {
