@@ -33,10 +33,9 @@ public class SlurmJobScriptGeneratorTest {
 
         String result = SlurmJobScriptGenerator.generate(description, null);
 
-        String expected =
-                "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n"
-                        + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n\n"
-                        + "srun null\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --nodes=1\n"
+                + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n"
+                + "#SBATCH --error=/dev/null\n\n" + "srun null\n";
 
         assertEquals(expected, result);
     }
@@ -64,12 +63,11 @@ public class SlurmJobScriptGeneratorTest {
 
         String result = SlurmJobScriptGenerator.generate(description, null);
 
-        String expected =
-                "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --workdir='/some/working/directory'\n"
-                        + "#SBATCH --partition=the.queue\n" + "#SBATCH --nodes=5\n" + "#SBATCH --ntasks-per-node=55\n"
-                        + "#SBATCH --time=100\n" + "#SBATCH --input='stdin.file'\n" + "#SBATCH --output='stdout.file'\n"
-                        + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
-                        + "export some=\"environment.value\"\n\n" + "srun /bin/executable 'some' 'arguments'\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --workdir='/some/working/directory'\n"
+                + "#SBATCH --partition=the.queue\n" + "#SBATCH --nodes=5\n" + "#SBATCH --ntasks-per-node=55\n"
+                + "#SBATCH --time=100\n" + "#SBATCH --input='stdin.file'\n" + "#SBATCH --output='stdout.file'\n"
+                + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
+                + "export some=\"environment.value\"\n\n" + "srun /bin/executable 'some' 'arguments'\n";
 
         System.out.println(result);
 

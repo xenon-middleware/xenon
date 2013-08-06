@@ -46,8 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
-    
-    
+
     private static final Logger logger = LoggerFactory.getLogger(SlurmJobAdaptorTest.class);
 
     @BeforeClass
@@ -75,9 +74,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         AbsolutePath script = root.resolve(new RelativePath("script"));
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
 
-        String scriptContent = "#!/bin/bash\n" +
-        "#SBATCH -o " + stdout.getPath() + "\n" 
-                + "#SBATCH -e /dev/null\n" + "echo " + message;
+        String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
+                + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, scriptContent);
@@ -101,7 +99,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         }
 
         String outputContent = readFully(files.newInputStream(stdout));
-        
+
         logger.debug("got output " + outputContent);
 
         files.delete(stdout);
@@ -135,7 +133,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
     @Test
     public void slurm_test04_parallel_batchJob() throws Exception {
         String message = "Hello World! Test Slurm 04";
-        
+
         String workingDir = getWorkingDir("slurm_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
@@ -159,15 +157,15 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
-        
+
         if (!status.isDone()) {
             throw new Exception("Job not finished");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job did not finish properly", status.getException());
         }
-        
+
         String outputContent = readFully(files.newInputStream(stdout));
 
         files.delete(stdout);
@@ -176,13 +174,13 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         files.close(filesystem);
-        
+
         logger.debug("got back result: {}", outputContent);
 
         String[] lines = outputContent.split("\\r?\\n");
-        
+
         assertTrue(lines.length == 4);
-        for (String line: lines) {
+        for (String line : lines) {
             assertTrue(line.equals(message));
         }
     }

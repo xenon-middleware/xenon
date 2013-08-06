@@ -36,7 +36,7 @@ public class ScriptingParser {
     public static final String BAR_REGEX = "\\s*\\|\\s*";
 
     public static final String NEWLINE_REGEX = "\\r?\\n";
-    
+
     public static final String EQUALS_REGEX = "\\s*=\\s*";
 
     private ScriptingParser() {
@@ -218,7 +218,7 @@ public class ScriptingParser {
 
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();
-            
+
             if (fields[i].isEmpty()) {
                 throw new OctopusException(adaptorName, "Output contains empty field name in line \"" + lines[0] + "\"");
             }
@@ -311,8 +311,8 @@ public class ScriptingParser {
                 String[] elements = line.split(separatorRegEx, 2);
 
                 if (elements.length != 2) {
-                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in output, got \""
-                            + line + "\"");
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in output, got \"" + line
+                            + "\"");
                 }
 
                 String key = elements[0].trim();

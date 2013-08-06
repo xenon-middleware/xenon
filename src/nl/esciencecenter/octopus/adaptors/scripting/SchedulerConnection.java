@@ -97,7 +97,7 @@ public abstract class SchedulerConnection {
             throw new InvalidLocationException(adaptorName, "Fragments are not allowed in a uri for this scheduler, uri given: "
                     + location);
         }
-        
+
         if (location.getQuery() != null) {
             throw new InvalidLocationException(adaptorName, "Queries are not allowed in a uri for this scheduler, uri given: "
                     + location);

@@ -48,8 +48,8 @@ public class SchedulerConnectionTest {
 
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
-    
-    @Test(expected=IncompleteJobDescriptionException.class)
+
+    @Test(expected = IncompleteJobDescriptionException.class)
     public void verifyJobDescription_NoExecutable_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -57,8 +57,8 @@ public class SchedulerConnectionTest {
 
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
-    
-    @Test(expected=InvalidJobDescriptionException.class)
+
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_ZeroNodeCount_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -68,8 +68,7 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
 
-    
-    @Test(expected=InvalidJobDescriptionException.class)
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_NegativeNodeCount_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -79,7 +78,7 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
 
-    @Test(expected=InvalidJobDescriptionException.class)
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_ZeroProcessesPerNode_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -89,8 +88,7 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
 
-    
-    @Test(expected=InvalidJobDescriptionException.class)
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_NegativeProcessesPerNode_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -99,8 +97,8 @@ public class SchedulerConnectionTest {
 
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
-    
-    @Test(expected=InvalidJobDescriptionException.class)
+
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_ZeroMaxTime_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -110,8 +108,7 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
 
-    
-    @Test(expected=InvalidJobDescriptionException.class)
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_NegativeMaxTime_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -120,8 +117,8 @@ public class SchedulerConnectionTest {
 
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
-    
-    @Test(expected=InvalidJobDescriptionException.class)
+
+    @Test(expected = InvalidJobDescriptionException.class)
     public void verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
@@ -136,43 +133,41 @@ public class SchedulerConnectionTest {
         URI input = new URI("fake:///");
 
         URI expected = new URI("local:///");
-        
+
         URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-        
+
         assertEquals(expected, result);
     }
 
-    
     @Test
     public void getSubSchedulerLocation_HostGiven_SSHLocation() throws Exception {
         URI input = new URI("fake://some.host.nl");
 
         URI expected = new URI("ssh://some.host.nl");
-        
+
         URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-        
+
         assertEquals(expected, result);
     }
-    
+
     @Test
     public void getSubSchedulerLocation_SingleSlashPath_NoPathLocation() throws Exception {
         URI input = new URI("fake://some.host.nl/");
-        
+
         //note the path has been stripped
         URI expected = new URI("ssh://some.host.nl");
-        
+
         URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-        
+
         assertEquals(expected, result);
     }
-    
+
     @Test(expected = InvalidLocationException.class)
     public void getSubSchedulerLocation_LocationWithPath_ThrowsException() throws Exception {
         URI input = new URI("fake://some.host.nl/some/path");
 
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
-    
 
     @Test
     /**
@@ -184,27 +179,26 @@ public class SchedulerConnectionTest {
 
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake", "other.scheme", "valid");
     }
-    
+
     @Test(expected = InvalidLocationException.class)
     public void getSubSchedulerLocation_InvalidScheme_ThrowsException() throws Exception {
         URI input = new URI("illegal://some.host.nl/");
 
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
-    
+
     @Test(expected = InvalidLocationException.class)
     public void getSubSchedulerLocation_LocationWithFragment_ThrowsException() throws Exception {
         URI input = new URI("fake://some.host.nl#fragment");
 
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
-    
+
     @Test(expected = InvalidLocationException.class)
     public void getSubSchedulerLocation_LocationWithQuery_ThrowsException() throws Exception {
         URI input = new URI("fake://some.host.nl?whatsupdoc");
 
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
-    
 
 }

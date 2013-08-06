@@ -51,12 +51,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     private String defaultQueue;
     private String[] queues;
-    
+
     private long queueWaitTime;
     private long updateTime;
-    
+
     private String parallelEnvironment;
-    
+
     public GridEngineJobTestConfig(String configfile) throws Exception {
 
         super("gridengine");
@@ -80,15 +80,15 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
         String wrongLocation = getPropertyOrFail(p, "test.gridengine.location.wrong");
 
-        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");        
+        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
         String queueList = getPropertyOrFail(p, "test.gridengine.queues");
         queues = queueList.split("\\s*,\\s*");
 
         queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.queue.wait.time"));
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.update.time"));
-        
+
         parallelEnvironment = getPropertyOrFail(p, "test.gridengine.parallel.environment");
-        
+
         correctURI = new URI("ge://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
         correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
@@ -155,12 +155,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new HashMap<String,String>(), username, passwd);
+        return credentials.newPasswordCredential("ge", new HashMap<String, String>(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new HashMap<String,String>(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("ge", new HashMap<String, String>(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -205,35 +205,35 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public String getInvalidQueueName() throws Exception {
         return "aap";
     }
-    
+
     public boolean supportsProperties() throws Exception {
         return true;
     }
 
     @Override
-    public Map<String,String> getDefaultProperties() throws Exception {
-        Map<String,String> result = new HashMap<String,String>();
+    public Map<String, String> getDefaultProperties() throws Exception {
+        Map<String, String> result = new HashMap<String, String>();
         result.put("octopus.adaptors.gridengine.poll.delay", "100");
         return result;
     }
-    
-    public Map<String,String> getUnknownProperties() throws Exception {
-        Map<String,String> result = new HashMap<String,String>();
+
+    public Map<String, String> getUnknownProperties() throws Exception {
+        Map<String, String> result = new HashMap<String, String>();
         result.put("octopus.adaptors.gridengine.unknown.property", "some.value");
         return result;
     }
 
-    public Map<String,String>[] getInvalidProperties() throws Exception {
+    public Map<String, String>[] getInvalidProperties() throws Exception {
         Map[] result = new Map[1];
-        
-        result[0] = new HashMap<String,String>();
-        
+
+        result[0] = new HashMap<String, String>();
+
         result[0].put("octopus.adaptors.gridengine.poll.delay", "AAP");
         return result;
     }
 
-    public Map<String,String> getCorrectProperties() throws Exception {
-        Map<String,String> result = new HashMap<String,String>();
+    public Map<String, String> getCorrectProperties() throws Exception {
+        Map<String, String> result = new HashMap<String, String>();
         result.put("octopus.adaptors.gridengine.poll.delay", "100");
         return result;
     }
@@ -257,7 +257,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public boolean supportsParallelJobs() {
         return true;
     }
-    
+
     public String getParallelEnvironment() {
         return parallelEnvironment;
     }

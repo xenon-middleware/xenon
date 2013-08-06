@@ -44,7 +44,7 @@ public class SlurmConfigTest {
 
         assertTrue(config.accountingAvailable());
     }
-    
+
     @Test
     public void test_versionNumberWithPostfix() throws OctopusException {
 
@@ -78,7 +78,7 @@ public class SlurmConfigTest {
 
         new SlurmConfig(configInfo, false);
     }
-    
+
     @Test(expected = IncompatibleVersionException.class)
     public void test_invalidVersion_Exception() throws OctopusException {
         //Relevant part of config used in current implementation
@@ -88,7 +88,7 @@ public class SlurmConfigTest {
 
         new SlurmConfig(configInfo, false);
     }
-    
+
     @Test(expected = IncompatibleVersionException.class)
     public void test_invalidVersionWithNoPeriod_Exception() throws OctopusException {
         //Relevant part of config used in current implementation
@@ -111,7 +111,7 @@ public class SlurmConfigTest {
         //check if the rest of the config is actually done
         assertTrue(config.accountingAvailable());
     }
-    
+
     @Test(expected = OctopusException.class)
     public void test_noAccountingConfig_Exception() throws OctopusException {
         //Relevant part of config used in current implementation
@@ -120,8 +120,5 @@ public class SlurmConfigTest {
 
         new SlurmConfig(configInfo, false);
     }
-
-    
-    
 
 }
