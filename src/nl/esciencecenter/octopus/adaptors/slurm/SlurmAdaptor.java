@@ -50,6 +50,9 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     /** Should the slurm version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
+    /** Should the accounting usage be disabled? */
+    public static final String DISABLE_ACCOUNTING_USAGE = PREFIX + "disable.accounting.usage";
+
     /** Polling delay for jobs started by this adaptor. */
     public static final String POLL_DELAY_PROPERTY = PREFIX + "poll.delay";
 
@@ -62,6 +65,9 @@ public class SlurmAdaptor extends ScriptingAdaptor {
             new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
                     "false", "Skip version check is skipped when connecting to remote machines. "
                             + "WARNING: it is not recommended to use this setting in production environments!"),
+
+            new OctopusPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+                    "false", "Do not used accounting info of slurm, even when available. Mostly for testing purposes"),
 
             new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
                     "Number of milliseconds between polling the status of a job."), };
@@ -76,9 +82,9 @@ public class SlurmAdaptor extends ScriptingAdaptor {
      * @throws OctopusException
      *             if the adaptor creation fails.
      */
-    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {    
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, 
-                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties), new SlurmSchedulerConnectionFactory());
+    public SlurmAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, new OctopusProperties(
+                VALID_PROPERTIES, Level.OCTOPUS, properties), new SlurmSchedulerConnectionFactory());
     }
 
     @Override

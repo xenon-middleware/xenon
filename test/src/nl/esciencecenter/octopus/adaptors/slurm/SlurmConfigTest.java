@@ -40,7 +40,7 @@ public class SlurmConfigTest {
         configInfo.put("SLURM_VERSION", "2.3.4");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
-        SlurmConfig config = new SlurmConfig(configInfo, false);
+        SlurmConfig config = new SlurmConfig(configInfo, false, false);
 
         assertTrue(config.accountingAvailable());
     }
@@ -53,7 +53,7 @@ public class SlurmConfigTest {
         configInfo.put("SLURM_VERSION", "2.5.withsomerandomextraversioninfo");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
-        SlurmConfig config = new SlurmConfig(configInfo, false);
+        SlurmConfig config = new SlurmConfig(configInfo, false, false);
 
         assertTrue(config.accountingAvailable());
     }
@@ -65,7 +65,19 @@ public class SlurmConfigTest {
         configInfo.put("SLURM_VERSION", "2.3.4");
         configInfo.put("AccountingStorageType", "accounting_storage/none");
 
-        SlurmConfig config = new SlurmConfig(configInfo, false);
+        SlurmConfig config = new SlurmConfig(configInfo, false, false);
+
+        assertFalse(config.accountingAvailable());
+    }
+    
+    @Test
+    public void test_forcedAccountingDisabled() throws OctopusException {
+        //Relevant part of config used in current implementation
+        Map<String, String> configInfo = new HashMap<String, String>();
+        configInfo.put("SLURM_VERSION", "2.3.4");
+        configInfo.put("AccountingStorageType", "accounting_storage/fixetxt");
+
+        SlurmConfig config = new SlurmConfig(configInfo, false, true);
 
         assertFalse(config.accountingAvailable());
     }
@@ -76,7 +88,7 @@ public class SlurmConfigTest {
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
-        new SlurmConfig(configInfo, false);
+        new SlurmConfig(configInfo, false, false);
     }
 
     @Test(expected = IncompatibleVersionException.class)
@@ -86,7 +98,7 @@ public class SlurmConfigTest {
         configInfo.put("SLURM_VERSION", "1.2.3");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
-        new SlurmConfig(configInfo, false);
+        new SlurmConfig(configInfo, false, false);
     }
 
     @Test(expected = IncompatibleVersionException.class)
@@ -96,7 +108,7 @@ public class SlurmConfigTest {
         configInfo.put("SLURM_VERSION", "2.5thereisnoperiodhere");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
-        new SlurmConfig(configInfo, false);
+        new SlurmConfig(configInfo, false, false);
     }
 
     @Test
@@ -106,7 +118,7 @@ public class SlurmConfigTest {
         configInfo.put("SLURM_VERSION", "1.2.3");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
-        SlurmConfig config = new SlurmConfig(configInfo, true);
+        SlurmConfig config = new SlurmConfig(configInfo, true, false);
 
         //check if the rest of the config is actually done
         assertTrue(config.accountingAvailable());
@@ -118,7 +130,7 @@ public class SlurmConfigTest {
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "2.3.4");
 
-        new SlurmConfig(configInfo, false);
+        new SlurmConfig(configInfo, false, false);
     }
 
 }

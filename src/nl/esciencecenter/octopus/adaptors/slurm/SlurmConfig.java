@@ -37,7 +37,7 @@ public class SlurmConfig {
     private final boolean accountingAvailable;
     private final String version;
 
-    SlurmConfig(Map<String, String> info, boolean ignoreVersion) throws OctopusException {
+    SlurmConfig(Map<String, String> info, boolean ignoreVersion, boolean disableAccounting) throws OctopusException {
         version = info.get("SLURM_VERSION");
 
         if (version == null) {
@@ -51,7 +51,8 @@ public class SlurmConfig {
         if (accountingType == null) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm config does not contain expected accounting info");
         }
-        accountingAvailable = !accountingType.equals("accounting_storage/none");
+
+        accountingAvailable = !(accountingType.equals("accounting_storage/none") || disableAccounting);
 
         LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
     }
