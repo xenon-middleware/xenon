@@ -34,7 +34,7 @@ public class SlurmJobScriptGeneratorTest {
     
     @Test
     public void test00_constructorIsPrivate() throws Throwable {
-        Constructor<SlurmJobScriptGeneratorTest> constructor = SlurmJobScriptGeneratorTest.class.getDeclaredConstructor();
+        Constructor<SlurmJobScriptGenerator> constructor = SlurmJobScriptGenerator.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance();
