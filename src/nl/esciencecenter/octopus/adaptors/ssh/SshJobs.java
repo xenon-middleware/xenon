@@ -121,8 +121,8 @@ public class SshJobs implements Jobs {
         long pollingDelay = p.getLongProperty(SshAdaptor.POLLING_DELAY);
         int multiQThreads = p.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT);
         
-        JobQueues jobQueues =
-                new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine, scheduler, fs, factory, multiQThreads, pollingDelay);
+        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine.files(), scheduler, fs, factory, multiQThreads,
+                pollingDelay);
 
         synchronized (this) {
             schedulers.put(uniqueID, new SchedulerInfo(session, jobQueues));

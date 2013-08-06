@@ -138,12 +138,10 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Before
     public void prepare() throws OctopusException {
-        //FIXME: this should be a scheduler option, not an adaptor option...
-        //FIXME: we should be able to pass properties to the test via the JobTestConfig...
-        Map<String, String> properties = new HashMap<>();
-        properties.put(SshAdaptor.POLLING_DELAY, "100");
-
-        octopus = OctopusFactory.newOctopus(properties);
+        // This is not an adaptor option, so it will throw an exception!
+        //Map<String, String> properties = new HashMap<>();
+        //properties.put(SshAdaptor.POLLING_DELAY, "100");
+        octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
         jobs = octopus.jobs();
         credentials = octopus.credentials();
@@ -151,7 +149,8 @@ public abstract class GenericJobAdaptorTestParent {
 
     @After
     public void cleanup() throws OctopusException {
-        OctopusFactory.endOctopus(octopus);
+        // OctopusFactory.endOctopus(octopus);
+        OctopusFactory.endAll();
     }
 
     protected String getWorkingDir(String testName) {

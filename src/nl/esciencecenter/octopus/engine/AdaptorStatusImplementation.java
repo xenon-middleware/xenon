@@ -57,6 +57,11 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
 
     @Override
     public OctopusPropertyDescription [] getSupportedProperties() {
+        
+        if (supportedProperties == null) { 
+            return new OctopusPropertyDescription[0];
+        }
+        
         return supportedProperties.clone();
     }
 

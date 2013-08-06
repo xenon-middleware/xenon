@@ -84,7 +84,7 @@ public class OctopusPropertiesTest {
         
         OctopusProperties octprop = new OctopusProperties(supportedProperties, props);
         
-        assertEquals("{key=value, key2=value2}", octprop.toString());
+        assertEquals("{key2=value2, <<key=value>>}", octprop.toString());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class OctopusPropertiesTest {
         props.put("key2", "value2");
         
         OctopusProperties octprop = new OctopusProperties(supportedProperties, props).filter(Level.OCTOPUS);
-        assertEquals("{key=value}", octprop.toString());
+        assertEquals("{<<key=value>>}", octprop.toString());
     }
 
     //    @Test

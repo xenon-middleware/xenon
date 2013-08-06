@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
@@ -120,19 +121,19 @@ public class LocalDirectoryAttributeStreamTest {
     }
 
     @org.junit.Before
-    public void prepareTest() throws OctopusIOException, OctopusException {
+    public void prepareTest() throws Exception {
 
-        octopus = new OctopusEngine(null);
+        octopus = Util.createOctopusEngine(null);
         localAdaptor = new LocalAdaptor(octopus, new HashMap<String,String>());
-        localFiles = new LocalFiles(localAdaptor, octopus);
+        localFiles = new LocalFiles(localAdaptor, octopus.getCopyEngine());
         fs = localFiles.getLocalCWDFileSystem();
         root = fs.getEntryPath();
         testDir = root.resolve(new RelativePath(TEST_DIR));
     }
 
     @org.junit.After
-    public void cleanupTest() throws OctopusIOException, OctopusException {
-        octopus.end();
+    public void cleanupTest() throws Exception {
+        Util.endOctopusEngine(octopus);
     }
 
     @org.junit.Test(expected = OctopusIOException.class)

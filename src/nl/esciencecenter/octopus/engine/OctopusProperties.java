@@ -71,6 +71,17 @@ public class OctopusProperties {
         properties = new HashMap<>();
     }
     
+    /** 
+     * Create a new OctopusProperties that will support the properties in <code>supportedProperties</code>. All properties in
+     * <code>properties</code> will be added.  
+     *    
+     * @param supportedProperties the properties to support 
+     * @param properties the set of properties to store
+     * @throws UnknownPropertyException if key is found in <code>properties</code> that is not listed in 
+     *                                          <code>supportedProperties</code>
+     * @throws InvalidPropertyException if a key from <code>properties</code> has a value that does not match the type as listed 
+     *                                          in <code>supportedProperties</code>
+     */
     public OctopusProperties(OctopusPropertyDescription [] supportedProperties, Map<String,String> properties) 
             throws UnknownPropertyException, InvalidPropertyException {
         
@@ -86,6 +97,34 @@ public class OctopusProperties {
         addProperties(properties);
     }
     
+    /** 
+     * Create a new OctopusProperties that will support the properties in <code>supportedProperties</code> that are valid at level
+     * <code>level</code>. All properties in <code>properties</code> will be added.  
+     *    
+     * @param supportedProperties the properties to support 
+     * @param level
+     * @param properties the set of properties to store
+     * @throws UnknownPropertyException if key is found in <code>properties</code> that is not listed in  
+     *                                          <code>supportedProperties</code>, or not listed at level <code>level</code>.
+     * @throws InvalidPropertyException if a key from <code>properties</code> has a value that does not match the type as listed 
+     *                                          in <code>supportedProperties</code>. 
+     */
+    public OctopusProperties(OctopusPropertyDescription [] supportedProperties, Level level, Map<String,String> properties) 
+            throws UnknownPropertyException, InvalidPropertyException {
+        
+        super();
+        
+        this.supportedProperties = new HashMap<>();
+        this.properties = new HashMap<>();
+        
+        for (OctopusPropertyDescription d : supportedProperties) {
+            if (d.getLevels().contains(level)) { 
+                this.supportedProperties.put(d.getName(), d);
+            }
+        }
+        
+        addProperties(properties);
+    }
     
     /**
      * Adds the specified properties to the current ones and checks if their names and types are correct.
@@ -127,7 +166,9 @@ public class OctopusProperties {
         try { 
             switch (t) { 
             case BOOLEAN:
-                Boolean.valueOf(value);
+                if (!(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false"))) { 
+                    throw new IllegalArgumentException("Not a boolean value: " + value);
+                }
                 break;            
             case INTEGER:
                 Integer.valueOf(value);

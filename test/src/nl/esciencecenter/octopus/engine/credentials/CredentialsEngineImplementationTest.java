@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -37,13 +38,13 @@ public class CredentialsEngineImplementationTest {
     private static OctopusEngine octopusEngine;
 
     @BeforeClass
-    public static void prepare() throws OctopusException {
-        octopusEngine = new OctopusEngine(new HashMap<String,String>());
+    public static void prepare() throws Exception {
+        octopusEngine = Util.createOctopusEngine(null);
     }
 
     @AfterClass
-    public static void cleanup() {
-        octopusEngine.end();
+    public static void cleanup() throws Exception {
+        Util.endOctopusEngine(octopusEngine);
     }
 
     @org.junit.Test
