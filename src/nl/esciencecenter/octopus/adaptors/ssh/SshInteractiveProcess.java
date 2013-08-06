@@ -39,12 +39,12 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class SshInteractiveProcess implements InteractiveProcess {
 
-    private final SshSession session;
+    private final SshMultiplexedSession session;
     private final ChannelExec channel;
     private final Streams streams;
     private boolean done = false;
 
-    public SshInteractiveProcess(SshSession session, Job job) throws OctopusIOException {
+    public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws OctopusIOException {
 
         this.session = session;
         this.channel = session.getExecChannel();

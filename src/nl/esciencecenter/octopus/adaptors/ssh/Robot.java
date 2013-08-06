@@ -16,26 +16,47 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.io.IOException;
-
-import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
-import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
-import nl.esciencecenter.octopus.engine.util.InteractiveProcessFactory;
+import com.jcraft.jsch.UserInfo;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * 
+ *
  */
-public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
+class Robot implements UserInfo {
 
-    private final SshMultiplexedSession session;
+    private final boolean yesNo;
 
-    public SshInteractiveProcessFactory(SshMultiplexedSession session) {
-        this.session = session;
+    Robot(boolean yesyNo) {
+        this.yesNo = yesyNo;
     }
 
     @Override
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
-        return new SshInteractiveProcess(session, job);
+    public String getPassphrase() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public boolean promptPassphrase(String message) {
+        return false;
+    }
+
+    @Override
+    public boolean promptPassword(String message) {
+        return false;
+    }
+
+    @Override
+    public boolean promptYesNo(String message) {
+        return yesNo;
+    }
+
+    @Override
+    public void showMessage(String message) {
+        // ignored
     }
 }

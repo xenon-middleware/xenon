@@ -85,9 +85,9 @@ public class SshFiles implements Files {
      */
     static class FileSystemInfo {
         private final FileSystemImplementation impl;
-        private final SshSession session;
+        private final SshMultiplexedSession session;
 
-        public FileSystemInfo(FileSystemImplementation impl, SshSession session) {
+        public FileSystemInfo(FileSystemImplementation impl, SshMultiplexedSession session) {
             super();
             this.impl = impl;
             this.session = session;
@@ -97,7 +97,7 @@ public class SshFiles implements Files {
             return impl;
         }
 
-        public SshSession getSession() {
+        public SshMultiplexedSession getSession() {
             return session;
         }
     }
@@ -112,7 +112,7 @@ public class SshFiles implements Files {
         this.adaptor = sshAdaptor;
     }
 
-    protected FileSystem newFileSystem(SshSession session, URI location, Credential credential, OctopusProperties properties)
+    protected FileSystem newFileSystem(SshMultiplexedSession session, URI location, Credential credential, OctopusProperties properties)
             throws OctopusException, OctopusIOException {
 
         String uniqueID = getNewUniqueID();
@@ -151,12 +151,12 @@ public class SshFiles implements Files {
 
         OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Level.FILESYSTEM), properties);
 
-        SshSession session = adaptor.createNewSession(location, credential, octopusProperties);
+        SshMultiplexedSession session = adaptor.createNewSession(location, credential, octopusProperties);
 
         return newFileSystem(session, location, credential, octopusProperties);
     }
 
-    private SshSession getSession(AbsolutePath path) throws OctopusIOException {
+    private SshMultiplexedSession getSession(AbsolutePath path) throws OctopusIOException {
 
         FileSystemImplementation fs = (FileSystemImplementation) path.getFileSystem();
         FileSystemInfo info = fileSystems.get(fs.getUniqueID());
@@ -203,7 +203,7 @@ public class SshFiles implements Files {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Parent directory " + dir.getParent() + " does not exist!");
         }
 
-        SshSession session = getSession(dir);
+        SshMultiplexedSession session = getSession(dir);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
@@ -271,7 +271,7 @@ public class SshFiles implements Files {
             throw new NoSuchFileException(getClass().getName(), "Cannot delete file, as it does not exist");
         }
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
         
         FileAttributes att = getAttributes(path);
@@ -345,7 +345,7 @@ public class SshFiles implements Files {
         }
 
         // Ok, here, we just have a local move
-        SshSession session = getSession(target);
+        SshMultiplexedSession session = getSession(target);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
@@ -373,7 +373,7 @@ public class SshFiles implements Files {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         List<LsEntry> result = null;
@@ -423,7 +423,7 @@ public class SshFiles implements Files {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
@@ -468,7 +468,7 @@ public class SshFiles implements Files {
             mode = ChannelSftp.APPEND;
         }
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
@@ -483,7 +483,7 @@ public class SshFiles implements Files {
     @Override
     public AbsolutePath readSymbolicLink(AbsolutePath path) throws OctopusIOException {
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         AbsolutePath result = null;
@@ -533,7 +533,7 @@ public class SshFiles implements Files {
     @Override
     public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
@@ -548,7 +548,7 @@ public class SshFiles implements Files {
 
     private SftpATTRS stat(AbsolutePath path) throws OctopusIOException {
 
-        SshSession session = getSession(path);
+        SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         SftpATTRS result = null;
