@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.octopus.doc;
 
-import java.util.Arrays;
-
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
@@ -29,25 +27,25 @@ import nl.esciencecenter.octopus.OctopusPropertyDescription;
  */
 public class AdaptorDocGenerator {
     
-    private static void printPropertyDescription(OctopusPropertyDescription d) { 
-        System.out.println(" - name: " + d.getName());
-        System.out.println(" - type: " + d.getType());
-        System.out.println(" - levels: " + d.getLevels());
-        System.out.println(" - default: " + d.getDefaultValue());
-        System.out.println(" - description: " + d.getDescription());
-        System.out.println();
+    private static void printPropertyDescription(OctopusPropertyDescription d) {
+        
+        System.out.println("### `" + d.getName() + "` ###\n");
+        System.out.println(d.getDescription() + "\n");
+        System.out.println("Expected type: " + d.getType() + "\n");
+        System.out.println("Default value: " + d.getDefaultValue() + "\n");
+        System.out.println("Valid for: " + d.getLevels() + "\n\n");
    }
     
     private static void printAdaptorDoc(AdaptorStatus a) { 
         
-        System.out.println("Adaptor: __" + a.getName() + "__");
+        System.out.println("Adaptor: " + a.getName());
         System.out.println("--------");
     
         System.out.println();
         System.out.println(a.getDescription());
         System.out.println();
         
-        System.out.print("This adaptor supports the following schemes: ");
+        System.out.println("### Supported schemes: ###");
         
         String [] schemes = a.getSupportedSchemes();
         
@@ -61,8 +59,7 @@ public class AdaptorDocGenerator {
         System.out.println();
         System.out.println();
         
-        System.out.println("Supported properties: ");
-        System.out.println();
+        System.out.println("### Supported properties: ###\n\n");
         
         OctopusPropertyDescription [] properties = a.getSupportedProperties(); 
         
