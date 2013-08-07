@@ -42,8 +42,7 @@ public class CreatingCredential {
             Credentials credentials = octopus.credentials();
             
             // We can now retrieve the default credential for a certain scheme
-            Credential tmp = credentials.getDefaultCredential("file");
-            tmp = credentials.getDefaultCredential("ssh");
+            Credential tmp = credentials.getDefaultCredential("ssh");
             
             // We can also create other types of credentials
             tmp = credentials.newPasswordCredential("ssh", null, "username", "password".toCharArray());

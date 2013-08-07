@@ -266,7 +266,7 @@ public class JobExecutor implements Runnable {
             return;
         }
 
-        long time = System.currentTimeMillis();
+        //long time = System.currentTimeMillis();
         
         try { 
             wait(pollingDelay);
@@ -274,10 +274,10 @@ public class JobExecutor implements Runnable {
             // ignored
         }
         
-        long deltaT = System.currentTimeMillis() - time;
+        //long deltaT = System.currentTimeMillis() - time;
         
-        System.err.println("XXXXXXXXXX JobeExecutor woke up after " + deltaT + " ms. of " + pollingDelay + " ms. done=" + done + 
-                " updateSignal = " + updateSignal);
+        //System.err.println("XXXXXXXXXX JobeExecutor woke up after " + deltaT + " ms. of " + pollingDelay + " ms. done=" + done + 
+                //" updateSignal = " + updateSignal);
     }
     
     @Override

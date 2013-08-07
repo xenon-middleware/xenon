@@ -65,7 +65,7 @@ public class FileExists {
             
             // Check if the file exists 
             if (files.exists(path)) { 
-                System.out.println("File " + filename + " exist!");
+                System.out.println("File " + filename + " exists!");
             } else { 
                 System.out.println("File " + filename + " does not exist!");
             }
