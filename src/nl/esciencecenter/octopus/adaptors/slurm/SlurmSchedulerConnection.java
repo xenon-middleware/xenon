@@ -67,6 +67,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final String DONE_STATE = "COMPLETED";
 
+    private static final String RUNNING_STATE = "RUNNING";
+
     //get an exit code from the scontrol "ExitCode" output field
     protected static Integer exitcodeFromString(String value) throws OctopusException {
         if (value == null) {
@@ -94,21 +96,25 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         String jobID = jobInfo.get("JobID");
 
-        if (jobID == null || !jobID.equals(job.getIdentifier())) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct output. Returned job id \"" + jobID
+        if (jobID == null) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct info. Info does not contain job id");
+        }
+
+        if (!jobID.equals(job.getIdentifier())) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct info. Found job id \"" + jobID
                     + "\" does not match " + job.getIdentifier());
         }
 
         String state = jobInfo.get("State");
 
         if (state == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct output. Output does not contain job state");
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct info. Info does not contain job state");
         }
 
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
 
         Exception exception;
-        if (!isFailedState(state) || (state.equals("FAILED") && exitcode != 0)) {
+        if (!isFailedState(state) || (state.equals("FAILED") && (exitcode != null && exitcode != 0))) {
             //Not a failed state (non zero exit code does not count either), no error.
             exception = null;
         } else if (state.startsWith("CANCELLED")) {
@@ -117,7 +123,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"),
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals(RUNNING_STATE),
                 isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
@@ -126,22 +132,26 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws OctopusException {
-        if (jobInfo == null || jobInfo.isEmpty()) {
+        if (jobInfo == null) {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
         }
 
         String jobID = jobInfo.get("JobId");
 
-        if (jobID == null || !jobID.equals(job.getIdentifier())) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol output. Returned jobid \""
-                    + jobInfo.get("JobId") + "\" does not match " + job.getIdentifier());
+        if (jobID == null) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Info does not contain job ID");
+        }
+
+        if (!jobID.equals(job.getIdentifier())) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Found jobid \"" + jobInfo.get("JobId")
+                    + "\" does not match " + job.getIdentifier());
         }
 
         String state = jobInfo.get("JobState");
 
         if (state == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol output. Output does not contain job state");
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Info does not contain job state");
         }
 
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
@@ -149,19 +159,21 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         String reason = jobInfo.get("Reason");
 
         if (reason == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol output. Output does not contain reason");
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Info does not contain reason");
         }
 
         Exception exception;
-        if (!isFailedState(state) || reason.equals("NonZeroExitCode")) {
+        if (!isFailedState(state) || state.equals("FAILED") && reason.equals("NonZeroExitCode")) {
             //Not a failed state (non zero exit code does not count either), no error.
             exception = null;
         } else if (state.startsWith("CANCELLED")) {
             exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase());
         } else if (!reason.equals("None")) {
-            exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm reported error reason: " + reason);
+            exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state + "\" and reason: "
+                    + reason);
         } else {
-            exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
+            exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state
+                    + "\" for unknown reason");
         }
 
         JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"),
@@ -172,15 +184,30 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) {
+    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
         if (jobInfo == null) {
             LOGGER.debug("job {} not found in queue", job.getIdentifier());
             return null;
         }
+        
+        String jobID = jobInfo.get("JOBID");
+
+        if (jobID == null) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid squeue info. Info does not contain job ID");
+        }
+
+        if (!jobID.equals(job.getIdentifier())) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid squeue info. Found jobid \"" + jobInfo.get("JobId")
+                    + "\" does not match " + job.getIdentifier());
+        }
 
         String state = jobInfo.get("STATE");
+        
+        if (state == null) {
+            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid squeue info. Info does not contain job state");
+        }
 
         return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
     }
