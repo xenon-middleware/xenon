@@ -352,17 +352,19 @@ public class JobQueues {
 
         verifyJobDescription(description);
 
+        // Copy the JobDescription to ensure that the user doesn't change it after we return. 
+        JobDescription copyOfDescription = new JobDescription(description);
+        
         LOGGER.debug("{}: JobDescription verified OK", adaptorName);
 
-        JobImplementation result =
-                new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), description, description.isInteractive(),
-                        true);
+        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), copyOfDescription, 
+                copyOfDescription.isInteractive(), true);
 
         LOGGER.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
 
         JobExecutor executor = new JobExecutor(adaptorName, myFiles, myFileSystem, factory, result, pollingDelay);
 
-        String queueName = description.getQueueName();
+        String queueName = copyOfDescription.getQueueName();
 
         LOGGER.debug("{}: Submitting job to queue {}", adaptorName, queueName);
 
@@ -379,7 +381,7 @@ public class JobQueues {
             singleExecutor.execute(executor);
         }
 
-        if (description.isInteractive()) {
+        if (copyOfDescription.isInteractive()) {
             executor.waitUntilRunning(0);
 
             if (executor.isDone() && !executor.hasRun()) {

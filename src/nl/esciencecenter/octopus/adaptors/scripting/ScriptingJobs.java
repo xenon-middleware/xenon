@@ -168,9 +168,8 @@ public class ScriptingJobs implements Jobs {
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
-        SchedulerConnection connection = getConnection(scheduler);
-
-        return connection.submitJob(description);
+        // Copy the JobDescription to ensure the user doesn't change it after we return.
+        return getConnection(scheduler).submitJob(new JobDescription(description));
     }
 
     @Override

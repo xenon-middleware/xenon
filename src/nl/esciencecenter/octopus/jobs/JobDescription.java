@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.jobs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,25 @@ public class JobDescription {
      */
     public JobDescription() {
         // nothing
+    }
+
+    /**
+     * Create a JobDescription by copying an existing one.
+     */
+    public JobDescription(JobDescription original) {
+        queueName = original.getQueueName();
+        executable = original.getExecutable();
+        arguments.addAll(original.getArguments());
+        stdin = original.getStdin();
+        stdout = original.getStdout();
+        stderr = original.getStderr();
+        workingDirectory = original.getWorkingDirectory();
+        environment.putAll(original.getEnvironment());
+        jobOptions.putAll(original.getJobOptions());
+        nodeCount = original.getNodeCount();
+        processesPerNode = original.getProcessesPerNode();
+        maxTime = original.getMaxTime();
+        interactive = original.isInteractive();
     }
 
     /**
@@ -181,7 +201,7 @@ public class JobDescription {
      * @return Returns the arguments of the executable.
      */
     public List<String> getArguments() {
-        return arguments;
+        return Collections.unmodifiableList(arguments);
     }
 
     /**
@@ -224,7 +244,7 @@ public class JobDescription {
      * @return the environment of the executable.
      */
     public Map<String, String> getEnvironment() {
-        return environment;
+        return Collections.unmodifiableMap(environment);
     }
 
     /**
@@ -275,7 +295,7 @@ public class JobDescription {
      * @return the job options of the job.
      */
     public Map<String, String> getJobOptions() {
-        return jobOptions;
+        return Collections.unmodifiableMap(jobOptions);
     }
 
     /**
