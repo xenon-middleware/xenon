@@ -63,19 +63,53 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test01b_parseKeyValuePairs_ExtraWhiteSpace_ResultMap() throws Exception {
+    public void test01b_parseKeyValuePairs_ExtraWhiteSpace_Ignored() throws Exception {
+        Map<String, String> expected = new HashMap<String, String>();
+        expected.put("key1", "value1");
+        expected.put("key2", "value2");
+        expected.put("key3", "value3");
+        expected.put("key4", "value4");
+        expected.put("key5", "value5");
+        expected.put("key6", "value6");
+
+        String input = "key1=value1    key2=value2\n    key3=value3\t\t\t\t\tkey4=value4\n"
+                + "    key5=value5  key6=value6         ";
+
+        Map<String, String> result = ScriptingParser.parseKeyValuePairs(input, "fake");
+
+        assertEquals("parser does not handle whitespace correctly", expected, result);
+    }
+    
+    @Test
+    public void test01c_parseKeyValuePairs_EmptyLines_Ignored() throws Exception {
         Map<String, String> expected = new HashMap<String, String>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
         expected.put("key4", "value4");
 
-        String input = "key1=value1    key2=value2\nkey3=value3\t\t\t\t\tkey4=value4         ";
+        String input = "key1=value1 key2=value2\n\n\n\n\n\n\n\n\nkey3=value3 key4=value4";
 
         Map<String, String> result = ScriptingParser.parseKeyValuePairs(input, "fake");
 
-        assertEquals("parser does not handle whitespace correctly", expected, result);
+        assertEquals("parser does not handle empty lines correctly", expected, result);
     }
+    
+    @Test
+    public void test01d_parseKeyValuePairs_IgnoredLines_Ignored() throws Exception {
+        Map<String, String> expected = new HashMap<String, String>();
+        expected.put("key1", "value1");
+        expected.put("key2", "value2");
+        expected.put("key3", "value3");
+        expected.put("key4", "value4");
+
+        String input = "key1=value1 key2=value2\n\n\n\nignore this line\n\nplease ignore\n\n\nkey3=value3 key4=value4\nsorry, please ignore";
+
+        Map<String, String> result = ScriptingParser.parseKeyValuePairs(input, "fake", "ignore");
+
+        assertEquals("parser does not handle empty lines correctly", expected, result);
+    }
+
 
     @Test(expected = OctopusException.class)
     public void test01c_parseKeyValuePairs_SpaceInKeyValuePair_ExceptionThrown() throws Exception {
