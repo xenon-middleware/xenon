@@ -72,20 +72,20 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static void verifyJobDescription(JobDescription description) throws OctopusException {
         checkJobOptions(description.getJobOptions());
-    
+
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
         }
-    
+
         //check for option that overrides job script completely.
         if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
             //no remaining settings checked.
             return;
         }
-    
+
         //perform standard checks.
         SchedulerConnection.verifyJobDescription(description, GridEngineAdaptor.ADAPTOR_NAME);
-    
+
         //check if the parallel environment and queue are specified.
         if (description.getNodeCount() != 1) {
             if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
@@ -114,7 +114,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         Exception exception = null;
         String state = "done";
         String exitCodeString = info.get("exit_status");
-    
+
         try {
             if (exitCodeString != null) {
                 exitCode = Integer.parseInt(exitCodeString);
@@ -122,11 +122,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         } catch (NumberFormatException e) {
             exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
                     + job.getIdentifier() + " from string " + exitCodeString, e);
-    
+
         }
-    
+
         String failedString = info.get("failed");
-    
+
         if (failedString != null && !failedString.equals("0")) {
             if (failedString.startsWith("100")) {
                 //error code for killed jobs
@@ -135,7 +135,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 exception = new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
             }
         }
-    
+
         return new JobStatusImplementation(job, state, exitCode, exception, false, true, info);
     }
 
@@ -487,13 +487,47 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     @Override
     public JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException {
+
+        String statusOutput = runCheckedCommand(null, "qstat", "-xml");
+
+        Map<String, Map<String, String>> info = parser.parseJobInfos(statusOutput);
+
+        //mark all jobs in this map as recently seen
+        markJobsSeen(info.keySet());
+
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < result.length; i++) {
             if (jobs[i] == null) {
                 result[i] = null;
             } else {
-                result[i] = getJobStatus(jobs[i]);
+
+                result[i] = getJobStatusFromQstatInfo(info, jobs[i]);
+
+                if (result[i] == null) {
+                    result[i] = getJobStatusFromQacct(jobs[i]);
+                }
+
+                //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
+                //qstat/qacct output completely
+                if (result[i] == null && getJobDeleted(jobs[i].getIdentifier())) {
+                    Exception exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job "
+                            + jobs[i].getIdentifier() + " deleted by user while still pending");
+                    result[i] = new JobStatusImplementation(jobs[i], "killed", null, exception, false, true, null);
+                }
+
+                //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
+                if (result[i] == null && haveRecentlySeen(jobs[i].getIdentifier())) {
+                    result[i] = new JobStatusImplementation(jobs[i], "unknown", null, null, false, false,
+                            new HashMap<String, String>());
+                }
+
+                //this job really does not exist. set it to an error state. List qacct exception as cause (if set)
+                if (result[i] == null) {
+                    Exception exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + jobs[i].getIdentifier()
+                            + " not found on server");
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
+                }
             }
         }
         return result;
