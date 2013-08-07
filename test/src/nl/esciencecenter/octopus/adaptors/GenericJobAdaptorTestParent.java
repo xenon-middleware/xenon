@@ -1465,8 +1465,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setExecutable("/usr/bin/printenv");
         description.setArguments("SOME_VARIABLE");
         description.setInteractive(false);
-
-        description.getEnvironment().put("SOME_VARIABLE", "some_value");
+        description.addEnvironment("SOME_VARIABLE", "some_value");
 
         description.setWorkingDirectory(workingDir);
         description.setStderr(null);
@@ -1558,5 +1557,46 @@ public abstract class GenericJobAdaptorTestParent {
         if (!gotException) {
             throw new Exception("Submit did not throw exception, which was expected!");
         }
+    }
+    
+    @org.junit.Test
+    public void test43_submit_JobDescriptionShouldBeCopied_Success() throws Exception {
+
+        String workingDir = getWorkingDir("test43");
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("non-existing-executable");
+        description.setInteractive(false);
+        description.setWorkingDirectory(workingDir);
+        description.setStdout("stdout.txt");
+        
+        Job job = jobs.submitJob(scheduler, description);
+
+        description.setStdout("aap.txt");
+        
+        JobDescription original = job.getJobDescription();
+        
+        assertEquals("Job description should have been copied!", "stdout.txt", original.getStdout());
+        
+        JobStatus status = jobs.cancelJob(job);
+        
+        if (!status.isDone()) {
+            jobs.waitUntilDone(job, 60000);
+        }
+        
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        
+        if (files.exists(out)) { 
+            files.delete(out);
+        }
+        
+        files.delete(root);
+        files.close(filesystem);
     }
 }
