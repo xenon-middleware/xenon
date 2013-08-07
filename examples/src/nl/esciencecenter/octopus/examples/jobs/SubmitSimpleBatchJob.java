@@ -20,7 +20,6 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -37,17 +36,16 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class SubmitSimpleBatchJob {
 
-    @SuppressWarnings("unused")
     public static void main(String [] args) { 
         try { 
+            // Convert the command line parameter to a URI
+            URI location = new URI(args[0]);
             
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
-            // Next, we retrieve the Files, Jobs and Credentials API
-            Files files = octopus.files();
+            // Next, we retrieve the Jobs API
             Jobs jobs = octopus.jobs();
-            Credentials credentials = octopus.credentials();
             
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
@@ -55,7 +53,7 @@ public class SubmitSimpleBatchJob {
             description.setArguments("5");
             
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(new URI("local:///"), null, null);
+            Scheduler scheduler = jobs.newScheduler(location, null, null);
             
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
