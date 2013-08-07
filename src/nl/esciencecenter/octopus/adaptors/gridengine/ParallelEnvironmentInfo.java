@@ -31,7 +31,7 @@ class ParallelEnvironmentInfo {
     private final int slots;
     private final String allocationRule;
 
-    public ParallelEnvironmentInfo(Map<String, String> info) throws OctopusException {
+    protected ParallelEnvironmentInfo(Map<String, String> info) throws OctopusException {
         name = info.get("pe_name");
 
         if (name == null) {

@@ -260,7 +260,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final Scheduler scheduler;
 
-    private final SlurmConfig config;
+    private final SlurmSetup config;
 
     SlurmSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
             OctopusEngine engine) throws OctopusIOException, OctopusException {
@@ -311,7 +311,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return defaultQueueName;
     }
 
-    private SlurmConfig getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws OctopusIOException,
+    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws OctopusIOException,
             OctopusException {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
@@ -319,7 +319,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX,
                 SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of", "Slurmctld(primary/backup) at");
 
-        return new SlurmConfig(info, ignoreVersion, disableAccounting);
+        return new SlurmSetup(info, ignoreVersion, disableAccounting);
     }
 
     @Override

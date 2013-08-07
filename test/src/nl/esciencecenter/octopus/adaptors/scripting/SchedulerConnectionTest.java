@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.adaptors.scripting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.net.URI;
 
@@ -34,6 +35,13 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.JVM)
 public class SchedulerConnectionTest {
+    
+    @Test
+    public void test01_supportsScheme() {
+        
+        fail("not implemented");
+        //protected static boolean supportsScheme(String scheme, String[] supportedSchemes) {
+    }
 
     @Test
     public void verifyJobDescription_ValidJobDescription_NoException() throws Exception {

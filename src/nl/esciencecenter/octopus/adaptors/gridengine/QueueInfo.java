@@ -34,7 +34,7 @@ class QueueInfo {
     private final int slots;
     private final String[] parallelEnvironments;
 
-    QueueInfo(Map<String, String> info) throws OctopusException {
+    protected QueueInfo(Map<String, String> info) throws OctopusException {
         name = info.get("qname");
 
         if (name == null) {

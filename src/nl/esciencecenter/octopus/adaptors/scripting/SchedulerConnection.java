@@ -71,7 +71,7 @@ public abstract class SchedulerConnection {
 
     private final long pollDelay;
 
-    private static boolean supportsScheme(String scheme, String[] supportedSchemes) {
+    protected static boolean supportsScheme(String scheme, String[] supportedSchemes) {
         for (String validScheme : supportedSchemes) {
             if (validScheme.equalsIgnoreCase(scheme)) {
                 return true;
@@ -291,7 +291,7 @@ public abstract class SchedulerConnection {
     }
 
     /**
-     * check if the given working directory exists. Useful for schedulers that do not check this (like slurm)
+     * check if the given working directory exists. Useful for schedulers that do not check this (like Slurm)
      * 
      * @param workingDirectory
      *            the working directory (either absolute or relative) as given by the user.

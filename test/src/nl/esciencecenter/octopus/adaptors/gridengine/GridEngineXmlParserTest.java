@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -102,4 +103,10 @@ public class GridEngineXmlParserTest {
         assertEquals(9, result.size());
 
     }
+    
+    @Test
+    public void testSomeMore() throws Throwable {
+        fail("need more tests");
+    }
+    
 }

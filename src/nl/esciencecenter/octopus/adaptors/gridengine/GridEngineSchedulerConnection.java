@@ -70,6 +70,75 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final String QACCT_HEADER = "==============================================================";
 
+    private static void verifyJobDescription(JobDescription description) throws OctopusException {
+        checkJobOptions(description.getJobOptions());
+    
+        if (description.isInteractive()) {
+            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
+        }
+    
+        //check for option that overrides job script completely.
+        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
+            //no remaining settings checked.
+            return;
+        }
+    
+        //perform standard checks.
+        SchedulerConnection.verifyJobDescription(description, GridEngineAdaptor.ADAPTOR_NAME);
+    
+        //check if the parallel environment and queue are specified.
+        if (description.getNodeCount() != 1) {
+            if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
+                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
+                        "Parallel job requested but mandatory parallel.environment option not specificied.");
+            }
+            if (description.getQueueName() == null && !description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_SLOTS)) {
+                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
+                        "Parallel job requested but neither queue nor number of slots specificied (at least one is required)");
+            }
+        }
+    }
+
+    /**
+     * Creates a JobStatus from qacct output. For more info on the output, see the "N1 Grid Engine 6 User's Guide". Retrieved
+     * from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
+     * 
+     * @param info
+     *            a map containing key/value pairs parsed from the qacct output.
+     * @param job
+     *            the job to get the info for.
+     * @return the current status of the job.
+     */
+    private static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) {
+        Integer exitCode = null;
+        Exception exception = null;
+        String state = "done";
+        String exitCodeString = info.get("exit_status");
+    
+        try {
+            if (exitCodeString != null) {
+                exitCode = Integer.parseInt(exitCodeString);
+            }
+        } catch (NumberFormatException e) {
+            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
+                    + job.getIdentifier() + " from string " + exitCodeString, e);
+    
+        }
+    
+        String failedString = info.get("failed");
+    
+        if (failedString != null && !failedString.equals("0")) {
+            if (failedString.startsWith("100")) {
+                //error code for killed jobs
+                exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job killed by signal");
+            } else {
+                exception = new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
+            }
+        }
+    
+        return new JobStatusImplementation(job, state, exitCode, exception, false, true, info);
+    }
+
     private final long accountingGraceTime;
 
     /**
@@ -281,35 +350,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         }
     }
 
-    private static void verifyJobDescription(JobDescription description) throws OctopusException {
-        checkJobOptions(description.getJobOptions());
-
-        if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
-        }
-
-        //check for option that overrides job script completely.
-        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
-            //no remaining settings checked.
-            return;
-        }
-
-        //perform standard checks.
-        SchedulerConnection.verifyJobDescription(description, GridEngineAdaptor.ADAPTOR_NAME);
-
-        //check if the parallel environment and queue are specified.
-        if (description.getNodeCount() != 1) {
-            if (!description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_ENVIRONMENT)) {
-                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
-                        "Parallel job requested but mandatory parallel.environment option not specificied.");
-            }
-            if (description.getQueueName() == null && !description.getJobOptions().containsKey(JOB_OPTION_PARALLEL_SLOTS)) {
-                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
-                        "Parallel job requested but neither queue nor number of slots specificied (at least one is required)");
-            }
-        }
-    }
-
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
@@ -402,46 +442,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 GridEngineAdaptor.ADAPTOR_NAME, QACCT_HEADER);
 
         return getJobStatusFromQacctInfo(info, job);
-    }
-
-    /**
-     * Creates a JobStatus from qacct output. For more info on the output, see the "N1 Grid Engine 6 User's Guide". Retrieved
-     * from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
-     * 
-     * @param info
-     *            a map containing key/value pairs parsed from the qacct output.
-     * @param job
-     *            the job to get the info for.
-     * @return the current status of the job.
-     */
-    private JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) {
-        Integer exitCode = null;
-        Exception exception = null;
-        String state = "done";
-        String exitCodeString = info.get("exit_status");
-
-        try {
-            if (exitCodeString != null) {
-                exitCode = Integer.parseInt(exitCodeString);
-            }
-        } catch (NumberFormatException e) {
-            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
-                    + job.getIdentifier() + " from string " + exitCodeString, e);
-
-        }
-
-        String failedString = info.get("failed");
-
-        if (failedString != null && !failedString.equals("0")) {
-            if (failedString.startsWith("100")) {
-                //error code for killed jobs
-                exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job killed by signal");
-            } else {
-                exception = new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
-            }
-        }
-
-        return new JobStatusImplementation(job, state, exitCode, exception, false, true, info);
     }
 
     @Override

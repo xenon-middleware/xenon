@@ -392,7 +392,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test07_checkIfContains_DoesContain_Index() throws OctopusException {
+    public void test07a_checkIfContains_DoesContain_Index() throws OctopusException {
 
         String input = "which one will it contain?";
 
@@ -402,7 +402,7 @@ public class ScriptingParserTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test07_checkIfContains_DoesNotContain_ExceptionThrown() throws OctopusException {
+    public void test07b_checkIfContains_DoesNotContain_ExceptionThrown() throws OctopusException {
 
         String input = "which one will it contain?";
 

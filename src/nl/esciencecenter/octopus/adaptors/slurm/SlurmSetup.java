@@ -28,16 +28,16 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  * @version 1.0
  * @since 1.0
  */
-public class SlurmConfig {
+public class SlurmSetup {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSetup.class);
 
     private static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5." };
 
     private final boolean accountingAvailable;
     private final String version;
 
-    SlurmConfig(Map<String, String> info, boolean ignoreVersion, boolean disableAccounting) throws OctopusException {
+    SlurmSetup(Map<String, String> info, boolean ignoreVersion, boolean disableAccounting) throws OctopusException {
         version = info.get("SLURM_VERSION");
 
         if (version == null) {
