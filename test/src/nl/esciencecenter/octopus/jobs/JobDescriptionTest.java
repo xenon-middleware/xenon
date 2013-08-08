@@ -84,7 +84,7 @@ public class JobDescriptionTest {
         assertTrue(list != null);
         assertTrue(list.size() == 3);
         assertTrue(Arrays.equals(list.toArray(new String[3]), new String[] { "a", "b", "c" }));
-
+        
         Map<String, String> env = new HashMap<>();
         env.put("ENV1", "ARG1");
         env.put("ENV2", "ARG2");
@@ -129,25 +129,25 @@ public class JobDescriptionTest {
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionKeyEmpty() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions("", "value");
+        j.addJobOption("", "value");
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionKeyNull() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions(null, "value");
+        j.addJobOption(null, "value");
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionValueEmpty() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions("key", "");
+        j.addJobOption("key", "");
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_jobOptionValueNull() throws Exception {
         JobDescription j = new JobDescription();
-        j.addJobOptions("key", null);
+        j.addJobOption("key", null);
     }
 
     @org.junit.Test

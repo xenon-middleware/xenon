@@ -17,16 +17,14 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 
 @SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 public final class SlurmJobScriptGenerator {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmJobScriptGenerator.class);
-    
+
     private SlurmJobScriptGenerator() {
         //DO NOT USE
     }
 
-    //Stop sonar from complaining about %n vs \n. As these scripts get copied to a unix machine, the newline must be a \n
-    
-    public static String generate(JobDescription description, AbsolutePath fsEntryPath) throws OctopusException {
+    static String generate(JobDescription description, AbsolutePath fsEntryPath) throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -37,13 +35,16 @@ public final class SlurmJobScriptGenerator {
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
+            String path;
             if (description.getWorkingDirectory().startsWith("/")) {
-                script.format("#SBATCH --workdir=%s\n", description.getWorkingDirectory());
+                path = description.getWorkingDirectory();
             } else {
                 //make relative path absolute
                 AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
-                script.format("#SBATCH --workdir=%s\n", workingDirectory.getPath());
+                path = workingDirectory.getPath();
             }
+            script.format("#SBATCH --workdir='%s'\n", path);
+
         }
 
         if (description.getQueueName() != null) {
@@ -56,32 +57,27 @@ public final class SlurmJobScriptGenerator {
         //number of processer per node
         script.format("#SBATCH --ntasks-per-node=%d\n", description.getProcessesPerNode());
 
-        //resulting number of tasks (redundant)
-        //script.format("#SBATCH --ntasks=%d\n", description.getNodeCount() * description.getProcessesPerNode());
-
         //add maximum runtime
         script.format("#SBATCH --time=%d\n", description.getMaxTime());
 
         if (description.getStdin() != null) {
-            script.format("#SBATCH --input=%s\n", description.getStdin());
+            script.format("#SBATCH --input='%s'\n", description.getStdin());
         }
 
         if (description.getStdout() == null) {
             script.format("#SBATCH --output=/dev/null\n");
         } else {
-            script.format("#SBATCH --output=%s\n", description.getStdout());
+            script.format("#SBATCH --output='%s'\n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
             script.format("#SBATCH --error=/dev/null\n");
         } else {
-            script.format("#SBATCH --error=%s\n", description.getStderr());
+            script.format("#SBATCH --error='%s'\n", description.getStderr());
         }
 
-        if (description.getEnvironment() != null) {
-            for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
-                script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
-            }
+        for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
+            script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());
         }
 
         script.format("\n");

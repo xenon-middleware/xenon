@@ -54,7 +54,7 @@ class SshMultiplexedSession {
     private final OctopusProperties properties;
 
     private Credential credential;
-    
+
     private String user;
     private String host;
     private int port;
@@ -70,7 +70,7 @@ class SshMultiplexedSession {
             throws OctopusException, OctopusIOException {
 
         LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
-        
+
         this.jsch = jsch;
         this.properties = properties;
         credential = cred;
@@ -78,7 +78,7 @@ class SshMultiplexedSession {
         user = location.getUserInfo();
         host = location.getHost();
         port = location.getPort();
-        
+
         if (credential == null) {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");
         }
@@ -115,45 +115,45 @@ class SshMultiplexedSession {
         }
 
         LOGGER.debug("Checking property: " + SshAdaptor.GATEWAY);
-        
+
         if (properties.propertySet(SshAdaptor.GATEWAY)) {
-            
+
             try {
                 gatewayURI = new URI(properties.getStringProperty(SshAdaptor.GATEWAY));
             } catch (URISyntaxException e) {
                 throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse gateway URI!", e);
             }
-            
+
             connectToGateway();
         }
-        
+
         createSession();
     }
 
-    private void connectToGateway() throws OctopusException, OctopusIOException { 
-        
+    private synchronized void connectToGateway() throws OctopusException, OctopusIOException {
+
         String gatewayUser = gatewayURI.getUserInfo();
-        
-        if (gatewayUser == null) { 
+
+        if (gatewayUser == null) {
             gatewayUser = user;
         }
-        
+
         String gatewayHost = gatewayURI.getHost();
-        
+
         if (gatewayHost == null) {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Gateway URI does not contain hostname: " + gatewayURI);
         }
-        
+
         int gatewayPort = gatewayURI.getPort();
-        
+
         if (port <= 0) {
             port = SshAdaptor.DEFAULT_PORT;
         }
-            
+
         gatewaySession = createSession(jsch, -1, gatewayUser, credential, gatewayHost, gatewayPort, null, null, properties);
     }
-    
-    private SshSession findSession(Channel c) throws OctopusIOException {
+
+    private synchronized SshSession findSession(Channel c) throws OctopusIOException {
         try {
             return findSession(c.getSession());
         } catch (JSchException e) {
@@ -161,7 +161,7 @@ class SshMultiplexedSession {
         }
     }
 
-    private SshSession findSession(Session s) throws OctopusIOException {
+    private synchronized SshSession findSession(Session s) throws OctopusIOException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession info = sessions.get(i);
@@ -174,33 +174,32 @@ class SshMultiplexedSession {
         throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH Session not found!");
     }
 
-    private SshSession createSession() throws OctopusIOException, OctopusException {
+    private synchronized SshSession createSession() throws OctopusIOException, OctopusException {
         SshSession s = createSession(jsch, nextSessionID++, user, credential, host, port, gatewaySession, gatewayURI, properties);
         sessions.add(s);
         return s;
     }
 
-    private static SshSession createSession(JSch jsch, int sessionID, String user, Credential credential, String host, int port, 
+    private static synchronized SshSession createSession(JSch jsch, int sessionID, String user, Credential credential, String host, int port,
             SshSession gateway, URI gatewayURI, OctopusProperties properties) throws OctopusIOException, OctopusException {
 
         String sessionHost = host;
         int sessionPort = port;
         int tunnelPort = -1;
-        
-        
+
         LOGGER.debug("SSHSESSION: Creating new session to " + user + "@" + host + ":" + port);
-        
-        if (gateway != null) { 
+
+        if (gateway != null) {
             LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayURI);
-    
+
             tunnelPort = sessionPort = gateway.addTunnel(0, host, port);
             sessionHost = "localhost";
-        
+
             LOGGER.debug("SSHSESSION: Rerouting session via " + user + "@" + sessionHost + ":" + sessionPort);
         }
-        
+
         Session session = null;
-        
+
         try {
             session = jsch.getSession(user, sessionHost, sessionPort);
         } catch (JSchException e) {
@@ -211,7 +210,7 @@ class SshMultiplexedSession {
             PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
             session.setPassword(new String(passwordCredential.getPassword()));
         }
-        
+
         if (properties.getBooleanProperty(SshAdaptor.STRICT_HOST_KEY_CHECKING)) {
             LOGGER.debug("SSHSESSION: Strict host key checking enabled");
 
@@ -226,7 +225,7 @@ class SshMultiplexedSession {
             LOGGER.debug("SSHSESSION: Strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
         }
-       
+
         try {
             session.connect();
         } catch (JSchException e) {
@@ -236,8 +235,6 @@ class SshMultiplexedSession {
         return new SshSession(session, tunnelPort, sessionID);
     }
 
-    
-    
     /**
      * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
      * connecting.
@@ -307,40 +304,40 @@ class SshMultiplexedSession {
         findSession(channel).failedSftpChannel(channel);
     }
 
-//    synchronized int createTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException {
-//
-//        for (int i = 0; i < sessions.size(); i++) {
-//            SshSession s = sessions.get(i);
-//
-//            int resultPort = s.addTunnel(localPort, targetHost, targetPort);
-//
-//            if (resultPort > 0) { 
-//                return resultPort;
-//            }
-//        }
-//
-//        try {
-//            SshSession s = createSession();
-//            return s.addTunnel(localPort, targetHost, targetPort);
-//        } catch (OctopusException e) {
-//            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
-//        }
-//    }
-//
-//    synchronized void removeTunnel(int localPort) throws OctopusIOException {
-//
-//        for (int i = 0; i < sessions.size(); i++) {
-//            SshSession s = sessions.get(i);
-//            
-//            if (s.getTunnelPort() == localPort) { 
-//                s.removeTunnel(localPort);
-//                return;
-//            } 
-//        }
-//
-//        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to find tunnel at !" + localPort);
-//    }
-    
+    //    synchronized int createTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException {
+    //
+    //        for (int i = 0; i < sessions.size(); i++) {
+    //            SshSession s = sessions.get(i);
+    //
+    //            int resultPort = s.addTunnel(localPort, targetHost, targetPort);
+    //
+    //            if (resultPort > 0) { 
+    //                return resultPort;
+    //            }
+    //        }
+    //
+    //        try {
+    //            SshSession s = createSession();
+    //            return s.addTunnel(localPort, targetHost, targetPort);
+    //        } catch (OctopusException e) {
+    //            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
+    //        }
+    //    }
+    //
+    //    synchronized void removeTunnel(int localPort) throws OctopusIOException {
+    //
+    //        for (int i = 0; i < sessions.size(); i++) {
+    //            SshSession s = sessions.get(i);
+    //            
+    //            if (s.getTunnelPort() == localPort) { 
+    //                s.removeTunnel(localPort);
+    //                return;
+    //            } 
+    //        }
+    //
+    //        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to find tunnel at !" + localPort);
+    //    }
+
     synchronized void disconnect() {
 
         while (sessions.size() > 0) {
@@ -349,9 +346,9 @@ class SshMultiplexedSession {
             if (s != null) {
                 s.disconnect();
             }
-            
+
             int tunnelPort = s.getTunnelPort();
-            
+
             if (tunnelPort > 0) {
                 try {
                     gatewaySession.removeTunnel(tunnelPort);
@@ -360,8 +357,8 @@ class SshMultiplexedSession {
                 }
             }
         }
-        
-        if (gatewaySession != null) { 
+
+        if (gatewaySession != null) {
             gatewaySession.disconnect();
         }
     }

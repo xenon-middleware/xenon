@@ -31,6 +31,6 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
  */
 public interface SchedulerConnectionFactory {
 
-    SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, 
+    SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential,
             OctopusProperties properties, OctopusEngine engine) throws OctopusIOException, OctopusException;
 }

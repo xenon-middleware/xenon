@@ -80,7 +80,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     private final FileSystem home;
 
     public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) throws OctopusException {
-        
         this.localAdaptor = localAdaptor;
         this.copyEngine = copyEngine;
 
@@ -143,7 +142,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         try {
             java.nio.file.Path path = LocalUtils.javaPath(link);
             java.nio.file.Path target = Files.readSymbolicLink(path);
-        
+
             AbsolutePath parent = link.getParent();
 
             if (parent == null || target.isAbsolute()) {
@@ -161,7 +160,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throws OctopusIOException {
 
         FileAttributes att = getAttributes(dir);
-        
+
         if (!att.isDirectory()) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
@@ -176,10 +175,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
 
-            throws OctopusIOException {
+    throws OctopusIOException {
 
         FileAttributes att = getAttributes(dir);
-        
+
         if (!att.isDirectory()) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
@@ -199,7 +198,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
 
         FileAttributes att = getAttributes(path);
-        
+
         if (att.isDirectory()) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }
@@ -279,7 +278,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         }
 
         OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Level.FILESYSTEM), properties);
-        
+
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, new RelativePath(
                 LocalUtils.getCWD()), credential, p);
     }
@@ -381,7 +380,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException,
+            UnsupportedOperationException {
 
         boolean async = false;
         boolean verify = false;

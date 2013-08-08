@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -29,13 +30,13 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
 
-public class GridEngineParserTest {
+public class GridEngineXmlParserTest {
 
     @Test
     public void testCheckVersion() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -44,7 +45,7 @@ public class GridEngineParserTest {
     public void testCheckVersion_NoSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -53,7 +54,7 @@ public class GridEngineParserTest {
     public void testCheckVersion_WrongSchema_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -62,7 +63,7 @@ public class GridEngineParserTest {
     public void testCheckVersion_EmptyFile_Exception() throws Throwable {
         File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         parser.checkVersion(testFile);
     }
@@ -74,7 +75,7 @@ public class GridEngineParserTest {
 
         String content = new String(encoded);
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
 
@@ -94,13 +95,18 @@ public class GridEngineParserTest {
 
         System.err.println("parsing queue info from: " + content);
 
-        GridEngineParser parser = new GridEngineParser(false);
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(content);
 
         //FIXME: check equality fully, not only if there are info's at all...
-        System.out.println(result);
         assertEquals(9, result.size());
 
     }
+    
+    @Test
+    public void testSomeMore() throws Throwable {
+        fail("need more tests");
+    }
+    
 }

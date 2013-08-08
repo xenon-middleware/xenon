@@ -15,12 +15,12 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
+import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -44,49 +44,84 @@ public class GridEngineSetup {
 
     private final Map<String, ParallelEnvironmentInfo> parallelEnvironments;
 
-    public GridEngineSetup(SchedulerConnection schedulerConnection, GridEngineParser parser) throws OctopusIOException,
+    public GridEngineSetup(SchedulerConnection schedulerConnection, GridEngineXmlParser parser) throws OctopusIOException,
             OctopusException {
 
         String queueListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sql");
 
-        this.queueNames = parser.parseQconfList(queueListOutput);
+        this.queueNames = ScriptingParser.parseList(queueListOutput);
 
-        String queueDetailsOutput =
-                schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
+        this.queues = getQueues(queueNames, schedulerConnection);
 
-        this.queues = parser.parseQconfQueueInfo(queueDetailsOutput);
-
-        this.parallelEnvironments = fetchParallelEnvironments(schedulerConnection, parser);
+        this.parallelEnvironments = getParallelEnvironments(schedulerConnection);
 
         LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
     }
 
-    private Map<String, ParallelEnvironmentInfo> fetchParallelEnvironments(SchedulerConnection schedulerConnection,
-            GridEngineParser parser) throws OctopusIOException, OctopusException {
+    private Map<String, QueueInfo> getQueues(String[] queueNames, SchedulerConnection schedulerConnection)
+            throws OctopusIOException, OctopusException {
+        String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
+
+        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
+
+        ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
+
+        Map<String, QueueInfo> result = new HashMap<String, QueueInfo>();
+
+        for (Map.Entry<String, Map<String, String>> entry : maps.entrySet()) {
+            result.put(entry.getKey(), new QueueInfo(entry.getValue()));
+        }
+
+        return result;
+    }
+
+    /**
+     * generate arguments to list details of all parallel environments given
+     * 
+     * @param parallelEnvironmentNames
+     *            names of parallel environments to list
+     * @return a list of all qconf arguments needed to list all parallel environments
+     */
+    private static String[] qconfPeDetailsArguments(String[] parallelEnvironmentNames) {
+        String[] result = new String[parallelEnvironmentNames.length * 2];
+        for (int i = 0; i < parallelEnvironmentNames.length; i++) {
+            result[2 * i] = "-sp";
+            result[(2 * i) + 1] = parallelEnvironmentNames[i];
+        }
+        return result;
+    }
+
+    private Map<String, ParallelEnvironmentInfo> getParallelEnvironments(SchedulerConnection schedulerConnection)
+            throws OctopusIOException, OctopusException {
+        //first retrieve a list of parallel environments
         RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
-        
+
         //Qconf returns an error if there are no parallel environments
         if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
             return new HashMap<String, ParallelEnvironmentInfo>();
         }
-        
+
         if (!runner.success()) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Could not get parallel environment info from scheduler: " + runner);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Could not get parallel environment info from scheduler: "
+                    + runner);
         }
 
-        String[] peNames = parser.parseQconfList(runner.getStdout());
+        String[] parallelEnvironmentNames = ScriptingParser.parseList(runner.getStdout());
 
-        //build arguments for qconf to list parallel environments
-        ArrayList<String> arguments = new ArrayList<String>();
-        for (String name : peNames) {
-            arguments.add("-sp");
-            arguments.add(name);
+        //then get the details of each parallel environment
+        String peDetailsOutput = schedulerConnection.runCheckedCommand(null, "qconf",
+                qconfPeDetailsArguments(parallelEnvironmentNames));
+
+        Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name",
+                ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
+
+        Map<String, ParallelEnvironmentInfo> result = new HashMap<String, ParallelEnvironmentInfo>();
+
+        for (Map.Entry<String, Map<String, String>> entry : maps.entrySet()) {
+            result.put(entry.getKey(), new ParallelEnvironmentInfo(entry.getValue()));
         }
 
-        String peDetailsOutput =
-                schedulerConnection.runCheckedCommand(null, "qconf", arguments.toArray(new String[arguments.size()]));
-
-        return parser.parseQconfParallelEnvironementInfo(peDetailsOutput);
+        return result;
     }
 
     public String[] getQueueNames() {
@@ -94,8 +129,8 @@ public class GridEngineSetup {
     }
 
     /**
-     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, which number we need
-     * to give is dependent on the parallel environment settings.
+     * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
+     * give is dependent on the parallel environment settings.
      */
     int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws OctopusException {
         ParallelEnvironmentInfo environment = parallelEnvironments.get(parallelEnvironmentName);

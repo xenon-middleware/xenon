@@ -16,10 +16,13 @@
 
 package nl.esciencecenter.octopus.adaptors.slurm;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
@@ -30,6 +33,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.junit.AfterClass;
@@ -46,8 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
-    
-    
+
     private static final Logger logger = LoggerFactory.getLogger(SlurmJobAdaptorTest.class);
 
     @BeforeClass
@@ -75,16 +78,15 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         AbsolutePath script = root.resolve(new RelativePath("script"));
         AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
 
-        String scriptContent = "#!/bin/bash\n" +
-        "#SBATCH -o " + stdout.getPath() + "\n" 
-                + "#SBATCH -e /dev/null\n" + "echo " + message;
+        String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
+                + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, scriptContent);
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOptions("job.script", script.getPath());
+        description.addJobOption("job.script", script.getPath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);
@@ -101,7 +103,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         }
 
         String outputContent = readFully(files.newInputStream(stdout));
-        
+
         logger.debug("got output " + outputContent);
 
         files.delete(stdout);
@@ -135,7 +137,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
     @Test
     public void slurm_test04_parallel_batchJob() throws Exception {
         String message = "Hello World! Test Slurm 04";
-        
+
         String workingDir = getWorkingDir("slurm_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
@@ -153,19 +155,21 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
 
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
-        
+
         if (!status.isDone()) {
             throw new Exception("Job not finished");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job did not finish properly", status.getException());
         }
-        
+
         String outputContent = readFully(files.newInputStream(stdout));
 
         files.delete(stdout);
@@ -174,15 +178,188 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         files.close(filesystem);
-        
+
         logger.debug("got back result: {}", outputContent);
 
         String[] lines = outputContent.split("\\r?\\n");
-        
+
         assertTrue(lines.length == 4);
-        for (String line: lines) {
+        for (String line : lines) {
             assertTrue(line.equals(message));
         }
+    }
+
+    @org.junit.Test
+    public void slurm_test05_jobStatusWithAccountingDisabled() throws Exception {
+
+        String message = "Hello World! test05";
+        String workingDir = getWorkingDir("slurm_test05");
+
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE, "true");
+
+        Scheduler scheduler = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), properties);
+
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/echo");
+        description.setArguments("-n", message);
+        description.setInteractive(false);
+        description.setWorkingDirectory(workingDir);
+        description.setStdin(null);
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+
+        Job job = jobs.submitJob(scheduler, description);
+
+        JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
+
+        if (status.isRunning()) {
+            status = jobs.waitUntilDone(job, config.getUpdateTime());
+        }
+
+        if (!status.isDone()) {
+            throw new Exception("Job exceeded deadline!");
+        }
+
+        if (status.hasException()) {
+            throw new Exception("Job failed!", status.getException());
+        }
+
+        jobs.close(scheduler);
+
+        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
+        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+
+        String tmpout = readFully(files.newInputStream(out));
+        String tmperr = readFully(files.newInputStream(err));
+
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
+
+        files.close(filesystem);
+
+        System.err.println("STDOUT: " + tmpout);
+        System.err.println("STDERR: " + tmperr);
+
+        assertTrue(tmpout != null);
+        assertTrue(tmpout.length() > 0);
+        assertTrue(tmpout.equals(message));
+        assertTrue(tmperr.length() == 0);
+    }
+
+    @org.junit.Test
+    public void slurm_test06_multiJobWithAccountingDisabled() throws Exception {
+
+        String workingDir = getWorkingDir("slurm_test06");
+
+        //custom scheduler with accounting disabled
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE, "true");
+        Scheduler scheduler = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), properties);
+
+        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+
+        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        files.createDirectories(root);
+
+        AbsolutePath[] out = new AbsolutePath[5];
+        AbsolutePath[] err = new AbsolutePath[5];
+
+        Jobs jobs = octopus.jobs();
+
+        Job[] j = new Job[5];
+
+        for (int i = 0; i < j.length; i++) {
+
+            out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
+            err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
+
+            JobDescription description = new JobDescription();
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+            description.setWorkingDirectory(workingDir);
+
+            description.setQueueName(config.getDefaultQueueName());
+            description.setInteractive(false);
+            description.setStdin(null);
+            description.setStdout("stdout" + i + ".txt");
+            description.setStderr("stderr" + i + ".txt");
+
+            j[i] = jobs.submitJob(scheduler, description);
+        }
+
+        // Bit hard to determine realistic deadline here ?
+        long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + (5 * config.getUpdateTime());
+
+        boolean done = false;
+
+        while (!done) {
+            JobStatus[] status = jobs.getJobStatuses(j);
+
+            int count = 0;
+
+            for (int i = 0; i < j.length; i++) {
+                if (j[i] != null) {
+                    if (status[i].isDone()) {
+                        if (status[i].hasException()) {
+                            System.err.println("Job " + i + " failed!");
+                            throw new Exception("Job " + i + " failed", status[i].getException());
+                        }
+
+                        System.err.println("Job " + i + " done.");
+                        j[i] = null;
+                    } else {
+                        count++;
+                    }
+                }
+            }
+
+            if (count == 0) {
+                done = true;
+            } else {
+                Thread.sleep(1000);
+
+                long now = System.currentTimeMillis();
+
+                if (now > deadline) {
+                    throw new Exception("Job exceeded deadline!");
+                }
+            }
+        }
+
+        for (int i = 0; i < j.length; i++) {
+
+            String tmpout = readFully(files.newInputStream(out[i]));
+            String tmperr = readFully(files.newInputStream(err[i]));
+
+            assertTrue(tmpout != null);
+            assertTrue(tmpout.length() == 0);
+
+            assertTrue(tmperr != null);
+            assertTrue(tmperr.length() == 0);
+
+            files.delete(out[i]);
+            files.delete(err[i]);
+        }
+
+        jobs.close(scheduler);
+        files.delete(root);
+        files.close(filesystem);
+    }
+
+    @org.junit.Test
+    public void slurm_test06_getDefaultQueue() throws Exception {
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+
+        String reportedDefaultQueueName = jobs.getDefaultQueueName(scheduler);
+
+        assertEquals(config.getDefaultQueueName(), reportedDefaultQueueName);
     }
 
 }

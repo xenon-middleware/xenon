@@ -38,7 +38,6 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class SlurmJobTestConfig extends JobTestConfig {
 
-
     private String username;
     private char[] passwd;
 
@@ -55,7 +54,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     private long queueWaitTime;
     private long updateTime;
-    
+
     public SlurmJobTestConfig(String configfile) throws Exception {
 
         super("slurm");
@@ -85,7 +84,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
         queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.queue.wait.time"));
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.update.time"));
-        
+
         correctURI = new URI("slurm://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);
         correctURIWithPath = new URI("slurm://" + username + "@" + location + "/");
@@ -104,31 +103,30 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
         return tmp;
     }
-    
+
     @Override
     public String getAdaptorName() {
         return "slurm";
     }
 
     @Override
-    public Map<String,String> getUnknownProperties() throws Exception {
-        Map<String,String> properties = new HashMap<>();
-        properties.put("some.key",  "some value");
-        
+    public Map<String, String> getUnknownProperties() throws Exception {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("some.key", "some value");
+
         return properties;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Map<String,String>[] getInvalidProperties() throws Exception {
+    public Map<String, String>[] getInvalidProperties() throws Exception {
         return new Map[0];
     }
 
     @Override
-    public Map<String,String> getCorrectProperties() throws Exception {
-        return new HashMap<String,String>();
+    public Map<String, String> getCorrectProperties() throws Exception {
+        return new HashMap<String, String>();
     }
-
 
     @Override
     public URI getCorrectURI() throws Exception {
@@ -182,12 +180,12 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", new HashMap<String,String>(), username, passwd);
+        return credentials.newPasswordCredential("slurm", new HashMap<String, String>(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", new HashMap<String,String>(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("slurm", new HashMap<String, String>(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -234,7 +232,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Map<String,String> getDefaultProperties() throws Exception {
+    public Map<String, String> getDefaultProperties() throws Exception {
         return new HashMap<>();
     }
 
@@ -257,7 +255,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     public boolean supportsParallelJobs() {
         return true;
     }
-    
+
     @Override
     public boolean supportsEnvironmentVariables() {
         return true;

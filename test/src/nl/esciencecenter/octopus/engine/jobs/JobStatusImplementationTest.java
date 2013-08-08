@@ -103,6 +103,6 @@ public class JobStatusImplementationTest {
 
         assertTrue(jsi.toString().equals(
                 "JobStatusImplementation [job=" + j + ", state=STATE, exitCode=42, exception=" + e
-                        + ", done=false, schedulerSpecificInformation=" + info + "]"));
+                        + ", running=true, done=false, schedulerSpecificInformation=" + info + "]"));
     }
 }

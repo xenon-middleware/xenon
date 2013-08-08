@@ -88,7 +88,11 @@ public class RemoteCommandRunner {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        JobStatus status = octopus.jobs().waitUntilDone(job, 0);
+        JobStatus status = octopus.jobs().getJobStatus(job);
+
+        if (!status.isDone()) {
+            status = octopus.jobs().waitUntilDone(job, 0);
+        }
 
         if (status.hasException()) {
             throw new OctopusException(adaptorName, "Could not run command remotely", status.getException());

@@ -61,7 +61,7 @@ public final class GridEngineJobScriptGenerator {
 
         String pe = options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT);
 
-        //determine the number of slots we need. Can be overriden by the user
+        //determine the number of slots we need. Can be overridden by the user
         int slots;
         if (options.containsKey(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS)) {
             slots = parseIntOption(options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS));
@@ -88,11 +88,11 @@ public final class GridEngineJobScriptGenerator {
         //set working directory
         if (description.getWorkingDirectory() != null) {
             if (description.getWorkingDirectory().startsWith("/")) {
-                script.format("#$ -wd %s\n", description.getWorkingDirectory());
+                script.format("#$ -wd '%s'\n", description.getWorkingDirectory());
             } else {
                 //make relative path absolute
                 AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
-                script.format("#$ -wd %s\n", workingDirectory.getPath());
+                script.format("#$ -wd '%s'\n", workingDirectory.getPath());
             }
         }
 
@@ -110,19 +110,19 @@ public final class GridEngineJobScriptGenerator {
                 % MINUTES_PER_HOUR);
 
         if (description.getStdin() != null) {
-            script.format("#$ -i %s\n", description.getStdin());
+            script.format("#$ -i '%s'\n", description.getStdin());
         }
 
         if (description.getStdout() == null) {
             script.format("#$ -o /dev/null\n");
         } else {
-            script.format("#$ -o %s\n", description.getStdout());
+            script.format("#$ -o '%s'\n", description.getStdout());
         }
 
         if (description.getStderr() == null) {
             script.format("#$ -e /dev/null\n");
         } else {
-            script.format("#$ -e %s\n", description.getStderr());
+            script.format("#$ -e '%s'\n", description.getStderr());
         }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
