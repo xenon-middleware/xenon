@@ -31,9 +31,9 @@ public class AdaptorDocGenerator {
         
         System.out.println("### `" + d.getName() + "` ###\n");
         System.out.println(d.getDescription() + "\n");
-        System.out.println("Expected type: " + d.getType() + "\n");
-        System.out.println("Default value: " + d.getDefaultValue() + "\n");
-        System.out.println("Valid for: " + d.getLevels() + "\n\n");
+        System.out.println("- Expected type: " + d.getType() + "\n");
+        System.out.println("- Default value: " + d.getDefaultValue() + "\n");
+        System.out.println("- Valid for: " + d.getLevels() + "\n\n");
    }
     
     private static void printAdaptorDoc(AdaptorStatus a) { 

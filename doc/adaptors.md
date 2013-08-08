@@ -20,22 +20,22 @@ local, file
 
 The polling delay for monitoring running jobs (in milliseconds).
 
-Expected type: INTEGER
+- Expected type: INTEGER
 
-Default value: 1000
+- Default value: 1000
 
-Valid for: [OCTOPUS]
+- Valid for: [OCTOPUS]
 
 
 ### `octopus.adaptors.local.queue.multi.maxConcurrentJobs` ###
 
 The maximum number of concurrent jobs in the multiq..
 
-Expected type: INTEGER
+- Expected type: INTEGER
 
-Default value: 4
+- Default value: 4
 
-Valid for: [OCTOPUS]
+- Valid for: [OCTOPUS]
 
 
 
@@ -54,66 +54,66 @@ ssh, sftp
 
 Automatically add unknown host keys to known_hosts.
 
-Expected type: BOOLEAN
+- Expected type: BOOLEAN
 
-Default value: true
+- Default value: true
 
-Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
 
 Enable strict host key checking.
 
-Expected type: BOOLEAN
+- Expected type: BOOLEAN
 
-Default value: true
+- Default value: true
 
-Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
 
 Load the standard known_hosts file.
 
-Expected type: BOOLEAN
+- Expected type: BOOLEAN
 
-Default value: true
+- Default value: true
 
-Valid for: [OCTOPUS]
+- Valid for: [OCTOPUS]
 
 
 ### `octopus.adaptors.ssh.queue.pollingDelay` ###
 
 The polling delay for monitoring running jobs (in milliseconds).
 
-Expected type: LONG
+- Expected type: LONG
 
-Default value: 1000
+- Default value: 1000
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.queue.multi.maxConcurrentJobs` ###
 
 The maximum number of concurrent jobs in the multiq..
 
-Expected type: INTEGER
+- Expected type: INTEGER
 
-Default value: 4
+- Default value: 4
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.gateway` ###
 
 The gateway machine used to create an SSH tunnel to the target.
 
-Expected type: STRING
+- Expected type: STRING
 
-Default value: null
+- Default value: null
 
-Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
@@ -132,33 +132,33 @@ ge, sge
 
 Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
 
-Expected type: BOOLEAN
+- Expected type: BOOLEAN
 
-Default value: false
+- Default value: false
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
 
 
 ### `octopus.adaptors.gridengine.accounting.grace.time` ###
 
 Number of milliseconds a job is allowed to take going from the queue to the qacct output.
 
-Expected type: LONG
+- Expected type: LONG
 
-Default value: 60000
+- Default value: 60000
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
 
 
 ### `octopus.adaptors.gridengine.poll.delay` ###
 
 Number of milliseconds between polling the status of a job.
 
-Expected type: LONG
+- Expected type: LONG
 
-Default value: 1000
+- Default value: 1000
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
 
 
 
@@ -177,22 +177,33 @@ slurm
 
 Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
 
-Expected type: BOOLEAN
+- Expected type: BOOLEAN
 
-Default value: false
+- Default value: false
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
+
+
+### `octopus.adaptors.slurm.disable.accounting.usage` ###
+
+Do not used accounting info of slurm, even when available. Mostly for testing purposes
+
+- Expected type: BOOLEAN
+
+- Default value: false
+
+- Valid for: [SCHEDULER]
 
 
 ### `octopus.adaptors.slurm.poll.delay` ###
 
 Number of milliseconds between polling the status of a job.
 
-Expected type: LONG
+- Expected type: LONG
 
-Default value: 1000
+- Default value: 1000
 
-Valid for: [SCHEDULER]
+- Valid for: [SCHEDULER]
 
 
 
