@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
@@ -29,9 +30,11 @@ import org.junit.Test;
 public class OctopusFactoryTest {
 
     @Test
-    public void testNewOctopusFactory() throws OctopusException {
+    public void testNewOctopusFactory() throws Exception {
         // Test to satisfy coverage.
-        new OctopusFactory();
+        Constructor<OctopusFactory> constructor = OctopusFactory.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        constructor.newInstance();
     }
 
     @Test

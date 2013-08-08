@@ -22,8 +22,12 @@ import java.net.URI;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class URIUtils {
+public final class URIUtils {
 
+    private URIUtils() { 
+        // DO NOTE USE
+    }
+    
     public static URI getFileSystemURI(URI uri) {
 
         // Strip the URI of all the parts we do not need for octopus. 

@@ -47,10 +47,14 @@ import nl.esciencecenter.octopus.files.RelativePath;
  * @author Niels Drost
  * 
  */
-public class FileUtils {
+public final class FileUtils {
 
     public static final int BUFFER_SIZE = 10240;
 
+    private FileUtils() { 
+        // DO NOT USE
+    }
+    
     private static void close(Closeable c) {
 
         try {

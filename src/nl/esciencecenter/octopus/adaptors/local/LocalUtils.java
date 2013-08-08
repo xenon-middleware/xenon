@@ -54,6 +54,10 @@ class LocalUtils {
     public static final String LOCAL_JOB_URI = "local:///";
     public static final String LOCAL_FILE_URI = "file:///";
 
+    private LocalUtils() { 
+        // DO NOTE USE
+    }
+    
     static String getHome() throws OctopusException {
 
         String path = System.getProperty("user.home");

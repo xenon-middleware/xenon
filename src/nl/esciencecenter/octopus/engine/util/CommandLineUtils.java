@@ -21,8 +21,12 @@ package nl.esciencecenter.octopus.engine.util;
  * @author Niels Drost
  * 
  */
-public class CommandLineUtils {
+public final class CommandLineUtils {
 
+    private CommandLineUtils() { 
+        // DO NOT USE
+    }
+    
     /**
      * Escapes and quotes command line arguments to keep shells from expanding/interpreting them.
      * 

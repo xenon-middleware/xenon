@@ -16,6 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.nio.file.attribute.FileAttribute;
 import java.util.HashSet;
@@ -37,8 +38,10 @@ public class LocalUtilsTest {
 
     @org.junit.Test
     public void test_new() throws Exception {
-        // Useless operation!
-        new LocalUtils();
+        // Test to satisfy coverage.
+        Constructor<LocalUtils> constructor = LocalUtils.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        constructor.newInstance();
     }
 
     @org.junit.Test(expected = OctopusIOException.class)

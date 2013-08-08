@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  * @since 1.0
  */
-public class OctopusEngine implements Octopus {
+public final class OctopusEngine implements Octopus {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OctopusEngine.class);
 
