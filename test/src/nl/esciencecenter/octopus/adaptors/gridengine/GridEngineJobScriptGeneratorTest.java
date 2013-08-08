@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
@@ -38,14 +39,13 @@ public class GridEngineJobScriptGeneratorTest {
     }
 
     @Test
-    public void testEmptyDescription() throws OctopusException {
+    public void test01_EmptyDescription_Result() throws OctopusException {
         JobDescription description = new JobDescription();
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --nodes=1\n"
-                + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n"
-                + "#SBATCH --error=/dev/null\n\n" + "srun null\n";
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N octopus\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n"
+                + "#$ -e /dev/null\n" + "\n" + "null\n";
 
         assertEquals(expected, result);
     }
@@ -55,7 +55,7 @@ public class GridEngineJobScriptGeneratorTest {
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      * @throws OctopusException
      */
-    public void testFilledDescription() throws OctopusException {
+    public void test02_FilledDescription_Result() throws OctopusException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
@@ -63,8 +63,8 @@ public class GridEngineJobScriptGeneratorTest {
         description.addJobOption("job", "option");
         description.setExecutable("/bin/executable");
         description.setMaxTime(100);
-        description.setNodeCount(5);
-        description.setProcessesPerNode(55);
+        description.setNodeCount(1);
+        description.setProcessesPerNode(1);
         description.setQueueName("the.queue");
         description.setStderr("stderr.file");
         description.setStdin("stdin.file");
@@ -73,15 +73,68 @@ public class GridEngineJobScriptGeneratorTest {
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --workdir='/some/working/directory'\n"
-                + "#SBATCH --partition=the.queue\n" + "#SBATCH --nodes=5\n" + "#SBATCH --ntasks-per-node=55\n"
-                + "#SBATCH --time=100\n" + "#SBATCH --input='stdin.file'\n" + "#SBATCH --output='stdout.file'\n"
-                + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
-                + "export some=\"environment.value\"\n\n" + "srun /bin/executable 'some' 'arguments'\n";
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N octopus\n" + "#$ -wd '/some/working/directory'\n"
+                + "#$ -q the.queue\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n"
+                + "#$ -e 'stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
+                + "export some=\"environment.value\"\n" + "\n" + "/bin/executable 'some' 'arguments'\n";
 
         System.out.println(result);
 
         assertEquals(expected, result);
     }
 
+    @Test
+    /**
+     * Check to see if the output is _exactly_ what we expect, and not a single char different.
+     * @throws OctopusException
+     */
+    public void test03_ParallelDescription_Result() throws OctopusException {
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/executable");
+        description.setArguments("some", "arguments");
+        description.setMaxTime(100);
+        description.setNodeCount(4);
+        description.setProcessesPerNode(10);
+        description.setQueueName("the.queue");
+        description.setStderr("stderr.file");
+        description.setStdin("stdin.file");
+        description.setStdout("stdout.file");
+        description.setWorkingDirectory("/some/working/directory");
+
+        //set pe and slots explicitly. We test the setup class used to automatically get these values separately.
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "5");
+
+        String result = GridEngineJobScriptGenerator.generate(description, null, null);
+
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N octopus\n" + "#$ -wd '/some/working/directory'\n"
+                + "#$ -q the.queue\n" + "#$ -pe some.pe 5\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n"
+                + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
+                + "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "done\n" + "\n" + "wait\n" + "exit 0\n\n";
+
+        System.out.println(result);
+
+        assertEquals(expected, result);
+    }
+
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test04_InvalidParallelSlotsOption_ExceptionThrown() throws OctopusException {
+        JobDescription description = new JobDescription();
+        description.setNodeCount(2);
+
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "five");
+
+        GridEngineJobScriptGenerator.generate(description, null, null);
+    }
 }

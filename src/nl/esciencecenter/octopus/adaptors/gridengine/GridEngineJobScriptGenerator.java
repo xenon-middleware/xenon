@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -51,7 +52,7 @@ public final class GridEngineJobScriptGenerator {
         try {
             return Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Error in parsing integer option", e);
+            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Error in parsing integer option \"" + string + "\"", e);
         }
     }
 
@@ -157,7 +158,7 @@ public final class GridEngineJobScriptGenerator {
         script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
 
         for (int i = 0; i < description.getProcessesPerNode(); i++) {
-            script.format("\tssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
+            script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
             script.format("%s", description.getExecutable());
             for (String argument : description.getArguments()) {
                 script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
