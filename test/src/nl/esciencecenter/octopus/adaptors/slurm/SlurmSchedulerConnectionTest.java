@@ -25,13 +25,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
+import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
-import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -84,39 +83,6 @@ public class SlurmSchedulerConnectionTest {
         SlurmSchedulerConnection.exitcodeFromString(input);
     }
 
-    private static class FakeJob implements Job {
-        final String identifier;
-
-        FakeJob(String identifier) {
-            this.identifier = identifier;
-        }
-
-        @Override
-        public JobDescription getJobDescription() {
-            return null;
-        }
-
-        @Override
-        public Scheduler getScheduler() {
-            return null;
-        }
-
-        @Override
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        @Override
-        public boolean isInteractive() {
-            return false;
-        }
-
-        @Override
-        public boolean isOnline() {
-            return false;
-        }
-    }
-
     //new JobStatusImplementation(inputJob, state, exitCode, error, running, done, jobInfo);
 
     @Test
@@ -129,7 +95,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -151,7 +117,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -173,7 +139,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -196,7 +162,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -218,7 +184,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -233,80 +199,29 @@ public class SlurmSchedulerConnectionTest {
     }
     
     @Test
-    public void test02f_getJobStatusFromSacctInfo_FailedJobWithNoExitCode_JobStatusWithException() throws OctopusException {
-        String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        jobInfo.put("JobID", jobID);
-        jobInfo.put("State", "FAILED");
-        //no exit code
-
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
-        JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
-        assertEquals(job, result.getJob());
-        assertEquals("FAILED", result.getState());
-        assertNull(result.getExitCode());
-        assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof OctopusException);
-        assertFalse(result.getException() instanceof JobCanceledException);
-        assertFalse(result.isRunning());
-        assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
-    }
-    
-    @Test
-    public void test02g_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws OctopusException {
+    public void test02f_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws OctopusException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
         
         assertNull(result);
     }
     
     @Test(expected=OctopusException.class)
-    public void test02h_getJobStatusFromSacctInfo_JobIDNotInJobInfo_ExceptionThrown() throws OctopusException {
+    public void test02g_getJobStatusFromSacctInfo_InvalidJobInfo_ExceptionThrown() throws OctopusException {
         String jobID = "555";
+        //very invalid info, no info at all
         Map<String, String> jobInfo = new HashMap<String, String>();
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
         
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         
         SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
     }
 
-    @Test(expected=OctopusException.class)
-    public void test02i_getJobStatusFromSacctInfo_IncorrectJobIDInJobInfo_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        //incorrect job ID
-        jobInfo.put("JobID", "222");
-
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        //jobInfo of job 555 in map under 222
-        input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
-        
-        SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-    }
-    
-    @Test(expected=OctopusException.class)
-    public void test02j_getJobStatusFromSacctInfo_NoJobState_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        jobInfo.put("JobID", jobID);
-        //no job state
-
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
-        SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-    }
 
     @Test
     public void test03a_getJobStatusFromScontrolInfo_CompletedJob_JobStatus() throws OctopusException {
@@ -317,7 +232,7 @@ public class SlurmSchedulerConnectionTest {
         jobInfo.put("ExitCode", "5:0");
         jobInfo.put("Reason", "None");
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
         
         assertEquals(job, result.getJob());
@@ -338,7 +253,7 @@ public class SlurmSchedulerConnectionTest {
         jobInfo.put("ExitCode", "0:0");
         jobInfo.put("Reason", "None");
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
         
         assertEquals(job, result.getJob());
@@ -359,7 +274,7 @@ public class SlurmSchedulerConnectionTest {
         jobInfo.put("ExitCode", "0:0");
         jobInfo.put("Reason", "None");
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
         
         assertEquals(job, result.getJob());
@@ -381,7 +296,7 @@ public class SlurmSchedulerConnectionTest {
         jobInfo.put("ExitCode", "11:0");
         jobInfo.put("Reason", "NonZeroExitCode");
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
         
         assertEquals(job, result.getJob());
@@ -402,7 +317,7 @@ public class SlurmSchedulerConnectionTest {
         jobInfo.put("ExitCode", "4:0");
         jobInfo.put("Reason", "SomethingWentWrongNoIdea");
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
         
         assertEquals(job, result.getJob());
@@ -425,7 +340,7 @@ public class SlurmSchedulerConnectionTest {
         jobInfo.put("ExitCode", "4:0");
         jobInfo.put("Reason", "None");
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
         
         assertEquals(job, result.getJob());
@@ -440,81 +355,22 @@ public class SlurmSchedulerConnectionTest {
     }
     
     @Test
-    public void test03g_getJobStatusFromScontrolInfo_FailedJobWithNoExitCode_JobStatusWithException() throws OctopusException {
+    public void test03g_getJobStatusFromScontrolInfo_NullInput_NullReturned() throws OctopusException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        jobInfo.put("JobId", jobID);
-        jobInfo.put("JobState", "FAILED");
-        jobInfo.put("Reason", "SomethingWentWrongNoIdea");
-        //no exit code
-
-        Job job = new FakeJob(jobID);
-        JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
-        assertEquals(job, result.getJob());
-        assertEquals("FAILED", result.getState());
-        assertNull(result.getExitCode());
-        assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof OctopusException);
-        assertFalse(result.getException() instanceof JobCanceledException);
-        assertFalse(result.isRunning());
-        assertTrue(result.isDone());
-        assertEquals(jobInfo, result.getSchedulerSpecficInformation());
-    }
-    
-    @Test
-    public void test03h_getJobStatusFromScontrolInfo_NullInput_NullReturned() throws OctopusException {
-        String jobID = "555";
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(null, job);
         
         assertNull(result);
     }
     
     @Test(expected=OctopusException.class)
-    public void test03i_getJobStatusFromScontrolInfo_JobIDNotInJobInfo_ExceptionThrown() throws OctopusException {
+    public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws OctopusException {
         String jobID = "555";
+        //empty job info
         Map<String, String> jobInfo = new HashMap<String, String>();
 
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         
-        SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-    }
-
-    @Test(expected=OctopusException.class)
-    public void test03j_getJobStatusFromScontrolInfo_IncorrectJobIDInJobInfo_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        //incorrect job ID
-        jobInfo.put("JobId", "222");
-
-        Job job = new FakeJob(jobID);
-        
-        SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-    }
-    
-    @Test(expected=OctopusException.class)
-    public void test03k_getJobStatusFromScontrolInfo_NoJobState_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        jobInfo.put("JobId", jobID);
-        //no job state
-        jobInfo.put("Reason", "None");
-
-        Job job = new FakeJob(jobID);
-        SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-    }
-    
-    @Test(expected=OctopusException.class)
-    public void test03l_getJobStatusFromScontrolInfo_NoReason_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        jobInfo.put("JobId", jobID);
-        jobInfo.put("JobState", "COMPLETED");
-        //no reason
-
-        Job job = new FakeJob(jobID);
         SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
     }
 
@@ -527,7 +383,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -548,7 +404,7 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
         
         assertEquals(job, result.getJob());
@@ -561,54 +417,27 @@ public class SlurmSchedulerConnectionTest {
     }
     
     @Test
-    public void test04g_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws OctopusException {
+    public void test04c_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws OctopusException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
         
         assertNull(result);
     }
     
     @Test(expected=OctopusException.class)
-    public void test04h_getJobStatusFromSqueueInfo_JobIDNotInJobInfo_ExceptionThrown() throws OctopusException {
+    public void test04d_getJobStatusFromSqueueInfo_IncompleteJobInfo_ExceptionThrown() throws OctopusException {
         String jobID = "555";
+
+        //very incomplete job info
         Map<String, String> jobInfo = new HashMap<String, String>();
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
         
-        Job job = new FakeJob(jobID);
+        Job job = new FakeScriptingJob(jobID);
         
-        SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
-    }
-
-    @Test(expected=OctopusException.class)
-    public void test04i_getJobStatusFromSqueueInfo_IncorrectJobIDInJobInfo_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        //incorrect job ID
-        jobInfo.put("JOBID", "222");
-
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        //jobInfo of job 555 in map under 222
-        input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
-        
-        SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
-    }
-    
-    @Test(expected=OctopusException.class)
-    public void test04j_getJobStatusFromSqueueInfo_NoJobState_ExceptionThrown() throws OctopusException {
-        String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
-        jobInfo.put("JOBID", jobID);
-        //no job state
-
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        input.put(jobID, jobInfo);
-        Job job = new FakeJob(jobID);
         SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
     }
 

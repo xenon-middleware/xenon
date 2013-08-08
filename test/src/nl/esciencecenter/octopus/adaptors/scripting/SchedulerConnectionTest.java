@@ -19,10 +19,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 import org.junit.FixMethodOrder;
@@ -35,40 +39,39 @@ import org.junit.runners.MethodSorters;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SchedulerConnectionTest {
-    
+
     @Test
     public void test01a_supportsScheme_IsSupported_True() {
         String input = "jfg";
-        String[] supported = new String[] {"jfg", "hik", "bla"};
-        
+        String[] supported = new String[] { "jfg", "hik", "bla" };
+
         boolean expected = true;
         boolean result = SchedulerConnection.supportsScheme(input, supported);
 
         assertEquals("this scheme should be supported", expected, result);
     }
-    
+
     @Test
     public void test01b_supportsScheme_NotSupported_False() {
         String input = "notaschemewaytoolong";
-        String[] supported = new String[] {"jfg", "hik", "bla"};
-        
+        String[] supported = new String[] { "jfg", "hik", "bla" };
+
         boolean expected = false;
         boolean result = SchedulerConnection.supportsScheme(input, supported);
 
         assertEquals("this scheme must not be supported", expected, result);
     }
-    
+
     @Test
     public void test01a_supportsScheme_DifferentCase_Matches() {
         String input = "JFg";
-        String[] supported = new String[] {"jFg", "hik", "bla"};
-        
+        String[] supported = new String[] { "jFg", "hik", "bla" };
+
         boolean expected = true;
         boolean result = SchedulerConnection.supportsScheme(input, supported);
 
         assertEquals("scheme matching should be case insensitive", expected, result);
     }
-
 
     @Test
     public void test02a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
@@ -236,4 +239,60 @@ public class SchedulerConnectionTest {
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
 
+    @Test(expected = OctopusException.class)
+    public void test04a_verifyJobInfoValidInfo_NoException() throws OctopusException {
+        String jobID = "555";
+
+        Map<String, String> jobInfo = new HashMap<String, String>();
+        jobInfo.put("JobID", "555");
+        jobInfo.put("AdditionalField", "AdditionalInfo");
+
+        Job job = new FakeScriptingJob(jobID);
+
+        SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID", "AdditionalField");
+    }
+
+    @Test(expected = OctopusException.class)
+    public void test04a_verifyJobInfo_NullInfoMap_ExceptionThrown() throws OctopusException {
+        String jobID = "555";
+
+        Job job = new FakeScriptingJob(jobID);
+
+        SchedulerConnection.verifyJobInfo(null, job, "fake", "JobID");
+    }
+
+    @Test(expected = OctopusException.class)
+    public void test04a_verifyJobInfo_NoJobID_ExceptionThrown() throws OctopusException {
+        String jobID = "555";
+        Map<String, String> jobInfo = new HashMap<String, String>();
+
+        Job job = new FakeScriptingJob(jobID);
+
+        SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID");
+    }
+
+    @Test(expected = OctopusException.class)
+    public void test04a_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws OctopusException {
+        String jobID = "555";
+
+        Map<String, String> jobInfo = new HashMap<String, String>();
+        //incorrect job ID
+        jobInfo.put("JobID", "222");
+
+        Job job = new FakeScriptingJob(jobID);
+
+        SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID");
+    }
+
+    @Test(expected = OctopusException.class)
+    public void test04a_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws OctopusException {
+        String jobID = "555";
+        Map<String, String> jobInfo = new HashMap<String, String>();
+        jobInfo.put("JobID", jobID);
+        //no job state
+        jobInfo.put("Reason", "None");
+
+        Job job = new FakeScriptingJob(jobID);
+        SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID", "Reason", "JobState");
+    }
 }

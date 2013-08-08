@@ -156,6 +156,47 @@ public abstract class SchedulerConnection {
         }
     }
 
+    /**
+     * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
+     * 
+     * @param info
+     *            the map the job info should be .
+     * @param job
+     *            the job to check the presence for.
+     * @param jobIDField
+     *            the field which contains the job id.
+     * @param additionalFields
+     *            any additional fields to check the presence of.
+     * @throws OctopusException
+     *             if any fields are missing or incorrect
+     */
+    protected static void verifyJobInfo(Map<String, String> jobInfo, Job job, String adaptorName, String jobIDField,
+            String... additionalFields) throws OctopusException {
+        if (jobInfo == null) {
+            //redundant check, calling functions usually already check for this and return null.
+            throw new OctopusException(adaptorName, "Job " + job.getIdentifier() + " not found in job info");
+        }
+
+        String jobID = jobInfo.get(jobIDField);
+
+        if (jobID == null) {
+            throw new OctopusException(adaptorName, "Invalid job info. Info does not contain job id");
+        }
+
+        if (!jobID.equals(job.getIdentifier())) {
+            throw new OctopusException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match "
+                    + job.getIdentifier());
+        }
+
+        for (String field : additionalFields) {
+            if (!jobInfo.containsKey(field)) {
+                throw new OctopusException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field
+                        + "\"");
+            }
+        }
+
+    }
+
     protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
             OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
 

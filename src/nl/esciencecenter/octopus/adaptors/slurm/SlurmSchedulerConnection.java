@@ -94,22 +94,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        String jobID = jobInfo.get("JobID");
-
-        if (jobID == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct info. Info does not contain job id");
-        }
-
-        if (!jobID.equals(job.getIdentifier())) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct info. Found job id \"" + jobID
-                    + "\" does not match " + job.getIdentifier());
-        }
+        //also checks if the job id is correct
+        SchedulerConnection.verifyJobInfo(jobInfo, job, SlurmAdaptor.ADAPTOR_NAME, "JobID", "State", "ExitCode");
 
         String state = jobInfo.get("State");
-
-        if (state == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid sacct info. Info does not contain job state");
-        }
 
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
 
@@ -136,31 +124,13 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
         }
-
-        String jobID = jobInfo.get("JobId");
-
-        if (jobID == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Info does not contain job ID");
-        }
-
-        if (!jobID.equals(job.getIdentifier())) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Found jobid \"" + jobInfo.get("JobId")
-                    + "\" does not match " + job.getIdentifier());
-        }
-
+        
+        //also checks if the job id is correct
+        SchedulerConnection.verifyJobInfo(jobInfo, job, SlurmAdaptor.ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
+        
         String state = jobInfo.get("JobState");
-
-        if (state == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Info does not contain job state");
-        }
-
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
-
         String reason = jobInfo.get("Reason");
-
-        if (reason == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid scontrol info. Info does not contain reason");
-        }
 
         Exception exception;
         if (!isFailedState(state) || state.equals("FAILED") && reason.equals("NonZeroExitCode")) {
@@ -192,22 +162,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             return null;
         }
         
-        String jobID = jobInfo.get("JOBID");
-
-        if (jobID == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid squeue info. Info does not contain job ID");
-        }
-
-        if (!jobID.equals(job.getIdentifier())) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid squeue info. Found jobid \"" + jobInfo.get("JobId")
-                    + "\" does not match " + job.getIdentifier());
-        }
-
-        String state = jobInfo.get("STATE");
+        //also checks if the job id is correct
+        SchedulerConnection.verifyJobInfo(jobInfo, job, SlurmAdaptor.ADAPTOR_NAME, "JOBID", "STATE");
         
-        if (state == null) {
-            throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Invalid squeue info. Info does not contain job state");
-        }
+        String state = jobInfo.get("STATE");
 
         return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
     }
@@ -303,21 +261,21 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         //If the size of the column is not specified the default partition does not get listed with a "*"
         String output = runCheckedCommand(null, "sinfo", "--noheader", "--format=%120P");
 
-        String[] queueNames = ScriptingParser.parseList(output);
+        String[] foundQueueNames = ScriptingParser.parseList(output);
 
-        String defaultQueueName = null;
-        for (int i = 0; i < queueNames.length; i++) {
-            String queueName = queueNames[i];
+        String foundDefaultQueueName = null;
+        for (int i = 0; i < foundQueueNames.length; i++) {
+            String queueName = foundQueueNames[i];
             if (queueName.endsWith("*")) {
                 //cut "*" of queue name
-                queueNames[i] = queueName.substring(0, queueName.length() - 1);
-                defaultQueueName = queueNames[i];
+                foundQueueNames[i] = queueName.substring(0, queueName.length() - 1);
+                foundDefaultQueueName = foundQueueNames[i];
             }
         }
-        this.queueNames = queueNames;
-        this.defaultQueueName = defaultQueueName;
+        this.queueNames = foundQueueNames;
+        this.defaultQueueName = foundDefaultQueueName;
 
-        scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, queueNames, credential,
+        scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, foundQueueNames, credential,
                 getProperties(), false, false, true);
 
         LOGGER.debug("new slurm scheduler connection {}", scheduler);
@@ -555,30 +513,30 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     @Override
     public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws OctopusIOException, OctopusException {
-        String[] queueNames;
+        String[] targetQueueNames;
 
         if (requestedQueueNames == null) {
             throw new IllegalArgumentException("list of queue names cannot be null");
         } else if (requestedQueueNames.length == 0) {
-            queueNames = getQueueNames();
+            targetQueueNames = getQueueNames();
         } else {
-            queueNames = requestedQueueNames;
+            targetQueueNames = requestedQueueNames;
         }
 
-        Map<String, Map<String, String>> info = getSinfoInfo(queueNames);
+        Map<String, Map<String, String>> info = getSinfoInfo(targetQueueNames);
 
-        QueueStatus[] result = new QueueStatus[queueNames.length];
+        QueueStatus[] result = new QueueStatus[targetQueueNames.length];
 
-        for (int i = 0; i < queueNames.length; i++) {
-            if (queueNames[i] == null) {
+        for (int i = 0; i < targetQueueNames.length; i++) {
+            if (targetQueueNames[i] == null) {
                 result[i] = null;
             } else {
-                result[i] = getQueueStatusFromSInfo(info, queueNames[i], getScheduler());
+                result[i] = getQueueStatusFromSInfo(info, targetQueueNames[i], getScheduler());
 
                 if (result[i] == null) {
                     Exception exception = new NoSuchQueueException(SlurmAdaptor.ADAPTOR_NAME, "Cannot get status of queue \""
-                            + queueNames[i] + "\" from server");
-                    result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
+                            + targetQueueNames[i] + "\" from server");
+                    result[i] = new QueueStatusImplementation(getScheduler(), targetQueueNames[i], exception, null);
                 }
             }
         }

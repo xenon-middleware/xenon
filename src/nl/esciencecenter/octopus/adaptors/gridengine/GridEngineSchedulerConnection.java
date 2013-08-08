@@ -291,8 +291,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         Map<String, String> map = allMap.get(queueName);
 
         if (map == null || map.isEmpty()) {
-            throw new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue " + queueName
-                    + " from server, perhaps it does not exist?");
+            throw new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue \"" + queueName
+                    + "\" from server, perhaps it does not exist?");
         }
 
         return new QueueStatusImplementation(getScheduler(), queueName, null, map);
@@ -311,17 +311,15 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
 
         for (int i = 0; i < queueNames.length; i++) {
-            if (allMap == null || allMap.isEmpty()) {
-                Exception exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME,
-                        "Failed to get status of queues on server");
-                result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
+            if (queueNames[i] == null) {
+                result[i] = null;
             } else {
                 //state for only the requested queue
                 Map<String, String> map = allMap.get(queueNames[i]);
 
                 if (map == null || map.isEmpty()) {
-                    Exception exception = new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue "
-                            + queueNames[i] + " from server");
+                    Exception exception = new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue \""
+                            + queueNames[i] + "\" from server, perhaps it does not exist?");
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
                 } else {
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, map);
