@@ -1508,8 +1508,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setExecutable("/usr/bin/printenv");
         description.setArguments("SOME_VARIABLE");
         description.setInteractive(false);
-
-        description.getEnvironment().put("SOME_VARIABLE", "some_value");
+        description.addEnvironment("SOME_VARIABLE", "some_value");
 
         description.setWorkingDirectory(null);
         description.setStderr(null);
