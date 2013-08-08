@@ -34,34 +34,32 @@ public interface Credentials {
      * Constructs a certificate Credential.
      * 
      * A certificate Credential is created out of a <code>certfile</code> pointing to the certificate, a username and a password.
-     * 
      * @param certfile
      *            the certificate file (for example userkey.pem or id_dsa)
      * @param username
      *            the username
      * @param password
      *            the password or passphrase belonging to the key and certificate.
+     * 
      * @returns an ID for the credential, which can be used to remove it from the credential set again.
      */
-    Credential newCertificateCredential(String scheme, Map<String, String> properties, String certfile, String username,
-            char[] password) throws OctopusException;
+    Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
+            Map<String, String> properties) throws OctopusException;
 
     /**
      * Constructs a password credential.
      * 
      * If a username is given in the URIs, it must be identical to username parameter.
-     * 
      * @param username
      *            the username.
      * @param password
      *            the password.
      */
-    Credential newPasswordCredential(String scheme, Map<String, String> properties, String username, char[] password)
+    Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws OctopusException;
 
     /**
      * Creates a proxy credential.
-     * 
      * @param host
      *            the hostname of the proxy server
      * @param port
@@ -71,8 +69,8 @@ public interface Credentials {
      * @param password
      *            the password to use to connect to the proxy server
      */
-    Credential newProxyCredential(String scheme, Map<String, String> properties, String host, int port, String username,
-            char[] password) throws OctopusException;
+    Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
+            Map<String, String> properties) throws OctopusException;
 
     /**
      * Creates a proxy credential.

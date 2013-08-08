@@ -41,21 +41,21 @@ public class ForwardingCredentials implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Map<String, String> properties, String certfile, String username,
-            char[] password) throws OctopusException {
-        return octopusEngine.credentials().newCertificateCredential(targetScheme, properties, certfile, username, password);
+    public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
+            Map<String, String> properties) throws OctopusException {
+        return octopusEngine.credentials().newCertificateCredential(targetScheme, certfile, username, password, properties);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Map<String, String> properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws OctopusException {
-        return octopusEngine.credentials().newPasswordCredential(targetScheme, properties, username, password);
+        return octopusEngine.credentials().newPasswordCredential(targetScheme, username, password, properties);
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Map<String, String> properties, String host, int port, String username,
-            char[] password) throws OctopusException {
-        return octopusEngine.credentials().newProxyCredential(targetScheme, properties, host, port, username, password);
+    public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
+            Map<String, String> properties) throws OctopusException {
+        return octopusEngine.credentials().newProxyCredential(targetScheme, host, port, username, password, properties);
     }
 
     @Override

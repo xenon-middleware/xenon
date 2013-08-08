@@ -155,12 +155,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new HashMap<String, String>(), username, passwd);
+        return credentials.newPasswordCredential("ge", username, passwd, new HashMap<String, String>());
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", new HashMap<String, String>(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("ge", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
     }
 
     @Override

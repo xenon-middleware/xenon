@@ -43,7 +43,7 @@ public class CreatingCredential {
             Credential credential1 = credentials.getDefaultCredential("ssh");
 
             // We can also create other types of credentials
-            Credential credential2 = credentials.newPasswordCredential("ssh", null, "username", "password".toCharArray());
+            Credential credential2 = credentials.newPasswordCredential("ssh", "username", "password".toCharArray(), null);
 
             // Close the credentials once we're done.
             credentials.close(credential1);
