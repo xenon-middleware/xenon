@@ -65,7 +65,7 @@ public class SchedulerImplementation implements Scheduler {
         if (queueNames == null) {
             this.queueNames = new String[0];
         } else {
-            this.queueNames = queueNames.clone();
+            this.queueNames = Arrays.copyOf(queueNames, queueNames.length);
         }
     }
 
