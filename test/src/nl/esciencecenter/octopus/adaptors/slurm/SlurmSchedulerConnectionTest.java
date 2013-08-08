@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -24,13 +25,16 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
+import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingScheduler;
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
-import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
+import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.QueueStatus;
+import nl.esciencecenter.octopus.jobs.Scheduler;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -442,28 +446,180 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test05_getQueueStatusFromSInfo() {
-        fail("Not yet implemented");
+    public void test05a_getQueueStatusFromSInfo_CorrectInfo_Result() {
+        String queueName = "some.q";
+        
+        Scheduler scheduler = new FakeScriptingScheduler();
+
+        Map<String, String> queueInfo = new HashMap<String, String>();
+        
+        queueInfo.put("MaxUsers", "5");
+        queueInfo.put("Nodes", "23");
+
+        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        input.put(queueName, queueInfo);
+
+        
+        QueueStatus result = SlurmSchedulerConnection.getQueueStatusFromSInfo(input, queueName, scheduler);
+        
+        assertNotNull(result);
+        assertEquals(queueName, result.getQueueName());
+        assertEquals(queueInfo, result.getSchedulerSpecficInformation());
+        assertEquals(scheduler, result.getScheduler());
+    }
+    
+    @Test
+    public void test05b_getQueueStatusFromSInfo_QueueNotInInfo_NullReturned() {
+        String queueName = "some.q";
+        
+        Scheduler scheduler = new FakeScriptingScheduler();
+
+        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        
+        QueueStatus result = SlurmSchedulerConnection.getQueueStatusFromSInfo(input, queueName, scheduler);
+        
+        assertNull(result);
     }
 
     @Test
-    public void test06_identifiersAsCSList() {
-        fail("Not yet implemented");
+    public void test06a_identifiersAsCSList_Jobs_OutputString() {
+        Job[] input = new Job[5];
+        input[0] = new FakeScriptingJob("000");
+        input[1] = new FakeScriptingJob("111");
+        input[2] = new FakeScriptingJob("222");
+        input[3] = new FakeScriptingJob("333");
+        input[4] = new FakeScriptingJob("444");
+
+        String expected = "000,111,222,333,444";
+        
+        String result = SlurmSchedulerConnection.identifiersAsCSList(input);
+        
+        assertEquals(result, expected);
     }
+    
+    @Test
+    public void test06b_identifiersAsCSList_JobsWithNulls_OutputString() {
+        Job[] input = new Job[8];
+        input[0] = null;
+        input[1] = new FakeScriptingJob("000");
+        input[2] = new FakeScriptingJob("111");
+        input[3] = null;
+        input[4] = new FakeScriptingJob("222");
+        input[5] = new FakeScriptingJob("333");
+        input[6] = new FakeScriptingJob("444");
+        input[7] = null;
+
+        String expected = "000,111,222,333,444";
+        
+        String result = SlurmSchedulerConnection.identifiersAsCSList(input);
+        
+        assertEquals(result, expected);
+    }
+
 
     @Test
     public void test07_isDoneState() {
-        fail("Not yet implemented");
+        assertTrue(SlurmSchedulerConnection.isDoneState("COMPLETED"));
+        
+        assertTrue(SlurmSchedulerConnection.isDoneState("FAILED"));
+        
+        assertFalse(SlurmSchedulerConnection.isDoneState("SOMERANDOMSTATE"));
+        
+        assertFalse(SlurmSchedulerConnection.isDoneState("RUNNING"));
     }
 
     @Test
     public void test08_isFailedState() {
-        fail("Not yet implemented");
+        assertFalse(SlurmSchedulerConnection.isFailedState("COMPLETED"));
+        
+        assertTrue(SlurmSchedulerConnection.isFailedState("FAILED"));
+        
+        assertFalse(SlurmSchedulerConnection.isFailedState("SOMERANDOMSTATE"));
+        
+        assertFalse(SlurmSchedulerConnection.isFailedState("RUNNING"));
+    }
+    
+    @Test
+    public void test09a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
+        JobDescription description = new JobDescription();
+
+        //all the settings the function checks for set exactly right
+        description.setExecutable("/bin/nothing");
+        description.setNodeCount(1);
+        description.setProcessesPerNode(1);
+        description.setMaxTime(1);
+        //slurm specific info
+        description.setInteractive(false);
+
+        SlurmSchedulerConnection.verifyJobDescription(description);
+    }
+    
+    @Test
+    public void test09b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
+        JobDescription description = new JobDescription();
+
+        //all the settings the function checks for set exactly right
+        description.setExecutable("/bin/nothing");
+        description.setNodeCount(1);
+        description.setProcessesPerNode(1);
+        description.setMaxTime(1);
+        //slurm specific info
+        description.addJobOption(SlurmSchedulerConnection.JOB_OPTION_JOB_SCRIPT, "some.script");
+        description.setInteractive(false);
+
+        SlurmSchedulerConnection.verifyJobDescription(description);
+    }
+    
+    @Test
+    public void test09c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
+        JobDescription description = new JobDescription();
+
+        //set a job option
+        description.addJobOption(SlurmSchedulerConnection.JOB_OPTION_JOB_SCRIPT, "some.script");
+        description.setInteractive(false);
+        
+        //All these settings are wrong. This should not lead to an error
+        description.setExecutable(null);
+        description.setNodeCount(0);
+        description.setProcessesPerNode(0);
+        description.setMaxTime(0);
+        //slurm specific info
+
+        SlurmSchedulerConnection.verifyJobDescription(description);
+    }
+    
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test09d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
+        JobDescription description = new JobDescription();
+
+        //set a job option
+        description.addJobOption("wrong.setting", "wrong.value");
+        description.setInteractive(false);
+        
+        SlurmSchedulerConnection.verifyJobDescription(description);
+    }
+    
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test09e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
+        JobDescription description = new JobDescription();
+
+        description.setInteractive(true);
+        
+        SlurmSchedulerConnection.verifyJobDescription(description);
+    }
+    
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test09f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
+        JobDescription description = new JobDescription();
+
+        //verify the standard settings are also checked
+        description.setExecutable("bin/bla");
+        description.setMaxTime(0);
+        
+        SlurmSchedulerConnection.verifyJobDescription(description);
     }
 
-    @Test
-    public void test09_verifyJobDescriptionJobDescription() {
-        fail("Not yet implemented");
-    }
+
+
 
 }
