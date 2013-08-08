@@ -50,8 +50,14 @@ public abstract class Adaptor {
         this.octopusEngine = octopusEngine;
         this.name = name;
         this.description = description;
-        this.supportedSchemes = supportedSchemes;
-        this.validProperties = validProperties;
+        this.supportedSchemes = supportedSchemes.clone();
+        
+        if (validProperties == null) {
+            this.validProperties = new OctopusPropertyDescription[0];
+        } else { 
+            this.validProperties = validProperties.clone();
+        } 
+        
         this.properties = properties;
     }
 

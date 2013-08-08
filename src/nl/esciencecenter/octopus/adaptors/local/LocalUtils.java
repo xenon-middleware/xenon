@@ -49,7 +49,7 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
  * @version 1.0
  * @since 1.0
  */
-class LocalUtils {
+final class LocalUtils {
 
     public static final String LOCAL_JOB_URI = "local:///";
     public static final String LOCAL_FILE_URI = "file:///";
