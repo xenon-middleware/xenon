@@ -60,5 +60,6 @@ public class OctopusFactoryTest {
 
         OctopusFactory.endAll();
         OctopusFactory.endOctopus(octopus1);
+        OctopusFactory.endOctopus(octopus2);        
     }
 }

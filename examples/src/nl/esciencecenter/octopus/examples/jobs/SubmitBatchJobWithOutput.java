@@ -40,54 +40,54 @@ import nl.esciencecenter.octopus.util.FileUtils;
  */
 public class SubmitBatchJobWithOutput {
 
-    public static void main(String [] args) { 
-        try { 
-            
+    public static void main(String[] args) {
+        try {
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Jobs API
             Files files = octopus.files();
             Jobs jobs = octopus.jobs();
-            
+
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/uname");
             description.setArguments("-a");
             description.setStdout("stdout.txt");
             description.setStderr("stderr.txt");
-            
+
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(new URI("local:///"), null, null);
-            
+
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
-            
+
             // Wait for the job to finish
             JobStatus status = jobs.waitUntilDone(job, 60000);
-            
+
             // Check if the job was successful. 
-            if (!status.isDone()) { 
+            if (!status.isDone()) {
                 System.out.println("Job failed to run withing deadline.");
-            } else if (status.hasException()) { 
+            } else if (status.hasException()) {
                 Exception e = status.getException();
                 System.out.println("Job produced an exception: " + e.getMessage());
                 e.printStackTrace();
-            } else { 
-                
+            } else {
+
                 System.out.println("Job ran succesfully and produced:");
-                
+
                 FileSystem fs = files.getLocalCWDFileSystem();
                 AbsolutePath stdout = fs.getEntryPath().resolve(new RelativePath("stdout.txt"));
                 AbsolutePath stderr = fs.getEntryPath().resolve(new RelativePath("stderr.txt"));
-                
-                if (files.exists(stdout)) { 
+
+                if (files.exists(stdout)) {
                     String output = new String(FileUtils.readAllBytes(octopus, stdout));
                     System.out.println(" STDOUT: " + output);
                     files.delete(stdout);
                 }
-                
-                if (files.exists(stderr)) { 
+
+                if (files.exists(stderr)) {
                     String output = new String(FileUtils.readAllBytes(octopus, stderr));
                     System.out.println(" STDERR: " + output);
                     files.delete(stderr);
@@ -96,11 +96,11 @@ public class SubmitBatchJobWithOutput {
 
             // Close the scheduler
             jobs.close(scheduler);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

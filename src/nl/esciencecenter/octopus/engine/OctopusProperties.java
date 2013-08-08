@@ -33,146 +33,154 @@ import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
  */
 public class OctopusProperties {
-    
+
     private static final String NAME = "OctopusProperties";
 
     /** One kilo is 1024 */
     private static final int KILO = 1024;
-    
+
     /** One mega is a kilo*kilo */
-    private static final int MEGA = KILO*KILO;
-    
+    private static final int MEGA = KILO * KILO;
+
     /** One giga is a kilo*kilo*kilo */
-    private static final int GIGA = KILO*MEGA; 
-    
+    private static final int GIGA = KILO * MEGA;
+
     /** Contains a description of all properties this OctopusProperties should accept, including their type, default, etc. */
     private final Map<String, OctopusPropertyDescription> supportedProperties;
-       
+
     /** The properties that are actually set. */
     private final Map<String, String> properties;
-    
-    /** 
+
+    /**
      * Private constructor for OctopusProperties using in copying and filtering. The <code>properties</code> parameter is assumed
-     * to only contain valid supported properties and have values of the correct type.   
+     * to only contain valid supported properties and have values of the correct type.
      * 
-     * @param supportedProperties a map containing a description of all supported properties. 
-     * @param properties a map containing valid properties and their values. 
-     */    
-    private OctopusProperties(Map<String, OctopusPropertyDescription> supportedProperties, Map<String,String> properties) { 
+     * @param supportedProperties
+     *            a map containing a description of all supported properties.
+     * @param properties
+     *            a map containing valid properties and their values.
+     */
+    private OctopusProperties(Map<String, OctopusPropertyDescription> supportedProperties, Map<String, String> properties) {
         this.supportedProperties = supportedProperties;
         this.properties = properties;
-    } 
+    }
 
-    /** 
+    /**
      * Creates an empty OctopusProperties.
      */
     public OctopusProperties() {
         supportedProperties = new HashMap<>();
         properties = new HashMap<>();
     }
-    
-    /** 
+
+    /**
      * Create a new OctopusProperties that will support the properties in <code>supportedProperties</code>. All properties in
-     * <code>properties</code> will be added.  
-     *    
-     * @param supportedProperties the properties to support 
-     * @param properties the set of properties to store
-     * @throws UnknownPropertyException if key is found in <code>properties</code> that is not listed in 
-     *                                          <code>supportedProperties</code>
-     * @throws InvalidPropertyException if a key from <code>properties</code> has a value that does not match the type as listed 
-     *                                          in <code>supportedProperties</code>
+     * <code>properties</code> will be added.
+     * 
+     * @param supportedProperties
+     *            the properties to support
+     * @param properties
+     *            the set of properties to store
+     * @throws UnknownPropertyException
+     *             if key is found in <code>properties</code> that is not listed in <code>supportedProperties</code>
+     * @throws InvalidPropertyException
+     *             if a key from <code>properties</code> has a value that does not match the type as listed in
+     *             <code>supportedProperties</code>
      */
-    public OctopusProperties(OctopusPropertyDescription [] supportedProperties, Map<String,String> properties) 
+    public OctopusProperties(OctopusPropertyDescription[] supportedProperties, Map<String, String> properties)
             throws UnknownPropertyException, InvalidPropertyException {
-        
+
         super();
-        
+
         this.supportedProperties = new HashMap<>();
         this.properties = new HashMap<>();
-        
+
         for (OctopusPropertyDescription d : supportedProperties) {
             this.supportedProperties.put(d.getName(), d);
         }
-        
+
         addProperties(properties);
     }
-    
-    /** 
+
+    /**
      * Create a new OctopusProperties that will support the properties in <code>supportedProperties</code> that are valid at level
-     * <code>level</code>. All properties in <code>properties</code> will be added.  
-     *    
-     * @param supportedProperties the properties to support 
+     * <code>level</code>. All properties in <code>properties</code> will be added.
+     * 
+     * @param supportedProperties
+     *            the properties to support
      * @param level
-     * @param properties the set of properties to store
-     * @throws UnknownPropertyException if key is found in <code>properties</code> that is not listed in  
-     *                                          <code>supportedProperties</code>, or not listed at level <code>level</code>.
-     * @throws InvalidPropertyException if a key from <code>properties</code> has a value that does not match the type as listed 
-     *                                          in <code>supportedProperties</code>. 
+     * @param properties
+     *            the set of properties to store
+     * @throws UnknownPropertyException
+     *             if key is found in <code>properties</code> that is not listed in <code>supportedProperties</code>, or not
+     *             listed at level <code>level</code>.
+     * @throws InvalidPropertyException
+     *             if a key from <code>properties</code> has a value that does not match the type as listed in
+     *             <code>supportedProperties</code>.
      */
-    public OctopusProperties(OctopusPropertyDescription [] supportedProperties, Level level, Map<String,String> properties) 
+    public OctopusProperties(OctopusPropertyDescription[] supportedProperties, Level level, Map<String, String> properties)
             throws UnknownPropertyException, InvalidPropertyException {
-        
+
         super();
-        
+
         this.supportedProperties = new HashMap<>();
         this.properties = new HashMap<>();
-        
+
         for (OctopusPropertyDescription d : supportedProperties) {
-            if (d.getLevels().contains(level)) { 
+            if (d.getLevels().contains(level)) {
                 this.supportedProperties.put(d.getName(), d);
             }
         }
-        
+
         addProperties(properties);
     }
-    
+
     /**
      * Adds the specified properties to the current ones and checks if their names and types are correct.
      * 
      * @param properties
      *            the properties to add.
-     * @throws UnknownPropertyException 
-     * @throws InvalidPropertyException 
+     * @throws UnknownPropertyException
+     * @throws InvalidPropertyException
      */
     private void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
-        
+
         if (properties == null) {
             return;
         }
 
-        for (Entry<String,String> e : properties.entrySet()) { 
-            
+        for (Entry<String, String> e : properties.entrySet()) {
+
             String key = e.getKey();
 
             OctopusPropertyDescription d = supportedProperties.get(key);
-            
-            if (d == null) { 
-                throw new UnknownPropertyException(NAME, "Unknown property " + key); 
+
+            if (d == null) {
+                throw new UnknownPropertyException(NAME, "Unknown property " + key);
             }
 
             String value = e.getValue();
-            
+
             checkType(d, key, value);
-            
+
             this.properties.put(key, value);
         }
     }
-    
-    private void checkType(OctopusPropertyDescription description, String key, String value) 
-            throws InvalidPropertyException { 
-        
+
+    private void checkType(OctopusPropertyDescription description, String key, String value) throws InvalidPropertyException {
+
         Type t = description.getType();
-        
-        try { 
-            switch (t) { 
+
+        try {
+            switch (t) {
             case BOOLEAN:
-                if (!(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false"))) { 
+                if (!(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false"))) {
                     throw new IllegalArgumentException("Not a boolean value: " + value);
                 }
-                break;            
+                break;
             case INTEGER:
                 Integer.valueOf(value);
-                break;            
+                break;
             case DOUBLE:
                 Double.valueOf(value);
                 break;
@@ -185,16 +193,17 @@ public class OctopusProperties {
             case STRING:
                 break;
             }
-        } catch (Exception e) { 
-            throw new InvalidPropertyException(NAME, "Property " + key + " has invalid value: " + value + 
-                    " (expected " + t + ")", e);            
-        }        
+        } catch (Exception e) {
+            throw new InvalidPropertyException(NAME,
+                    "Property " + key + " has invalid value: " + value + " (expected " + t + ")", e);
+        }
     }
-    
+
     /**
      * Check if this OctopusProperties supports a property with the given name.
-     *   
-     * @param name the name of the property.
+     * 
+     * @param name
+     *            the name of the property.
      * @return <code>true</code> if this OctopusProperties supports a property with the given name, <code>false</code> otherwise.
      */
     public boolean supportsProperty(String name) {
@@ -202,90 +211,97 @@ public class OctopusProperties {
     }
 
     /**
-     * Check if the property with the given name is set. 
-     *   
-     * @param name the name of the property.
+     * Check if the property with the given name is set.
+     * 
+     * @param name
+     *            the name of the property.
      * @return <code>true</code> if the property with the given name is set, <code>false</code> otherwise.
-     * @throws UnknownPropertyException if the given name is not a supported property.  
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
      */
-    public boolean propertySet(String name) throws UnknownPropertyException { 
-        
-        if (!supportedProperties.containsKey(name)) { 
+    public boolean propertySet(String name) throws UnknownPropertyException {
+
+        if (!supportedProperties.containsKey(name)) {
             throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
-        
+
         return properties.containsKey(name);
     }
-    
-    /** 
-     * Retrieves the value of a property with the given name without checking its type. 
+
+    /**
+     * Retrieves the value of a property with the given name without checking its type.
      * 
-     * If the property is not set, its default value will be returned. That the type of the value is not checked. Instead its 
+     * If the property is not set, its default value will be returned. That the type of the value is not checked. Instead its
      * <code>String</code> representation is always returned.
      * 
-     * @param name the name of the property.
-     * @return the value of the property with the given name or its default value if it is not set. 
-     * @throws UnknownPropertyException if the given name is not a supported property.
+     * @param name
+     *            the name of the property.
+     * @return the value of the property with the given name or its default value if it is not set.
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
      */
     public String getProperty(String name) throws UnknownPropertyException {
 
         OctopusPropertyDescription d = supportedProperties.get(name);
-        
+
         if (d == null) {
             throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
-        
+
         String value = d.getDefaultValue();
-        
-        if (properties.containsKey(name)) { 
+
+        if (properties.containsKey(name)) {
             value = properties.get(name);
         }
-        
+
         return value;
     }
-    
-    private String getProperty(String name, Type type) throws UnknownPropertyException, PropertyTypeException { 
+
+    private String getProperty(String name, Type type) throws UnknownPropertyException, PropertyTypeException {
 
         OctopusPropertyDescription d = supportedProperties.get(name);
-        
+
         if (d == null) {
             throw new UnknownPropertyException(NAME, "No such property: " + name);
         }
-        
-        if (d.getType() != type) { 
-            throw new PropertyTypeException(NAME, "Property " + name + " is of type " + d.getType() + 
-                    " not " + type);
+
+        if (d.getType() != type) {
+            throw new PropertyTypeException(NAME, "Property " + name + " is of type " + d.getType() + " not " + type);
         }
-        
+
         String value = d.getDefaultValue();
-        
-        if (properties.containsKey(name)) { 
+
+        if (properties.containsKey(name)) {
             value = properties.get(name);
         }
 
-        return value;        
+        return value;
     }
-    
-    
+
     /**
      * Retrieves the value of a boolean property with the given name.
      * 
      * @return the value of a boolean property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type boolean.
-     * @throws InvalidPropertyException if the property value cannot be converted into a boolean. 
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type boolean.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a boolean.
      */
-    public boolean getBooleanProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
-        
+    public boolean getBooleanProperty(String name) throws UnknownPropertyException, PropertyTypeException,
+            InvalidPropertyException {
+
         String value = getProperty(name, Type.BOOLEAN);
 
-        try { 
+        try {
             return Boolean.parseBoolean(value);
-        } catch (Exception e) { 
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
-                    " (expected BOOLEAN)", e); 
+        } catch (Exception e) {
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected BOOLEAN)",
+                    e);
         }
     }
 
@@ -293,21 +309,25 @@ public class OctopusProperties {
      * Retrieves the value of an integer property with the given name.
      * 
      * @return the value of an integer property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type integer.
-     * @throws InvalidPropertyException if the property value cannot be converted into a integer. 
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type integer.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a integer.
      */
     public int getIntegerProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
         String value = getProperty(name, Type.INTEGER);
 
-        try { 
+        try {
             return Integer.parseInt(value);
-        } catch (Exception e) { 
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
-                    " (expected INTEGER)", e); 
+        } catch (Exception e) {
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)",
+                    e);
         }
     }
 
@@ -315,69 +335,81 @@ public class OctopusProperties {
      * Retrieves the value of an integer property with the given name.
      * 
      * @return the value of an integer property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type integer.
-     * @throws InvalidPropertyException if the property value cannot be converted into a integer. 
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type integer.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a integer.
      */
-    public int getIntegerProperty(String name, int defaultValue) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
+    public int getIntegerProperty(String name, int defaultValue) throws UnknownPropertyException, PropertyTypeException,
+            InvalidPropertyException {
 
         String value = getProperty(name, Type.INTEGER);
 
-        if (value == null || value.length() == 0) { 
+        if (value == null || value.length() == 0) {
             return defaultValue;
         }
-            
-        try { 
+
+        try {
             return Integer.parseInt(value);
-        } catch (Exception e) { 
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
-                    " (expected INTEGER)", e); 
+        } catch (Exception e) {
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)",
+                    e);
         }
     }
-    
+
     /**
      * Retrieves the value of an long property with the given name.
      * 
      * @return the value of an long property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type long.
-     * @throws InvalidPropertyException if the property value cannot be converted into a long. 
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type long.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a long.
      */
     public long getLongProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
-        
+
         String value = getProperty(name, Type.LONG);
 
-        try { 
+        try {
             return Long.parseLong(value);
-        } catch (Exception e) { 
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
-                    " (expected LONG)", e); 
+        } catch (Exception e) {
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected LONG)", e);
         }
     }
-    
+
     /**
      * Retrieves the value of an double property with the given name.
      * 
      * @return the value of an double property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type double.
-     * @throws InvalidPropertyException if the property value cannot be converted into a double. 
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type double.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a double.
      */
     public double getDoubleProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
 
         String value = getProperty(name, Type.DOUBLE);
 
-        try { 
+        try {
             return Double.parseDouble(value);
-        } catch (Exception e) { 
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
-                    " (expected DOUBLE)", e); 
+        } catch (Exception e) {
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected DOUBLE)",
+                    e);
         }
     }
 
@@ -385,10 +417,13 @@ public class OctopusProperties {
      * Retrieves the value of a string property with the given name.
      * 
      * @return the value of an string property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type string.
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type string.
      */
     public String getStringProperty(String name) throws UnknownPropertyException, PropertyTypeException {
         return getProperty(name, Type.STRING);
@@ -397,18 +432,22 @@ public class OctopusProperties {
     /**
      * Retrieves the value of a size property with the given name.
      * 
-     * Valid values for the property are a long or a long a long followed by either a K, M or G. These size modifiers multiply 
-     * the value by 1024, 1024^2 and 1024^3 respectively.
+     * Valid values for the property are a long or a long a long followed by either a K, M or G. These size modifiers multiply the
+     * value by 1024, 1024^2 and 1024^3 respectively.
      * 
      * @return the value of an size property with the given name.
-     * @param name the name of the property
-     *            
-     * @throws UnknownPropertyException if the given name is not a supported property.
-     * @throws PropertyTypeException if the property is not of type size.
-     * @throws InvalidPropertyException if the property value cannot be converted into a long. 
+     * @param name
+     *            the name of the property
+     * 
+     * @throws UnknownPropertyException
+     *             if the given name is not a supported property.
+     * @throws PropertyTypeException
+     *             if the property is not of type size.
+     * @throws InvalidPropertyException
+     *             if the property value cannot be converted into a long.
      */
     public long getSizeProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
-        
+
         String value = getProperty(name, Type.SIZE);
 
         try {
@@ -427,8 +466,7 @@ public class OctopusProperties {
             return Long.parseLong(value);
 
         } catch (NumberFormatException e) {
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + 
-                    " (expected SIZE)", e); 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected SIZE)", e);
         }
     }
 
@@ -436,84 +474,87 @@ public class OctopusProperties {
      * Returns a new OctopusProperties that contains only the properties whose key start with a certain prefix.
      * 
      * @return an OctopusProperties containing only the matching properties.
-     * @param tmp the desired prefix
+     * @param tmp
+     *            the desired prefix
      */
     public OctopusProperties filter(String prefix) {
 
         String tmp = prefix;
-        
+
         if (tmp == null) {
             tmp = "";
         }
-        
+
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();
-        
-        for (String key : supportedProperties.keySet()) { 
-            if (key.startsWith(tmp)) { 
+
+        for (String key : supportedProperties.keySet()) {
+            if (key.startsWith(tmp)) {
                 remaining.put(key, supportedProperties.get(key));
-                
-                if (properties.containsKey(key)) { 
+
+                if (properties.containsKey(key)) {
                     p.put(key, properties.get(key));
-                }               
+                }
             }
         }
 
         return new OctopusProperties(remaining, p);
     }
-      
+
     /**
      * Returns a new OctopusProperties that contains only the properties with a given level.
      * 
      * @return an OctopusProperties containing only the properties with the matching level.
-     * @param tmp the desired prefix
+     * @param tmp
+     *            the desired prefix
      */
     public OctopusProperties filter(Level level) {
 
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();
-        
+
         for (OctopusPropertyDescription d : supportedProperties.values()) {
-            
-            if (d.getLevels().contains(level)) { 
-                
+
+            if (d.getLevels().contains(level)) {
+
                 String key = d.getName();
                 remaining.put(key, d);
-   
-                if (properties.containsKey(key)) { 
+
+                if (properties.containsKey(key)) {
                     p.put(key, properties.get(key));
-                }               
+                }
             }
         }
 
         return new OctopusProperties(remaining, p);
-    }    
-    
+    }
+
     /**
-     * Returns a copy of this OctopusProperties that contains all properties except the properties that start with the given 
-     * prefix. Note that these properties are also removed from the supported properties set.   
-     *  
-     * @param prefix the prefix of the properties to exclude
+     * Returns a copy of this OctopusProperties that contains all properties except the properties that start with the given
+     * prefix. Note that these properties are also removed from the supported properties set.
+     * 
+     * @param prefix
+     *            the prefix of the properties to exclude
      * @return an OctopusProperties containing all properties except the properties with the given prefix.
      */
     public OctopusProperties exclude(String prefix) {
 
         String tmp = prefix;
-        
+
         if (tmp == null) {
             tmp = "";
         }
-        
+
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();
-      
-        for (String key : supportedProperties.keySet()) { 
-            if (!key.startsWith(tmp)) { 
+
+        for (String key : supportedProperties.keySet()) {
+            if (!key.startsWith(tmp)) {
                 remaining.put(key, supportedProperties.get(key));
-                
-                if (properties.containsKey(key)) { 
+
+                if (properties.containsKey(key)) {
                     p.put(key, properties.get(key));
-                }               
+                }
             }
         }
 
@@ -521,66 +562,64 @@ public class OctopusProperties {
     }
 
     /**
-     * Returns a copy of this OctopusProperties that contains all properties but clears the properties that start with the given 
-     * prefix. Note that these properties are not removed from the supported properties set. 
-     *  
-     * @param prefix the prefix of the properties to exclude
+     * Returns a copy of this OctopusProperties that contains all properties but clears the properties that start with the given
+     * prefix. Note that these properties are not removed from the supported properties set.
+     * 
+     * @param prefix
+     *            the prefix of the properties to exclude
      * @return an OctopusProperties containing all properties except the properties with the given prefix.
      */
     public OctopusProperties clear(String prefix) {
 
         String tmp = prefix;
-        
+
         if (tmp == null) {
             tmp = "";
         }
-        
+
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();
-      
-        for (String key : supportedProperties.keySet()) { 
+
+        for (String key : supportedProperties.keySet()) {
             remaining.put(key, supportedProperties.get(key));
-            
-            if (!key.startsWith(tmp)) { 
-                if (properties.containsKey(key)) { 
+
+            if (!key.startsWith(tmp)) {
+                if (properties.containsKey(key)) {
                     p.put(key, properties.get(key));
-                }               
+                }
             }
         }
 
         return new OctopusProperties(remaining, p);
     }
 
-    
-    
-    
     /**
      * Returns the descriptions of all supported properties.
      * 
-     * @return the descriptions of all supported properties. 
+     * @return the descriptions of all supported properties.
      */
-    public OctopusPropertyDescription [] getSupportedProperties() { 
+    public OctopusPropertyDescription[] getSupportedProperties() {
         return supportedProperties.values().toArray(new OctopusPropertyDescription[0]);
     }
-    
+
     /**
      * Returns a sorted list of all supported property names.
      * 
      * @return Sorted list of supported property names.
      */
     public String[] getPropertyNames() {
-        ArrayList<String> list = new ArrayList<String>(supportedProperties.keySet()); 
+        ArrayList<String> list = new ArrayList<String>(supportedProperties.keySet());
         Collections.sort(list);
         return list.toArray(new String[list.size()]);
     }
-    
+
     /**
-     * Returns all properties that are set in a Map.  
-     *  
-     * @return all properties that are set in a Map.  
+     * Returns all properties that are set in a Map.
+     * 
+     * @return all properties that are set in a Map.
      */
-    public Map<String,String> toMap() { 
-       return Collections.unmodifiableMap(properties);
+    public Map<String, String> toMap() {
+        return Collections.unmodifiableMap(properties);
     }
 
     /**
@@ -592,27 +631,27 @@ public class OctopusProperties {
      *            Only print properties which start with the given prefix. If null, will print all properties
      */
     public void printProperties(PrintStream out, String prefix) {
-        
+
         String tmp = prefix;
-        
+
         if (tmp == null) {
             tmp = "";
         }
-        
+
         tmp = tmp.toLowerCase();
-        
+
         for (OctopusPropertyDescription d : supportedProperties.values()) {
-        
+
             String key = d.getName();
-            
+
             if (key.toLowerCase().startsWith(tmp)) {
-            
+
                 String value = d.getDefaultValue();
 
-                if (properties.containsKey(key)) { 
+                if (properties.containsKey(key)) {
                     value = properties.get(key);
                 }
-            
+
                 out.println(key + " = " + value);
             }
         }
@@ -631,11 +670,11 @@ public class OctopusProperties {
 
             String key = d.getName();
 
-            if (properties.containsKey(d.getName())) { 
+            if (properties.containsKey(d.getName())) {
                 sb.append(key);
                 sb.append("=");
                 sb.append(properties.get(key));
-            } else { 
+            } else {
                 sb.append("<<");
                 sb.append(key);
                 sb.append("=");
@@ -646,9 +685,8 @@ public class OctopusProperties {
         }
 
         sb.append("}");
-        
+
         return sb.toString();
     }
-
 
 }

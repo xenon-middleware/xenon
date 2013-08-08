@@ -52,7 +52,7 @@ public interface AdaptorStatus {
      * 
      * @return an array containing all properties this adaptor supports.
      */
-    OctopusPropertyDescription [] getSupportedProperties();
+    OctopusPropertyDescription[] getSupportedProperties();
 
     /**
      * Returns a map containing scheduler specific status information.

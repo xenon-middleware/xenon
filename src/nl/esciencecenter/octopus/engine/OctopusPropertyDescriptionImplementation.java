@@ -30,62 +30,63 @@ import nl.esciencecenter.octopus.OctopusPropertyDescription;
  */
 public class OctopusPropertyDescriptionImplementation implements OctopusPropertyDescription {
 
-    private final String name;    
+    private final String name;
     private final OctopusPropertyDescription.Type type;
     private final Set<OctopusPropertyDescription.Level> levels;
     private final String defaultValue;
     private final String description;
-    
-    public OctopusPropertyDescriptionImplementation(String name, Type type, Set<Level> levels, String defaultValue, String description) {
-        
-        if (name == null) { 
+
+    public OctopusPropertyDescriptionImplementation(String name, Type type, Set<Level> levels, String defaultValue,
+            String description) {
+
+        if (name == null) {
             throw new IllegalArgumentException("Name is null!");
         }
-        
+
         this.name = name;
-        
-        if (type == null) { 
+
+        if (type == null) {
             throw new IllegalArgumentException("Type is null!");
         }
-        
+
         this.type = type;
-        
-        if (levels == null) { 
+
+        if (levels == null) {
             throw new IllegalArgumentException("Levels is null!");
         }
-        
-        if (levels.size() == 0) { 
+
+        if (levels.size() == 0) {
             throw new IllegalArgumentException("No level specified!");
         }
-        
+
         this.levels = new HashSet<Level>(levels);
-        
+
         this.defaultValue = defaultValue;
-        
-        if (description == null) { 
+
+        if (description == null) {
             throw new IllegalArgumentException("Description is null!");
         }
-        
+
         this.description = description;
     }
-  
-    public String getName() { 
+
+    public String getName() {
         return name;
     }
-    
-    public Type getType() { 
+
+    public Type getType() {
         return type;
     }
-    
-    public Set<Level> getLevels() { 
+
+    public Set<Level> getLevels() {
         return levels;
     }
 
-    public String getDefaultValue() { 
+    public String getDefaultValue() {
         return defaultValue;
     }
-    
-    public String getDescription() { 
+
+    public String getDescription() {
         return description;
     }
 

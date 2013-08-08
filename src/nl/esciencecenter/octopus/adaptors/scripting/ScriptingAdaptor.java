@@ -42,8 +42,8 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ForwardingCredentials credentialsAdaptor;
 
     protected ScriptingAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusPropertyDescription [] validProperties, OctopusProperties properties, SchedulerConnectionFactory factory) 
-                    throws OctopusException {  
+            OctopusPropertyDescription[] validProperties, OctopusProperties properties, SchedulerConnectionFactory factory)
+            throws OctopusException {
 
         super(octopusEngine, name, description, supportedSchemes, validProperties, properties);
 

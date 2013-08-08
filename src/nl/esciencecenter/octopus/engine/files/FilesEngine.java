@@ -79,7 +79,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
+    public FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
         return adaptor.filesAdaptor().newFileSystem(location, credential, properties);
@@ -126,7 +126,8 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException,
+            UnsupportedOperationException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();

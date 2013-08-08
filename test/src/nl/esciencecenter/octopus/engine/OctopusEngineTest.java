@@ -34,49 +34,49 @@ public class OctopusEngineTest {
     @Test
     public void newEngine_NullProperties_Succeeds() throws OctopusException {
         Octopus octopus = OctopusEngine.newOctopus(null);
-        assertEquals("Expected empty hashmap", new HashMap<String,String>(), octopus.getProperties());
+        assertEquals("Expected empty hashmap", new HashMap<String, String>(), octopus.getProperties());
     }
 
     @Test
     public void newEngine_EmptyProperties_Succeeds() throws OctopusException {
-        HashMap<String,String> tmp = new HashMap<String,String>();
+        HashMap<String, String> tmp = new HashMap<String, String>();
         Octopus octopus = OctopusEngine.newOctopus(tmp);
         assertEquals("Expected empty hashmap", tmp, octopus.getProperties());
     }
-    
+
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_UnknownProperties_ThrowsException() throws OctopusException {
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("key", "value");
         OctopusEngine.newOctopus(properties);
     }
-    
+
     @Test
     public void newEngine_CorrectProperties_Success() throws OctopusException {
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         OctopusEngine.newOctopus(properties);
     }
 
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectPropertiesAtWrongLevel_ThrowsException() throws OctopusException {
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         // This property is valid at scheduler level, not at octopus level 
         properties.put("octopus.adaptors.ssh.queue.pollingDelay", "1500");
         OctopusEngine.newOctopus(properties);
     }
-    
+
     @Test
     public void newEngine_MultipleCorrectProperties_Success() throws OctopusException {
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         properties.put("octopus.adaptors.local.queue.pollingDelay", "1500");
         OctopusEngine.newOctopus(properties);
     }
-    
+
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectAndIncorrectProperties_ThrowsException() throws OctopusException {
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         properties.put("key", "value");
         OctopusEngine.newOctopus(properties);
@@ -84,7 +84,7 @@ public class OctopusEngineTest {
 
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_PropertiesAtCorrectAndWrongLevel_ThrowsException() throws OctopusException {
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         // These are octopus level properties
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         properties.put("octopus.adaptors.local.queue.pollingDelay", "1500");
@@ -93,13 +93,11 @@ public class OctopusEngineTest {
         OctopusEngine.newOctopus(properties);
     }
 
-    
     @Test
     public void getAdaptorInfo_LocalAdaptor_Succeeds() throws OctopusException {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         AdaptorStatus adaptorInfo = octopus.getAdaptorStatus("local");
-        assertEquals("The adaptor info for the local adaptor should contain the name \"local\"", 
-                "local", adaptorInfo.getName());
+        assertEquals("The adaptor info for the local adaptor should contain the name \"local\"", "local", adaptorInfo.getName());
     }
 
     @Test
@@ -149,22 +147,22 @@ public class OctopusEngineTest {
         }
     }
 
-//    @Test
-//    public void testGetAdaptors() throws OctopusException {
-//        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
-//
-//        Adaptor[] tmp = octopus.getAdaptors();
-//
-//        assert (tmp != null);
-//        assert (tmp.length == 3);
-//    }
+    //    @Test
+    //    public void testGetAdaptors() throws OctopusException {
+    //        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
+    //
+    //        Adaptor[] tmp = octopus.getAdaptors();
+    //
+    //        assert (tmp != null);
+    //        assert (tmp.length == 3);
+    //    }
 
     @Test
     public void getAdaptorInfos_StandardAdaptors_Succeeds() throws OctopusException {
-        
+
         // We currently have 4 adaptors, local, ssh, gridengine, slurm 
         int count = 4;
-        
+
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
 
         AdaptorStatus[] tmp = octopus.getAdaptorStatuses();
@@ -190,8 +188,8 @@ public class OctopusEngineTest {
 
     @Test
     public void endAll_MultipleOctopus_Succeeds() throws OctopusException {
-        OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
-        OctopusEngine octopus2 = (OctopusEngine) OctopusEngine.newOctopus(null);
+        OctopusEngine.newOctopus(null);
+        OctopusEngine.newOctopus(null);
 
         OctopusEngine.endAll();
     }

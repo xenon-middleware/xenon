@@ -48,7 +48,7 @@ public class LocalAdaptor extends Adaptor {
 
     /** Local properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "local.";
-    
+
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
             + " standard java classes such as java.lang.Process and java.nio.file.Files.";
@@ -70,15 +70,14 @@ public class LocalAdaptor extends Adaptor {
 
     /** The schemes supported by the adaptor */
     private static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
-    
+
     /** The properties supported by this adaptor */
-    private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
-        new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
-                "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-        new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
-                "4", "The maximum number of concurrent jobs in the multiq.."),
-    };
-    
+    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+            new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.OCTOPUS), "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.OCTOPUS), "4",
+                    "The maximum number of concurrent jobs in the multiq.."), };
+
     /** Local implementation for Files */
     private final LocalFiles localFiles;
 
@@ -88,9 +87,9 @@ public class LocalAdaptor extends Adaptor {
     /** Local implementation for Credentials */
     private final LocalCredentials localCredentials;
 
-    public LocalAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, 
-                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties));
+    public LocalAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
+                VALID_PROPERTIES, Level.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
         localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWDFileSystem(), octopusEngine);

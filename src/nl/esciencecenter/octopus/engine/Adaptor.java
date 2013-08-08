@@ -38,12 +38,12 @@ public abstract class Adaptor {
     private final String name;
     private final String description;
     private final String[] supportedSchemes;
-    private final OctopusPropertyDescription [] validProperties;
+    private final OctopusPropertyDescription[] validProperties;
     private final OctopusProperties properties;
     private final OctopusEngine octopusEngine;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusPropertyDescription [] validProperties, OctopusProperties properties) throws OctopusException {
+            OctopusPropertyDescription[] validProperties, OctopusProperties properties) throws OctopusException {
 
         super();
 
@@ -55,10 +55,10 @@ public abstract class Adaptor {
         this.properties = properties;
     }
 
-    protected OctopusEngine getOctopusEngine() { 
+    protected OctopusEngine getOctopusEngine() {
         return octopusEngine;
     }
-    
+
     public OctopusProperties getProperties() {
         return properties;
     }
@@ -78,26 +78,26 @@ public abstract class Adaptor {
         return false;
     }
 
-    public OctopusPropertyDescription [] getSupportedProperties() {
+    public OctopusPropertyDescription[] getSupportedProperties() {
         return validProperties.clone();
     }
-    
-    public OctopusPropertyDescription [] getSupportedProperties(Level level) {
-        
+
+    public OctopusPropertyDescription[] getSupportedProperties(Level level) {
+
         ArrayList<OctopusPropertyDescription> tmp = new ArrayList<>();
-        
-        for (int i=0;i<validProperties.length;i++) { 
+
+        for (int i = 0; i < validProperties.length; i++) {
 
             OctopusPropertyDescription d = validProperties[i];
-            
-            if (d.getLevels().contains(level)) { 
+
+            if (d.getLevels().contains(level)) {
                 tmp.add(d);
             }
         }
-        
+
         return tmp.toArray(new OctopusPropertyDescription[tmp.size()]);
     }
-    
+
     public AdaptorStatus getAdaptorStatus() {
         return new AdaptorStatusImplementation(name, description, supportedSchemes, getSupportedProperties(),
                 getAdaptorSpecificInformation());

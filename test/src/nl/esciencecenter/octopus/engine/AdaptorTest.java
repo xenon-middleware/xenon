@@ -43,8 +43,8 @@ public class AdaptorTest {
     class TestAdaptor extends Adaptor {
 
         public TestAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-                OctopusPropertyDescription [] validProperties, OctopusProperties p) throws OctopusException {
-            
+                OctopusPropertyDescription[] validProperties, OctopusProperties p) throws OctopusException {
+
             super(octopusEngine, name, description, supportedSchemes, validProperties, p);
         }
 
@@ -79,7 +79,7 @@ public class AdaptorTest {
 
         String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
 
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, new OctopusPropertyDescription[0], 
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, new OctopusPropertyDescription[0],
                 new OctopusProperties());
 
         String[] tmp = t.getSupportedSchemes();
@@ -92,74 +92,71 @@ public class AdaptorTest {
     public void test1() throws OctopusException {
 
         String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
-        
-        OctopusPropertyDescription [] supportedProperties = new OctopusPropertyDescription [] { 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS), 
-                        "aap2", "test property p1"), 
 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS), 
-                        "noot2", "test property p2"), 
-        };
-        
-        OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String,String>());
+        OctopusPropertyDescription[] supportedProperties = new OctopusPropertyDescription[] {
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                        "aap2", "test property p1"),
+
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                        "noot2", "test property p2"), };
+
+        OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String, String>());
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
 
-        OctopusPropertyDescription [] p = t.getSupportedProperties();
+        OctopusPropertyDescription[] p = t.getSupportedProperties();
 
-        assert(p != null);
-        assert(p.length == 2);
-        assert(p[0].getName().equals("octopus.adaptors.test.p1"));
-        assert(p[0].getDefaultValue().equals("aap2"));
-        assert(p[1].getName().equals("octopus.adaptors.test.p2"));
-        assert(p[1].getDefaultValue().equals("noot2"));
+        assert (p != null);
+        assert (p.length == 2);
+        assert (p[0].getName().equals("octopus.adaptors.test.p1"));
+        assert (p[0].getDefaultValue().equals("aap2"));
+        assert (p[1].getName().equals("octopus.adaptors.test.p2"));
+        assert (p[1].getDefaultValue().equals("noot2"));
     }
 
     @Test
     public void test2() throws OctopusException {
 
         String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
-        
-        OctopusPropertyDescription [] supportedProperties = new OctopusPropertyDescription [] { 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS), 
-                        "aap2", "test property p1"), 
 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS), 
-                        "noot2", "test property p2"), 
-        };
-        
-        Map<String,String> m = new HashMap<>();
+        OctopusPropertyDescription[] supportedProperties = new OctopusPropertyDescription[] {
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                        "aap2", "test property p1"),
+
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                        "noot2", "test property p2"), };
+
+        Map<String, String> m = new HashMap<>();
         m.put("octopus.adaptors.test.p1", "mies");
         m.put("octopus.adaptors.test.p2", "zus");
-        
-        OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String,String>());
+
+        OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String, String>());
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
 
-        OctopusPropertyDescription [] p = t.getSupportedProperties();
+        OctopusPropertyDescription[] p = t.getSupportedProperties();
 
-        assert(p != null);
-        assert(p.length == 2);
-        assert(p[0].getName().equals("octopus.adaptors.test.p1"));
-        assert(p[0].getDefaultValue().equals("mies"));
-        assert(p[1].getName().equals("octopus.adaptors.test.p2"));
-        assert(p[1].getDefaultValue().equals("zus"));
+        assert (p != null);
+        assert (p.length == 2);
+        assert (p[0].getName().equals("octopus.adaptors.test.p1"));
+        assert (p[0].getDefaultValue().equals("mies"));
+        assert (p[1].getName().equals("octopus.adaptors.test.p2"));
+        assert (p[1].getDefaultValue().equals("zus"));
     }
 
     @Test(expected = OctopusException.class)
     public void test3() throws OctopusException {
 
         String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
-        
-        OctopusPropertyDescription [] supportedProperties = new OctopusPropertyDescription [] { 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS), 
-                        "aap2", "test property p1"), 
 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS), 
-                        "noot2", "test property p2"), 
-        };
-        
-        Map<String,String> p = new HashMap<>();
+        OctopusPropertyDescription[] supportedProperties = new OctopusPropertyDescription[] {
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                        "aap2", "test property p1"),
+
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                        "noot2", "test property p2"), };
+
+        Map<String, String> p = new HashMap<>();
         p.put("octopus.adaptors.test.p3", "mies");
-        
+
         OctopusProperties prop = new OctopusProperties(supportedProperties, p);
 
         new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);

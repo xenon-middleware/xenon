@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
  * 
  */
 public class OutputReader extends Thread {
-    
+
     public static final int BUFFER_SIZE = 1024;
 
     private final InputStream source;

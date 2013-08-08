@@ -33,46 +33,45 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class ListQueueStatus {
 
-    public static void main(String [] args) {
-        
-        if (args.length != 1) { 
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
             System.out.println("Example required a scheduler URI as a parameter!");
             System.exit(1);
         }
-        
-        try { 
+
+        try {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
-            
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
-            
+
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location, null, null);
 
             // Retrieve the status of all queues.
-            QueueStatus [] result = jobs.getQueueStatuses(scheduler);
-            
+            QueueStatus[] result = jobs.getQueueStatuses(scheduler);
+
             // Print the result
             System.out.println("The scheduler at " + location + " has " + result.length + " queues:");
-            
-            for (QueueStatus q : result) { 
+
+            for (QueueStatus q : result) {
                 System.out.println("  " + q.getQueueName());
             }
-            
+
             // Close the scheduler
             jobs.close(scheduler);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
 }
-

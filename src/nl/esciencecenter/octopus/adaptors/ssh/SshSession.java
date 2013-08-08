@@ -28,16 +28,16 @@ import com.jcraft.jsch.Session;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 class SshSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SshSession.class);
-    
+
     private static final int MAX_OPEN_CHANNELS = 7;
-    
+
     private final Session session;
-    private final int tunnelPort; 
+    private final int tunnelPort;
     private final int sessionID;
 
     private ChannelSftp sftpChannelCache;
@@ -48,16 +48,16 @@ class SshSession {
         this.tunnelPort = tunnelPort;
         this.sessionID = sessionID;
     }
-    
-    Session getSession() { 
+
+    Session getSession() {
         return session;
     }
 
-    int getTunnelPort() { 
+    int getTunnelPort() {
         return tunnelPort;
     }
 
-    int getSessionID() { 
+    int getSessionID() {
         return sessionID;
     }
 
@@ -172,17 +172,17 @@ class SshSession {
         incOpenChannels("SFTP");
         return channel;
     }
-    
-    int addTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException { 
-        
-        LOGGER.debug("SSHSESSION-{}: Creating tunnel from localhost:{} via {}:{} to {}:{}", sessionID, localPort, 
+
+    int addTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException {
+
+        LOGGER.debug("SSHSESSION-{}: Creating tunnel from localhost:{} via {}:{} to {}:{}", sessionID, localPort,
                 session.getHost(), session.getPort(), targetHost, targetPort);
-        
-        if (tunnelPort > 0) { 
+
+        if (tunnelPort > 0) {
             LOGGER.debug("SSHSESSION-{}: Tunnel already in used for this session!", sessionID);
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Tunnel already in use!");
         }
-        
+
         try {
             return session.setPortForwardingL(0, targetHost, targetPort);
         } catch (JSchException e) {
@@ -191,11 +191,10 @@ class SshSession {
         }
     }
 
-    
     void removeTunnel(int localPort) throws OctopusIOException {
-        
+
         LOGGER.debug("SSHSESSION-{}: Removing tunnel at localhost:{}", sessionID, localPort);
-        
+
         try {
             session.delPortForwardingL(localPort);
         } catch (JSchException e) {

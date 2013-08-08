@@ -30,28 +30,28 @@ public class SshUtil {
 
     /** read by owner */
     static final int READ_OWNER = 00400;
-    
-    /**  write by owner */
-    static final int WRITE_OWNER = 00200; 
-    
+
+    /** write by owner */
+    static final int WRITE_OWNER = 00200;
+
     /** execute/search by owner */
-    static final int EXEC_OWNER = 00100;  
+    static final int EXEC_OWNER = 00100;
 
     /** read by group */
-    static final int READ_GROUP = 00040;  
-    
+    static final int READ_GROUP = 00040;
+
     /** write by group */
     static final int WRITE_GROUP = 00020;
-    
+
     /** execute/search by group */
-    static final int EXEC_GROUP = 00010; 
+    static final int EXEC_GROUP = 00010;
 
     /** read by others */
     static final int READ_OTHERS = 00004;
-    
+
     /** write by others */
     static final int WRITE_OTHERS = 00002;
-    
+
     /** execute/search by others */
     static final int EXEC_OTHERS = 00001;
 

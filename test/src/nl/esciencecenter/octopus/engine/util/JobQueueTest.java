@@ -60,14 +60,14 @@ public class JobQueueTest {
     static class MyProcessWrapper implements InteractiveProcess {
 
         final JobImplementation job;
-        final byte [] output;
-        final byte [] error;
-        
+        final byte[] output;
+        final byte[] error;
+
         boolean destoyed = false;
         boolean done = false;
         int exit = -1;
 
-        public MyProcessWrapper(JobImplementation job, byte [] output, byte [] error) {
+        public MyProcessWrapper(JobImplementation job, byte[] output, byte[] error) {
             this.job = job;
             this.output = output;
             this.error = error;
@@ -75,7 +75,7 @@ public class JobQueueTest {
 
         @Override
         public Streams getStreams() {
-            return new StreamsImplementation(job, new ByteArrayInputStream(output), new ByteArrayOutputStream(), 
+            return new StreamsImplementation(job, new ByteArrayInputStream(output), new ByteArrayOutputStream(),
                     new ByteArrayInputStream(error));
         }
 
@@ -177,20 +177,20 @@ public class JobQueueTest {
 
     @After
     public void cleanupTest() throws Exception {
-        
+
         AbsolutePath p = filesystem.getEntryPath().resolve(new RelativePath("stderr.txt"));
-        
-        if (files.exists(p)) { 
+
+        if (files.exists(p)) {
             files.delete(p);
         }
-        
+
         p = filesystem.getEntryPath().resolve(new RelativePath("stdout.txt"));
-        
-        if (files.exists(p)) { 
+
+        if (files.exists(p)) {
             files.delete(p);
         }
     }
-    
+
     @Test(expected = BadParameterException.class)
     public void test_constructor2() throws Exception {
         // throws exception
@@ -272,21 +272,21 @@ public class JobQueueTest {
         jobQueue.submitJob(d);
     }
 
-//    @Test(expected = InvalidJobDescriptionException.class)
-//    public void test_invalidJobDescription8() throws Exception {
-//        JobDescription d = new JobDescription();
-//        d.setExecutable("exec_invalidJobDescription8");
-//        d.setStdout(null);
-//        jobQueue.submitJob(d);
-//    }
-//
-//    @Test(expected = InvalidJobDescriptionException.class)
-//    public void test_invalidJobDescription9() throws Exception {
-//        JobDescription d = new JobDescription();
-//        d.setExecutable("exec_invalidJobDescription9");
-//        d.setStderr(null);
-//        jobQueue.submitJob(d);
-//    }
+    //    @Test(expected = InvalidJobDescriptionException.class)
+    //    public void test_invalidJobDescription8() throws Exception {
+    //        JobDescription d = new JobDescription();
+    //        d.setExecutable("exec_invalidJobDescription8");
+    //        d.setStdout(null);
+    //        jobQueue.submitJob(d);
+    //    }
+    //
+    //    @Test(expected = InvalidJobDescriptionException.class)
+    //    public void test_invalidJobDescription9() throws Exception {
+    //        JobDescription d = new JobDescription();
+    //        d.setExecutable("exec_invalidJobDescription9");
+    //        d.setStderr(null);
+    //        jobQueue.submitJob(d);
+    //    }
 
     @Test(expected = OctopusException.class)
     public void test_failingInteractiveJob1() throws Exception {

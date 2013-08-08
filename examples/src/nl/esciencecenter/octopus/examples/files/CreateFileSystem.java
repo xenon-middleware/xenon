@@ -34,35 +34,35 @@ import nl.esciencecenter.octopus.files.Files;
  */
 public class CreateFileSystem {
 
-    public static void main(String [] args) { 
-        try { 
+    public static void main(String[] args) {
+        try {
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
-            
+
             // To create a new FileSystem we need a URI indicating its location.
             URI uri = new URI("file://localhost/");
-            
+
             // We also need a Credential that enable us to access the location. 
-            Credential c = credentials.getDefaultCredential("file");  
-            
+            Credential c = credentials.getDefaultCredential("file");
+
             // Now we can create a FileSystem (we don't provide any properties). 
             FileSystem fs = files.newFileSystem(uri, c, null);
-            
+
             // We can now uses the FileSystem to access files!
             // ....
-            
+
             // If we are done we need to close the FileSystem and the credential
             credentials.close(c);
             files.close(fs);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("CreatingFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

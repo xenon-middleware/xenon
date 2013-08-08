@@ -135,12 +135,12 @@ public class SSHFileTestConfig extends FileTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", new HashMap<String,String>(), username, passwd);
+        return credentials.newPasswordCredential("ssh", new HashMap<String, String>(), username, passwd);
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", new HashMap<String,String>(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("ssh", new HashMap<String, String>(), username, "wrongpassword".toCharArray());
     }
 
     @Override
@@ -164,7 +164,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Map<String,String> getDefaultProperties() throws Exception {
+    public Map<String, String> getDefaultProperties() throws Exception {
         return null;
     }
 

@@ -20,13 +20,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingScheduler;
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
+import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingScheduler;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -101,7 +100,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("COMPLETED", result.getState());
         assertEquals(new Integer(5), result.getExitCode());
@@ -110,7 +109,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test02b_getJobStatusFromSacctInfo_RunningJob_JobStatus() throws OctopusException {
         String jobID = "555";
@@ -123,7 +122,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("RUNNING", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
@@ -132,7 +131,7 @@ public class SlurmSchedulerConnectionTest {
         assertFalse(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test02c_getJobStatusFromSacctInfo_CanceledJob_JobStatusWithException() throws OctopusException {
         String jobID = "555";
@@ -145,7 +144,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("CANCELLED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
@@ -155,7 +154,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test02d_getJobStatusFromSacctInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws OctopusException {
         String jobID = "555";
@@ -168,7 +167,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(11), result.getExitCode());
@@ -177,7 +176,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test02e_getJobStatusFromSacctInfo_FailedJobWithZeroExitCode_JobStatusWithException() throws OctopusException {
         String jobID = "555";
@@ -190,7 +189,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
@@ -201,18 +200,18 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test02f_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws OctopusException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
-        
+
         assertNull(result);
     }
-    
-    @Test(expected=OctopusException.class)
+
+    @Test(expected = OctopusException.class)
     public void test02g_getJobStatusFromSacctInfo_InvalidJobInfo_ExceptionThrown() throws OctopusException {
         String jobID = "555";
         //very invalid info, no info at all
@@ -220,12 +219,11 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        
+
         Job job = new FakeScriptingJob(jobID);
-        
+
         SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
     }
-
 
     @Test
     public void test03a_getJobStatusFromScontrolInfo_CompletedJob_JobStatus() throws OctopusException {
@@ -238,7 +236,7 @@ public class SlurmSchedulerConnectionTest {
 
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("COMPLETED", result.getState());
         assertEquals(new Integer(5), result.getExitCode());
@@ -247,7 +245,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test03b_getJobStatusFromScontrolInfo_RunningJob_JobStatus() throws OctopusException {
         String jobID = "555";
@@ -259,7 +257,7 @@ public class SlurmSchedulerConnectionTest {
 
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("RUNNING", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
@@ -268,7 +266,7 @@ public class SlurmSchedulerConnectionTest {
         assertFalse(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test03c_getJobStatusFromScontrolInfo_CanceledJob_JobStatusWithException() throws OctopusException {
         String jobID = "555";
@@ -280,7 +278,7 @@ public class SlurmSchedulerConnectionTest {
 
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("CANCELLED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
@@ -290,7 +288,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test03d_getJobStatusFromScontrolInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws OctopusException {
         String jobID = "555";
@@ -302,7 +300,7 @@ public class SlurmSchedulerConnectionTest {
 
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(11), result.getExitCode());
@@ -311,7 +309,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test03e_getJobStatusFromScontrolInfo_FailedJob_JobStatusWithException() throws OctopusException {
         String jobID = "555";
@@ -323,7 +321,7 @@ public class SlurmSchedulerConnectionTest {
 
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
@@ -334,7 +332,7 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test03f_getJobStatusFromScontrolInfo_FailedJobWithNoReason_JobStatusWithException() throws OctopusException {
         String jobID = "555";
@@ -346,7 +344,7 @@ public class SlurmSchedulerConnectionTest {
 
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
@@ -357,24 +355,24 @@ public class SlurmSchedulerConnectionTest {
         assertTrue(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test03g_getJobStatusFromScontrolInfo_NullInput_NullReturned() throws OctopusException {
         String jobID = "555";
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(null, job);
-        
+
         assertNull(result);
     }
-    
-    @Test(expected=OctopusException.class)
+
+    @Test(expected = OctopusException.class)
     public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws OctopusException {
         String jobID = "555";
         //empty job info
         Map<String, String> jobInfo = new HashMap<String, String>();
 
         Job job = new FakeScriptingJob(jobID);
-        
+
         SlurmSchedulerConnection.getJobStatusFromScontrolInfo(jobInfo, job);
     }
 
@@ -389,7 +387,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("PENDING", result.getState());
         assertNull(result.getExitCode());
@@ -398,7 +396,7 @@ public class SlurmSchedulerConnectionTest {
         assertFalse(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test04b_getJobStatusFromSqueueInfo_RunningJob_JobStatus() throws OctopusException {
         String jobID = "555";
@@ -410,7 +408,7 @@ public class SlurmSchedulerConnectionTest {
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
-        
+
         assertEquals(job, result.getJob());
         assertEquals("RUNNING", result.getState());
         assertNull(result.getExitCode());
@@ -419,18 +417,18 @@ public class SlurmSchedulerConnectionTest {
         assertFalse(result.isDone());
         assertEquals(jobInfo, result.getSchedulerSpecficInformation());
     }
-    
+
     @Test
     public void test04c_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws OctopusException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
-        
+
         assertNull(result);
     }
-    
-    @Test(expected=OctopusException.class)
+
+    @Test(expected = OctopusException.class)
     public void test04d_getJobStatusFromSqueueInfo_IncompleteJobInfo_ExceptionThrown() throws OctopusException {
         String jobID = "555";
 
@@ -439,45 +437,44 @@ public class SlurmSchedulerConnectionTest {
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(jobID, jobInfo);
-        
+
         Job job = new FakeScriptingJob(jobID);
-        
+
         SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
     }
 
     @Test
     public void test05a_getQueueStatusFromSInfo_CorrectInfo_Result() {
         String queueName = "some.q";
-        
+
         Scheduler scheduler = new FakeScriptingScheduler();
 
         Map<String, String> queueInfo = new HashMap<String, String>();
-        
+
         queueInfo.put("MaxUsers", "5");
         queueInfo.put("Nodes", "23");
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         input.put(queueName, queueInfo);
 
-        
         QueueStatus result = SlurmSchedulerConnection.getQueueStatusFromSInfo(input, queueName, scheduler);
-        
+
         assertNotNull(result);
         assertEquals(queueName, result.getQueueName());
         assertEquals(queueInfo, result.getSchedulerSpecficInformation());
         assertEquals(scheduler, result.getScheduler());
     }
-    
+
     @Test
     public void test05b_getQueueStatusFromSInfo_QueueNotInInfo_NullReturned() {
         String queueName = "some.q";
-        
+
         Scheduler scheduler = new FakeScriptingScheduler();
 
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
-        
+
         QueueStatus result = SlurmSchedulerConnection.getQueueStatusFromSInfo(input, queueName, scheduler);
-        
+
         assertNull(result);
     }
 
@@ -491,12 +488,12 @@ public class SlurmSchedulerConnectionTest {
         input[4] = new FakeScriptingJob("444");
 
         String expected = "000,111,222,333,444";
-        
+
         String result = SlurmSchedulerConnection.identifiersAsCSList(input);
-        
+
         assertEquals(result, expected);
     }
-    
+
     @Test
     public void test06b_identifiersAsCSList_JobsWithNulls_OutputString() {
         Job[] input = new Job[8];
@@ -510,35 +507,34 @@ public class SlurmSchedulerConnectionTest {
         input[7] = null;
 
         String expected = "000,111,222,333,444";
-        
+
         String result = SlurmSchedulerConnection.identifiersAsCSList(input);
-        
+
         assertEquals(result, expected);
     }
-
 
     @Test
     public void test07_isDoneState() {
         assertTrue(SlurmSchedulerConnection.isDoneState("COMPLETED"));
-        
+
         assertTrue(SlurmSchedulerConnection.isDoneState("FAILED"));
-        
+
         assertFalse(SlurmSchedulerConnection.isDoneState("SOMERANDOMSTATE"));
-        
+
         assertFalse(SlurmSchedulerConnection.isDoneState("RUNNING"));
     }
 
     @Test
     public void test08_isFailedState() {
         assertFalse(SlurmSchedulerConnection.isFailedState("COMPLETED"));
-        
+
         assertTrue(SlurmSchedulerConnection.isFailedState("FAILED"));
-        
+
         assertFalse(SlurmSchedulerConnection.isFailedState("SOMERANDOMSTATE"));
-        
+
         assertFalse(SlurmSchedulerConnection.isFailedState("RUNNING"));
     }
-    
+
     @Test
     public void test09a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
         JobDescription description = new JobDescription();
@@ -553,7 +549,7 @@ public class SlurmSchedulerConnectionTest {
 
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
-    
+
     @Test
     public void test09b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
         JobDescription description = new JobDescription();
@@ -569,7 +565,7 @@ public class SlurmSchedulerConnectionTest {
 
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
-    
+
     @Test
     public void test09c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
         JobDescription description = new JobDescription();
@@ -577,7 +573,7 @@ public class SlurmSchedulerConnectionTest {
         //set a job option
         description.addJobOption(SlurmSchedulerConnection.JOB_OPTION_JOB_SCRIPT, "some.script");
         description.setInteractive(false);
-        
+
         //All these settings are wrong. This should not lead to an error
         description.setExecutable(null);
         description.setNodeCount(0);
@@ -587,7 +583,7 @@ public class SlurmSchedulerConnectionTest {
 
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
-    
+
     @Test(expected = InvalidJobDescriptionException.class)
     public void test09d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
@@ -595,19 +591,19 @@ public class SlurmSchedulerConnectionTest {
         //set a job option
         description.addJobOption("wrong.setting", "wrong.value");
         description.setInteractive(false);
-        
+
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
-    
+
     @Test(expected = InvalidJobDescriptionException.class)
     public void test09e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
         description.setInteractive(true);
-        
+
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
-    
+
     @Test(expected = InvalidJobDescriptionException.class)
     public void test09f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
@@ -615,11 +611,8 @@ public class SlurmSchedulerConnectionTest {
         //verify the standard settings are also checked
         description.setExecutable("bin/bla");
         description.setMaxTime(0);
-        
+
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
-
-
-
 
 }

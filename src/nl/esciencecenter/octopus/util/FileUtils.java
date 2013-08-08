@@ -265,9 +265,8 @@ public class FileUtils {
                     try {
                         for (PathAttributesPair attributesEntry : octopus.files().newAttributesDirectoryStream(path)) {
                             // recursion step
-                            FileVisitResult result =
-                                    walk(octopus, attributesEntry.path(), attributesEntry.attributes(), followLinks,
-                                            maxDepth - 1, visitor);
+                            FileVisitResult result = walk(octopus, attributesEntry.path(), attributesEntry.attributes(),
+                                    followLinks, maxDepth - 1, visitor);
 
                             if (result == FileVisitResult.SKIP_SIBLINGS) {
                                 // stop handling entries in this directory`
@@ -331,7 +330,7 @@ public class FileUtils {
 
         FileAttributes att = octopus.files().getAttributes(source);
         boolean srcIsDir = att.isDirectory();
-        
+
         if (srcIsDir) {
             if (exist) {
                 if (ignore) {
@@ -376,9 +375,9 @@ public class FileUtils {
      * @throws OctopusIOException
      */
     public static void recursiveDelete(Octopus octopus, AbsolutePath path) throws OctopusIOException {
-        
+
         FileAttributes att = octopus.files().getAttributes(path);
-        
+
         if (att.isDirectory()) {
             for (AbsolutePath f : octopus.files().newDirectoryStream(path)) {
                 FileUtils.recursiveDelete(octopus, f);

@@ -22,14 +22,14 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * @author Niels Drost
- *
+ * 
  */
 public class FakeScriptingScheduler implements Scheduler {
 
     public FakeScriptingScheduler() {
-        
+
     }
-    
+
     @Override
     public String getAdaptorName() {
         return null;

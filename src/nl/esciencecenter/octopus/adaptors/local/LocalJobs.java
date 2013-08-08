@@ -64,14 +64,14 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
         URI uri = LocalUtils.getLocalJobURI();
 
-        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, 
-                new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
+        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, new String[] { "single",
+                "multi", "unlimited" }, null, properties, true, true, true);
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = properties.getIntegerProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
         int pollingDelay = properties.getIntegerProperty(LocalAdaptor.POLLING_DELAY);
 
-        jobQueues = new JobQueues(LocalAdaptor.ADAPTOR_NAME, engine.files(), localScheduler, cwd, this, multiQThreads, 
+        jobQueues = new JobQueues(LocalAdaptor.ADAPTOR_NAME, engine.files(), localScheduler, cwd, this, multiQThreads,
                 pollingDelay);
     }
 
@@ -81,7 +81,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
+    public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException {
 
         localAdaptor.checkURI(location);

@@ -26,11 +26,11 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     private final String name;
     private final String description;
     private final String[] supportedSchemes;
-    private final OctopusPropertyDescription [] supportedProperties;
+    private final OctopusPropertyDescription[] supportedProperties;
     private final Map<String, String> adaptorSpecificInformation;
 
     public AdaptorStatusImplementation(String name, String description, String[] supportedSchemes,
-            OctopusPropertyDescription [] supportedProperties, Map<String, String> adaptorSpecificInformation) {
+            OctopusPropertyDescription[] supportedProperties, Map<String, String> adaptorSpecificInformation) {
 
         super();
         this.name = name;
@@ -56,12 +56,12 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     }
 
     @Override
-    public OctopusPropertyDescription [] getSupportedProperties() {
-        
-        if (supportedProperties == null) { 
+    public OctopusPropertyDescription[] getSupportedProperties() {
+
+        if (supportedProperties == null) {
             return new OctopusPropertyDescription[0];
         }
-        
+
         return supportedProperties.clone();
     }
 

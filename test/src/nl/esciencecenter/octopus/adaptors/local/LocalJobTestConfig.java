@@ -91,7 +91,7 @@ public class LocalJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public Map<String,String> getDefaultProperties() throws Exception {
+    public Map<String, String> getDefaultProperties() throws Exception {
         return null;
     }
 

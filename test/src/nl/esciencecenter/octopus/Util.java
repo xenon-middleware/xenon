@@ -25,30 +25,34 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class Util {
 
-    /** 
+    /**
      * Invoke the private constructor of OctopusEngine. Needed in some tests.
-     *  
-     * @param properties the properties to pass to the OctopusEngine.
+     * 
+     * @param properties
+     *            the properties to pass to the OctopusEngine.
      * @return a new OctopusEngine.
-     * @throws Exception if the OctopusEngine could not be created or throws an exception. 
+     * @throws Exception
+     *             if the OctopusEngine could not be created or throws an exception.
      */
-    public static OctopusEngine createOctopusEngine(HashMap<String,String> properties) throws Exception { 
+    public static OctopusEngine createOctopusEngine(HashMap<String, String> properties) throws Exception {
         Constructor<OctopusEngine> constructor = OctopusEngine.class.getDeclaredConstructor(Map.class);
         constructor.setAccessible(true);
         return constructor.newInstance(properties);
     }
-    
-    /** 
+
+    /**
      * Invoke the private end method of OctopusEngine. Needed in some tests.
      * 
-     * @param e the OctopusEngine to end.
-     * @throws Exception if the method could not be invoked.
+     * @param e
+     *            the OctopusEngine to end.
+     * @throws Exception
+     *             if the method could not be invoked.
      */
-    public static void endOctopusEngine(OctopusEngine e) throws Exception { 
+    public static void endOctopusEngine(OctopusEngine e) throws Exception {
         Method method = OctopusEngine.class.getDeclaredMethod("end");
         method.setAccessible(true);
         method.invoke(e);

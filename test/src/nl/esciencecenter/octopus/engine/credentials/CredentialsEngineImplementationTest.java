@@ -16,7 +16,8 @@
 
 package nl.esciencecenter.octopus.engine.credentials;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import java.util.HashMap;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -69,7 +69,7 @@ public class CredentialsEngineImplementationTest {
         assertEquals("ssh", cci.getAdaptorName());
         assertEquals("username", cci.getUsername());
         assertEquals("certfile", cci.getCertfile());
-        assertEquals(new HashMap<String,String>(), cci.getProperties());
+        assertEquals(new HashMap<String, String>(), cci.getProperties());
 
         assertTrue(Arrays.equals(cci.getPassword(), "password".toCharArray()));
     }
@@ -86,7 +86,7 @@ public class CredentialsEngineImplementationTest {
 
         assertEquals("ssh", pci.getAdaptorName());
         assertEquals("username", pci.getUsername());
-        assertEquals(new HashMap<String,String>(), pci.getProperties());
+        assertEquals(new HashMap<String, String>(), pci.getProperties());
 
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
     }
@@ -105,7 +105,7 @@ public class CredentialsEngineImplementationTest {
         assertEquals("username", pci.getUsername());
         assertEquals(pci.getHost(), "host");
         assertEquals(pci.getPort(), 42);
-        assertEquals(new HashMap<String,String>(), pci.getProperties());
+        assertEquals(new HashMap<String, String>(), pci.getProperties());
 
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
     }

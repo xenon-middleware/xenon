@@ -91,8 +91,8 @@ public class ScriptingParser {
     }
 
     /**
-     * Parses lines containing single key/value pairs separated by the given separator, possibly surrounded by whitespace. Will ignore
-     * empty lines.
+     * Parses lines containing single key/value pairs separated by the given separator, possibly surrounded by whitespace. Will
+     * ignore empty lines.
      * 
      * @param input
      *            the input to parse

@@ -58,7 +58,7 @@ public class SshAdaptor extends Adaptor {
     public static final String ADAPTOR_NAME = "ssh";
 
     /** The default SSH port */
-    protected static final int DEFAULT_PORT = 22; 
+    protected static final int DEFAULT_PORT = 22;
 
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
@@ -80,7 +80,7 @@ public class SshAdaptor extends Adaptor {
 
     /** Add gateway to access machine. */
     public static final String GATEWAY = PREFIX + "gateway";
-    
+
     /** All our own queue properties start with this prefix. */
     public static final String QUEUE = PREFIX + "queue.";
 
@@ -97,21 +97,20 @@ public class SshAdaptor extends Adaptor {
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** List of properties supported by this SSH adaptor */
-    private static final OctopusPropertyDescription [] VALID_PROPERTIES = new OctopusPropertyDescription[] {        
-        new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, 
-                EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."), 
-        new OctopusPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, 
-                EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), "true", "Enable strict host key checking."), 
-        new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, 
-                EnumSet.of(Level.OCTOPUS), "true", "Load the standard known_hosts file."),
-        new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, 
-                EnumSet.of(Level.SCHEDULER), "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-        new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, 
-                EnumSet.of(Level.SCHEDULER), "4", "The maximum number of concurrent jobs in the multiq.."),
-        new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), 
-                null, "The gateway machine used to create an SSH tunnel to the target."),
-    };
-    
+    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+            new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
+                    Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
+            new OctopusPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
+                    Level.FILESYSTEM), "true", "Enable strict host key checking."),
+            new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Level.OCTOPUS),
+                    "true", "Load the standard known_hosts file."),
+            new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.SCHEDULER), "4",
+                    "The maximum number of concurrent jobs in the multiq.."),
+            new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM),
+                    null, "The gateway machine used to create an SSH tunnel to the target."), };
+
     private final SshFiles filesAdaptor;
 
     private final SshJobs jobsAdaptor;
@@ -120,19 +119,19 @@ public class SshAdaptor extends Adaptor {
 
     private JSch jsch;
 
-    public SshAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {
+    public SshAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
         this(octopusEngine, new JSch(), properties);
     }
 
-    public SshAdaptor(OctopusEngine octopusEngine, JSch jsch, Map<String,String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, 
-                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties));
+    public SshAdaptor(OctopusEngine octopusEngine, JSch jsch, Map<String, String> properties) throws OctopusException {
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
+                VALID_PROPERTIES, Level.OCTOPUS, properties));
 
         this.filesAdaptor = new SshFiles(this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
         this.credentialsAdaptor = new SshCredentials(getProperties(), this);
         this.jsch = jsch;
-        
+
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
             String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
             LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
@@ -161,7 +160,7 @@ public class SshAdaptor extends Adaptor {
             }
         }
     }
-    
+
     void checkURI(URI location) throws InvalidLocationException {
         if (!supports(location.getScheme())) {
             throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme "
@@ -182,7 +181,7 @@ public class SshAdaptor extends Adaptor {
     }
 
     @Override
-    public OctopusPropertyDescription [] getSupportedProperties() {
+    public OctopusPropertyDescription[] getSupportedProperties() {
         return VALID_PROPERTIES.clone();
     }
 

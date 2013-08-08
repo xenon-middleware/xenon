@@ -29,9 +29,9 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * A simple example of how to list a directory. 
+ * A simple example of how to list a directory.
  * 
- * This example assumes the user provides the URI of the directory on the command line. 
+ * This example assumes the user provides the URI of the directory on the command line.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -39,60 +39,60 @@ import nl.esciencecenter.octopus.util.URIUtils;
  */
 public class DirectoryListing {
 
-    public static void main(String [] args) { 
-        
-        if (args.length != 1) { 
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
             System.out.println("Example requires an URI a parameter!");
             System.exit(1);
         }
-                
+
         try {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
-            
+
             // Next, extract the parts from the URI we need to access the FileSystem.
             URI fsURI = URIUtils.getFileSystemURI(uri);
-            
+
             // Also extract the (absolute) path to the file.
             String filepath = uri.getPath();
-            
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
-            
+
             // Next we create a FileSystem. Note that both credential and properties are null (which means: use default)
             FileSystem fs = files.newFileSystem(fsURI, null, null);
-            
+
             // We now create an AbsolutePath representing the directory we want to list.
             AbsolutePath path = files.newPath(fs, new RelativePath(filepath));
-            
+
             // Retrieve the attributes of the file.
             FileAttributes att = files.getAttributes(path);
-            
+
             // Retrieve the attributes of the files in the directory.
-            if (att.isDirectory()) { 
-                
+            if (att.isDirectory()) {
+
                 System.out.println("Directory " + uri + " exists and contains the following:");
-                
+
                 DirectoryStream<AbsolutePath> stream = files.newDirectoryStream(path);
-                
-                for (AbsolutePath p : stream) { 
+
+                for (AbsolutePath p : stream) {
                     System.out.println("   " + p.getFileName());
                 }
-                
-            } else { 
+
+            } else {
                 System.out.println("Directory " + uri + " does not exists or is not a directory.");
             }
-                
+
             // If we are done we need to close the FileSystem
             files.close(fs);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("CreatingFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

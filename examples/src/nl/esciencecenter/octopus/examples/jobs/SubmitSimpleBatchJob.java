@@ -35,49 +35,49 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class SubmitSimpleBatchJob {
 
-    public static void main(String [] args) { 
-        try { 
+    public static void main(String[] args) {
+        try {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
-            
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs API
             Jobs jobs = octopus.jobs();
-            
+
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
             description.setArguments("5");
-            
+
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location, null, null);
-            
+
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
-            
+
             // Wait for the job to finish
             JobStatus status = jobs.waitUntilDone(job, 60000);
-            
+
             // Check if the job was successful. 
-            if (!status.isDone()) { 
+            if (!status.isDone()) {
                 System.out.println("Job failed to run within deadline.");
-            } else if (status.hasException()) { 
+            } else if (status.hasException()) {
                 Exception e = status.getException();
                 System.out.println("Job produced an exception: " + e.getMessage());
                 e.printStackTrace();
-            } else { 
+            } else {
                 System.out.println("Job ran succesfully!");
             }
 
             // Close the scheduler
             jobs.close(scheduler);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

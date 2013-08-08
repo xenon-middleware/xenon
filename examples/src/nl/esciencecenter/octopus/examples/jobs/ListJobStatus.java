@@ -26,6 +26,7 @@ import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
 import nl.esciencecenter.octopus.jobs.Scheduler;
+
 /**
  * A simple example of how to retrieve the job status.
  * 
@@ -35,50 +36,49 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class ListJobStatus {
 
-    public static void main(String [] args) {
-        
-        if (args.length != 1) { 
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
             System.out.println("Example required a scheduler URI as a parameter!");
             System.exit(1);
         }
-        
-        try { 
+
+        try {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
-            
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
-            
+
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location, null, null);
 
             // Retrieve all jobs of all queues.
-            Job [] allJobs = jobs.getJobs(scheduler);
-            
+            Job[] allJobs = jobs.getJobs(scheduler);
+
             // Retrieve the status of the first ten jobs.
-            JobStatus [] result = jobs.getJobStatuses(Arrays.copyOf(allJobs, 10));
-            
+            JobStatus[] result = jobs.getJobStatuses(Arrays.copyOf(allJobs, 10));
+
             // Print the result
             for (JobStatus j : result) {
-                if (j != null) { 
-                    System.out.println("  " + j.getJob().getIdentifier() + " " + j.getState() + " " 
+                if (j != null) {
+                    System.out.println("  " + j.getJob().getIdentifier() + " " + j.getState() + " "
                             + j.getSchedulerSpecficInformation());
                 }
             }
-            
+
             // Close the scheduler
             jobs.close(scheduler);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
 }
-

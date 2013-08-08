@@ -38,5 +38,5 @@ public interface Credential {
      * 
      * @return the properties used to create this Credential.
      */
-    Map<String,String> getProperties();
+    Map<String, String> getProperties();
 }

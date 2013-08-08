@@ -38,8 +38,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import ch.qos.logback.core.db.dialect.MySQLDialect;
-
 public class RealFileUtilsTest {
 
     public static String ROOT = "/tmp/octopus_RealFileUtilsTest_" + System.currentTimeMillis();

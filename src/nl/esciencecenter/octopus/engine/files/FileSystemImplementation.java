@@ -58,12 +58,12 @@ public class FileSystemImplementation implements FileSystem {
         this.uri = uri;
         this.entryPath = entryPath;
         this.credential = credential;
-        
-        if (properties == null) { 
+
+        if (properties == null) {
             this.properties = new OctopusProperties();
-        } else { 
+        } else {
             this.properties = properties;
-        }        
+        }
     }
 
     public Credential getCredential() {
@@ -85,7 +85,7 @@ public class FileSystemImplementation implements FileSystem {
     }
 
     @Override
-    public Map<String,String> getProperties() {
+    public Map<String, String> getProperties() {
         return properties.toMap();
     }
 

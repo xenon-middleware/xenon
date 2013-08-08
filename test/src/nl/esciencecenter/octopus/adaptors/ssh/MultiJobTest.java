@@ -79,8 +79,10 @@ public class MultiJobTest {
         Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
 
-        FileSystem filesystem = files.newFileSystem(correctFSURI, credentials.getDefaultCredential("sftp"), new HashMap<String,String>());
-        Scheduler scheduler = jobs.newScheduler(correctURI, credentials.getDefaultCredential("ssh"), new HashMap<String,String>());
+        FileSystem filesystem = files.newFileSystem(correctFSURI, credentials.getDefaultCredential("sftp"),
+                new HashMap<String, String>());
+        Scheduler scheduler = jobs.newScheduler(correctURI, credentials.getDefaultCredential("ssh"),
+                new HashMap<String, String>());
 
         String workingDir = TEST_ROOT + "/" + testName;
 

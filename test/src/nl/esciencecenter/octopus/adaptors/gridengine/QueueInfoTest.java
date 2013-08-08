@@ -21,7 +21,7 @@ import org.junit.Test;
 
 /**
  * @author Niels Drost
- *
+ * 
  */
 public class QueueInfoTest {
 

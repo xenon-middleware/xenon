@@ -24,7 +24,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
- * A simple example of how to configure an octopus with properties. 
+ * A simple example of how to configure an octopus with properties.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -32,26 +32,26 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  */
 public class CreatingOctopusWithProperties {
 
-    public static void main(String [] args) { 
-        try { 
-            
+    public static void main(String[] args) {
+        try {
+
             // We create some properties here to configure octopus. In this example 
             // we set the polling delay of the local adaptor to 1000ms. We also set 
             // the strictHostKeyChecking property of the ssh adaptor to true. 
-            Map<String,String> p = new HashMap<>();
+            Map<String, String> p = new HashMap<>();
             p.put("octopus.adaptors.local.queue.pollingDelay", "1000");
             p.put("octopus.adaptors.ssh.loadKnownHosts", "true");
-            
+
             // We now create a new octopus with the properties using the OctopusFactory.
             Octopus octopus = OctopusFactory.newOctopus(p);
-           
+
             // We can now uses the octopus to get some work done!
             // ....
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) { 
+        } catch (OctopusException e) {
             System.out.println("CreatingOctopusWithProperties example failed: " + e.getMessage());
             e.printStackTrace();
         }

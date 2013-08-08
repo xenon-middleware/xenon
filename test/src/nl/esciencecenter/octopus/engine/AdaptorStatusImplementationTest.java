@@ -31,8 +31,8 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testGetters() {
 
-        AdaptorStatusImplementation a =
-                new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1", "SCHEME2" }, null, null);
+        AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1",
+                "SCHEME2" }, null, null);
 
         String name = a.getName();
 
@@ -49,7 +49,7 @@ public class AdaptorStatusImplementationTest {
         assert (schemes[0].equals("SCHEME1"));
         assert (schemes[1].equals("SCHEME2"));
 
-        OctopusPropertyDescription [] props = a.getSupportedProperties();
+        OctopusPropertyDescription[] props = a.getSupportedProperties();
 
         assert (props == null);
 
@@ -61,9 +61,8 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testToString() {
 
-        String tmp =
-                new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1", "SCHEME2" }, null, null)
-                        .toString();
+        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1", "SCHEME2" }, null, null)
+                .toString();
 
         assert (tmp
                 .equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, SCHEME2], supportedProperties=null, adaptorSpecificInformation=null]"));

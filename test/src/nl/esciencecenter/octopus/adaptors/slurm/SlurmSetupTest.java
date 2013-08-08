@@ -69,7 +69,7 @@ public class SlurmSetupTest {
 
         assertFalse(config.accountingAvailable());
     }
-    
+
     @Test
     public void test_forcedAccountingDisabled() throws OctopusException {
         //Relevant part of config used in current implementation

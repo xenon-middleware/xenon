@@ -175,9 +175,8 @@ public class JavaJobDescriptionTest {
         //use a strange path separator to test if this is properly handled
         List<String> arguments = j.getArguments('_');
 
-        String[] expected =
-                new String[] { "-Xtesting=true", "-classpath", "element1_element2_element3", "-Dproperty.key=property.value",
-                        "nl.esciencecenter.main.class", "argument" };
+        String[] expected = new String[] { "-Xtesting=true", "-classpath", "element1_element2_element3",
+                "-Dproperty.key=property.value", "nl.esciencecenter.main.class", "argument" };
 
         assertNotNull(arguments);
         assertArrayEquals(expected, arguments.toArray(new String[0]));
@@ -217,11 +216,10 @@ public class JavaJobDescriptionTest {
         j.setStderr("stderr");
         j.setExecutable("exec");
 
-        String expected =
-                "JavaJobDescription [javaOptions=[-Xtesting=true], javaSystemProperties={property.key=property.value},"
-                        + " javaMain=nl.esciencecenter.main.class, javaArguments=[argument], javaClassPath=[element1, element2, element3],"
-                        + " queueName=noot, executable=exec, stdin=null, stdout=stdout, stderr=stderr, workingDirectory=aap,"
-                        + " environment={}, jobOptions={}, nodeCount=1, processesPerNode=1, maxTime=15, interactive=true]";
+        String expected = "JavaJobDescription [javaOptions=[-Xtesting=true], javaSystemProperties={property.key=property.value},"
+                + " javaMain=nl.esciencecenter.main.class, javaArguments=[argument], javaClassPath=[element1, element2, element3],"
+                + " queueName=noot, executable=exec, stdin=null, stdout=stdout, stderr=stderr, workingDirectory=aap,"
+                + " environment={}, jobOptions={}, nodeCount=1, processesPerNode=1, maxTime=15, interactive=true]";
 
         assertEquals(expected, j.toString());
     }
@@ -236,12 +234,12 @@ public class JavaJobDescriptionTest {
         assertFalse(one.equals("AAP"));
         assertFalse(one.equals(new JobDescription()));
         assertTrue(one.equals(other));
-        
+
         one.setExecutable("bla");
         assertFalse(one.equals(other));
         other.setExecutable("bla");
         assertTrue(one.equals(other));
-        
+
         one.setJavaOptions("some", "options");
         assertFalse(one.equals(other));
         other.setJavaOptions("some", "options");
@@ -261,28 +259,28 @@ public class JavaJobDescriptionTest {
         assertFalse(one.equals(other));
         other.setJavaMain("main.class");
         assertTrue(one.equals(other));
-        
+
         one.setJavaMain(null);
         assertFalse(one.equals(other));
         other.setJavaMain(null);
         assertTrue(one.equals(other));
-        
+
         one.setJavaClasspath("some", "elements");
         assertFalse(one.equals(other));
         other.setJavaClasspath("some", "elements");
         assertTrue(one.equals(other));
 
     }
-    
+
     @org.junit.Test
     public void test_hashcode_empty() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
-        
+
         int prime = 31;
-        
+
         //start with hashcode of super class
         int result = new JobDescription().hashCode();
-        
+
         result = prime * result + new ArrayList<String>().hashCode();
         result = prime * result + new ArrayList<String>().hashCode();
         result = prime * result + 0;
@@ -291,30 +289,29 @@ public class JavaJobDescriptionTest {
 
         assertEquals(result, j.hashCode());
     }
-    
+
     @org.junit.Test
     public void test_hashcode_filled() throws Exception {
-        String[] arguments = new String[] {"some", "arguments"};
-        String[] options = new String[] {"some", "options"};
+        String[] arguments = new String[] { "some", "arguments" };
+        String[] options = new String[] { "some", "options" };
         String main = "main";
-        String[] classpath = new String[] {"class", "path"};
-        
+        String[] classpath = new String[] { "class", "path" };
+
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("some.key", "some.value");
-        
-        
+
         JavaJobDescription j = new JavaJobDescription();
         j.setJavaArguments(arguments);
         j.setJavaOptions(options);
         j.setJavaMain(main);
         j.setJavaClasspath(classpath);
         j.setJavaSystemProperties(properties);
-        
+
         int prime = 31;
 
         //start with hashcode of super class
         int result = new JobDescription().hashCode();
-        
+
         result = prime * result + Arrays.asList(arguments).hashCode();
         result = prime * result + Arrays.asList(classpath).hashCode();
         result = prime * result + main.hashCode();
@@ -324,5 +321,4 @@ public class JavaJobDescriptionTest {
         assertEquals(result, j.hashCode());
     }
 
-    
 }

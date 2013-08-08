@@ -65,7 +65,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    FileSystem newFileSystem(URI location, Credential credential, Map<String,String> properties) throws OctopusException,
+    FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException;
 
     /**
@@ -387,8 +387,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
-            throws OctopusIOException;
+    DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException;
 
     /**
      * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code>.

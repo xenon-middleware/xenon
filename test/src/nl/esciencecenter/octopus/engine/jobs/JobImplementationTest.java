@@ -36,9 +36,8 @@ public class JobImplementationTest {
     public void test_constructor0() throws Exception {
         JobDescription desc = new JobDescription();
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         new JobImplementation(s, "id1", desc, true, true);
     }
@@ -58,9 +57,8 @@ public class JobImplementationTest {
     public void test_constructor3() throws Exception {
         JobDescription desc = new JobDescription();
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         new JobImplementation(s, null, desc, true, true);
     }
@@ -70,9 +68,8 @@ public class JobImplementationTest {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         JobImplementation ji = new JobImplementation(s, "id1", desc, true, true);
 
@@ -88,9 +85,8 @@ public class JobImplementationTest {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         JobImplementation ji = new JobImplementation(s, "id1", desc, true, true);
 
@@ -104,9 +100,8 @@ public class JobImplementationTest {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         JobImplementation ji = new JobImplementation(s, "id1", desc, true, true);
 

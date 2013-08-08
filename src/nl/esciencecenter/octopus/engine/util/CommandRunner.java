@@ -100,7 +100,7 @@ public class CommandRunner {
         err = new OutputReader(p.getErrorStream());
 
         int exit = 0;
-        
+
         try {
             exit = p.waitFor();
 
@@ -114,7 +114,7 @@ public class CommandRunner {
         } catch (InterruptedException e) {
             // IGNORE
         }
-        
+
         exitCode = exit;
     }
 

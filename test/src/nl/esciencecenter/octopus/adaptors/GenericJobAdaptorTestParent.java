@@ -16,7 +16,10 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +30,6 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
@@ -234,24 +236,23 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test04c_newScheduler() throws Exception {
         if (config.supportsCredentials()) {
-            Scheduler s =
-                    jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
-                            config.getDefaultProperties());
+            Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
+                    config.getDefaultProperties());
             jobs.close(s);
         }
     }
 
     @Test
     public void test05_newScheduler() throws Exception {
-        Scheduler s =
-                jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String, String>());
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
+                new HashMap<String, String>());
         jobs.close(s);
     }
 
     @Test
     public void test06_newScheduler() throws Exception {
-        Scheduler s =
-                jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), config.getDefaultProperties());
+        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
+                config.getDefaultProperties());
         jobs.close(s);
     }
 
@@ -277,9 +278,8 @@ public abstract class GenericJobAdaptorTestParent {
     public void test08_newScheduler() throws Exception {
         if (config.supportsProperties()) {
             try {
-                Scheduler s =
-                        jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
-                                config.getUnknownProperties());
+                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
+                        config.getUnknownProperties());
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw UnknownPropertyException");
@@ -660,7 +660,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
 
         long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + config.getUpdateTime();
@@ -727,7 +727,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
@@ -901,7 +901,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        
+
         // We immediately kill the job. Hopefully it isn't running yet!
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.cancelJob(job);
@@ -958,7 +958,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
 
         // Wait for job to run before killing it!
@@ -1025,7 +1025,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
@@ -1085,7 +1085,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
@@ -1184,7 +1184,6 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.close(scheduler);
         files.close(filesystem);
     }
-    
 
     @org.junit.Test
     public void test37c_batchJobSubmitWithAbsoluteWorkDir() throws Exception {
@@ -1262,7 +1261,7 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(status.hasException());
         jobs.close(scheduler);
     }
-    
+
     @org.junit.Test
     public void test37e_batchJobSubmitWithWorkDirWithSpaces() throws Exception {
         //note the space in the path
@@ -1298,7 +1297,6 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.close(scheduler);
         files.close(filesystem);
     }
-
 
     //@org.junit.Test
     public void test38_multipleBatchJobSubmitWithInput() throws Exception {
@@ -1595,7 +1593,7 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Submit did not throw exception, which was expected!");
         }
     }
-    
+
     @org.junit.Test
     public void test43_submit_JobDescriptionShouldBeCopied_Success() throws Exception {
 
@@ -1612,27 +1610,27 @@ public abstract class GenericJobAdaptorTestParent {
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdout("stdout.txt");
-        
+
         Job job = jobs.submitJob(scheduler, description);
 
         description.setStdout("aap.txt");
-        
+
         JobDescription original = job.getJobDescription();
-        
+
         assertEquals("Job description should have been copied!", "stdout.txt", original.getStdout());
-        
+
         JobStatus status = jobs.cancelJob(job);
-        
+
         if (!status.isDone()) {
             jobs.waitUntilDone(job, 60000);
         }
-        
+
         AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
-        
-        if (files.exists(out)) { 
+
+        if (files.exists(out)) {
             files.delete(out);
         }
-        
+
         files.delete(root);
         files.close(filesystem);
     }

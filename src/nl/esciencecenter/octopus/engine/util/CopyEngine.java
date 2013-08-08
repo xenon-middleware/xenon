@@ -71,7 +71,7 @@ public class CopyEngine {
 
     /** The name of this unit */
     private static final String NAME = "CopyEngine";
-    
+
     /** The polling delay */
     private static final int POLLING_DELAY = 1000;
 
@@ -83,10 +83,10 @@ public class CopyEngine {
 
     /** Pending copies */
     private Deque<CopyInfo> pending = new LinkedList<>();
-    
+
     /** Finished copies */
     private Map<String, CopyInfo> finished = new LinkedHashMap<>();
-    
+
     /** Running copy */
     private CopyInfo running;
 
@@ -95,7 +95,7 @@ public class CopyEngine {
 
     /** Should we terminate ? */
     private boolean done = false;
-    
+
     public CopyEngine(Files owner) {
         this.owner = owner;
         new CopyThread().start();

@@ -23,84 +23,84 @@ import nl.esciencecenter.octopus.OctopusPropertyDescription;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class AdaptorDocGenerator {
-    
+
     private static void printPropertyDescription(OctopusPropertyDescription d) {
-        
+
         System.out.println("### `" + d.getName() + "` ###\n");
         System.out.println(d.getDescription() + "\n");
         System.out.println("- Expected type: " + d.getType() + "\n");
         System.out.println("- Default value: " + d.getDefaultValue() + "\n");
         System.out.println("- Valid for: " + d.getLevels() + "\n\n");
-   }
-    
-    private static void printAdaptorDoc(AdaptorStatus a) { 
-        
+    }
+
+    private static void printAdaptorDoc(AdaptorStatus a) {
+
         System.out.println("Adaptor: " + a.getName());
         System.out.println("--------");
-    
+
         System.out.println();
         System.out.println(a.getDescription());
         System.out.println();
-        
+
         System.out.println("### Supported schemes: ###");
-        
-        String [] schemes = a.getSupportedSchemes();
-        
+
+        String[] schemes = a.getSupportedSchemes();
+
         String comma = "";
-        
-        for (int i=0;i<schemes.length;i++) { 
+
+        for (int i = 0; i < schemes.length; i++) {
             System.out.print(comma + schemes[i]);
             comma = ", ";
         }
-        
+
         System.out.println();
         System.out.println();
-        
+
         System.out.println("### Supported properties: ###\n\n");
-        
-        OctopusPropertyDescription [] properties = a.getSupportedProperties(); 
-        
-        for (OctopusPropertyDescription d : properties) { 
+
+        OctopusPropertyDescription[] properties = a.getSupportedProperties();
+
+        for (OctopusPropertyDescription d : properties) {
             printPropertyDescription(d);
         }
-        
+
         System.out.println();
     }
-    
-    public static void main(String [] args) { 
-        
+
+    public static void main(String[] args) {
+
         try {
             Octopus octopus = OctopusFactory.newOctopus(null);
-            AdaptorStatus [] adaptors = octopus.getAdaptorStatuses();
-            
+            AdaptorStatus[] adaptors = octopus.getAdaptorStatuses();
+
             System.out.println("Octopus Adaptor Documentation");
             System.out.println("=============================");
             System.out.println("");
-            System.out.println("This document contains the adaptor documentation. This documentation is generated " +
-                               "from the information provided by the adaptors themselves.");
+            System.out.println("This document contains the adaptor documentation. This documentation is generated "
+                    + "from the information provided by the adaptors themselves.");
             System.out.println("");
             System.out.print("Octopus currently supports " + adaptors.length + " adaptors: ");
 
             String comma = "";
-            
-            for (AdaptorStatus a : adaptors) { 
+
+            for (AdaptorStatus a : adaptors) {
                 System.out.print(comma + a.getName());
                 comma = ", ";
             }
 
             System.out.println(".");
             System.out.println();
-                                   
-            for (AdaptorStatus a : adaptors) { 
+
+            for (AdaptorStatus a : adaptors) {
                 printAdaptorDoc(a);
             }
 
             OctopusFactory.endAll();
-            
-        } catch (Exception e) { 
+
+        } catch (Exception e) {
             System.err.println("Failed to generate adaptor documentation: " + e.getMessage());
             e.printStackTrace(System.err);
         }

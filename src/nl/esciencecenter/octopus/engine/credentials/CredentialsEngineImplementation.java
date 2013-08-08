@@ -34,21 +34,21 @@ public class CredentialsEngineImplementation implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Map<String,String> properties, String certfile, String username, 
+    public Credential newCertificateCredential(String scheme, Map<String, String> properties, String certfile, String username,
             char[] password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, properties, certfile, username, password);
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Map<String,String> properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, Map<String, String> properties, String username, char[] password)
             throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, properties, username, password);
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Map<String,String> properties, String host, int port, String username,
+    public Credential newProxyCredential(String scheme, Map<String, String> properties, String host, int port, String username,
             char[] password) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newProxyCredential(scheme, properties, host, port, username, password);
@@ -64,7 +64,7 @@ public class CredentialsEngineImplementation implements Credentials {
     public void close(Credential credential) throws OctopusException {
         getCredentialsAdaptor(credential).close(credential);
     }
-    
+
     private Credentials getCredentialsAdaptor(Credential credential) {
         try {
             Adaptor adaptor = octopusEngine.getAdaptor(credential.getAdaptorName());
@@ -72,7 +72,8 @@ public class CredentialsEngineImplementation implements Credentials {
         } catch (OctopusException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new OctopusRuntimeException("CredentialEngine", "Could not find adaptor named " + credential.getAdaptorName(), e);
+            throw new OctopusRuntimeException("CredentialEngine", "Could not find adaptor named " + credential.getAdaptorName(),
+                    e);
         }
     }
 }

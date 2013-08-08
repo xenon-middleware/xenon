@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
 import nl.esciencecenter.octopus.jobs.Scheduler;
+
 /**
  * A simple example of how to retrieve the job status.
  * 
@@ -33,46 +34,45 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class ListJobs {
 
-    public static void main(String [] args) {
-        
-        if (args.length != 1) { 
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
             System.out.println("Example required a scheduler URI as a parameter!");
             System.exit(1);
         }
-        
-        try { 
+
+        try {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
-            
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
-            
+
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location, null, null);
 
             // Retrieve all jobs of all queues.
-            Job [] result = jobs.getJobs(scheduler);
-            
+            Job[] result = jobs.getJobs(scheduler);
+
             // Print the result
             System.out.println("The scheduler at " + location + " has " + result.length + " jobs:");
-            
+
             for (Job j : result) {
                 System.out.println("  " + j.getIdentifier());
             }
-            
+
             // Close the scheduler
             jobs.close(scheduler);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
 }
-

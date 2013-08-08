@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-
 import java.net.URI;
 import java.util.HashMap;
 
@@ -28,29 +27,28 @@ import nl.esciencecenter.octopus.files.Files;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 public class SSHTunnelTest {
 
     @org.junit.Test
     public void test_sshViaTunnel() throws Exception {
-        
+
         URI fsURI = new URI("ssh://10.0.0.2");
         String gatewayURI = "ssh://192.168.56.101:4444";
-        
+
         Octopus octopus = OctopusFactory.newOctopus(null);
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
 
-        HashMap<String,String> properties = new HashMap<String,String>();
+        HashMap<String, String> properties = new HashMap<String, String>();
         properties.put("octopus.adaptors.ssh.gateway", gatewayURI);
 
         // Will thrown an exception if the tunnel fails ?
         FileSystem filesystem = files.newFileSystem(fsURI, credentials.getDefaultCredential("sftp"), properties);
-        
+
         files.close(filesystem);
         OctopusFactory.endOctopus(octopus);
     }
-    
-    
+
 }

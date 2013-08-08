@@ -46,7 +46,7 @@ public interface FileSystem {
      * 
      * @return the properties used to create this FileSystem.
      */
-    Map<String,String> getProperties();
+    Map<String, String> getProperties();
 
     /**
      * Get the entry path of this file system.

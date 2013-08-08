@@ -39,9 +39,8 @@ public class StreamsImplementationTest {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         Job j = new JobImplementation(s, "id1", desc, true, true);
 

@@ -103,10 +103,10 @@ public class GridEngineXmlParserTest {
         assertEquals(9, result.size());
 
     }
-    
+
     @Test
     public void testSomeMore() throws Throwable {
         fail("need more tests");
     }
-    
+
 }

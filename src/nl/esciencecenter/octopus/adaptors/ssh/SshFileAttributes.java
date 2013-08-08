@@ -27,16 +27,15 @@ import com.jcraft.jsch.SftpATTRS;
 public class SshFileAttributes implements FileAttributes {
 
     private final static int MILLISECONDS_PER_SECOND = 1000;
-    
-    
+
     /** Bitset to set user ID on execution */
-    static final int SUID = 04000; 
- 
+    static final int SUID = 04000;
+
     /** Bitset to set group ID on execution */
     static final int SGID = 02000;
-    
-    /** Bitset to set sticky bit   ****** NOT DOCUMENTED *****/
-    static final int SVTX = 01000; 
+
+    /** Bitset to set sticky bit ****** NOT DOCUMENTED *****/
+    static final int SVTX = 01000;
 
     private final SftpATTRS attributes;
     private final AbsolutePath path;

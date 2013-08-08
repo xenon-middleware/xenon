@@ -27,7 +27,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import org.junit.Test;
 
 public class GridEngineJobScriptGeneratorTest {
-    
+
     @Test
     public void test00_constructorIsPrivate() throws Throwable {
         Constructor<GridEngineJobScriptGenerator> constructor = GridEngineJobScriptGenerator.class.getDeclaredConstructor();
@@ -83,6 +83,5 @@ public class GridEngineJobScriptGeneratorTest {
 
         assertEquals(expected, result);
     }
-
 
 }

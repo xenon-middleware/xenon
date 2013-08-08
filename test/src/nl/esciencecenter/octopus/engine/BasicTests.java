@@ -36,7 +36,7 @@ public class BasicTests {
     @org.junit.Test
     public void test2() throws Exception {
 
-        Map<String,String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("some.key", "some.value");
 
         Octopus octopus = OctopusFactory.newOctopus(properties);

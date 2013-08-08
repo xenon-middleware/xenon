@@ -306,19 +306,19 @@ public class JavaJobDescription extends JobDescription {
         if (this == obj) {
             return true;
         }
-        
+
         if (obj == null) {
             return false;
         }
-        
+
         if (getClass() != obj.getClass()) {
             return false;
         }
-        
+
         if (!super.equals(obj)) {
             return false;
         }
-        
+
         JavaJobDescription other = (JavaJobDescription) obj;
         if (!javaArguments.equals(other.javaArguments)) {
             return false;

@@ -59,6 +59,6 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public abstract long getQueueWaitTime();
 
     public abstract long getUpdateTime();
-    
+
     public abstract boolean supportsParallelJobs();
 }

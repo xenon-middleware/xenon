@@ -59,8 +59,8 @@ public enum PosixFilePermission {
     /**
      * Write permission, owner.
      */
-    OWNER_WRITE,;
-        
+    OWNER_WRITE, ;
+
     /**
      * Check if an array of <code>PosixFilePermission</code> contains a specific option.
      * 

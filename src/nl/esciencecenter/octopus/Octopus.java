@@ -38,7 +38,7 @@ public interface Octopus {
      * 
      * @return the properties used to create this Octopus.
      */
-    Map<String,String> getProperties();
+    Map<String, String> getProperties();
 
     /**
      * Returns information about the specified adaptor.

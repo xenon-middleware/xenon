@@ -79,7 +79,7 @@ public class ScriptingParserTest {
 
         assertEquals("parser does not handle whitespace correctly", expected, result);
     }
-    
+
     @Test
     public void test01c_parseKeyValuePairs_EmptyLines_Ignored() throws Exception {
         Map<String, String> expected = new HashMap<String, String>();
@@ -94,7 +94,7 @@ public class ScriptingParserTest {
 
         assertEquals("parser does not handle empty lines correctly", expected, result);
     }
-    
+
     @Test
     public void test01d_parseKeyValuePairs_IgnoredLines_Ignored() throws Exception {
         Map<String, String> expected = new HashMap<String, String>();
@@ -109,7 +109,6 @@ public class ScriptingParserTest {
 
         assertEquals("parser does not handle empty lines correctly", expected, result);
     }
-
 
     @Test(expected = OctopusException.class)
     public void test01c_parseKeyValuePairs_SpaceInKeyValuePair_ExceptionThrown() throws Exception {

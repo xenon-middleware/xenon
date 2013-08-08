@@ -124,7 +124,7 @@ public class LocalDirectoryAttributeStreamTest {
     public void prepareTest() throws Exception {
 
         octopus = Util.createOctopusEngine(null);
-        localAdaptor = new LocalAdaptor(octopus, new HashMap<String,String>());
+        localAdaptor = new LocalAdaptor(octopus, new HashMap<String, String>());
         localFiles = new LocalFiles(localAdaptor, octopus.getCopyEngine());
         fs = localFiles.getLocalCWDFileSystem();
         root = fs.getEntryPath();
@@ -145,8 +145,8 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test
     public void test_ok_allTrue() throws Exception {
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllTrue()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllTrue()));
 
         while (stream.hasNext()) {
             stream.next();
@@ -158,8 +158,8 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test
     public void test_ok_allTrue2() throws Exception {
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllTrue()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllTrue()));
 
         for (int i = 0; i < 10; i++) {
             if (!stream.hasNext()) {
@@ -177,8 +177,8 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test
     public void test_ok_allFalse() throws Exception {
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllFalse()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllFalse()));
 
         while (stream.hasNext()) {
             stream.next();
@@ -190,8 +190,8 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test(expected = NoSuchElementException.class)
     public void test_ok_allFalse2() throws Exception {
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllFalse()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllFalse()));
 
         stream.next();
     }
@@ -199,8 +199,8 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test(expected = NoSuchElementException.class)
     public void test_fails_next() throws Exception {
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllTrue()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllTrue()));
 
         while (true) {
             stream.next();
@@ -220,8 +220,8 @@ public class LocalDirectoryAttributeStreamTest {
             throw new Exception("Failed to create file4!");
         }
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(dir0, new AllTrue()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(dir0,
+                new AllTrue()));
 
         while (stream.hasNext()) {
             localFiles.delete(file4);
@@ -234,16 +234,16 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test(expected = UnsupportedOperationException.class)
     public void test_fails_remove() throws Exception {
 
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllTrue()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllTrue()));
 
         stream.remove();
     }
 
     @org.junit.Test
     public void test_ok_double_close() throws Exception {
-        LocalDirectoryAttributeStream stream =
-                new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir, new AllTrue()));
+        LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
+                new AllTrue()));
 
         stream.close();
         stream.close();

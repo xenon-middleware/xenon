@@ -21,12 +21,13 @@ import org.junit.Test;
 
 /**
  * @author Niels Drost
- *
+ * 
  */
 public class ParallelEnvironmentInfoTest {
 
     /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.ParallelEnvironmentInfo#ParallelEnvironmentInfo(java.util.Map)}.
+     * Test method for
+     * {@link nl.esciencecenter.octopus.adaptors.gridengine.ParallelEnvironmentInfo#ParallelEnvironmentInfo(java.util.Map)}.
      */
     @Test
     public void testParallelEnvironmentInfo() {

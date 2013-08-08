@@ -49,7 +49,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(description.getExecutable());
-        
+
         //We need to special case for the java job description here,
         //as it needs to be told the path separator in case the target is a windows machine.
         List<String> arguments;
@@ -59,7 +59,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         } else {
             arguments = description.getArguments();
         }
-        
+
         builder.command().addAll(arguments);
         builder.environment().putAll(description.getEnvironment());
 

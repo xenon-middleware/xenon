@@ -104,7 +104,7 @@ public class SshFiles implements Files {
 
     private final OctopusEngine octopusEngine;
     private final SshAdaptor adaptor;
-    
+
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     public SshFiles(SshAdaptor sshAdaptor, OctopusEngine octopusEngine) {
@@ -112,8 +112,8 @@ public class SshFiles implements Files {
         this.adaptor = sshAdaptor;
     }
 
-    protected FileSystem newFileSystem(SshMultiplexedSession session, URI location, Credential credential, OctopusProperties properties)
-            throws OctopusException, OctopusIOException {
+    protected FileSystem newFileSystem(SshMultiplexedSession session, URI location, Credential credential,
+            OctopusProperties properties) throws OctopusException, OctopusIOException {
 
         String uniqueID = getNewUniqueID();
 
@@ -135,8 +135,8 @@ public class SshFiles implements Files {
 
         LOGGER.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
-        FileSystemImplementation result =
-                new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath, credential, properties);
+        FileSystemImplementation result = new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath,
+                credential, properties);
 
         fileSystems.put(uniqueID, new FileSystemInfo(result, session));
 
@@ -273,9 +273,9 @@ public class SshFiles implements Files {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
-        
+
         FileAttributes att = getAttributes(path);
-        
+
         try {
             if (att.isDirectory()) {
                 if (newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER).iterator().hasNext()) {
@@ -364,7 +364,7 @@ public class SshFiles implements Files {
     private List<LsEntry> listDirectory(AbsolutePath path, Filter filter) throws OctopusIOException {
 
         FileAttributes att = getAttributes(path);
-        
+
         if (!att.isDirectory()) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
@@ -418,7 +418,7 @@ public class SshFiles implements Files {
         }
 
         FileAttributes att = getAttributes(path);
-        
+
         if (att.isDirectory()) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
         }

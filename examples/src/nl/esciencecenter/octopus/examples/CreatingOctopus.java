@@ -33,9 +33,9 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 public class CreatingOctopus {
 
     @SuppressWarnings("unused")
-    public static void main(String [] args) { 
-        try { 
-            
+    public static void main(String[] args) {
+        try {
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -43,14 +43,14 @@ public class CreatingOctopus {
             Files files = octopus.files();
             Jobs jobs = octopus.jobs();
             Credentials credentials = octopus.credentials();
-            
+
             // We can now uses the interfaces to get some work done!
             // ....
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) { 
+        } catch (OctopusException e) {
             System.out.println("CreatingOctopus example failed: " + e.getMessage());
             e.printStackTrace();
         }

@@ -182,10 +182,10 @@ public class AbsolutePathImplementationTest {
     public void test_equals() throws Exception {
         AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
 
-        FileSystem fs2 =
-                new FileSystemImplementation("other", "other-fs-0", new URI("file:///"), new RelativePath("/"), null, null);
-        FileSystem fs3 =
-                new FileSystemImplementation("local", "local-fs-0", new URI("aap:///"), new RelativePath("/"), null, null);
+        FileSystem fs2 = new FileSystemImplementation("other", "other-fs-0", new URI("file:///"), new RelativePath("/"), null,
+                null);
+        FileSystem fs3 = new FileSystemImplementation("local", "local-fs-0", new URI("aap:///"), new RelativePath("/"), null,
+                null);
 
         AbsolutePath path2 = new AbsolutePathImplementation(fs2, new RelativePath("/aap/noot/mies/bla"));
         AbsolutePath path3 = new AbsolutePathImplementation(fs3, new RelativePath("/aap/noot/mies/bla"));

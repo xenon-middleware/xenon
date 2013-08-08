@@ -28,9 +28,9 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
- * A simple example of how to check if a given file exists. 
+ * A simple example of how to check if a given file exists.
  * 
- * This example assumes the user provides a path to check. 
+ * This example assumes the user provides a path to check.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -38,46 +38,46 @@ import nl.esciencecenter.octopus.files.RelativePath;
  */
 public class FileExists {
 
-    public static void main(String [] args) { 
-        
-        if (args.length != 1) { 
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
             System.out.println("Example required an absolute file path as a parameter!");
             System.exit(1);
         }
-        
+
         String filename = args[0];
-        
-        try { 
+
+        try {
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
-            
+
             // Next we create a FileSystem 
             URI uri = new URI("file://localhost/");
-            Credential c = credentials.getDefaultCredential("file");  
+            Credential c = credentials.getDefaultCredential("file");
             FileSystem fs = files.newFileSystem(uri, c, null);
-            
+
             // We now create an AbsolutePath representing the file
-            AbsolutePath path = files.newPath(fs, new RelativePath(filename)); 
-            
+            AbsolutePath path = files.newPath(fs, new RelativePath(filename));
+
             // Check if the file exists 
-            if (files.exists(path)) { 
+            if (files.exists(path)) {
                 System.out.println("File " + filename + " exists!");
-            } else { 
+            } else {
                 System.out.println("File " + filename + " does not exist!");
             }
-            
+
             // If we are done we need to close the FileSystem ad the credential
             files.close(fs);
             credentials.close(c);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("CreatingFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

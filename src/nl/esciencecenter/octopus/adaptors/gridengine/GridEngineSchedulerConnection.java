@@ -318,8 +318,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 Map<String, String> map = allMap.get(queueNames[i]);
 
                 if (map == null || map.isEmpty()) {
-                    Exception exception = new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot get status of queue \""
-                            + queueNames[i] + "\" from server, perhaps it does not exist?");
+                    Exception exception = new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME,
+                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
                 } else {
                     result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, map);
@@ -506,8 +506,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                     result[i] = getJobStatusFromQacct(jobs[i]);
                 }
 
-                //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
-                //qstat/qacct output completely
+                // perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear 
+                // from qstat/qacct output completely
                 if (result[i] == null && getJobDeleted(jobs[i].getIdentifier())) {
                     Exception exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job "
                             + jobs[i].getIdentifier() + " deleted by user while still pending");

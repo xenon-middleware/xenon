@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 public class OctopusEngine implements Octopus {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OctopusEngine.class);
-    
+
     /** The local adaptor is a special case, therefore we publish its name here. */
     public static final String LOCAL_ADAPTOR_NAME = "local";
 
@@ -82,7 +82,7 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public static synchronized Octopus newOctopus(Map<String,String> properties) throws OctopusException {
+    public static synchronized Octopus newOctopus(Map<String, String> properties) throws OctopusException {
         OctopusEngine result = new OctopusEngine(properties);
         OCTOPUS_ENGINES.add(result);
         return result;
@@ -120,7 +120,7 @@ public class OctopusEngine implements Octopus {
 
     private boolean ended = false;
 
-    private final Map<String,String> properties;
+    private final Map<String, String> properties;
 
     private final FilesEngine filesEngine;
 
@@ -131,7 +131,7 @@ public class OctopusEngine implements Octopus {
     private final Adaptor[] adaptors;
 
     private final CopyEngine copyEngine;
-    
+
     /**
      * Constructs a OctopusEngine.
      * 
@@ -145,12 +145,12 @@ public class OctopusEngine implements Octopus {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    private OctopusEngine(Map<String,String> properties) throws OctopusException {
-        
+    private OctopusEngine(Map<String, String> properties) throws OctopusException {
+
         // Store the properties for later reference.
-        if (properties == null) { 
+        if (properties == null) {
             this.properties = Collections.unmodifiableMap(new HashMap<String, String>());
-        } else { 
+        } else {
             this.properties = Collections.unmodifiableMap(new HashMap<String, String>(properties));
         }
 
@@ -159,17 +159,17 @@ public class OctopusEngine implements Octopus {
         jobsEngine = new JobsEngine(this);
         credentialsEngine = new CredentialsEngineImplementation(this);
         copyEngine = new CopyEngine(filesEngine);
-        
+
         adaptors = loadAdaptors(this.properties);
 
         LOGGER.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
-    private Adaptor[] loadAdaptors(Map<String,String> properties) throws OctopusException {
+    private Adaptor[] loadAdaptors(Map<String, String> properties) throws OctopusException {
 
         // Copy the map so we can manipulate it. 
-        Map<String,String> tmp = new HashMap<>(properties);
-        
+        Map<String, String> tmp = new HashMap<>(properties);
+
         Adaptor[] result = new Adaptor[4];
 
         result[0] = new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX));
@@ -178,32 +178,32 @@ public class OctopusEngine implements Octopus {
         result[3] = new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX));
 
         // Check if there are any properties left. If so, this is a problem. 
-        if (tmp.size() != 0) { 
+        if (tmp.size() != 0) {
             throw new UnknownPropertyException("OctopusEngine", "Unknown properties: " + tmp);
         }
-                
+
         return result;
     }
 
-    private Map<String,String> extract(Map<String,String> source, String prefix) { 
+    private Map<String, String> extract(Map<String, String> source, String prefix) {
 
-        HashMap<String,String> tmp = new HashMap<>();
-        
+        HashMap<String, String> tmp = new HashMap<>();
+
         Iterator<String> itt = source.keySet().iterator();
-        
-        while (itt.hasNext()) { 
-            
+
+        while (itt.hasNext()) {
+
             String key = itt.next();
 
-            if (key.startsWith(prefix)) { 
+            if (key.startsWith(prefix)) {
                 tmp.put(key, source.get(key));
                 itt.remove();
             }
         }
-        
+
         return tmp;
     }
-    
+
     // ************** Octopus Interface Implementation ***************\\
 
     @Override
@@ -251,7 +251,7 @@ public class OctopusEngine implements Octopus {
     }
 
     @Override
-    public synchronized Map<String,String> getProperties() {
+    public synchronized Map<String, String> getProperties() {
         return properties;
     }
 
@@ -297,7 +297,6 @@ public class OctopusEngine implements Octopus {
 
     @Override
     public String toString() {
-        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended="
-                + ended + "]";
+        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
     }
 }

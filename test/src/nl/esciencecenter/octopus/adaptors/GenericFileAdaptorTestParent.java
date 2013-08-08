@@ -16,22 +16,16 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-//import java.nio.ByteBuffer;
-//import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.Octopus;

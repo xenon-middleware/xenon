@@ -84,7 +84,7 @@ public class JobDescriptionTest {
         assertTrue(list != null);
         assertTrue(list.size() == 3);
         assertTrue(Arrays.equals(list.toArray(new String[3]), new String[] { "a", "b", "c" }));
-        
+
         Map<String, String> env = new HashMap<>();
         env.put("ENV1", "ARG1");
         env.put("ENV2", "ARG2");
@@ -234,7 +234,7 @@ public class JobDescriptionTest {
 
         JobDescription other = new JobDescription();
         assertTrue(j.equals(other));
-        
+
         other.setInteractive(true);
         assertFalse(j.equals(other));
         other.setInteractive(false);
@@ -317,11 +317,10 @@ public class JobDescriptionTest {
     @org.junit.Test
     public void test_toString() throws Exception {
 
-        String expected =
-                "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], nodeCount=1,"
-                        + " processesPerNode=1, maxTime=15, interactive=true, stdin=stdin.txt,"
-                        + " stdout=stdout.txt, stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1, ENV2=ARG2},"
-                        + " jobOptions={OPT1=ARG1, OPT2=ARG2}]";
+        String expected = "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], nodeCount=1,"
+                + " processesPerNode=1, maxTime=15, interactive=true, stdin=stdin.txt,"
+                + " stdout=stdout.txt, stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1, ENV2=ARG2},"
+                + " jobOptions={OPT1=ARG1, OPT2=ARG2}]";
 
         JobDescription j = new JobDescription();
         j.setInteractive(true);

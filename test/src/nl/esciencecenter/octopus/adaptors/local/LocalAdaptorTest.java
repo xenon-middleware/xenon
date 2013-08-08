@@ -97,7 +97,7 @@ public class LocalAdaptorTest {
 
     @org.junit.Test
     public void test_getSupportedProperties() throws Exception {
-        OctopusPropertyDescription [] p = new LocalAdaptor(Util.createOctopusEngine(null), null).getSupportedProperties();
+        OctopusPropertyDescription[] p = new LocalAdaptor(Util.createOctopusEngine(null), null).getSupportedProperties();
         assert (p != null);
     }
 

@@ -35,8 +35,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     private final Deque<PathAttributesPair> stream;
 
-    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, List<LsEntry> listing)
-            throws OctopusIOException {
+    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
 
         stream = new LinkedList<PathAttributesPair>();
 

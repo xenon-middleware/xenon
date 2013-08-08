@@ -50,13 +50,13 @@ import org.slf4j.LoggerFactory;
 public class JobQueues {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobQueues.class);
-    
+
     /** The minimal allowed value for the polling delay */
     private static final int MIN_POLLING_DELAY = 100;
-    
+
     /** The maximum allowed value for the polling delay */
     private static final int MAX_POLLING_DELAY = 60000;
-    
+
     private final String adaptorName;
 
     private final Files myFiles;
@@ -86,8 +86,8 @@ public class JobQueues {
     public JobQueues(String adaptorName, Files myFiles, Scheduler myScheduler, FileSystem myFileSystem,
             InteractiveProcessFactory factory, int multiQThreads, long pollingDelay) throws BadParameterException {
 
-        LOGGER.debug("Creating JobQueues for Adaptor {} with multiQThreads: {} and pollingDelay: {}",
-                adaptorName, multiQThreads, pollingDelay);
+        LOGGER.debug("Creating JobQueues for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads,
+                pollingDelay);
 
         this.adaptorName = adaptorName;
         this.myFiles = myFiles;
@@ -105,7 +105,7 @@ public class JobQueues {
         }
 
         if (pollingDelay < MIN_POLLING_DELAY || pollingDelay > MAX_POLLING_DELAY) {
-            throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and " 
+            throw new BadParameterException(adaptorName, "Polling delay must be between " + MIN_POLLING_DELAY + " and "
                     + MAX_POLLING_DELAY + "!");
         }
 
@@ -162,9 +162,9 @@ public class JobQueues {
                 }
             }
         }
-        
+
         LOGGER.debug("{}: getJobs for queues {} returns {}", adaptorName, queueNames, out);
-        
+
         return out.toArray(new Job[out.size()]);
     }
 
@@ -354,10 +354,10 @@ public class JobQueues {
 
         // Copy the JobDescription to ensure that the user doesn't change it after we return. 
         JobDescription copyOfDescription = new JobDescription(description);
-        
+
         LOGGER.debug("{}: JobDescription verified OK", adaptorName);
 
-        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), copyOfDescription, 
+        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), copyOfDescription,
                 copyOfDescription.isInteractive(), true);
 
         LOGGER.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
@@ -375,7 +375,7 @@ public class JobQueues {
         } else if (queueName.equals("multi")) {
             multiQ.add(executor);
             multiExecutor.execute(executor);
-        } else { 
+        } else {
             // queueName == "single"  
             singleQ.add(executor);
             singleExecutor.execute(executor);
@@ -402,21 +402,21 @@ public class JobQueues {
         List<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
 
         JobExecutor e = findJob(queue, job);
-        
+
         boolean killed = e.kill();
-        
+
         JobStatus status = null;
-        
+
         if (killed) {
             status = e.getStatus();
-        } else { 
+        } else {
             status = e.waitUntilDone(pollingDelay);
         }
 
         if (status.isDone()) {
             cleanupJob(queue, job);
         }
-        
+
         return status;
     }
 

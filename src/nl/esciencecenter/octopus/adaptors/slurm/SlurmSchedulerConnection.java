@@ -124,10 +124,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
         }
-        
+
         //also checks if the job id is correct
         SchedulerConnection.verifyJobInfo(jobInfo, job, SlurmAdaptor.ADAPTOR_NAME, "JobId", "JobState", "ExitCode", "Reason");
-        
+
         String state = jobInfo.get("JobState");
         Integer exitcode = exitcodeFromString(jobInfo.get("ExitCode"));
         String reason = jobInfo.get("Reason");
@@ -155,16 +155,17 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
+
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
         if (jobInfo == null) {
             LOGGER.debug("job {} not found in queue", job.getIdentifier());
             return null;
         }
-        
+
         //also checks if the job id is correct
         SchedulerConnection.verifyJobInfo(jobInfo, job, SlurmAdaptor.ADAPTOR_NAME, "JOBID", "STATE");
-        
+
         String state = jobInfo.get("STATE");
 
         return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);

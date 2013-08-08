@@ -29,15 +29,14 @@ public class CertificateCredentialImplementationTest {
 
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
-        CertificateCredentialImplementation pwc =
-                new CertificateCredentialImplementation("test", "id1", null, "certfile", "username",
-                        "password".toCharArray());
+        CertificateCredentialImplementation pwc = new CertificateCredentialImplementation("test", "id1", null, "certfile",
+                "username", "password".toCharArray());
 
         assertEquals(pwc.getAdaptorName(), "test");
         assertEquals(pwc.getUniqueID(), "id1");
         assertEquals(pwc.getUsername(), "username");
         assertEquals(pwc.getCertfile(), "certfile");
-        assertEquals(pwc.getProperties(), new HashMap<String,String>());
+        assertEquals(pwc.getProperties(), new HashMap<String, String>());
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
         assertTrue(pwc.toString().equals(

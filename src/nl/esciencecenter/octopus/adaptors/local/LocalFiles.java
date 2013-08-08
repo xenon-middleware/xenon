@@ -448,9 +448,9 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                     + " and VERIFY");
         }
 
-        CopyImplementation copy = 
-                new CopyImplementation(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source, target);
-        
+        CopyImplementation copy = new CopyImplementation(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,
+                target);
+
         CopyInfo info = new CopyInfo(copy, mode, verify);
         copyEngine.copy(info, async);
 

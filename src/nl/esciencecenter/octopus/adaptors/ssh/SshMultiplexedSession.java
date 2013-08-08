@@ -180,8 +180,9 @@ class SshMultiplexedSession {
         return s;
     }
 
-    private static synchronized SshSession createSession(JSch jsch, int sessionID, String user, Credential credential, String host, int port,
-            SshSession gateway, URI gatewayURI, OctopusProperties properties) throws OctopusIOException, OctopusException {
+    private static synchronized SshSession createSession(JSch jsch, int sessionID, String user, Credential credential,
+            String host, int port, SshSession gateway, URI gatewayURI, OctopusProperties properties) throws OctopusIOException,
+            OctopusException {
 
         String sessionHost = host;
         int sessionPort = port;
@@ -341,7 +342,7 @@ class SshMultiplexedSession {
     synchronized void disconnect() {
 
         while (sessions.size() > 0) {
-            
+
             SshSession s = sessions.remove(0);
 
             if (s != null) {

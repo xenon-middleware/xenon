@@ -87,8 +87,8 @@ public class FilesEngineTest {
         OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
-        FileSystemImplementation fsi =
-                new FileSystemImplementation("test", "test1", new URI("test:///"), new RelativePath(), null, null);
+        FileSystemImplementation fsi = new FileSystemImplementation("test", "test1", new URI("test:///"), new RelativePath(),
+                null, null);
 
         // Should throw exception
         engine.newPath(fsi, new RelativePath("tmp/bla.txt"));
@@ -100,13 +100,13 @@ public class FilesEngineTest {
         OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
-        FileSystemImplementation fs1 =
-                new FileSystemImplementation("aap", "test1", new URI("test:///"), new RelativePath(), null, null);
+        FileSystemImplementation fs1 = new FileSystemImplementation("aap", "test1", new URI("test:///"), new RelativePath(),
+                null, null);
 
         AbsolutePathImplementation p1 = new AbsolutePathImplementation(fs1, new RelativePath("test"));
 
-        FileSystemImplementation fs2 =
-                new FileSystemImplementation("noot", "test1", new URI("test:///"), new RelativePath(), null, null);
+        FileSystemImplementation fs2 = new FileSystemImplementation("noot", "test1", new URI("test:///"), new RelativePath(),
+                null, null);
 
         AbsolutePathImplementation p2 = new AbsolutePathImplementation(fs2, new RelativePath("test"));
 

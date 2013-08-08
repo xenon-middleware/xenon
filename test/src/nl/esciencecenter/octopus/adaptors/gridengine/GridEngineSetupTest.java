@@ -21,12 +21,14 @@ import org.junit.Test;
 
 /**
  * @author Niels Drost
- *
+ * 
  */
 public class GridEngineSetupTest {
 
     /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.GridEngineSetup#GridEngineSetup(nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection, nl.esciencecenter.octopus.adaptors.gridengine.GridEngineXmlParser)}.
+     * Test method for
+     * {@link nl.esciencecenter.octopus.adaptors.gridengine.GridEngineSetup#GridEngineSetup(nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection, nl.esciencecenter.octopus.adaptors.gridengine.GridEngineXmlParser)}
+     * .
      */
     @Test
     public void testGridEngineSetup() {
@@ -42,7 +44,9 @@ public class GridEngineSetupTest {
     }
 
     /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.GridEngineSetup#calculateSlots(java.lang.String, java.lang.String, int)}.
+     * Test method for
+     * {@link nl.esciencecenter.octopus.adaptors.gridengine.GridEngineSetup#calculateSlots(java.lang.String, java.lang.String, int)}
+     * .
      */
     @Test
     public void testCalculateSlots() {

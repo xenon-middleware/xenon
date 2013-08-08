@@ -29,9 +29,9 @@ import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * A simple example of how to check file attributes. 
+ * A simple example of how to check file attributes.
  * 
- * This example assumes the user provides a URI on the command line to check. 
+ * This example assumes the user provides a URI on the command line to check.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -39,39 +39,39 @@ import nl.esciencecenter.octopus.util.URIUtils;
  */
 public class ShowFileAttributes {
 
-    public static void main(String [] args) { 
-        
-        if (args.length != 1) { 
+    public static void main(String[] args) {
+
+        if (args.length != 1) {
             System.out.println("Example requires an URI a parameter!");
             System.exit(1);
         }
-                
+
         try {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
-            
+
             // Next, extract the parts from the URI we need to access the FileSystem.
             URI fsURI = URIUtils.getFileSystemURI(uri);
-            
+
             // Also get the (absolute) path to the file.
             String filepath = uri.getPath();
-            
+
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
-            
+
             // Next we create a FileSystem 
             FileSystem fs = files.newFileSystem(fsURI, null, null);
-            
+
             // We now create an AbsolutePath representing the file.
             AbsolutePath path = files.newPath(fs, new RelativePath(filepath));
-            
-            try { 
+
+            try {
                 // Retrieve the attributes of the file
                 FileAttributes attributes = files.getAttributes(path);
-                
+
                 System.out.println("File " + uri + " exists and has the following attributes:");
                 System.out.println("  isDirectory: " + attributes.isDirectory());
                 System.out.println("  isSymbolicLink: " + attributes.isSymbolicLink());
@@ -79,22 +79,22 @@ public class ShowFileAttributes {
                 System.out.println("  owner: " + attributes.owner());
                 System.out.println("  group: " + attributes.group());
                 System.out.println("  permissions: " + attributes.permissions());
-                
-            } catch (NoSuchFileException e) { 
+
+            } catch (NoSuchFileException e) {
                 System.out.println("File " + uri + " does not exist!");
-            
+
             } catch (Exception e) {
                 System.out.println("Failed to retrieve attributes of " + uri + " " + e.getMessage());
                 e.printStackTrace();
             }
-            
+
             // If we are done we need to close the FileSystem
             files.close(fs);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) { 
+        } catch (Exception e) {
             System.out.println("CreatingFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

@@ -20,7 +20,7 @@ import com.jcraft.jsch.UserInfo;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- *
+ * 
  */
 class Robot implements UserInfo {
 

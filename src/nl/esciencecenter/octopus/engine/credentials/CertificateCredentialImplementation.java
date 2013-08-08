@@ -39,8 +39,8 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String certfile,
-            String username, char[] password) {
+    public CertificateCredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties,
+            String certfile, String username, char[] password) {
 
         super(adaptorName, uniqueID, properties, username, password);
         this.certfile = certfile;
@@ -57,7 +57,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
 
     @Override
     public String toString() {
-        return "CertificateCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", certfile=" + 
-                certfile + "]";
+        return "CertificateCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", certfile="
+                + certfile + "]";
     }
 }

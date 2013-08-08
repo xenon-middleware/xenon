@@ -20,16 +20,19 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
@@ -211,7 +214,7 @@ abstract public class AbstractFileTests {
         for (AbsolutePath path : absolutePaths) {
             getFiles().delete(path);
             if (assertDeletion)
-                Assert.assertFalse("After Files().delete(), the path may not exist:" + path.getPath(), getFiles().exists(path));
+                assertFalse("After Files().delete(), the path may not exist:" + path.getPath(), getFiles().exists(path));
         }
     }
 
@@ -224,9 +227,9 @@ abstract public class AbstractFileTests {
         // Basic Sanity checks of the test environment; 
         // Typically Exceptions should be thrown here if the call fails. 
         URI uri = getTestLocation();
-        Assert.assertNotNull("Setup: Can't do tests on a NULL location", uri);
-        Assert.assertNotNull("Setup: The Files() interface is NULL", getFiles());
-        Assert.assertNotNull("Setup: Actual FileSystem to run tests on is NULL", getFileSystem());
+        assertNotNull("Setup: Can't do tests on a NULL location", uri);
+        assertNotNull("Setup: The Files() interface is NULL", getFiles());
+        assertNotNull("Setup: Actual FileSystem to run tests on is NULL", getFileSystem());
     }
 
     // ========================
@@ -236,15 +239,15 @@ abstract public class AbstractFileTests {
     @org.junit.Test
     public void testGetTestDir() throws Exception {
         AbsolutePath path = getTestDir();
-        Assert.assertNotNull("TestPath returned NULL", path);
-        Assert.assertNotNull("Actual path element of AbsolutePath may not be NULL", path.getPath());
+        assertNotNull("TestPath returned NULL", path);
+        assertNotNull("Actual path element of AbsolutePath may not be NULL", path.getPath());
 
         infoPrintf("Test location path URI      =%s\n", path.getFileSystem().getUri());
         infoPrintf("Test location path          =%s\n", path.getPath());
         infoPrintf("Test location toString()    =%s\n", path.toString());
         infoPrintf("Test location getFileName() =%s\n", path.getFileName());
 
-        Assert.assertTrue("Root test location must exists (won't create here):" + path.getPath(), getFiles().exists(path));
+        assertTrue("Root test location must exists (won't create here):" + path.getPath(), getFiles().exists(path));
     }
 
     /**
@@ -265,19 +268,19 @@ abstract public class AbstractFileTests {
             } catch (Exception e) {
 
             }
-            Assert.assertFalse(
+            assertFalse(
                     "exists(): Can't test createFile is previous test file already exists. File should now be deleted, please run test again.",
                     preExisting);
         }
 
         AbsolutePath actualPath = files.createFile(filePath);
         // enforce ? 
-        Assert.assertEquals("createFile(): New path is not equal to given path", filePath, actualPath);
+        assertEquals("createFile(): New path is not equal to given path", filePath, actualPath);
         boolean exists = files.exists(filePath);
-        Assert.assertTrue("exist(): After createFile() exists() reports false.", exists);
+        assertTrue("exist(): After createFile() exists() reports false.", exists);
 
         files.delete(filePath);
-        Assert.assertTrue("delet(): After delete, method exist() return true.", exists);
+        assertTrue("delet(): After delete, method exist() return true.", exists);
     }
 
     /**
@@ -289,28 +292,28 @@ abstract public class AbstractFileTests {
         Files files = getFiles();
 
         AbsolutePath dirPath = getTestDir().resolve(new RelativePath("testSubdir01"));
-        Assert.assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath.getPath(),
+        assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath.getPath(),
                 files.exists(dirPath));
 
         AbsolutePath actualPath = getFiles().createDirectory(dirPath);
         // test both ? 
         boolean exists = files.exists(dirPath);
-        Assert.assertTrue("After createDirectory(), method exists() reports false for given path:" + dirPath, exists);
+        assertTrue("After createDirectory(), method exists() reports false for given path:" + dirPath, exists);
         exists = files.exists(actualPath);
-        Assert.assertTrue("After createDirectory(), method exists() reports false for returned path:" + actualPath, exists);
+        assertTrue("After createDirectory(), method exists() reports false for returned path:" + actualPath, exists);
 
         assertDirIsEmpty(files, dirPath);
 
         files.delete(dirPath);
         exists = files.exists(dirPath);
-        Assert.assertFalse("After delete() on directory, method exists() reports false.", exists);
+        assertFalse("After delete() on directory, method exists() reports false.", exists);
     }
 
     public void assertDirIsEmpty(Files files, AbsolutePath dirPath) throws Exception {
 
         DirectoryStream<AbsolutePath> dirStream = files.newDirectoryStream(dirPath);
         Iterator<AbsolutePath> iterator = dirStream.iterator();
-        Assert.assertFalse("Method hasNext() from empty directory iterator must return false.", iterator.hasNext());
+        assertFalse("Method hasNext() from empty directory iterator must return false.", iterator.hasNext());
     }
 
     @org.junit.Test
@@ -320,7 +323,7 @@ abstract public class AbstractFileTests {
 
         // just test whether it works: 
         AbsolutePath relEntryPath = fs.getEntryPath();
-        Assert.assertNotNull("Entry Path may not be null.", relEntryPath);
+        assertNotNull("Entry Path may not be null.", relEntryPath);
     }
 
     @org.junit.Test
@@ -330,7 +333,7 @@ abstract public class AbstractFileTests {
 
         // resolve "/", for current filesystems this must equal to "/" ? 
         AbsolutePath rootPath = getFiles().newPath(fs, new RelativePath("/"));
-        Assert.assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath.getPath());
+        assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath.getPath());
     }
 
     @org.junit.Test
@@ -390,7 +393,7 @@ abstract public class AbstractFileTests {
         }
 
         infoPrintf("Directory has:%d entries\n", count);
-        Assert.assertEquals("Directory must have 3 sub directories\n", 3, count);
+        assertEquals("Directory must have 3 sub directories\n", 3, count);
 
         // POST: 
         deletePaths(new AbsolutePath[] { dir1, dir2, dir3, testDirPath }, true);
@@ -426,7 +429,7 @@ abstract public class AbstractFileTests {
         }
 
         infoPrintf("Directory has:%d entries\n", count);
-        Assert.assertEquals("Directory must have 3 file entries\n", 3, count);
+        assertEquals("Directory must have 3 file entries\n", 3, count);
 
         // POST: 
         deletePaths(new AbsolutePath[] { file1, file2, file3, testDirPath }, true);
@@ -460,7 +463,7 @@ abstract public class AbstractFileTests {
         }
 
         infoPrintf("Directory has:%d entries\n", count);
-        Assert.assertEquals("Directory must have 3 sub directories\n", 3, count);
+        assertEquals("Directory must have 3 sub directories\n", 3, count);
 
         // POST: 
         deletePaths(new AbsolutePath[] { dir1, dir2, dir3, testDirPath }, true);
@@ -509,7 +512,7 @@ abstract public class AbstractFileTests {
 
         // PRE: 
         AbsolutePath testFilePath = createUniqueTestFile(getTestDir(), "testStreaReadWriteFile03", true);
-        Assert.assertTrue("Test file doesn't exists:" + testFilePath, getFiles().exists(testFilePath));
+        assertTrue("Test file doesn't exists:" + testFilePath, getFiles().exists(testFilePath));
 
         // TEST: 
         java.io.OutputStream outps = getFiles().newOutputStream(testFilePath, OpenOption.CREATE);
@@ -540,7 +543,7 @@ abstract public class AbstractFileTests {
         // readBytes[100]=13; // test fault insertion here. 
 
         for (int i = 0; i < numBytes; i++) {
-            Assert.assertEquals("Byte at #" + i + " does not equal orginal value.", bytes[i], readBytes[i]);
+            assertEquals("Byte at #" + i + " does not equal orginal value.", bytes[i], readBytes[i]);
         }
 
         try {

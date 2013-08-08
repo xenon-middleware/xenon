@@ -34,8 +34,8 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class JobExecutor implements Runnable {
 
-    private static final long MILLISECONDS_IN_MINUTE = 60*1000;
-    
+    private static final long MILLISECONDS_IN_MINUTE = 60 * 1000;
+
     private final JobImplementation job;
 
     private final InteractiveProcessFactory factory;
@@ -51,7 +51,7 @@ public class JobExecutor implements Runnable {
 
     private Integer exitStatus;
 
-    private boolean updateSignal = false;    
+    private boolean updateSignal = false;
     private boolean isRunning = false;
     private boolean killed = false;
     private boolean done = false;
@@ -77,18 +77,18 @@ public class JobExecutor implements Runnable {
     }
 
     public synchronized boolean kill() throws OctopusException {
-        
+
         if (done) {
             return true;
         }
 
         killed = true;
 
-        if (!isRunning) { 
+        if (!isRunning) {
             updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return true;
         }
-    
+
         return false;
     }
 
@@ -99,14 +99,14 @@ public class JobExecutor implements Runnable {
     public Job getJob() {
         return job;
     }
-    
+
     public synchronized JobStatus getStatus() {
-        
-        if (!done) { 
+
+        if (!done) {
             triggerStatusUpdate();
             waitForStatusUpdate(pollingDelay);
         }
-        
+
         return new JobStatusImplementation(job, state, exitStatus, error, state.equals("RUNNING"), done, null);
     }
 
@@ -160,15 +160,15 @@ public class JobExecutor implements Runnable {
         long leftover = timeout;
 
         triggerStatusUpdate();
-        
+
         while (state.equals("PENDING")) {
             // Note: will wait forever if leftover == 0.
-            try { 
+            try {
                 wait(leftover);
-            } catch (InterruptedException e) { 
+            } catch (InterruptedException e) {
                 // ignored
             }
-            
+
             long now = System.currentTimeMillis();
 
             if (now >= deadline) {
@@ -191,16 +191,16 @@ public class JobExecutor implements Runnable {
         long leftover = timeout;
 
         triggerStatusUpdate();
-        
+
         while (!done) {
-            
+
             if (leftover <= 0) {
                 break;
             }
 
-            try { 
+            try {
                 wait(leftover);
-            } catch (InterruptedException e) { 
+            } catch (InterruptedException e) {
                 // ignored
             }
 
@@ -216,70 +216,72 @@ public class JobExecutor implements Runnable {
         return getStatus();
     }
 
-    /** 
+    /**
      * Signal the polling thread to produce a status update.
      */
-    private synchronized void triggerStatusUpdate() { 
+    private synchronized void triggerStatusUpdate() {
 
-        if (done) { 
+        if (done) {
             return;
         }
-        
-        updateSignal = true;            
+
+        updateSignal = true;
         notifyAll();
     }
-        
-    /** 
+
+    /**
      * Wait for a certain amount of time for an update.
-     *  
-     * @param maxDelay the maximum time to wait
+     * 
+     * @param maxDelay
+     *            the maximum time to wait
      */
-    private synchronized void waitForStatusUpdate(long maxDelay) { 
-        
-        if (done || !updateSignal) { 
+    private synchronized void waitForStatusUpdate(long maxDelay) {
+
+        if (done || !updateSignal) {
             return;
         }
 
-        try { 
+        try {
             wait(maxDelay);
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             // ignored
-        }            
+        }
     }
 
-    /** 
+    /**
      * Clear the update signal and wake up any waiting threads
      */
-    private synchronized void clearUpdateRequest() { 
-        updateSignal = false;            
+    private synchronized void clearUpdateRequest() {
+        updateSignal = false;
         notifyAll();
     }
-    
-    /** 
-     * Sleep for a certain amount of time, provide the job is not done, and no one requested an update.  
+
+    /**
+     * Sleep for a certain amount of time, provide the job is not done, and no one requested an update.
      * 
-     * @param pollingDelay the maximum amount of time to wait
+     * @param pollingDelay
+     *            the maximum amount of time to wait
      */
     private synchronized void sleep(long pollingDelay) {
-        
+
         if (done || updateSignal) {
             return;
         }
 
         //long time = System.currentTimeMillis();
-        
-        try { 
+
+        try {
             wait(pollingDelay);
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             // ignored
         }
-        
+
         //long deltaT = System.currentTimeMillis() - time;
-        
+
         //System.err.println("XXXXXXXXXX JobeExecutor woke up after " + deltaT + " ms. of " + pollingDelay + " ms. done=" + done + 
-                //" updateSignal = " + updateSignal);
+        //" updateSignal = " + updateSignal);
     }
-    
+
     @Override
     public void run() {
 
@@ -333,7 +335,7 @@ public class JobExecutor implements Runnable {
             }
 
             clearUpdateRequest();
-            
+
             sleep(pollingDelay);
         }
     }

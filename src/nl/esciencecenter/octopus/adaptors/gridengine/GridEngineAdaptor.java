@@ -57,8 +57,8 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     public static final String POLL_DELAY_PROPERTY = PREFIX + "poll.delay";
 
     /** Human readable description of this adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local "
-            + "or the ssh adaptor to gain access to the scheduler machine.";
+    public static final String ADAPTOR_DESCRIPTION = "The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler."
+            + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
     private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
@@ -82,9 +82,9 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
      * @throws OctopusException
      *             if the adaptor creation fails.
      */
-    public GridEngineAdaptor(OctopusEngine octopusEngine, Map<String,String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, 
-                new OctopusProperties(VALID_PROPERTIES, Level.OCTOPUS, properties), new GridEngineSchedulerConnectionFactory());
+    public GridEngineAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, new OctopusProperties(
+                VALID_PROPERTIES, Level.OCTOPUS, properties), new GridEngineSchedulerConnectionFactory());
     }
 
     @Override

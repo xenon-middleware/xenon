@@ -54,7 +54,7 @@ public class OctopusFactory {
      * @throws OctopusException
      *             If the Octopus failed initialize.
      */
-    public static Octopus newOctopus(Map<String,String> properties) throws OctopusException {
+    public static Octopus newOctopus(Map<String, String> properties) throws OctopusException {
         return OctopusEngine.newOctopus(properties);
     }
 

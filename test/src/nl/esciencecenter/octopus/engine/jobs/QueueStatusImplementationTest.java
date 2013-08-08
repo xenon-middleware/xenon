@@ -33,9 +33,8 @@ public class QueueStatusImplementationTest {
     @org.junit.Test
     public void test_constructor0() throws Exception {
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         new QueueStatusImplementation(s, "testq", null, null);
     }
@@ -48,9 +47,8 @@ public class QueueStatusImplementationTest {
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_constructor2() throws Exception {
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         new QueueStatusImplementation(s, null, null, null);
     }
@@ -58,9 +56,8 @@ public class QueueStatusImplementationTest {
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         Exception e = new Exception("Test Exception");
 
@@ -80,9 +77,8 @@ public class QueueStatusImplementationTest {
     @org.junit.Test
     public void test_hasException() throws Exception {
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         Exception e = new Exception("Test Exception");
 
@@ -101,9 +97,8 @@ public class QueueStatusImplementationTest {
     @org.junit.Test
     public void test_toString() throws Exception {
 
-        Scheduler s =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
-                        true);
+        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+                true, true);
 
         Exception e = new Exception("Test Exception");
 

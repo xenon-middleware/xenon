@@ -29,12 +29,12 @@ public class PasswordCredentialImplementationTest {
 
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
-        PasswordCredentialImplementation pwc =
-                new PasswordCredentialImplementation("test", "id1", null, "username", "password".toCharArray());
+        PasswordCredentialImplementation pwc = new PasswordCredentialImplementation("test", "id1", null, "username",
+                "password".toCharArray());
         assertEquals(pwc.getAdaptorName(), "test");
         assertEquals(pwc.getUniqueID(), "id1");
         assertEquals(pwc.getUsername(), "username");
-        assertEquals(pwc.getProperties(), new HashMap<String,String>());
+        assertEquals(pwc.getProperties(), new HashMap<String, String>());
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
         assertTrue(pwc.toString().equals("PasswordCredentialImplementation [adaptorName=test, username=username]"));

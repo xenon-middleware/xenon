@@ -31,7 +31,7 @@ import org.junit.Test;
  * 
  */
 public class SlurmJobScriptGeneratorTest {
-    
+
     @Test
     public void test00_constructorIsPrivate() throws Throwable {
         Constructor<SlurmJobScriptGenerator> constructor = SlurmJobScriptGenerator.class.getDeclaredConstructor();

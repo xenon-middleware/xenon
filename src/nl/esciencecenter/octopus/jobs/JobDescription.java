@@ -31,10 +31,10 @@ import java.util.Map.Entry;
  * @since 1.0
  */
 public class JobDescription {
-    
+
     /** The default maximum run time */
     public static final int DEFAULT_MAX_RUN_TIME = 15;
-    
+
     /** The queue to submit to. */
     private String queueName = null;
 
@@ -443,7 +443,7 @@ public class JobDescription {
                 + ", interactive=" + interactive + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr
                 + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions + "]";
     }
-    
+
     private boolean compare(Object a, Object b) {
 
         if (a == null) {
@@ -477,7 +477,7 @@ public class JobDescription {
         result = prime * result + ((workingDirectory == null) ? 0 : workingDirectory.hashCode());
         return result;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

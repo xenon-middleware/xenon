@@ -49,14 +49,13 @@ public class SchedulerImplementationTest {
     @org.junit.Test
     public void test_getters_and_setters() throws Exception {
 
-        SchedulerImplementation si =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
-                        true, true);
+        SchedulerImplementation si = new SchedulerImplementation("test", "id1", new URI("test:///"),
+                new String[] { "aap", "noot" }, null, null, true, true, true);
 
         assertEquals("test", si.getAdaptorName());
         assertEquals("id1", si.getUniqueID());
         assertEquals(null, si.getCredential());
-        assertEquals(new HashMap<String,String>(), si.getProperties());
+        assertEquals(new HashMap<String, String>(), si.getProperties());
         assertEquals(new URI("test:///"), si.getUri());
 
         assertTrue(Arrays.equals(new String[] { "aap", "noot" }, si.getQueueNames()));
@@ -69,9 +68,8 @@ public class SchedulerImplementationTest {
     @org.junit.Test
     public void test_toString() throws Exception {
 
-        SchedulerImplementation si =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
-                        true, true);
+        SchedulerImplementation si = new SchedulerImplementation("test", "id1", new URI("test:///"),
+                new String[] { "aap", "noot" }, null, null, true, true, true);
 
         System.err.println("SI: " + si.toString());
 
@@ -83,9 +81,8 @@ public class SchedulerImplementationTest {
     @org.junit.Test
     public void test_hashcode_equals() throws Exception {
 
-        SchedulerImplementation si =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
-                        true, true);
+        SchedulerImplementation si = new SchedulerImplementation("test", "id1", new URI("test:///"),
+                new String[] { "aap", "noot" }, null, null, true, true, true);
 
         int hash = (31 + "test".hashCode()) * 31 + "id1".hashCode();
 
@@ -95,21 +92,18 @@ public class SchedulerImplementationTest {
         assertFalse(si.equals(null));
         assertFalse(si.equals("AAP"));
 
-        SchedulerImplementation si2 =
-                new SchedulerImplementation("test2", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null,
-                        true, true, true);
+        SchedulerImplementation si2 = new SchedulerImplementation("test2", "id1", new URI("test:///"), new String[] { "aap",
+                "noot" }, null, null, true, true, true);
 
         assertFalse(si.equals(si2));
 
-        SchedulerImplementation si3 =
-                new SchedulerImplementation("test", "id2", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
-                        true, true);
+        SchedulerImplementation si3 = new SchedulerImplementation("test", "id2", new URI("test:///"), new String[] { "aap",
+                "noot" }, null, null, true, true, true);
 
         assertFalse(si.equals(si3));
 
-        SchedulerImplementation si4 =
-                new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap", "noot" }, null, null, true,
-                        true, true);
+        SchedulerImplementation si4 = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "aap",
+                "noot" }, null, null, true, true, true);
 
         assertTrue(si.equals(si4));
     }

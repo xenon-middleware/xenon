@@ -56,17 +56,17 @@ public class SchedulerImplementation implements Scheduler {
         this.supportsInteractive = supportsInteractive;
         this.supportsBatch = supportsBatch;
 
-        if (queueNames == null) { 
+        if (queueNames == null) {
             this.queueNames = new String[0];
-        } else { 
+        } else {
             this.queueNames = queueNames.clone();
         }
-        
-        if (properties == null) { 
+
+        if (properties == null) {
             this.properties = new OctopusProperties();
-        } else { 
+        } else {
             this.properties = properties;
-        }        
+        }
     }
 
     public Credential getCredential() {
@@ -83,7 +83,7 @@ public class SchedulerImplementation implements Scheduler {
     }
 
     @Override
-    public Map<String,String> getProperties() {
+    public Map<String, String> getProperties() {
         return properties.toMap();
     }
 

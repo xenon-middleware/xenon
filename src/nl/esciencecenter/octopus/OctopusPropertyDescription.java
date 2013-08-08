@@ -19,7 +19,7 @@ package nl.esciencecenter.octopus;
 import java.util.Set;
 
 /**
- * OctopusPropertyDescription contains a description of a property that is recognized by octopus or one of its components.  
+ * OctopusPropertyDescription contains a description of a property that is recognized by octopus or one of its components.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -27,32 +27,24 @@ import java.util.Set;
  */
 public interface OctopusPropertyDescription {
 
-    /** 
-     * Level names all possible levels at which a property can be provided.  
+    /**
+     * Level names all possible levels at which a property can be provided.
      */
     public enum Level {
-        OCTOPUS, 
-        SCHEDULER, 
-        FILESYSTEM,
-        CREDENTIALS, 
-//        JOBS, 
-//        FILES, 
-//        CREDENTIAL, 
-    }
-    
-    /** 
-     * Type names all possible types of properties. 
-     */
-    public enum Type {
-        BOOLEAN, 
-        INTEGER, 
-        LONG, 
-        DOUBLE,
-        STRING, 
-        SIZE,
+        OCTOPUS, SCHEDULER, FILESYSTEM, CREDENTIALS,
+        //        JOBS, 
+        //        FILES, 
+        //        CREDENTIAL, 
     }
 
-    /** 
+    /**
+     * Type names all possible types of properties.
+     */
+    public enum Type {
+        BOOLEAN, INTEGER, LONG, DOUBLE, STRING, SIZE,
+    }
+
+    /**
      * Returns the name of the property.
      * 
      * @return the name of the property.
@@ -60,29 +52,29 @@ public interface OctopusPropertyDescription {
     String getName();
 
     /**
-     * Returns the type of the property. 
+     * Returns the type of the property.
      * 
      * @return the type of the property.
      */
     Type getType();
-    
+
     /**
-     * Return a set containing all levels at which this property can be set. 
+     * Return a set containing all levels at which this property can be set.
      * 
-     * @return  a set containing all levels at which this property can be set.
+     * @return a set containing all levels at which this property can be set.
      */
     Set<Level> getLevels();
 
-    /** 
-     * Returns the default value for this property. 
+    /**
+     * Returns the default value for this property.
      * 
      * @return the default value for this property or <code>null</code> is no default is set.
      */
     String getDefaultValue();
-    
-    /** 
+
+    /**
      * Returns a human readable description of this property.
-     *  
+     * 
      * @return a human readable description of this property.
      */
     String getDescription();

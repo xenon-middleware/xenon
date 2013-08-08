@@ -31,28 +31,28 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  */
 public class CreatingCredential {
 
-    public static void main(String [] args) { 
-        try { 
+    public static void main(String[] args) {
+        try {
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Credentials API
             Credentials credentials = octopus.credentials();
-            
+
             // We can now retrieve the default credential for a certain scheme
             Credential credential1 = credentials.getDefaultCredential("ssh");
-            
+
             // We can also create other types of credentials
             Credential credential2 = credentials.newPasswordCredential("ssh", null, "username", "password".toCharArray());
-            
+
             // Close the credentials once we're done.
             credentials.close(credential1);
             credentials.close(credential2);
-            
+
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) { 
+        } catch (OctopusException e) {
             System.out.println("CreatingOctopus example failed: " + e.getMessage());
             e.printStackTrace();
         }

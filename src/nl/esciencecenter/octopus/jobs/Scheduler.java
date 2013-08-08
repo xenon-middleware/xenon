@@ -46,7 +46,7 @@ public interface Scheduler {
      * 
      * @return the properties used to create this Scheduler.
      */
-    Map<String,String> getProperties();
+    Map<String, String> getProperties();
 
     /**
      * Get the queue names supported by this Scheduler.

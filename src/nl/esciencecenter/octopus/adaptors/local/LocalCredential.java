@@ -36,7 +36,7 @@ public class LocalCredential implements Credential {
     }
 
     @Override
-    public Map<String,String> getProperties() {
+    public Map<String, String> getProperties() {
         return new HashMap<String, String>();
     }
 }
