@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class JavaJobDescriptionTest {
         j.setJavaOptions("a", "b", "c");
         j.addJavaOption("d");
         List<String> optionsList = j.getJavaOptions();
+        assertNotNull(optionsList);
         assertArrayEquals(new String[] { "a", "b", "c", "d" }, optionsList.toArray(new String[4]));
 
         //system properties
@@ -86,6 +88,7 @@ public class JavaJobDescriptionTest {
         j.setJavaArguments("d", "e", "f");
         j.addJavaArgument("g");
         List<String> argumentList = j.getJavaArguments();
+        assertNotNull(argumentList);
         assertArrayEquals(new String[] { "d", "e", "f", "g" }, argumentList.toArray(new String[0]));
 
         //class path
@@ -93,6 +96,7 @@ public class JavaJobDescriptionTest {
         j.setJavaClasspath("h", "i", "j");
         j.addJavaClasspathElement("k");
         List<String> classpathList = j.getJavaClasspath();
+        assertNotNull(classpathList);
         assertArrayEquals(new String[] { "h", "i", "j", "k" }, classpathList.toArray(new String[0]));
     }
 
@@ -175,6 +179,7 @@ public class JavaJobDescriptionTest {
                 new String[] { "-Xtesting=true", "-classpath", "element1_element2_element3", "-Dproperty.key=property.value",
                         "nl.esciencecenter.main.class", "argument" };
 
+        assertNotNull(arguments);
         assertArrayEquals(expected, arguments.toArray(new String[0]));
     }
 
@@ -190,6 +195,7 @@ public class JavaJobDescriptionTest {
 
         String[] expected = new String[] { "-jar", "somefile.jar" };
 
+        assertNotNull(arguments);
         assertArrayEquals(expected, arguments.toArray(new String[0]));
     }
 

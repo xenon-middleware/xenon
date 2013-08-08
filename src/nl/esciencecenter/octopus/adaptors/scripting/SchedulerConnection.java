@@ -29,6 +29,7 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -51,10 +52,9 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public abstract class SchedulerConnection {
-    
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerConnection.class);
-    
+
     private static int schedulerID = 0;
 
     protected static synchronized int getNextSchedulerID() {
@@ -64,54 +64,182 @@ public abstract class SchedulerConnection {
     private final ScriptingAdaptor adaptor;
     private final String id;
     private final OctopusEngine engine;
-    private final Scheduler sshScheduler;
-    private final FileSystem sshFileSystem;
-    
+    private final Scheduler subScheduler;
+    private final FileSystem subFileSystem;
+
     private final OctopusProperties properties;
 
     private final long pollDelay;
-    
-    protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties, 
+
+    protected static boolean supportsScheme(String scheme, String[] supportedSchemes) {
+        for (String validScheme : supportedSchemes) {
+            if (validScheme.equalsIgnoreCase(scheme)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected static URI getSubSchedulerLocation(URI location, String adaptorName, String... supportedSchemes)
+            throws InvalidLocationException {
+        if (!supportsScheme(location.getScheme(), supportedSchemes)) {
+            throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme \"" + location.getScheme() + "\"");
+        }
+
+        //only null or "/" are allowed as paths
+        if (location.getPath() != null && location.getPath().length() != 0 && !location.getPath().equals("/")) {
+            throw new InvalidLocationException(adaptorName, "Paths are not allowed in a uri for this scheduler, uri given: "
+                    + location);
+        }
+
+        if (location.getFragment() != null) {
+            throw new InvalidLocationException(adaptorName, "Fragments are not allowed in a uri for this scheduler, uri given: "
+                    + location);
+        }
+
+        if (location.getQuery() != null) {
+            throw new InvalidLocationException(adaptorName, "Queries are not allowed in a uri for this scheduler, uri given: "
+                    + location);
+        }
+
+        try {
+            if (location.getHost() == null) {
+                return new URI("local:///");
+            }
+
+            return new URI("ssh", location.getAuthority(), null, null, null);
+        } catch (URISyntaxException e) {
+            throw new InvalidLocationException(adaptorName, "Failed to create URI for scheduler connection", e);
+        }
+    }
+
+    /**
+     * Do some checks on a job description.
+     * 
+     * @param description
+     *            the job description to check
+     * @param adaptorName
+     *            the name of the adaptor. Used when an exception is thrown
+     * @throws IncompleteJobDescription
+     *             if the description is missing a mandatory value.
+     * @throws InvalidJobDescription
+     *             if the description contains illegal values.
+     */
+    protected static void verifyJobDescription(JobDescription description, String adaptorName) throws OctopusException {
+        String executable = description.getExecutable();
+
+        if (executable == null) {
+            throw new IncompleteJobDescriptionException(adaptorName, "Executable missing in JobDescription!");
+        }
+
+        int nodeCount = description.getNodeCount();
+
+        if (nodeCount < 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal node count: " + nodeCount);
+        }
+
+        int processesPerNode = description.getProcessesPerNode();
+
+        if (processesPerNode < 1) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal processes per node count: " + processesPerNode);
+        }
+
+        int maxTime = description.getMaxTime();
+
+        if (maxTime <= 0) {
+            throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
+        }
+
+        if (description.isInteractive()) {
+            throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
+        }
+    }
+
+    /**
+     * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
+     * 
+     * @param info
+     *            the map the job info should be .
+     * @param job
+     *            the job to check the presence for.
+     * @param jobIDField
+     *            the field which contains the job id.
+     * @param additionalFields
+     *            any additional fields to check the presence of.
+     * @throws OctopusException
+     *             if any fields are missing or incorrect
+     */
+    protected static void verifyJobInfo(Map<String, String> jobInfo, Job job, String adaptorName, String jobIDField,
+            String... additionalFields) throws OctopusException {
+        if (jobInfo == null) {
+            //redundant check, calling functions usually already check for this and return null.
+            throw new OctopusException(adaptorName, "Job " + job.getIdentifier() + " not found in job info");
+        }
+
+        String jobID = jobInfo.get(jobIDField);
+
+        if (jobID == null) {
+            throw new OctopusException(adaptorName, "Invalid job info. Info does not contain job id");
+        }
+
+        if (!jobID.equals(job.getIdentifier())) {
+            throw new OctopusException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match "
+                    + job.getIdentifier());
+        }
+
+        for (String field : additionalFields) {
+            if (!jobInfo.containsKey(field)) {
+                throw new OctopusException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field
+                        + "\"");
+            }
+        }
+
+    }
+
+    protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
             OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
-    
+
         this.adaptor = adaptor;
         this.engine = engine;
         this.properties = properties;
         this.pollDelay = pollDelay;
-        
-        adaptor.checkLocation(location);
-        
-        try {
-            id = adaptor.getName() + "-" + getNextSchedulerID();
-            //FIXME: check if this works for encode uri's, illegal characters, fragments, etc..
-            URI actualLocation = new URI("ssh", location.getSchemeSpecificPart(), location.getFragment());
 
-            if (location.getHost() == null || location.getHost().length() == 0) {
-                actualLocation = new URI("local:///");
-            }
+        id = adaptor.getName() + "-" + getNextSchedulerID();
 
-            LOGGER.debug("creating ssh scheduler for {} adaptor at {}", adaptor.getName(), actualLocation);
-            Map<String, String> sshProperties = new HashMap<String, String>();
-            //FIXME: compensating for ssh performance bug #143
-            sshProperties.put(SshAdaptor.POLLING_DELAY, "100");
-            sshScheduler = engine.jobs().newScheduler(actualLocation, credential, sshProperties);
+        URI subSchedulerLocation = getSubSchedulerLocation(location, adaptor.getName(), adaptor.getSupportedSchemes());
 
-            LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), actualLocation);
-            sshFileSystem = engine.files().newFileSystem(actualLocation, credential, null);
+        LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), subSchedulerLocation);
+        Map<String, String> subSchedulerProperties = new HashMap<String, String>();
 
-        } catch (URISyntaxException e) {
-            throw new OctopusException(adaptor.getName(), "Cannot create SSH URI from location " + location, e);
+        //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
+        if (subSchedulerLocation.getScheme().equals("ssh")) {
+            subSchedulerProperties.put(SshAdaptor.POLLING_DELAY, "100");
         }
+        subScheduler = engine.jobs().newScheduler(subSchedulerLocation, credential, subSchedulerProperties);
+
+        LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), subSchedulerLocation);
+        subFileSystem = engine.files().newFileSystem(subSchedulerLocation, credential, null);
     }
 
-   
+    protected AbsolutePath getFsEntryPath() {
+        return subFileSystem.getEntryPath();
+    }
+
+    public OctopusProperties getProperties() {
+        return properties;
+    }
+
+    public String getID() {
+        return id;
+    }
 
     /**
      * Run a command on the remote scheduler machine.
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws OctopusException,
             OctopusIOException {
-        return new RemoteCommandRunner(engine, sshScheduler, adaptor.getName(), stdin, executable, arguments);
+        return new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable, arguments);
     }
 
     /**
@@ -119,11 +247,12 @@ public abstract class SchedulerConnection {
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException,
             OctopusIOException {
-        RemoteCommandRunner runner = new RemoteCommandRunner(engine, sshScheduler, adaptor.getName(), stdin, executable, arguments);
+        RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable,
+                arguments);
 
         if (!runner.success()) {
             throw new OctopusException(adaptor.getName(), "could not run command \"" + executable + "\" with arguments \""
-                    + Arrays.toString(arguments) + "\" at \"" + sshScheduler + "\". Exit code = " + runner.getExitCode()
+                    + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = " + runner.getExitCode()
                     + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
@@ -146,18 +275,6 @@ public abstract class SchedulerConnection {
             throw new NoSuchQueueException(adaptor.getName(), "Invalid queues given: "
                     + Arrays.toString(invalidQueues.toArray(new String[0])));
         }
-    }
-
-    public OctopusProperties getProperties() {
-        return properties;
-    }
-
-    public String getID() {
-        return id;
-    }
-
-    public void close() throws OctopusIOException, OctopusException {
-        engine.jobs().close(sshScheduler);
     }
 
     public JobStatus waitUntilDone(Job job, long timeout) throws OctopusIOException, OctopusException {
@@ -214,44 +331,8 @@ public abstract class SchedulerConnection {
         return status;
     }
 
-    //do some checks on the job description. subclass could perform additional checks
-    protected void verifyJobDescription(JobDescription description) throws OctopusException {
-        String executable = description.getExecutable();
-
-        if (executable == null) {
-            throw new IncompleteJobDescriptionException(adaptor.getName(), "Executable missing in JobDescription!");
-        }
-
-        int nodeCount = description.getNodeCount();
-
-        if (nodeCount < 1) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal node count: " + nodeCount);
-        }
-
-        int processesPerNode = description.getProcessesPerNode();
-
-        if (processesPerNode < 1) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal processes per node count: " + processesPerNode);
-        }
-
-        int maxTime = description.getMaxTime();
-
-        if (maxTime <= 0) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Illegal maximum runtime: " + maxTime);
-        }
-
-        if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(adaptor.getName(), "Adaptor does not support interactive jobs");
-        }
-
-    }
-
-    protected AbsolutePath getFsEntryPath() {
-        return sshFileSystem.getEntryPath();
-    }
-
     /**
-     * check if the given working directory exists. Useful for schedulers that do not check this (like slurm)
+     * check if the given working directory exists. Useful for schedulers that do not check this (like Slurm)
      * 
      * @param workingDirectory
      *            the working directory (either absolute or relative) as given by the user.
@@ -263,7 +344,7 @@ public abstract class SchedulerConnection {
 
         AbsolutePath path;
         if (workingDirectory.startsWith("/")) {
-            path = engine.files().newPath(sshFileSystem, new RelativePath(workingDirectory));
+            path = engine.files().newPath(subFileSystem, new RelativePath(workingDirectory));
         } else {
             //make relative path absolute
             path = getFsEntryPath().resolve(new RelativePath(workingDirectory));
@@ -271,6 +352,10 @@ public abstract class SchedulerConnection {
         if (!engine.files().exists(path)) {
             throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);
         }
+    }
+
+    public void close() throws OctopusIOException, OctopusException {
+        engine.jobs().close(subScheduler);
     }
 
     //implemented by sub-class

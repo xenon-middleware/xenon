@@ -107,8 +107,8 @@ public class ScriptingJobs implements Jobs {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
 
-        SchedulerConnection connection =
-                connectionFactory.newSchedulerConnection(adaptor, location, credential, p, octopusEngine);
+        SchedulerConnection connection = connectionFactory
+                .newSchedulerConnection(adaptor, location, credential, p, octopusEngine);
 
         addConnection(connection);
 

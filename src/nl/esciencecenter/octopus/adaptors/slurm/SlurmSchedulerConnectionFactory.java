@@ -14,7 +14,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 public class SlurmSchedulerConnectionFactory implements SchedulerConnectionFactory {
 
     @Override
-    public SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, 
+    public SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential,
             OctopusProperties properties, OctopusEngine engine) throws OctopusIOException, OctopusException {
         return new SlurmSchedulerConnection(adaptor, location, credential, properties, engine);
     }

@@ -28,16 +28,16 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  * @version 1.0
  * @since 1.0
  */
-public class SlurmConfig {
+public class SlurmSetup {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSetup.class);
 
-    private static final String[] SUPPORTED_VERSIONS = { "2.3", "2.5" };
+    private static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5." };
 
     private final boolean accountingAvailable;
     private final String version;
 
-    SlurmConfig(Map<String, String> info, boolean ignoreVersion) throws OctopusException {
+    SlurmSetup(Map<String, String> info, boolean ignoreVersion, boolean disableAccounting) throws OctopusException {
         version = info.get("SLURM_VERSION");
 
         if (version == null) {
@@ -51,23 +51,24 @@ public class SlurmConfig {
         if (accountingType == null) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Slurm config does not contain expected accounting info");
         }
-        accountingAvailable = !accountingType.equals("accounting_storage/none");
+
+        accountingAvailable = !(accountingType.equals("accounting_storage/none") || disableAccounting);
 
         LOGGER.debug("Created new SlurmConfig. version = \"{}\", accounting available: {}", version, accountingAvailable);
     }
 
-    private void checkVersion(boolean throwException) throws IncompatibleVersionException {
+    private void checkVersion(boolean ignoreVersion) throws IncompatibleVersionException {
         for (String supportedVersion : SUPPORTED_VERSIONS) {
             if (version.startsWith(supportedVersion)) {
                 return;
             }
         }
-        if (throwException) {
-            throw new IncompatibleVersionException(SlurmAdaptor.ADAPTOR_NAME, "Slurm version " + version
-                    + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + "to ignore");
-        } else {
+        if (ignoreVersion) {
             LOGGER.warn("Slurm version {} not supported by Slurm Adaptor. Ignoring as requested by {} property", version,
                     SlurmAdaptor.IGNORE_VERSION_PROPERTY);
+        } else {
+            throw new IncompatibleVersionException(SlurmAdaptor.ADAPTOR_NAME, "Slurm version " + version
+                    + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + "to ignore");
         }
     }
 

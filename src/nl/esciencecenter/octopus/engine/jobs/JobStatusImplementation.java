@@ -87,10 +87,13 @@ public final class JobStatusImplementation implements JobStatus {
     public Map<String, String> getSchedulerSpecficInformation() {
         return schedulerSpecificInformation;
     }
-
+    
     @Override
     public String toString() {
         return "JobStatusImplementation [job=" + job + ", state=" + state + ", exitCode=" + exitCode + ", exception=" + exception
-                + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation + "]";
+                + ", running=" + running + ", done=" + done + ", schedulerSpecificInformation=" + schedulerSpecificInformation
+                + "]";
     }
+    
+
 }

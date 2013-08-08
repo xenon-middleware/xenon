@@ -15,23 +15,19 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import nl.esciencecenter.octopus.jobs.JobDescription;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class JobScriptGeneratorTest {
+/**
+ * @author Niels Drost
+ *
+ */
+public class GridEngineSchedulerConnectionTest {
 
     @Test
-    public void testGenerate() throws Exception {
-        //JobScriptGenerator generator = new JobScriptGenerator();
-
-        JobDescription job = new JobDescription();
-
-        job.setExecutable("/bin/echo");
-
-        job.setArguments("this", "and", "that");
-
-        System.out.println(GridEngineJobScriptGenerator.generate(job, null, null));
+    public void someMoreTests() {
+        fail("Not yet implemented");
     }
 
 }

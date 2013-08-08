@@ -46,8 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
-    
-    
+
     private static final Logger logger = LoggerFactory.getLogger(GridEngineJobAdaptorTest.class);
 
     @BeforeClass
@@ -82,7 +81,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOptions("job.script", script.getPath());
+        description.addJobOption("job.script", script.getPath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);
@@ -99,7 +98,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         }
 
         String outputContent = readFully(files.newInputStream(stdout));
-        
+
         logger.debug("got output " + outputContent);
 
         files.delete(stdout);
@@ -133,7 +132,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
     @Test
     public void ge_test04_parallel_batchJob() throws Exception {
         String message = "Hello World! Test GE 04";
-        
+
         String workingDir = getWorkingDir("ge_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
@@ -146,26 +145,29 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
 
         JobDescription description = new JobDescription();
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
         description.setWorkingDirectory(workingDir);
         description.setExecutable("/bin/echo");
         description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        description.addJobOptions("parallel.environment", "prun");
+        //FIXME: ugly config cast
+        description.addJobOption("parallel.environment", ((GridEngineJobTestConfig) config).getParallelEnvironment());
         description.setQueueName("all.q");
 
         Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
-        
+
         if (!status.isDone()) {
             throw new Exception("Job not finished");
         }
-        
+
         if (status.hasException()) {
             throw new Exception("Job did not finish properly", status.getException());
         }
-        
+
         String outputContent = readFully(files.newInputStream(stdout));
 
         files.delete(stdout);
@@ -174,13 +176,13 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         files.close(filesystem);
-        
+
         logger.debug("got back result: {}", outputContent);
 
         String[] lines = outputContent.split("\\r?\\n");
-        
+
         assertTrue(lines.length == 4);
-        for (String line: lines) {
+        for (String line : lines) {
             assertTrue(line.equals(message));
         }
     }
