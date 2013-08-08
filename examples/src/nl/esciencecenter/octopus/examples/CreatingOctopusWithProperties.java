@@ -40,7 +40,7 @@ public class CreatingOctopusWithProperties {
             // the strictHostKeyChecking property of the ssh adaptor to true. 
             Map<String,String> p = new HashMap<>();
             p.put("octopus.adaptors.local.queue.pollingDelay", "1000");
-            p.put("octopus.adaptors.ssh.strictHostKeyChecking", "true");
+            p.put("octopus.adaptors.ssh.loadKnownHosts", "true");
             
             // We now create a new octopus with the properties using the OctopusFactory.
             Octopus octopus = OctopusFactory.newOctopus(p);

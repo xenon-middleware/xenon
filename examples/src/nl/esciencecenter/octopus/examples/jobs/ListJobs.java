@@ -21,21 +21,25 @@ import java.net.URI;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.jobs.Scheduler;
 
+import nl.esciencecenter.octopus.jobs.Scheduler;
 /**
- * A simple example of how to create an octopus and how to retrieve the various interfaces.
+ * A simple example of how to retrieve the job status.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class SubmitSimpleBatchJob {
+public class ListJobs {
 
-    public static void main(String [] args) { 
+    public static void main(String [] args) {
+        
+        if (args.length != 1) { 
+            System.out.println("Example required a scheduler URI as a parameter!");
+            System.exit(1);
+        }
+        
         try { 
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
@@ -43,34 +47,22 @@ public class SubmitSimpleBatchJob {
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
-            // Next, we retrieve the Jobs API
+            // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
-            
-            // We can now create a JobDescription for the job we want to run.
-            JobDescription description = new JobDescription();
-            description.setExecutable("/bin/sleep");
-            description.setArguments("5");
             
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location, null, null);
-            
-            // Submit the job
-            Job job = jobs.submitJob(scheduler, description);
-            
-            // Wait for the job to finish
-            JobStatus status = jobs.waitUntilDone(job, 60000);
-            
-            // Check if the job was successful. 
-            if (!status.isDone()) { 
-                System.out.println("Job failed to run withing deadline.");
-            } else if (status.hasException()) { 
-                Exception e = status.getException();
-                System.out.println("Job produced an exception: " + e.getMessage());
-                e.printStackTrace();
-            } else { 
-                System.out.println("Job ran succesfully!");
-            }
 
+            // Retrieve all jobs of all queues.
+            Job [] result = jobs.getJobs(scheduler);
+            
+            // Print the result
+            System.out.println("The scheduler at " + location + " has " + result.length + " jobs:");
+            
+            for (Job j : result) {
+                System.out.println("  " + j.getIdentifier());
+            }
+            
             // Close the scheduler
             jobs.close(scheduler);
             
@@ -78,8 +70,9 @@ public class SubmitSimpleBatchJob {
             OctopusFactory.endOctopus(octopus);
 
         } catch (Exception e) { 
-            System.out.println("SubmitBatchJob example failed: " + e.getMessage());
+            System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
 }
+

@@ -111,4 +111,9 @@ public class SshCredentials implements Credentials {
         throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried "
                 + certFile.getPath() + " and " + certFile2.getPath());
     }
+    
+    @Override
+    public void close(Credential credential) throws OctopusException {
+        // TODO: implement
+    }
 }

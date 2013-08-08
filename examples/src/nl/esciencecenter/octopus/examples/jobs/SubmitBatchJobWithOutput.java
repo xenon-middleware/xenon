@@ -20,7 +20,6 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -41,17 +40,15 @@ import nl.esciencecenter.octopus.util.FileUtils;
  */
 public class SubmitBatchJobWithOutput {
 
-    @SuppressWarnings("unused")
     public static void main(String [] args) { 
         try { 
             
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
-            // Next, we retrieve the Files, Jobs and Credentials API
+            // Next, we retrieve the Files and Jobs API
             Files files = octopus.files();
             Jobs jobs = octopus.jobs();
-            Credentials credentials = octopus.credentials();
             
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();

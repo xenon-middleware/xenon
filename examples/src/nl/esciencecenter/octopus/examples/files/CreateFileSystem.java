@@ -55,7 +55,8 @@ public class CreateFileSystem {
             // We can now uses the FileSystem to access files!
             // ....
             
-            // If we are done we need to close the FileSystem
+            // If we are done we need to close the FileSystem and the credential
+            credentials.close(c);
             files.close(fs);
             
             // Finally, we end octopus to release all resources 

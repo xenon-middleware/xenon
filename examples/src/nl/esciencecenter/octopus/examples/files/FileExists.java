@@ -65,13 +65,14 @@ public class FileExists {
             
             // Check if the file exists 
             if (files.exists(path)) { 
-                System.out.println("File " + filename + " exist!");
+                System.out.println("File " + filename + " exists!");
             } else { 
                 System.out.println("File " + filename + " does not exist!");
             }
             
-            // If we are done we need to close the FileSystem
+            // If we are done we need to close the FileSystem ad the credential
             files.close(fs);
+            credentials.close(c);
             
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);

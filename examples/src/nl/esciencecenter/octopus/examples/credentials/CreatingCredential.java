@@ -31,10 +31,8 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  */
 public class CreatingCredential {
 
-    @SuppressWarnings("unused")
     public static void main(String [] args) { 
         try { 
-            
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -42,11 +40,14 @@ public class CreatingCredential {
             Credentials credentials = octopus.credentials();
             
             // We can now retrieve the default credential for a certain scheme
-            Credential tmp = credentials.getDefaultCredential("file");
-            tmp = credentials.getDefaultCredential("ssh");
+            Credential credential1 = credentials.getDefaultCredential("ssh");
             
             // We can also create other types of credentials
-            tmp = credentials.newPasswordCredential("ssh", null, "username", "password".toCharArray());
+            Credential credential2 = credentials.newPasswordCredential("ssh", null, "username", "password".toCharArray());
+            
+            // Close the credentials once we're done.
+            credentials.close(credential1);
+            credentials.close(credential2);
             
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
