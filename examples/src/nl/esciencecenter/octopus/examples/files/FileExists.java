@@ -70,8 +70,9 @@ public class FileExists {
                 System.out.println("File " + filename + " does not exist!");
             }
             
-            // If we are done we need to close the FileSystem
+            // If we are done we need to close the FileSystem ad the credential
             files.close(fs);
+            credentials.close(c);
             
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);

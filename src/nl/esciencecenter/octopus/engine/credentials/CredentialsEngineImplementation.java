@@ -22,6 +22,9 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.files.FileSystem;
 
 public class CredentialsEngineImplementation implements Credentials {
     private final OctopusEngine octopusEngine;
@@ -55,5 +58,21 @@ public class CredentialsEngineImplementation implements Credentials {
     public Credential getDefaultCredential(String scheme) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().getDefaultCredential(scheme);
+    }
+
+    @Override
+    public void close(Credential credential) throws OctopusException {
+        getCredentialsAdaptor(credential).close(credential);
+    }
+    
+    private Credentials getCredentialsAdaptor(Credential credential) {
+        try {
+            Adaptor adaptor = octopusEngine.getAdaptor(credential.getAdaptorName());
+            return adaptor.credentialsAdaptor();
+        } catch (OctopusException e) {
+            // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
+            // Therefore, we make this a runtime exception.
+            throw new OctopusRuntimeException("CredentialEngine", "Could not find adaptor named " + credential.getAdaptorName(), e);
+        }
     }
 }

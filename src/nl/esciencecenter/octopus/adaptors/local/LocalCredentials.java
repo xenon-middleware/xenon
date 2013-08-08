@@ -57,4 +57,9 @@ public class LocalCredentials implements Credentials {
     public Credential getDefaultCredential(String scheme) throws OctopusException {
         return credential;
     }
+
+    @Override
+    public void close(Credential credential) throws OctopusException {
+        // ignored
+    }
 }

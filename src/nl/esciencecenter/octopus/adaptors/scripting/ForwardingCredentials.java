@@ -63,4 +63,9 @@ public class ForwardingCredentials implements Credentials {
     public Credential getDefaultCredential(String scheme) throws OctopusException {
         return octopusEngine.credentials().getDefaultCredential(targetScheme);
     }
+
+    @Override
+    public void close(Credential credential) throws OctopusException {
+        // TODO: implement
+    }
 }

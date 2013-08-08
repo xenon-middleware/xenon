@@ -87,4 +87,17 @@ public interface Credentials {
      *            the password to use to connect to the proxy server
      */
     Credential getDefaultCredential(String scheme) throws OctopusException;
+    
+    /**
+     * Close a Credential
+     * 
+     * @param credential
+     *            the Credential to close.
+     * 
+     * @throws OctopusException
+     *             If the Credential failed to close.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */    
+    void close(Credential credential) throws OctopusException;
 }
