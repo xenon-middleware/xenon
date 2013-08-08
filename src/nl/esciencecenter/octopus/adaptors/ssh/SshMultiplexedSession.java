@@ -341,19 +341,20 @@ class SshMultiplexedSession {
     synchronized void disconnect() {
 
         while (sessions.size() > 0) {
+            
             SshSession s = sessions.remove(0);
 
             if (s != null) {
                 s.disconnect();
-            }
 
-            int tunnelPort = s.getTunnelPort();
+                int tunnelPort = s.getTunnelPort();
 
-            if (tunnelPort > 0) {
-                try {
-                    gatewaySession.removeTunnel(tunnelPort);
-                } catch (OctopusIOException e) {
-                    LOGGER.warn("Failed to remove SSH tunnel at localhost:" + tunnelPort);
+                if (tunnelPort > 0) {
+                    try {
+                        gatewaySession.removeTunnel(tunnelPort);
+                    } catch (OctopusIOException e) {
+                        LOGGER.warn("Failed to remove SSH tunnel at localhost:" + tunnelPort);
+                    }
                 }
             }
         }

@@ -62,7 +62,7 @@ public class SubmitSimpleBatchJob {
             
             // Check if the job was successful. 
             if (!status.isDone()) { 
-                System.out.println("Job failed to run withing deadline.");
+                System.out.println("Job failed to run within deadline.");
             } else if (status.hasException()) { 
                 Exception e = status.getException();
                 System.out.println("Job produced an exception: " + e.getMessage());
