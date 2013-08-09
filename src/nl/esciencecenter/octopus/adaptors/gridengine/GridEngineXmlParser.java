@@ -39,7 +39,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Parses output from various grid engine command line tools.
+ * Parses xml output from various grid engine command line tools. For more info on the output, see the
+ * "N1 Grid Engine 6 User's Guide". Retrieved from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
  * 
  * @author Niels Drost
  * 
@@ -151,8 +152,8 @@ public class GridEngineXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseQueueInfos(String data) throws OctopusIOException, OctopusException {
-        Document document = parseDocument(data);
+    Map<String, Map<String, String>> parseQueueInfos(String input) throws OctopusIOException, OctopusException {
+        Document document = parseDocument(input);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 

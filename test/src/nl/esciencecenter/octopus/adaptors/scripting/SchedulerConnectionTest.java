@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.adaptors.scripting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -238,7 +239,7 @@ public class SchedulerConnectionTest {
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
 
-    @Test(expected = OctopusException.class)
+    @Test
     public void test04a_verifyJobInfoValidInfo_NoException() throws OctopusException {
         String jobID = "555";
 
@@ -294,4 +295,46 @@ public class SchedulerConnectionTest {
         Job job = new FakeScriptingJob(jobID);
         SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID", "Reason", "JobState");
     }
+    
+    @Test
+    public void test05a_verifyJobOptions() {
+        fail("implement");
+        //protected static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName) throws InvalidJobDescriptionException {
+    }
+    
+    @Test
+    public void test06a_identifiersAsCSList_Jobs_OutputString() {
+        Job[] input = new Job[5];
+        input[0] = new FakeScriptingJob("000");
+        input[1] = new FakeScriptingJob("111");
+        input[2] = new FakeScriptingJob("222");
+        input[3] = new FakeScriptingJob("333");
+        input[4] = new FakeScriptingJob("444");
+
+        String expected = "000,111,222,333,444";
+
+        String result = SchedulerConnection.identifiersAsCSList(input);
+
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void test06b_identifiersAsCSList_JobsWithNulls_OutputString() {
+        Job[] input = new Job[8];
+        input[0] = null;
+        input[1] = new FakeScriptingJob("000");
+        input[2] = new FakeScriptingJob("111");
+        input[3] = null;
+        input[4] = new FakeScriptingJob("222");
+        input[5] = new FakeScriptingJob("333");
+        input[6] = new FakeScriptingJob("444");
+        input[7] = null;
+
+        String expected = "000,111,222,333,444";
+
+        String result = SchedulerConnection.identifiersAsCSList(input);
+
+        assertEquals(result, expected);
+    }
+
 }

@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -39,7 +40,7 @@ public class GridEngineJobScriptGeneratorTest {
     }
 
     @Test
-    public void test01_EmptyDescription_Result() throws OctopusException {
+    public void test01a_generate_EmptyDescription_Result() throws OctopusException {
         JobDescription description = new JobDescription();
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
@@ -55,7 +56,7 @@ public class GridEngineJobScriptGeneratorTest {
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      * @throws OctopusException
      */
-    public void test02_FilledDescription_Result() throws OctopusException {
+    public void test01b_generate__FilledDescription_Result() throws OctopusException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
@@ -88,7 +89,7 @@ public class GridEngineJobScriptGeneratorTest {
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      * @throws OctopusException
      */
-    public void test03_ParallelDescription_Result() throws OctopusException {
+    public void test01c_generate__ParallelDescription_Result() throws OctopusException {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
@@ -129,7 +130,7 @@ public class GridEngineJobScriptGeneratorTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test04_InvalidParallelSlotsOption_ExceptionThrown() throws OctopusException {
+    public void test01d_InvalidParallelSlotsOption_ExceptionThrown() throws OctopusException {
         JobDescription description = new JobDescription();
         description.setNodeCount(2);
 
@@ -137,4 +138,28 @@ public class GridEngineJobScriptGeneratorTest {
 
         GridEngineJobScriptGenerator.generate(description, null, null);
     }
+    
+    
+    
+    @Test
+    public void test02a_parseIntOption() {
+        fail("implement");
+    }
+
+    
+    @Test
+    public void test03a_generateParallelEnvironmentSpecification() {
+        fail("implement");
+    }
+
+    @Test
+    public void test04a_generateSerialScriptContent() {
+        fail("implement");
+    }
+
+    @Test
+    public void test05a_generateParallelScriptContent() {
+        fail("implement");
+    }
+
 }

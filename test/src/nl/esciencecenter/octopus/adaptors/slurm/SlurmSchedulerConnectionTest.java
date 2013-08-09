@@ -26,6 +26,7 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingScheduler;
+import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -478,43 +479,9 @@ public class SlurmSchedulerConnectionTest {
         assertNull(result);
     }
 
+ 
     @Test
-    public void test06a_identifiersAsCSList_Jobs_OutputString() {
-        Job[] input = new Job[5];
-        input[0] = new FakeScriptingJob("000");
-        input[1] = new FakeScriptingJob("111");
-        input[2] = new FakeScriptingJob("222");
-        input[3] = new FakeScriptingJob("333");
-        input[4] = new FakeScriptingJob("444");
-
-        String expected = "000,111,222,333,444";
-
-        String result = SlurmSchedulerConnection.identifiersAsCSList(input);
-
-        assertEquals(result, expected);
-    }
-
-    @Test
-    public void test06b_identifiersAsCSList_JobsWithNulls_OutputString() {
-        Job[] input = new Job[8];
-        input[0] = null;
-        input[1] = new FakeScriptingJob("000");
-        input[2] = new FakeScriptingJob("111");
-        input[3] = null;
-        input[4] = new FakeScriptingJob("222");
-        input[5] = new FakeScriptingJob("333");
-        input[6] = new FakeScriptingJob("444");
-        input[7] = null;
-
-        String expected = "000,111,222,333,444";
-
-        String result = SlurmSchedulerConnection.identifiersAsCSList(input);
-
-        assertEquals(result, expected);
-    }
-
-    @Test
-    public void test07_isDoneState() {
+    public void test06_isDoneState() {
         assertTrue(SlurmSchedulerConnection.isDoneState("COMPLETED"));
 
         assertTrue(SlurmSchedulerConnection.isDoneState("FAILED"));
@@ -525,7 +492,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test08_isFailedState() {
+    public void test07_isFailedState() {
         assertFalse(SlurmSchedulerConnection.isFailedState("COMPLETED"));
 
         assertTrue(SlurmSchedulerConnection.isFailedState("FAILED"));
@@ -536,7 +503,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test09a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
+    public void test08a_verifyJobDescription_ValidJobDescription_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
         //all the settings the function checks for set exactly right
@@ -551,7 +518,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test09b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
+    public void test08b_verifyJobDescription_ScriptOptionSet_NoException() throws Exception {
         JobDescription description = new JobDescription();
 
         //all the settings the function checks for set exactly right
@@ -567,7 +534,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test09c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
+    public void test08c_verifyJobDescription_JobScriptSet_NoFurtherChecking() throws Exception {
         JobDescription description = new JobDescription();
 
         //set a job option
@@ -585,7 +552,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test09d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
+    public void test08d_verifyJobDescription_InvalidOptions_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
         //set a job option
@@ -596,7 +563,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test09e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
+    public void test08e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
         description.setInteractive(true);
@@ -605,7 +572,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test(expected = InvalidJobDescriptionException.class)
-    public void test09f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
+    public void test08f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {
         JobDescription description = new JobDescription();
 
         //verify the standard settings are also checked

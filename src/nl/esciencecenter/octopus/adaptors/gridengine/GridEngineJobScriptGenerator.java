@@ -38,7 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * 
  */
 @SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
-public final class GridEngineJobScriptGenerator {
+final class GridEngineJobScriptGenerator {
 
     private GridEngineJobScriptGenerator() {
         //DO NOT USE
@@ -48,15 +48,16 @@ public final class GridEngineJobScriptGenerator {
 
     private static final int MINUTES_PER_HOUR = 60;
 
-    private static int parseIntOption(String string) throws OctopusException {
+    protected static int parseIntOption(String string) throws OctopusException {
         try {
             return Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Error in parsing integer option \"" + string + "\"", e);
+            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Error in parsing integer option \""
+                    + string + "\"", e);
         }
     }
 
-    private static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setupInfo,
+    protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setupInfo,
             Formatter script) throws OctopusException {
         Map<String, String> options = description.getJobOptions();
 
@@ -73,7 +74,35 @@ public final class GridEngineJobScriptGenerator {
         script.format("#$ -pe %s %d\n", pe, slots);
     }
 
-    public static String generate(JobDescription description, AbsolutePath fsEntryPath, GridEngineSetup setup)
+    protected static void generateSerialScriptContent(JobDescription description, Formatter script) {
+        script.format("%s", description.getExecutable());
+
+        for (String argument : description.getArguments()) {
+            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+        }
+        script.format("\n");
+    }
+
+    protected static void generateParallelScriptContent(JobDescription description, Formatter script) {
+        script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
+
+        for (int i = 0; i < description.getProcessesPerNode(); i++) {
+            script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
+            script.format("%s", description.getExecutable());
+            for (String argument : description.getArguments()) {
+                script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
+            }
+            script.format("\"&\n");
+        }
+        //wait for all ssh connections to finish
+        script.format("done\n\n");
+        script.format("wait\n");
+        script.format("exit 0\n");
+        script.format("\n");
+        //FIXME: return an exit code here.
+    }
+
+    protected static String generate(JobDescription description, AbsolutePath fsEntryPath, GridEngineSetup setup)
             throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
@@ -144,33 +173,4 @@ public final class GridEngineJobScriptGenerator {
 
         return stringBuilder.toString();
     }
-
-    private static void generateSerialScriptContent(JobDescription description, Formatter script) {
-        script.format("%s", description.getExecutable());
-
-        for (String argument : description.getArguments()) {
-            script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
-        }
-        script.format("\n");
-    }
-
-    private static void generateParallelScriptContent(JobDescription description, Formatter script) {
-        script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
-
-        for (int i = 0; i < description.getProcessesPerNode(); i++) {
-            script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
-            script.format("%s", description.getExecutable());
-            for (String argument : description.getArguments()) {
-                script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
-            }
-            script.format("\"&\n");
-        }
-        //wait for all ssh connections to finish
-        script.format("done\n\n");
-        script.format("wait\n");
-        script.format("exit 0\n");
-        script.format("\n");
-        //FIXME: return an exit code here.
-    }
-
 }
