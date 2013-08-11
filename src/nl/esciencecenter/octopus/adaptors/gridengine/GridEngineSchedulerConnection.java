@@ -121,7 +121,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         try {
             exitcode = Integer.parseInt(info.get("exit_status"));
         } catch (NumberFormatException e) {
-            exception = new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
                     + job.getIdentifier() + " from string " + exitcodeString, e);
 
         }
@@ -140,10 +140,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
-        if (info == null) {
-            return null;
-        }
-
+        boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
         
         if (jobInfo == null) {
@@ -158,9 +155,10 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         Exception exception = null;
         if (stateCode.contains("E")) {
             exception = new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error state: " + stateCode);
+            done = true;
         }
 
-        return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), false, jobInfo);
+        return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), done, jobInfo);
     }
 
     private final long accountingGraceTime;
