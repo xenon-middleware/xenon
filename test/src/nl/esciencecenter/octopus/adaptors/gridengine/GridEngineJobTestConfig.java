@@ -224,6 +224,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     public Map<String, String>[] getInvalidProperties() throws Exception {
+        @SuppressWarnings("unchecked")
         Map<String, String>[] result = new Map[1];
 
         result[0] = new HashMap<String, String>();

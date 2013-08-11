@@ -34,7 +34,7 @@ class QueueInfo {
     private final int slots;
     private final String[] parallelEnvironments;
 
-    protected QueueInfo(Map<String, String> info) throws OctopusException {
+    QueueInfo(Map<String, String> info) throws OctopusException {
         name = info.get("qname");
 
         if (name == null) {
@@ -60,6 +60,18 @@ class QueueInfo {
             throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue " + name);
         }
         parallelEnvironments = peValue.split(ScriptingParser.WHITESPACE_REGEX);
+    }
+    
+    /**
+     * Testing constructor
+     * @param name name of the queue
+     * @param slots number of slots
+     * @param parallelEnvironments parallel environment names
+     */
+    QueueInfo(String name, int slots, String... parallelEnvironments) {
+        this.name = name;
+        this.slots = slots;
+        this.parallelEnvironments = parallelEnvironments;
     }
 
     @Override
