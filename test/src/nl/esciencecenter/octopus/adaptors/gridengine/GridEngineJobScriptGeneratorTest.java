@@ -21,13 +21,17 @@ import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Formatter;
 
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineJobScriptGeneratorTest {
 
     @Test
@@ -121,45 +125,86 @@ public class GridEngineJobScriptGeneratorTest {
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
                 + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "done\n" + "\n" + "wait\n" + "exit 0\n\n";
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n" + "done\n"
+                + "\n" + "wait\n" + "exit 0\n\n";
 
         System.out.println(result);
 
         assertEquals(expected, result);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test01d_InvalidParallelSlotsOption_ExceptionThrown() throws OctopusException {
+    public void test02a__generateParallelEnvironmentSpecification_SlotsProvided_Result() throws OctopusException {
         JobDescription description = new JobDescription();
-        description.setNodeCount(2);
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "5");
 
+        Formatter output = new Formatter();
+
+        String expected = "#$ -pe some.pe 5\n";
+
+        GridEngineJobScriptGenerator.generateParallelEnvironmentSpecification(description, null, output);
+
+        assertEquals("parallel environment specification incorrect", expected, output.out().toString());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void test02b__generateParallelEnvironmentSpecification_ParallelSlotsNotProvided_SetupUsed() throws OctopusException {
+        //this should trigger the usage of the GridEngineSetup to calculate the slots 
+        JobDescription description = new JobDescription();
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
+
+        Formatter output = new Formatter();
+
+        //setup not provided, leads to NullpointerException
+        GridEngineJobScriptGenerator.generateParallelEnvironmentSpecification(description, null, output);
+
+        fail("calling generator should lead to null pointer exception");
+    }
+
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test02c__generateParallelEnvironmentSpecification_InvalidParallelSlotsOption_ExceptionThrown()
+            throws OctopusException {
+        JobDescription description = new JobDescription();
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "five");
 
-        GridEngineJobScriptGenerator.generate(description, null, null);
-    }
-    
-    
-    
-    @Test
-    public void test02a_parseIntOption() {
-        fail("implement");
-    }
+        Formatter output = new Formatter();
 
-    
-    @Test
-    public void test03a_generateParallelEnvironmentSpecification() {
-        fail("implement");
+        GridEngineJobScriptGenerator.generateParallelEnvironmentSpecification(description, null, output);
     }
 
     @Test
-    public void test04a_generateSerialScriptContent() {
-        fail("implement");
+    public void test03a_generateSerialScriptContent() {
+        JobDescription description = new JobDescription();
+        description.setExecutable("/bin/executable");
+        description.setArguments("some", "arguments");
+
+        Formatter output = new Formatter();
+
+        String expected = "/bin/executable 'some' 'arguments'\n";
+
+        GridEngineJobScriptGenerator.generateSerialScriptContent(description, output);
+
+        assertEquals("serial script content incorrect", expected, output.out().toString());
     }
 
     @Test
-    public void test05a_generateParallelScriptContent() {
-        fail("implement");
+    public void test04a_generateParallelScriptContent() {
+        JobDescription description = new JobDescription();
+        description.setProcessesPerNode(2);
+        description.setExecutable("/bin/executable");
+        description.setArguments("some", "arguments");
+
+        Formatter output = new Formatter();
+
+        String expected = "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
+                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n" + "done\n"
+                + "\n" + "wait\n" + "exit 0\n\n";
+
+        GridEngineJobScriptGenerator.generateParallelScriptContent(description, output);
+
+        assertEquals("parallel script content incorrect", expected, output.out().toString());
     }
 
 }

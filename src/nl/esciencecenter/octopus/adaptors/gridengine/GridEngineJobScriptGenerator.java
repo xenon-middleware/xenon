@@ -48,16 +48,7 @@ final class GridEngineJobScriptGenerator {
 
     private static final int MINUTES_PER_HOUR = 60;
 
-    protected static int parseIntOption(String string) throws OctopusException {
-        try {
-            return Integer.parseInt(string);
-        } catch (NumberFormatException e) {
-            throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Error in parsing integer option \""
-                    + string + "\"", e);
-        }
-    }
-
-    protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setupInfo,
+    protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup,
             Formatter script) throws OctopusException {
         Map<String, String> options = description.getJobOptions();
 
@@ -65,10 +56,17 @@ final class GridEngineJobScriptGenerator {
 
         //determine the number of slots we need. Can be overridden by the user
         int slots;
-        if (options.containsKey(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS)) {
-            slots = parseIntOption(options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS));
+        String slotsString = options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS);
+
+        if (slotsString == null) {
+            slots = setup.calculateSlots(pe, description.getQueueName(), description.getNodeCount());
         } else {
-            slots = setupInfo.calculateSlots(pe, description.getQueueName(), description.getNodeCount());
+            try {
+                slots = Integer.parseInt(slotsString);
+            } catch (NumberFormatException e) {
+                throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME,
+                        "Error in parsing parallel slots option \"" + slotsString + "\"", e);
+            }
         }
 
         script.format("#$ -pe %s %d\n", pe, slots);
