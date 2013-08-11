@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;

@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of Octopus Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
- * in the adaptors using this class.
+ * in the adaptors.
  * 
  * @author Niels Drost
  * 

@@ -21,7 +21,6 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * @author Niels Drost
@@ -136,7 +135,7 @@ public class ScriptingParser {
      *            the adaptor name to report in case parsing failed
      * @param possiblePrefixes
      *            a number of possible prefixes before the job ID.
-     * @return
+     * @return the job ID found on the input line.
      * @throws OctopusException
      */
     public static long parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws OctopusException {
@@ -266,7 +265,7 @@ public class ScriptingParser {
      * @param options
      *            all possible options the input could contain
      * @return the index of the matching option
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             in case the input does not contain any of the options given.
      */
     public static int checkIfContains(String input, String adaptorName, String... options) throws OctopusException {
@@ -303,7 +302,7 @@ public class ScriptingParser {
      * @param keyField
      *            the header field which triggers a new record. the first line of the output must contain this key
      * @return a map with all records found. The value of the key field is used as a key.
-     * @throws OctopusIOException
+     * @throws OctopusException in case the output does not match the expected format
      */
     public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, String separatorRegEx,
             String adaptorName, String... ignoredLines) throws OctopusException {

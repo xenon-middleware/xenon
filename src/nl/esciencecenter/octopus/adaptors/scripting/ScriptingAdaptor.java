@@ -28,8 +28,8 @@ import nl.esciencecenter.octopus.files.Files;
  * ScriptingAdaptor is a generic adaptor implementation. It server as a parent class for adaptors that are based on running
  * scripts over an SSH connection.
  * 
- * @see GridEngineAdaptor
- * @see SlurmAdaptor
+ * @see nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor
+ * @see nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
