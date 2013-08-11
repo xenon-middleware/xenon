@@ -26,7 +26,6 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingScheduler;
-import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
