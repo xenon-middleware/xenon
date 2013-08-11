@@ -224,7 +224,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     public Map<String, String>[] getInvalidProperties() throws Exception {
-        Map[] result = new Map[1];
+        Map<String, String>[] result = new Map[1];
 
         result[0] = new HashMap<String, String>();
 

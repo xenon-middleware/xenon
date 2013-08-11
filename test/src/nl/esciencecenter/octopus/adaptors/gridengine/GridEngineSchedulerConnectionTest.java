@@ -15,13 +15,15 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
-import nl.esciencecenter.octopus.adaptors.slurm.SlurmSchedulerConnection;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
