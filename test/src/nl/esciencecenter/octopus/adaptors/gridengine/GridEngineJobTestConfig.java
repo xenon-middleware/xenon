@@ -87,7 +87,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.queue.wait.time"));
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.update.time"));
 
-        parallelEnvironment = getPropertyOrFail(p, "test.gridengine.parallel.environment");
+        parallelEnvironment = p.getProperty("test.gridengine.parallel.environment");
 
         correctURI = new URI("ge://" + username + "@" + location);
         correctFSURI = new URI("sftp://" + username + "@" + location);

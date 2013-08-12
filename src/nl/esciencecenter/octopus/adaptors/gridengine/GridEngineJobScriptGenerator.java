@@ -97,7 +97,6 @@ final class GridEngineJobScriptGenerator {
         script.format("wait\n");
         script.format("exit 0\n");
         script.format("\n");
-        //FIXME: return an exit code here.
     }
 
     protected static String generate(JobDescription description, AbsolutePath fsEntryPath, GridEngineSetup setup)
