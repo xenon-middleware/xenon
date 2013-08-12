@@ -30,6 +30,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -42,8 +43,8 @@ public class AdaptorTest {
 
     class TestAdaptor extends Adaptor {
 
-        public TestAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-                OctopusPropertyDescription[] validProperties, OctopusProperties p) throws OctopusException {
+        public TestAdaptor(OctopusEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+                ImmutableArray<OctopusPropertyDescription> validProperties, OctopusProperties p) throws OctopusException {
 
             super(octopusEngine, name, description, supportedSchemes, validProperties, p);
         }
@@ -77,28 +78,28 @@ public class AdaptorTest {
     @Test
     public void test0() throws OctopusException {
 
-        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, new OctopusPropertyDescription[0],
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes,  new ImmutableArray<OctopusPropertyDescription>(),
                 new OctopusProperties());
 
         String[] tmp = t.getSupportedSchemes();
 
         assert (tmp != null);
-        assert (Arrays.equals(schemes, tmp));
+        assert (Arrays.equals(schemes.asArray(), tmp));
     }
 
     @Test
     public void test1() throws OctopusException {
 
-        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
-        OctopusPropertyDescription[] supportedProperties = new OctopusPropertyDescription[] {
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
                         "aap2", "test property p1"),
 
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
-                        "noot2", "test property p2"), };
+                        "noot2", "test property p2"));
 
         OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String, String>());
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
@@ -116,14 +117,14 @@ public class AdaptorTest {
     @Test
     public void test2() throws OctopusException {
 
-        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
-        OctopusPropertyDescription[] supportedProperties = new OctopusPropertyDescription[] {
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
                         "aap2", "test property p1"),
 
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
-                        "noot2", "test property p2"), };
+                        "noot2", "test property p2"));
 
         Map<String, String> m = new HashMap<>();
         m.put("octopus.adaptors.test.p1", "mies");
@@ -145,14 +146,14 @@ public class AdaptorTest {
     @Test(expected = OctopusException.class)
     public void test3() throws OctopusException {
 
-        String[] schemes = new String[] { "SCHEME1", "SCHEME2" };
+        ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
-        OctopusPropertyDescription[] supportedProperties = new OctopusPropertyDescription[] {
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
                         "aap2", "test property p1"),
 
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
-                        "noot2", "test property p2"), };
+                        "noot2", "test property p2"));
 
         Map<String, String> p = new HashMap<>();
         p.put("octopus.adaptors.test.p3", "mies");

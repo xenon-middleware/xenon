@@ -26,6 +26,7 @@ import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
@@ -45,8 +46,9 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = OctopusEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
-
+    // private static final String[] ADAPTOR_SCHEMES = new String[] { "slurm" };
+    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<String>("slurm");
+    
     /** Should the slurm version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
@@ -61,16 +63,28 @@ public class SlurmAdaptor extends ScriptingAdaptor {
             + "or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
-            new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
-                    "false", "Skip version check is skipped when connecting to remote machines. "
-                            + "WARNING: it is not recommended to use this setting in production environments!"),
+//    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+//            new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+//                    "false", "Skip version check is skipped when connecting to remote machines. "
+//                            + "WARNING: it is not recommended to use this setting in production environments!"),
+//
+//            new OctopusPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+//                    "false", "Do not used accounting info of slurm, even when available. Mostly for testing purposes"),
+//
+//            new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+//                    "Number of milliseconds between polling the status of a job."), };
 
-            new OctopusPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
-                    "false", "Do not used accounting info of slurm, even when available. Mostly for testing purposes"),
-
-            new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
-                    "Number of milliseconds between polling the status of a job."), };
+    private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = 
+            new ImmutableArray<OctopusPropertyDescription>(
+        new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+                "false", "Skip version check is skipped when connecting to remote machines. "
+                 + "WARNING: it is not recommended to use this setting in production environments!"),
+        
+        new OctopusPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+                "false", "Do not used accounting info of slurm, even when available. Mostly for testing purposes"),
+                
+        new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+                "Number of milliseconds between polling the status of a job."));
 
     /**
      * Create a new SlurmAdaptor.

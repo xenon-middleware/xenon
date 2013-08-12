@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
@@ -87,7 +88,7 @@ public class OctopusProperties {
      *             if a key from <code>properties</code> has a value that does not match the type as listed in
      *             <code>supportedProperties</code>
      */
-    public OctopusProperties(OctopusPropertyDescription[] supportedProperties, Map<String, String> properties)
+    public OctopusProperties(ImmutableArray<OctopusPropertyDescription> supportedProperties, Map<String, String> properties)
             throws UnknownPropertyException, InvalidPropertyException {
 
         super();
@@ -118,8 +119,8 @@ public class OctopusProperties {
      *             if a key from <code>properties</code> has a value that does not match the type as listed in
      *             <code>supportedProperties</code>.
      */
-    public OctopusProperties(OctopusPropertyDescription[] supportedProperties, Level level, Map<String, String> properties)
-            throws UnknownPropertyException, InvalidPropertyException {
+    public OctopusProperties(ImmutableArray<OctopusPropertyDescription> supportedProperties, Level level, 
+            Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
 
         super();
 

@@ -30,6 +30,7 @@ import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
@@ -120,8 +121,9 @@ public class FileSystemImplementationTest {
         Map<String, String> tmp = new HashMap<>();
         tmp.put("test", "test");
 
-        OctopusPropertyDescription[] valid = new OctopusPropertyDescription[] { new OctopusPropertyDescriptionImplementation(
-                "test", Type.STRING, EnumSet.of(Level.OCTOPUS), "test", "test property") };
+        ImmutableArray<OctopusPropertyDescription> valid = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation(
+                "test", Type.STRING, EnumSet.of(Level.OCTOPUS), "test", "test property"));
 
         OctopusProperties p = new OctopusProperties(valid, tmp);
 

@@ -19,6 +19,7 @@ package nl.esciencecenter.octopus.engine;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 
 import org.junit.Test;
 
@@ -31,8 +32,8 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testGetters() {
 
-        AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1",
-                "SCHEME2" }, null, null);
+        AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
+                new ImmutableArray<String>("SCHEME1", "SCHEME2"), new ImmutableArray<OctopusPropertyDescription>(), null);
 
         String name = a.getName();
 
@@ -61,11 +62,11 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testToString() {
 
-        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new String[] { "SCHEME1", "SCHEME2" }, null, null)
-                .toString();
+        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<String>("SCHEME1", "SCHEME2"), 
+                new ImmutableArray<OctopusPropertyDescription>(), null).toString();
 
-        assert (tmp
-                .equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, SCHEME2], supportedProperties=null, adaptorSpecificInformation=null]"));
+        assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, " +
+        		"SCHEME2], supportedProperties=[], adaptorSpecificInformation=null]"));
     }
 
 }

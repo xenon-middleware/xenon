@@ -31,6 +31,7 @@ import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
@@ -64,7 +65,8 @@ public class SshAdaptor extends Adaptor {
     private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
 
     /** The schemes supported by this adaptor */
-    private static final String[] ADAPTOR_SCHEME = new String[] { "ssh", "sftp" };
+    //    private static final String[] ADAPTOR_SCHEME = new String[] { "ssh", "sftp" };
+    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ssh", "sftp");
 
     /** All our own properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "ssh.";
@@ -97,19 +99,33 @@ public class SshAdaptor extends Adaptor {
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** List of properties supported by this SSH adaptor */
-    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+    //    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+    //            new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
+    //                    Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
+    //            new OctopusPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
+    //                    Level.FILESYSTEM), "true", "Enable strict host key checking."),
+    //            new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Level.OCTOPUS),
+    //                    "true", "Load the standard known_hosts file."),
+    //            new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+    //                    "The polling delay for monitoring running jobs (in milliseconds)."),
+    //            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.SCHEDULER), "4",
+    //                    "The maximum number of concurrent jobs in the multiq.."),
+    //            new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM),
+    //                    null, "The gateway machine used to create an SSH tunnel to the target."), };
+
+    private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = new ImmutableArray<OctopusPropertyDescription>(
             new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
                     Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
             new OctopusPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
-                    Level.FILESYSTEM), "true", "Enable strict host key checking."),
-            new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Level.OCTOPUS),
-                    "true", "Load the standard known_hosts file."),
+                    Level.FILESYSTEM), "true", "Enable strict host key checking."), 
+            new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Level.OCTOPUS), 
+                    "true", "Load the standard known_hosts file."), 
             new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
-            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.SCHEDULER), "4",
-                    "The maximum number of concurrent jobs in the multiq.."),
-            new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM),
-                    null, "The gateway machine used to create an SSH tunnel to the target."), };
+            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.SCHEDULER), "4", 
+                    "The maximum number of concurrent jobs in the multiq.."), 
+            new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), 
+                    null, "The gateway machine used to create an SSH tunnel to the target."));
 
     private final SshFiles filesAdaptor;
 
@@ -182,7 +198,7 @@ public class SshAdaptor extends Adaptor {
 
     @Override
     public OctopusPropertyDescription[] getSupportedProperties() {
-        return VALID_PROPERTIES.clone();
+        return VALID_PROPERTIES.asArray();
     }
 
     @Override

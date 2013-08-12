@@ -26,6 +26,7 @@ import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
@@ -45,8 +46,9 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = OctopusEngine.ADAPTORS + GridEngineAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
-
+    // private static final String[] ADAPTOR_SCHEMES = new String[] { "ge", "sge" };
+    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("ge", "sge");
+    
     /** Should the grid engine version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
@@ -61,16 +63,27 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
             + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
-            new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
-                    "false", "Skip version check is skipped when connecting to remote machines. "
-                            + "WARNING: it is not recommended to use this setting in production environments!"),
+//    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
+//            new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+//                    "false", "Skip version check is skipped when connecting to remote machines. "
+//                            + "WARNING: it is not recommended to use this setting in production environments!"),
+//
+//            new OctopusPropertyDescriptionImplementation(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER),
+//                    "60000", "Number of milliseconds a job is allowed to take going from the queue to the qacct output."),
+//
+//            new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+//                    "Number of milliseconds between polling the status of a job."), };
 
-            new OctopusPropertyDescriptionImplementation(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER),
-                    "60000", "Number of milliseconds a job is allowed to take going from the queue to the qacct output."),
+    private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = 
+            new ImmutableArray<OctopusPropertyDescription>(
+        new OctopusPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER),
+                "false", "Skip version check is skipped when connecting to remote machines. "
+                        + "WARNING: it is not recommended to use this setting in production environments!"),
+        new OctopusPropertyDescriptionImplementation(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER),
+                "60000", "Number of milliseconds a job is allowed to take going from the queue to the qacct output."),
 
-            new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
-                    "Number of milliseconds between polling the status of a job."), };
+        new OctopusPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+                "Number of milliseconds between polling the status of a job."));
 
     /**
      * Create a new GridEngineAdaptor.

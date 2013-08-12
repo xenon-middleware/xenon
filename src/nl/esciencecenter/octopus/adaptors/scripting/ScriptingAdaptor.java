@@ -21,6 +21,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
@@ -41,9 +42,9 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ScriptingJobs jobsAdaptor;
     private final ForwardingCredentials credentialsAdaptor;
 
-    protected ScriptingAdaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusPropertyDescription[] validProperties, OctopusProperties properties, SchedulerConnectionFactory factory)
-            throws OctopusException {
+    protected ScriptingAdaptor(OctopusEngine octopusEngine, String name, String description, 
+            ImmutableArray<String> supportedSchemes, ImmutableArray<OctopusPropertyDescription> validProperties, 
+            OctopusProperties properties, SchedulerConnectionFactory factory) throws OctopusException {
 
         super(octopusEngine, name, description, supportedSchemes, validProperties, properties);
 
