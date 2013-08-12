@@ -28,7 +28,6 @@ import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
-import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
@@ -378,62 +377,18 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public FileSystem getLocalHomeFileSystem() throws OctopusException {
         return home;
     }
-
-    private CopyOption checkMode(CopyOption previous, CopyOption current) throws UnsupportedOperationException { 
-        
-        if (previous != null && previous != current) {
-            throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + previous + " and " + 
-                    current);
-        }
-
-        return current;
-    }
-    
-    
+       
     @Override
     public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException,
             UnsupportedOperationException {
 
-        boolean async = false;
-        boolean verify = false;
+        CopyInfo info = CopyInfo.createCopyInfo(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,
+                target, options);
+         
+        copyEngine.copy(info);
 
-        CopyOption mode = null;
-
-        for (CopyOption opt : options) {
-            switch (opt) {
-            case CREATE:
-            case REPLACE:
-            case APPEND:
-            case RESUME:
-            case IGNORE:
-                mode = checkMode(mode, opt);
-                break;
-            case VERIFY:
-                verify = true;
-                break;
-            case ASYNCHRONOUS:
-                async = true;
-                break;
-            }
-        }
-
-        if (mode == null) {
-            mode = CopyOption.CREATE;
-        }
-
-        if (verify && mode != CopyOption.RESUME) {
-            throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                    + " and VERIFY");
-        }
-
-        CopyImplementation copy = new CopyImplementation(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,
-                target);
-
-        CopyInfo info = new CopyInfo(copy, mode, verify);
-        copyEngine.copy(info, async);
-
-        if (async) {
-            return copy;
+        if (info.isAsync()) {
+            return info.getCopy();
         } else {
 
             Exception e = info.getException();
@@ -444,7 +399,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
             return null;
         }
-
     }
 
     @Override

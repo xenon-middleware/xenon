@@ -30,16 +30,16 @@ public abstract class CredentialImplementation implements Credential {
     private final String uniqueID;
 
     /** the user name to use for this context */
-    protected final String username;
+    private final String username;
 
     /**
      * Must be char array for security!! (Strings end up in the constant pool, etc.)
      */
     private final char[] password;
 
-    protected final String adaptorName;
+    private final String adaptorName;
 
-    protected final OctopusProperties properties;
+    private final OctopusProperties properties;
 
     protected CredentialImplementation(String adaptorName, String uniqueID, OctopusProperties properties, String username,
             char[] password) {

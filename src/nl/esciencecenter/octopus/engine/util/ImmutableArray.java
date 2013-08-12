@@ -29,7 +29,7 @@ public class ImmutableArray<T> implements Iterable<T> {
 
     class ImmutableArrayIterator implements Iterator<T> { 
      
-        int index = 0;
+        private int index = 0;
 
         @Override
         public boolean hasNext() {

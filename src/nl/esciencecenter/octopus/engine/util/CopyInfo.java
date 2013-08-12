@@ -16,7 +16,9 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
+import  nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
+import nl.esciencecenter.octopus.files.AbsolutePath;
 import nl.esciencecenter.octopus.files.CopyOption;
 
 /**
@@ -31,17 +33,19 @@ public class CopyInfo {
     private final CopyImplementation copy;
     private final CopyOption mode;
     private final boolean verify;
-
+    private final boolean async;
+    
     private Exception exception;
     private boolean cancel = false;
     private long bytesToCopy = -1;
     private long bytesCopied = 0;
 
-    public CopyInfo(CopyImplementation copy, CopyOption mode, boolean verify) {
+    public CopyInfo(CopyImplementation copy, CopyOption mode, boolean verify, boolean async) {
         super();
         this.copy = copy;
         this.mode = mode;
         this.verify = verify;
+        this.async = async;
     }
 
     public CopyImplementation getCopy() {
@@ -56,14 +60,17 @@ public class CopyInfo {
         return verify;
     }
 
+    public boolean isAsync() {
+        return async;
+    }
+    
     public boolean hasID(String copyID) { 
         return copy.hasID(copyID);
     }
     
     public String getUniqueID() { 
         return copy.getUniqueID();
-    }
-    
+    }    
     
     public synchronized Exception getException() {
         return exception;
@@ -103,4 +110,64 @@ public class CopyInfo {
                 + copy.getTarget().getPath() + ", mode=" + mode + ", verify=" + verify + ", bytesToCopy=" + getBytesToCopy()
                 + ", bytesCopied=" + getBytesCopied() + ", isCancelled=" + isCancelled() + "]";
     }
+
+    
+    private static CopyOption checkMode(String adaptorName, CopyOption previous, CopyOption current) 
+            throws UnsupportedOperationException { 
+        
+        if (previous != null && !previous.equals(current)) {
+            throw new UnsupportedOperationException(adaptorName, "Conflicting copy options: " + previous + " and " + 
+                    current);
+        }
+
+        return current;
+    }
+    
+    /**
+     * @param adaptorName
+     * @param nextID
+     * @param source
+     * @param target
+     * @param options
+     * @return
+     * @throws UnsupportedOperationException 
+     */
+    public static CopyInfo createCopyInfo(String adaptorName, String nextID, AbsolutePath source, AbsolutePath target,
+            CopyOption ... options) throws UnsupportedOperationException {
+
+        boolean async = false;
+        boolean verify = false;
+        
+        CopyOption mode = null;
+        
+        for (CopyOption opt : options) {
+            switch (opt) {
+            case CREATE:
+            case REPLACE:
+            case APPEND:
+            case RESUME:
+            case IGNORE:
+                mode = checkMode(adaptorName, mode, opt);
+                break;
+            case VERIFY:
+                verify = true;
+                break;
+            case ASYNCHRONOUS:
+                async = true;
+                break;
+            }
+        }
+
+        if (mode == null) {
+            mode = CopyOption.CREATE;
+        }
+
+        if (verify && mode != CopyOption.RESUME) {
+            throw new UnsupportedOperationException(adaptorName, "Conflicting copy options: " + mode + " and VERIFY");
+        }
+
+        CopyImplementation copy = new CopyImplementation(adaptorName, nextID, source, target);
+        return new CopyInfo(copy, mode, verify, async);
+    }
+    
 }

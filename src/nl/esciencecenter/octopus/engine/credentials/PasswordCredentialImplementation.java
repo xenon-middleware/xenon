@@ -37,6 +37,6 @@ public class PasswordCredentialImplementation extends CredentialImplementation {
 
     @Override
     public String toString() {
-        return "PasswordCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + "]";
+        return "PasswordCredentialImplementation [adaptorName=" + getAdaptorName() + ", username=" + getUsername() + "]";
     }
 }

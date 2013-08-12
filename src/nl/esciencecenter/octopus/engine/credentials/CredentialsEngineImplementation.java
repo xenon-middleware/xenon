@@ -22,9 +22,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
-import nl.esciencecenter.octopus.files.FileSystem;
 
 public class CredentialsEngineImplementation implements Credentials {
     private final OctopusEngine octopusEngine;

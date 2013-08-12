@@ -305,40 +305,6 @@ class SshMultiplexedSession {
         findSession(channel).failedSftpChannel(channel);
     }
 
-    //    synchronized int createTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException {
-    //
-    //        for (int i = 0; i < sessions.size(); i++) {
-    //            SshSession s = sessions.get(i);
-    //
-    //            int resultPort = s.addTunnel(localPort, targetHost, targetPort);
-    //
-    //            if (resultPort > 0) { 
-    //                return resultPort;
-    //            }
-    //        }
-    //
-    //        try {
-    //            SshSession s = createSession();
-    //            return s.addTunnel(localPort, targetHost, targetPort);
-    //        } catch (OctopusException e) {
-    //            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
-    //        }
-    //    }
-    //
-    //    synchronized void removeTunnel(int localPort) throws OctopusIOException {
-    //
-    //        for (int i = 0; i < sessions.size(); i++) {
-    //            SshSession s = sessions.get(i);
-    //            
-    //            if (s.getTunnelPort() == localPort) { 
-    //                s.removeTunnel(localPort);
-    //                return;
-    //            } 
-    //        }
-    //
-    //        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to find tunnel at !" + localPort);
-    //    }
-
     synchronized void disconnect() {
 
         while (sessions.size() > 0) {

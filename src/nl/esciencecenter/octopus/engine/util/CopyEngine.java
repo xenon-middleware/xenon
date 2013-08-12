@@ -60,7 +60,7 @@ public class CopyEngine {
             CopyInfo ac = dequeue();
 
             while (ac != null) {
-                copy(ac);
+                startCopy(ac);
                 ac = dequeue();
             }
         }
@@ -433,7 +433,7 @@ public class CopyEngine {
         }
     }
 
-    private void copy(CopyInfo info) {
+    private void startCopy(CopyInfo info) {
 
         LOGGER.debug("Start copy: {}", info);
 
@@ -464,11 +464,11 @@ public class CopyEngine {
         LOGGER.debug("Finished copy: {}", info);
     }
 
-    public void copy(CopyInfo info, boolean asynchronous) {
-        if (asynchronous) {
+    public void copy(CopyInfo info) {
+        if (info.isAsync()) {
             enqueue(info);
         } else {
-            copy(info);
+            startCopy(info);
         }
     }
 

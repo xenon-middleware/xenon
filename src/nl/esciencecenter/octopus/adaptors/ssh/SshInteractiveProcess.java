@@ -73,9 +73,6 @@ public class SshInteractiveProcess implements InteractiveProcess {
             }
         }
 
-        // TODO make property for X Forwarding
-        // channel.setXForwarding(true);
-
         // set the streams first, then connect the channel.
         try {
             streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());

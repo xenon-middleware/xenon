@@ -28,12 +28,12 @@ public class ProxyCredentialImplementation extends CredentialImplementation {
     /**
      * The hostname of the server
      */
-    protected String host;
+    private String host;
 
     /**
      * the port where the server runs
      */
-    protected int port;
+    private int port;
 
     /**
      * Creates a {@link ProxyCredentialImplementation}.
@@ -74,7 +74,7 @@ public class ProxyCredentialImplementation extends CredentialImplementation {
 
     @Override
     public String toString() {
-        return "ProxyCredentialImplementation [adaptorName=" + adaptorName + ", username=" + username + ", host=" + host
+        return "ProxyCredentialImplementation [adaptorName=" + getAdaptorName() + ", username=" + getUsername() + ", host=" + host
                 + ", port=" + port + "]";
     }
 }

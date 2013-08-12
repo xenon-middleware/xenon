@@ -70,8 +70,6 @@ public class LocalAdaptor extends Adaptor {
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
     /** The schemes supported by the adaptor */
-    // private static final String[] ADAPTOR_SCHEME = new String[] { "local", "file" };
-
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<String>("local", "file");
 
     /** The properties supported by this adaptor */
@@ -81,13 +79,6 @@ public class LocalAdaptor extends Adaptor {
                             "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
                     new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
                             "4", "The maximum number of concurrent jobs in the multiq.."));
-
-    /** The properties supported by this adaptor */
-//    private static final OctopusPropertyDescription[] VALID_PROPERTIES = new OctopusPropertyDescription[] {
-//            new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.OCTOPUS), "1000",
-//                    "The polling delay for monitoring running jobs (in milliseconds)."),
-//            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.OCTOPUS), "4",
-//                    "The maximum number of concurrent jobs in the multiq.."), };
 
     /** Local implementation for Files */
     private final LocalFiles localFiles;

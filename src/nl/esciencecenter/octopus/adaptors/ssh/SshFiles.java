@@ -28,12 +28,10 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
-import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
-import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
@@ -578,90 +576,25 @@ public class SshFiles implements Files {
             return false;
         }
     }
-
+    
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws UnsupportedOperationException,
-            OctopusIOException {
-
-        boolean async = false;
-        boolean verify = false;
-
-        CopyOption mode = null;
-
-        for (CopyOption opt : options) {
-            switch (opt) {
-            case CREATE:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(SshAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and CREATE");
-                }
-
-                mode = opt;
-                break;
-            case REPLACE:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(SshAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and REPLACE");
-                }
-
-                mode = opt;
-                break;
-            case APPEND:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(SshAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and APPEND");
-                }
-
-                mode = opt;
-                break;
-            case RESUME:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(SshAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and RESUME");
-                }
-
-                mode = opt;
-                break;
-            case IGNORE:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(SshAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and RESUME");
-                }
-
-                mode = opt;
-                break;
-            case VERIFY:
-                verify = true;
-                break;
-            case ASYNCHRONOUS:
-                async = true;
-                break;
-            default:
-                // ignored
-            }
-        }
-
-        if (mode == null) {
-            mode = CopyOption.CREATE;
-        }
-
-        if (verify && mode != CopyOption.RESUME) {
-            throw new UnsupportedOperationException(SshAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode + " and VERIFY");
-        }
+    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException,
+            UnsupportedOperationException {
 
         CopyEngine ce = octopusEngine.getCopyEngine();
-        CopyImplementation copy = new CopyImplementation(SshAdaptor.ADAPTOR_NAME, ce.getNextID("SSH_COPY_"), source, target);
-        CopyInfo info = new CopyInfo(copy, mode, verify);
-        ce.copy(info, async);
+        
+        CopyInfo info = CopyInfo.createCopyInfo(SshAdaptor.ADAPTOR_NAME, ce.getNextID("SSH_COPY_"), source, target, options);
+         
+        ce.copy(info);
 
-        if (async) {
-            return copy;
+        if (info.isAsync()) {
+            return info.getCopy();
         } else {
 
             Exception e = info.getException();
 
             if (e != null) {
-                throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Copy failed!", e);
+                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Copy failed!", e);
             }
 
             return null;
