@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.adaptors.scripting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test
-    public void test01a_supportsScheme_DifferentCase_Matches() {
+    public void test01c_supportsScheme_DifferentCase_Matches() {
         String input = "JFg";
         String[] supported = new String[] { "jFg", "hik", "bla" };
 
@@ -238,7 +239,7 @@ public class SchedulerConnectionTest {
         SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
     }
 
-    @Test(expected = OctopusException.class)
+    @Test
     public void test04a_verifyJobInfoValidInfo_NoException() throws OctopusException {
         String jobID = "555";
 
@@ -252,7 +253,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_NullInfoMap_ExceptionThrown() throws OctopusException {
+    public void test04b_verifyJobInfo_NullInfoMap_ExceptionThrown() throws OctopusException {
         String jobID = "555";
 
         Job job = new FakeScriptingJob(jobID);
@@ -261,7 +262,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_NoJobID_ExceptionThrown() throws OctopusException {
+    public void test04c_verifyJobInfo_NoJobID_ExceptionThrown() throws OctopusException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
 
@@ -271,7 +272,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws OctopusException {
+    public void test04d_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws OctopusException {
         String jobID = "555";
 
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -284,7 +285,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws OctopusException {
+    public void test04e_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws OctopusException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -294,4 +295,40 @@ public class SchedulerConnectionTest {
         Job job = new FakeScriptingJob(jobID);
         SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID", "Reason", "JobState");
     }
+    
+    @Test
+    public void test05a_identifiersAsCSList_Jobs_OutputString() {
+        Job[] input = new Job[5];
+        input[0] = new FakeScriptingJob("000");
+        input[1] = new FakeScriptingJob("111");
+        input[2] = new FakeScriptingJob("222");
+        input[3] = new FakeScriptingJob("333");
+        input[4] = new FakeScriptingJob("444");
+
+        String expected = "000,111,222,333,444";
+
+        String result = SchedulerConnection.identifiersAsCSList(input);
+
+        assertEquals(result, expected);
+    }
+
+    @Test
+    public void test05b_identifiersAsCSList_JobsWithNulls_OutputString() {
+        Job[] input = new Job[8];
+        input[0] = null;
+        input[1] = new FakeScriptingJob("000");
+        input[2] = new FakeScriptingJob("111");
+        input[3] = null;
+        input[4] = new FakeScriptingJob("222");
+        input[5] = new FakeScriptingJob("333");
+        input[6] = new FakeScriptingJob("444");
+        input[7] = null;
+
+        String expected = "000,111,222,333,444";
+
+        String result = SchedulerConnection.identifiersAsCSList(input);
+
+        assertEquals(result, expected);
+    }
+
 }

@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -39,7 +38,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * Parses output from various grid engine command line tools.
+ * Parses xml output from various grid engine command line tools. For more info on the output, see the
+ * "N1 Grid Engine 6 User's Guide". Retrieved from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
  * 
  * @author Niels Drost
  * 
@@ -57,75 +57,36 @@ public class GridEngineXmlParser {
 
     private final boolean ignoreVersion;
 
-    GridEngineXmlParser(boolean ignoreVersion) throws OctopusIOException {
+    GridEngineXmlParser(boolean ignoreVersion) throws OctopusException {
         this.ignoreVersion = ignoreVersion;
 
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
         }
     }
 
-    private void checkVersion(Document document) throws IncompatibleVersionException {
+    void checkVersion(Document document) throws IncompatibleVersionException {
         Element documentElement = document.getDocumentElement();
 
-        if (documentElement == null || !documentElement.hasAttribute(SGE62_SCHEMA_ATTRIBUTE)
-                || documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) == null) {
-
+        if (!documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SGE62_SCHEMA_VALUE)) {
             if (ignoreVersion) {
-                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
+                LOGGER.warn("cannot determine version, version attribute found: \""
+                        + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Ignoring as requested by "
                         + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
-
                 throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME,
-                        "cannot determine version, version attribute not found. Use the "
+                        "cannot determine version, version attribute found: \""
+                                + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Use the "
                                 + GridEngineAdaptor.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
-        }
 
-        String schemaValue = documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE);
-
-        LOGGER.debug("found schema value " + schemaValue);
-
-        //schemaValue == null checked above
-        if (!SGE62_SCHEMA_VALUE.equals(schemaValue)) {
-            if (ignoreVersion) {
-                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
-                        + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
-            } else {
-
-                throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
-                        + schemaValue + ") incompatible with adaptor. Use the " + GridEngineAdaptor.IGNORE_VERSION_PROPERTY
-                        + " property to ignore this error");
-            }
-        }
-
-    }
-
-    /**
-     * Testing version of checkVersion function
-     * 
-     * @param file
-     *            the file to check
-     * @throws OctopusException
-     *             if the version is incorrect
-     * @throws OctopusIOException
-     *             if the file cannot be read or parsed
-     */
-    void checkVersion(File file) throws OctopusException, OctopusIOException {
-        try {
-            Document result = documentBuilder.parse(file);
-            result.normalize();
-
-            checkVersion(result);
-        } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         }
     }
 
-    private Document parseDocument(String data) throws OctopusException, OctopusIOException {
+    Document parseDocument(String data) throws OctopusException, OctopusIOException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
@@ -134,55 +95,14 @@ public class GridEngineXmlParser {
             checkVersion(result);
 
             return result;
-        } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+        } catch (SAXException e) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+        } catch (IOException e) {
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not read xml file", e);
         }
     }
 
-    /**
-     * Parses queue info from "qstat -g c -xml"
-     * 
-     * @param in
-     *            the stream to get the xml data from
-     * @return a list containing all queue names found
-     * @throws OctopusIOException
-     *             if the file could not be parsed
-     * @throws OctopusException
-     *             if the server version is not compatible with this adaptor
-     * @throws Exception
-     */
-    Map<String, Map<String, String>> parseQueueInfos(String data) throws OctopusIOException, OctopusException {
-        Document document = parseDocument(data);
-
-        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
-
-        LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
-        NodeList clusterNodes = document.getElementsByTagName("cluster_queue_summary");
-
-        for (int i = 0; i < clusterNodes.getLength(); i++) {
-            Node clusterNode = clusterNodes.item(i);
-
-            if (clusterNode.getNodeType() == Node.ELEMENT_NODE) {
-                Map<String, String> queueInfo = mapFromElement((Element) clusterNode);
-
-                String queueName = queueInfo.get("name");
-
-                if (queueName == null || queueName.length() == 0) {
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
-                }
-
-                result.put(queueName, queueInfo);
-            }
-        }
-
-        if (result.size() == 0) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
-        }
-
-        return result;
-    }
-
-    private Map<String, String> mapFromElement(Element root) throws OctopusIOException {
+    private Map<String, String> mapFromElement(Element root) {
         Map<String, String> result = new HashMap<String, String>();
 
         NodeList tagNodes = root.getChildNodes();
@@ -201,6 +121,48 @@ public class GridEngineXmlParser {
                 }
             }
         }
+        return result;
+    }
+
+    /**
+     * Parses queue info from "qstat -g c -xml"
+     * 
+     * @param in
+     *            the stream to get the xml data from
+     * @return a list containing all queue names found
+     * @throws OctopusIOException
+     *             if the file could not be parsed
+     * @throws OctopusException
+     *             if the server version is not compatible with this adaptor
+     * @throws Exception
+     */
+    Map<String, Map<String, String>> parseQueueInfos(String input) throws OctopusException, OctopusIOException {
+        Document document = parseDocument(input);
+
+        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+
+        LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
+        NodeList clusterNodes = document.getElementsByTagName("cluster_queue_summary");
+
+        for (int i = 0; i < clusterNodes.getLength(); i++) {
+            Node clusterNode = clusterNodes.item(i);
+
+            if (clusterNode.getNodeType() == Node.ELEMENT_NODE) {
+                Map<String, String> queueInfo = mapFromElement((Element) clusterNode);
+
+                String queueName = queueInfo.get("name");
+
+                if (queueName == null || queueName.length() == 0) {
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+                }
+
+                result.put(queueName, queueInfo);
+            }
+        }
+
+        if (result.size() == 0) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
+        }
 
         return result;
     }
@@ -217,7 +179,7 @@ public class GridEngineXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusIOException, OctopusException {
+    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusException, OctopusIOException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         Document document = parseDocument(data);
@@ -242,7 +204,7 @@ public class GridEngineXmlParser {
                 String jobID = jobInfo.get("JB_job_number");
 
                 if (jobID == null || jobID.length() == 0) {
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
                 result.put(jobID, jobInfo);

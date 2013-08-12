@@ -15,70 +15,127 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 /**
  * @author Niels Drost
  * 
  */
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class QueueInfoTest {
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#hashCode()}.
-     */
     @Test
-    public void testHashCode() {
-        fail("Not yet implemented");
+    public void test01a_queueInfoFromMap_Map_Result() throws OctopusException {
+        Map<String, String> input = new HashMap<String, String>();
+
+        input.put("qname", "some.q");
+        input.put("slots", "200");
+        input.put("pe_list", "some.pe other.pe");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expectedPeList = new String[] { "some.pe", "other.pe" };
+
+        assertEquals("queue name incorrect", "some.q", result.getName());
+        assertEquals("queue slots incorrect", 200, result.getSlots());
+
+        assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#QueueInfo(java.util.Map)}.
-     */
-    @Test
-    public void testQueueInfo() {
-        fail("Not yet implemented");
+    @Test(expected = OctopusException.class)
+    public void test01b_queueInfoFromMap_NoName_ExceptionThrown() throws OctopusException {
+        Map<String, String> input = new HashMap<String, String>();
+
+        //input.put("qname", "some.q");
+        input.put("slots", "200");
+        input.put("pe_list", "some.pe other.pe");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expectedPeList = new String[] { "some.pe", "other.pe" };
+
+        assertEquals("queue name incorrect", "some.pe", result.getName());
+        assertEquals("queue slots incorrect", 200, result.getSlots());
+
+        assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#toString()}.
-     */
-    @Test
-    public void testToString() {
-        fail("Not yet implemented");
+    @Test(expected = OctopusException.class)
+    public void test01c_queueInfoFromMap_NoSlots_ExceptionThrown() throws OctopusException {
+        Map<String, String> input = new HashMap<String, String>();
+
+        input.put("qname", "some.q");
+        //input.put("slots", "200");
+        input.put("pe_list", "some.pe other.pe");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expectedPeList = new String[] { "some.pe", "other.pe" };
+
+        assertEquals("queue name incorrect", "some.pe", result.getName());
+        assertEquals("queue slots incorrect", 200, result.getSlots());
+
+        assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#getName()}.
-     */
-    @Test
-    public void testGetName() {
-        fail("Not yet implemented");
+    @Test(expected = OctopusException.class)
+    public void test01d_queueInfoFromMap_IncorrectSlots_ExceptionThrown() throws OctopusException {
+        Map<String, String> input = new HashMap<String, String>();
+
+        input.put("qname", "some.q");
+        input.put("slots", "twohundred");
+        input.put("pe_list", "some.pe other.pe");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expectedPeList = new String[] { "some.pe", "other.pe" };
+
+        assertEquals("queue name incorrect", "some.pe", result.getName());
+        assertEquals("queue slots incorrect", 200, result.getSlots());
+
+        assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#getSlots()}.
-     */
-    @Test
-    public void testGetSlots() {
-        fail("Not yet implemented");
+    @Test(expected = OctopusException.class)
+    public void test01e_queueInfoFromMap_NoPeList_ExceptionThrown() throws OctopusException {
+        Map<String, String> input = new HashMap<String, String>();
+
+        input.put("qname", "some.q");
+        input.put("slots", "200");
+        //input.put("pe_list", "some.pe other.pe");
+
+        QueueInfo result = new QueueInfo(input);
+
+        String[] expectedPeList = new String[] { "some.pe", "other.pe" };
+
+        assertEquals("queue name incorrect", "some.pe", result.getName());
+        assertEquals("queue slots incorrect", 200, result.getSlots());
+
+        assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#getParallelEnvironments()}.
-     */
     @Test
-    public void testGetParallelEnvironments() {
-        fail("Not yet implemented");
-    }
+    public void test02_toString_SomeInfo_Result() throws OctopusException {
+        QueueInfo info = new QueueInfo("some.name", 4, "some.pe", "other.pe");
 
-    /**
-     * Test method for {@link nl.esciencecenter.octopus.adaptors.gridengine.QueueInfo#equals(java.lang.Object)}.
-     */
-    @Test
-    public void testEqualsObject() {
-        fail("Not yet implemented");
+        String result = info.toString();
+
+        String expected = "QueueInfo [name=some.name, slots=4, parallelEnvironments=[some.pe, other.pe]]";
+
+        System.out.println(result);
+
+        assertEquals(expected, result);
     }
 
 }

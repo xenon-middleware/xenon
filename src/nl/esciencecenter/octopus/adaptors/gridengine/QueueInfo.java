@@ -18,8 +18,6 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
@@ -34,38 +32,48 @@ class QueueInfo {
     private final int slots;
     private final String[] parallelEnvironments;
 
-    protected QueueInfo(Map<String, String> info) throws OctopusException {
+    QueueInfo(Map<String, String> info) throws OctopusException {
         name = info.get("qname");
 
         if (name == null) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in qconf output");
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in output");
         }
 
         String slotsValue = info.get("slots");
 
         if (slotsValue == null) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue " + name);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue \"" + name + "\"");
         }
 
         try {
             slots = Integer.parseInt(slotsValue);
         } catch (NumberFormatException e) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue " + name + ", got "
-                    + slotsValue, e);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue \"" + name + "\", got \""
+                    + slotsValue + "\"", e);
         }
 
         String peValue = info.get("pe_list");
 
         if (peValue == null) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue " + name);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue \"" + name + "\"");
         }
         parallelEnvironments = peValue.split(ScriptingParser.WHITESPACE_REGEX);
     }
 
-    @Override
-    public String toString() {
-        return "QueueInfo [name=" + name + ", slots=" + slots + ", parallelEnvironments=" + Arrays.toString(parallelEnvironments)
-                + "]";
+    /**
+     * Testing constructor
+     * 
+     * @param name
+     *            name of the queue
+     * @param slots
+     *            number of slots
+     * @param parallelEnvironments
+     *            parallel environment names
+     */
+    QueueInfo(String name, int slots, String... parallelEnvironments) {
+        this.name = name;
+        this.slots = slots;
+        this.parallelEnvironments = parallelEnvironments;
     }
 
     public String getName() {
@@ -81,43 +89,8 @@ class QueueInfo {
     }
 
     @Override
-    @Generated("Eclipse")
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result + Arrays.hashCode(parallelEnvironments);
-        result = prime * result + slots;
-        return result;
+    public String toString() {
+        return "QueueInfo [name=" + name + ", slots=" + slots + ", parallelEnvironments=" + Arrays.toString(parallelEnvironments)
+                + "]";
     }
-
-    @Override
-    @Generated("Eclipse")
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        QueueInfo other = (QueueInfo) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (!Arrays.equals(parallelEnvironments, other.parallelEnvironments)) {
-            return false;
-        }
-        if (slots != other.slots) {
-            return false;
-        }
-        return true;
-    }
-
 }
