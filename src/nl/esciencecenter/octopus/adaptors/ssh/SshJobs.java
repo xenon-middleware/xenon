@@ -208,7 +208,12 @@ public class SshJobs implements Jobs {
     }
 
     public void end() {
-        // FIXME singleExecutor.shutdownNow();
+        
+        for (SchedulerInfo tmp : schedulers.values()) { 
+            tmp.end();
+        }
+        
+        schedulers.clear();
     }
 
     @Override

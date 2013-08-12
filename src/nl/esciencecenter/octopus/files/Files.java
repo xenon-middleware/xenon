@@ -164,7 +164,7 @@ public interface Files {
      * 
      * If the target is equal to the source this method has no effect.
      * 
-     * (FIXME) If the source is a link, the link itself will be copied, not the path to which it refers. (FIXME)
+     * If the source is a link, the path to which it refers will be copied, not the link itself.
      * 
      * The <code>options</code> parameter determines how the copy is performed:
      * 

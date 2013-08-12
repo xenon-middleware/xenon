@@ -144,7 +144,7 @@ public class LocalFileAttributes implements FileAttributes {
     @Override
     public String toString() {
         return "LocalFileAttributes [executable=" + executable + ", readable=" + readable + ", writable=" + writable
-                + ", hidden=" + hidden + ", attributes=" + PosixFilePermissions.toString(attributes.permissions()) + "]";
+                + ", hidden=" + hidden + ", attributes=" + attributes + " " + PosixFilePermissions.toString(attributes.permissions()) + "]";
     }
 
     @Override
@@ -191,15 +191,14 @@ public class LocalFileAttributes implements FileAttributes {
             return false;
         }
 
-        // FIXME: Always fails ?         
-        //        if (attributes == null) { 
-        //            if (other.attributes != null) { 
-        //                return false;
-        //            }
-        //        } else if (!attributes.equals(other.attributes)) { 
-        //            return false;
-        //        }
-        //        
-        return true;
+        if (attributes == null) {
+            if (other.attributes != null) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        return attributes.permissions().equals(other.attributes.permissions());
     }
 }

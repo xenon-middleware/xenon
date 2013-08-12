@@ -19,6 +19,9 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jcraft.jsch.ChannelExec;
 
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
@@ -39,11 +42,13 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class SshInteractiveProcess implements InteractiveProcess {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SshInteractiveProcess.class);
+    
     private final SshMultiplexedSession session;
     private final ChannelExec channel;
     private final Streams streams;
     private boolean done = false;
-
+    
     public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws OctopusIOException {
 
         this.session = session;
@@ -96,7 +101,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
         try {
             session.releaseExecChannel(channel);
         } catch (OctopusIOException e) {
-            // FIXME: What now ? 
+            LOGGER.warn("SshInteractiveProcess failed to release exec channel!", e);
         }
     }
 
@@ -132,7 +137,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
         try {
             channel.sendSignal("KILL");
         } catch (Exception e) {
-            // LOGGER.debug("Failed to kill remote process!", e);
+            LOGGER.warn("SshInteractiveProcess failed to kill remote process!", e);
         }
 
         cleanup();
