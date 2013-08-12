@@ -69,64 +69,25 @@ public class GridEngineXmlParser {
         }
     }
 
-    private void checkVersion(Document document) throws IncompatibleVersionException {
+    void checkVersion(Document document) throws IncompatibleVersionException {
         Element documentElement = document.getDocumentElement();
 
-        if (documentElement == null || !documentElement.hasAttribute(SGE62_SCHEMA_ATTRIBUTE)
-                || documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) == null) {
-
+        if (!documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SGE62_SCHEMA_VALUE)) {
             if (ignoreVersion) {
-                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
+                LOGGER.warn("cannot determine version, version attribute found: \""
+                        + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Ignoring as requested by "
                         + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
             } else {
-
                 throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME,
-                        "cannot determine version, version attribute not found. Use the "
+                        "cannot determine version, version attribute found: \""
+                                + documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE) + "\". Use the "
                                 + GridEngineAdaptor.IGNORE_VERSION_PROPERTY + " property to ignore this error");
             }
-        }
 
-        String schemaValue = documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE);
-
-        LOGGER.debug("found schema value " + schemaValue);
-
-        //schemaValue == null checked above
-        if (!SGE62_SCHEMA_VALUE.equals(schemaValue)) {
-            if (ignoreVersion) {
-                LOGGER.warn("cannot determine version, version attribute not found. Ignoring as requested by "
-                        + GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
-            } else {
-
-                throw new IncompatibleVersionException(GridEngineAdaptor.ADAPTOR_NAME, "schema version reported by server ("
-                        + schemaValue + ") incompatible with adaptor. Use the " + GridEngineAdaptor.IGNORE_VERSION_PROPERTY
-                        + " property to ignore this error");
-            }
-        }
-
-    }
-
-    /**
-     * Testing version of checkVersion function
-     * 
-     * @param file
-     *            the file to check
-     * @throws OctopusException
-     *             if the version is incorrect
-     * @throws OctopusIOException
-     *             if the file cannot be read or parsed
-     */
-    void checkVersion(File file) throws OctopusException, OctopusIOException {
-        try {
-            Document result = documentBuilder.parse(file);
-            result.normalize();
-
-            checkVersion(result);
-        } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         }
     }
 
-    private Document parseDocument(String data) throws OctopusException, OctopusIOException {
+    Document parseDocument(String data) throws OctopusException, OctopusIOException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
@@ -138,6 +99,28 @@ public class GridEngineXmlParser {
         } catch (SAXException | IOException e) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         }
+    }
+
+    private Map<String, String> mapFromElement(Element root) throws OctopusIOException {
+        Map<String, String> result = new HashMap<String, String>();
+
+        NodeList tagNodes = root.getChildNodes();
+
+        //fetch tags from the list of tag nodes. Ignores empty values
+        for (int j = 0; j < tagNodes.getLength(); j++) {
+            Node tagNode = tagNodes.item(j);
+            if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
+                String key = tagNode.getNodeName();
+                if (key != null && key.length() > 0) {
+                    NodeList children = tagNode.getChildNodes();
+                    if (children.getLength() > 0) {
+                        String value = tagNode.getChildNodes().item(0).getNodeValue();
+                        result.put(key, value);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -178,29 +161,6 @@ public class GridEngineXmlParser {
 
         if (result.size() == 0) {
             throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
-        }
-
-        return result;
-    }
-
-    private Map<String, String> mapFromElement(Element root) throws OctopusIOException {
-        Map<String, String> result = new HashMap<String, String>();
-
-        NodeList tagNodes = root.getChildNodes();
-
-        //fetch tags from the list of tag nodes. Ignores empty values
-        for (int j = 0; j < tagNodes.getLength(); j++) {
-            Node tagNode = tagNodes.item(j);
-            if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
-                String key = tagNode.getNodeName();
-                if (key != null && key.length() > 0) {
-                    NodeList children = tagNode.getChildNodes();
-                    if (children.getLength() > 0) {
-                        String value = tagNode.getChildNodes().item(0).getNodeValue();
-                        result.put(key, value);
-                    }
-                }
-            }
         }
 
         return result;

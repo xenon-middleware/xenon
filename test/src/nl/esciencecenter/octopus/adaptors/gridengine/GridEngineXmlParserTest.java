@@ -16,10 +16,11 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -28,85 +29,167 @@ import java.util.Map;
 import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
+import org.apache.commons.io.Charsets;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineXmlParserTest {
 
+    private static String readFile(String path) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return Charsets.UTF_8.decode(ByteBuffer.wrap(encoded)).toString();
+    }
+
     @Test
-    public void testCheckVersion() throws Throwable {
-        File testFile = new File("test/fixtures/gridengine/jobs.xml");
+    public void test01a_checkVersion() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        parser.checkVersion(testFile);
+        parser.parseDocument(input);
     }
 
     @Test(expected = IncompatibleVersionException.class)
-    public void testCheckVersion_NoSchema_Exception() throws Throwable {
-        File testFile = new File("test/fixtures/gridengine/jobs-no-schema.xml");
+    public void test01b_checkVersion_NoSchema_Exception() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs-no-schema.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        parser.checkVersion(testFile);
+        parser.parseDocument(input);
     }
 
     @Test(expected = IncompatibleVersionException.class)
-    public void testCheckVersion_WrongSchema_Exception() throws Throwable {
-        File testFile = new File("test/fixtures/gridengine/jobs-wrong-schema.xml");
+    public void test01d_checkVersion_WrongSchema_ExceptionThrown() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs-wrong-schema.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        parser.checkVersion(testFile);
+        parser.parseDocument(input);
+    }
+    
+    @Test
+    public void test01d_checkVersion_WrongSchemaIgnoreVersion_Ignored() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs-wrong-schema.xml");
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(true);
+
+        parser.parseDocument(input);
     }
 
     @Test(expected = OctopusIOException.class)
-    public void testCheckVersion_EmptyFile_Exception() throws Throwable {
-        File testFile = new File("test/fixtures/gridengine/jobs-empty.xml");
+    public void test01c_checkVersion_EmptyFile_ExceptionThrown() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs-empty.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        parser.checkVersion(testFile);
+        parser.parseDocument(input);
     }
 
     @Test
-    public void testParseQueueInfo() throws Throwable {
+    public void test02a_parseQueueInfo_SomeQueues_Result() throws Throwable {
 
-        byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/queues.xml"));
-
-        String content = new String(encoded);
+        String input = readFile("test/fixtures/gridengine/queues.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        Map<String, Map<String, String>> result = parser.parseQueueInfos(content);
-
-        //FIXME: check equality fully, not only if there are info's at all...
+        Map<String, Map<String, String>> result = parser.parseQueueInfos(input);
 
         String[] queues = result.keySet().toArray(new String[0]);
         Arrays.sort(queues);
 
         assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
     }
+    
+    @Test(expected=OctopusIOException.class)
+    public void test02b_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
-    @Test
-    public void testParseJobInfo() throws Throwable {
-        byte[] encoded = Files.readAllBytes(Paths.get("test/fixtures/gridengine/jobs.xml"));
-
-        String content = new String(encoded);
-
-        System.err.println("parsing queue info from: " + content);
+        String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
-        Map<String, Map<String, String>> result = parser.parseJobInfos(content);
-
-        //FIXME: check equality fully, not only if there are info's at all...
-        assertEquals(9, result.size());
-
+        parser.parseQueueInfos(input);
     }
+    
+    @Test(expected=OctopusIOException.class)
+    public void test02c_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
+
+        String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
+
+        parser.parseQueueInfos(input);
+    }
+    
+    @Test(expected = OctopusIOException.class)
+    public void test02d_parseQueueInfo_queueEmptyName_exceptionThrown() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/queues-queue-empty-name.xml");
+
+        System.err.println("parsing queue info from: " + input);
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
+
+        parser.parseQueueInfos(input);
+    }
+
+
+    @Test(expected = OctopusIOException.class)
+    public void test02e_parseQueueInfo_queueWithoutName_exceptionThrown() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/queues-queue-without-name.xml");
+
+        System.err.println("parsing queue  info from: " + input);
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
+
+        parser.parseQueueInfos(input);
+    }
+
+
+
 
     @Test
-    public void testSomeMore() throws Throwable {
-        fail("need more tests");
+    public void test03a_parseJobInfo_SomeJobs_Result() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs.xml");
+
+        System.err.println("parsing queue info from: " + input);
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
+
+        String[] expectedJobIDs = new String[] { "583111", "583235", "583238", "583244", "583246", "583296", "583320", "583325",
+                "583302" };
+        Arrays.sort(expectedJobIDs);
+
+        Map<String, Map<String, String>> result = parser.parseJobInfos(input);
+
+        assertNotNull(result);
+        String[] resultJobIDs = result.keySet().toArray(new String[0]);
+        Arrays.sort(resultJobIDs);
+
+        assertArrayEquals(expectedJobIDs, resultJobIDs);
+    }
+    
+    
+    @Test(expected = OctopusIOException.class)
+    public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs-empty-jobnumber.xml");
+
+        System.err.println("parsing job info from: " + input);
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
+
+        parser.parseJobInfos(input);
     }
 
+
+    @Test(expected = OctopusIOException.class)
+    public void test03c_parseJobInfo_jobWithoutJobNumber_exceptionThrown() throws Throwable {
+        String input = readFile("test/fixtures/gridengine/jobs-without-jobnumber.xml");
+
+        System.err.println("parsing job info from: " + input);
+
+        GridEngineXmlParser parser = new GridEngineXmlParser(false);
+
+        parser.parseJobInfos(input);
+    }
 }
