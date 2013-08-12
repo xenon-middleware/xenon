@@ -194,7 +194,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         deletedJobs = new HashSet<Long>();
 
         //will run a few commands to fetch info
-        setupInfo = new GridEngineSetup(this, parser);
+        setupInfo = new GridEngineSetup(this);
 
         scheduler = new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
                 credential, getProperties(), false, false, true);

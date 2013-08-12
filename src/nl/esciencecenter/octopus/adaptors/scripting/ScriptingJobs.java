@@ -278,7 +278,6 @@ public class ScriptingJobs implements Jobs {
             try {
                 connection.close();
             } catch (OctopusIOException | OctopusException e) {
-                //FIXME: do something with this error, perhaps?
                 LOGGER.error("Error on closing connection to server", e);
             }
         }

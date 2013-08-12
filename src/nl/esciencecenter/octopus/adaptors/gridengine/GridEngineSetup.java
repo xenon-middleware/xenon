@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.gridengine.ParallelEnvironmentInfo.AllocationRule;
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
@@ -83,7 +84,7 @@ public class GridEngineSetup {
         return result;
     }
 
-    public GridEngineSetup(SchedulerConnection schedulerConnection, GridEngineXmlParser parser) throws OctopusIOException,
+    public GridEngineSetup(SchedulerConnection schedulerConnection) throws OctopusIOException,
             OctopusException {
 
         this.queueNames = getQueueNames(schedulerConnection);
@@ -170,24 +171,24 @@ public class GridEngineSetup {
                 + " and allocation rule \"{}\" with ppn {}", nodeCount, queueName, parallelEnvironmentName,
                 pe.getAllocationRule(), pe.getPpn());
 
-        switch (pe.getAllocationRule()) {
-        case PE_SLOTS:
+        AllocationRule allocationRule = pe.getAllocationRule();
+        if (allocationRule == AllocationRule.PE_SLOTS) {
             if (nodeCount > 1) {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
                         + " only supports single node parallel jobs");
             }
             return 1;
-        case FILL_UP:
+        } else if (allocationRule == AllocationRule.FILL_UP) {
             //we need to request all slots of a node before we get a new node. The number of slots per node is listed in the
             //queue info.
             return nodeCount * queue.getSlots();
-        case ROUND_ROBIN:
+        } else if (allocationRule == AllocationRule.ROUND_ROBIN) {
             //we should get a "new" node for each slot until no more slots remain.
             return nodeCount;
-        case INTEGER:
+        } else if (allocationRule == AllocationRule.INTEGER) {
             //Multiply the number of nodes we require with the number of slots on each host.
             return nodeCount * pe.getPpn();
-        default:
+        } else {
             throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "unknown pe allocation rule: " + pe.getAllocationRule());
         }
     }
