@@ -63,7 +63,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test
-    public void test01a_supportsScheme_DifferentCase_Matches() {
+    public void test01c_supportsScheme_DifferentCase_Matches() {
         String input = "JFg";
         String[] supported = new String[] { "jFg", "hik", "bla" };
 
@@ -253,7 +253,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_NullInfoMap_ExceptionThrown() throws OctopusException {
+    public void test04b_verifyJobInfo_NullInfoMap_ExceptionThrown() throws OctopusException {
         String jobID = "555";
 
         Job job = new FakeScriptingJob(jobID);
@@ -262,7 +262,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_NoJobID_ExceptionThrown() throws OctopusException {
+    public void test04c_verifyJobInfo_NoJobID_ExceptionThrown() throws OctopusException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
 
@@ -272,7 +272,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws OctopusException {
+    public void test04d_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws OctopusException {
         String jobID = "555";
 
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -285,7 +285,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void test04a_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws OctopusException {
+    public void test04e_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws OctopusException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -297,13 +297,7 @@ public class SchedulerConnectionTest {
     }
     
     @Test
-    public void test05a_verifyJobOptions() {
-        fail("implement");
-        //protected static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName) throws InvalidJobDescriptionException {
-    }
-    
-    @Test
-    public void test06a_identifiersAsCSList_Jobs_OutputString() {
+    public void test05a_identifiersAsCSList_Jobs_OutputString() {
         Job[] input = new Job[5];
         input[0] = new FakeScriptingJob("000");
         input[1] = new FakeScriptingJob("111");
@@ -319,7 +313,7 @@ public class SchedulerConnectionTest {
     }
 
     @Test
-    public void test06b_identifiersAsCSList_JobsWithNulls_OutputString() {
+    public void test05b_identifiersAsCSList_JobsWithNulls_OutputString() {
         Job[] input = new Job[8];
         input[0] = null;
         input[1] = new FakeScriptingJob("000");
