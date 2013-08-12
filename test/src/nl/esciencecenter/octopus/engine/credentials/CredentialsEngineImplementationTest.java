@@ -60,7 +60,7 @@ public class CredentialsEngineImplementationTest {
     public void testCertificate() throws Exception {
 
         CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
-        Credential c = ce.newCertificateCredential("ssh", null, "certfile", "username", "password".toCharArray());
+        Credential c = ce.newCertificateCredential("ssh", "certfile", "username", "password".toCharArray(), null);
 
         assertTrue(c instanceof CertificateCredentialImplementation);
 
@@ -78,7 +78,7 @@ public class CredentialsEngineImplementationTest {
     public void testPassword() throws Exception {
 
         CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
-        Credential c = ce.newPasswordCredential("ssh", null, "username", "password".toCharArray());
+        Credential c = ce.newPasswordCredential("ssh", "username", "password".toCharArray(), null);
 
         assertTrue(c instanceof PasswordCredentialImplementation);
 
@@ -95,7 +95,7 @@ public class CredentialsEngineImplementationTest {
     public void testProxy() throws Exception {
 
         CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
-        Credential c = ce.newProxyCredential("ssh", null, "host", 42, "username", "password".toCharArray());
+        Credential c = ce.newProxyCredential("ssh", "host", 42, "username", "password".toCharArray(), null);
 
         assertTrue(c instanceof ProxyCredentialImplementation);
 

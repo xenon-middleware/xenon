@@ -22,6 +22,7 @@ import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -37,13 +38,13 @@ public abstract class Adaptor {
 
     private final String name;
     private final String description;
-    private final String[] supportedSchemes;
-    private final OctopusPropertyDescription[] validProperties;
+    private final ImmutableArray<String> supportedSchemes;
+    private final ImmutableArray<OctopusPropertyDescription> validProperties;
     private final OctopusProperties properties;
     private final OctopusEngine octopusEngine;
 
-    protected Adaptor(OctopusEngine octopusEngine, String name, String description, String[] supportedSchemes,
-            OctopusPropertyDescription[] validProperties, OctopusProperties properties) throws OctopusException {
+    protected Adaptor(OctopusEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+            ImmutableArray<OctopusPropertyDescription> validProperties, OctopusProperties properties) throws OctopusException {
 
         super();
 
@@ -51,7 +52,13 @@ public abstract class Adaptor {
         this.name = name;
         this.description = description;
         this.supportedSchemes = supportedSchemes;
-        this.validProperties = validProperties;
+        
+        if (validProperties == null) {
+            this.validProperties = new ImmutableArray<>();
+        } else { 
+            this.validProperties = validProperties;
+        }
+         
         this.properties = properties;
     }
 
@@ -79,32 +86,32 @@ public abstract class Adaptor {
     }
 
     public OctopusPropertyDescription[] getSupportedProperties() {
-        return validProperties.clone();
+        return validProperties.asArray();
     }
 
-    public OctopusPropertyDescription[] getSupportedProperties(Level level) {
+    public ImmutableArray<OctopusPropertyDescription> getSupportedProperties(Level level) {
 
         ArrayList<OctopusPropertyDescription> tmp = new ArrayList<>();
 
-        for (int i = 0; i < validProperties.length; i++) {
+        for (int i = 0; i < validProperties.length(); i++) {
 
-            OctopusPropertyDescription d = validProperties[i];
+            OctopusPropertyDescription d = validProperties.get(i);
 
             if (d.getLevels().contains(level)) {
                 tmp.add(d);
             }
         }
 
-        return tmp.toArray(new OctopusPropertyDescription[tmp.size()]);
+        return new ImmutableArray<>(tmp);
     }
 
     public AdaptorStatus getAdaptorStatus() {
-        return new AdaptorStatusImplementation(name, description, supportedSchemes, getSupportedProperties(),
+        return new AdaptorStatusImplementation(name, description, supportedSchemes, validProperties,
                 getAdaptorSpecificInformation());
     }
 
     public String[] getSupportedSchemes() {
-        return supportedSchemes.clone();
+        return supportedSchemes.asArray();
     }
 
     @Override

@@ -15,27 +15,37 @@
  */
 package nl.esciencecenter.octopus.engine;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 
 public class AdaptorStatusImplementation implements AdaptorStatus {
 
     private final String name;
     private final String description;
-    private final String[] supportedSchemes;
-    private final OctopusPropertyDescription[] supportedProperties;
+    private final ImmutableArray<String> supportedSchemes;
+    private final ImmutableArray<OctopusPropertyDescription> supportedProperties;
     private final Map<String, String> adaptorSpecificInformation;
 
-    public AdaptorStatusImplementation(String name, String description, String[] supportedSchemes,
-            OctopusPropertyDescription[] supportedProperties, Map<String, String> adaptorSpecificInformation) {
+    public AdaptorStatusImplementation(String name, String description, ImmutableArray<String> supportedSchemes,
+            ImmutableArray<OctopusPropertyDescription> supportedProperties, Map<String, String> adaptorSpecificInformation) {
 
         super();
         this.name = name;
         this.description = description;
+        
+        if (supportedSchemes == null) { 
+            throw new IllegalArgumentException("Schemes is null!");
+        }
+        
         this.supportedSchemes = supportedSchemes;
+        
+        if (supportedProperties == null) { 
+            throw new IllegalArgumentException("SupportedProperties is null!");
+        }
+        
         this.supportedProperties = supportedProperties;
         this.adaptorSpecificInformation = adaptorSpecificInformation;
     }
@@ -52,17 +62,12 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
 
     @Override
     public String[] getSupportedSchemes() {
-        return supportedSchemes.clone();
+        return supportedSchemes.asArray();
     }
 
     @Override
     public OctopusPropertyDescription[] getSupportedProperties() {
-
-        if (supportedProperties == null) {
-            return new OctopusPropertyDescription[0];
-        }
-
-        return supportedProperties.clone();
+        return supportedProperties.asArray();
     }
 
     @Override
@@ -73,7 +78,7 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     @Override
     public String toString() {
         return "AdaptorStatusImplementation [name=" + name + ", description=" + description + ", supportedSchemes="
-                + Arrays.toString(supportedSchemes) + ", supportedProperties=" + Arrays.toString(supportedProperties)
-                + ", adaptorSpecificInformation=" + adaptorSpecificInformation + "]";
+                + supportedSchemes + ", supportedProperties=" + supportedProperties + ", adaptorSpecificInformation=" 
+                + adaptorSpecificInformation + "]";
     }
 }

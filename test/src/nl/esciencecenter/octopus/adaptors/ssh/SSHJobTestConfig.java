@@ -137,12 +137,12 @@ public class SSHJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", new HashMap<String, String>(), username, passwd);
+        return credentials.newPasswordCredential("ssh", username, passwd, new HashMap<String, String>());
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", new HashMap<String, String>(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
     }
 
     @Override

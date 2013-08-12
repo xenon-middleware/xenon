@@ -52,8 +52,8 @@ public class SshCredentials implements Credentials {
     }
 
     @Override
-    public Credential newCertificateCredential(String scheme, Map<String, String> properties, String certfile, String username,
-            char[] password) throws OctopusException {
+    public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
+            Map<String, String> properties) throws OctopusException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
 
@@ -61,7 +61,7 @@ public class SshCredentials implements Credentials {
     }
 
     @Override
-    public Credential newPasswordCredential(String scheme, Map<String, String> properties, String username, char[] password)
+    public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws OctopusException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
@@ -70,8 +70,8 @@ public class SshCredentials implements Credentials {
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, Map<String, String> properties, String host, int port, String username,
-            char[] password) throws OctopusException {
+    public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
+            Map<String, String> properties) throws OctopusException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
 

@@ -242,10 +242,12 @@ public class CopyEngine {
             return;
         }
 
-        AbsolutePath source = ac.copy.getSource();
-        AbsolutePath target = ac.copy.getTarget();
+        CopyImplementation copy = ac.getCopy();
+        
+        AbsolutePath source = copy.getSource();
+        AbsolutePath target = copy.getTarget();
 
-        LOGGER.debug("Resume copy from {} to {} verify={}", source.getPath(), target.getPath(), ac.verify);
+        LOGGER.debug("Resume copy from {} to {} verify={}", source.getPath(), target.getPath(), ac.mustVerify());
 
         if (!owner.exists(source)) {
             throw new NoSuchFileException(NAME, "Source " + source.getPath() + " does not exist!");
@@ -279,7 +281,7 @@ public class CopyEngine {
             return;
         }
 
-        if (ac.verify) {
+        if (ac.mustVerify()) {
             if (ac.isCancelled()) {
                 ac.setException(new IOException("Copy killed by user"));
                 return;
@@ -327,9 +329,11 @@ public class CopyEngine {
             return;
         }
 
-        AbsolutePath source = ac.copy.getSource();
-        AbsolutePath target = ac.copy.getTarget();
-
+        CopyImplementation copy = ac.getCopy();
+        
+        AbsolutePath source = copy.getSource();
+        AbsolutePath target = copy.getTarget();
+        
         LOGGER.debug("Append from {} to {} verify={}", source.getPath(), target.getPath());
 
         if (!owner.exists(source)) {
@@ -368,11 +372,13 @@ public class CopyEngine {
             return;
         }
 
-        AbsolutePath source = ac.copy.getSource();
-        AbsolutePath target = ac.copy.getTarget();
+        CopyImplementation copy = ac.getCopy();
+        
+        AbsolutePath source = copy.getSource();
+        AbsolutePath target = copy.getTarget();
 
-        boolean replace = (ac.mode == CopyOption.REPLACE);
-        boolean ignore = (ac.mode == CopyOption.IGNORE);
+        boolean replace = (ac.getMode() == CopyOption.REPLACE);
+        boolean ignore = (ac.getMode() == CopyOption.IGNORE);
 
         LOGGER.debug("Copy from {} to {} replace={} ignore={}", source.getPath(), target.getPath(), replace, ignore);
 
@@ -432,7 +438,10 @@ public class CopyEngine {
         LOGGER.debug("Start copy: {}", info);
 
         try {
-            switch (info.mode) {
+            
+            CopyOption mode = info.getMode(); 
+            
+            switch (mode) {
             case CREATE:
             case REPLACE:
             case IGNORE:
@@ -445,8 +454,8 @@ public class CopyEngine {
                 doResume(info);
                 break;
             default:
-                throw new OctopusIOException(NAME, "INTERNAL ERROR: Failed to recognise copy mode! (" + info.mode + " "
-                        + info.verify + ")");
+                throw new OctopusIOException(NAME, "INTERNAL ERROR: Failed to recognise copy mode! (" + mode + " "
+                        + info.mustVerify() + ")");
             }
         } catch (Exception e) {
             info.setException(e);
@@ -482,7 +491,7 @@ public class CopyEngine {
         LOGGER.debug("CopyEngine dequeueing copy");
 
         if (running != null) {
-            finished.put(running.copy.getUniqueID(), running);
+            finished.put(running.getUniqueID(), running);
             running = null;
             notifyAll();
         }
@@ -508,7 +517,7 @@ public class CopyEngine {
 
         LOGGER.debug("Waiting until copy {} is cancelled.", copyID);
 
-        while (running != null && copyID.equals(running.copy.getUniqueID())) {
+        while (running != null && running.hasID(copyID)) {
             try {
                 wait(POLLING_DELAY);
             } catch (InterruptedException e) {
@@ -529,7 +538,7 @@ public class CopyEngine {
 
         LOGGER.debug("Attempting to cancel copy {}.", copyID);
 
-        if (running != null && copyID.equals(running.copy.getUniqueID())) {
+        if (running != null && running.hasID(copyID)) {
             LOGGER.debug("Canceled copy {} is running,", copyID);
             running.cancel();
 
@@ -553,7 +562,7 @@ public class CopyEngine {
 
             CopyInfo c = it.next();
 
-            if (c.copy.getUniqueID().equals(copyID)) {
+            if (c.hasID(copyID)) {
                 it.remove();
                 LOGGER.debug("Canceled copy {} was queued.", copyID);
                 return new CopyStatusImplementation(copy, "KILLED", false, false, c.getBytesToCopy(), 0, new IOException(
@@ -581,7 +590,7 @@ public class CopyEngine {
         boolean isRunning = false;
         boolean isDone = false;
 
-        if (running != null && copyID.equals(running.copy.getUniqueID())) {
+        if (running != null && running.hasID(copyID)) {
             state = "RUNNING";
             ac = running;
             isRunning = true;
@@ -598,7 +607,7 @@ public class CopyEngine {
 
         if (ac == null) {
             for (CopyInfo c : pending) {
-                if (c.copy.getUniqueID().equals(copyID)) {
+                if (c.hasID(copyID)) {
                     ac = c;
                     state = "PENDING";
                     break;

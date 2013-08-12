@@ -126,8 +126,12 @@ public class LocalFileAttributesTest {
         assertFalse(att1.equals(att2));
 
         files.setPosixFilePermissions(path2, LocalUtils.octopusPermissions(PosixFilePermissions.fromString("rwxr--r--")));
+                
         att2 = new LocalFileAttributes(path2);
 
+        System.out.println("path1: " + att1);
+        System.out.println("path2: " + att2);
+        
         assertTrue(att1.equals(att2));
 
         files.delete(path1);

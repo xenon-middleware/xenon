@@ -180,12 +180,12 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", new HashMap<String, String>(), username, passwd);
+        return credentials.newPasswordCredential("slurm", username, passwd, new HashMap<String, String>());
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", new HashMap<String, String>(), username, "wrongpassword".toCharArray());
+        return credentials.newPasswordCredential("slurm", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
     }
 
     @Override

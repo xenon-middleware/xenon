@@ -56,16 +56,16 @@ public class SchedulerImplementation implements Scheduler {
         this.supportsInteractive = supportsInteractive;
         this.supportsBatch = supportsBatch;
 
-        if (queueNames == null) {
-            this.queueNames = new String[0];
-        } else {
-            this.queueNames = queueNames.clone();
-        }
-
         if (properties == null) {
             this.properties = new OctopusProperties();
         } else {
             this.properties = properties;
+        }
+
+        if (queueNames == null) {
+            this.queueNames = new String[0];
+        } else {
+            this.queueNames = Arrays.copyOf(queueNames, queueNames.length);
         }
     }
 

@@ -27,13 +27,13 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  * @version 1.0
  * @since 1.0
  */
-public class OctopusFactory {
+public final class OctopusFactory {
 
     /**
      * Constructor of OctopusFactory should never be used.
      */
-    OctopusFactory() {
-        //DO NOT USE
+    private OctopusFactory() {
+        // DO NOT USE
     }
 
     /**

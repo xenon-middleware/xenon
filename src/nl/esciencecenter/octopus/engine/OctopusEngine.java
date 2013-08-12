@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
@@ -35,7 +36,6 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementat
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
-import nl.esciencecenter.octopus.exceptions.IllegalPropertyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  * @since 1.0
  */
-public class OctopusEngine implements Octopus {
+public final class OctopusEngine implements Octopus {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OctopusEngine.class);
 
@@ -170,33 +170,33 @@ public class OctopusEngine implements Octopus {
         // Copy the map so we can manipulate it. 
         Map<String, String> tmp = new HashMap<>(properties);
 
-        Adaptor[] result = new Adaptor[4];
+        List<Adaptor> result = new ArrayList<>();
 
-        result[0] = new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX));
-        result[1] = new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX));
-        result[2] = new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX));
-        result[3] = new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX));
+        result.add(new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX)));
+        result.add(new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX)));
+        result.add(new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX)));
+        result.add(new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX)));
 
         // Check if there are any properties left. If so, this is a problem. 
         if (tmp.size() != 0) {
             throw new UnknownPropertyException("OctopusEngine", "Unknown properties: " + tmp);
         }
 
-        return result;
+        return result.toArray(new Adaptor[result.size()]);
     }
 
     private Map<String, String> extract(Map<String, String> source, String prefix) {
 
         HashMap<String, String> tmp = new HashMap<>();
 
-        Iterator<String> itt = source.keySet().iterator();
+        Iterator<Entry<String, String>> itt = source.entrySet().iterator();
 
         while (itt.hasNext()) {
 
-            String key = itt.next();
-
-            if (key.startsWith(prefix)) {
-                tmp.put(key, source.get(key));
+            Entry<String,String> e = itt.next();
+            
+            if (e.getKey().startsWith(prefix)) {
+                tmp.put(e.getKey(), e.getValue());
                 itt.remove();
             }
         }

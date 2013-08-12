@@ -49,11 +49,15 @@ import nl.esciencecenter.octopus.files.PosixFilePermission;
  * @version 1.0
  * @since 1.0
  */
-class LocalUtils {
+final class LocalUtils {
 
     public static final String LOCAL_JOB_URI = "local:///";
     public static final String LOCAL_FILE_URI = "file:///";
 
+    private LocalUtils() { 
+        // DO NOTE USE
+    }
+    
     static String getHome() throws OctopusException {
 
         String path = System.getProperty("user.home");
@@ -294,7 +298,7 @@ class LocalUtils {
                 throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was "
                         + killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             // Failed, so use the regular Java destroy.
             process.destroy();
         }

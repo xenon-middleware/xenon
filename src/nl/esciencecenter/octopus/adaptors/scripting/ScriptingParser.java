@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  * @author Niels Drost
  * 
  */
-public class ScriptingParser {
+public final class ScriptingParser {
 
     public static final String WHITESPACE_REGEX = "\\s+";
 
