@@ -154,6 +154,24 @@ public abstract class SchedulerConnection {
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
         }
+
+    }
+
+    protected static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName)
+            throws InvalidJobDescriptionException {
+
+        //check if all given job options are valid
+        for (String option : options.keySet()) {
+            boolean found = false;
+            for (String validOption : validOptions) {
+                if (validOption.equals(option)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new InvalidJobDescriptionException(adaptorName, "Given Job option \"" + option + "\" not supported");
+            }
+        }
     }
 
     /**
@@ -194,7 +212,20 @@ public abstract class SchedulerConnection {
                         + "\"");
             }
         }
+    }
 
+    protected static String identifiersAsCSList(Job[] jobs) {
+        String result = null;
+        for (Job job : jobs) {
+            if (job != null) {
+                if (result == null) {
+                    result = job.getIdentifier();
+                } else {
+                    result += "," + job.getIdentifier();
+                }
+            }
+        }
+        return result;
     }
 
     protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,

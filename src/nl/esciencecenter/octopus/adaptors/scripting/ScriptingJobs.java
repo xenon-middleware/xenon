@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of Octopus Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
- * in the adaptors using this class.
+ * in the adaptors.
  * 
  * @author Niels Drost
  * 
@@ -278,7 +278,6 @@ public class ScriptingJobs implements Jobs {
             try {
                 connection.close();
             } catch (OctopusIOException | OctopusException e) {
-                //FIXME: do something with this error, perhaps?
                 LOGGER.error("Error on closing connection to server", e);
             }
         }

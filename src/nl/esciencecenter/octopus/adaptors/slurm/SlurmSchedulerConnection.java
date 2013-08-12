@@ -70,7 +70,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private static final String RUNNING_STATE = "RUNNING";
 
     //get an exit code from the scontrol "ExitCode" output field
-    protected static Integer exitcodeFromString(String value) throws OctopusException {
+    static Integer exitcodeFromString(String value) throws OctopusException {
         if (value == null) {
             return null;
         }
@@ -86,7 +86,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     }
 
-    protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
+    static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
         if (jobInfo == null) {
@@ -119,7 +119,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws OctopusException {
+    static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws OctopusException {
         if (jobInfo == null) {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
@@ -154,7 +154,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
+    static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
 
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
@@ -171,7 +171,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
     }
 
-    protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName,
+    static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName,
             Scheduler scheduler) {
         Map<String, String> queueInfo = info.get(queueName);
 
@@ -183,26 +183,12 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
     }
 
-    protected static String identifiersAsCSList(Job[] jobs) {
-        String result = null;
-        for (Job job : jobs) {
-            if (job != null) {
-                if (result == null) {
-                    result = job.getIdentifier();
-                } else {
-                    result += "," + job.getIdentifier();
-                }
-            }
-        }
-        return result;
-    }
-
     //failed also implies done
-    protected static boolean isDoneState(String state) {
+    static boolean isDoneState(String state) {
         return state.equals(DONE_STATE) || isFailedState(state);
     }
 
-    protected static boolean isFailedState(String state) {
+    static boolean isFailedState(String state) {
         for (String validState : FAILED_STATES) {
             if (state.startsWith(validState)) {
                 return true;
@@ -211,20 +197,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return false;
     }
 
-    protected static void verifyJobDescription(JobDescription description) throws OctopusException {
-        //check if all given job options make sense
-        for (String option : description.getJobOptions().keySet()) {
-            boolean found = false;
-            for (String validOption : VALID_JOB_OPTIONS) {
-                if (validOption.equals(option)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Given Job option \"" + option
-                        + "\" not supported");
-            }
-        }
+    static void verifyJobDescription(JobDescription description) throws OctopusException {
+        SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, SlurmAdaptor.ADAPTOR_NAME);
 
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
@@ -393,7 +367,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException, OctopusIOException {
         String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs="
-                + identifiersAsCSList(jobs));
+                + SchedulerConnection.identifiersAsCSList(jobs));
 
         return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
                 "*", "~");
@@ -416,7 +390,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         //but it may produce output on stderr when it finds non-standard lines in the accounting log
         RemoteCommandRunner runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
                 + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
-                + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + identifiersAsCSList(jobs));
+                + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + SchedulerConnection.identifiersAsCSList(jobs));
 
         if (runner.getExitCode() != 0) {
             throw new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
