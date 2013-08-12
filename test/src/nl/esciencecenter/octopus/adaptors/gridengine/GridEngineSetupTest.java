@@ -175,7 +175,7 @@ public class GridEngineSetupTest {
     public void test03_qconfPeDetailsArguments() {
         String[] input = new String[] { "some.pe", "other.pe", "this.pe", "that.pe" };
 
-        String[] expected = new String[] { "-pe", "some.pe", "-pe", "other.pe", "-pe", "this.pe", "-pe", "that.pe" };
+        String[] expected = new String[] { "-sp", "some.pe", "-sp", "other.pe", "-sp", "this.pe", "-sp", "that.pe" };
         
         String[] result = GridEngineSetup.qconfPeDetailsArguments(input);
         

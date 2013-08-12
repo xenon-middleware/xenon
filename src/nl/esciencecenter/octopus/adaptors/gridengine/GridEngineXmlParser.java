@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -58,14 +57,14 @@ public class GridEngineXmlParser {
 
     private final boolean ignoreVersion;
 
-    GridEngineXmlParser(boolean ignoreVersion) throws OctopusIOException {
+    GridEngineXmlParser(boolean ignoreVersion) throws OctopusException {
         this.ignoreVersion = ignoreVersion;
 
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
         }
     }
 
@@ -96,12 +95,14 @@ public class GridEngineXmlParser {
             checkVersion(result);
 
             return result;
-        } catch (SAXException | IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+        } catch (SAXException e) {
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+        } catch (IOException e) {
+            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not read xml file", e);
         }
     }
 
-    private Map<String, String> mapFromElement(Element root) throws OctopusIOException {
+    private Map<String, String> mapFromElement(Element root) {
         Map<String, String> result = new HashMap<String, String>();
 
         NodeList tagNodes = root.getChildNodes();
@@ -135,7 +136,7 @@ public class GridEngineXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseQueueInfos(String input) throws OctopusIOException, OctopusException {
+    Map<String, Map<String, String>> parseQueueInfos(String input) throws OctopusException, OctopusIOException {
         Document document = parseDocument(input);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
@@ -152,7 +153,7 @@ public class GridEngineXmlParser {
                 String queueName = queueInfo.get("name");
 
                 if (queueName == null || queueName.length() == 0) {
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
 
                 result.put(queueName, queueInfo);
@@ -160,7 +161,7 @@ public class GridEngineXmlParser {
         }
 
         if (result.size() == 0) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
         return result;
@@ -178,7 +179,7 @@ public class GridEngineXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusIOException, OctopusException {
+    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusException, OctopusIOException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         Document document = parseDocument(data);
@@ -203,7 +204,7 @@ public class GridEngineXmlParser {
                 String jobID = jobInfo.get("JB_job_number");
 
                 if (jobID == null || jobID.length() == 0) {
-                    throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
+                    throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
                 result.put(jobID, jobInfo);

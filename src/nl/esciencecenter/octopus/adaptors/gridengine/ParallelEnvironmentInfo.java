@@ -65,32 +65,24 @@ class ParallelEnvironmentInfo {
         if (allocationValue == null) {
             throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for parallel environment "
                     + name);
-        }
-
-        switch (allocationValue) {
-        case ALLOCATION_PE_SLOTS:
+        } else if (allocationValue.equals(ALLOCATION_PE_SLOTS)) {
             allocationRule = AllocationRule.PE_SLOTS;
             ppn = 0;
-            break;
-        case ALLOCATION_ROUND_ROBIN:
+        } else if (allocationValue.equals(ALLOCATION_ROUND_ROBIN)) {
             allocationRule = AllocationRule.ROUND_ROBIN;
             ppn = 0;
-            break;
-        case ALLOCATION_FILL_UP:
+        } else if (allocationValue.equals(ALLOCATION_FILL_UP)) {
             allocationRule = AllocationRule.FILL_UP;
             ppn = 0;
-            break;
-        default:
+        } else {
             allocationRule = AllocationRule.INTEGER;
-
             try {
                 ppn = Integer.parseInt(allocationValue);
             } catch (NumberFormatException e) {
                 throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse allocation for parallel environment \""
-                        + name + "\", expected a number, got " + allocationValue, e);
+                        + name + "\", expected a number, got \"" + allocationValue + "\"", e);
             }
         }
-
     }
 
     /**
@@ -114,13 +106,14 @@ class ParallelEnvironmentInfo {
     public AllocationRule getAllocationRule() {
         return allocationRule;
     }
-    
+
     public int getPpn() {
         return ppn;
     }
 
     @Override
     public String toString() {
-        return "ParallelEnvironmentInfo [name=" + name + ", slots=" + slots + ", allocationRule=" + allocationRule + "]";
+        return "ParallelEnvironmentInfo [name=" + name + ", slots=" + slots + ", allocationRule=" + allocationRule + ", ppn="
+                + ppn + "]";
     }
 }

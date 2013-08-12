@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -27,7 +26,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 import org.apache.commons.io.Charsets;
 import org.junit.FixMethodOrder;
@@ -78,7 +77,7 @@ public class GridEngineXmlParserTest {
         parser.parseDocument(input);
     }
 
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test01c_checkVersion_EmptyFile_ExceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/jobs-empty.xml");
 
@@ -102,7 +101,7 @@ public class GridEngineXmlParserTest {
         assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
     }
     
-    @Test(expected=OctopusIOException.class)
+    @Test(expected=OctopusException.class)
     public void test02b_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
         String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
@@ -112,7 +111,7 @@ public class GridEngineXmlParserTest {
         parser.parseQueueInfos(input);
     }
     
-    @Test(expected=OctopusIOException.class)
+    @Test(expected=OctopusException.class)
     public void test02c_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
         String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
@@ -122,7 +121,7 @@ public class GridEngineXmlParserTest {
         parser.parseQueueInfos(input);
     }
     
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test02d_parseQueueInfo_queueEmptyName_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/queues-queue-empty-name.xml");
 
@@ -134,7 +133,7 @@ public class GridEngineXmlParserTest {
     }
 
 
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test02e_parseQueueInfo_queueWithoutName_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/queues-queue-without-name.xml");
 
@@ -170,7 +169,7 @@ public class GridEngineXmlParserTest {
     }
     
     
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/jobs-empty-jobnumber.xml");
 
@@ -182,7 +181,7 @@ public class GridEngineXmlParserTest {
     }
 
 
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test03c_parseJobInfo_jobWithoutJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/jobs-without-jobnumber.xml");
 
