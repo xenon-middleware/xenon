@@ -154,7 +154,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setProcessesPerNode(2);
         //FIXME: ugly config cast
         description.addJobOption("parallel.environment", ((GridEngineJobTestConfig) config).getParallelEnvironment());
-        description.setQueueName("all.q");
+        description.setQueueName(config.getDefaultQueueName());
 
         Job job = jobs.submitJob(scheduler, description);
 

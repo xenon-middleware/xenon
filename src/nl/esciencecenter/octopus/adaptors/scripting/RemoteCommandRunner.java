@@ -73,6 +73,7 @@ public class RemoteCommandRunner {
         description.setInteractive(true);
         description.setExecutable(executable);
         description.setArguments(arguments);
+        description.setQueueName("unlimited");
 
         Job job = octopus.jobs().submitJob(scheduler, description);
 

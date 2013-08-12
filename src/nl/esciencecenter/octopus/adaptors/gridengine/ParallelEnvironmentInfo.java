@@ -27,11 +27,20 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
  */
 class ParallelEnvironmentInfo {
 
+    public enum AllocationRule {
+        INTEGER, PE_SLOTS, ROUND_ROBIN, FILL_UP;
+    }
+
+    public static final String ALLOCATION_PE_SLOTS = "$pe_slots";
+    public static final String ALLOCATION_ROUND_ROBIN = "$round_robin";
+    public static final String ALLOCATION_FILL_UP = "$fill_up";
+
     private final String name;
     private final int slots;
-    private final String allocationRule;
+    private final AllocationRule allocationRule;
+    private final int ppn;
 
-    protected ParallelEnvironmentInfo(Map<String, String> info) throws OctopusException {
+    ParallelEnvironmentInfo(Map<String, String> info) throws OctopusException {
         name = info.get("pe_name");
 
         if (name == null) {
@@ -51,12 +60,39 @@ class ParallelEnvironmentInfo {
                     + ", got " + slotsValue, e);
         }
 
-        allocationRule = info.get("allocation_rule");
+        String allocationValue = info.get("allocation_rule");
 
-        if (allocationRule == null) {
+        if (allocationValue == null) {
             throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for parallel environment "
                     + name);
+        } else if (allocationValue.equals(ALLOCATION_PE_SLOTS)) {
+            allocationRule = AllocationRule.PE_SLOTS;
+            ppn = 0;
+        } else if (allocationValue.equals(ALLOCATION_ROUND_ROBIN)) {
+            allocationRule = AllocationRule.ROUND_ROBIN;
+            ppn = 0;
+        } else if (allocationValue.equals(ALLOCATION_FILL_UP)) {
+            allocationRule = AllocationRule.FILL_UP;
+            ppn = 0;
+        } else {
+            allocationRule = AllocationRule.INTEGER;
+            try {
+                ppn = Integer.parseInt(allocationValue);
+            } catch (NumberFormatException e) {
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse allocation for parallel environment \""
+                        + name + "\", expected a number, got \"" + allocationValue + "\"", e);
+            }
         }
+    }
+
+    /**
+     * Testing constructor.
+     */
+    ParallelEnvironmentInfo(String name, int slots, AllocationRule allocationRule, int ppn) {
+        this.name = name;
+        this.slots = slots;
+        this.allocationRule = allocationRule;
+        this.ppn = ppn;
     }
 
     public String getName() {
@@ -67,12 +103,17 @@ class ParallelEnvironmentInfo {
         return slots;
     }
 
-    public String getAllocationRule() {
+    public AllocationRule getAllocationRule() {
         return allocationRule;
+    }
+
+    public int getPpn() {
+        return ppn;
     }
 
     @Override
     public String toString() {
-        return "ParallelEnvironmentInfo [name=" + name + ", slots=" + slots + ", allocationRule=" + allocationRule + "]";
+        return "ParallelEnvironmentInfo [name=" + name + ", slots=" + slots + ", allocationRule=" + allocationRule + ", ppn="
+                + ppn + "]";
     }
 }

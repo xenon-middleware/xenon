@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.adaptors.gridengine.ParallelEnvironmentInfo.AllocationRule;
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
@@ -43,22 +44,30 @@ public class GridEngineSetup {
     private final Map<String, QueueInfo> queues;
 
     private final Map<String, ParallelEnvironmentInfo> parallelEnvironments;
-
-    public GridEngineSetup(SchedulerConnection schedulerConnection, GridEngineXmlParser parser) throws OctopusIOException,
-            OctopusException {
-
+    
+    /**
+     * generate arguments to list details of all parallel environments given
+     * 
+     * @param parallelEnvironmentNames
+     *            names of parallel environments to list
+     * @return a list of all qconf arguments needed to list all parallel environments
+     */
+    static String[] qconfPeDetailsArguments(String[] parallelEnvironmentNames) {
+        String[] result = new String[parallelEnvironmentNames.length * 2];
+        for (int i = 0; i < parallelEnvironmentNames.length; i++) {
+            result[2 * i] = "-sp";
+            result[(2 * i) + 1] = parallelEnvironmentNames[i];
+        }
+        return result;
+    }
+    
+    private static String[] getQueueNames(SchedulerConnection schedulerConnection) throws OctopusIOException, OctopusException {
         String queueListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sql");
 
-        this.queueNames = ScriptingParser.parseList(queueListOutput);
-
-        this.queues = getQueues(queueNames, schedulerConnection);
-
-        this.parallelEnvironments = getParallelEnvironments(schedulerConnection);
-
-        LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
+        return ScriptingParser.parseList(queueListOutput);
     }
 
-    private Map<String, QueueInfo> getQueues(String[] queueNames, SchedulerConnection schedulerConnection)
+    private static Map<String, QueueInfo> getQueues(String[] queueNames, SchedulerConnection schedulerConnection)
             throws OctopusIOException, OctopusException {
         String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
@@ -75,28 +84,24 @@ public class GridEngineSetup {
         return result;
     }
 
-    /**
-     * generate arguments to list details of all parallel environments given
-     * 
-     * @param parallelEnvironmentNames
-     *            names of parallel environments to list
-     * @return a list of all qconf arguments needed to list all parallel environments
-     */
-    private static String[] qconfPeDetailsArguments(String[] parallelEnvironmentNames) {
-        String[] result = new String[parallelEnvironmentNames.length * 2];
-        for (int i = 0; i < parallelEnvironmentNames.length; i++) {
-            result[2 * i] = "-sp";
-            result[(2 * i) + 1] = parallelEnvironmentNames[i];
-        }
-        return result;
-    }
+    public GridEngineSetup(SchedulerConnection schedulerConnection) throws OctopusIOException,
+            OctopusException {
 
-    private Map<String, ParallelEnvironmentInfo> getParallelEnvironments(SchedulerConnection schedulerConnection)
+        this.queueNames = getQueueNames(schedulerConnection);
+
+        this.queues = getQueues(queueNames, schedulerConnection);
+
+        this.parallelEnvironments = getParallelEnvironments(schedulerConnection);
+
+        LOGGER.debug("Created setup info, queues = {}, parallel environments = {}", this.queues, this.parallelEnvironments);
+    }
+    
+    private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(SchedulerConnection schedulerConnection)
             throws OctopusIOException, OctopusException {
         //first retrieve a list of parallel environments
         RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
 
-        //Qconf returns an error if there are no parallel environments
+        //qconf returns an error if there are no parallel environments
         if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
             return new HashMap<String, ParallelEnvironmentInfo>();
         }
@@ -124,6 +129,22 @@ public class GridEngineSetup {
         return result;
     }
 
+    /**
+     * Testing constructor.
+     * 
+     * @param queueNames
+     *            queue names to use.
+     * @param queues
+     *            queues to use.
+     * @param parallelEnvironments
+     *            parallel environments to use.
+     */
+    GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments) {
+        this.queueNames = queueNames;
+        this.queues = queues;
+        this.parallelEnvironments = parallelEnvironments;
+    }
+
     public String[] getQueueNames() {
         return queueNames.clone();
     }
@@ -133,10 +154,10 @@ public class GridEngineSetup {
      * give is dependent on the parallel environment settings.
      */
     int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws OctopusException {
-        ParallelEnvironmentInfo environment = parallelEnvironments.get(parallelEnvironmentName);
+        ParallelEnvironmentInfo pe = parallelEnvironments.get(parallelEnvironmentName);
         QueueInfo queue = queues.get(queueName);
 
-        if (environment == null) {
+        if (pe == null) {
             throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "requested parallel environment \""
                     + parallelEnvironmentName + "\" cannot be found at server");
         }
@@ -146,40 +167,29 @@ public class GridEngineSetup {
                     + "\" cannot be found at server");
         }
 
-        String allocationRule = environment.getAllocationRule();
+        LOGGER.debug("Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\""
+                + " and allocation rule \"{}\" with ppn {}", nodeCount, queueName, parallelEnvironmentName,
+                pe.getAllocationRule(), pe.getPpn());
 
-        LOGGER.debug(
-                "Calculating slots to get {} nodes in queue \"{}\" with parallel environment \"{}\" and allocation rule \"{}\"",
-                nodeCount, queueName, parallelEnvironmentName, allocationRule);
-
-        if (allocationRule == null) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME,
-                    "Cannot determine allocation rule for parallel environment " + parallelEnvironmentName);
-        } else if (allocationRule.equals("$pe_slots")) {
+        AllocationRule allocationRule = pe.getAllocationRule();
+        if (allocationRule == AllocationRule.PE_SLOTS) {
             if (nodeCount > 1) {
-                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel envrironment " + parallelEnvironmentName
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
                         + " only supports single node parallel jobs");
             }
             return 1;
-        } else if (allocationRule.equals("$fill_up")) {
+        } else if (allocationRule == AllocationRule.FILL_UP) {
             //we need to request all slots of a node before we get a new node. The number of slots per node is listed in the
             //queue info.
             return nodeCount * queue.getSlots();
-        } else if (environment.getAllocationRule().equals("$round_robin")) {
+        } else if (allocationRule == AllocationRule.ROUND_ROBIN) {
             //we should get a "new" node for each slot until no more slots remain.
             return nodeCount;
+        } else if (allocationRule == AllocationRule.INTEGER) {
+            //Multiply the number of nodes we require with the number of slots on each host.
+            return nodeCount * pe.getPpn();
         } else {
-            //the allocation rule should be an integer
-            try {
-                int processesPerHost = Integer.parseInt(allocationRule);
-
-                //Multiply the number of nodes we require with the number of slots on each host.
-                return nodeCount * processesPerHost;
-            } catch (NumberFormatException e) {
-                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Illegal allocation rule \"" + allocationRule
-                        + "\" in parallel environment \"" + parallelEnvironmentName + "\"", e);
-            }
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "unknown pe allocation rule: " + pe.getAllocationRule());
         }
-
     }
 }
