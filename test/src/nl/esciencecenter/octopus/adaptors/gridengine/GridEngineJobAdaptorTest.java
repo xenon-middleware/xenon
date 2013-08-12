@@ -16,7 +16,9 @@
 
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.OutputStream;
 import java.net.URI;
@@ -131,6 +133,11 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
     @Test
     public void ge_test04_parallel_batchJob() throws Exception {
+        String parallelEnvironment = ((GridEngineJobTestConfig) config).getParallelEnvironment();
+        
+        //skip test if no parallel environment configured
+        assumeTrue(parallelEnvironment != null);
+        
         String message = "Hello World! Test GE 04";
 
         String workingDir = getWorkingDir("ge_test04");
@@ -152,8 +159,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setArguments(message);
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
-        //FIXME: ugly config cast
-        description.addJobOption("parallel.environment", ((GridEngineJobTestConfig) config).getParallelEnvironment());
+        description.addJobOption("parallel.environment", parallelEnvironment);
         description.setQueueName(config.getDefaultQueueName());
 
         Job job = jobs.submitJob(scheduler, description);
@@ -181,7 +187,8 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         String[] lines = outputContent.split("\\r?\\n");
 
-        assertTrue(lines.length == 4);
+        assertEquals("output should be exactly 4 lines", 4, lines.length);
+        
         for (String line : lines) {
             assertTrue(line.equals(message));
         }

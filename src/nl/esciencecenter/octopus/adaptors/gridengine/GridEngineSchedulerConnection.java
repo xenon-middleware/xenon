@@ -108,7 +108,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         Integer exitcode = null;
         Exception exception = null;
         String state = "done";
-        
+
         if (info == null) {
             return null;
         }
@@ -121,8 +121,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         try {
             exitcode = Integer.parseInt(info.get("exit_status"));
         } catch (NumberFormatException e) {
-            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job "
-                    + job.getIdentifier() + " from string " + exitcodeString, e);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
+                    + " from string " + exitcodeString, e);
 
         }
 
@@ -142,7 +142,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws OctopusException {
         boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
-        
+
         if (jobInfo == null) {
             return null;
         }
@@ -221,19 +221,19 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         for (String identifier : identifiers) {
             lastSeenMap.put(identifier, currentTime);
         }
-        
+
         long expiredTime = currentTime + accountingGraceTime;
-        
+
         Iterator<Entry<String, Long>> iterator = lastSeenMap.entrySet().iterator();
 
         while (iterator.hasNext()) {
             Entry<String, Long> entry = iterator.next();
-            
+
             if (entry.getValue() > expiredTime) {
                 iterator.remove();
             }
         }
-        
+
     }
 
     private synchronized boolean haveRecentlySeen(String identifier) {
@@ -272,11 +272,13 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
-        if (queueNames.length == 0) {
+    public Job[] getJobs(String... requestedQueueNames) throws OctopusIOException, OctopusException {
+        String[] queueNames;
+        if (requestedQueueNames.length == 0) {
             queueNames = getQueueNames();
         } else {
-            checkQueueNames(queueNames);
+            checkQueueNames(requestedQueueNames);
+            queueNames = requestedQueueNames;
         }
 
         ArrayList<Job> result = new ArrayList<Job>();
@@ -305,7 +307,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         return resultArray;
     }
-    
+
     @Override
     public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
@@ -327,7 +329,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
-        
+
         if (queueNames.length == 0) {
             queueNames = getQueueNames();
         }
@@ -510,13 +512,17 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         JobStatus[] result = new JobStatus[jobs.length];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = getJobStatus(info, jobs[i]);
+            if (jobs[i] == null) {
+                result[i] = null;
+            } else {
+                result[i] = getJobStatus(info, jobs[i]);
 
-            //this job really does not exist. set it to an error state.
-            if (result[i] == null) {
-                Exception exception = new NoSuchJobException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + jobs[i].getIdentifier()
-                        + " not found on server");
-                result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
+                //this job really does not exist. set it to an error state.
+                if (result[i] == null) {
+                    Exception exception = new NoSuchJobException(GridEngineAdaptor.ADAPTOR_NAME, "Job " + jobs[i].getIdentifier()
+                            + " not found on server");
+                    result[i] = new JobStatusImplementation(jobs[i], null, null, exception, false, false, null);
+                }
             }
         }
         return result;

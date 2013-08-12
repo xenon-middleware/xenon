@@ -183,8 +183,11 @@ public class GridEngineSetup {
             //queue info.
             return nodeCount * queue.getSlots();
         } else if (allocationRule == AllocationRule.ROUND_ROBIN) {
-            //we should get a "new" node for each slot until no more slots remain.
-            return nodeCount;
+            if (nodeCount > 1) {
+                throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
+                        + " only supports single node parallel jobs, as the round robin allocation rule places jobs on a undeterministic number of nodes");
+            }
+            return 1;
         } else if (allocationRule == AllocationRule.INTEGER) {
             //Multiply the number of nodes we require with the number of slots on each host.
             return nodeCount * pe.getPpn();
