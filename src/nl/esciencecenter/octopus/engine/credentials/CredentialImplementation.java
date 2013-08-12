@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.engine.credentials;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -48,7 +49,7 @@ public abstract class CredentialImplementation implements Credential {
         this.uniqueID = uniqueID;
 
         if (password != null) {
-            this.password = password.clone();
+            this.password = Arrays.copyOf(password, password.length);
         } else {
             this.password = null;
         }

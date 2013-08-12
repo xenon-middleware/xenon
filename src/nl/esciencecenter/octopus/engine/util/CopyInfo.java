@@ -28,9 +28,9 @@ import nl.esciencecenter.octopus.files.CopyOption;
  */
 public class CopyInfo {
 
-    public final CopyImplementation copy;
-    public final CopyOption mode;
-    public final boolean verify;
+    private final CopyImplementation copy;
+    private final CopyOption mode;
+    private final boolean verify;
 
     private Exception exception;
     private boolean cancel = false;
@@ -44,6 +44,27 @@ public class CopyInfo {
         this.verify = verify;
     }
 
+    public CopyImplementation getCopy() {
+        return copy;
+    }
+
+    public CopyOption getMode() {
+        return mode;
+    }
+
+    public boolean mustVerify() {
+        return verify;
+    }
+
+    public boolean hasID(String copyID) { 
+        return copy.hasID(copyID);
+    }
+    
+    public String getUniqueID() { 
+        return copy.getUniqueID();
+    }
+    
+    
     public synchronized Exception getException() {
         return exception;
     }

@@ -298,7 +298,7 @@ final class LocalUtils {
                 throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was "
                         + killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             // Failed, so use the regular Java destroy.
             process.destroy();
         }

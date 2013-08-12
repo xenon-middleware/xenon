@@ -55,4 +55,8 @@ public class CopyImplementation implements Copy {
     public AbsolutePath getTarget() {
         return target;
     }
+    
+    public boolean hasID(String copyID) { 
+        return uniqueID.equals(copyID);
+    }
 }
