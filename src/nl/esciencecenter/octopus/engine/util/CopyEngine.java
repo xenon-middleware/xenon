@@ -270,11 +270,11 @@ public class CopyEngine {
         FileAttributes targetAtt = owner.getAttributes(target);
 
         if (targetAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Target " + target.getPath() + " is a directory");
+            throw new IllegalTargetPathException(NAME, "Target " + target.getPath() + " is a directory");
         }
 
         if (targetAtt.isSymbolicLink()) {
-            throw new IllegalSourcePathException(NAME, "Target " + target.getPath() + " is a link");
+            throw new IllegalTargetPathException(NAME, "Target " + target.getPath() + " is a link");
         }
 
         if (source.normalize().equals(target.normalize())) {

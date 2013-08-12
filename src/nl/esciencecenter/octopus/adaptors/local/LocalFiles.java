@@ -379,6 +379,17 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return home;
     }
 
+    private CopyOption checkMode(CopyOption previous, CopyOption current) throws UnsupportedOperationException { 
+        
+        if (previous != null && previous != current) {
+            throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + previous + " and " + 
+                    current);
+        }
+
+        return current;
+    }
+    
+    
     @Override
     public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException,
             UnsupportedOperationException {
@@ -391,44 +402,11 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         for (CopyOption opt : options) {
             switch (opt) {
             case CREATE:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and CREATE");
-                }
-
-                mode = opt;
-                break;
             case REPLACE:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and REPLACE");
-                }
-
-                mode = opt;
-                break;
             case APPEND:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and APPEND");
-                }
-
-                mode = opt;
-                break;
             case RESUME:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and RESUME");
-                }
-
-                mode = opt;
-                break;
             case IGNORE:
-                if (mode != null && mode != opt) {
-                    throw new UnsupportedOperationException(LocalAdaptor.ADAPTOR_NAME, "Conflicting copy options: " + mode
-                            + " and RESUME");
-                }
-
-                mode = opt;
+                mode = checkMode(mode, opt);
                 break;
             case VERIFY:
                 verify = true;

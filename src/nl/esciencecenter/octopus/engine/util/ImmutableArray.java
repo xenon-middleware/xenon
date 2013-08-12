@@ -19,6 +19,7 @@ package nl.esciencecenter.octopus.engine.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -37,6 +38,11 @@ public class ImmutableArray<T> implements Iterable<T> {
 
         @Override
         public T next() {
+            
+            if (index >= data.length) { 
+                throw new NoSuchElementException("No more elements in ImmutableArray!");
+            }
+            
             return data[index++];
         }
 
