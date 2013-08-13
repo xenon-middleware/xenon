@@ -44,7 +44,7 @@ public interface Jobs {
      * @param credential
      *            the Credentials to use to get access to the Scheduler.
      * @param properties
-     *            optional properties to use when creating the Scheduler.
+     *            optional properties to configure the Scheduler when it is created.
      * 
      * @return the new Scheduler.
      * 
@@ -100,7 +100,7 @@ public interface Jobs {
     void close(Scheduler scheduler) throws OctopusException, OctopusIOException;
 
     /**
-     * Test is a Scheduler is open.
+     * Test if a Scheduler is open.
      * 
      * @param scheduler
      *            the Scheduler to test.
@@ -243,13 +243,13 @@ public interface Jobs {
 
     /**
      * Get the status of all specified <code>jobs</code>.
-     * 
+     * <p>
      * The array of <code>JobStatus</code> contains one entry for each of the <code>jobs</code>. The order of the elements in the
      * returned <code>JobStatus</code> array corresponds to the order in which the <code>jobs</code> are passed as parameters. If
      * a <code>job</code> is <code>null</code>, the corresponding entry in the <code>JobStatus</code> array will also be
      * <code>null</code>. If the retrieval of the <code>JobStatus</code> fails for a job, the exception will be stored in the
      * corresponding <code>JobsStatus</code> entry.
-     * 
+     * </p>
      * @param jobs
      *            the jobs for which to retrieve the status.
      * 
@@ -278,14 +278,15 @@ public interface Jobs {
 
     /**
      * Cancel a job.
-     * 
-     * A status is returned that indicates the state of the job after the cancel. If the jobs was already done it cannot be killed
-     * afterwards.
-     * 
-     * A JobStatus is returned that can be used to determine the state of the job after cancelJob returns. Note that it may take
-     * some time before the job is actually terminated. The <code>waitUntilDone</code> method can be used to wait until the job is
-     * terminated.
-     * 
+     * <p>
+     * A status is returned that indicates the state of the job after the cancel. If the job was already done it cannot be 
+     * cancelled.
+     * </p>
+     * <p>
+     * A {@link JobStatus} is returned that can be used to determine the state of the job after cancelJob returns. Note that it 
+     * may take some time before the job has actually terminated. The {@link #waitUntilDone(Job, long) waitUntilDone} method can 
+     * be used to wait until the job is terminated.
+     * </p>
      * @param job
      *            the job to kill.
      * @return the status of the Job.
@@ -301,14 +302,16 @@ public interface Jobs {
 
     /**
      * Wait until a job is done or until a timeout expires.
-     * 
+     * <p>
      * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the timeout
      * expires, the job will continue to run normally.
-     * 
+     * </p>
+     * <p>
      * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
-     * 
+     * </p>
+     * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
-     * 
+     * </p>
      * @param job
      *            the job.
      * @param timeout
@@ -326,15 +329,17 @@ public interface Jobs {
 
     /**
      * Wait for as long a job is waiting in a queue, or until a timeout expires.
-     * 
+     * <p>
      * This method will return as soon as the job is no longer waiting in the queue. This is generally the case when it starts
      * running, but it may also be killed or produce an error. If the timeout expires, the job will continue to be queued
      * normally.
-     * 
+     * </p>
+     * <p>
      * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
-     * 
+     * </p>
+     * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
-     * 
+     * </p>
      * @param job
      *            the job.
      * @param timeout

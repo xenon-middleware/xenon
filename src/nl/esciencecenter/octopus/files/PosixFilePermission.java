@@ -24,7 +24,7 @@ package nl.esciencecenter.octopus.files;
  */
 public enum PosixFilePermission {
 
-    /**
+    /** 
      * Execute/search permission, group.
      */
     GROUP_EXECUTE,

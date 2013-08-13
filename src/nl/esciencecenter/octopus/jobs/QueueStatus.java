@@ -48,7 +48,7 @@ public interface QueueStatus {
     boolean hasException();
 
     /**
-     * Get the exception produced by the queue, or <code>null</code> if <code>hasEsception()</code> returns <code>false</code>.
+     * Get the exception produced by the queue, or <code>null</code> if <code>hasException()</code> returns <code>false</code>.
      * 
      * @return the exception.
      */
@@ -57,7 +57,7 @@ public interface QueueStatus {
     /**
      * Get scheduler specific information on the queue.
      * 
-     * @return cheduler specific information on the queue.
+     * @return Scheduler specific information on the queue.
      */
     Map<String, String> getSchedulerSpecficInformation();
 }

@@ -16,7 +16,14 @@
 package nl.esciencecenter.octopus.jobs;
 
 /**
- * Job represents a Job belonging to a {@link Scheduler}.
+ * Job represents a job that has been submitted to a {@link Scheduler}.
+ * <p>
+ * When a {@link JobDescription} is submitted to a {@link Scheduler} using 
+ * {@link Jobs#submitJob(Scheduler, JobDescription) Jobs.submitJob}, a <code>Job</code> is returned. This <code>Job</code> can be 
+ * used to retrieve the status of the job using {@link Jobs#getJobStatus(Job) Jobs.getJobStatus}, cancel the job using 
+ * {@link Jobs#cancelJob(Job) Jobs.cancelJob}, or wait until the job terminates using
+ * {@link Jobs#waitUntilDone(Job, long) Jobs.waitUntilDone}.
+ * </p>
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -56,7 +63,7 @@ public interface Job {
     /**
      * Returns if this is an online job.
      * 
-     * Online jobs will disappear when the application that submitted is exist, while offlines jobs will keep running.
+     * Online jobs will disappear when the application that submitted is exist, while ofline jobs will keep running.
      * 
      * Interactive jobs are by definition online. Batch jobs will be online if the scheduler to which they were submitted is
      * online.
