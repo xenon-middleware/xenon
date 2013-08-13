@@ -46,13 +46,7 @@ public class LocalCredentials implements Credentials {
             throws OctopusException {
         throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "PasswordCredential not supported!");
     }
-
-    @Override
-    public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
-            Map<String, String> properties) throws OctopusException {
-        throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "ProxyCredential not supported!");
-    }
-
+    
     @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
         return credential;

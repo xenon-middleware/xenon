@@ -43,13 +43,13 @@ public final class OctopusFactory {
      * {@link OctopusException} will be thrown if properties contains any unknown keys.
      * 
      * @param properties
-     *            the properties to use.
+     *            (optional) properties used to configure the newly created octopus.
      * 
      * @return a new Octopus instance.
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
-     * @throws IllegalPropertyException
+     * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
      * @throws OctopusException
      *             If the Octopus failed initialize.
@@ -61,7 +61,9 @@ public final class OctopusFactory {
     /**
      * Ends an Octopus.
      * 
-     * When an Octopus ended all non off line Jobs it has creates will be killed.
+     * Ending an Octopus will automatically close local resources, such as <code>Schedulers</code>, <code>FileSystems</code> and 
+     * <code>Credentials</code>. In addition, all non online <code>Jobs</code> it has creates will be killed (for example jobs 
+     * that run locally).
      * 
      * @param octopus
      *            the octopus to end.

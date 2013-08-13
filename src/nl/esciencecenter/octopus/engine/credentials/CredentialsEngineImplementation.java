@@ -46,13 +46,6 @@ public class CredentialsEngineImplementation implements Credentials {
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
-            Map<String, String> properties) throws OctopusException {
-        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
-        return adaptor.credentialsAdaptor().newProxyCredential(scheme, host, port, username, password, properties);
-    }
-
-    @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().getDefaultCredential(scheme);
@@ -68,7 +61,7 @@ public class CredentialsEngineImplementation implements Credentials {
             Adaptor adaptor = octopusEngine.getAdaptor(credential.getAdaptorName());
             return adaptor.credentialsAdaptor();
         } catch (OctopusException e) {
-            // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
+            // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.
             // Therefore, we make this a runtime exception.
             throw new OctopusRuntimeException("CredentialEngine", "Could not find adaptor named " + credential.getAdaptorName(),
                     e);

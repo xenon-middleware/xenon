@@ -24,7 +24,6 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.octopus.engine.credentials.ProxyCredentialImplementation;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
@@ -67,15 +66,6 @@ public class SshCredentials implements Credentials {
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
         return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, username, password);
-    }
-
-    @Override
-    public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
-            Map<String, String> properties) throws OctopusException {
-
-        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
-
-        return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, host, port, username, password);
     }
 
     @Override

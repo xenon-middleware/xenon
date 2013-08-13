@@ -90,24 +90,4 @@ public class CredentialsEngineImplementationTest {
 
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
     }
-
-    @org.junit.Test
-    public void testProxy() throws Exception {
-
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
-        Credential c = ce.newProxyCredential("ssh", "host", 42, "username", "password".toCharArray(), null);
-
-        assertTrue(c instanceof ProxyCredentialImplementation);
-
-        ProxyCredentialImplementation pci = (ProxyCredentialImplementation) c;
-
-        assertEquals("ssh", pci.getAdaptorName());
-        assertEquals("username", pci.getUsername());
-        assertEquals(pci.getHost(), "host");
-        assertEquals(pci.getPort(), 42);
-        assertEquals(new HashMap<String, String>(), pci.getProperties());
-
-        assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
-    }
-
 }

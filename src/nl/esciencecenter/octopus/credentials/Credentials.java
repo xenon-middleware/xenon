@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.credentials;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 /**
  * Credentials represents the credentials interface of Octopus.
@@ -33,15 +34,28 @@ public interface Credentials {
     /**
      * Constructs a certificate Credential.
      * 
-     * A certificate Credential is created out of a <code>certfile</code> pointing to the certificate, a username and a password.
+     * A certificate Credential is created out of a certificate file (containing the certificate), a user name, and (optionally)
+     * a password needed to access the credential.
+     *
+     * @param scheme
+     *          the scheme for which to create a credential.                
      * @param certfile
-     *            the certificate file (for example userkey.pem or id_dsa)
+     *          the certificate file (for example userkey.pem or id_dsa).
      * @param username
-     *            the username
+     *          the user name.
      * @param password
-     *            the password or passphrase belonging to the key and certificate.
+     *          the password or pass phrase belonging to the certificate.
+     * @param properties
+     *            (optional) properties used to configure the credential.
      * 
-     * @returns an ID for the credential, which can be used to remove it from the credential set again.
+     * @returns the Credential.
+     * 
+     * @throws UnknownPropertyException
+     *             If an unknown property was passed.
+     * @throws InvalidPropertyException
+     *             If a known property was passed with an illegal value.
+     * @throws OctopusException
+     *             If the <code>Credential<code> could not be created.
      */
     Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws OctopusException;
@@ -49,40 +63,45 @@ public interface Credentials {
     /**
      * Constructs a password credential.
      * 
-     * If a username is given in the URIs, it must be identical to username parameter.
+     * A password Credential consists of a user name and a password.
+     * 
+     * @param scheme
+     *          the scheme for which to create a credential.                
      * @param username
-     *            the username.
+     *          the user name.
      * @param password
-     *            the password.
+     *          the password.
+     * @param properties
+     *            (optional) properties used to configure the credential.
+     * 
+     * @returns the Credential.
+     * 
+     * @throws UnknownPropertyException
+     *             If an unknown property was passed.
+     * @throws InvalidPropertyException
+     *             If a known property was passed with an illegal value.
+     * @throws OctopusException
+     *             If the <code>Credential<code> could not be created.
      */
     Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws OctopusException;
 
     /**
-     * Creates a proxy credential.
-     * @param host
-     *            the hostname of the proxy server
-     * @param port
-     *            the port where the proxy server runs, -1 for the default port
-     * @param username
-     *            the username to use to connect to the proxy server
-     * @param password
-     *            the password to use to connect to the proxy server
-     */
-    Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
-            Map<String, String> properties) throws OctopusException;
-
-    /**
-     * Creates a proxy credential.
+     * Creates a default credential for the given scheme.
      * 
-     * @param host
-     *            the hostname of the proxy server
-     * @param port
-     *            the port where the proxy server runs, -1 for the default port
-     * @param username
-     *            the username to use to connect to the proxy server
-     * @param password
-     *            the password to use to connect to the proxy server
+     * It depends on the scheme if a default credential can be created. 
+     * 
+     * @param scheme
+     *          the scheme for which to create a certificate.                
+     * 
+     * @returns the Credential.
+     * 
+     * @throws UnknownPropertyException
+     *             If an unknown property was passed.
+     * @throws InvalidPropertyException
+     *             If a known property was passed with an illegal value.
+     * @throws OctopusException
+     *             If the <code>Credential<code> could not be created.
      */
     Credential getDefaultCredential(String scheme) throws OctopusException;
 
@@ -94,8 +113,6 @@ public interface Credentials {
      * 
      * @throws OctopusException
      *             If the Credential failed to close.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
      */
     void close(Credential credential) throws OctopusException;
 }

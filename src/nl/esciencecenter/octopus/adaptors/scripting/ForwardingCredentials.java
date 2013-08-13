@@ -53,12 +53,6 @@ public class ForwardingCredentials implements Credentials {
     }
 
     @Override
-    public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
-            Map<String, String> properties) throws OctopusException {
-        return octopusEngine.credentials().newProxyCredential(targetScheme, host, port, username, password, properties);
-    }
-
-    @Override
     public Credential getDefaultCredential(String scheme) throws OctopusException {
         return octopusEngine.credentials().getDefaultCredential(targetScheme);
     }
