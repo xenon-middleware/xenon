@@ -48,7 +48,7 @@ public interface Credentials {
      * @param properties
      *            (optional) properties used to configure the credential.
      * 
-     * @returns the Credential.
+     * @return the Credential.
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
@@ -74,7 +74,7 @@ public interface Credentials {
      * @param properties
      *            (optional) properties used to configure the credential.
      * 
-     * @returns the Credential.
+     * @return the Credential.
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
@@ -94,7 +94,7 @@ public interface Credentials {
      * @param scheme
      *          the scheme for which to create a certificate.                
      * 
-     * @returns the Credential.
+     * @return the Credential.
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
