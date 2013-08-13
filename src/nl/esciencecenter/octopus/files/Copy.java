@@ -18,24 +18,32 @@ package nl.esciencecenter.octopus.files;
 
 /**
  * Copy represents a (asynchronous) copy operation.
+ * <p>
+ * A <code>Copy</code> is returned as the result of the {@link Files#copy(AbsolutePath, AbsolutePath, CopyOption []) Files.copy} 
+ * method, when the option {@link CopyOption#ASYNCHRONOUS CopyOption.ASYNCHRONOUS} is provided. This <copy>Copy</code> can then 
+ * be used to retrieve the status of the copy operation using {@link Files#getCopyStatus(Copy) Files.getCopyStatus} or cancel it 
+ * using {@link Files#cancelCopy(Copy) Files.cancelCopy}.
+ * </p>
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
+ * @see Files
+ * @see CopyOption
  */
 public interface Copy {
 
     /**
-     * Retrieve the source path to copy from.
+     * Retrieve the source to copy from.
      * 
-     * @return the source path to copy from.
+     * @return the source to copy from.
      */
     AbsolutePath getSource();
 
     /**
-     * Retrieve the target path to copy to.
+     * Retrieve the target to copy to.
      * 
-     * @return the target path to copy to.
+     * @return the target to copy to.
      */
     AbsolutePath getTarget();
 }

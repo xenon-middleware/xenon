@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-/** 
- * This package contains classes and interfaces which are used to provide advanced input and output. 
+/**
+ * This package contains classes and interfaces for manipulating files.
  */
 package nl.esciencecenter.octopus.files;
 

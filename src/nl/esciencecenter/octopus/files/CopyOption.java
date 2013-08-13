@@ -18,6 +18,13 @@ package nl.esciencecenter.octopus.files;
 /**
  * CopyOption is an enumeration containing all possible options for copying a file.
  * 
+ * Note that the <code>CREATE</code>, <code>REPLACE</code>,<code>IGNORE</code>,<code>APPEND</code> and <code>RESUME</code> options
+ * are mutually exclusive.  
+ * 
+ * The <code>VERIFY</code> option can only be used in combination with <code>RESUME</code>.
+ * 
+ * The <code>ASYNCHRONOUS</code> option can be combined with all others. 
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
@@ -60,14 +67,14 @@ public enum CopyOption {
     ASYNCHRONOUS, ;
 
     /**
-     * Check if an array of <code>CopyOption</code> contains a specific option.
+     * Check if a sequence of <code>CopyOption</code>s contains a specific option.
      * 
      * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
      * 
-     * @param options
-     *            the array to check.
-     * @param option
+     * @param toFind
      *            the option to check for.
+     * @param options
+     *            the options to check.
      * 
      * @return if <code>options</code> contains <code>option<code>.
      */

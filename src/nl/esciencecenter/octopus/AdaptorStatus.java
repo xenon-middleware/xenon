@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus;
 import java.util.Map;
 
 /**
- * AdaptorStatus contains status information of a specific adaptors.
+ * AdaptorStatus contains information on a specific adaptor.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

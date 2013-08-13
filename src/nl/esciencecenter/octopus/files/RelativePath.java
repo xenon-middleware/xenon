@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
@@ -91,7 +92,7 @@ public class RelativePath {
      * @param elements
      *            the path elements to use.
      * 
-     * @thows IllegalArgumentExeption If the elements arrays contains <code>null</code>, empty Strings, or Strings containing the
+     * @throws IllegalArgumentExeption If the elements arrays contains <code>null</code>, empty Strings, or Strings containing the
      *        seperator.
      */
     public RelativePath(String... elements) {
@@ -508,16 +509,16 @@ public class RelativePath {
      * 
      * For example, for the path "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
      * 
-     * @return
+     * @return the iterator.
      */
     public Iterator<RelativePath> iterator() {
         return new RelativePathIterator();
     }
 
     /**
-     * Get a string representation of this path.
+     * Get a <code>String</code> representation of this path.
      * 
-     * @return a string representation of this path.
+     * @return a String representation of this path.
      */
     public String getPath() {
 
@@ -531,7 +532,7 @@ public class RelativePath {
             tmp.append(separator);
             tmp.append(elements[i]);
         }
-
+        
         return tmp.toString();
     }
 

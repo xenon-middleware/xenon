@@ -21,7 +21,7 @@ import java.util.Iterator;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
- * DirectoryStream represents an Iterable set of elements.
+ * DirectoryStream represents an {@link Iterable} set of elements.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0

@@ -15,7 +15,7 @@
  */
 
 /**
- * This package is the main entry point into Octopus API.
+ * This package is the main entry point into the Octopus API.
  */
 package nl.esciencecenter.octopus;
 

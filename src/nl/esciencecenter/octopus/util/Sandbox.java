@@ -159,7 +159,7 @@ public class Sandbox {
     }
 
     /**
-     * @return List of files that will be uploaded on execution of {@Link #upload() upload} method.
+     * @return List of files that will be uploaded on execution of {@link #upload(CopyOption []) upload} method.
      */
     public List<Pair> getUploadFiles() {
         return uploadFiles;
@@ -202,7 +202,7 @@ public class Sandbox {
     }
 
     /**
-     * @return List of files that will be downloaded on execution of {@Link #download() download} method.
+     * @return List of files that will be downloaded on execution of {@link #download(CopyOption []) download} method.
      */
     public List<Pair> getDownloadFiles() {
         return downloadFiles;

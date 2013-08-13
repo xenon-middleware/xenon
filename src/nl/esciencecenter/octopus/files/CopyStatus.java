@@ -33,9 +33,9 @@ public interface CopyStatus {
     Copy getCopy();
 
     /**
-     * Get the state of the Job.
+     * Get the state of the Copy operation.
      * 
-     * @return the state of the Job.
+     * @return the state of the Copy operation.
      */
     String getState();
 
@@ -47,14 +47,14 @@ public interface CopyStatus {
     Exception getException();
 
     /**
-     * Is the Copy still running.
+     * Is the Copy still running?
      * 
      * @return if the Copy is running.
      */
     boolean isRunning();
 
     /**
-     * Is the Copy done.
+     * Is the Copy done?
      * 
      * @return if the Copy is done.
      */
@@ -63,12 +63,12 @@ public interface CopyStatus {
     /**
      * Has the Copy or status retrieval produced a exception ?
      * 
-     * @return if the Copy has an exception.
+     * @return if the Copy or status retrieval produced a exception.
      */
     boolean hasException();
 
     /**
-     * Get the number of bytes that need to be copied.
+     * Get the number of bytes that need to be copied for the entire copy operation.
      * 
      * @return the number of bytes that need to be copied.
      */

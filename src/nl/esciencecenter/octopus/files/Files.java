@@ -73,9 +73,6 @@ public interface Files {
      * 
      * Multiple invocations of this method may return the same FileSystem.
      * 
-     * @param properties
-     *            optional properties to use when creating the FileSystem.
-     * 
      * @return a FileSystem that represents the local current working directory.
      * 
      * @throws UnknownPropertyException
@@ -92,9 +89,6 @@ public interface Files {
      * Get a FileSystem that represents the local home directory of the current user.
      * 
      * Multiple invocations of this method may return the same FileSystem.
-     * 
-     * @param properties
-     *            optional properties to use when creating the FileSystem.
      * 
      * @return a FileSystem that represents the local home directory of the current user.
      * 
@@ -157,17 +151,27 @@ public interface Files {
 
     /**
      * Copy an existing source file or symbolic link to a target file.
-     * 
+     * <p>
+     * When using copy, the following rules apply:
+     * </p>
+     * <ul>
+     * <li>
      * Both source and target must NOT be a directory.
-     * 
+     * </li>
+     * <li>
      * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
-     * 
+     * </li>
+     * <li>
      * If the target is equal to the source this method has no effect.
-     * 
+     * </li>
+     * <li>
      * If the source is a link, the path to which it refers will be copied, not the link itself.
-     * 
-     * The <code>options</code> parameter determines how the copy is performed:
-     * 
+     * </li>
+     * </ul>
+     * <p>
+     * In addition, the <code>options</code> parameter determines how the copy is performed:
+     * </p>
+     * <ul>
      * <li><code>CREATE</code> (default): Create a new target file and copy to it. Fail if the target already exists.</li>
      * 
      * <li><code>REPLACE</code>: Replace target if it already exists. If the target does not exist it will be created.</li>
@@ -176,30 +180,33 @@ public interface Files {
      * 
      * <li><code>APPEND</code>: The data in source will appended to target. Fails if the target does not exist.</li>
      * 
-     * <li><code>RESUME</code>: A copy from source to target will be resumed. Fails if the target does not exist. To resume a
-     * copy, the size of the target is used as the start position in the source. All data from the source after this start
+     * <li><code>RESUME</code>: A copy from source to target will be resumed. This fails if the target does not exist. To resume 
+     * a copy, the size of the target is used as the start position in the source. All data from the source after this start
      * position is append to the target. For example, if the target contains 100 bytes (0-99) and the source 200 bytes (0-199),
      * the data at bytes 100-199 in the source will be append to target. By default, there is no verification that the existing
      * data in target corresponds to the data in source.</li>
-     * 
-     * Note that these four options are exclusive. Only one can be selected at a time. If more than one of these options is
-     * provided, an exception will be thrown.
-     * 
-     * The following additional options exist:
-     * 
+     * <p>
+     * Note that the five options above are mutually exclusive. Only one can be selected at a time. If more than one of these 
+     * options is provided, an exception will be thrown. 
+     * </p>
+     * <p>
+     * The following options modify the behavior of the copy operation:
+     * </p>
      * <li><code>VERIFY</code> (can only be used in combination with <code>RESUME</code>): When resuming a copy, verify that the
      * existing data in target corresponds to the data in source.</li>
      * 
      * <li><code>ASYNCHRONOUS</code>: Perform an asynchronous copy. Instead of blocking until the copy is complete, the call
-     * returns immediately and the copy is performed in the background.<li>
-     * 
+     * returns immediately and the copy is performed in the background.</li>
+     * </ul>
+     * <p> 
      * If the <code>ASYNCHRONOUS</code> option is provided, a {@link Copy} is returned that can be used to retrieve the status of
      * the copy operation (in a {@link CopyStatus}) or cancel it. Any exceptions produced during the copy operation are also
      * stored in the {@link CopyStatus}.
-     * 
+     * </p>
+     * <p>
      * If the <code>ASYNCHRONOUS</code> option is not provided, the copy will block until it is completed and <code>null</code>
      * will be returned.
-     * 
+     * </p>
      * 
      * @param source
      *            the existing source file or link.
@@ -226,7 +233,7 @@ public interface Files {
 
     /**
      * Move or rename an existing source path to a non-existing target path.
-     * 
+     * <p>
      * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
      * 
      * If the target is equal to the source this method has no effect.
@@ -235,7 +242,7 @@ public interface Files {
      * 
      * If the source is a directory, it will be renamed to the target. This implies that a moving a directory between physical
      * locations may fail.
-     * 
+     * </p>
      * @param source
      *            the existing source path.
      * @param target
@@ -271,8 +278,6 @@ public interface Files {
      * 
      * @param copy
      *            the asynchronous copy which to cancel.
-     * @param removeTarget
-     *            should the (partially copied) remote target file be removed ?
      * 
      * @throws NoSuchCopyException
      *             If the copy is not known.
@@ -446,35 +451,46 @@ public interface Files {
 
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
-     * 
+     * <p>
      * The options determine how the file is opened, if a new file is created, if the existing data in the file is preserved, and
-     * if the file should be written or read.
-     * 
+     * if the file should be written or read:
+     * </p>
+     * <ul>
+     * <li>
      * If the <code>CREATE</code> option is specified, a new file will be created and an exception is thrown if the file already
      * exists.
-     * 
+     * </li>
+     * <li>
      * If the <code>OPEN_EXISTING</code> option is specified, an existing file will be opened, and an exception is thrown if the
      * file does not exist.
-     * 
+     * </li>
+     * <li>
      * If the <code>OPEN_OR_CREATE</code> option is specified, an attempt will be made to open an existing file. If it does not
      * exist a new file will be created.
-     * 
-     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more
-     * than one will result in an exception.
-     * 
+     * </li>
+     * <li>
      * If the <code>APPEND</code> option is specified, data will be added to the end of the file. No existing data will be
      * overwritten.
-     * 
+     * </li>
+     * <li>
      * If the <code>TRUNCATE</code> option is specified, any existing data in the file will be deleted (resulting in a file of
      * size 0). The data will then be appended from the beginning of the file.
-     * 
+     * </li>
+     * </ul>
+     * <p>
+     * One of <code>CREATE</code>, <code>OPEN_EXISTING</code> or <code>OPEN_OR_CREATE</code> must be specified. Specifying more
+     * than one will result in an exception.
+     * </p>
+     * <p>
      * Either <code>APPEND</code> or <code>TRUNCATE</code> must be specified. Specifying both will result in an exception.
-     * 
+     * </p>
+     * <p>
      * The <code>READ</code> option must not be set. If it is set, an exception will be thrown.
-     * 
+     * </p>
+     * <p>
      * If the <code>WRITE</code> option is specified, the file is opened for writing. As this is the default behavior, the
      * <code>WRITE</code> option may be omitted.
-     * 
+     * </p>
      * @param path
      *            the target file for the OutputStream.
      * @param options

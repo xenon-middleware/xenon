@@ -44,26 +44,26 @@ public class JavaJobDescription extends JobDescription {
     private final List<String> javaClasspath = new ArrayList<String>();
 
     /**
-     * Create a {@link JavaJobDescription}, which describes the java application.
+     * Create a JavaJobDescription which describes the java application.
      */
     public JavaJobDescription() {
         super();
     }
 
     /**
-     * Returns the jvm options.
+     * Returns the JVM options.
      * 
-     * @return the jvm options.
+     * @return the JVM options.
      */
     public List<String> getJavaOptions() {
         return javaOptions;
     }
 
     /**
-     * Sets the jvm options.
+     * Sets the JVM options.
      * 
      * @param options
-     *            the jvm options.
+     *            the JVM options.
      */
     public void setJavaOptions(String... options) {
         this.javaOptions.clear();
@@ -74,10 +74,10 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Adds a jvm options.
+     * Adds a JVM option.
      * 
-     * @param options
-     *            the jvm options.
+     * @param option
+     *            the JVM option.
      */
     public void addJavaOption(String option) {
         if (option == null || option.length() == 0) {
@@ -168,9 +168,11 @@ public class JavaJobDescription extends JobDescription {
         javaArguments.add(javaArgument);
     }
 
+    
+    
     /**
      * <b>This method should not be used</b>. This method will throw an runtime exception when used. The methods
-     * {@link #setJavaClasspath(String)} , {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)},
+     * {@link #setJavaClasspath(String [])} , {@link #setJavaOptions(String[])}, {@link #setJavaSystemProperties(Map)},
      * {@link #setJavaMain(String)} and {@link #setJavaArguments(String[])} should be used to construct the command line
      * arguments.
      * 
@@ -181,7 +183,7 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Constructs the command line arguments from the class path, the jvm options, the system properties, the main and the java
+     * Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java
      * arguments.
      * 
      * @return the command line arguments
@@ -192,7 +194,7 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Constructs the command line arguments from the class path, the jvm options, the system properties, the main and the java
+     * Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java
      * arguments.
      * 
      * @param pathSeperator

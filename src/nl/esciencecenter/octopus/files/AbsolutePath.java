@@ -27,7 +27,7 @@ import java.util.Iterator;
 public interface AbsolutePath {
 
     /**
-     * Get the FileSystem to which this AbsolutePath is linked.
+     * Get the FileSystem to which this AbsolutePath refers.
      * 
      * @return the FileSystem.
      */
@@ -64,14 +64,14 @@ public interface AbsolutePath {
     /**
      * Get the number of name elements in the path.
      * 
-     * @return the number of elements in the path, or 0 if this is empty.
+     * @return the number of elements in the path, or 0 if it is empty.
      */
     int getNameCount();
 
     /**
-     * Get the number of name elements in the path.
+     * Get the name elements in the path.
      * 
-     * @return the number of elements in the path, or 0 if this path is empty.
+     * @return the name elements in the path or an empty array if it is empty.
      */
     String[] getNames();
 
@@ -180,7 +180,7 @@ public interface AbsolutePath {
      * 
      * For example, for the path "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
      * 
-     * @return
+     * @return an {@link Iterator} that returns all possible sub paths of this path.
      */
     Iterator<AbsolutePath> iterator();
 

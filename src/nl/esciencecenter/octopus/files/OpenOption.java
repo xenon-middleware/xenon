@@ -16,7 +16,7 @@
 package nl.esciencecenter.octopus.files;
 
 /**
- * OpenOption is an enumeration containing all possible options for opening a stream or channel to a file.
+ * OpenOption is an enumeration containing all possible options for opening a stream to a file.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
@@ -60,14 +60,14 @@ public enum OpenOption {
     WRITE;
 
     /**
-     * Check if an array of <code>OpenOption</code> contains a specific option.
+     * Check if a sequence of <code>OpenOption</code>s contains a specific option.
      * 
      * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
      * 
+     * @param toFind
+     *            the option to check for.
      * @param options
      *            the array to check.
-     * @param option
-     *            the option to check for.
      * 
      * @return if <code>options</code> contains <code>option<code>.
      */

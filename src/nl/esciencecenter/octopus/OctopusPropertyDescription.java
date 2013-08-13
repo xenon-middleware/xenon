@@ -19,24 +19,38 @@ package nl.esciencecenter.octopus;
 import java.util.Set;
 
 /**
- * OctopusPropertyDescription contains a all necessary information about a property that is recognized by octopus or one of its
- * components. 
+ * <p>OctopusPropertyDescription contains all necessary information about a property that is recognized by octopus or one of its
+ * components.</p> 
  * 
- * Each OctopusPropertyDescription contains the following information:
+ * <p>Each OctopusPropertyDescription contains the following information:</p>
  * 
- * A name that uniquely identifies the property. This name should be used as a key when passing properties to octopus in a 
- * {@link java.util.Map}. 
+ * <ul>
+ * <li>
+ * A name that uniquely identifies the property.
+ * This name should be used as a key when passing properties to octopus in a {@link java.util.Map}.
+ * </li> 
  * 
+ * <li>
  * A (human-readable) description that explains the use of the property.  
+ * </li>
  * 
- * The type of values that are accepted for the property (one of the {@link Type} enum). Even though it is customary to pass 
- * the values of properties as <code>String</code>s, the user should ensure the values can be converted into the expected type. 
+ * <li>
+ * The type of values that are accepted for the property (one of the {@link Type} enum).
+ * Even though it is customary to pass the values of properties as <code>String</code>s, the user should ensure the values can be
+ * converted into the expected type. 
+ * </li>
  * 
+ * <li>
  * The default value of the property. 
+ * </li>
  * 
- * The components by which this property is accepted (a <code>Set</code> of {@link Component}). Properties are only valid for 
- * certain components of octopus. For example, some properties may be used when creating an new <code>Octopus</code>, while 
- * others can be used when creating a new <code>Scheduler</code>, <code>FileSystem</code>, or <code>Credential</code>. 
+ * <li>
+ * The components by which this property is accepted (a <code>Set</code> of {@link Component}).
+ * Properties are only valid for certain components of octopus. For example, some properties may be used when creating an new 
+ * <code>Octopus</code>, while others can be used when creating a new <code>Scheduler</code>, <code>FileSystem</code>, or 
+ * <code>Credential</code>. 
+ * </li>
+ * </ul>
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -45,14 +59,14 @@ import java.util.Set;
 public interface OctopusPropertyDescription {
 
     /**
-     * Level names all possible levels at which a property can be provided.
+     * Component enum names all possible components for which a property can be provided.
      */
     public enum Component {
         OCTOPUS, SCHEDULER, FILESYSTEM, CREDENTIALS,
     }
 
     /**
-     * Type names all possible types of properties.
+     * Type enum names all possible types of properties.
      */
     public enum Type {
         BOOLEAN, INTEGER, LONG, DOUBLE, STRING, SIZE,

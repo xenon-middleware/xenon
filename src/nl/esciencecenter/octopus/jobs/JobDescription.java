@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * JobDescription contains a description of a job that can be submitted to a {@link} Scheduler.
+ * JobDescription contains a description of a job that can be submitted to a {@link Scheduler}.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -38,7 +38,7 @@ public class JobDescription {
     /** The queue to submit to. */
     private String queueName = null;
 
-    /** The exectuable to run. */
+    /** The executable to run. */
     private String executable = null;
 
     /** The arguments to pass to the executable. */
@@ -112,7 +112,7 @@ public class JobDescription {
     /**
      * Set the number of nodes.
      * 
-     * @param nodesCount
+     * @param nodeCount
      *            the number of nodes;
      */
     public void setNodeCount(int nodeCount) {
@@ -273,10 +273,12 @@ public class JobDescription {
      * The environment of the executable consists of a {@link Map} of environment variables with their values (for example:
      * "JAVA_HOME", "/path/to/java").
      * 
-     * The name of an environment variable may not be <code>null</code> or empty.
+     * The key of an environment variable may not be <code>null</code> or empty.
      * 
-     * @param environment
-     *            environment of the executable.
+     * @param key
+     *          the unique key under which to store the value.
+     * @param value
+     *          the value to store the value.
      */
     public void addEnvironment(String key, String value) {
 
@@ -324,8 +326,10 @@ public class JobDescription {
      * 
      * Neither the key or value of a job option may be <code>null</code> or empty.
      * 
-     * @param options
-     *            job options of the job.
+     * @param key 
+     *            the unique key under which to store the job option.
+     * @param value 
+     *            the value of the option to store.
      */
     public void addJobOption(String key, String value) {
 

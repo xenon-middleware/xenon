@@ -283,7 +283,7 @@ public interface Jobs {
      * afterwards.
      * 
      * A JobStatus is returned that can be used to determine the state of the job after cancelJob returns. Note that it may take
-     * some time before the job is actually terminated. The {@link waitUntilDone} method can be used to wait until the job is
+     * some time before the job is actually terminated. The <code>waitUntilDone</code> method can be used to wait until the job is
      * terminated.
      * 
      * @param job
@@ -313,7 +313,7 @@ public interface Jobs {
      *            the job.
      * @param timeout
      *            the maximum time to wait for the job in milliseconds.
-     * @returns the status of the Job.
+     * @return the status of the Job.
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
@@ -339,7 +339,7 @@ public interface Jobs {
      *            the job.
      * @param timeout
      *            the maximum time to wait in milliseconds.
-     * @returns the status of the Job.
+     * @return the status of the Job.
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
