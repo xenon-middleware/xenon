@@ -272,15 +272,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job[] getJobs(String... requestedQueueNames) throws OctopusIOException, OctopusException {
-        String[] queueNames;
-        if (requestedQueueNames.length == 0) {
-            queueNames = getQueueNames();
-        } else {
-            checkQueueNames(requestedQueueNames);
-            queueNames = requestedQueueNames;
-        }
-
+    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
         ArrayList<Job> result = new ArrayList<Job>();
 
         if (queueNames == null || queueNames.length == 0) {
@@ -409,6 +401,9 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //keep track of the deleted jobs.
         if (matched == 1) {
             addDeletedJob(job);
+        } else {
+            //it will take a while to get this job to the accounting. Remember it existed for now
+            updateJobsSeenMap(Collections.singleton(identifier));
         }
 
         return getJobStatus(job);
