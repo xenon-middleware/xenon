@@ -55,9 +55,9 @@ public interface AdaptorStatus {
     OctopusPropertyDescription[] getSupportedProperties();
 
     /**
-     * Returns a map containing scheduler specific status information.
+     * Returns a map containing adaptor specific status information.
      * 
-     * @return a map containing scheduler specific status information.
+     * @return a map containing adaptor specific status information.
      */
     Map<String, String> getAdaptorSpecificInformation();
 }

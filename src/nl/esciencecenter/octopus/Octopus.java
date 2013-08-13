@@ -23,9 +23,9 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
 /**
- * Main interface to Octopus.
+ * Main Octopus interface.
  * 
- * Provides an access point to all packages of Octopus and several utility functions.
+ * This interface provides an access point to all packages of Octopus and several utility functions.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -44,10 +44,10 @@ public interface Octopus {
      * Returns information about the specified adaptor.
      * 
      * @param adaptorName
-     *            the adaptor for which to return the information.
+     *            the adaptor for which to return the information.            
      * @return an AdaptorInfo containing information about the specified adaptor.
      * @throws OctopusException
-     *             when the adaptor does not exist, or no information could be retrieved.
+     *             if the adaptor does not exist, or no information could be retrieved.
      */
     AdaptorStatus getAdaptorStatus(String adaptorName) throws OctopusException;
 
@@ -59,21 +59,21 @@ public interface Octopus {
     AdaptorStatus[] getAdaptorStatuses();
 
     /**
-     * Get a reference to the Files package interface.
+     * Retrieve the <code>Files</code> interface.
      * 
      * @return a reference to the Files interface.
      */
     Files files();
 
     /**
-     * Get a reference to the Jobs package interface.
+     * Retrieve the <code>Jobs</code> interface.
      * 
      * @return a reference to the Files package interface.
      */
     Jobs jobs();
 
     /**
-     * Get a reference to the Credentials package interface.
+     * Retrieve the <code>Credentials</code> package interface.
      * 
      * @return a reference to the Credentials package interface.
      */

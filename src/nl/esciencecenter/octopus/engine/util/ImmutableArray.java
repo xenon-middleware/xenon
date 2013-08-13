@@ -17,7 +17,6 @@
 package nl.esciencecenter.octopus.engine.util;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -54,22 +53,12 @@ public class ImmutableArray<T> implements Iterable<T> {
     
     private final T [] data;
     
-    @SafeVarargs
+    @SuppressWarnings("unchecked")
     public ImmutableArray(T ... elements) { 
         if (elements == null) {
-            data = null; 
+            data = (T[]) new Object[0];
         } else { 
             data = Arrays.copyOf(elements, elements.length);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public ImmutableArray(Collection<T> elements) { 
-        
-        if (elements == null) {
-            data = null; 
-        } else { 
-            data = (T[]) elements.toArray();
         }
     }
     
@@ -77,7 +66,7 @@ public class ImmutableArray<T> implements Iterable<T> {
         return Arrays.copyOf(data, data.length);        
     }
 
-    public int length() { 
+    public int length() {
         return data.length;
     }
     

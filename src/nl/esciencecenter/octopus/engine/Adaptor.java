@@ -102,7 +102,7 @@ public abstract class Adaptor {
             }
         }
 
-        return new ImmutableArray<>(tmp);
+        return new ImmutableArray<>(tmp.toArray(new OctopusPropertyDescription[tmp.size()]));
     }
 
     public AdaptorStatus getAdaptorStatus() {

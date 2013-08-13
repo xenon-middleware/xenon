@@ -193,7 +193,8 @@ class SshMultiplexedSession {
         if (gateway != null) {
             LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayURI);
 
-            tunnelPort = sessionPort = gateway.addTunnel(0, host, port);
+            tunnelPort = gateway.addTunnel(0, host, port);
+            sessionPort = tunnelPort;
             sessionHost = "localhost";
 
             LOGGER.debug("SSHSESSION: Rerouting session via " + user + "@" + sessionHost + ":" + sessionPort);

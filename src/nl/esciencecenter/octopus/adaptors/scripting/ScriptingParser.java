@@ -30,7 +30,6 @@ public final class ScriptingParser {
 
     public static final String WHITESPACE_REGEX = "\\s+";
 
-    public static final String COMMA_REGEX = "\\s*,\\s*";
 
     public static final String BAR_REGEX = "\\s*\\|\\s*";
 
@@ -160,7 +159,7 @@ public final class ScriptingParser {
                     return Long.parseLong(jobId);
                 } catch (NumberFormatException e) {
                     throw new OctopusException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
-                            + jobId + "\" is not a number");
+                            + jobId + "\" is not a number", e);
                 }
             }
         }
