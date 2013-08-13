@@ -20,7 +20,7 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -89,7 +89,7 @@ public abstract class Adaptor {
         return validProperties.asArray();
     }
 
-    public ImmutableArray<OctopusPropertyDescription> getSupportedProperties(Level level) {
+    public ImmutableArray<OctopusPropertyDescription> getSupportedProperties(Component level) {
 
         ArrayList<OctopusPropertyDescription> tmp = new ArrayList<>();
 

@@ -32,11 +32,11 @@ public class OctopusPropertyDescriptionImplementation implements OctopusProperty
 
     private final String name;
     private final OctopusPropertyDescription.Type type;
-    private final Set<OctopusPropertyDescription.Level> levels;
+    private final Set<OctopusPropertyDescription.Component> levels;
     private final String defaultValue;
     private final String description;
 
-    public OctopusPropertyDescriptionImplementation(String name, Type type, Set<Level> levels, String defaultValue,
+    public OctopusPropertyDescriptionImplementation(String name, Type type, Set<Component> levels, String defaultValue,
             String description) {
 
         if (name == null) {
@@ -59,7 +59,7 @@ public class OctopusPropertyDescriptionImplementation implements OctopusProperty
             throw new IllegalArgumentException("No level specified!");
         }
 
-        this.levels = new HashSet<Level>(levels);
+        this.levels = new HashSet<Component>(levels);
 
         this.defaultValue = defaultValue;
 
@@ -78,7 +78,7 @@ public class OctopusPropertyDescriptionImplementation implements OctopusProperty
         return type;
     }
 
-    public Set<Level> getLevels() {
+    public Set<Component> getLevels() {
         return levels;
     }
 

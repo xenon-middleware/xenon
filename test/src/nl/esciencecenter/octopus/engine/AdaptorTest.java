@@ -24,7 +24,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
@@ -95,10 +95,10 @@ public class AdaptorTest {
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
         ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.OCTOPUS),
                         "aap2", "test property p1"),
 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.OCTOPUS),
                         "noot2", "test property p2"));
 
         OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String, String>());
@@ -120,10 +120,10 @@ public class AdaptorTest {
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
         ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.OCTOPUS),
                         "aap2", "test property p1"),
 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.OCTOPUS),
                         "noot2", "test property p2"));
 
         Map<String, String> m = new HashMap<>();
@@ -149,10 +149,10 @@ public class AdaptorTest {
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
 
         ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.OCTOPUS),
                         "aap2", "test property p1"),
 
-                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Level.OCTOPUS),
+                new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.OCTOPUS),
                         "noot2", "test property p2"));
 
         Map<String, String> p = new HashMap<>();

@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -105,7 +105,7 @@ public class ScriptingJobs implements Jobs {
     public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
             OctopusIOException {
 
-        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
         SchedulerConnection connection = connectionFactory
                 .newSchedulerConnection(adaptor, location, credential, p, octopusEngine);

@@ -15,7 +15,7 @@
  */
 
 /**
- * This package contains classes and interfaces which are used throughout the Octopus application API.
+ * This package is the main entry point into Octopus API.
  */
 package nl.esciencecenter.octopus;
 

@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -105,7 +105,7 @@ public class SshJobs implements Jobs {
 
         LOGGER.debug("Starting ssh scheduler with properties {}", properties);
 
-        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.SCHEDULER), properties);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
         SshMultiplexedSession session = adaptor.createNewSession(location, credential, p);
 

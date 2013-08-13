@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
@@ -119,7 +119,7 @@ public class OctopusProperties {
      *             if a key from <code>properties</code> has a value that does not match the type as listed in
      *             <code>supportedProperties</code>.
      */
-    public OctopusProperties(ImmutableArray<OctopusPropertyDescription> supportedProperties, Level level, 
+    public OctopusProperties(ImmutableArray<OctopusPropertyDescription> supportedProperties, Component level, 
             Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
 
         super();
@@ -509,7 +509,7 @@ public class OctopusProperties {
      * @param tmp
      *            the desired prefix
      */
-    public OctopusProperties filter(Level level) {
+    public OctopusProperties filter(Component level) {
 
         HashMap<String, OctopusPropertyDescription> remaining = new HashMap<>();
         HashMap<String, String> p = new HashMap<>();

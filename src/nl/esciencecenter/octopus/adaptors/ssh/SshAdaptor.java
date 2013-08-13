@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
@@ -99,17 +99,17 @@ public class SshAdaptor extends Adaptor {
 
     /** List of properties supported by this SSH adaptor */
     private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = new ImmutableArray<OctopusPropertyDescription>(
-            new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
-                    Level.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-            new OctopusPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Level.SCHEDULER,
-                    Level.FILESYSTEM), "true", "Enable strict host key checking."), 
-            new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Level.OCTOPUS), 
+            new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+                    Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
+            new OctopusPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+                    Component.FILESYSTEM), "true", "Enable strict host key checking."), 
+            new OctopusPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.OCTOPUS), 
                     "true", "Load the standard known_hosts file."), 
-            new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Level.SCHEDULER), "1000",
+            new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
-            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.SCHEDULER), "4", 
+            new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4", 
                     "The maximum number of concurrent jobs in the multiq.."), 
-            new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Level.SCHEDULER, Level.FILESYSTEM), 
+            new OctopusPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), 
                     null, "The gateway machine used to create an SSH tunnel to the target."));
 
     private final SshFiles filesAdaptor;
@@ -126,7 +126,7 @@ public class SshAdaptor extends Adaptor {
 
     public SshAdaptor(OctopusEngine octopusEngine, JSch jsch, Map<String, String> properties) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
-                VALID_PROPERTIES, Level.OCTOPUS, properties));
+                VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         this.filesAdaptor = new SshFiles(this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);

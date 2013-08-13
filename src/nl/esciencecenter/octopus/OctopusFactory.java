@@ -63,9 +63,8 @@ public final class OctopusFactory {
      * 
      * When an Octopus ended all non off line Jobs it has creates will be killed.
      * 
-     * @param properties
-     *            the properties to use.
-     * @return a new Octopus instance.
+     * @param octopus
+     *            the octopus to end.
      * 
      * @throws NoSuchOctopusException
      *             If the Octopus was not found

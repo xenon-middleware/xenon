@@ -21,7 +21,7 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
@@ -75,9 +75,9 @@ public class LocalAdaptor extends Adaptor {
     /** The properties supported by this adaptor */
     private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<OctopusPropertyDescription>(
-                    new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
+                    new OctopusPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Component.OCTOPUS), 
                             "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-                    new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Level.OCTOPUS), 
+                    new OctopusPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.OCTOPUS), 
                             "4", "The maximum number of concurrent jobs in the multiq.."));
 
     /** Local implementation for Files */
@@ -91,7 +91,7 @@ public class LocalAdaptor extends Adaptor {
 
     public LocalAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
-                VALID_PROPERTIES, Level.OCTOPUS, properties));
+                VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
         localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWDFileSystem(), octopusEngine);

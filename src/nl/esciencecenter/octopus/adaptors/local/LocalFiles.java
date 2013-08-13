@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
@@ -276,7 +276,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local file system with path!");
         }
 
-        OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Level.FILESYSTEM), properties);
+        OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, new RelativePath(
                 LocalUtils.getCWD()), credential, p);

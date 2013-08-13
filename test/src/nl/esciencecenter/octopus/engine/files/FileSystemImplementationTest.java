@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -123,7 +123,7 @@ public class FileSystemImplementationTest {
 
         ImmutableArray<OctopusPropertyDescription> valid = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation(
-                "test", Type.STRING, EnumSet.of(Level.OCTOPUS), "test", "test property"));
+                "test", Type.STRING, EnumSet.of(Component.OCTOPUS), "test", "test property"));
 
         OctopusProperties p = new OctopusProperties(valid, tmp);
 

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -147,7 +147,7 @@ public class SshFiles implements Files {
 
         adaptor.checkPath(location, "filesystem");
 
-        OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Level.FILESYSTEM), properties);
+        OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         SshMultiplexedSession session = adaptor.createNewSession(location, credential, octopusProperties);
 

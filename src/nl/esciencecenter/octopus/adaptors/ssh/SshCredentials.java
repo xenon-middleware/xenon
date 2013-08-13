@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.io.File;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Level;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -55,7 +55,7 @@ public class SshCredentials implements Credentials {
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws OctopusException {
 
-        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
         return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, certfile, username, password);
     }
@@ -64,7 +64,7 @@ public class SshCredentials implements Credentials {
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws OctopusException {
 
-        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
         return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, username, password);
     }
@@ -73,7 +73,7 @@ public class SshCredentials implements Credentials {
     public Credential newProxyCredential(String scheme, String host, int port, String username, char[] password,
             Map<String, String> properties) throws OctopusException {
 
-        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Level.CREDENTIALS), properties);
+        OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
         return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, host, port, username, password);
     }
