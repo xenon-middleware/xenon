@@ -28,74 +28,24 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 import org.junit.Test;
 
 public class FileUtilsTest {
 
-    //    @Test
-    //    public void testCopyOctopusInputStreamAbsolutePathCopyOptionArray() throws OctopusException {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testCopyOctopusAbsolutePathOutputStream() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testNewBufferedReader() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testNewBufferedWriter() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testReadAllBytes() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testReadAllLines() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testWriteOctopusAbsolutePathByteArrayOpenOptionArray() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testWriteOctopusAbsolutePathIterableOfQextendsCharSequenceCharsetOpenOptionArray() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testWalkFileTreeOctopusAbsolutePathFileVisitor() {
-    //        fail("Not yet implemented");
-    //    }
-    //
-    //    @Test
-    //    public void testWalkFileTreeOctopusAbsolutePathBooleanIntFileVisitor() {
-    //        fail("Not yet implemented");
-    //    }
-
     @Test
     public void testRecursiveCopy_SingleFile_CopiedFile() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcFile = mock(AbsolutePath.class);
-        AbsolutePath dstFile = mock(AbsolutePath.class);
+        Path srcFile = mock(Path.class);
+        Path dstFile = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(false);
@@ -116,8 +66,8 @@ public class FileUtilsTest {
     public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcDir = mock(AbsolutePath.class);
-        AbsolutePath dstDir = mock(AbsolutePath.class);
+        Path srcDir = mock(Path.class);
+        Path dstDir = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(true);
@@ -129,9 +79,9 @@ public class FileUtilsTest {
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(false);
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
@@ -145,12 +95,12 @@ public class FileUtilsTest {
     public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcDir = mock(AbsolutePath.class); // foo
-        AbsolutePath srcFile = mock(AbsolutePath.class); // foo/myfile        
+        Path srcDir = mock(Path.class); // foo
+        Path srcFile = mock(Path.class); // foo/myfile        
         when(srcFile.getFileName()).thenReturn("myfile");
-        AbsolutePath dstDir = mock(AbsolutePath.class); // bar
-        AbsolutePath dstFile = mock(AbsolutePath.class); // bar/myfile        
-        RelativePath relSrcFile = new RelativePath("myfile");
+        Path dstDir = mock(Path.class); // bar
+        Path dstFile = mock(Path.class); // bar/myfile        
+        Pathname relSrcFile = new Pathname("myfile");
         when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
 
         FileAttributes attributes = mock(FileAttributes.class);
@@ -170,9 +120,9 @@ public class FileUtilsTest {
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(false);
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true, false);
         when(iterator.next()).thenReturn(srcFile);
@@ -188,8 +138,8 @@ public class FileUtilsTest {
     public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcFile = mock(AbsolutePath.class);
-        AbsolutePath dstFile = mock(AbsolutePath.class);
+        Path srcFile = mock(Path.class);
+        Path dstFile = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(false);
@@ -217,8 +167,8 @@ public class FileUtilsTest {
     public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcDir = mock(AbsolutePath.class);
-        AbsolutePath dstDir = mock(AbsolutePath.class);
+        Path srcDir = mock(Path.class);
+        Path dstDir = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(true);
@@ -230,9 +180,9 @@ public class FileUtilsTest {
         when(files.exists(srcDir)).thenReturn(true);
         when(files.exists(dstDir)).thenReturn(true);
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
@@ -253,12 +203,12 @@ public class FileUtilsTest {
     public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcDir = mock(AbsolutePath.class); // foo
-        AbsolutePath srcFile = mock(AbsolutePath.class); // foo/myfile
+        Path srcDir = mock(Path.class); // foo
+        Path srcFile = mock(Path.class); // foo/myfile
         when(srcFile.getFileName()).thenReturn("myfile");
-        AbsolutePath dstDir = mock(AbsolutePath.class); // bar
-        AbsolutePath dstFile = mock(AbsolutePath.class); // bar/myfile
-        RelativePath relSrcFile = new RelativePath("myfile");
+        Path dstDir = mock(Path.class); // bar
+        Path dstFile = mock(Path.class); // bar/myfile
+        Pathname relSrcFile = new Pathname("myfile");
         when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
 
         FileAttributes attributes = mock(FileAttributes.class);
@@ -278,9 +228,9 @@ public class FileUtilsTest {
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(true);
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true, false);
         when(iterator.next()).thenReturn(srcFile);
@@ -303,8 +253,8 @@ public class FileUtilsTest {
     public void recursiveCopy_IgnoreDir_DirNotCopied() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcDir = mock(AbsolutePath.class);
-        AbsolutePath dstDir = mock(AbsolutePath.class);
+        Path srcDir = mock(Path.class);
+        Path dstDir = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(true);
@@ -320,9 +270,9 @@ public class FileUtilsTest {
         when(dstDir.getFileSystem()).thenReturn(dstFs);
         when(dstFs.getAdaptorName()).thenReturn("ssh");
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
@@ -336,8 +286,8 @@ public class FileUtilsTest {
     public void recursiveCopy_IgnoreFile_FileNotCopied() throws OctopusIOException,
             nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcFile = mock(AbsolutePath.class);
-        AbsolutePath dstFile = mock(AbsolutePath.class);
+        Path srcFile = mock(Path.class);
+        Path dstFile = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(false);
@@ -361,8 +311,8 @@ public class FileUtilsTest {
     @Test
     public void recursiveCopy_IgnoreAndReplace_UnsupporterOperationException() throws OctopusIOException {
         Files files = mock(Files.class);
-        AbsolutePath srcDir = mock(AbsolutePath.class); // foo
-        AbsolutePath dstDir = mock(AbsolutePath.class); // bar
+        Path srcDir = mock(Path.class); // foo
+        Path dstDir = mock(Path.class); // bar
 
         try {
             FileUtils.recursiveCopy(files, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
@@ -375,8 +325,8 @@ public class FileUtilsTest {
     @Test
     public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws OctopusIOException, UnsupportedOperationException {
         Files files = mock(Files.class);
-        AbsolutePath srcFile = mock(AbsolutePath.class);
-        AbsolutePath dstFile = mock(AbsolutePath.class);
+        Path srcFile = mock(Path.class);
+        Path dstFile = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(false);
@@ -396,7 +346,7 @@ public class FileUtilsTest {
     @Test
     public void testRecursiveDelete_SingleDirectory_DeletedDirectory() throws OctopusIOException {
         Files files = mock(Files.class);
-        AbsolutePath directory = mock(AbsolutePath.class);
+        Path directory = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(true);
@@ -404,9 +354,9 @@ public class FileUtilsTest {
 
         //        when(files.isDirectory(directory)).thenReturn(true);
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(directory)).thenReturn(listing);
@@ -420,8 +370,8 @@ public class FileUtilsTest {
     public void testRecursiveDelete_DirectoryWithFile_DeletedDirectoryAndFile() throws OctopusIOException {
         Files files = mock(Files.class);
 
-        AbsolutePath directory = mock(AbsolutePath.class);
-        AbsolutePath myfile = mock(AbsolutePath.class);
+        Path directory = mock(Path.class);
+        Path myfile = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(true);
@@ -433,9 +383,9 @@ public class FileUtilsTest {
 
         //        when(files.isDirectory(directory)).thenReturn(true);
         @SuppressWarnings("unchecked")
-        DirectoryStream<AbsolutePath> listing = mock(DirectoryStream.class);
+        DirectoryStream<Path> listing = mock(DirectoryStream.class);
         @SuppressWarnings("unchecked")
-        Iterator<AbsolutePath> iterator = mock(Iterator.class);
+        Iterator<Path> iterator = mock(Iterator.class);
         when(listing.iterator()).thenReturn(iterator);
         when(iterator.hasNext()).thenReturn(true, false);
         when(iterator.next()).thenReturn(myfile);
@@ -450,7 +400,7 @@ public class FileUtilsTest {
     @Test
     public void testRecursiveDelete_SingleFile_DeletedFile() throws OctopusIOException {
         Files files = mock(Files.class);
-        AbsolutePath myfile = mock(AbsolutePath.class);
+        Path myfile = mock(Path.class);
 
         FileAttributes attributes = mock(FileAttributes.class);
         when(attributes.isDirectory()).thenReturn(false);

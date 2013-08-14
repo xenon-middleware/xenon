@@ -37,9 +37,9 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * Various file utilities implemented on top of the Octopus API.
@@ -103,7 +103,7 @@ public final class FileUtils {
      * @throws UnsupportedOperationException
      *             if {@code options} contains a copy option that is not supported
      */
-    public static long copy(Files files, InputStream in, AbsolutePath target, boolean truncate) throws OctopusException {
+    public static long copy(Files files, InputStream in, Path target, boolean truncate) throws OctopusException {
 
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
@@ -146,7 +146,7 @@ public final class FileUtils {
      *             if an I/O error occurs while reading or writing
      * 
      */
-    public static long copy(Files files, AbsolutePath source, OutputStream out) throws OctopusException {
+    public static long copy(Files files, Path source, OutputStream out) throws OctopusException {
         byte[] buffer = new byte[BUFFER_SIZE];
         long totalBytes = 0;
 
@@ -187,7 +187,7 @@ public final class FileUtils {
      * @throws OctopusIOException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static BufferedReader newBufferedReader(Files files, AbsolutePath source, Charset cs) throws OctopusIOException {
+    public static BufferedReader newBufferedReader(Files files, Path source, Charset cs) throws OctopusIOException {
         return new BufferedReader(new InputStreamReader(files.newInputStream(source), cs));
     }
 
@@ -209,7 +209,7 @@ public final class FileUtils {
      * @throws OctopusIOException
      *          if an I/O error occurs while opening or writing the file.
      */
-    public static BufferedWriter newBufferedWriter(Files files, AbsolutePath target, Charset cs, boolean truncate)
+    public static BufferedWriter newBufferedWriter(Files files, Path target, Charset cs, boolean truncate)
             throws OctopusIOException {
 
         OutputStream out = files.newOutputStream(target, openOptionsForWrite(truncate));
@@ -229,7 +229,7 @@ public final class FileUtils {
      * @throws OctopusIOException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static byte[] readAllBytes(Files files, AbsolutePath source) throws OctopusException {
+    public static byte[] readAllBytes(Files files, Path source) throws OctopusException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         copy(files, source, out);
         return out.toByteArray();
@@ -250,7 +250,7 @@ public final class FileUtils {
      * @throws OctopusIOException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static List<String> readAllLines(Files files, AbsolutePath source, Charset cs) throws OctopusIOException {
+    public static List<String> readAllLines(Files files, Path source, Charset cs) throws OctopusIOException {
 
         ArrayList<String> result = new ArrayList<String>();
 
@@ -290,7 +290,7 @@ public final class FileUtils {
      * @throws OctopusException
      *          if an I/O error occurs while opening or writing to the file.
      */
-    public static void write(Files files, AbsolutePath target, byte[] bytes, boolean truncate) throws OctopusException {
+    public static void write(Files files, Path target, byte[] bytes, boolean truncate) throws OctopusException {
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         copy(files, in, target, truncate);
         close(in);
@@ -313,7 +313,7 @@ public final class FileUtils {
      * @throws OctopusIOException
      *          if an I/O error occurs while opening or writing to the file.
      */
-    public static void write(Files files, AbsolutePath target, Iterable<? extends CharSequence> lines, Charset cs,
+    public static void write(Files files, Path target, Iterable<? extends CharSequence> lines, Charset cs,
             boolean truncate) throws OctopusIOException {
 
         BufferedWriter writer = null;
@@ -337,7 +337,7 @@ public final class FileUtils {
      * Walks over a file tree. 
      * 
      * <p>
-     * This method is equivalent to invoking {@link #walkFileTree(Files, AbsolutePath, boolean, int, FileVisitor) 
+     * This method is equivalent to invoking {@link #walkFileTree(Files, Path, boolean, int, FileVisitor) 
      * walkFileTree(files, start, false, Integer.MAX_VALUE, visitor}. 
      * </p>
      * 
@@ -346,11 +346,11 @@ public final class FileUtils {
      * @param start
      *          the path to start from.
      * @param visitor
-     *          a {@link FileVisitor} that will be invoked for every {@link AbsolutePath} encountered during the walk.
+     *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
      * @throws OctopusIOException
      *          if an I/O error occurs during the walk.
      */
-    public static void walkFileTree(Files files, AbsolutePath start, FileVisitor visitor) throws OctopusIOException {
+    public static void walkFileTree(Files files, Path start, FileVisitor visitor) throws OctopusIOException {
         walkFileTree(files, start, false, Integer.MAX_VALUE, visitor);
     }
 
@@ -363,7 +363,7 @@ public final class FileUtils {
      * <ul>
      * <li> 
      * If the current path is a file, it is forwarded to 
-     * {@link FileVisitor#visitFile(AbsolutePath, FileAttributes, Files) visitor.visitFile} and the result of this call will be 
+     * {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and the result of this call will be 
      * returned.
      * </li>
      * <li>
@@ -372,18 +372,18 @@ public final class FileUtils {
      * </li>
      * <li> 
      * If the current path is a link and <code>followLinks</code> is <code>false</code> the link is not followed. Instead the 
-     * link itself is forwarded to {@link FileVisitor#visitFile(AbsolutePath, FileAttributes, Files) visitor.visitFile} and the
+     * link itself is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and the
      * result of this call is returned.
      * </li>
      * <li>
      * If the current path is a directory and the current distance from <code>start</code> is more than <code>maxDepth</code>, 
-     * the directory is forwarded to {@link FileVisitor#visitFile(AbsolutePath, FileAttributes, Files) visitor.visitFile} and 
+     * the directory is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and 
      * the result of this call is returned.
      * </li>
      * <li>
      * If the current path is a directory and the current distance from <code>start</code> is less or equal to 
      * <code>maxDepth</code> the path is forwarded to 
-     * {@link FileVisitor#preVisitDirectory(AbsolutePath, FileAttributes, Files) visitor.preVisitDirectory}. The subsequent 
+     * {@link FileVisitor#preVisitDirectory(Path, FileAttributes, Files) visitor.preVisitDirectory}. The subsequent 
      * behavior then depends on the result of this call:
      * <ul>
      * <li> 
@@ -392,7 +392,7 @@ public final class FileUtils {
      * </li>
      * <li> 
      * If {@link FileVisitResult#SKIP_SUBTREE} is returned, the elements in the directory will not be visited. Instead 
-     * {@link FileVisitor#postVisitDirectory(AbsolutePath, OctopusIOException, Files) visitor.postVisitDirectory} and  
+     * {@link FileVisitor#postVisitDirectory(Path, OctopusIOException, Files) visitor.postVisitDirectory} and  
      * {@link FileVisitResult#CONTINUE} is returned.
      * </li>
      * <li> 
@@ -403,7 +403,7 @@ public final class FileUtils {
      * If {@link FileVisitResult#CONTINUE} is returned <code>walkFileTree</code> is called on each of the elements 
      * in the directory.
      * If any of these calls returns {@link FileVisitResult#SKIP_SIBLINGS} the remaining elements will be 
-     * skipped, {@link FileVisitor#postVisitDirectory(AbsolutePath, OctopusIOException, Files) visitor.postVisitDirectory} will be 
+     * skipped, {@link FileVisitor#postVisitDirectory(Path, OctopusIOException, Files) visitor.postVisitDirectory} will be 
      * called, and its result will be returned.  
      * If any of these calls returns {@link FileVisitResult#TERMINATE} the walk is terminated immediately and 
      * {@link FileVisitResult#TERMINATE} is returned.
@@ -421,19 +421,19 @@ public final class FileUtils {
      * @param maxDepth
      *          the maximum distance from the start to walk to. 
      * @param visitor
-     *          a {@link FileVisitor} that will be invoked for every {@link AbsolutePath} encountered during the walk.
+     *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
      *          
      * @throws OctopusIOException
      *          if an I/O error occurs during the walk.
      */
-    public static void walkFileTree(Files files, AbsolutePath start, boolean followLinks, int maxDepth,
+    public static void walkFileTree(Files files, Path start, boolean followLinks, int maxDepth,
             FileVisitor visitor) throws OctopusIOException {
         FileAttributes attributes = files.getAttributes(start);
         walk(files, start, attributes, followLinks, maxDepth, visitor);
     }
 
     // Walk a file tree.
-    private static FileVisitResult walk(Files files, AbsolutePath path, FileAttributes attributes, boolean followLinks,
+    private static FileVisitResult walk(Files files, Path path, FileAttributes attributes, boolean followLinks,
             int maxDepth, FileVisitor visitor) throws OctopusIOException {
         FileVisitResult visitResult;
         OctopusIOException exception = null;
@@ -472,7 +472,7 @@ public final class FileUtils {
                 }
             } else if (attributes.isSymbolicLink()) {
                 if (followLinks) {
-                    AbsolutePath target = files.readSymbolicLink(path);
+                    Path target = files.readSymbolicLink(path);
                     return walk(files, target, files.getAttributes(target), followLinks, maxDepth - 1, visitor);
                 } else {
                     // visit the link itself
@@ -503,7 +503,7 @@ public final class FileUtils {
      * @throws OctopusIOException
      *           if an I/O error occurs during the copying
      */
-    public static void recursiveCopy(Files files, AbsolutePath source, AbsolutePath target, CopyOption... options)
+    public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options)
             throws OctopusIOException, UnsupportedOperationException {
 
         boolean exist = files.exists(target);
@@ -531,9 +531,9 @@ public final class FileUtils {
             } else {
                 files.createDirectories(target);
             }
-            for (AbsolutePath f : files.newDirectoryStream(source)) {
-                AbsolutePath fsource = f;
-                AbsolutePath ftarget = target.resolve(new RelativePath(f.getFileName()));
+            for (Path f : files.newDirectoryStream(source)) {
+                Path fsource = f;
+                Path ftarget = target.resolve(new Pathname(f.getFileName()));
                 recursiveCopy(files, fsource, ftarget, options);
             }
         } else {
@@ -563,12 +563,12 @@ public final class FileUtils {
      * @throws OctopusIOException
      *          if an I/O error occurs during the copying
      */
-    public static void recursiveDelete(Files files, AbsolutePath path) throws OctopusIOException {
+    public static void recursiveDelete(Files files, Path path) throws OctopusIOException {
 
         FileAttributes att = files.getAttributes(path);
 
         if (att.isDirectory()) {
-            for (AbsolutePath f : files.newDirectoryStream(path)) {
+            for (Path f : files.newDirectoryStream(path)) {
                 FileUtils.recursiveDelete(files, f);
             }
         }

@@ -24,10 +24,10 @@ import java.util.NoSuchElementException;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
@@ -35,7 +35,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
 
     private final Deque<PathAttributesPair> stream;
 
-    SshDirectoryAttributeStream(AbsolutePath dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryAttributeStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
 
         stream = new LinkedList<PathAttributesPair>();
 
@@ -46,7 +46,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
-                AbsolutePath tmp = dir.resolve(new RelativePath(filename));
+                Path tmp = dir.resolve(new Pathname(filename));
 
                 if (filter.accept(tmp)) {
                     SshFileAttributes attributes = new SshFileAttributes(e.getAttrs(), tmp);

@@ -27,14 +27,14 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.Sandbox.Pair;
 
 import org.junit.Test;
@@ -43,18 +43,18 @@ public class SandboxTest {
 
     private Sandbox sampleSandbox() throws URISyntaxException, OctopusException, OctopusIOException {
 
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
-        sandbox.addUploadFile(new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile")));
-        sandbox.addDownloadFile("outputfile", new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile")));
+        sandbox.addUploadFile(new PathImplementation(fs, new Pathname("/tmp/inputfile")));
+        sandbox.addDownloadFile("outputfile", new PathImplementation(fs, new Pathname("/tmp/outputfile")));
         return sandbox;
     }
 
     @Test(expected = OctopusException.class)
     public void testSandbox_WithNullOctopus() throws URISyntaxException, OctopusIOException, OctopusException {
         // throws exception
-        new Sandbox(null, mock(AbsolutePath.class), "sandbox-1");
+        new Sandbox(null, mock(Path.class), "sandbox-1");
     }
 
     @Test(expected = OctopusException.class)
@@ -65,12 +65,12 @@ public class SandboxTest {
 
     @Test
     public void testSandbox_WithName() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
 
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
-        AbsolutePath expectedPath = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1"));
+        Path expectedPath = new PathImplementation(fs, new Pathname("/tmp/sandbox-1"));
         assertEquals(expectedPath, sandbox.getPath());
         assertEquals(0, sandbox.getUploadFiles().size());
         assertEquals(0, sandbox.getDownloadFiles().size());
@@ -78,8 +78,8 @@ public class SandboxTest {
 
     @Test
     public void testSandbox_WithoutName() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
 
         Sandbox sandbox = new Sandbox(mock(Files.class), path, null);
 
@@ -89,15 +89,15 @@ public class SandboxTest {
 
     @Test
     public void testAddUploadFile_SrcAndDst() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox.addUploadFile(src, "input");
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/input"));
         assertEquals(1, uploadfiles.size());
         assertEquals(src, uploadfiles.get(0).source);
         assertEquals(dst, uploadfiles.get(0).destination);
@@ -105,19 +105,19 @@ public class SandboxTest {
 
     @Test
     public void testSetUploadFiles() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
-        AbsolutePath src1 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/input1"));
-        AbsolutePath src2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/input2"));
+        Path src1 = new PathImplementation(fs, new Pathname("/tmp/input1"));
+        Path src2 = new PathImplementation(fs, new Pathname("/tmp/input2"));
 
         sandbox.setUploadFiles(src1, src2);
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
 
-        AbsolutePath dst1 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input1"));
-        AbsolutePath dst2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input2"));
+        Path dst1 = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/input1"));
+        Path dst2 = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/input2"));
 
         assertEquals(2, uploadfiles.size());
         assertEquals(src1, uploadfiles.get(0).source);
@@ -129,15 +129,15 @@ public class SandboxTest {
 
     @Test
     public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandboxes"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp/sandboxes"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox.addUploadFile(src, null);
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandboxes/sandbox-1/inputfile"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/sandboxes/sandbox-1/inputfile"));
         assertEquals(1, uploadfiles.size());
         assertEquals(src, uploadfiles.get(0).source);
         assertEquals(dst, uploadfiles.get(0).destination);
@@ -145,8 +145,8 @@ public class SandboxTest {
 
     @Test
     public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
         try {
@@ -160,62 +160,62 @@ public class SandboxTest {
     @Test
     public void testUpload_NoSandboxDir_MkdirAndCopy() throws OctopusIOException, OctopusException, URISyntaxException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox.addUploadFile(src, "input");
 
         sandbox.upload();
 
-        AbsolutePath sandboxDir = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1"));
+        Path sandboxDir = new PathImplementation(fs, new Pathname("/tmp/sandbox-1"));
         verify(files).createDirectory(sandboxDir);
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/input"));
         verify(files).copy(src, dst);
     }
 
     @Test
     public void testUpload_SandboxDirExists_Copy() throws OctopusIOException, OctopusException, URISyntaxException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath sandboxDir = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1"));
+        Path sandboxDir = new PathImplementation(fs, new Pathname("/tmp/sandbox-1"));
         when(files.exists(sandboxDir)).thenReturn(true);
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox.addUploadFile(src, "input");
 
         sandbox.upload();
 
         verify(files, never()).createDirectory(sandboxDir);
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/input"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/input"));
         verify(files).copy(src, dst);
     }
 
     @Test
     public void testDelete() throws URISyntaxException, OctopusIOException, OctopusException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath root = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path root = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(files, root, "sandbox-1");
 
         sandbox.delete();
 
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1"));
+        Path path = new PathImplementation(fs, new Pathname("/tmp/sandbox-1"));
         verify(files).delete(path);
     }
 
     @Test
     public void testAddDownloadFile_SrcAndDst() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/outputfile"));
         sandbox.addDownloadFile("output", dst);
 
         List<Pair> uploadfiles = sandbox.getDownloadFiles();
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/output"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/output"));
         assertEquals(1, uploadfiles.size());
         assertEquals(src, uploadfiles.get(0).source);
         assertEquals(dst, uploadfiles.get(0).destination);
@@ -223,15 +223,15 @@ public class SandboxTest {
 
     @Test
     public void testAddDownloadFile_SrcNull_SrcSameFileName() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandboxes"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp/sandboxes"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/outputfile"));
         sandbox.addDownloadFile(null, dst);
 
         List<Pair> uploadfiles = sandbox.getDownloadFiles();
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandboxes/sandbox-1/outputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/sandboxes/sandbox-1/outputfile"));
         assertEquals(1, uploadfiles.size());
         assertEquals(src, uploadfiles.get(0).source);
         assertEquals(dst, uploadfiles.get(0).destination);
@@ -240,8 +240,8 @@ public class SandboxTest {
     @Test
     public void testAddDownloadFile_DstNull_NullPointerException() throws URISyntaxException, OctopusIOException,
             OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(mock(Files.class), path, "sandbox-1");
 
         try {
@@ -255,15 +255,15 @@ public class SandboxTest {
     @Test
     public void testDownload() throws OctopusIOException, URISyntaxException, OctopusException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
         Sandbox sandbox = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath dst = new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile"));
+        Path dst = new PathImplementation(fs, new Pathname("/tmp/outputfile"));
         sandbox.addDownloadFile("output", dst);
 
         sandbox.download();
 
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/sandbox-1/output"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/sandbox-1/output"));
         verify(files).copy(src, dst);
     }
 
@@ -290,8 +290,8 @@ public class SandboxTest {
 
     @Test
     public void testEquals_otherOctopus_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
 
         Sandbox sandbox1 = new Sandbox(mock(Files.class), path, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(mock(Files.class), path, "sandbox-1");
@@ -302,10 +302,10 @@ public class SandboxTest {
     @Test
     public void testEquals_otherPath_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
 
-        AbsolutePath path1 = new AbsolutePathImplementation(fs, new RelativePath("/tmp1"));
-        AbsolutePath path2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp2"));
+        Path path1 = new PathImplementation(fs, new Pathname("/tmp1"));
+        Path path2 = new PathImplementation(fs, new Pathname("/tmp2"));
 
         Sandbox sandbox1 = new Sandbox(files, path1, "sandbox-1");
         Sandbox sandbox2 = new Sandbox(files, path2, "sandbox-2");
@@ -317,11 +317,11 @@ public class SandboxTest {
     public void testEquals_otherUpload_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
         Files files = mock(Files.class);
         
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
 
         Sandbox sandbox1 = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox1.addUploadFile(src);
         Sandbox sandbox2 = new Sandbox(files, path, "sandbox-1");
 
@@ -331,11 +331,11 @@ public class SandboxTest {
     @Test
     public void testEquals_otherDownload_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
 
         Sandbox sandbox1 = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/outputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/outputfile"));
         sandbox1.addDownloadFile("outputfile", src);
         Sandbox sandbox2 = new Sandbox(files, path, "sandbox-1");
 
@@ -345,14 +345,14 @@ public class SandboxTest {
     @Test
     public void testEquals_sameUpload_Equal() throws URISyntaxException, OctopusIOException, OctopusException {
         Files files = mock(Files.class);
-        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new RelativePath(), null, null);
-        AbsolutePath path = new AbsolutePathImplementation(fs, new RelativePath("/tmp"));
+        FileSystem fs = new FileSystemImplementation("local", "local-0", new URI("file:///"), new Pathname(), null, null);
+        Path path = new PathImplementation(fs, new Pathname("/tmp"));
 
         Sandbox sandbox1 = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath src = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox1.addUploadFile(src);
         Sandbox sandbox2 = new Sandbox(files, path, "sandbox-1");
-        AbsolutePath src2 = new AbsolutePathImplementation(fs, new RelativePath("/tmp/inputfile"));
+        Path src2 = new PathImplementation(fs, new Pathname("/tmp/inputfile"));
         sandbox2.addUploadFile(src2);
 
         assertEquals(sandbox1, sandbox2);

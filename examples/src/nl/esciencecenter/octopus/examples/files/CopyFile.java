@@ -20,11 +20,11 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
@@ -60,9 +60,9 @@ public class CopyFile {
             FileSystem sourceFS = files.newFileSystem(URIUtils.getFileSystemURI(source), null, null);
             FileSystem targetFS = files.newFileSystem(URIUtils.getFileSystemURI(target), null, null);
 
-            // We now create an AbsolutePath representing both files.
-            AbsolutePath sourcePath = files.newPath(sourceFS, new RelativePath(source.getPath()));
-            AbsolutePath targetPath = files.newPath(targetFS, new RelativePath(target.getPath()));
+            // We now create an Path representing both files.
+            Path sourcePath = files.newPath(sourceFS, new Pathname(source.getPath()));
+            Path targetPath = files.newPath(targetFS, new Pathname(target.getPath()));
 
             // Copy the file. The CREATE options ensures the target does not exist yet. 
             files.copy(sourcePath, targetPath, CopyOption.CREATE);

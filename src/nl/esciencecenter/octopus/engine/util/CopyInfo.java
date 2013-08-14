@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.engine.util;
 
 import  nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 
 /**
@@ -132,7 +132,7 @@ public class CopyInfo {
      * @return
      * @throws UnsupportedOperationException 
      */
-    public static CopyInfo createCopyInfo(String adaptorName, String nextID, AbsolutePath source, AbsolutePath target,
+    public static CopyInfo createCopyInfo(String adaptorName, String nextID, Path source, Path target,
             CopyOption ... options) throws UnsupportedOperationException {
 
         boolean async = false;

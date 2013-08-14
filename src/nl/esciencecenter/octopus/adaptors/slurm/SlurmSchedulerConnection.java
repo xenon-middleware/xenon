@@ -37,8 +37,8 @@ import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -285,7 +285,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
-        AbsolutePath fsEntryPath = getFsEntryPath();
+        Path fsEntryPath = getFsEntryPath();
 
         verifyJobDescription(description);
 
@@ -302,7 +302,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
             //convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
-                AbsolutePath scriptFile = fsEntryPath.resolve(new RelativePath(customScriptFile));
+                Path scriptFile = fsEntryPath.resolve(new Pathname(customScriptFile));
                 customScriptFile = scriptFile.getPath();
             }
 

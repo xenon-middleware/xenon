@@ -33,7 +33,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
@@ -44,7 +44,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -72,7 +72,7 @@ public abstract class GenericFileAdaptorTestParent {
     protected Files files;
     protected Credentials credentials;
 
-    protected AbsolutePath testDir;
+    protected Path testDir;
 
     private long counter = 0;
 
@@ -119,7 +119,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         FileSystem filesystem = config.getTestFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(TEST_ROOT));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(TEST_ROOT));
 
         if (files.exists(root)) {
             files.delete(root);
@@ -144,28 +144,28 @@ public abstract class GenericFileAdaptorTestParent {
 
     class AllTrue implements DirectoryStream.Filter {
         @Override
-        public boolean accept(AbsolutePath entry) {
+        public boolean accept(Path entry) {
             return true;
         }
     }
 
     class AllFalse implements DirectoryStream.Filter {
         @Override
-        public boolean accept(AbsolutePath entry) {
+        public boolean accept(Path entry) {
             return false;
         }
     }
 
     class Select implements DirectoryStream.Filter {
 
-        private Set<AbsolutePath> set;
+        private Set<Path> set;
 
-        public Select(Set<AbsolutePath> set) {
+        public Select(Set<Path> set) {
             this.set = set;
         }
 
         @Override
-        public boolean accept(AbsolutePath entry) {
+        public boolean accept(Path entry) {
             return set.contains(entry);
         }
     }
@@ -212,10 +212,10 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    // Depends on: AbsolutePath.resolve, RelativePath, exists
-    private AbsolutePath createNewTestDirName(AbsolutePath root) throws Exception {
+    // Depends on: Path.resolve, Pathname, exists
+    private Path createNewTestDirName(Path root) throws Exception {
 
-        AbsolutePath dir = root.resolve(new RelativePath("dir" + counter));
+        Path dir = root.resolve(new Pathname("dir" + counter));
         counter++;
 
         if (files.exists(dir)) {
@@ -226,9 +226,9 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: [createNewTestDirName], createDirectory, exists
-    private AbsolutePath createTestDir(AbsolutePath root) throws Exception {
+    private Path createTestDir(Path root) throws Exception {
 
-        AbsolutePath dir = createNewTestDirName(root);
+        Path dir = createNewTestDirName(root);
 
         files.createDirectory(dir);
 
@@ -246,18 +246,18 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        AbsolutePath entry = fs.getEntryPath();
-        testDir = entry.resolve(new RelativePath(TEST_ROOT, testName));
+        Path entry = fs.getEntryPath();
+        testDir = entry.resolve(new Pathname(TEST_ROOT, testName));
 
         if (!files.exists(testDir)) {
             files.createDirectories(testDir);
         }
     }
 
-    // Depends on: AbsolutePath.resolve, RelativePath, exists 
-    private AbsolutePath createNewTestFileName(AbsolutePath root) throws Exception {
+    // Depends on: Path.resolve, Pathname, exists 
+    private Path createNewTestFileName(Path root) throws Exception {
 
-        AbsolutePath file = root.resolve(new RelativePath("file" + counter));
+        Path file = root.resolve(new Pathname("file" + counter));
         counter++;
 
         if (files.exists(file)) {
@@ -268,7 +268,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: newOutputStream
-    private void writeData(AbsolutePath testFile, byte[] data) throws Exception {
+    private void writeData(Path testFile, byte[] data) throws Exception {
 
         OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE);
         if (data != null) {
@@ -278,9 +278,9 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: [createNewTestFileName], createFile, [writeData]
-    private AbsolutePath createTestFile(AbsolutePath root, byte[] data) throws Exception {
+    private Path createTestFile(Path root, byte[] data) throws Exception {
 
-        AbsolutePath file = createNewTestFileName(root);
+        Path file = createNewTestFileName(root);
 
         files.createFile(file);
 
@@ -292,7 +292,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: exists, isDirectory, delete
-    private void deleteTestFile(AbsolutePath file) throws Exception {
+    private void deleteTestFile(Path file) throws Exception {
 
         if (!files.exists(file)) {
             throw new Exception("Cannot delete non-existing file: " + file);
@@ -308,7 +308,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: exists, isDirectory, delete
-    private void deleteTestDir(AbsolutePath dir) throws Exception {
+    private void deleteTestDir(Path dir) throws Exception {
 
         if (!files.exists(dir)) {
             throw new Exception("Cannot delete non-existing dir: " + dir);
@@ -582,13 +582,13 @@ public abstract class GenericFileAdaptorTestParent {
     // Possible parameters: 
     //
     // FileSystem - null / correct 
-    // RelativePath - null / empty / value
+    // Pathname - null / empty / value
     //
     // Total combinations : 2
     // 
-    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), AbsolutePath.getPath(), RelativePath, close
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), Path.getPath(), Pathname, close
 
-    private void test03_newPath(FileSystem fs, RelativePath path, String expected, boolean mustFail) throws Exception {
+    private void test03_newPath(FileSystem fs, Pathname path, String expected, boolean mustFail) throws Exception {
 
         String result = null;
 
@@ -627,10 +627,10 @@ public abstract class GenericFileAdaptorTestParent {
         test03_newPath(fs, null, null, true);
 
         // test with correct filesystem and empty relative path 
-        test03_newPath(fs, new RelativePath(), root, false);
+        test03_newPath(fs, new Pathname(), root, false);
 
         // test with correct filesystem and relativepath with value
-        test03_newPath(fs, new RelativePath("test"), root + "test", false);
+        test03_newPath(fs, new Pathname("test"), root + "test", false);
 
         files.close(fs);
 
@@ -642,14 +642,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing dir / existing dir / existing file / non-exising parent / closed filesystem    
+    // Path null / non-existing dir / existing dir / existing file / non-exising parent / closed filesystem    
     // 
     // Total combinations : 5
     // 
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], [createTestFile], 
     //             createDirectory, [deleteTestDir], [deleteTestFile], [closeTestFileSystem]
 
-    private void test04_createDirectory(AbsolutePath path, boolean mustFail) throws Exception {
+    private void test04_createDirectory(Path path, boolean mustFail) throws Exception {
 
         try {
             files.createDirectory(path);
@@ -678,8 +678,8 @@ public abstract class GenericFileAdaptorTestParent {
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
-        AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(TEST_ROOT));
+        Path entry = fs.getEntryPath();
+        Path root = entry.resolve(new Pathname(TEST_ROOT));
 
         // test with non-existing dir
         test04_createDirectory(root, false);
@@ -688,13 +688,13 @@ public abstract class GenericFileAdaptorTestParent {
         test04_createDirectory(root, true);
 
         // test with existing file 
-        AbsolutePath file0 = createTestFile(root, null);
+        Path file0 = createTestFile(root, null);
         test04_createDirectory(file0, true);
         deleteTestFile(file0);
 
         // test with non-existent parent dir
-        AbsolutePath parent = createNewTestDirName(root);
-        AbsolutePath dir0 = createNewTestDirName(parent);
+        Path parent = createNewTestDirName(root);
+        Path dir0 = createNewTestDirName(parent);
         test04_createDirectory(dir0, true);
 
         // cleanup 
@@ -714,7 +714,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing dir / existing dir / dir with existing parents / dir with non existing parents / 
+    // Path null / non-existing dir / existing dir / dir with existing parents / dir with non existing parents / 
     //               dir where last parent is file / closed filesystem    
     // 
     // Total combinations : 7
@@ -722,7 +722,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    private void test05_createDirectories(AbsolutePath path, boolean mustFail) throws Exception {
+    private void test05_createDirectories(Path path, boolean mustFail) throws Exception {
 
         try {
             files.createDirectories(path);
@@ -758,8 +758,8 @@ public abstract class GenericFileAdaptorTestParent {
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
-        AbsolutePath entry = fs.getEntryPath();
-        AbsolutePath root = entry.resolve(new RelativePath(TEST_ROOT, "test05_createDirectories"));
+        Path entry = fs.getEntryPath();
+        Path root = entry.resolve(new Pathname(TEST_ROOT, "test05_createDirectories"));
 
         // test with non-existing dir
         test05_createDirectories(root, false);
@@ -768,17 +768,17 @@ public abstract class GenericFileAdaptorTestParent {
         test05_createDirectories(root, true);
 
         // dir with existing parents 
-        AbsolutePath dir0 = createNewTestDirName(root);
+        Path dir0 = createNewTestDirName(root);
         test05_createDirectories(dir0, false);
         deleteTestDir(dir0);
 
         // dir with non-existing parents 
-        AbsolutePath dir1 = createNewTestDirName(dir0);
+        Path dir1 = createNewTestDirName(dir0);
         test05_createDirectories(dir1, false);
 
         // dir where last parent is file 
-        AbsolutePath file0 = createTestFile(dir0, null);
-        AbsolutePath dir2 = createNewTestDirName(file0);
+        Path file0 = createTestFile(dir0, null);
+        Path dir2 = createNewTestDirName(file0);
         test05_createDirectories(dir2, true);
 
         // cleanup 
@@ -803,14 +803,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file / existing dir / closed filesystem
+    // Path null / non-existing file / existing file / existing dir / closed filesystem
     // 
     // Total combinations : 4
     // 
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile] 
     //             [closeTestFileSystem]
     //
-    //    private void test06_isDirectory(AbsolutePath path, boolean expected, boolean mustFail) throws Exception {
+    //    private void test06_isDirectory(Path path, boolean expected, boolean mustFail) throws Exception {
     //
     //        boolean result = false;
     //
@@ -848,11 +848,11 @@ public abstract class GenericFileAdaptorTestParent {
     //        test06_isDirectory(null, false, true);
     //
     //        // test with non-existing file
-    //        AbsolutePath file0 = createNewTestFileName(testDir);
+    //        Path file0 = createNewTestFileName(testDir);
     //        test06_isDirectory(file0, false, false);
     //
     //        // test with existing file
-    //        AbsolutePath file1 = createTestFile(testDir, null);
+    //        Path file1 = createTestFile(testDir, null);
     //        test06_isDirectory(file1, false, false);
     //        deleteTestFile(file1);
     //
@@ -876,14 +876,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file / existing dir / non-existing parent / closed filesystem    
+    // Path null / non-existing file / existing file / existing dir / non-existing parent / closed filesystem    
     // 
     // Total combinations : 6
     // 
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], createFile, delete, [deleteTestDir] 
     //             [closeTestFileSystem]
 
-    private void test07_createFile(AbsolutePath path, boolean mustFail) throws Exception {
+    private void test07_createFile(Path path, boolean mustFail) throws Exception {
 
         try {
             files.createFile(path);
@@ -915,7 +915,7 @@ public abstract class GenericFileAdaptorTestParent {
         test07_createFile(null, true);
 
         // test with non-existing file
-        AbsolutePath file0 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
         test07_createFile(file0, false);
 
         // test with existing file
@@ -924,8 +924,8 @@ public abstract class GenericFileAdaptorTestParent {
         // test with existing dir
         test07_createFile(testDir, true);
 
-        AbsolutePath tmp = createNewTestDirName(testDir);
-        AbsolutePath file1 = createNewTestFileName(tmp);
+        Path tmp = createNewTestDirName(testDir);
+        Path file1 = createNewTestFileName(tmp);
 
         // test with non-existing parent
         test07_createFile(file1, true);
@@ -948,14 +948,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file   
+    // Path null / non-existing file / existing file   
     // 
     // Total combinations : 3 
     // 
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile], 
     //             [closeTestFileSystem], exists  
 
-    private void test08_exists(AbsolutePath path, boolean expected, boolean mustFail) throws Exception {
+    private void test08_exists(Path path, boolean expected, boolean mustFail) throws Exception {
 
         boolean result = false;
 
@@ -993,11 +993,11 @@ public abstract class GenericFileAdaptorTestParent {
         test08_exists(null, false, true);
 
         // test with non-existing file
-        AbsolutePath file0 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
         test08_exists(file0, false, false);
 
         // test with existing file
-        AbsolutePath file1 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
         test08_exists(file1, true, false);
         deleteTestFile(file1);
 
@@ -1013,7 +1013,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file / existing empty dir / existing non-empty dir / 
+    // Path null / non-existing file / existing file / existing empty dir / existing non-empty dir / 
     //              existing non-writable file / closed filesystem    
     // 
     // Total combinations : 7
@@ -1021,7 +1021,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], delete, [deleteTestFile], [deleteTestDir] 
     //             [closeTestFileSystem]
 
-    private void test09_delete(AbsolutePath path, boolean mustFail) throws Exception {
+    private void test09_delete(Path path, boolean mustFail) throws Exception {
 
         try {
             files.delete(path);
@@ -1056,24 +1056,24 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test09_delete");
 
         // test with non-existing file
-        AbsolutePath file0 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
         test09_delete(file0, true);
 
         // test with existing file
-        AbsolutePath file1 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
         test09_delete(file1, false);
 
         // test with existing empty dir 
-        AbsolutePath dir0 = createTestDir(testDir);
+        Path dir0 = createTestDir(testDir);
         test09_delete(dir0, false);
 
         // test with existing non-empty dir
-        AbsolutePath dir1 = createTestDir(testDir);
-        AbsolutePath file2 = createTestFile(dir1, null);
+        Path dir1 = createTestDir(testDir);
+        Path file2 = createTestFile(dir1, null);
         test09_delete(dir1, true);
 
         // test with non-writable file 
-        //        AbsolutePath file3 = createTestFile(testDir, null);
+        //        Path file3 = createTestFile(testDir, null);
         //        files.setPosixFilePermissions(file3, new HashSet<PosixFilePermission>());
 
         //      System.err.println("Attempting to delete: " + file3.getPath() + " " + files.getAttributes(file3));
@@ -1099,14 +1099,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file size 0 / existing file size N / file from closed FS  
+    // Path null / non-existing file / existing file size 0 / existing file size N / file from closed FS  
     // 
     // Total combinations : 5
     // 
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile], 
     //             [deleteTestDir], [closeTestFileSystem], size, close  
 
-    //    private void test10_size(AbsolutePath path, long expected, boolean mustFail) throws Exception {
+    //    private void test10_size(Path path, long expected, boolean mustFail) throws Exception {
     //
     //        long result = -1;
     //
@@ -1143,21 +1143,21 @@ public abstract class GenericFileAdaptorTestParent {
     //        prepareTestDir(fs, "test10_size");
     //
     //        // test with non existing file
-    //        AbsolutePath file1 = createNewTestFileName(testDir);
+    //        Path file1 = createNewTestFileName(testDir);
     //        test10_size(file1, -1, true);
     //
     //        // test with existing empty file
-    //        AbsolutePath file2 = createTestFile(testDir, new byte[0]);
+    //        Path file2 = createTestFile(testDir, new byte[0]);
     //        test10_size(file2, 0, false);
     //        deleteTestFile(file2);
     //
     //        // test with existing filled file
-    //        AbsolutePath file3 = createTestFile(testDir, new byte[13]);
+    //        Path file3 = createTestFile(testDir, new byte[13]);
     //        test10_size(file3, 13, false);
     //        deleteTestFile(file3);
     //
     //        // test with dir
-    //        AbsolutePath dir0 = createTestDir(testDir);
+    //        Path dir0 = createTestDir(testDir);
     //        test10_size(dir0, 0, false);
     //        deleteTestDir(dir0);
     //        deleteTestDir(testDir);
@@ -1176,7 +1176,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
+    // Path null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
     //              existing file / closed filesystem    
     // 
     // Total combinations : 7
@@ -1184,15 +1184,15 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestDirName], [createTestFile], newDirectoryStream,   
     //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    private void test11_newDirectoryStream(AbsolutePath root, Set<AbsolutePath> expected, boolean mustFail) throws Exception {
+    private void test11_newDirectoryStream(Path root, Set<Path> expected, boolean mustFail) throws Exception {
 
-        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        Set<Path> tmp = new HashSet<Path>();
 
         if (expected != null) {
             tmp.addAll(expected);
         }
 
-        DirectoryStream<AbsolutePath> in = null;
+        DirectoryStream<Path> in = null;
 
         try {
             in = files.newDirectoryStream(root);
@@ -1211,7 +1211,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test11_newDirectoryStream");
         }
 
-        for (AbsolutePath p : in) {
+        for (Path p : in) {
 
             if (tmp.contains(p)) {
                 tmp.remove(p);
@@ -1243,19 +1243,19 @@ public abstract class GenericFileAdaptorTestParent {
         test11_newDirectoryStream(testDir, null, false);
 
         // test with non-existing dir
-        AbsolutePath dir0 = createNewTestDirName(testDir);
+        Path dir0 = createNewTestDirName(testDir);
         test11_newDirectoryStream(dir0, null, true);
 
         // test with exising file
-        AbsolutePath file0 = createTestFile(testDir, null);
+        Path file0 = createTestFile(testDir, null);
         test11_newDirectoryStream(file0, null, true);
 
         // test with non-empty dir
-        AbsolutePath file1 = createTestFile(testDir, null);
-        AbsolutePath file2 = createTestFile(testDir, null);
-        AbsolutePath file3 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
 
-        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        Set<Path> tmp = new HashSet<Path>();
         tmp.add(file0);
         tmp.add(file1);
         tmp.add(file2);
@@ -1264,8 +1264,8 @@ public abstract class GenericFileAdaptorTestParent {
         test11_newDirectoryStream(testDir, tmp, false);
 
         // test with subdirs 
-        AbsolutePath dir1 = createTestDir(testDir);
-        AbsolutePath file4 = createTestFile(dir1, null);
+        Path dir1 = createTestDir(testDir);
+        Path file4 = createTestFile(dir1, null);
 
         tmp.add(dir1);
 
@@ -1293,7 +1293,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
+    // Path null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
     //              existing file / closed filesystem    
     // 
     // directoryStreams.Filter null / filter returns all / filter returns none / filter selects one. 
@@ -1303,16 +1303,16 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    public void test12_newDirectoryStream(AbsolutePath root, DirectoryStream.Filter filter, Set<AbsolutePath> expected,
+    public void test12_newDirectoryStream(Path root, DirectoryStream.Filter filter, Set<Path> expected,
             boolean mustFail) throws Exception {
 
-        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        Set<Path> tmp = new HashSet<Path>();
 
         if (expected != null) {
             tmp.addAll(expected);
         }
 
-        DirectoryStream<AbsolutePath> in = null;
+        DirectoryStream<Path> in = null;
 
         try {
             in = files.newDirectoryStream(root, filter);
@@ -1331,11 +1331,11 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test12_newDirectoryStream_with_filter");
         }
 
-        Iterator<AbsolutePath> itt = in.iterator();
+        Iterator<Path> itt = in.iterator();
 
         while (itt.hasNext()) {
 
-            AbsolutePath p = itt.next();
+            Path p = itt.next();
 
             if (p == null) {
                 throwUnexpectedElement("test12_newDirectoryStream_with_filter", null);
@@ -1379,19 +1379,19 @@ public abstract class GenericFileAdaptorTestParent {
         test12_newDirectoryStream(testDir, new AllTrue(), null, false);
 
         // test with non-existing dir
-        AbsolutePath dir0 = createNewTestDirName(testDir);
+        Path dir0 = createNewTestDirName(testDir);
         test12_newDirectoryStream(dir0, new AllTrue(), null, true);
 
         // test with existing file
-        AbsolutePath file0 = createTestFile(testDir, null);
+        Path file0 = createTestFile(testDir, null);
         test12_newDirectoryStream(file0, new AllTrue(), null, true);
 
         // test with non-empty dir and allTrue
-        AbsolutePath file1 = createTestFile(testDir, null);
-        AbsolutePath file2 = createTestFile(testDir, null);
-        AbsolutePath file3 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
 
-        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        Set<Path> tmp = new HashSet<Path>();
         tmp.add(file0);
         tmp.add(file1);
         tmp.add(file2);
@@ -1408,8 +1408,8 @@ public abstract class GenericFileAdaptorTestParent {
         test12_newDirectoryStream(testDir, new Select(tmp), tmp, false);
 
         // test with subdirs 
-        AbsolutePath dir1 = createTestDir(testDir);
-        AbsolutePath file4 = createTestFile(dir1, null);
+        Path dir1 = createTestDir(testDir);
+        Path file4 = createTestFile(dir1, null);
 
         test12_newDirectoryStream(testDir, new Select(tmp), tmp, false);
 
@@ -1435,7 +1435,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / existing link (!) 
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / existing link (!) 
     //              closed filesystem    
     // 
     // Total combinations : 7
@@ -1443,7 +1443,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    private void test13_getAttributes(AbsolutePath path, boolean isDirectory, long size, boolean mustFail) throws Exception {
+    private void test13_getAttributes(Path path, boolean isDirectory, long size, boolean mustFail) throws Exception {
 
         FileAttributes result = null;
 
@@ -1489,19 +1489,19 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test13_getAttributes");
 
         // test with non-existing file
-        AbsolutePath file0 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
         test13_getAttributes(file0, false, -1, true);
 
         // test with existing empty file
-        AbsolutePath file1 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
         test13_getAttributes(file1, false, 0, false);
 
         // test with existing non-empty file
-        AbsolutePath file2 = createTestFile(testDir, new byte[] { 1, 2, 3 });
+        Path file2 = createTestFile(testDir, new byte[] { 1, 2, 3 });
         test13_getAttributes(file2, false, 3, false);
 
         // test with existing dir 
-        AbsolutePath dir0 = createTestDir(testDir);
+        Path dir0 = createTestDir(testDir);
         test13_getAttributes(dir0, true, -1, false);
 
         // TODO: test with link!
@@ -1523,7 +1523,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing file / existing dir / existing link (!) / closed filesystem
+    // Path null / non-existing file / existing file / existing dir / existing link (!) / closed filesystem
     // Set<PosixFilePermission> null / empty set / [various correct set] 
     // 
     // Total combinations : N
@@ -1531,7 +1531,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    private void test14_setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions, boolean mustFail)
+    private void test14_setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions, boolean mustFail)
             throws Exception {
 
         try {
@@ -1570,7 +1570,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test14_setPosixFilePermissions");
 
         // test with existing file, null set
-        AbsolutePath file0 = createTestFile(testDir, null);
+        Path file0 = createTestFile(testDir, null);
         test14_setPosixFilePermissions(file0, null, true);
 
         // test with existing file, empty set 
@@ -1590,11 +1590,11 @@ public abstract class GenericFileAdaptorTestParent {
         test14_setPosixFilePermissions(file0, permissions, false);
 
         // test with non-existing file
-        AbsolutePath file1 = createNewTestFileName(testDir);
+        Path file1 = createNewTestFileName(testDir);
         test14_setPosixFilePermissions(file1, permissions, true);
 
         // test with existing dir 
-        AbsolutePath dir0 = createTestDir(testDir);
+        Path dir0 = createTestDir(testDir);
 
         permissions.add(PosixFilePermission.OWNER_EXECUTE);
         permissions.add(PosixFilePermission.OWNER_READ);
@@ -1623,7 +1623,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
+    // Path null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
     //              existing file / closed filesystem    
     // 
     // Total combinations : 7
@@ -1631,7 +1631,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestDirName], [createTestFile], newDirectoryStream,   
     //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    private void test15_newAttributesDirectoryStream(AbsolutePath root, Set<PathAttributesPair> expected, boolean mustFail)
+    private void test15_newAttributesDirectoryStream(Path root, Set<PathAttributesPair> expected, boolean mustFail)
             throws Exception {
 
         Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
@@ -1722,17 +1722,17 @@ public abstract class GenericFileAdaptorTestParent {
         test15_newAttributesDirectoryStream(testDir, null, false);
 
         // test with non-existing dir
-        AbsolutePath dir0 = createNewTestDirName(testDir);
+        Path dir0 = createNewTestDirName(testDir);
         test15_newAttributesDirectoryStream(dir0, null, true);
 
         // test with exising file
-        AbsolutePath file0 = createTestFile(testDir, null);
+        Path file0 = createTestFile(testDir, null);
         test15_newAttributesDirectoryStream(file0, null, true);
 
         // test with non-empty dir
-        AbsolutePath file1 = createTestFile(testDir, null);
-        AbsolutePath file2 = createTestFile(testDir, null);
-        AbsolutePath file3 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
 
         Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
@@ -1743,8 +1743,8 @@ public abstract class GenericFileAdaptorTestParent {
         test15_newAttributesDirectoryStream(testDir, result, false);
 
         // test with subdirs 
-        AbsolutePath dir1 = createTestDir(testDir);
-        AbsolutePath file4 = createTestFile(dir1, null);
+        Path dir1 = createTestDir(testDir);
+        Path file4 = createTestFile(dir1, null);
 
         result.add(new PathAttributesPairImplementation(dir1, files.getAttributes(dir1)));
 
@@ -1772,7 +1772,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
+    // Path null / non-existing dir / existing empty dir / existing non-empty dir / existing dir with subdirs / 
     //              existing file / closed filesystem    
     // 
     // directoryStreams.Filter null / filter returns all / filter returns none / filter selects one. 
@@ -1782,7 +1782,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    public void test16_newAttributesDirectoryStream(AbsolutePath root, DirectoryStream.Filter filter,
+    public void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter,
             Set<PathAttributesPair> expected, boolean mustFail) throws Exception {
 
         Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
@@ -1877,17 +1877,17 @@ public abstract class GenericFileAdaptorTestParent {
         test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, false);
 
         // test with non-existing dir
-        AbsolutePath dir0 = createNewTestDirName(testDir);
+        Path dir0 = createNewTestDirName(testDir);
         test16_newAttributesDirectoryStream(dir0, new AllTrue(), null, true);
 
         // test with existing file
-        AbsolutePath file0 = createTestFile(testDir, null);
+        Path file0 = createTestFile(testDir, null);
         test16_newAttributesDirectoryStream(file0, new AllTrue(), null, true);
 
         // test with non-empty dir and allTrue
-        AbsolutePath file1 = createTestFile(testDir, null);
-        AbsolutePath file2 = createTestFile(testDir, null);
-        AbsolutePath file3 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
 
         Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
@@ -1901,14 +1901,14 @@ public abstract class GenericFileAdaptorTestParent {
         test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
 
         // test with subdirs  
-        AbsolutePath dir1 = createTestDir(testDir);
-        AbsolutePath file4 = createTestFile(dir1, null);
+        Path dir1 = createTestDir(testDir);
+        Path file4 = createTestFile(dir1, null);
 
         result.add(new PathAttributesPairImplementation(dir1, files.getAttributes(dir1)));
         test16_newAttributesDirectoryStream(testDir, new AllTrue(), result, false);
 
         // test with non-empty dir and select        
-        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        Set<Path> tmp = new HashSet<Path>();
         tmp.add(file0);
         tmp.add(file1);
         tmp.add(file2);
@@ -1942,13 +1942,13 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem    
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem    
     // 
     // Total combinations : 6
     // 
     // Depends on: 
 
-    public void test20_newInputStream(AbsolutePath file, byte[] expected, boolean mustFail) throws Exception {
+    public void test20_newInputStream(Path file, byte[] expected, boolean mustFail) throws Exception {
 
         InputStream in = null;
 
@@ -2001,19 +2001,19 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test20_newInputStream");
 
         // test with non-existing file
-        AbsolutePath file0 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
         test20_newInputStream(file0, null, true);
 
         // test with existing empty file
-        AbsolutePath file1 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
         test20_newInputStream(file1, null, false);
 
         // test with existing non-empty file
-        AbsolutePath file2 = createTestFile(testDir, data);
+        Path file2 = createTestFile(testDir, data);
         test20_newInputStream(file2, data, false);
 
         // test with existing dir 
-        AbsolutePath dir0 = createTestDir(testDir);
+        Path dir0 = createTestDir(testDir);
         test20_newInputStream(dir0, null, true);
 
         // cleanup
@@ -2036,14 +2036,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
     // OpenOption null / CREATE / OPEN / OPEN_OR_CREATE / READ / TRUNCATE / READ / WRITE + combinations
     // 
     // Total combinations : N
     // 
     // Depends on: 
 
-    public void test21_newOutputStream(AbsolutePath path, OpenOption[] options, byte[] data, byte[] expected, boolean mustFail)
+    public void test21_newOutputStream(Path path, OpenOption[] options, byte[] data, byte[] expected, boolean mustFail)
             throws Exception {
 
         OutputStream out = null;
@@ -2103,7 +2103,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test21_newOuputStream");
 
         // test with existing file and null options
-        AbsolutePath file0 = createTestFile(testDir, null);
+        Path file0 = createTestFile(testDir, null);
         test21_newOutputStream(file0, null, null, null, true);
 
         // test with existing file and empty options
@@ -2159,21 +2159,21 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file0);
 
         // test with non-existing and CREATE + APPEND option
-        AbsolutePath file1 = createNewTestFileName(testDir);
+        Path file1 = createNewTestFileName(testDir);
         test21_newOutputStream(file1, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, false);
         deleteTestFile(file1);
 
         // test with non-existing and OPEN_OR_CREATE + APPEND option
-        AbsolutePath file2 = createNewTestFileName(testDir);
+        Path file2 = createNewTestFileName(testDir);
         test21_newOutputStream(file2, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, data, data, false);
         deleteTestFile(file2);
 
         // test with non-existing and OPEN + APPEND option
-        AbsolutePath file3 = createNewTestFileName(testDir);
+        Path file3 = createNewTestFileName(testDir);
         test21_newOutputStream(file3, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND }, null, null, true);
 
         // test with exising dir
-        AbsolutePath dir0 = createTestDir(testDir);
+        Path dir0 = createTestDir(testDir);
 
         test21_newOutputStream(dir0, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, null, null, true);
         test21_newOutputStream(dir0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, null, null, true);
@@ -2182,7 +2182,7 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(dir0);
 
         // test with conflicting options
-        AbsolutePath file4 = createTestFile(testDir, null);
+        Path file4 = createTestFile(testDir, null);
 
         test21_newOutputStream(file4, new OpenOption[] { OpenOption.CREATE, OpenOption.OPEN, OpenOption.APPEND }, null, null,
                 true);
@@ -2193,7 +2193,7 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file4);
 
         // test with non-existing and CREATE option
-        AbsolutePath file5 = createNewTestFileName(testDir);
+        Path file5 = createNewTestFileName(testDir);
         test21_newOutputStream(file5, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, false);
         deleteTestFile(file5);
 
@@ -2213,14 +2213,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
     // OpenOption null / CREATE / OPEN / OPEN_OR_CREATE / READ / TRUNCATE / READ / WRITE + combinations
     // 
     // Total combinations : N
     // 
     // Depends on: 
 
-    //    public void test22_newByteChannel(AbsolutePath path, OpenOption [] options, byte [] toWrite, byte [] toRead, 
+    //    public void test22_newByteChannel(Path path, OpenOption [] options, byte [] toWrite, byte [] toRead, 
     //            boolean mustFail) throws Exception {
     //
     //        if (!config.supportsNewByteChannel()) {
@@ -2287,7 +2287,7 @@ public abstract class GenericFileAdaptorTestParent {
     //        prepareTestDir(fs, "test22_newByteChannel");
     //        
     //        // test with existing file and null options
-    //        AbsolutePath file0 = createTestFile(testDir, null);
+    //        Path file0 = createTestFile(testDir, null);
     //        test22_newByteChannel(file0, null, null, null, true);
     //        
     //        // test with existing file and empty options
@@ -2321,7 +2321,7 @@ public abstract class GenericFileAdaptorTestParent {
     //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, OpenOption.APPEND }, null, null, true);
     //        
     //        // test with existing file and OPEN + READ option
-    //        AbsolutePath file1 = createTestFile(testDir, data);
+    //        Path file1 = createTestFile(testDir, data);
     //        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
     //
     //        // Test with existing file and OPEN + APPEND + READ + WRITE 
@@ -2339,17 +2339,17 @@ public abstract class GenericFileAdaptorTestParent {
     //        deleteTestFile(file1);
     //        
     //        // test with non-existing file and CREATE + WRITE + APPEND
-    //        AbsolutePath file2 = createNewTestFileName(testDir);
+    //        Path file2 = createNewTestFileName(testDir);
     //        test22_newByteChannel(file2, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, null, false);
     //        test22_newByteChannel(file2, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
     //        deleteTestFile(file2);
     //        
     //        // test with non-existing file and OPEN + READ
-    //        AbsolutePath file3 = createNewTestFileName(testDir);
+    //        Path file3 = createNewTestFileName(testDir);
     //        test22_newByteChannel(file3, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, null, true);
     //        
     //        // test with non-existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
-    //        AbsolutePath file4 = createNewTestFileName(testDir);
+    //        Path file4 = createNewTestFileName(testDir);
     //        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.READ }, data, data, false);
     //
     //        // test with existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
@@ -2377,14 +2377,14 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
     // CopyOptions  null / CREATE / REPLACE / IGNORE / APPEND / RESUME / VERIFY / ASYNCHRONOUS 
     // 
     // Total combinations : N
     // 
     // Depends on: 
 
-    private void test23_copy(AbsolutePath source, AbsolutePath target, CopyOption[] options, byte[] expected, boolean mustFail)
+    private void test23_copy(Path source, Path target, CopyOption[] options, byte[] expected, boolean mustFail)
             throws Exception {
 
         Copy copy;
@@ -2431,7 +2431,7 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test23_copy");
 
-        AbsolutePath file0 = createTestFile(testDir, data);
+        Path file0 = createTestFile(testDir, data);
 
         // test without target
         test23_copy(file0, null, new CopyOption[] { CopyOption.CREATE }, null, true);
@@ -2439,17 +2439,17 @@ public abstract class GenericFileAdaptorTestParent {
         // test without source
         test23_copy(null, file0, new CopyOption[] { CopyOption.CREATE }, null, true);
 
-        AbsolutePath file1 = createNewTestFileName(testDir);
-        AbsolutePath file2 = createNewTestFileName(testDir);
-        AbsolutePath file3 = createNewTestFileName(testDir);
+        Path file1 = createNewTestFileName(testDir);
+        Path file2 = createNewTestFileName(testDir);
+        Path file3 = createNewTestFileName(testDir);
 
-        AbsolutePath file4 = createTestFile(testDir, data2);
-        AbsolutePath file5 = createTestFile(testDir, data3);
+        Path file4 = createTestFile(testDir, data2);
+        Path file5 = createTestFile(testDir, data3);
 
-        AbsolutePath dir0 = createTestDir(testDir);
-        AbsolutePath dir1 = createNewTestDirName(testDir);
+        Path dir0 = createTestDir(testDir);
+        Path dir1 = createNewTestDirName(testDir);
 
-        AbsolutePath file6 = createNewTestFileName(dir1);
+        Path file6 = createNewTestFileName(dir1);
 
         // test copy with non-existing source
         test23_copy(file1, file2, new CopyOption[0], null, true);
@@ -2548,7 +2548,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
     // CopyOptions  null / CREATE / REPLACE / IGNORE / APPEND / RESUME / VERIFY / ASYNCHRONOUS 
     // 
     // Total combinations : N
@@ -2564,8 +2564,8 @@ public abstract class GenericFileAdaptorTestParent {
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
         prepareTestDir(fs, "test24_copy_async");
-        AbsolutePath file0 = createTestFile(testDir, data);
-        AbsolutePath file1 = createNewTestFileName(testDir);
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
 
         // Test the async copy
         Copy copy = files.copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.ASYNCHRONOUS });
@@ -2597,7 +2597,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Possible parameters:
     //
-    // AbsolutePath null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
+    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
     // CopyOptions  null / CREATE / REPLACE / IGNORE / APPEND / RESUME / VERIFY / ASYNCHRONOUS 
     // 
     // Total combinations : N
@@ -2650,7 +2650,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: 
 
-    private void test27_move(AbsolutePath source, AbsolutePath target, boolean mustFail) throws Exception {
+    private void test27_move(Path source, Path target, boolean mustFail) throws Exception {
 
         try {
             files.move(source, target);
@@ -2694,21 +2694,21 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test27_move");
 
         // test with non-existing source
-        AbsolutePath file0 = createNewTestFileName(testDir);
-        AbsolutePath file1 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
+        Path file1 = createNewTestFileName(testDir);
         test27_move(file0, file1, true);
 
         // test with existing source, non-existing target
-        AbsolutePath file2 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
         test27_move(file2, file0, false);
 
         // test with existing source and target
-        AbsolutePath file3 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
         test27_move(file3, file0, true);
 
         // test file existing source, and target with non-existing parent
-        AbsolutePath dir0 = createNewTestDirName(testDir);
-        AbsolutePath file4 = createNewTestFileName(dir0);
+        Path dir0 = createNewTestDirName(testDir);
+        Path file4 = createNewTestFileName(dir0);
 
         test27_move(file0, file4, true);
 
@@ -2719,7 +2719,7 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file3);
 
         // test with existing dir
-        AbsolutePath dir1 = createTestDir(testDir);
+        Path dir1 = createTestDir(testDir);
         test27_move(dir1, file1, false);
 
         deleteTestDir(file1);
@@ -2739,9 +2739,9 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: 
 
-    private void test28_readSymbolicLink(AbsolutePath link, AbsolutePath expected, boolean mustFail) throws Exception {
+    private void test28_readSymbolicLink(Path link, Path expected, boolean mustFail) throws Exception {
 
-        AbsolutePath target = null;
+        Path target = null;
 
         try {
             target = files.readSymbolicLink(link);
@@ -2777,16 +2777,16 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir(fs, "test28_readSybmolicLink");
 
         // test with non-exising file
-        AbsolutePath file0 = createNewTestFileName(testDir);
+        Path file0 = createNewTestFileName(testDir);
         test28_readSymbolicLink(file0, null, true);
 
         // test with existing file
-        AbsolutePath file1 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
         test28_readSymbolicLink(file1, null, true);
         deleteTestFile(file1);
 
         // test with existing dir
-        AbsolutePath dir0 = createTestDir(testDir);
+        Path dir0 = createTestDir(testDir);
         test28_readSymbolicLink(dir0, null, true);
 
         deleteTestDir(dir0);
@@ -2808,25 +2808,25 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
 
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
         }
 
         // prepare the test files 
-        AbsolutePath file0 = root.resolve(new RelativePath("file0")); // exists
-        AbsolutePath file1 = root.resolve(new RelativePath("file1")); // exists
-        AbsolutePath file2 = root.resolve(new RelativePath("file2")); // does not exist
+        Path file0 = root.resolve(new Pathname("file0")); // exists
+        Path file1 = root.resolve(new Pathname("file1")); // exists
+        Path file2 = root.resolve(new Pathname("file2")); // does not exist
 
         // prepare the test links 
-        AbsolutePath link0 = root.resolve(new RelativePath("link0")); // points to file0 (contains text) 
-        AbsolutePath link1 = root.resolve(new RelativePath("link1")); // points to file1 (is empty)
-        AbsolutePath link2 = root.resolve(new RelativePath("link2")); // points to non-existing file2 
-        AbsolutePath link3 = root.resolve(new RelativePath("link3")); // points to link0 which points to file0 (contains text)
-        AbsolutePath link4 = root.resolve(new RelativePath("link4")); // points to link2 which points to non-existing file2 
-        AbsolutePath link5 = root.resolve(new RelativePath("link5")); // points to link6 (circular)  
-        AbsolutePath link6 = root.resolve(new RelativePath("link6")); // points to link5 (circular)
+        Path link0 = root.resolve(new Pathname("link0")); // points to file0 (contains text) 
+        Path link1 = root.resolve(new Pathname("link1")); // points to file1 (is empty)
+        Path link2 = root.resolve(new Pathname("link2")); // points to non-existing file2 
+        Path link3 = root.resolve(new Pathname("link3")); // points to link0 which points to file0 (contains text)
+        Path link4 = root.resolve(new Pathname("link4")); // points to link2 which points to non-existing file2 
+        Path link5 = root.resolve(new Pathname("link5")); // points to link6 (circular)  
+        Path link6 = root.resolve(new Pathname("link6")); // points to link5 (circular)
 
         // link0 should point to file0
         test28_readSymbolicLink(link0, file0, false);
@@ -2860,20 +2860,20 @@ public abstract class GenericFileAdaptorTestParent {
     //        FileSystem fs = config.getTestFileSystem(files, credentials);
     //
     //        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-    //        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+    //        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
     //
     //        if (!files.exists(root)) {
     //            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
     //        }
     //
     //        // prepare the test files
-    //        boolean v = files.isSymbolicLink(root.resolve(new RelativePath("file0")));
+    //        boolean v = files.isSymbolicLink(root.resolve(new Pathname("file0")));
     //        assertFalse(v);
     //
-    //        v = files.isSymbolicLink(root.resolve(new RelativePath("link0")));
+    //        v = files.isSymbolicLink(root.resolve(new Pathname("link0")));
     //        assertTrue(v);
     //
-    //        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
+    //        v = files.isSymbolicLink(root.resolve(new Pathname("file2")));
     //        assertFalse(v);
     //
     //        cleanup();
@@ -2887,26 +2887,26 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
 
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
         }
 
         // prepare the test files 
-        AbsolutePath file0 = root.resolve(new RelativePath("file0")); // exists
-        AbsolutePath file1 = root.resolve(new RelativePath("file1")); // exists
+        Path file0 = root.resolve(new Pathname("file0")); // exists
+        Path file1 = root.resolve(new Pathname("file1")); // exists
 
         // prepare the test links 
-        AbsolutePath link0 = root.resolve(new RelativePath("link0")); // points to file0 (contains text) 
-        AbsolutePath link1 = root.resolve(new RelativePath("link1")); // points to file1 (is empty)
-        AbsolutePath link2 = root.resolve(new RelativePath("link2")); // points to non-existing file2 
-        AbsolutePath link3 = root.resolve(new RelativePath("link3")); // points to link0 which points to file0 (contains text)
-        AbsolutePath link4 = root.resolve(new RelativePath("link4")); // points to link2 which points to non-existing file2 
-        AbsolutePath link5 = root.resolve(new RelativePath("link5")); // points to link6 (circular)  
-        AbsolutePath link6 = root.resolve(new RelativePath("link6")); // points to link5 (circular)
+        Path link0 = root.resolve(new Pathname("link0")); // points to file0 (contains text) 
+        Path link1 = root.resolve(new Pathname("link1")); // points to file1 (is empty)
+        Path link2 = root.resolve(new Pathname("link2")); // points to non-existing file2 
+        Path link3 = root.resolve(new Pathname("link3")); // points to link0 which points to file0 (contains text)
+        Path link4 = root.resolve(new Pathname("link4")); // points to link2 which points to non-existing file2 
+        Path link5 = root.resolve(new Pathname("link5")); // points to link6 (circular)  
+        Path link6 = root.resolve(new Pathname("link6")); // points to link5 (circular)
 
-        Set<AbsolutePath> tmp = new HashSet<AbsolutePath>();
+        Set<Path> tmp = new HashSet<Path>();
         tmp.add(file0);
         tmp.add(file1);
         tmp.add(link0);
@@ -2930,24 +2930,24 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        AbsolutePath root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
 
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
         }
 
         // prepare the test files 
-        AbsolutePath file0 = root.resolve(new RelativePath("file0")); // exists
-        AbsolutePath file1 = root.resolve(new RelativePath("file1")); // exists
+        Path file0 = root.resolve(new Pathname("file0")); // exists
+        Path file1 = root.resolve(new Pathname("file1")); // exists
 
         // prepare the test links 
-        AbsolutePath link0 = root.resolve(new RelativePath("link0")); // points to file0 (contains text) 
-        AbsolutePath link1 = root.resolve(new RelativePath("link1")); // points to file1 (is empty)
-        AbsolutePath link2 = root.resolve(new RelativePath("link2")); // points to non-existing file2 
-        AbsolutePath link3 = root.resolve(new RelativePath("link3")); // points to link0 which points to file0 (contains text)
-        AbsolutePath link4 = root.resolve(new RelativePath("link4")); // points to link2 which points to non-existing file2 
-        AbsolutePath link5 = root.resolve(new RelativePath("link5")); // points to link6 (circular)  
-        AbsolutePath link6 = root.resolve(new RelativePath("link6")); // points to link5 (circular)
+        Path link0 = root.resolve(new Pathname("link0")); // points to file0 (contains text) 
+        Path link1 = root.resolve(new Pathname("link1")); // points to file1 (is empty)
+        Path link2 = root.resolve(new Pathname("link2")); // points to non-existing file2 
+        Path link3 = root.resolve(new Pathname("link3")); // points to link0 which points to file0 (contains text)
+        Path link4 = root.resolve(new Pathname("link4")); // points to link2 which points to non-existing file2 
+        Path link5 = root.resolve(new Pathname("link5")); // points to link6 (circular)  
+        Path link6 = root.resolve(new Pathname("link6")); // points to link5 (circular)
 
         Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
         tmp.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
@@ -2966,9 +2966,9 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     /*        
-    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException;
+    public Path readSymbolicLink(Path link) throws OctopusIOException;
 
-    public boolean isSymbolicLink(AbsolutePath path) throws OctopusIOException;
+    public boolean isSymbolicLink(Path path) throws OctopusIOException;
     
      
     */

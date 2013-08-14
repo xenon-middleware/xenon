@@ -11,8 +11,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 @SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
@@ -24,7 +24,7 @@ public final class SlurmJobScriptGenerator {
         //DO NOT USE
     }
 
-    static String generate(JobDescription description, AbsolutePath fsEntryPath) throws OctopusException {
+    static String generate(JobDescription description, Path fsEntryPath) throws OctopusException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -40,7 +40,7 @@ public final class SlurmJobScriptGenerator {
                 path = description.getWorkingDirectory();
             } else {
                 //make relative path absolute
-                AbsolutePath workingDirectory = fsEntryPath.resolve(new RelativePath(description.getWorkingDirectory()));
+                Path workingDirectory = fsEntryPath.resolve(new Pathname(description.getWorkingDirectory()));
                 path = workingDirectory.getPath();
             }
             script.format("#SBATCH --workdir='%s'\n", path);

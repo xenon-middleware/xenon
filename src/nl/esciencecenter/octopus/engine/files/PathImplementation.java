@@ -18,20 +18,20 @@ package nl.esciencecenter.octopus.engine.files;
 import java.util.Iterator;
 
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.AbsolutePath;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * Implementation of Path. Will create new Paths directly, using either an adaptor identical to the original in case of an
  * absolute path, or the local adaptor in case of a relative path.
  */
-public final class AbsolutePathImplementation implements AbsolutePath {
+public final class PathImplementation implements Path {
 
-    class AbsolutePathIterator implements Iterator<AbsolutePath> {
+    class PathIterator implements Iterator<Path> {
 
-        private final Iterator<RelativePath> iterator;
+        private final Iterator<Pathname> iterator;
 
-        AbsolutePathIterator(Iterator<RelativePath> iterator) {
+        PathIterator(Iterator<Pathname> iterator) {
             this.iterator = iterator;
         }
 
@@ -41,8 +41,8 @@ public final class AbsolutePathImplementation implements AbsolutePath {
         }
 
         @Override
-        public AbsolutePath next() {
-            return new AbsolutePathImplementation(filesystem, iterator.next());
+        public Path next() {
+            return new PathImplementation(filesystem, iterator.next());
         }
 
         @Override
@@ -52,23 +52,23 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     }
 
     private final FileSystem filesystem;
-    private final RelativePath relativePath;
+    private final Pathname pathname;
 
-    public AbsolutePathImplementation(FileSystem filesystem, RelativePath relativePath) {
+    public PathImplementation(FileSystem filesystem, Pathname pathname) {
 
         if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
         }
 
-        if (relativePath == null) {
-            throw new IllegalArgumentException("RelativePath may not be null!");
+        if (pathname == null) {
+            throw new IllegalArgumentException("Pathname may not be null!");
         }
 
         this.filesystem = filesystem;
-        this.relativePath = relativePath;
+        this.pathname = pathname;
     }
 
-    public AbsolutePathImplementation(FileSystem filesystem, RelativePath... relativePaths) {
+    public PathImplementation(FileSystem filesystem, Pathname... pathnames) {
 
         if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
@@ -76,11 +76,11 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
         this.filesystem = filesystem;
 
-        if (relativePaths.length == 0) {
-            throw new IllegalArgumentException("AbsolutePathImplementation requires at least one RelativePath");
+        if (pathnames.length == 0) {
+            throw new IllegalArgumentException("PathImplementation requires at least one pathname");
         }
 
-        this.relativePath = new RelativePath(relativePaths);
+        this.pathname = new Pathname(pathnames);
     }
 
     @Override
@@ -89,8 +89,8 @@ public final class AbsolutePathImplementation implements AbsolutePath {
     }
 
     @Override
-    public RelativePath getRelativePath() {
-        return relativePath;
+    public Pathname getPathname() {
+        return pathname;
     }
 
     @Override
@@ -100,92 +100,92 @@ public final class AbsolutePathImplementation implements AbsolutePath {
 
     @Override
     public String getFileName() {
-        return relativePath.getFileName();
+        return pathname.getFileName();
     }
 
     @Override
-    public AbsolutePath getParent() {
-        RelativePath path = relativePath.getParent();
+    public Path getParent() {
+        Pathname path = pathname.getParent();
         if (path == null) {
             return null;
         }
-        return new AbsolutePathImplementation(filesystem, path);
+        return new PathImplementation(filesystem, path);
     }
 
     @Override
     public int getNameCount() {
-        return relativePath.getNameCount();
+        return pathname.getNameCount();
     }
 
     @Override
     public String[] getNames() {
-        return relativePath.getNames();
+        return pathname.getNames();
     }
 
     @Override
     public String getName(int index) {
-        return relativePath.getName(index);
+        return pathname.getName(index);
     }
 
     @Override
-    public AbsolutePath subpath(int beginIndex, int endIndex) {
-        return new AbsolutePathImplementation(filesystem, relativePath.subpath(beginIndex, endIndex));
+    public Path subpath(int beginIndex, int endIndex) {
+        return new PathImplementation(filesystem, pathname.subpath(beginIndex, endIndex));
     }
 
     @Override
-    public AbsolutePath normalize() {
-        return new AbsolutePathImplementation(filesystem, relativePath.normalize());
+    public Path normalize() {
+        return new PathImplementation(filesystem, pathname.normalize());
     }
 
     @Override
-    public boolean startsWith(RelativePath other) {
-        return relativePath.startsWith(other);
+    public boolean startsWith(Pathname other) {
+        return pathname.startsWith(other);
     }
 
     @Override
-    public boolean endsWith(RelativePath other) {
-        return relativePath.endsWith(other);
+    public boolean endsWith(Pathname other) {
+        return pathname.endsWith(other);
     }
 
     @Override
-    public AbsolutePath resolve(RelativePath other) {
-        return new AbsolutePathImplementation(filesystem, relativePath.resolve(other));
+    public Path resolve(Pathname other) {
+        return new PathImplementation(filesystem, pathname.resolve(other));
     }
 
     @Override
-    public AbsolutePath resolveSibling(RelativePath other) {
-        return new AbsolutePathImplementation(filesystem, relativePath.resolveSibling(other));
+    public Path resolveSibling(Pathname other) {
+        return new PathImplementation(filesystem, pathname.resolveSibling(other));
     }
 
     @Override
-    public RelativePath relativize(RelativePath other) {
-        return relativePath.relativize(other);
+    public Pathname relativize(Pathname other) {
+        return pathname.relativize(other);
     }
 
     @Override
-    public Iterator<AbsolutePath> iterator() {
-        return new AbsolutePathIterator(relativePath.iterator());
+    public Iterator<Path> iterator() {
+        return new PathIterator(pathname.iterator());
     }
 
     @Override
     public String getPath() {
 
-        if (relativePath.isEmpty()) {
-            return "" + relativePath.getSeparator();
+        if (pathname.isEmpty()) {
+            return "" + pathname.getSeparator();
         }
 
-        return relativePath.getPath();
+        return pathname.getPath();
     }
 
     public String toString() {
-        return filesystem.toString() + relativePath.toString();
+        return filesystem.toString() + pathname.toString();
     }
 
     @Override
     public int hashCode() {
         int result = 31 + filesystem.getAdaptorName().hashCode();
         result = 31 * result + filesystem.getUri().hashCode();
-        return 31 * result + relativePath.hashCode();
+        return 31 * result + pathname.hashCode();
     }
 
     @Override
@@ -198,11 +198,11 @@ public final class AbsolutePathImplementation implements AbsolutePath {
             return false;
         }
 
-        if (!(obj instanceof AbsolutePathImplementation)) {
+        if (!(obj instanceof PathImplementation)) {
             return false;
         }
 
-        AbsolutePathImplementation other = (AbsolutePathImplementation) obj;
+        PathImplementation other = (PathImplementation) obj;
 
         if (!filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())) {
             return false;
@@ -212,6 +212,6 @@ public final class AbsolutePathImplementation implements AbsolutePath {
             return false;
         }
 
-        return relativePath.equals(other.relativePath);
+        return pathname.equals(other.pathname);
     }
 }

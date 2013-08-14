@@ -21,11 +21,11 @@ import java.io.OutputStream;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
@@ -44,29 +44,29 @@ class BatchProcess implements InteractiveProcess {
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
 
-    private AbsolutePath processPath(Files files, AbsolutePath root, String path) throws OctopusIOException, OctopusException {
+    private Path processPath(Files files, Path root, String path) throws OctopusIOException, OctopusException {
 
-        AbsolutePath result = null;
+        Path result = null;
 
         if (path == null) {
             result = root;
         } else if (path.startsWith("/")) {
-            result = files.newPath(root.getFileSystem(), new RelativePath(path));
+            result = files.newPath(root.getFileSystem(), new Pathname(path));
         } else {
-            result = root.resolve(new RelativePath(path));
+            result = root.resolve(new Pathname(path));
         }
 
         return result;
     }
 
-    private OutputStream createOutputStream(Files files, AbsolutePath workdir, String filename) throws OctopusIOException,
+    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws OctopusIOException,
             OctopusException {
 
         if (filename == null) {
             return null;
         }
 
-        AbsolutePath file = processPath(files, workdir, filename);
+        Path file = processPath(files, workdir, filename);
 
         // Create the files for the output stream. Will fail if the files already exist!
         files.createFile(file);
@@ -81,14 +81,14 @@ class BatchProcess implements InteractiveProcess {
         JobDescription description = job.getJobDescription();
 
         // Retrieve the filesystem that goes with the scheduler.
-        AbsolutePath workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
+        Path workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
 
         if (!files.exists(workdir)) {
             throw new IOException("Working directory " + workdir + " does not exist!");
         }
 
         // If needed create a file for stdin, and make sure it exists!
-        AbsolutePath stdin = null;
+        Path stdin = null;
 
         if (description.getStdin() != null) {
             stdin = processPath(files, workdir, description.getStdin());

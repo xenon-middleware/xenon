@@ -22,10 +22,10 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * A simple example of how to check if a given file exists.
@@ -60,8 +60,8 @@ public class FileExists {
             Credential c = credentials.getDefaultCredential("file");
             FileSystem fs = files.newFileSystem(uri, c, null);
 
-            // We now create an AbsolutePath representing the file
-            AbsolutePath path = files.newPath(fs, new RelativePath(filename));
+            // We now create an Path representing the file
+            Path path = files.newPath(fs, new Pathname(filename));
 
             // Check if the file exists 
             if (files.exists(path)) {

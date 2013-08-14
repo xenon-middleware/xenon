@@ -34,10 +34,10 @@ import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -178,13 +178,13 @@ public class JobQueueTest {
     @After
     public void cleanupTest() throws Exception {
 
-        AbsolutePath p = filesystem.getEntryPath().resolve(new RelativePath("stderr.txt"));
+        Path p = filesystem.getEntryPath().resolve(new Pathname("stderr.txt"));
 
         if (files.exists(p)) {
             files.delete(p);
         }
 
-        p = filesystem.getEntryPath().resolve(new RelativePath("stdout.txt"));
+        p = filesystem.getEntryPath().resolve(new Pathname("stdout.txt"));
 
         if (files.exists(p)) {
             files.delete(p);

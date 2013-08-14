@@ -20,10 +20,10 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -78,8 +78,8 @@ public class SubmitBatchJobWithOutput {
                 System.out.println("Job ran succesfully and produced:");
 
                 FileSystem fs = files.getLocalCWDFileSystem();
-                AbsolutePath stdout = fs.getEntryPath().resolve(new RelativePath("stdout.txt"));
-                AbsolutePath stderr = fs.getEntryPath().resolve(new RelativePath("stderr.txt"));
+                Path stdout = fs.getEntryPath().resolve(new Pathname("stdout.txt"));
+                Path stderr = fs.getEntryPath().resolve(new Pathname("stderr.txt"));
 
                 if (files.exists(stdout)) {
                     String output = new String(FileUtils.readAllBytes(files, stdout));

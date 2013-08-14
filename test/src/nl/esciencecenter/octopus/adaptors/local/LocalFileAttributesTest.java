@@ -24,11 +24,11 @@ import java.nio.file.attribute.PosixFilePermissions;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -47,7 +47,7 @@ public class LocalFileAttributesTest {
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
 
-        AbsolutePath path = fs.getEntryPath().resolve(new RelativePath("noot.txt"));
+        Path path = fs.getEntryPath().resolve(new Pathname("noot.txt"));
         new LocalFileAttributes(path);
     }
 
@@ -56,7 +56,7 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath path = fs.getEntryPath().resolve(new RelativePath("aap.txt"));
+        Path path = fs.getEntryPath().resolve(new Pathname("aap.txt"));
 
         long now = System.currentTimeMillis();
 
@@ -80,7 +80,7 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath path = fs.getEntryPath().resolve(new RelativePath("aap.txt"));
+        Path path = fs.getEntryPath().resolve(new Pathname("aap.txt"));
         files.createFile(path);
 
         FileAttributes att = new LocalFileAttributes(path);
@@ -98,10 +98,10 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath path1 = fs.getEntryPath().resolve(new RelativePath("aap.txt"));
+        Path path1 = fs.getEntryPath().resolve(new Pathname("aap.txt"));
         files.createFile(path1);
 
-        AbsolutePath path2 = fs.getEntryPath().resolve(new RelativePath("noot.txt"));
+        Path path2 = fs.getEntryPath().resolve(new Pathname("noot.txt"));
         files.createFile(path2);
 
         files.setPosixFilePermissions(path1, LocalUtils.octopusPermissions(PosixFilePermissions.fromString("rwxr--r--")));

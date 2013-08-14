@@ -28,9 +28,9 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -71,24 +71,24 @@ public class SandboxedLocalJobIT {
 
         // create workdir
         String workFn = tmpdir + "/AAP" + work_id;
-        AbsolutePath workdir = octopus.files().newPath(localrootfs, new RelativePath(workFn));
+        Path workdir = octopus.files().newPath(localrootfs, new Pathname(workFn));
         octopus.files().createDirectory(workdir);
 
         // fill workdir
         String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
-        octopus.files().copy(octopus.files().newPath(localrootfs, new RelativePath(input_file)),
-                octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
+        octopus.files().copy(octopus.files().newPath(localrootfs, new Pathname(input_file)),
+                octopus.files().newPath(localrootfs, new Pathname(workFn + "/lorem_ipsum.txt")));
 
         // create sandbox
         String sandbox_id = "MIES" + UUID.randomUUID().toString();
-        AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(tmpdir));
+        Path sandboxPath = octopus.files().newPath(localrootfs, new Pathname(tmpdir));
         Sandbox sandbox = new Sandbox(octopus.files(), sandboxPath, sandbox_id);
 
-        sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
+        sandbox.addUploadFile(octopus.files().newPath(localrootfs, new Pathname(workFn + "/lorem_ipsum.txt")),
                 "lorem_ipsum.txt");
 
-        sandbox.addDownloadFile("stdout.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
-        sandbox.addDownloadFile("stderr.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
+        sandbox.addDownloadFile("stdout.txt", octopus.files().newPath(localrootfs, new Pathname(workFn + "/stdout.txt")));
+        sandbox.addDownloadFile("stderr.txt", octopus.files().newPath(localrootfs, new Pathname(workFn + "/stderr.txt")));
 
         // upload lorem_ipsum.txt to sandbox
         sandbox.upload();
@@ -99,7 +99,7 @@ public class SandboxedLocalJobIT {
         description.setQueueName("single");
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        description.setWorkingDirectory(sandbox.getPath().getRelativePath().getPath());
+        description.setWorkingDirectory(sandbox.getPath().getPathname().getPath());
 
         URI sh_location = new URI("local:///");
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, null, null);

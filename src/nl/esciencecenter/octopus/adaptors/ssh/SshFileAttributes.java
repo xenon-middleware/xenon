@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
@@ -38,9 +38,9 @@ public class SshFileAttributes implements FileAttributes {
     static final int SVTX = 01000;
 
     private final SftpATTRS attributes;
-    private final AbsolutePath path;
+    private final Path path;
 
-    public SshFileAttributes(SftpATTRS attributes, AbsolutePath path) {
+    public SshFileAttributes(SftpATTRS attributes, Path path) {
         this.attributes = attributes;
         this.path = path;
     }

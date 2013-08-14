@@ -40,8 +40,8 @@ public class InterSchemeMoveTest {
         FileSystem fs1 = files.getLocalCWDFileSystem();
         FileSystem fs2 = files.newFileSystem(new URI("ssh://test@localhost"), null, null);
 
-        AbsolutePath file1 = fs1.getEntryPath().resolve(new RelativePath("test"));
-        AbsolutePath file2 = fs2.getEntryPath().resolve(new RelativePath("test"));
+        Path file1 = fs1.getEntryPath().resolve(new Pathname("test"));
+        Path file2 = fs2.getEntryPath().resolve(new Pathname("test"));
 
         files.move(file1, file2);
     }

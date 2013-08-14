@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.net.URISyntaxException;
 import java.util.List;
@@ -29,11 +28,11 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.Sandbox.Pair;
 
 import org.junit.AfterClass;
@@ -46,10 +45,10 @@ public class RealSandboxTest {
     private static Files files;
     private static FileSystem fileSystem;
 
-    private static AbsolutePath testDir;
+    private static Path testDir;
 
-    private static AbsolutePath testInput1;
-    private static AbsolutePath testInput2;
+    private static Path testInput1;
+    private static Path testInput2;
 
     private static int counter = 0;
 
@@ -58,11 +57,11 @@ public class RealSandboxTest {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
         fileSystem = files.getLocalCWDFileSystem();
-        testDir = fileSystem.getEntryPath().resolve(new RelativePath("octopus_test_" + System.currentTimeMillis()));
+        testDir = fileSystem.getEntryPath().resolve(new Pathname("octopus_test_" + System.currentTimeMillis()));
         files.createDirectory(testDir);
 
-        testInput1 = testDir.resolve(new RelativePath("input1"));
-        testInput2 = testDir.resolve(new RelativePath("input2"));
+        testInput1 = testDir.resolve(new Pathname("input1"));
+        testInput2 = testDir.resolve(new Pathname("input2"));
 
         files.createFile(testInput1);
         files.createFile(testInput2);
@@ -95,7 +94,7 @@ public class RealSandboxTest {
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
-        AbsolutePath expectedPath = testDir.resolve(new RelativePath(name));
+        Path expectedPath = testDir.resolve(new Pathname(name));
         assertEquals(expectedPath, sandbox.getPath());
         assertEquals(0, sandbox.getUploadFiles().size());
         assertEquals(0, sandbox.getDownloadFiles().size());
@@ -121,7 +120,7 @@ public class RealSandboxTest {
         sandbox.addUploadFile(testInput1, "input");
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
-        AbsolutePath dst = testDir.resolve(new RelativePath(name)).resolve(new RelativePath("input"));
+        Path dst = testDir.resolve(new Pathname(name)).resolve(new Pathname("input"));
 
         assertEquals(1, uploadfiles.size());
         assertEquals(testInput1, uploadfiles.get(0).source);
@@ -138,9 +137,9 @@ public class RealSandboxTest {
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
 
-        AbsolutePath sb = testDir.resolve(new RelativePath(name));
-        AbsolutePath dst1 = sb.resolve(new RelativePath("input1"));
-        AbsolutePath dst2 = sb.resolve(new RelativePath("input2"));
+        Path sb = testDir.resolve(new Pathname(name));
+        Path dst1 = sb.resolve(new Pathname("input1"));
+        Path dst2 = sb.resolve(new Pathname("input2"));
 
         assertEquals(2, uploadfiles.size());
         assertEquals(testInput1, uploadfiles.get(0).source);
@@ -160,25 +159,20 @@ public class RealSandboxTest {
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
 
-        AbsolutePath dst = testDir.resolve(new RelativePath(name)).resolve(new RelativePath("input1"));
+        Path dst = testDir.resolve(new Pathname(name)).resolve(new Pathname("input1"));
 
         assertEquals(1, uploadfiles.size());
         assertEquals(testInput1, uploadfiles.get(0).source);
         assertEquals(dst, uploadfiles.get(0).destination);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
-        try {
-            sandbox.addUploadFile(null);
-            fail("Expected an NullPointerException");
-        } catch (NullPointerException e) {
-            assertEquals("the source path cannot be null when adding a preStaged file", e.getMessage());
-        }
+        sandbox.addUploadFile(null);
     }
 
     @Test
@@ -191,8 +185,8 @@ public class RealSandboxTest {
 
         List<Pair> downfiles = sandbox.getDownloadFiles();
 
-        AbsolutePath sb = testDir.resolve(new RelativePath(name));
-        AbsolutePath src = sb.resolve(new RelativePath("output1"));
+        Path sb = testDir.resolve(new Pathname(name));
+        Path src = sb.resolve(new Pathname("output1"));
 
         assertEquals(1, downfiles.size());
         assertEquals(src, downfiles.get(0).source);
@@ -209,15 +203,15 @@ public class RealSandboxTest {
 
         List<Pair> downfiles = sandbox.getDownloadFiles();
 
-        AbsolutePath sb = testDir.resolve(new RelativePath(name));
-        AbsolutePath src = sb.resolve(new RelativePath("input1"));
+        Path sb = testDir.resolve(new Pathname(name));
+        Path src = sb.resolve(new Pathname("input1"));
 
         assertEquals(1, downfiles.size());
         assertEquals(src, downfiles.get(0).source);
         assertEquals(testInput1, downfiles.get(0).destination);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testAddDownloadFileDstNull() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
@@ -236,8 +230,8 @@ public class RealSandboxTest {
         sandbox.addUploadFile(testInput1, "input");
         sandbox.upload(CopyOption.REPLACE);
 
-        AbsolutePath dstDir = testDir.resolve(new RelativePath(name));
-        AbsolutePath dstFile = dstDir.resolve(new RelativePath("input"));
+        Path dstDir = testDir.resolve(new Pathname(name));
+        Path dstFile = dstDir.resolve(new Pathname("input"));
 
         assertTrue(files.exists(dstDir));
         assertTrue(files.exists(dstFile));
@@ -254,15 +248,15 @@ public class RealSandboxTest {
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
-        AbsolutePath download = testDir.resolve(new RelativePath("download"));
+        Path download = testDir.resolve(new Pathname("download"));
 
         sandbox.addUploadFile(testInput1, "input");
         sandbox.addDownloadFile("input", download);
 
         sandbox.upload(CopyOption.REPLACE);
 
-        AbsolutePath dstDir = testDir.resolve(new RelativePath(name));
-        AbsolutePath dstFile = dstDir.resolve(new RelativePath("input"));
+        Path dstDir = testDir.resolve(new Pathname(name));
+        Path dstFile = dstDir.resolve(new Pathname("input"));
 
         assertTrue(files.exists(dstDir));
         assertTrue(files.exists(dstFile));
@@ -288,8 +282,8 @@ public class RealSandboxTest {
 
         sandbox.upload(CopyOption.REPLACE);
 
-        AbsolutePath dstDir = testDir.resolve(new RelativePath(name));
-        AbsolutePath dstFile = dstDir.resolve(new RelativePath("input"));
+        Path dstDir = testDir.resolve(new Pathname(name));
+        Path dstFile = dstDir.resolve(new Pathname("input"));
 
         assertTrue(files.exists(dstDir));
         assertTrue(files.exists(dstFile));
@@ -310,8 +304,8 @@ public class RealSandboxTest {
 
         final int prime = 31;
         int result = 1;
-        result = prime * result + octopus.hashCode();
-        result = prime * result + testDir.resolve(new RelativePath(name)).hashCode();
+        result = prime * result + files.hashCode();
+        result = prime * result + testDir.resolve(new Pathname(name)).hashCode();
         result = prime * result + sandbox.getUploadFiles().hashCode();
         result = prime * result + sandbox.getDownloadFiles().hashCode();
 
@@ -366,7 +360,7 @@ public class RealSandboxTest {
     @Test
     public void testEquals_otherPath_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
 
-        AbsolutePath path = fileSystem.getEntryPath().resolve(new RelativePath("octopus_test_" + System.currentTimeMillis()));
+        Path path = fileSystem.getEntryPath().resolve(new Pathname("octopus_test_" + System.currentTimeMillis()));
 
         String name = getNextSandbox();
 
@@ -417,8 +411,8 @@ public class RealSandboxTest {
     @Test
     public void testPair_Equals() throws URISyntaxException, OctopusIOException, OctopusException {
 
-        AbsolutePath src = testInput1;
-        AbsolutePath dst = testInput2;
+        Path src = testInput1;
+        Path dst = testInput2;
 
         Sandbox.Pair pair = new Sandbox.Pair(src, dst);
         Sandbox.Pair pair2 = new Sandbox.Pair(src, dst);
@@ -446,8 +440,8 @@ public class RealSandboxTest {
     @Test
     public void testPair_hashCode() throws URISyntaxException, OctopusIOException, OctopusException {
 
-        AbsolutePath src = testInput1;
-        AbsolutePath dst = testInput2;
+        Path src = testInput1;
+        Path dst = testInput2;
 
         Sandbox.Pair pair = new Sandbox.Pair(src, dst);
         Sandbox.Pair pair2 = new Sandbox.Pair(null, null);
@@ -483,8 +477,8 @@ public class RealSandboxTest {
     @Test
     public void testPair_toString() throws URISyntaxException, OctopusIOException, OctopusException {
 
-        AbsolutePath src = testInput1;
-        AbsolutePath dst = testInput2;
+        Path src = testInput1;
+        Path dst = testInput2;
 
         Sandbox.Pair pair = new Sandbox.Pair(src, dst);
 

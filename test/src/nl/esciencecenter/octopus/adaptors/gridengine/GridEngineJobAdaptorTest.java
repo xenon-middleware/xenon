@@ -25,10 +25,10 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -70,11 +70,11 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath script = root.resolve(new RelativePath("script"));
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        Path script = root.resolve(new Pathname("script"));
+        Path stdout = root.resolve(new Pathname("stdout.txt"));
 
         String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
 
@@ -145,11 +145,11 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
+        Path stdout = root.resolve(new Pathname("stdout.txt"));
+        Path stderr = root.resolve(new Pathname("stderr.txt"));
 
         JobDescription description = new JobDescription();
         description.setStdout("stdout.txt");

@@ -27,7 +27,7 @@ import java.util.Set;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
@@ -39,7 +39,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
@@ -49,7 +49,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * LocalFiles implements an Octopus <code>Files</code> adaptor for local file operations.
@@ -83,10 +83,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         this.copyEngine = copyEngine;
 
         cwd = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
-                new RelativePath(LocalUtils.getCWD()), null, null);
+                new Pathname(LocalUtils.getCWD()), null, null);
 
         home = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), LocalUtils.getLocalFileURI(),
-                new RelativePath(LocalUtils.getHome()), null, null);
+                new Pathname(LocalUtils.getHome()), null, null);
     }
 
     /**
@@ -111,7 +111,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
      *             If the move failed.
      */
     @Override
-    public AbsolutePath move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+    public Path move(Path source, Path target) throws OctopusIOException {
 
         if (!exists(source)) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
@@ -136,26 +136,26 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public AbsolutePath readSymbolicLink(AbsolutePath link) throws OctopusIOException {
+    public Path readSymbolicLink(Path link) throws OctopusIOException {
 
         try {
             java.nio.file.Path path = LocalUtils.javaPath(link);
             java.nio.file.Path target = Files.readSymbolicLink(path);
 
-            AbsolutePath parent = link.getParent();
+            Path parent = link.getParent();
 
             if (parent == null || target.isAbsolute()) {
-                return new AbsolutePathImplementation(link.getFileSystem(), new RelativePath(target.toString()));
+                return new PathImplementation(link.getFileSystem(), new Pathname(target.toString()));
             }
 
-            return parent.resolve(new RelativePath(target.toString()));
+            return parent.resolve(new Pathname(target.toString()));
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }
     }
 
     @Override
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter)
             throws OctopusIOException {
 
         FileAttributes att = getAttributes(dir);
@@ -172,7 +172,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter)
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
 
     throws OctopusIOException {
 
@@ -190,7 +190,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
+    public InputStream newInputStream(Path path) throws OctopusIOException {
 
         if (!exists(path)) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
@@ -206,7 +206,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public OutputStream newOutputStream(AbsolutePath path, OpenOption... options) throws OctopusIOException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
 
         OpenOptions tmp = OpenOptions.processOptions(LocalAdaptor.ADAPTOR_NAME, options);
 
@@ -240,17 +240,17 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public FileAttributes getAttributes(AbsolutePath path) throws OctopusIOException {
+    public FileAttributes getAttributes(Path path) throws OctopusIOException {
         return new LocalFileAttributes(path);
     }
 
     @Override
-    public boolean exists(AbsolutePath path) throws OctopusIOException {
+    public boolean exists(Path path) throws OctopusIOException {
         return Files.exists(LocalUtils.javaPath(path));
     }
 
     @Override
-    public void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
 
         if (!exists(path)) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
@@ -278,13 +278,13 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, new RelativePath(
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, new Pathname(
                 LocalUtils.getCWD()), credential, p);
     }
 
     @Override
-    public AbsolutePath newPath(FileSystem filesystem, RelativePath location) throws OctopusException, OctopusIOException {
-        return new AbsolutePathImplementation(filesystem, location);
+    public Path newPath(FileSystem filesystem, Pathname location) throws OctopusException, OctopusIOException {
+        return new PathImplementation(filesystem, location);
     }
 
     @Override
@@ -298,16 +298,16 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public AbsolutePath createDirectories(AbsolutePath dir) throws OctopusIOException {
+    public Path createDirectories(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
         }
 
-        Iterator<AbsolutePath> itt = dir.iterator();
+        Iterator<Path> itt = dir.iterator();
 
         while (itt.hasNext()) {
-            AbsolutePath path = itt.next();
+            Path path = itt.next();
 
             if (!exists(path)) {
                 createDirectory(path);
@@ -318,7 +318,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public AbsolutePath createDirectory(AbsolutePath dir) throws OctopusIOException {
+    public Path createDirectory(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
@@ -338,7 +338,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public AbsolutePath createFile(AbsolutePath path) throws OctopusIOException {
+    public Path createFile(Path path) throws OctopusIOException {
 
         if (exists(path)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " already exists!");
@@ -354,17 +354,17 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public void delete(AbsolutePath path) throws OctopusIOException {
+    public void delete(Path path) throws OctopusIOException {
         LocalUtils.delete(path);
     }
 
     @Override
-    public DirectoryStream<AbsolutePath> newDirectoryStream(AbsolutePath dir) throws OctopusIOException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusIOException {
         return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(AbsolutePath dir) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusIOException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
@@ -379,7 +379,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
        
     @Override
-    public Copy copy(AbsolutePath source, AbsolutePath target, CopyOption... options) throws OctopusIOException,
+    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusIOException,
             UnsupportedOperationException {
 
         CopyInfo info = CopyInfo.createCopyInfo(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,

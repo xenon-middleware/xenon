@@ -20,7 +20,7 @@ import java.util.Iterator;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
@@ -63,7 +63,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     @Override
     public PathAttributesPair next() {
 
-        AbsolutePath path = stream.next();
+        Path path = stream.next();
 
         try {
             FileAttributes attributes = localFiles.getAttributes(path);

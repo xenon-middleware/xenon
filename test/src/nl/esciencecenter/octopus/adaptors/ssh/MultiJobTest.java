@@ -27,10 +27,10 @@ import java.util.HashMap;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -86,18 +86,18 @@ public class MultiJobTest {
 
         String workingDir = TEST_ROOT + "/" + testName;
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath[] out = new AbsolutePath[jobCount];
-        AbsolutePath[] err = new AbsolutePath[jobCount];
+        Path[] out = new Path[jobCount];
+        Path[] err = new Path[jobCount];
 
         Job[] j = new Job[jobCount];
 
         for (int i = 0; i < j.length; i++) {
 
-            out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
-            err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
+            out[i] = root.resolve(new Pathname("stdout" + i + ".txt"));
+            err[i] = root.resolve(new Pathname("stderr" + i + ".txt"));
 
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");

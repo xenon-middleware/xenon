@@ -18,37 +18,37 @@ package nl.esciencecenter.octopus.files;
 import java.util.Iterator;
 
 /**
- * AbsolutePath represents a RelativePath on a specific FileSystem.
+ * Path represents a specific location on a FileSystem, as identified by a Pathname. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public interface AbsolutePath {
+public interface Path {
 
     /**
-     * Get the FileSystem to which this AbsolutePath refers.
+     * Get the FileSystem to which this Path refers.
      * 
      * @return the FileSystem.
      */
     FileSystem getFileSystem();
 
     /**
-     * Get the RelativePath on the FileSystem.
+     * Get the Pathname on the FileSystem.
      * 
-     * @return the RelativePath.
+     * @return the Pathname.
      */
-    RelativePath getRelativePath();
+    Pathname getPathname();
 
     /**
-     * Is this AbsolutePath created by the local adaptor ?
+     * Is this Path created by the local adaptor ?
      * 
-     * @return If this AbsolutePath is created by the local adaptor ?
+     * @return If this Path is created by the local adaptor ?
      */
     boolean isLocal();
 
     /**
-     * Get the file name, or <code>null</code> if the AbsolutePath is empty.
+     * Get the file name, or <code>null</code> if the Path is empty.
      * 
      * @return the resulting file name or <code>null</code>.
      */
@@ -59,7 +59,7 @@ public interface AbsolutePath {
      * 
      * @return a path representing the path's parent.
      */
-    AbsolutePath getParent();
+    Path getParent();
 
     /**
      * Get the number of name elements in the path.
@@ -96,13 +96,13 @@ public interface AbsolutePath {
      * @param endIndex
      *            the index of the last element, exclusive
      * 
-     * @return a new AbsolutePath that is a subsequence of the name elements in this path.
+     * @return a new Path that is a subsequence of the name elements in this path.
      * 
      * @throws IllegalArgumentException
      *             If the beginIndex or endIndex is negative or greater or equal to the number of elements in the path, or if
      *             beginIndex is larger that or equal to the endIndex.
      */
-    AbsolutePath subpath(int beginIndex, int endIndex);
+    Path subpath(int beginIndex, int endIndex);
 
     /**
      * Tests if this path starts with the given path.
@@ -112,7 +112,7 @@ public interface AbsolutePath {
      * 
      * @return If this paths start with the other path.
      */
-    boolean startsWith(RelativePath other);
+    boolean startsWith(Pathname other);
 
     /**
      * Tests if this path ends with the given path.
@@ -122,21 +122,21 @@ public interface AbsolutePath {
      * 
      * @return If this paths ends with the other path.
      */
-    boolean endsWith(RelativePath other);
+    boolean endsWith(Pathname other);
 
     /**
-     * Resolve a RelativePath against this AbsolutePath by appending all path elements in the RelativePath to the path elements in
-     * this AbsolutePath.
+     * Resolve a Pathname against this Path by appending all path elements in the Pathname to the path elements in
+     * this Path.
      * 
      * @param other
-     *            the RelativePath.
+     *            the Pathname.
      * 
-     * @return the resulting AbsolutePath.
+     * @return the resulting Path.
      */
-    AbsolutePath resolve(RelativePath other);
+    Path resolve(Pathname other);
 
     /**
-     * Normalize this AbsolutePath by removing as many redundant path elements as possible.
+     * Normalize this Path by removing as many redundant path elements as possible.
      * 
      * Redundant path elements are <code>"."</code> (indicating the current directory) and <code>".."</code> (indicating the
      * parent directory).
@@ -145,7 +145,7 @@ public interface AbsolutePath {
      * 
      * @return the normalize path.
      */
-    AbsolutePath normalize();
+    Path normalize();
 
     /**
      * Resolves the given path to this paths parent path, thereby creating a sibling to this path.
@@ -153,12 +153,12 @@ public interface AbsolutePath {
      * @param other
      *            the path to resolve as sibling.
      * 
-     * @return a AbsolutePath representing the sibling.
+     * @return a Path representing the sibling.
      * 
      * @throws IllegalArgumentException
      *             If the path can not be resolved as a sibling to this path.
      */
-    AbsolutePath resolveSibling(RelativePath other);
+    Path resolveSibling(Pathname other);
 
     /**
      * Create a relative path between the given path and this path.
@@ -168,12 +168,12 @@ public interface AbsolutePath {
      * @param other
      *            the path to relativize.
      * 
-     * @return a AbsolutePath representing a relative path between the given path and this path.
+     * @return a Path representing a relative path between the given path and this path.
      * 
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    RelativePath relativize(RelativePath other);
+    Pathname relativize(Pathname other);
 
     /**
      * Create an {@link Iterator} that returns all possible sub paths of this path, in order of increasing length.
@@ -182,7 +182,7 @@ public interface AbsolutePath {
      * 
      * @return an {@link Iterator} that returns all possible sub paths of this path.
      */
-    Iterator<AbsolutePath> iterator();
+    Iterator<Path> iterator();
 
     /**
      * Get a string representation of this path.

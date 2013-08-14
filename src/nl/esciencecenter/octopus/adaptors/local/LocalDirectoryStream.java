@@ -21,9 +21,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * LocalDirectoryStream implements a {@link DirectoryStream} for local directories.
@@ -32,7 +32,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
  * @version 1.0
  * @since 1.0
  */
-class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
+class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
     /** The DirectoryStream from the underlying java.nio implementation */
     private final java.nio.file.DirectoryStream<java.nio.file.Path> stream;
@@ -44,12 +44,12 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
     private final DirectoryStream.Filter filter;
 
     /** The directory to produce a stream for. */
-    private final AbsolutePath dir;
+    private final Path dir;
 
     /** A buffer to read ahead. */
-    private AbsolutePath readAhead;
+    private Path readAhead;
 
-    LocalDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter) throws OctopusIOException {
+    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException {
         try {
             this.dir = dir;
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
@@ -60,12 +60,12 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
         }
     }
 
-    private AbsolutePath getPath(java.nio.file.Path path) {
-        return dir.resolve(new RelativePath(path.getFileName().toString()));
+    private Path getPath(java.nio.file.Path path) {
+        return dir.resolve(new Pathname(path.getFileName().toString()));
     }
 
     @Override
-    public Iterator<AbsolutePath> iterator() {
+    public Iterator<Path> iterator() {
         return this;
     }
 
@@ -88,7 +88,7 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
         }
 
         while (iterator.hasNext()) {
-            AbsolutePath next = getPath(iterator.next());
+            Path next = getPath(iterator.next());
             if (filter.accept(next)) {
                 readAhead = next;
                 return true;
@@ -99,16 +99,16 @@ class LocalDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<Ab
     }
 
     @Override
-    public synchronized AbsolutePath next() {
+    public synchronized Path next() {
 
         if (readAhead != null) {
-            AbsolutePath tmp = readAhead;
+            Path tmp = readAhead;
             readAhead = null;
             return tmp;
         }
 
         while (iterator.hasNext()) {
-            AbsolutePath next = getPath(iterator.next());
+            Path next = getPath(iterator.next());
 
             if (filter.accept(next)) {
                 return next;

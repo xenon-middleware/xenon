@@ -19,14 +19,14 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.FileAttributes;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 
 /**
  * FileVisitor contains various callback methods called by 
- * {@link FileUtils#walkFileTree(Files, AbsolutePath, boolean, int, FileVisitor) FileUtils.walkTree}.
+ * {@link FileUtils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}.
  * 
  * By using an implementation of this interface in combination with 
- * {@link FileUtils#walkFileTree(Files, AbsolutePath, boolean, int, FileVisitor) FileUtils.walkTree}, an action can be defined for 
+ * {@link FileUtils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}, an action can be defined for 
  * each file and directory encountered during a tree walk.    
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
@@ -51,7 +51,7 @@ public interface FileVisitor {
      * @throws OctopusIOException
      *          if an I/O error occurs while visiting the directory.
      */
-    FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files) throws OctopusIOException;
+    FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files) throws OctopusIOException;
 
     /**
      * Invoked for a directory before entries in the directory are visited.
@@ -68,7 +68,7 @@ public interface FileVisitor {
      * @throws OctopusIOException
      *          if an I/O error occurs while visiting the directory. 
      */
-    FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files) throws OctopusIOException;
+    FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws OctopusIOException;
 
     /**
      * Invoked for a file in a directory.
@@ -85,7 +85,7 @@ public interface FileVisitor {
      * @throws OctopusIOException
      *          if an I/O error occurs while visiting the directory. 
      */
-    FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException;
+    FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException;
 
     /**
      * Invoked for a file that could not be visited.
@@ -102,5 +102,5 @@ public interface FileVisitor {
      * @throws OctopusIOException
      *          if an I/O error occurs while visiting the directory. 
      */     
-    FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files) throws OctopusIOException;
+    FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files) throws OctopusIOException;
 }

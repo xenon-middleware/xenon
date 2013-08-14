@@ -22,14 +22,14 @@ import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.engine.files.AbsolutePathImplementation;
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -46,13 +46,13 @@ public class LocalDirectoryStreamTest {
 
         Files files = octopus.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath root = fs.getEntryPath();
-        AbsolutePath testDir = root.resolve(new RelativePath(TEST_DIR));
+        Path root = fs.getEntryPath();
+        Path testDir = root.resolve(new Pathname(TEST_DIR));
         files.createDirectory(testDir);
 
-        AbsolutePath file0 = testDir.resolve(new RelativePath("file0"));
-        AbsolutePath file1 = testDir.resolve(new RelativePath("file2"));
-        AbsolutePath file2 = testDir.resolve(new RelativePath("file3"));
+        Path file0 = testDir.resolve(new Pathname("file0"));
+        Path file1 = testDir.resolve(new Pathname("file2"));
+        Path file2 = testDir.resolve(new Pathname("file3"));
 
         files.createFile(file0);
         files.createFile(file1);
@@ -68,11 +68,11 @@ public class LocalDirectoryStreamTest {
 
         Files files = octopus.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        AbsolutePath root = fs.getEntryPath();
-        AbsolutePath testDir = root.resolve(new RelativePath(TEST_DIR));
-        AbsolutePath file0 = testDir.resolve(new RelativePath("file0"));
-        AbsolutePath file1 = testDir.resolve(new RelativePath("file2"));
-        AbsolutePath file2 = testDir.resolve(new RelativePath("file3"));
+        Path root = fs.getEntryPath();
+        Path testDir = root.resolve(new Pathname(TEST_DIR));
+        Path file0 = testDir.resolve(new Pathname("file0"));
+        Path file1 = testDir.resolve(new Pathname("file2"));
+        Path file2 = testDir.resolve(new Pathname("file3"));
 
         if (files.exists(testDir)) {
             files.delete(file0);
@@ -87,19 +87,19 @@ public class LocalDirectoryStreamTest {
     private Octopus octopus;
     private Files files;
     private FileSystem fs;
-    private AbsolutePath root;
-    private AbsolutePath testDir;
+    private Path root;
+    private Path testDir;
 
     class AllTrue implements DirectoryStream.Filter {
         @Override
-        public boolean accept(AbsolutePath entry) {
+        public boolean accept(Path entry) {
             return true;
         }
     }
 
     class AllFalse implements DirectoryStream.Filter {
         @Override
-        public boolean accept(AbsolutePath entry) {
+        public boolean accept(Path entry) {
             return false;
         }
     }
@@ -112,7 +112,7 @@ public class LocalDirectoryStreamTest {
         files = octopus.files();
         fs = files.getLocalCWDFileSystem();
         root = fs.getEntryPath();
-        testDir = root.resolve(new RelativePath(TEST_DIR));
+        testDir = root.resolve(new Pathname(TEST_DIR));
     }
 
     @org.junit.After
@@ -122,7 +122,7 @@ public class LocalDirectoryStreamTest {
 
     @org.junit.Test(expected = OctopusIOException.class)
     public void test_nonexistant_dir() throws Exception {
-        AbsolutePath path = new AbsolutePathImplementation(mock(FileSystem.class), new RelativePath("aap"));
+        Path path = new PathImplementation(mock(FileSystem.class), new Pathname("aap"));
         new LocalDirectoryStream(path, new AllTrue());
     }
 

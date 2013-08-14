@@ -20,9 +20,9 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 public class FileSystemImplementation implements FileSystem {
 
@@ -32,9 +32,9 @@ public class FileSystemImplementation implements FileSystem {
     private final URI uri;
     private final Credential credential;
     private final OctopusProperties properties;
-    private final RelativePath entryPath;
+    private final Pathname entryPath;
 
-    public FileSystemImplementation(String adaptorName, String identifier, URI uri, RelativePath entryPath,
+    public FileSystemImplementation(String adaptorName, String identifier, URI uri, Pathname entryPath,
             Credential credential, OctopusProperties properties) {
 
         if (adaptorName == null) {
@@ -75,8 +75,8 @@ public class FileSystemImplementation implements FileSystem {
     }
 
     @Override
-    public AbsolutePath getEntryPath() {
-        return new AbsolutePathImplementation(this, entryPath);
+    public Path getEntryPath() {
+        return new PathImplementation(this, entryPath);
     }
 
     @Override

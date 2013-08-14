@@ -38,7 +38,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 /**
@@ -115,7 +115,7 @@ final class LocalUtils {
         return Files.exists(FileSystems.getDefault().getPath(expandHome(path)), LinkOption.NOFOLLOW_LINKS);
     }
 
-    static java.nio.file.Path javaPath(AbsolutePath path) {
+    static java.nio.file.Path javaPath(Path path) {
         return FileSystems.getDefault().getPath(expandHome(path.getPath()));
     }
 
@@ -187,7 +187,7 @@ final class LocalUtils {
      * @param path
      * @throws OctopusIOException
      */
-    static InputStream newInputStream(AbsolutePath path) throws OctopusIOException {
+    static InputStream newInputStream(Path path) throws OctopusIOException {
         try {
             return Files.newInputStream(javaPath(path));
         } catch (Exception e) {
@@ -200,7 +200,7 @@ final class LocalUtils {
      * @param options
      * @throws OctopusIOException
      */
-    static SeekableByteChannel newByteChannel(AbsolutePath path, OpenOption... options) throws OctopusIOException {
+    static SeekableByteChannel newByteChannel(Path path, OpenOption... options) throws OctopusIOException {
         try {
             return Files.newByteChannel(javaPath(path), javaOpenOptions(options));
         } catch (Exception e) {
@@ -213,7 +213,7 @@ final class LocalUtils {
      * @param permissions
      * @throws OctopusIOException
      */
-    static void setPosixFilePermissions(AbsolutePath path, Set<PosixFilePermission> permissions) throws OctopusIOException {
+    static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
@@ -226,7 +226,7 @@ final class LocalUtils {
      * @param path
      * @throws OctopusIOException
      */
-    static void createFile(AbsolutePath path) throws OctopusIOException {
+    static void createFile(Path path) throws OctopusIOException {
         try {
             Files.createFile(LocalUtils.javaPath(path));
         } catch (Exception e) {
@@ -239,7 +239,7 @@ final class LocalUtils {
      * @return
      * @throws OctopusIOException
      */
-    static long size(AbsolutePath path) throws OctopusIOException {
+    static long size(Path path) throws OctopusIOException {
         try {
             return Files.size(LocalUtils.javaPath(path));
         } catch (Exception e) {
@@ -251,7 +251,7 @@ final class LocalUtils {
      * @param path
      * @throws OctopusIOException
      */
-    static void delete(AbsolutePath path) throws OctopusIOException {
+    static void delete(Path path) throws OctopusIOException {
 
         try {
             Files.delete(LocalUtils.javaPath(path));
@@ -271,7 +271,7 @@ final class LocalUtils {
      * @param target
      * @throws OctopusIOException
      */
-    static void move(AbsolutePath source, AbsolutePath target) throws OctopusIOException {
+    static void move(Path source, Path target) throws OctopusIOException {
 
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));

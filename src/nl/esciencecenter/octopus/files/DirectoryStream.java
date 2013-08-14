@@ -36,14 +36,14 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
     interface Filter {
 
         /**
-         * Decide if the AbsolutePath entry should be accepted.
+         * Decide if the entry should be accepted.
          * 
          * @param entry
-         *            the AbsolutePath to test.
+         *            the path to test.
          * 
-         * @return if the AbsolutePath entry should be accepted.
+         * @return if the entry should be accepted.
          */
-        boolean accept(AbsolutePath entry);
+        boolean accept(Path entry);
     }
 
     @Override

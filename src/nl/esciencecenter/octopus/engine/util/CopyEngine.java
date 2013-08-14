@@ -38,7 +38,7 @@ import nl.esciencecenter.octopus.exceptions.InvalidDataException;
 import nl.esciencecenter.octopus.exceptions.NoSuchCopyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
@@ -142,7 +142,7 @@ public class CopyEngine {
         }
     }
 
-    private void append(AbsolutePath source, long fromOffset, AbsolutePath target, CopyInfo ac) throws OctopusIOException {
+    private void append(Path source, long fromOffset, Path target, CopyInfo ac) throws OctopusIOException {
 
         // We need to append some bytes from source to target. 
         LOGGER.debug("Appending from {} to {} starting at {}", source.getPath(), target.getPath(), fromOffset);
@@ -195,7 +195,7 @@ public class CopyEngine {
         return offset;
     }
 
-    private boolean compareHead(CopyInfo ac, AbsolutePath target, AbsolutePath source) throws IOException {
+    private boolean compareHead(CopyInfo ac, Path target, Path source) throws IOException {
 
         LOGGER.debug("Compare head of {} to {}", target.getPath(), source.getPath());
 
@@ -244,8 +244,8 @@ public class CopyEngine {
 
         CopyImplementation copy = ac.getCopy();
         
-        AbsolutePath source = copy.getSource();
-        AbsolutePath target = copy.getTarget();
+        Path source = copy.getSource();
+        Path target = copy.getTarget();
 
         LOGGER.debug("Resume copy from {} to {} verify={}", source.getPath(), target.getPath(), ac.mustVerify());
 
@@ -331,8 +331,8 @@ public class CopyEngine {
 
         CopyImplementation copy = ac.getCopy();
         
-        AbsolutePath source = copy.getSource();
-        AbsolutePath target = copy.getTarget();
+        Path source = copy.getSource();
+        Path target = copy.getTarget();
         
         LOGGER.debug("Append from {} to {} verify={}", source.getPath(), target.getPath());
 
@@ -374,8 +374,8 @@ public class CopyEngine {
 
         CopyImplementation copy = ac.getCopy();
         
-        AbsolutePath source = copy.getSource();
-        AbsolutePath target = copy.getTarget();
+        Path source = copy.getSource();
+        Path target = copy.getTarget();
 
         boolean replace = (ac.getMode() == CopyOption.REPLACE);
         boolean ignore = (ac.getMode() == CopyOption.IGNORE);

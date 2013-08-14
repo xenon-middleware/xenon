@@ -26,10 +26,10 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -72,11 +72,11 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath script = root.resolve(new RelativePath("script"));
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
+        Path script = root.resolve(new Pathname("script"));
+        Path stdout = root.resolve(new Pathname("stdout.txt"));
 
         String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
                 + message;
@@ -143,11 +143,11 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath stdout = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath stderr = root.resolve(new RelativePath("stderr.txt"));
+        Path stdout = root.resolve(new Pathname("stdout.txt"));
+        Path stderr = root.resolve(new Pathname("stderr.txt"));
 
         JobDescription description = new JobDescription();
         description.setWorkingDirectory(workingDir);
@@ -202,7 +202,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -232,8 +232,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        AbsolutePath out = root.resolve(new RelativePath("stdout.txt"));
-        AbsolutePath err = root.resolve(new RelativePath("stderr.txt"));
+        Path out = root.resolve(new Pathname("stdout.txt"));
+        Path err = root.resolve(new Pathname("stderr.txt"));
 
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -265,11 +265,11 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        AbsolutePath root = filesystem.getEntryPath().resolve(new RelativePath(workingDir));
+        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
         files.createDirectories(root);
 
-        AbsolutePath[] out = new AbsolutePath[5];
-        AbsolutePath[] err = new AbsolutePath[5];
+        Path[] out = new Path[5];
+        Path[] err = new Path[5];
 
         Jobs jobs = octopus.jobs();
 
@@ -277,8 +277,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         for (int i = 0; i < j.length; i++) {
 
-            out[i] = root.resolve(new RelativePath("stdout" + i + ".txt"));
-            err[i] = root.resolve(new RelativePath("stderr" + i + ".txt"));
+            out[i] = root.resolve(new Pathname("stdout" + i + ".txt"));
+            err[i] = root.resolve(new Pathname("stderr" + i + ".txt"));
 
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");

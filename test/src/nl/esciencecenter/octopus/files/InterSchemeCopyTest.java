@@ -44,24 +44,24 @@ public class InterSchemeCopyTest {
 
         String dirname = "octopus_test_" + System.currentTimeMillis();
 
-        AbsolutePath localDir = localFS.getEntryPath().resolve(new RelativePath(dirname));
+        Path localDir = localFS.getEntryPath().resolve(new Pathname(dirname));
         files.createDirectory(localDir);
 
-        AbsolutePath sshDir = sshFS.getEntryPath().resolve(new RelativePath(dirname));
+        Path sshDir = sshFS.getEntryPath().resolve(new Pathname(dirname));
         files.createDirectory(sshDir);
 
         // Create file locally and copy to remote        
-        AbsolutePath localFile = localDir.resolve(new RelativePath("test"));
+        Path localFile = localDir.resolve(new Pathname("test"));
         files.createFile(localFile);
-        AbsolutePath sshFile = sshDir.resolve(new RelativePath("test"));
+        Path sshFile = sshDir.resolve(new Pathname("test"));
         files.copy(localFile, sshFile, CopyOption.CREATE);
 
         assertTrue(files.exists(localFile));
         assertTrue(files.exists(sshFile));
 
         // Create file remotely and copy to local        
-        AbsolutePath localFile2 = localDir.resolve(new RelativePath("test2"));
-        AbsolutePath sshFile2 = sshDir.resolve(new RelativePath("test2"));
+        Path localFile2 = localDir.resolve(new Pathname("test2"));
+        Path sshFile2 = sshDir.resolve(new Pathname("test2"));
         files.createFile(sshFile2);
         files.copy(sshFile2, localFile2, CopyOption.CREATE);
 

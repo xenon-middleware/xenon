@@ -22,7 +22,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -40,7 +40,7 @@ public class PathAttributesPairImplementationTest {
     Octopus octopus;
     Files files;
     FileSystem filesystem;
-    AbsolutePath root;
+    Path root;
     FileAttributes att;
 
     @Before

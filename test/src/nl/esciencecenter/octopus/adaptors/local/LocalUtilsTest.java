@@ -29,7 +29,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -144,7 +144,7 @@ public class LocalUtilsTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Files files = octopus.files();
 
-        String tmp = LocalUtils.javaPath(files.newPath(files.getLocalCWDFileSystem(), new RelativePath("~"))).toString();
+        String tmp = LocalUtils.javaPath(files.newPath(files.getLocalCWDFileSystem(), new Pathname("~"))).toString();
 
         OctopusFactory.endOctopus(octopus);
 

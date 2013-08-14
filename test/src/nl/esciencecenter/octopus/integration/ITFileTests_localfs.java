@@ -21,9 +21,9 @@ import org.junit.Assert;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 public class ITFileTests_localfs extends AbstractFileTests {
     /**
@@ -43,7 +43,7 @@ public class ITFileTests_localfs extends AbstractFileTests {
     public void testIsLocal() throws Exception {
         // local file 
         FileSystem fs = getFileSystem();
-        AbsolutePath cwd = getFiles().newPath(fs, new RelativePath("."));
+        Path cwd = getFiles().newPath(fs, new Pathname("."));
         Assert.assertTrue("Local Path must return true for isLocal().", cwd.isLocal());
 
     }

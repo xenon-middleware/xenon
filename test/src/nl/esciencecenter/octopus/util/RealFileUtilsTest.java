@@ -28,11 +28,11 @@ import java.util.List;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -46,7 +46,7 @@ public class RealFileUtilsTest {
     public static Files files;
     public static FileSystem fileSystem;
 
-    public static AbsolutePath testDir;
+    public static Path testDir;
 
     @BeforeClass
     public static void prepare() throws Exception {
@@ -56,7 +56,7 @@ public class RealFileUtilsTest {
         files = octopus.files();
         fileSystem = files.getLocalCWDFileSystem();
 
-        testDir = files.newPath(fileSystem, new RelativePath(ROOT));
+        testDir = files.newPath(fileSystem, new Pathname(ROOT));
         files.createDirectory(testDir);
     }
 
@@ -71,7 +71,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyFromInputStream1.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_copyFromInputStream1.txt"));
 
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
 
@@ -89,7 +89,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyFromInputStream2.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_copyFromInputStream2.txt"));
 
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
@@ -108,7 +108,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyFromInputStream3.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_copyFromInputStream3.txt"));
 
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, false);
@@ -127,7 +127,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyToOutputStream1.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_copyToOutputStream1.txt"));
 
         FileUtils.write(files, testFile, message.getBytes(), true);
 
@@ -149,7 +149,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyToOutputStream2.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_copyToOutputStream2.txt"));
 
         FileUtils.write(files, testFile, message.getBytes(), true);
         FileUtils.write(files, testFile, message.getBytes(), true);
@@ -172,7 +172,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyToOutputStream3.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_copyToOutputStream3.txt"));
 
         FileUtils.write(files, testFile, message.getBytes(), true);
         FileUtils.write(files, testFile, message.getBytes(), false);
@@ -195,7 +195,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedWriter1.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_newBufferedWriter1.txt"));
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
@@ -215,7 +215,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedWriter2.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_newBufferedWriter2.txt"));
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
@@ -239,7 +239,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedWriter3.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_newBufferedWriter3.txt"));
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
@@ -263,7 +263,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedReader1.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_newBufferedReader1.txt"));
 
         FileUtils.write(files, testFile, message.getBytes(), true);
 
@@ -283,7 +283,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!\n";
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedReader2.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_newBufferedReader2.txt"));
 
         FileUtils.write(files, testFile, message.getBytes(), true);
         FileUtils.write(files, testFile, message.getBytes(), false);
@@ -306,7 +306,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_readAllLines1() throws Exception {
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_readAllLines1.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_readAllLines1.txt"));
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write("line1\n");
@@ -330,7 +330,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_write1() throws Exception {
 
-        AbsolutePath testFile = testDir.resolve(new RelativePath("test_write1.txt"));
+        Path testFile = testDir.resolve(new Pathname("test_write1.txt"));
 
         LinkedList<String> tmp1 = new LinkedList<>();
         tmp1.add("line1");
@@ -356,15 +356,15 @@ public class RealFileUtilsTest {
 
     class MyFileVisitor implements FileVisitor {
 
-        AbsolutePath[] dirs;
-        AbsolutePath[] files;
+        Path[] dirs;
+        Path[] files;
 
-        MyFileVisitor(AbsolutePath[] dirs, AbsolutePath[] files) {
+        MyFileVisitor(Path[] dirs, Path[] files) {
             this.dirs = dirs;
             this.files = files;
         }
 
-        private void check(AbsolutePath[] avail, AbsolutePath path) throws OctopusIOException {
+        private void check(Path[] avail, Path path) throws OctopusIOException {
 
             for (int i = 0; i < avail.length; i++) {
                 if (path.equals(avail[i])) {
@@ -376,14 +376,14 @@ public class RealFileUtilsTest {
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
+        public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             check(dirs, dir);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
+        public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
 
             check(dirs, dir);
@@ -391,14 +391,14 @@ public class RealFileUtilsTest {
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files f) throws OctopusIOException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files f) throws OctopusIOException {
 
             check(files, file);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
+        public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -408,17 +408,17 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree1() throws Exception {
 
-        AbsolutePath[] dirs = new AbsolutePath[2];
+        Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new RelativePath("test_walkFileTree1"));
-        dirs[1] = dirs[0].resolve(new RelativePath("dir0"));
+        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree1"));
+        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
 
         files.createDirectories(dirs[1]);
 
-        AbsolutePath[] tmp = new AbsolutePath[10];
+        Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = dirs[1].resolve(new RelativePath("file" + i));
+            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
             files.createFile(tmp[i]);
         }
 
@@ -436,24 +436,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor2 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
+        public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Unexpected visit of path: " + dir.getPath());
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
+        public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             return FileVisitResult.TERMINATE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
             throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
+        public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -462,17 +462,17 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree2() throws Exception {
 
-        AbsolutePath[] dirs = new AbsolutePath[2];
+        Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new RelativePath("test_walkFileTree2"));
-        dirs[1] = dirs[0].resolve(new RelativePath("dir0"));
+        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree2"));
+        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
 
         files.createDirectories(dirs[1]);
 
-        AbsolutePath[] tmp = new AbsolutePath[10];
+        Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = dirs[1].resolve(new RelativePath("file" + i));
+            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
             files.createFile(tmp[i]);
         }
 
@@ -490,24 +490,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor3 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
+        public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
+        public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             return FileVisitResult.SKIP_SUBTREE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
             throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
+        public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -516,17 +516,17 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree3() throws Exception {
 
-        AbsolutePath[] dirs = new AbsolutePath[2];
+        Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new RelativePath("test_walkFileTree3"));
-        dirs[1] = dirs[0].resolve(new RelativePath("dir0"));
+        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree3"));
+        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
 
         files.createDirectories(dirs[1]);
 
-        AbsolutePath[] tmp = new AbsolutePath[10];
+        Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = dirs[1].resolve(new RelativePath("file" + i));
+            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
             files.createFile(tmp[i]);
         }
 
@@ -546,21 +546,21 @@ public class RealFileUtilsTest {
         int countFiles = 0;
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
+        public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             countFiles = 0;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
+        public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             countFiles = 0;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
 
             if (countFiles == 0) {
                 countFiles = 1;
@@ -571,7 +571,7 @@ public class RealFileUtilsTest {
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
+        public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -580,24 +580,24 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree4() throws Exception {
 
-        AbsolutePath[] dirs = new AbsolutePath[3];
+        Path[] dirs = new Path[3];
 
-        dirs[0] = testDir.resolve(new RelativePath("test_walkFileTree4"));
-        dirs[1] = dirs[0].resolve(new RelativePath("dir0"));
-        dirs[2] = dirs[0].resolve(new RelativePath("dir1"));
+        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree4"));
+        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
+        dirs[2] = dirs[0].resolve(new Pathname("dir1"));
 
         files.createDirectories(dirs[1]);
         files.createDirectories(dirs[2]);
 
-        AbsolutePath[] tmp = new AbsolutePath[10];
+        Path[] tmp = new Path[10];
 
         for (int i = 0; i < 5; i++) {
-            tmp[i] = dirs[1].resolve(new RelativePath("file" + i));
+            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
             files.createFile(tmp[i]);
         }
 
         for (int i = 0; i < 5; i++) {
-            tmp[5 + i] = dirs[2].resolve(new RelativePath("file" + (5 + i)));
+            tmp[5 + i] = dirs[2].resolve(new Pathname("file" + (5 + i)));
             files.createFile(tmp[5 + i]);
         }
 
@@ -616,24 +616,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor5 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
+        public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
+        public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
             return FileVisitResult.TERMINATE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
+        public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -642,17 +642,17 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree5() throws Exception {
 
-        AbsolutePath[] dirs = new AbsolutePath[2];
+        Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new RelativePath("test_walkFileTree5"));
-        dirs[1] = dirs[0].resolve(new RelativePath("dir0"));
+        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree5"));
+        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
 
         files.createDirectories(dirs[1]);
 
-        AbsolutePath[] tmp = new AbsolutePath[10];
+        Path[] tmp = new Path[10];
 
         for (int i = 0; i < 10; i++) {
-            tmp[i] = dirs[1].resolve(new RelativePath("file" + i));
+            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
             files.createFile(tmp[i]);
         }
 
@@ -670,24 +670,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor6 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
+        public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + dir.getPath());
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
+        public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + dir.getPath());
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
+        public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -696,7 +696,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree6() throws Exception {
 
-        AbsolutePath dir = testDir.resolve(new RelativePath("test_walkFileTree6"));
+        Path dir = testDir.resolve(new Pathname("test_walkFileTree6"));
         files.createDirectories(dir);
 
         FileVisitor fv = new MyFileVisitor6();
@@ -710,46 +710,4 @@ public class RealFileUtilsTest {
 
         files.delete(dir);
     }
-
-    /**
-     * Walks a file tree.
-     */
-    //    public static AbsolutePath walkFileTree(Octopus octopus, AbsolutePath start, FileVisitor visitor) throws OctopusIOException {
-
-    /**
-     * Walks a file tree.
-     */
-    //  public static AbsolutePath walkFileTree(Octopus octopus, AbsolutePath start, boolean followLinks, int maxDepth,
-    //        FileVisitor visitor) throws OctopusIOException {
-
-    // Walk a file tree.
-    //private static FileVisitResult walk(Octopus octopus, AbsolutePath path, FileAttributes attributes, boolean followLinks,
-    //int maxDepth, FileVisitor visitor) throws OctopusIOException {
-
-    /**
-     * Recursively copies directories, files and symbolic links from source to target.
-     * 
-     * @param octopus
-     * @param source
-     * @param target
-     * @param options
-     * 
-     * @throws OctopusIOException
-     * @throws UnsupportedOperationException
-     *             Thrown when CopyOption.REPLACE_EXISTING and CopyOption.IGNORE_EXISTING are used together.
-     */
-    // public static void recursiveCopy(Octopus octopus, AbsolutePath source, AbsolutePath target, CopyOption... options)
-    //          throws OctopusIOException, UnsupportedOperationException {
-
-    /**
-     * Recursively removes all directories, files and symbolic links in path.
-     * 
-     * @param octopus
-     * @param path
-     * @throws OctopusIOException
-     */
-    //  public static void recursiveDelete(Octopus octopus, AbsolutePath path) throws OctopusIOException {
-    //
-    //}
-
 }

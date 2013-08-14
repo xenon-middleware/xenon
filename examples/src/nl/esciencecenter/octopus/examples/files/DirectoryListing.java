@@ -20,12 +20,12 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
@@ -65,8 +65,8 @@ public class DirectoryListing {
             // Next we create a FileSystem. Note that both credential and properties are null (which means: use default)
             FileSystem fs = files.newFileSystem(fsURI, null, null);
 
-            // We now create an AbsolutePath representing the directory we want to list.
-            AbsolutePath path = files.newPath(fs, new RelativePath(filepath));
+            // We now create an Path representing the directory we want to list.
+            Path path = files.newPath(fs, new Pathname(filepath));
 
             // Retrieve the attributes of the file.
             FileAttributes att = files.getAttributes(path);
@@ -76,9 +76,9 @@ public class DirectoryListing {
 
                 System.out.println("Directory " + uri + " exists and contains the following:");
 
-                DirectoryStream<AbsolutePath> stream = files.newDirectoryStream(path);
+                DirectoryStream<Path> stream = files.newDirectoryStream(path);
 
-                for (AbsolutePath p : stream) {
+                for (Path p : stream) {
                     System.out.println("   " + p.getFileName());
                 }
 

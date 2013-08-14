@@ -16,21 +16,21 @@
 package nl.esciencecenter.octopus.engine.files;
 
 import nl.esciencecenter.octopus.files.FileAttributes;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 
 public class PathAttributesPairImplementation implements PathAttributesPair {
 
-    private final AbsolutePath path;
+    private final Path path;
     private final FileAttributes attributes;
 
-    public PathAttributesPairImplementation(AbsolutePath path, FileAttributes attributes) {
+    public PathAttributesPairImplementation(Path path, FileAttributes attributes) {
         this.path = path;
         this.attributes = attributes;
     }
 
     @Override
-    public AbsolutePath path() {
+    public Path path() {
         return path;
     }
 

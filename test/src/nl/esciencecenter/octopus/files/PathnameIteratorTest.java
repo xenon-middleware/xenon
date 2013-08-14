@@ -25,21 +25,21 @@ import org.junit.Test;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class RelativePathIteratorTest {
+public class PathnameIteratorTest {
 
     @Test
     public void test_ok() {
 
         String[] s = new String[] { "aap", "noot", "mies" };
 
-        RelativePath path = new RelativePath(s);
+        Pathname path = new Pathname(s);
 
-        Iterator<RelativePath> itt = path.iterator();
+        Iterator<Pathname> itt = path.iterator();
 
         int i = 0;
 
         while (itt.hasNext()) {
-            RelativePath tmp = itt.next();
+            Pathname tmp = itt.next();
             assert (s[i].equals(tmp.getPath()));
             i++;
         }
@@ -49,15 +49,15 @@ public class RelativePathIteratorTest {
 
     @Test
     public void test_empy() {
-        RelativePath path = new RelativePath(new String[0]);
-        Iterator<RelativePath> itt = path.iterator();
+        Pathname path = new Pathname(new String[0]);
+        Iterator<Pathname> itt = path.iterator();
         assert (!itt.hasNext());
     }
 
     @Test
     public void test_ok2() {
-        RelativePath path = new RelativePath("aap", "noot", "mies");
-        Iterator<RelativePath> itt = path.iterator();
+        Pathname path = new Pathname("aap", "noot", "mies");
+        Iterator<Pathname> itt = path.iterator();
         itt.next();
         itt.next();
         itt.next();
@@ -65,15 +65,15 @@ public class RelativePathIteratorTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void test_remove() {
-        RelativePath path = new RelativePath("aap", "noot", "mies");
-        Iterator<RelativePath> itt = path.iterator();
+        Pathname path = new Pathname("aap", "noot", "mies");
+        Iterator<Pathname> itt = path.iterator();
         itt.remove();
     }
 
     @Test(expected = NoSuchElementException.class)
     public void test_one_next_too_many() {
-        RelativePath path = new RelativePath("aap", "noot", "mies");
-        Iterator<RelativePath> itt = path.iterator();
+        Pathname path = new Pathname("aap", "noot", "mies");
+        Iterator<Pathname> itt = path.iterator();
         itt.next();
         itt.next();
         itt.next();

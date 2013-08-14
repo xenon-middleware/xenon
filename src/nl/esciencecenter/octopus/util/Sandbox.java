@@ -22,10 +22,10 @@ import java.util.UUID;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * A sandbox is a (possibly remote and usually temporary) directory used for running jobs. 
@@ -71,7 +71,7 @@ public class Sandbox {
 
     private final Files files;
 
-    private final AbsolutePath path;
+    private final Path path;
 
     private List<Pair> uploadFiles = new LinkedList<Pair>();
     private List<Pair> downloadFiles = new LinkedList<Pair>();
@@ -81,10 +81,10 @@ public class Sandbox {
      */
     public static class Pair {
 
-        final AbsolutePath source;
-        final AbsolutePath destination;
+        final Path source;
+        final Path destination;
 
-        public Pair(AbsolutePath source, AbsolutePath destination) {
+        public Pair(Path source, Path destination) {
             this.source = source;
             this.destination = destination;
         }
@@ -149,7 +149,7 @@ public class Sandbox {
      * @throws OctopusException
      * @throws OctopusIOException
      */
-    public Sandbox(Files files, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
+    public Sandbox(Files files, Path root, String sandboxName) throws OctopusException, OctopusIOException {
 
         if (files == null) {
             throw new OctopusException("Sandbox", "Need an files interface to create a sandbox!");
@@ -164,7 +164,7 @@ public class Sandbox {
         }
 
         this.files = files;
-        this.path = root.resolve(new RelativePath(sandboxName));
+        this.path = root.resolve(new Pathname(sandboxName));
     }
 
     /**
@@ -172,7 +172,7 @@ public class Sandbox {
      * 
      * @return the sandbox directory.
      */
-    public AbsolutePath getPath() {
+    public Path getPath() {
         return path;
     }
 
@@ -192,7 +192,7 @@ public class Sandbox {
      * 
      * @param files the files to upload.
      */
-    public void setUploadFiles(AbsolutePath... files) {
+    public void setUploadFiles(Path... files) {
         uploadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
             addUploadFile(files[i]);
@@ -205,7 +205,7 @@ public class Sandbox {
      * @param src
      *            Source path of file. May not be <code>null</code>.
      */
-    public void addUploadFile(AbsolutePath src) {
+    public void addUploadFile(Path src) {
         addUploadFile(src, null);
     }
 
@@ -217,7 +217,7 @@ public class Sandbox {
      * @param dest
      *            The name of file in the sandbox. If <code>null</code> then <code>src.getFilename()</code> will be used.
      */
-    public void addUploadFile(AbsolutePath src, String dest) {
+    public void addUploadFile(Path src, String dest) {
         if (src == null) {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
@@ -225,7 +225,7 @@ public class Sandbox {
             dest = src.getFileName();
         }
 
-        uploadFiles.add(new Pair(src, path.resolve(new RelativePath(dest))));
+        uploadFiles.add(new Pair(src, path.resolve(new Pathname(dest))));
     }
 
     /**
@@ -245,7 +245,7 @@ public class Sandbox {
      * @param dest
      *            The target file. May not be <code>null</code>.
      */
-    public void addDownloadFile(String src, AbsolutePath dest) {
+    public void addDownloadFile(String src, Path dest) {
         if (dest == null) {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
@@ -253,7 +253,7 @@ public class Sandbox {
             src = dest.getFileName();
         }
 
-        downloadFiles.add(new Pair(path.resolve(new RelativePath(src)), dest));
+        downloadFiles.add(new Pair(path.resolve(new Pathname(src)), dest));
     }
 
     private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {

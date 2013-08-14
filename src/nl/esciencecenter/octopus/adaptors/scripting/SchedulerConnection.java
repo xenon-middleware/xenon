@@ -33,9 +33,9 @@ import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -253,7 +253,7 @@ public abstract class SchedulerConnection {
         subFileSystem = engine.files().newFileSystem(subSchedulerLocation, credential, null);
     }
 
-    protected AbsolutePath getFsEntryPath() {
+    protected Path getFsEntryPath() {
         return subFileSystem.getEntryPath();
     }
 
@@ -373,12 +373,12 @@ public abstract class SchedulerConnection {
             return;
         }
 
-        AbsolutePath path;
+        Path path;
         if (workingDirectory.startsWith("/")) {
-            path = engine.files().newPath(subFileSystem, new RelativePath(workingDirectory));
+            path = engine.files().newPath(subFileSystem, new Pathname(workingDirectory));
         } else {
             //make relative path absolute
-            path = getFsEntryPath().resolve(new RelativePath(workingDirectory));
+            path = getFsEntryPath().resolve(new Pathname(workingDirectory));
         }
         if (!engine.files().exists(path)) {
             throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);

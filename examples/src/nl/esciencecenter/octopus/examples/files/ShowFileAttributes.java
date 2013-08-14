@@ -21,11 +21,11 @@ import java.net.URI;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
@@ -65,8 +65,8 @@ public class ShowFileAttributes {
             // Next we create a FileSystem 
             FileSystem fs = files.newFileSystem(fsURI, null, null);
 
-            // We now create an AbsolutePath representing the file.
-            AbsolutePath path = files.newPath(fs, new RelativePath(filepath));
+            // We now create an Path representing the file.
+            Path path = files.newPath(fs, new Pathname(filepath));
 
             try {
                 // Retrieve the attributes of the file

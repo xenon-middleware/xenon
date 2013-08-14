@@ -25,11 +25,11 @@ package nl.esciencecenter.octopus.files;
 public interface PathAttributesPair {
 
     /**
-     * Get the AbsolutePath in this PathAttributesPair.
+     * Get the Path in this PathAttributesPair.
      * 
-     * @return the AbsolutePath.
+     * @return the Path.
      */
-    AbsolutePath path();
+    Path path();
 
     /**
      * Get the FileAttributes in this PathAttributesPair.

@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.octopus.engine.files;
 
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 
 /**
@@ -27,10 +27,10 @@ public class CopyImplementation implements Copy {
 
     private final String adaptorName;
     private final String uniqueID;
-    private final AbsolutePath source;
-    private final AbsolutePath target;
+    private final Path source;
+    private final Path target;
 
-    public CopyImplementation(String adaptorName, String uniqueID, AbsolutePath source, AbsolutePath target) {
+    public CopyImplementation(String adaptorName, String uniqueID, Path source, Path target) {
         super();
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
@@ -47,12 +47,12 @@ public class CopyImplementation implements Copy {
     }
 
     @Override
-    public AbsolutePath getSource() {
+    public Path getSource() {
         return source;
     }
 
     @Override
-    public AbsolutePath getTarget() {
+    public Path getTarget() {
         return target;
     }
     

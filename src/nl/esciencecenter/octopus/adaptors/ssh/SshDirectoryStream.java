@@ -23,19 +23,19 @@ import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.AbsolutePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Pathname;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
-public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterator<AbsolutePath> {
+public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
 
-    private final Deque<AbsolutePath> stream;
+    private final Deque<Path> stream;
 
-    SshDirectoryStream(AbsolutePath dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
 
-        stream = new LinkedList<AbsolutePath>();
+        stream = new LinkedList<Path>();
 
         for (LsEntry e : listing) {
 
@@ -44,7 +44,7 @@ public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterat
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
-                AbsolutePath tmp = dir.resolve(new RelativePath(filename));
+                Path tmp = dir.resolve(new Pathname(filename));
 
                 if (filter.accept(tmp)) {
                     stream.add(tmp);
@@ -54,7 +54,7 @@ public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterat
     }
 
     @Override
-    public Iterator<AbsolutePath> iterator() {
+    public Iterator<Path> iterator() {
         return this;
     }
 
@@ -69,7 +69,7 @@ public class SshDirectoryStream implements DirectoryStream<AbsolutePath>, Iterat
     }
 
     @Override
-    public synchronized AbsolutePath next() {
+    public synchronized Path next() {
 
         if (stream.size() > 0) {
             return stream.removeFirst();
