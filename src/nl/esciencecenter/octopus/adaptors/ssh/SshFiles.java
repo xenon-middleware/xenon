@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
+import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -110,6 +111,23 @@ public class SshFiles implements Files {
         this.adaptor = sshAdaptor;
     }
 
+    private void checkParent(Path path) throws OctopusIOException {
+        
+        Pathname parentName = path.getPathname().getParent();
+        
+        if (parentName == null) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
+        }
+        
+        Path parent = newPath(path.getFileSystem(), parentName);
+            
+        if (!exists(parent)) {
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parentName.getPath() + 
+                    " does not exist!");
+        }
+    }
+    
+    
     protected FileSystem newFileSystem(SshMultiplexedSession session, URI location, Credential credential,
             OctopusProperties properties) throws OctopusException, OctopusIOException {
 
@@ -167,7 +185,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public Path newPath(FileSystem filesystem, Pathname location) throws OctopusException, OctopusIOException {
+    public Path newPath(FileSystem filesystem, Pathname location) {
         return new PathImplementation(filesystem, location);
     }
 
@@ -197,9 +215,7 @@ public class SshFiles implements Files {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
         }
 
-        if (!exists(dir.getParent())) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Parent directory " + dir.getParent() + " does not exist!");
-        }
+        checkParent(dir);
 
         SshMultiplexedSession session = getSession(dir);
         ChannelSftp channel = session.getSftpChannel();
@@ -222,13 +238,13 @@ public class SshFiles implements Files {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
         }
 
-        Iterator<Path> itt = dir.iterator();
+        Iterator<Pathname> itt = dir.getPathname().iterator();
 
         while (itt.hasNext()) {
-            Path path = itt.next();
-
-            if (!exists(path)) {
-                createDirectory(path);
+            Path tmp = newPath(dir.getFileSystem(), itt.next());
+            
+            if (!exists(tmp)) {
+                createDirectory(tmp);
             }
         }
 
@@ -242,9 +258,7 @@ public class SshFiles implements Files {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " already exists!");
         }
 
-        if (!exists(path.getParent())) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Parent directory " + path.getParent() + " does not exist!");
-        }
+        checkParent(path);
 
         OutputStream out = null;
 
@@ -329,7 +343,10 @@ public class SshFiles implements Files {
             throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
         }
 
-        if (source.normalize().equals(target.normalize())) {
+        Pathname sourceName = source.getPathname().normalize();
+        Pathname targetName = target.getPathname().normalize();
+        
+        if (sourceName.equals(targetName)) {
             return target;
         }
 
@@ -337,10 +354,7 @@ public class SshFiles implements Files {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
         }
 
-        if (!exists(target.getParent())) {
-            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath()
-                    + " does not exist!");
-        }
+        checkParent(target);
 
         // Ok, here, we just have a local move
         SshMultiplexedSession session = getSession(target);
@@ -490,7 +504,7 @@ public class SshFiles implements Files {
             String target = channel.readlink(path.getPath());
 
             if (!target.startsWith(File.separator)) {
-                result = path.getParent().resolve(new Pathname(target));
+                result = new PathImplementation(path.getFileSystem(), path.getPathname().resolve(target));
             } else {
                 result = new PathImplementation(path.getFileSystem(), new Pathname(target));
             }

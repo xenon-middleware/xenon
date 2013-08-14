@@ -39,6 +39,7 @@ import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.files.Path;
@@ -110,7 +111,16 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
     };
+    
+    public Path resolve(Path root, String path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+    }
 
+    public Path resolve(FileSystem fs, String path) throws OctopusIOException {
+        return resolve(fs.getEntryPath(), path);
+    }
+
+    
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(JobTestConfig testConfig) {
         config = testConfig;
@@ -128,8 +138,8 @@ public abstract class GenericJobAdaptorTestParent {
         Credentials credentials = octopus.credentials();
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = filesystem.getEntryPath().resolve(new Pathname(TEST_ROOT));
+        Pathname entryPath = filesystem.getEntryPath().getPathname();
+        Path root = files.newPath(filesystem, entryPath.resolve(TEST_ROOT));
 
         if (files.exists(root)) {
             files.delete(root);
@@ -649,7 +659,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -686,8 +696,8 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-        Path out = root.resolve(new Pathname("stdout.txt"));
-        Path err = root.resolve(new Pathname("stderr.txt"));
+        Path out = resolve(root, "stdout.txt");
+        Path err = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -716,7 +726,8 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
+        
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -746,8 +757,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path out = root.resolve(new Pathname("stdout.txt"));
-        Path err = root.resolve(new Pathname("stderr.txt"));
+        Path out = resolve(root, "stdout.txt");
+        Path err = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -776,7 +787,7 @@ public abstract class GenericJobAdaptorTestParent {
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         Path[] out = new Path[jobCount];
@@ -788,8 +799,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         for (int i = 0; i < j.length; i++) {
 
-            out[i] = root.resolve(new Pathname("stdout" + i + ".txt"));
-            err[i] = root.resolve(new Pathname("stderr" + i + ".txt"));
+            out[i] = resolve(root, "stdout" + i + ".txt");
+            err[i] = resolve(root, "stderr" + i + ".txt");
 
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");
@@ -890,7 +901,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -917,8 +928,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path out = root.resolve(new Pathname(description.getStdout()));
-        Path err = root.resolve(new Pathname(description.getStderr()));
+        Path out = resolve(root, description.getStdout());
+        Path err = resolve(root, description.getStderr());
 
         if (files.exists(out)) {
             files.delete(out);
@@ -947,7 +958,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -981,8 +992,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path out = root.resolve(new Pathname(description.getStdout()));
-        Path err = root.resolve(new Pathname(description.getStderr()));
+        Path out = resolve(root, description.getStdout());
+        Path err = resolve(root, description.getStderr());
 
         if (files.exists(out)) {
             files.delete(out);
@@ -1010,10 +1021,10 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
-        Path stdin = root.resolve(new Pathname("stdin.txt"));
+        Path stdin = resolve(root, "stdin.txt");
 
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -1040,8 +1051,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
-        Path stderr = root.resolve(new Pathname("stderr.txt"));
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
@@ -1070,10 +1081,10 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
-        Path stdin = root.resolve(new Pathname("stdin.txt"));
+        Path stdin = resolve(root, "stdin.txt");
 
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -1104,8 +1115,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
-        Path stderr = root.resolve(new Pathname("stderr.txt"));
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
@@ -1157,7 +1168,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1192,7 +1203,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1270,7 +1281,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1306,10 +1317,10 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
-        Path stdin = root.resolve(new Pathname("stdin.txt"));
+        Path stdin = resolve(root, "stdin.txt");
 
         OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, message);
@@ -1334,8 +1345,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         for (int i = 0; i < 2; i++) {
 
-            Path stdoutTmp = root.resolve(new Pathname("stdout.txt." + i));
-            Path stderrTmp = root.resolve(new Pathname("stderr.txt." + i));
+            Path stdoutTmp = resolve(root, "stdout.txt." + i);
+            Path stderrTmp = resolve(root, "stderr.txt." + i);
 
             String tmpout = readFully(files.newInputStream(stdoutTmp));
             String tmperr = readFully(files.newInputStream(stderrTmp));
@@ -1493,7 +1504,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         //echo the given variable, to see if the va
@@ -1519,7 +1530,7 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
+        Path stdout = resolve(root, "stdout.txt");
 
         String stdoutContent = readFully(files.newInputStream(stdout));
 
@@ -1602,7 +1613,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1625,7 +1636,7 @@ public abstract class GenericJobAdaptorTestParent {
             jobs.waitUntilDone(job, 60000);
         }
 
-        Path out = root.resolve(new Pathname("stdout.txt"));
+        Path out = resolve(root, "stdout.txt");
 
         if (files.exists(out)) {
             files.delete(out);

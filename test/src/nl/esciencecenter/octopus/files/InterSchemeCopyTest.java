@@ -22,6 +22,7 @@ import java.net.URI;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 
 import org.junit.Test;
@@ -44,24 +45,24 @@ public class InterSchemeCopyTest {
 
         String dirname = "octopus_test_" + System.currentTimeMillis();
 
-        Path localDir = localFS.getEntryPath().resolve(new Pathname(dirname));
+        Path localDir = Util.resolve(files, localFS, dirname);
         files.createDirectory(localDir);
 
-        Path sshDir = sshFS.getEntryPath().resolve(new Pathname(dirname));
+        Path sshDir = Util.resolve(files, sshFS, dirname);
         files.createDirectory(sshDir);
 
         // Create file locally and copy to remote        
-        Path localFile = localDir.resolve(new Pathname("test"));
+        Path localFile = Util.resolve(files, localDir, "test");
         files.createFile(localFile);
-        Path sshFile = sshDir.resolve(new Pathname("test"));
+        Path sshFile = Util.resolve(files, sshDir, "test");
         files.copy(localFile, sshFile, CopyOption.CREATE);
 
         assertTrue(files.exists(localFile));
         assertTrue(files.exists(sshFile));
 
         // Create file remotely and copy to local        
-        Path localFile2 = localDir.resolve(new Pathname("test2"));
-        Path sshFile2 = sshDir.resolve(new Pathname("test2"));
+        Path localFile2 = Util.resolve(files, localDir, "test2");
+        Path sshFile2 = Util.resolve(files, sshDir, "test2");
         files.createFile(sshFile2);
         files.copy(sshFile2, localFile2, CopyOption.CREATE);
 

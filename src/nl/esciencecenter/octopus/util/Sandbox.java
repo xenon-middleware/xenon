@@ -25,7 +25,6 @@ import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * A sandbox is a (possibly remote and usually temporary) directory used for running jobs. 
@@ -164,9 +163,13 @@ public class Sandbox {
         }
 
         this.files = files;
-        this.path = root.resolve(new Pathname(sandboxName));
+        this.path = resolve(files, root, sandboxName);
     }
 
+    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+    }
+    
     /**
      * The sandbox directory.
      * 
@@ -191,8 +194,9 @@ public class Sandbox {
      * Any existing upload files will be discarded.
      * 
      * @param files the files to upload.
+     * @throws OctopusIOException 
      */
-    public void setUploadFiles(Path... files) {
+    public void setUploadFiles(Path... files) throws OctopusIOException {
         uploadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
             addUploadFile(files[i]);
@@ -204,8 +208,9 @@ public class Sandbox {
      * 
      * @param src
      *            Source path of file. May not be <code>null</code>.
+     * @throws OctopusIOException 
      */
-    public void addUploadFile(Path src) {
+    public void addUploadFile(Path src) throws OctopusIOException {
         addUploadFile(src, null);
     }
 
@@ -216,16 +221,17 @@ public class Sandbox {
      *            The source file. May not be <code>null</code>.
      * @param dest
      *            The name of file in the sandbox. If <code>null</code> then <code>src.getFilename()</code> will be used.
+     * @throws OctopusIOException 
      */
-    public void addUploadFile(Path src, String dest) {
+    public void addUploadFile(Path src, String dest) throws OctopusIOException {
         if (src == null) {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
         if (dest == null) {
-            dest = src.getFileName();
+            dest = src.getPathname().getFileNameAsString();
         }
 
-        uploadFiles.add(new Pair(src, path.resolve(new Pathname(dest))));
+        uploadFiles.add(new Pair(src, resolve(files, path, dest)));
     }
 
     /**
@@ -244,16 +250,17 @@ public class Sandbox {
      *            Name of the source file in the sandbox. When <code>null</code> the <code>dest.getFilename()</code> will be used.
      * @param dest
      *            The target file. May not be <code>null</code>.
+     * @throws OctopusIOException 
      */
-    public void addDownloadFile(String src, Path dest) {
+    public void addDownloadFile(String src, Path dest) throws OctopusIOException {
         if (dest == null) {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
         if (src == null) {
-            src = dest.getFileName();
+            src = dest.getPathname().getFileNameAsString();
         }
 
-        downloadFiles.add(new Pair(path.resolve(new Pathname(src)), dest));
+        downloadFiles.add(new Pair(resolve(files, path, src), dest));
     }
 
     private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {

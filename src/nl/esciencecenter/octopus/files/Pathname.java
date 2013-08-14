@@ -175,13 +175,27 @@ public class Pathname {
      * 
      * @return the resulting file name or <code>null</code>.
      */
-    public String getFileName() {
+    public Pathname getFileName() {
         if (elements.length == 0) {
             return null;
         }
-        return elements[elements.length - 1];
+        
+        return new Pathname(separator, elements[elements.length - 1]);
     }
 
+    /**
+     * Get the file name as a <code>String</code>, or <code>null</code> if the pathname is empty.
+     * 
+     * @return the resulting file name or <code>null</code>.
+     */
+    public String getFileNameAsString() {
+        if (elements.length == 0) {
+            return null;
+        }
+        
+        return elements[elements.length - 1];
+    }
+    
     /**
      * Get the separator.
      * 
@@ -221,9 +235,9 @@ public class Pathname {
      * 
      * @return the number of elements in the path, or 0 if this path is empty.
      */
-    public String[] getNames() {
-        return elements.clone();
-    }
+   // public String[] getNames() {
+        //return elements.clone();
+    //}
 
     /**
      * Get a name element of this path.
@@ -236,11 +250,11 @@ public class Pathname {
      * @throws IllegalArgumentException
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
-    public String getName(int index) {
+    public Pathname getName(int index) {
         if (index < 0 || index >= elements.length) {
             throw new IllegalArgumentException("index " + index + " not present in path " + this);
         }
-        return elements[index];
+        return new Pathname(separator, elements[index]);
     }
 
     /**
@@ -283,6 +297,9 @@ public class Pathname {
     /**
      * Tests if this path starts with the given path.
      * 
+     * This method returns <code>true</code> if this path starts with the same name elements as the given path. If the given path
+     * has more name elements than this path then false is returned.
+     * 
      * @param other
      *            the path to test.
      * 
@@ -314,6 +331,9 @@ public class Pathname {
     /**
      * Tests if this path ends with the given path.
      * 
+     * This method returns <code>true</code> if this path end with the same name elements as the given path. If the given path
+     * has more name elements than this path then false is returned.
+     * 
      * @param other
      *            the path to test.
      * 
@@ -344,6 +364,36 @@ public class Pathname {
         return true;
     }
 
+    /**
+     * Tests if this path starts with the given path.
+     *
+     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link Pathname(String)} and then uses 
+     * {@link #startsWith(Path)} to compare the paths.
+     * 
+     * @param other
+     *            the path to test.
+     * 
+     * @return If this paths start with the other path.
+     */
+    public boolean startsWith(String other) {
+        return startsWith(new Pathname(other));
+    }
+
+    /**
+     * Tests if this path ends with the given path.
+     * 
+     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link Pathname(String)} and then uses 
+     * {@link #endWith(Path)} to compare the paths.
+     * 
+     * @param other
+     *            the path to test.
+     * 
+     * @return If this paths ends with the other path.
+     */
+    public boolean endsWith(String other) {
+        return endsWith(new Pathname(other));
+    }
+    
     /**
      * Concatenate two String arrays.
      * 

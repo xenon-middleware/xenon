@@ -178,13 +178,15 @@ public class JobQueueTest {
     @After
     public void cleanupTest() throws Exception {
 
-        Path p = filesystem.getEntryPath().resolve(new Pathname("stderr.txt"));
+        Pathname entryPath = filesystem.getEntryPath().getPathname();
+        
+        Path p = files.newPath(filesystem, entryPath.resolve("stderr.txt"));
 
         if (files.exists(p)) {
             files.delete(p);
         }
 
-        p = filesystem.getEntryPath().resolve(new Pathname("stdout.txt"));
+        p = files.newPath(filesystem, entryPath.resolve("stdout.txt"));
 
         if (files.exists(p)) {
             files.delete(p);

@@ -22,7 +22,6 @@ import java.util.Map;
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
@@ -99,8 +98,9 @@ final class GridEngineJobScriptGenerator {
         script.format("\n");
     }
 
-    protected static String generate(JobDescription description, Path fsEntryPath, GridEngineSetup setup)
+    protected static String generate(JobDescription description, Pathname fsEntryPath, GridEngineSetup setup)
             throws OctopusException {
+        
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 
@@ -118,7 +118,7 @@ final class GridEngineJobScriptGenerator {
                 script.format("#$ -wd '%s'\n", description.getWorkingDirectory());
             } else {
                 //make relative path absolute
-                Path workingDirectory = fsEntryPath.resolve(new Pathname(description.getWorkingDirectory()));
+                Pathname workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
                 script.format("#$ -wd '%s'\n", workingDirectory.getPath());
             }
         }

@@ -111,12 +111,10 @@ public interface Files {
      * 
      * @return the resulting Path.
      * 
-     * @throws OctopusException
-     *             If the Path could not be created.
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    Path newPath(FileSystem filesystem, Pathname location) throws OctopusException, OctopusIOException;
+    Path newPath(FileSystem filesystem, Pathname location) throws OctopusIOException;
 
     /**
      * Close a FileSystem.

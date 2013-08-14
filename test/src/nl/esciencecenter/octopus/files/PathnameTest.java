@@ -150,14 +150,14 @@ public class PathnameTest {
     @Test
     public void testGetFileName_WithFile_LastElement() {
         Pathname path = new Pathname("mydir/myfile");
-        String filename = path.getFileName();
+        String filename = path.getFileNameAsString();
         assertEquals(filename, "myfile");
     }
 
     @Test
     public void testGetFileName_EmptyPath_Null() {
         Pathname path = new Pathname();
-        String filename = path.getFileName();
+        String filename = path.getFileNameAsString();
         assertNull(filename);
     }
 
@@ -190,20 +190,10 @@ public class PathnameTest {
     }
 
     @Test
-    public void testGetNames() {
-        String[] strings = new String[2];
-        strings[0] = "mydir";
-        strings[1] = "myfile";
-        Pathname path = new Pathname(strings);
-        String[] result = path.getNames();
-        assertArrayEquals(result, strings);
-    }
-
-    @Test
     public void testGetName_IndexWithinElements_ReturnsElement() {
         Pathname path = new Pathname("mydir/myfile");
-        String element = path.getName(1);
-        assertEquals(element, "myfile");
+        Pathname element = path.getName(1);
+        assertEquals(element.getPath(), "myfile");
     }
 
     @Test

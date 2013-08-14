@@ -72,11 +72,11 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
-        Path script = root.resolve(new Pathname("script"));
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
+        Path script = resolve(root, "script");
+        Path stdout = resolve(root, "stdout.txt");
 
         String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
                 + message;
@@ -143,11 +143,11 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
-        Path stderr = root.resolve(new Pathname("stderr.txt"));
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
 
         JobDescription description = new JobDescription();
         description.setWorkingDirectory(workingDir);
@@ -202,7 +202,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -232,8 +232,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path out = root.resolve(new Pathname("stdout.txt"));
-        Path err = root.resolve(new Pathname("stderr.txt"));
+        Path out = resolve(root, "stdout.txt");
+        Path err = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -265,7 +265,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         Path[] out = new Path[5];
@@ -277,8 +277,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         for (int i = 0; i < j.length; i++) {
 
-            out[i] = root.resolve(new Pathname("stdout" + i + ".txt"));
-            err[i] = root.resolve(new Pathname("stderr" + i + ".txt"));
+            out[i] = resolve(root, "stdout" + i + ".txt");
+            err[i] = resolve(root, "stderr" + i + ".txt");
 
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");

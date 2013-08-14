@@ -41,6 +41,10 @@ public class LocalDirectoryAttributeStreamTest {
 
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
 
+    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+    }
+    
     @org.junit.BeforeClass
     public static void prepareClass() throws OctopusIOException, OctopusException {
 
@@ -49,12 +53,12 @@ public class LocalDirectoryAttributeStreamTest {
         Files files = octopus.files();
         FileSystem fs = files.getLocalCWDFileSystem();
         Path root = fs.getEntryPath();
-        Path testDir = root.resolve(new Pathname(TEST_DIR));
+        Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
 
-        Path file0 = testDir.resolve(new Pathname("file0"));
-        Path file1 = testDir.resolve(new Pathname("file2"));
-        Path file2 = testDir.resolve(new Pathname("file3"));
+        Path file0 = resolve(files, testDir, "file0");
+        Path file1 = resolve(files, testDir, "file2");
+        Path file2 = resolve(files, testDir, "file3");
 
         files.createFile(file0);
         files.createFile(file1);
@@ -71,13 +75,13 @@ public class LocalDirectoryAttributeStreamTest {
         Files files = octopus.files();
         FileSystem fs = files.getLocalCWDFileSystem();
         Path root = fs.getEntryPath();
-        Path testDir = root.resolve(new Pathname(TEST_DIR));
-        Path file0 = testDir.resolve(new Pathname("file0"));
-        Path file1 = testDir.resolve(new Pathname("file2"));
-        Path file2 = testDir.resolve(new Pathname("file3"));
+        Path testDir = resolve(files, root, TEST_DIR);
+        Path file0 = resolve(files, testDir, "file0");
+        Path file1 = resolve(files, testDir, "file2");
+        Path file2 = resolve(files, testDir, "file3");
 
-        Path dir0 = testDir.resolve(new Pathname("dir0"));
-        Path file4 = dir0.resolve(new Pathname("file4"));
+        Path dir0 = resolve(files, testDir, "dir0");
+        Path file4 = resolve(files, dir0, "file4");
 
         if (files.exists(testDir)) {
 
@@ -128,7 +132,7 @@ public class LocalDirectoryAttributeStreamTest {
         localFiles = new LocalFiles(localAdaptor, octopus.getCopyEngine());
         fs = localFiles.getLocalCWDFileSystem();
         root = fs.getEntryPath();
-        testDir = root.resolve(new Pathname(TEST_DIR));
+        testDir = resolve(localFiles, root, TEST_DIR);
     }
 
     @org.junit.After
@@ -210,10 +214,10 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test(expected = DirectoryIteratorException.class)
     public void test_remove_file_halfway_allTrue() throws Exception {
 
-        Path dir0 = testDir.resolve(new Pathname("dir0"));
+        Path dir0 = resolve(localFiles, testDir, "dir0");
         localFiles.createDirectory(dir0);
 
-        Path file4 = dir0.resolve(new Pathname("file4"));
+        Path file4 = resolve(localFiles, dir0, "file4");
         localFiles.createFile(file4);
 
         if (!localFiles.exists(file4)) {

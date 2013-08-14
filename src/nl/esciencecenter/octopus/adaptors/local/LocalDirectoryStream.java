@@ -20,10 +20,10 @@ import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
-import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * LocalDirectoryStream implements a {@link DirectoryStream} for local directories.
@@ -61,7 +61,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     }
 
     private Path getPath(java.nio.file.Path path) {
-        return dir.resolve(new Pathname(path.getFileName().toString()));
+        return new PathImplementation(dir.getFileSystem(), dir.getPathname().resolve(path.getFileName().toString()));
     }
 
     @Override

@@ -33,6 +33,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
@@ -118,9 +119,9 @@ public abstract class GenericFileAdaptorTestParent {
         Credentials credentials = octopus.credentials();
 
         FileSystem filesystem = config.getTestFileSystem(files, credentials);
-
-        Path root = filesystem.getEntryPath().resolve(new Pathname(TEST_ROOT));
-
+        Pathname entryPath = filesystem.getEntryPath().getPathname();
+        Path root = files.newPath(filesystem, entryPath.resolve(TEST_ROOT));
+        
         if (files.exists(root)) {
             files.delete(root);
         }
@@ -128,6 +129,14 @@ public abstract class GenericFileAdaptorTestParent {
         OctopusFactory.endOctopus(octopus);
     }
 
+    public Path resolve(Path root, String... path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(new Pathname(path)));
+    }
+    
+    public Path resolve(FileSystem fs, String ... path) throws OctopusIOException {
+        return resolve(fs.getEntryPath(), path);
+    }
+    
     protected void prepare() throws Exception {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
@@ -215,7 +224,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: Path.resolve, Pathname, exists
     private Path createNewTestDirName(Path root) throws Exception {
 
-        Path dir = root.resolve(new Pathname("dir" + counter));
+        Path dir = resolve(root, "dir" + counter);
         counter++;
 
         if (files.exists(dir)) {
@@ -246,8 +255,7 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        Path entry = fs.getEntryPath();
-        testDir = entry.resolve(new Pathname(TEST_ROOT, testName));
+        testDir = resolve(fs, TEST_ROOT, testName);
 
         if (!files.exists(testDir)) {
             files.createDirectories(testDir);
@@ -257,7 +265,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: Path.resolve, Pathname, exists 
     private Path createNewTestFileName(Path root) throws Exception {
 
-        Path file = root.resolve(new Pathname("file" + counter));
+        Path file = resolve(root, "file" + counter);
         counter++;
 
         if (files.exists(file)) {
@@ -678,8 +686,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
-        Path entry = fs.getEntryPath();
-        Path root = entry.resolve(new Pathname(TEST_ROOT));
+        Path root = resolve(fs, TEST_ROOT);
 
         // test with non-existing dir
         test04_createDirectory(root, false);
@@ -758,8 +765,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
-        Path entry = fs.getEntryPath();
-        Path root = entry.resolve(new Pathname(TEST_ROOT, "test05_createDirectories"));
+        Path root = resolve(fs, TEST_ROOT, "test05_createDirectories");
 
         // test with non-existing dir
         test05_createDirectories(root, false);
@@ -2668,7 +2674,10 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test27_move");
         }
 
-        if (source.normalize().equals(target.normalize())) {
+        Pathname sourceName = source.getPathname().normalize();
+        Pathname targetName = target.getPathname().normalize();
+        
+        if (sourceName.equals(targetName)) {
             // source == target, so the move did nothing. 
             return;
         }
@@ -2808,25 +2817,25 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
-
+        Path root = resolve(fs, "octopus_test/links");
+        
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
         }
 
         // prepare the test files 
-        Path file0 = root.resolve(new Pathname("file0")); // exists
-        Path file1 = root.resolve(new Pathname("file1")); // exists
-        Path file2 = root.resolve(new Pathname("file2")); // does not exist
+        Path file0 = resolve(root, "file0"); // exists
+        Path file1 = resolve(root, "file1"); // exists
+        Path file2 = resolve(root, "file2"); // does not exist
 
         // prepare the test links 
-        Path link0 = root.resolve(new Pathname("link0")); // points to file0 (contains text) 
-        Path link1 = root.resolve(new Pathname("link1")); // points to file1 (is empty)
-        Path link2 = root.resolve(new Pathname("link2")); // points to non-existing file2 
-        Path link3 = root.resolve(new Pathname("link3")); // points to link0 which points to file0 (contains text)
-        Path link4 = root.resolve(new Pathname("link4")); // points to link2 which points to non-existing file2 
-        Path link5 = root.resolve(new Pathname("link5")); // points to link6 (circular)  
-        Path link6 = root.resolve(new Pathname("link6")); // points to link5 (circular)
+        Path link0 = resolve(root, "link0"); // points to file0 (contains text) 
+        Path link1 = resolve(root, "link1"); // points to file1 (is empty)
+        Path link2 = resolve(root, "link2"); // points to non-existing file2 
+        Path link3 = resolve(root, "link3"); // points to link0 which points to file0 (contains text)
+        Path link4 = resolve(root, "link4"); // points to link2 which points to non-existing file2 
+        Path link5 = resolve(root, "link5"); // points to link6 (circular)  
+        Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
         // link0 should point to file0
         test28_readSymbolicLink(link0, file0, false);
@@ -2887,24 +2896,24 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
+        Path root = resolve(fs, "octopus_test/links");
 
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
         }
 
         // prepare the test files 
-        Path file0 = root.resolve(new Pathname("file0")); // exists
-        Path file1 = root.resolve(new Pathname("file1")); // exists
+        Path file0 = resolve(root, "file0"); // exists
+        Path file1 = resolve(root, "file1"); // exists
 
         // prepare the test links 
-        Path link0 = root.resolve(new Pathname("link0")); // points to file0 (contains text) 
-        Path link1 = root.resolve(new Pathname("link1")); // points to file1 (is empty)
-        Path link2 = root.resolve(new Pathname("link2")); // points to non-existing file2 
-        Path link3 = root.resolve(new Pathname("link3")); // points to link0 which points to file0 (contains text)
-        Path link4 = root.resolve(new Pathname("link4")); // points to link2 which points to non-existing file2 
-        Path link5 = root.resolve(new Pathname("link5")); // points to link6 (circular)  
-        Path link6 = root.resolve(new Pathname("link6")); // points to link5 (circular)
+        Path link0 = resolve(root, "link0"); // points to file0 (contains text) 
+        Path link1 = resolve(root, "link1"); // points to file1 (is empty)
+        Path link2 = resolve(root, "link2"); // points to non-existing file2 
+        Path link3 = resolve(root, "link3"); // points to link0 which points to file0 (contains text)
+        Path link4 = resolve(root, "link4"); // points to link2 which points to non-existing file2 
+        Path link5 = resolve(root, "link5"); // points to link6 (circular)  
+        Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
         Set<Path> tmp = new HashSet<Path>();
         tmp.add(file0);
@@ -2930,24 +2939,24 @@ public abstract class GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
+        Path root = resolve(fs, "octopus_test/links");
 
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
         }
 
         // prepare the test files 
-        Path file0 = root.resolve(new Pathname("file0")); // exists
-        Path file1 = root.resolve(new Pathname("file1")); // exists
+        Path file0 = resolve(root, "file0"); // exists
+        Path file1 = resolve(root, "file1"); // exists
 
         // prepare the test links 
-        Path link0 = root.resolve(new Pathname("link0")); // points to file0 (contains text) 
-        Path link1 = root.resolve(new Pathname("link1")); // points to file1 (is empty)
-        Path link2 = root.resolve(new Pathname("link2")); // points to non-existing file2 
-        Path link3 = root.resolve(new Pathname("link3")); // points to link0 which points to file0 (contains text)
-        Path link4 = root.resolve(new Pathname("link4")); // points to link2 which points to non-existing file2 
-        Path link5 = root.resolve(new Pathname("link5")); // points to link6 (circular)  
-        Path link6 = root.resolve(new Pathname("link6")); // points to link5 (circular)
+        Path link0 = resolve(root, "link0"); // points to file0 (contains text) 
+        Path link1 = resolve(root, "link1"); // points to file1 (is empty)
+        Path link2 = resolve(root, "link2"); // points to non-existing file2 
+        Path link3 = resolve(root, "link3"); // points to link0 which points to file0 (contains text)
+        Path link4 = resolve(root, "link4"); // points to link2 which points to non-existing file2 
+        Path link5 = resolve(root, "link5"); // points to link6 (circular)  
+        Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
         Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
         tmp.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));

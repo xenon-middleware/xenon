@@ -86,7 +86,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Path newPath(FileSystem filesystem, Pathname location) throws OctopusException, OctopusIOException {
+    public Path newPath(FileSystem filesystem, Pathname location) throws OctopusIOException {
         return getFilesAdaptor(filesystem).newPath(filesystem, location);
     }
 

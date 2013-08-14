@@ -27,6 +27,7 @@ import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -71,7 +72,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_copyFromInputStream1.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_copyFromInputStream1.txt");
 
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
 
@@ -89,7 +90,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_copyFromInputStream2.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_copyFromInputStream2.txt");
 
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
@@ -108,7 +109,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_copyFromInputStream3.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_copyFromInputStream3.txt");
 
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
         FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, false);
@@ -127,7 +128,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_copyToOutputStream1.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_copyToOutputStream1.txt");
 
         FileUtils.write(files, testFile, message.getBytes(), true);
 
@@ -149,7 +150,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_copyToOutputStream2.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_copyToOutputStream2.txt");
 
         FileUtils.write(files, testFile, message.getBytes(), true);
         FileUtils.write(files, testFile, message.getBytes(), true);
@@ -172,7 +173,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_copyToOutputStream3.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_copyToOutputStream3.txt");
 
         FileUtils.write(files, testFile, message.getBytes(), true);
         FileUtils.write(files, testFile, message.getBytes(), false);
@@ -195,7 +196,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_newBufferedWriter1.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_newBufferedWriter1.txt");
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
@@ -215,7 +216,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_newBufferedWriter2.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_newBufferedWriter2.txt");
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
@@ -239,7 +240,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_newBufferedWriter3.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_newBufferedWriter3.txt");
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
@@ -263,7 +264,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = testDir.resolve(new Pathname("test_newBufferedReader1.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_newBufferedReader1.txt");
 
         FileUtils.write(files, testFile, message.getBytes(), true);
 
@@ -283,7 +284,7 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!\n";
 
-        Path testFile = testDir.resolve(new Pathname("test_newBufferedReader2.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_newBufferedReader2.txt");
 
         FileUtils.write(files, testFile, message.getBytes(), true);
         FileUtils.write(files, testFile, message.getBytes(), false);
@@ -306,7 +307,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_readAllLines1() throws Exception {
 
-        Path testFile = testDir.resolve(new Pathname("test_readAllLines1.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_readAllLines1.txt");
 
         BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write("line1\n");
@@ -330,7 +331,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_write1() throws Exception {
 
-        Path testFile = testDir.resolve(new Pathname("test_write1.txt"));
+        Path testFile = Util.resolve(files, testDir, "test_write1.txt");
 
         LinkedList<String> tmp1 = new LinkedList<>();
         tmp1.add("line1");
@@ -410,15 +411,15 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree1"));
-        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
+        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree1");
+        dirs[1] = Util.resolve(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
+            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
@@ -464,15 +465,15 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree2"));
-        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
+        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree2");
+        dirs[1] = Util.resolve(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
+            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
@@ -518,15 +519,15 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree3"));
-        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
+        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree3");
+        dirs[1] = Util.resolve(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
+            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
@@ -582,9 +583,9 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[3];
 
-        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree4"));
-        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
-        dirs[2] = dirs[0].resolve(new Pathname("dir1"));
+        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree4");
+        dirs[1] = Util.resolve(files, dirs[0], "dir0");
+        dirs[2] = Util.resolve(files, dirs[0], "dir1");
 
         files.createDirectories(dirs[1]);
         files.createDirectories(dirs[2]);
@@ -592,12 +593,12 @@ public class RealFileUtilsTest {
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < 5; i++) {
-            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
+            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
         for (int i = 0; i < 5; i++) {
-            tmp[5 + i] = dirs[2].resolve(new Pathname("file" + (5 + i)));
+            tmp[5 + i] = Util.resolve(files, dirs[2], "file" + (5 + i));
             files.createFile(tmp[5 + i]);
         }
 
@@ -644,15 +645,15 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = testDir.resolve(new Pathname("test_walkFileTree5"));
-        dirs[1] = dirs[0].resolve(new Pathname("dir0"));
+        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree5");
+        dirs[1] = Util.resolve(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < 10; i++) {
-            tmp[i] = dirs[1].resolve(new Pathname("file" + i));
+            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
@@ -696,7 +697,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree6() throws Exception {
 
-        Path dir = testDir.resolve(new Pathname("test_walkFileTree6"));
+        Path dir = Util.resolve(files, testDir, "test_walkFileTree6");
         files.createDirectories(dir);
 
         FileVisitor fv = new MyFileVisitor6();

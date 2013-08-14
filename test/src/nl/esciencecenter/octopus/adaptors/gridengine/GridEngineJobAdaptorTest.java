@@ -28,7 +28,6 @@ import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
     private static final Logger logger = LoggerFactory.getLogger(GridEngineJobAdaptorTest.class);
-
+    
     @BeforeClass
     public static void prepareGridEngineJobAdaptorTest() throws Exception {
         GenericJobAdaptorTestParent.prepareClass(new GridEngineJobTestConfig(null));
@@ -70,11 +69,11 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem.getEntryPath(), workingDir);
         files.createDirectories(root);
 
-        Path script = root.resolve(new Pathname("script"));
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
+        Path script = resolve(root, "script");
+        Path stdout = resolve(root, "stdout.txt");
 
         String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
 
@@ -145,12 +144,12 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = resolve(filesystem.getEntryPath(), workingDir);
         files.createDirectories(root);
 
-        Path stdout = root.resolve(new Pathname("stdout.txt"));
-        Path stderr = root.resolve(new Pathname("stderr.txt"));
-
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
+        
         JobDescription description = new JobDescription();
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");

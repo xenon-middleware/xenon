@@ -79,7 +79,7 @@ public class DirectoryListing {
                 DirectoryStream<Path> stream = files.newDirectoryStream(path);
 
                 for (Path p : stream) {
-                    System.out.println("   " + p.getFileName());
+                    System.out.println("   " + p.getPathname().getFileNameAsString());
                 }
 
             } else {

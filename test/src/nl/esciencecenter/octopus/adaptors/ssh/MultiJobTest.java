@@ -26,7 +26,9 @@ import java.util.HashMap;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -66,6 +68,7 @@ public class MultiJobTest {
         return new String(buffer, 0, offset);
     }
 
+   
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
 
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount + ")");
@@ -86,7 +89,8 @@ public class MultiJobTest {
 
         String workingDir = TEST_ROOT + "/" + testName;
 
-        Path root = filesystem.getEntryPath().resolve(new Pathname(workingDir));
+        Path root = Util.resolve(files, filesystem, workingDir);
+        
         files.createDirectories(root);
 
         Path[] out = new Path[jobCount];
@@ -96,8 +100,8 @@ public class MultiJobTest {
 
         for (int i = 0; i < j.length; i++) {
 
-            out[i] = root.resolve(new Pathname("stdout" + i + ".txt"));
-            err[i] = root.resolve(new Pathname("stderr" + i + ".txt"));
+            out[i] = Util.resolve(files, root, "stdout" + i + ".txt");
+            err[i] = Util.resolve(files, root, "stderr" + i + ".txt");
 
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");

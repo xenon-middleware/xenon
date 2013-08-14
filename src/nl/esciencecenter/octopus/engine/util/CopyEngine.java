@@ -45,6 +45,7 @@ import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * A CopyEngine is responsible for performing the asynchronous copy operations.
@@ -277,7 +278,10 @@ public class CopyEngine {
             throw new IllegalTargetPathException(NAME, "Target " + target.getPath() + " is a link");
         }
 
-        if (source.normalize().equals(target.normalize())) {
+        Pathname sourceName = source.getPathname().normalize();
+        Pathname targetName = target.getPathname().normalize();
+        
+        if (sourceName.equals(targetName)) {
             return;
         }
 
@@ -355,8 +359,11 @@ public class CopyEngine {
         if (targetAtt.isDirectory()) {
             throw new IllegalSourcePathException(NAME, "Target " + target.getPath() + " is a directory");
         }
-
-        if (source.normalize().equals(target.normalize())) {
+        
+        Pathname sourceName = source.getPathname().normalize();
+        Pathname targetName = target.getPathname().normalize();
+        
+        if (sourceName.equals(targetName)) {
             throw new IllegalTargetPathException(NAME, "Can not append a file to itself (source " + source.getPath()
                     + " equals target " + target.getPath() + ")");
         }
@@ -392,7 +399,10 @@ public class CopyEngine {
             throw new IllegalSourcePathException(NAME, "Source " + source.getPath() + " is a directory");
         }
 
-        if (source.normalize().equals(target.normalize())) {
+        Pathname sourceName = source.getPathname().normalize();
+        Pathname targetName = target.getPathname().normalize();
+        
+        if (sourceName.equals(targetName)) {
             return;
         }
 
@@ -405,8 +415,11 @@ public class CopyEngine {
             }
         }
 
-        if (!owner.exists(target.getParent())) {
-            throw new NoSuchFileException(NAME, "Target directory " + target.getParent().getPath() + " does not exist!");
+        Pathname parentName = target.getPathname().getParent();
+        Path parent = owner.newPath(target.getFileSystem(), parentName);
+        
+        if (!owner.exists(parent)) {
+            throw new NoSuchFileException(NAME, "Target directory " + parentName.getPath() + " does not exist!");
         }
 
         ac.setBytesToCopy(sourceAtt.size());

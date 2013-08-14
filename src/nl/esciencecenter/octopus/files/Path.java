@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.files;
 
-import java.util.Iterator;
-
 /**
  * Path represents a specific location on a FileSystem, as identified by a Pathname. 
  * 
@@ -45,35 +43,35 @@ public interface Path {
      * 
      * @return If this Path is created by the local adaptor ?
      */
-    boolean isLocal();
+//    boolean isLocal();
 
     /**
      * Get the file name, or <code>null</code> if the Path is empty.
      * 
      * @return the resulting file name or <code>null</code>.
      */
-    String getFileName();
+    //String getFileName();
 
     /**
      * Get the parent path, or <code>null</code> if this path does not have a parent.
      * 
      * @return a path representing the path's parent.
      */
-    Path getParent();
+//    Path getParent();
 
     /**
      * Get the number of name elements in the path.
      * 
      * @return the number of elements in the path, or 0 if it is empty.
      */
-    int getNameCount();
+ //   int getNameCount();
 
     /**
      * Get the name elements in the path.
      * 
      * @return the name elements in the path or an empty array if it is empty.
      */
-    String[] getNames();
+  //  String[] getNames();
 
     /**
      * Get a name element of this path.
@@ -86,7 +84,7 @@ public interface Path {
      * @throws IllegalArgumentException
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
-    String getName(int index);
+ //   String getName(int index);
 
     /**
      * Returns a relative Path that is a subsequence of the name elements of this path.
@@ -102,7 +100,7 @@ public interface Path {
      *             If the beginIndex or endIndex is negative or greater or equal to the number of elements in the path, or if
      *             beginIndex is larger that or equal to the endIndex.
      */
-    Path subpath(int beginIndex, int endIndex);
+  //  Path subpath(int beginIndex, int endIndex);
 
     /**
      * Tests if this path starts with the given path.
@@ -112,7 +110,7 @@ public interface Path {
      * 
      * @return If this paths start with the other path.
      */
-    boolean startsWith(Pathname other);
+ //   boolean startsWith(Pathname other);
 
     /**
      * Tests if this path ends with the given path.
@@ -122,7 +120,7 @@ public interface Path {
      * 
      * @return If this paths ends with the other path.
      */
-    boolean endsWith(Pathname other);
+  //  boolean endsWith(Pathname other);
 
     /**
      * Resolve a Pathname against this Path by appending all path elements in the Pathname to the path elements in
@@ -133,7 +131,7 @@ public interface Path {
      * 
      * @return the resulting Path.
      */
-    Path resolve(Pathname other);
+ //   Path resolve(Pathname other);
 
     /**
      * Normalize this Path by removing as many redundant path elements as possible.
@@ -145,7 +143,7 @@ public interface Path {
      * 
      * @return the normalize path.
      */
-    Path normalize();
+  //  Path normalize();
 
     /**
      * Resolves the given path to this paths parent path, thereby creating a sibling to this path.
@@ -158,7 +156,7 @@ public interface Path {
      * @throws IllegalArgumentException
      *             If the path can not be resolved as a sibling to this path.
      */
-    Path resolveSibling(Pathname other);
+ //   Path resolveSibling(Pathname other);
 
     /**
      * Create a relative path between the given path and this path.
@@ -173,7 +171,7 @@ public interface Path {
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    Pathname relativize(Pathname other);
+  //  Pathname relativize(Pathname other);
 
     /**
      * Create an {@link Iterator} that returns all possible sub paths of this path, in order of increasing length.
@@ -182,7 +180,7 @@ public interface Path {
      * 
      * @return an {@link Iterator} that returns all possible sub paths of this path.
      */
-    Iterator<Path> iterator();
+ //   Iterator<Path> iterator();
 
     /**
      * Get a string representation of this path.

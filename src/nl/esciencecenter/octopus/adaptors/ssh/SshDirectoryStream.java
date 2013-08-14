@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
@@ -44,8 +45,8 @@ public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path>
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
-                Path tmp = dir.resolve(new Pathname(filename));
-
+                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getPathname().resolve(filename));
+                
                 if (filter.accept(tmp)) {
                     stream.add(tmp);
                 }

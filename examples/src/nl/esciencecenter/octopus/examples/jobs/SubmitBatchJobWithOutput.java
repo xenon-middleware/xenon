@@ -78,8 +78,10 @@ public class SubmitBatchJobWithOutput {
                 System.out.println("Job ran succesfully and produced:");
 
                 FileSystem fs = files.getLocalCWDFileSystem();
-                Path stdout = fs.getEntryPath().resolve(new Pathname("stdout.txt"));
-                Path stderr = fs.getEntryPath().resolve(new Pathname("stderr.txt"));
+                Pathname entryPath = fs.getEntryPath().getPathname();
+                
+                Path stdout = files.newPath(fs, entryPath.resolve("stdout.txt"));
+                Path stderr = files.newPath(fs, entryPath.resolve("stderr.txt"));
 
                 if (files.exists(stdout)) {
                     String output = new String(FileUtils.readAllBytes(files, stdout));

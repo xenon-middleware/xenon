@@ -107,7 +107,7 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean isHidden() throws AttributeNotSupportedException {
-        return path.getFileName().startsWith(".");
+        return path.getPathname().startsWith(".");
     }
 
     @Override

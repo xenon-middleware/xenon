@@ -39,7 +39,6 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
-import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * Various file utilities implemented on top of the Octopus API.
@@ -533,7 +532,7 @@ public final class FileUtils {
             }
             for (Path f : files.newDirectoryStream(source)) {
                 Path fsource = f;
-                Path ftarget = target.resolve(new Pathname(f.getFileName()));
+                Path ftarget = files.newPath(target.getFileSystem(), target.getPathname().resolve(f.getPathname().getFileName()));
                 recursiveCopy(files, fsource, ftarget, options);
             }
         } else {

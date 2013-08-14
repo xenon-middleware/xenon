@@ -62,12 +62,12 @@ public class PathImplementationTest {
     public void testConstructor4() {
         Path path = new PathImplementation(fs, new Pathname("aap"), new Pathname("noot"));
 
-        assertTrue(path.getNameCount() == 2);
+        Pathname result = path.getPathname();
+        
+        assertTrue(result.getNameCount() == 2);
 
-        String[] names = path.getNames();
-
-        assertEquals("aap", names[0]);
-        assertEquals("noot", names[1]);
+        assertEquals("aap", result.getName(0).getPath());
+        assertEquals("noot", result.getName(1).getPath());
     }
 
     @Test
@@ -79,69 +79,69 @@ public class PathImplementationTest {
         assertEquals(rp, path.getPathname());
     }
 
-    @Test
-    public void testGetParent_Root_Null() {
-        PathImplementation path = new PathImplementation(fs, new Pathname("/"));
+//    @Test
+//    public void testGetParent_Root_Null() {
+//        PathImplementation path = new PathImplementation(fs, new Pathname("/"));
+//
+//        Path parentPath = path.getParent();
+//
+//        assertNull(parentPath);
+//    }
 
-        Path parentPath = path.getParent();
+//    @Test
+//    public void test_getNames0() {
+//        PathImplementation path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
+//
+//        assertTrue(path.getNameCount() == 3);
+//
+//        String[] names = path.getNames();
+//
+//        assertEquals("aap", names[0]);
+//        assertEquals("noot", names[1]);
+//        assertEquals("mies", names[2]);
+//
+//        String tmp = path.getName(0);
+//        assertEquals("aap", tmp);
+//
+//        tmp = path.getName(1);
+//        assertEquals("noot", tmp);
+//
+//        tmp = path.getName(2);
+//        assertEquals("mies", tmp);
+//    }
 
-        assertNull(parentPath);
-    }
-
-    @Test
-    public void test_getNames0() {
-        PathImplementation path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
-
-        assertTrue(path.getNameCount() == 3);
-
-        String[] names = path.getNames();
-
-        assertEquals("aap", names[0]);
-        assertEquals("noot", names[1]);
-        assertEquals("mies", names[2]);
-
-        String tmp = path.getName(0);
-        assertEquals("aap", tmp);
-
-        tmp = path.getName(1);
-        assertEquals("noot", tmp);
-
-        tmp = path.getName(2);
-        assertEquals("mies", tmp);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_getNames1() {
-        PathImplementation path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
-        path.getName(-1);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_getNames2() {
-        PathImplementation path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
-        path.getName(10);
-    }
-
-    @Test
-    public void test_getNames3() {
-        PathImplementation path = new PathImplementation(fs, new Pathname("/"));
-
-        assertTrue(path.getNameCount() == 0);
-
-        String[] names = path.getNames();
-
-        assertNotNull(names);
-        assertTrue(names.length == 0);
-    }
-
-    @Test
-    public void test_subpath0() {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
-        Path expected = new PathImplementation(fs, new Pathname("/noot/mies"));
-        Path sub = path.subpath(1, 3);
-
-        assertEquals(expected, sub);
-    }
+//    @Test(expected = IllegalArgumentException.class)
+//    public void test_getNames1() {
+//        PathImplementation path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
+//        path.getName(-1);
+//    }
+//
+//    @Test(expected = IllegalArgumentException.class)
+//    public void test_getNames2() {
+//        PathImplementation path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
+//        path.getName(10);
+//    }
+//
+//    @Test
+//    public void test_getNames3() {
+//        PathImplementation path = new PathImplementation(fs, new Pathname("/"));
+//
+//        assertTrue(path.getNameCount() == 0);
+//
+//        String[] names = path.getNames();
+//
+//        assertNotNull(names);
+//        assertTrue(names.length == 0);
+//    }
+//
+//    @Test
+//    public void test_subpath0() {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
+//        Path expected = new PathImplementation(fs, new Pathname("/noot/mies"));
+//        Path sub = path.subpath(1, 3);
+//
+//        assertEquals(expected, sub);
+//    }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_subpath1() {
@@ -158,25 +158,25 @@ public class PathImplementationTest {
         new PathImplementation(fs, new Pathname("/aap/noot/mies/bla").subpath(2, 1));
     }
 
-    @Test
-    public void test_isLocal() {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
-        assertTrue(path.isLocal());
-    }
-
-    @Test
-    public void test_startWith() {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
-        assertTrue(path.startsWith(new Pathname("/aap/noot/mies")));
-        assertFalse(path.startsWith(new Pathname("/noot/aap/mies")));
-    }
-
-    @Test
-    public void test_endsWith() {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
-        assertTrue(path.endsWith(new Pathname("/mies/bla")));
-        assertFalse(path.endsWith(new Pathname("/noot/aap")));
-    }
+//    @Test
+//    public void test_isLocal() {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
+//        assertTrue(path.isLocal());
+//    }
+//
+//    @Test
+//    public void test_startWith() {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
+//        assertTrue(path.startsWith(new Pathname("/aap/noot/mies")));
+//        assertFalse(path.startsWith(new Pathname("/noot/aap/mies")));
+//    }
+//
+//    @Test
+//    public void test_endsWith() {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
+//        assertTrue(path.endsWith(new Pathname("/mies/bla")));
+//        assertFalse(path.endsWith(new Pathname("/noot/aap")));
+//    }
 
     @Test
     public void test_equals() throws Exception {
@@ -200,24 +200,24 @@ public class PathImplementationTest {
         assertTrue(path.equals(path4));
     }
 
-    @Test
-    public void test_resolveSibling() throws Exception {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot"));
-        Path path2 = new PathImplementation(fs, new Pathname("/aap/mies"));
-        Path path3 = path.resolveSibling(new Pathname("mies"));
-        assertEquals(path2, path3);
-    }
-
-    @Test
-    public void test_relativize() throws Exception {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot"));
-        Pathname path2 = path.relativize(new Pathname("/aap/noot/mies/bla"));
-        assertEquals(new Pathname("/mies/bla"), path2);
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void test_iterator() throws Exception {
-        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
-        path.iterator().remove();
-    }
+//    @Test
+//    public void test_resolveSibling() throws Exception {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot"));
+//        Path path2 = new PathImplementation(fs, new Pathname("/aap/mies"));
+//        Path path3 = path.resolveSibling(new Pathname("mies"));
+//        assertEquals(path2, path3);
+//    }
+//
+//    @Test
+//    public void test_relativize() throws Exception {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot"));
+//        Pathname path2 = path.relativize(new Pathname("/aap/noot/mies/bla"));
+//        assertEquals(new Pathname("/mies/bla"), path2);
+//    }
+//
+//    @Test(expected = UnsupportedOperationException.class)
+//    public void test_iterator() throws Exception {
+//        Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies"));
+//        path.iterator().remove();
+//    }
 }

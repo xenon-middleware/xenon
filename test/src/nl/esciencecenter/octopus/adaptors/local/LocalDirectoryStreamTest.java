@@ -39,6 +39,10 @@ public class LocalDirectoryStreamTest {
 
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
 
+    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+    }
+    
     @org.junit.BeforeClass
     public static void prepareClass() throws OctopusIOException, OctopusException {
 
@@ -47,12 +51,12 @@ public class LocalDirectoryStreamTest {
         Files files = octopus.files();
         FileSystem fs = files.getLocalCWDFileSystem();
         Path root = fs.getEntryPath();
-        Path testDir = root.resolve(new Pathname(TEST_DIR));
+        Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
 
-        Path file0 = testDir.resolve(new Pathname("file0"));
-        Path file1 = testDir.resolve(new Pathname("file2"));
-        Path file2 = testDir.resolve(new Pathname("file3"));
+        Path file0 = resolve(files, testDir, "file0");
+        Path file1 = resolve(files, testDir, "file2");
+        Path file2 = resolve(files, testDir, "file3");
 
         files.createFile(file0);
         files.createFile(file1);
@@ -69,10 +73,11 @@ public class LocalDirectoryStreamTest {
         Files files = octopus.files();
         FileSystem fs = files.getLocalCWDFileSystem();
         Path root = fs.getEntryPath();
-        Path testDir = root.resolve(new Pathname(TEST_DIR));
-        Path file0 = testDir.resolve(new Pathname("file0"));
-        Path file1 = testDir.resolve(new Pathname("file2"));
-        Path file2 = testDir.resolve(new Pathname("file3"));
+        Path testDir = resolve(files, root, TEST_DIR);
+        
+        Path file0 = resolve(files, testDir, "file0");
+        Path file1 = resolve(files, testDir, "file2");
+        Path file2 = resolve(files, testDir, "file3");
 
         if (files.exists(testDir)) {
             files.delete(file0);
@@ -112,7 +117,7 @@ public class LocalDirectoryStreamTest {
         files = octopus.files();
         fs = files.getLocalCWDFileSystem();
         root = fs.getEntryPath();
-        testDir = root.resolve(new Pathname(TEST_DIR));
+        testDir = resolve(files, root, TEST_DIR);
     }
 
     @org.junit.After

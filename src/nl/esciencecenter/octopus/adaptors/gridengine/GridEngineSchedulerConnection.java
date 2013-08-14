@@ -356,8 +356,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
-        Path fsEntryPath = getFsEntryPath();
-
+        Pathname fsEntryPath = getFsEntryPath().getPathname();
+        
         verifyJobDescription(description);
 
         //check for option that overrides job script completely.
@@ -372,7 +372,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
             //convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
-                Path scriptFile = fsEntryPath.resolve(new Pathname(customScriptFile));
+                Pathname scriptFile = fsEntryPath.resolve(customScriptFile);
                 customScriptFile = scriptFile.getPath();
             }
 

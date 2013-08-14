@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
-import nl.esciencecenter.octopus.files.Pathname;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
@@ -46,7 +46,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
-                Path tmp = dir.resolve(new Pathname(filename));
+                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getPathname().resolve(filename));
 
                 if (filter.accept(tmp)) {
                     SshFileAttributes attributes = new SshFileAttributes(e.getAttrs(), tmp);

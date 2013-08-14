@@ -89,6 +89,22 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                 new Pathname(LocalUtils.getHome()), null, null);
     }
 
+    private void checkParent(Path path) throws OctopusIOException {
+        
+        Pathname parentName = path.getPathname().getParent();
+        
+        if (parentName == null) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
+        }
+        
+        Path parent = newPath(path.getFileSystem(), parentName);
+            
+        if (!exists(parent)) {
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parentName.getPath() + 
+                    " does not exist!");
+        }
+    }
+    
     /**
      * Move or rename an existing source path to a non-existing target path.
      * 
@@ -117,7 +133,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
         }
 
-        if (source.normalize().equals(target.normalize())) {
+        Pathname sourceName = source.getPathname().normalize();
+        Pathname targetName = target.getPathname().normalize();
+        
+        if (sourceName.equals(targetName)) {
             return target;
         }
 
@@ -125,10 +144,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
         }
 
-        if (!exists(target.getParent())) {
-            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Target directory " + target.getParent().getPath()
-                    + " does not exist!");
-        }
+        checkParent(target);
 
         LocalUtils.move(source, target);
 
@@ -142,13 +158,13 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             java.nio.file.Path path = LocalUtils.javaPath(link);
             java.nio.file.Path target = Files.readSymbolicLink(path);
 
-            Path parent = link.getParent();
+            Pathname parent = link.getPathname().getParent();
 
             if (parent == null || target.isAbsolute()) {
                 return new PathImplementation(link.getFileSystem(), new Pathname(target.toString()));
             }
 
-            return parent.resolve(new Pathname(target.toString()));
+            return newPath(link.getFileSystem(), parent.resolve(new Pathname(target.toString())));
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }
@@ -173,8 +189,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
-
-    throws OctopusIOException {
+            throws OctopusIOException {
 
         FileAttributes att = getAttributes(dir);
 
@@ -283,7 +298,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Path newPath(FileSystem filesystem, Pathname location) throws OctopusException, OctopusIOException {
+    public Path newPath(FileSystem filesystem, Pathname location) {
         return new PathImplementation(filesystem, location);
     }
 
@@ -304,13 +319,13 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
         }
 
-        Iterator<Path> itt = dir.iterator();
+        Iterator<Pathname> itt = dir.getPathname().iterator();
 
         while (itt.hasNext()) {
-            Path path = itt.next();
-
-            if (!exists(path)) {
-                createDirectory(path);
+            Path tmp = newPath(dir.getFileSystem(), itt.next());
+            
+            if (!exists(tmp)) {
+                createDirectory(tmp);
             }
         }
 
@@ -324,9 +339,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
         }
 
-        if (!exists(dir.getParent())) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + dir.getParent() + " does not exist!");
-        }
+        checkParent(dir);
 
         try {
             java.nio.file.Files.createDirectory(LocalUtils.javaPath(dir));
@@ -344,9 +357,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " already exists!");
         }
 
-        if (!exists(path.getParent())) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + path.getParent() + " does not exist!");
-        }
+        checkParent(path);
 
         LocalUtils.createFile(path);
 

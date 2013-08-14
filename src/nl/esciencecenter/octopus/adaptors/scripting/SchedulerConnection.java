@@ -378,7 +378,8 @@ public abstract class SchedulerConnection {
             path = engine.files().newPath(subFileSystem, new Pathname(workingDirectory));
         } else {
             //make relative path absolute
-            path = getFsEntryPath().resolve(new Pathname(workingDirectory));
+            Path fsEntryPath = getFsEntryPath();
+            path = engine.files().newPath(fsEntryPath.getFileSystem(), fsEntryPath.getPathname().resolve(workingDirectory));
         }
         if (!engine.files().exists(path)) {
             throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);

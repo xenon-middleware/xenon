@@ -36,6 +36,10 @@ import nl.esciencecenter.octopus.files.Pathname;
  */
 public class LocalFileAttributesTest {
 
+    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+    }
+    
     @org.junit.Test(expected = NullPointerException.class)
     public void testPathIsNull() throws Exception {
         new LocalFileAttributes(null);
@@ -47,7 +51,7 @@ public class LocalFileAttributesTest {
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
 
-        Path path = fs.getEntryPath().resolve(new Pathname("noot.txt"));
+        Path path = resolve(files, fs.getEntryPath(), "noot.txt");
         new LocalFileAttributes(path);
     }
 
@@ -56,7 +60,7 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        Path path = fs.getEntryPath().resolve(new Pathname("aap.txt"));
+        Path path = resolve(files, fs.getEntryPath(), "aap.txt");
 
         long now = System.currentTimeMillis();
 
@@ -80,7 +84,7 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        Path path = fs.getEntryPath().resolve(new Pathname("aap.txt"));
+        Path path = resolve(files, fs.getEntryPath(), "aap.txt");
         files.createFile(path);
 
         FileAttributes att = new LocalFileAttributes(path);
@@ -98,10 +102,10 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         FileSystem fs = files.getLocalCWDFileSystem();
-        Path path1 = fs.getEntryPath().resolve(new Pathname("aap.txt"));
+        Path path1 = resolve(files, fs.getEntryPath(), "aap.txt");
         files.createFile(path1);
-
-        Path path2 = fs.getEntryPath().resolve(new Pathname("noot.txt"));
+        Path path2 = resolve(files, fs.getEntryPath(), "noot.txt");
+        
         files.createFile(path2);
 
         files.setPosixFilePermissions(path1, LocalUtils.octopusPermissions(PosixFilePermissions.fromString("rwxr--r--")));

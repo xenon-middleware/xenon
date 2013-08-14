@@ -22,6 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.Pathname;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -57,4 +62,13 @@ public class Util {
         method.setAccessible(true);
         method.invoke(e);
     }
+    
+    public static Path resolve(Files files, Path root, String... path) throws OctopusIOException { 
+        return files.newPath(root.getFileSystem(), root.getPathname().resolve(new Pathname(path)));
+    }
+    
+    public static Path resolve(Files files, FileSystem fs, String ... path) throws OctopusIOException {
+        return resolve(files, fs.getEntryPath(), path);
+    }
+    
 }

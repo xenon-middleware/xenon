@@ -53,7 +53,7 @@ class BatchProcess implements InteractiveProcess {
         } else if (path.startsWith("/")) {
             result = files.newPath(root.getFileSystem(), new Pathname(path));
         } else {
-            result = root.resolve(new Pathname(path));
+            result = files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
         }
 
         return result;
