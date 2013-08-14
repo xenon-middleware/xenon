@@ -73,9 +73,9 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyFromInputStream1.txt"));
 
-        FileUtils.copy(octopus, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
 
-        byte[] tmp = FileUtils.readAllBytes(octopus, testFile);
+        byte[] tmp = FileUtils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -91,10 +91,10 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyFromInputStream2.txt"));
 
-        FileUtils.copy(octopus, new ByteArrayInputStream(message.getBytes()), testFile, true);
-        FileUtils.copy(octopus, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
 
-        byte[] tmp = FileUtils.readAllBytes(octopus, testFile);
+        byte[] tmp = FileUtils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -110,10 +110,10 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyFromInputStream3.txt"));
 
-        FileUtils.copy(octopus, new ByteArrayInputStream(message.getBytes()), testFile, true);
-        FileUtils.copy(octopus, new ByteArrayInputStream(message.getBytes()), testFile, false);
+        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, false);
 
-        byte[] tmp = FileUtils.readAllBytes(octopus, testFile);
+        byte[] tmp = FileUtils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -129,11 +129,11 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyToOutputStream1.txt"));
 
-        FileUtils.write(octopus, testFile, message.getBytes(), true);
+        FileUtils.write(files, testFile, message.getBytes(), true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        FileUtils.copy(octopus, testFile, out);
+        FileUtils.copy(files, testFile, out);
 
         byte[] tmp = out.toByteArray();
 
@@ -151,12 +151,12 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyToOutputStream2.txt"));
 
-        FileUtils.write(octopus, testFile, message.getBytes(), true);
-        FileUtils.write(octopus, testFile, message.getBytes(), true);
+        FileUtils.write(files, testFile, message.getBytes(), true);
+        FileUtils.write(files, testFile, message.getBytes(), true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        FileUtils.copy(octopus, testFile, out);
+        FileUtils.copy(files, testFile, out);
 
         byte[] tmp = out.toByteArray();
 
@@ -174,12 +174,12 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_copyToOutputStream3.txt"));
 
-        FileUtils.write(octopus, testFile, message.getBytes(), true);
-        FileUtils.write(octopus, testFile, message.getBytes(), false);
+        FileUtils.write(files, testFile, message.getBytes(), true);
+        FileUtils.write(files, testFile, message.getBytes(), false);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        FileUtils.copy(octopus, testFile, out);
+        FileUtils.copy(files, testFile, out);
 
         byte[] tmp = out.toByteArray();
 
@@ -197,11 +197,11 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedWriter1.txt"));
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(octopus, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        byte[] tmp = FileUtils.readAllBytes(octopus, testFile);
+        byte[] tmp = FileUtils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -217,15 +217,15 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedWriter2.txt"));
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(octopus, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        bw = FileUtils.newBufferedWriter(octopus, testFile, Charset.defaultCharset(), true);
+        bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        byte[] tmp = FileUtils.readAllBytes(octopus, testFile);
+        byte[] tmp = FileUtils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -241,15 +241,15 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedWriter3.txt"));
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(octopus, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        bw = FileUtils.newBufferedWriter(octopus, testFile, Charset.defaultCharset(), false);
+        bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), false);
         bw.write(message);
         bw.close();
 
-        byte[] tmp = FileUtils.readAllBytes(octopus, testFile);
+        byte[] tmp = FileUtils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -265,9 +265,9 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedReader1.txt"));
 
-        FileUtils.write(octopus, testFile, message.getBytes(), true);
+        FileUtils.write(files, testFile, message.getBytes(), true);
 
-        BufferedReader br = FileUtils.newBufferedReader(octopus, testFile, Charset.defaultCharset());
+        BufferedReader br = FileUtils.newBufferedReader(files, testFile, Charset.defaultCharset());
 
         String tmp = br.readLine();
         br.close();
@@ -285,10 +285,10 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_newBufferedReader2.txt"));
 
-        FileUtils.write(octopus, testFile, message.getBytes(), true);
-        FileUtils.write(octopus, testFile, message.getBytes(), false);
+        FileUtils.write(files, testFile, message.getBytes(), true);
+        FileUtils.write(files, testFile, message.getBytes(), false);
 
-        BufferedReader br = FileUtils.newBufferedReader(octopus, testFile, Charset.defaultCharset());
+        BufferedReader br = FileUtils.newBufferedReader(files, testFile, Charset.defaultCharset());
 
         String tmp1 = br.readLine();
         String tmp2 = br.readLine();
@@ -308,14 +308,14 @@ public class RealFileUtilsTest {
 
         AbsolutePath testFile = testDir.resolve(new RelativePath("test_readAllLines1.txt"));
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(octopus, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write("line1\n");
         bw.write("line2\n");
         bw.write("line3\n");
         bw.write("line4\n");
         bw.close();
 
-        List<String> tmp = FileUtils.readAllLines(octopus, testFile, Charset.defaultCharset());
+        List<String> tmp = FileUtils.readAllLines(files, testFile, Charset.defaultCharset());
 
         assertNotNull(tmp);
         assertTrue(tmp.size() == 4);
@@ -338,9 +338,9 @@ public class RealFileUtilsTest {
         tmp1.add("line3");
         tmp1.add("line4");
 
-        FileUtils.write(octopus, testFile, tmp1, Charset.defaultCharset(), true);
+        FileUtils.write(files, testFile, tmp1, Charset.defaultCharset(), true);
 
-        List<String> tmp2 = FileUtils.readAllLines(octopus, testFile, Charset.defaultCharset());
+        List<String> tmp2 = FileUtils.readAllLines(files, testFile, Charset.defaultCharset());
 
         System.err.println("Read " + tmp2.size() + " lines");
 
@@ -376,14 +376,14 @@ public class RealFileUtilsTest {
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             check(dirs, dir);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Octopus octopus)
+        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
 
             check(dirs, dir);
@@ -391,14 +391,14 @@ public class RealFileUtilsTest {
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Octopus octopus) throws OctopusIOException {
+        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files f) throws OctopusIOException {
 
             check(files, file);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -423,7 +423,7 @@ public class RealFileUtilsTest {
         }
 
         FileVisitor fv = new MyFileVisitor(dirs, tmp);
-        FileUtils.walkFileTree(octopus, dirs[0], fv);
+        FileUtils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -436,24 +436,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor2 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Unexpected visit of path: " + dir.getPath());
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Octopus octopus)
+        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             return FileVisitResult.TERMINATE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Octopus octopus) throws OctopusIOException {
+        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
             throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -477,7 +477,7 @@ public class RealFileUtilsTest {
         }
 
         FileVisitor fv = new MyFileVisitor2();
-        FileUtils.walkFileTree(octopus, dirs[0], fv);
+        FileUtils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -490,24 +490,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor3 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Octopus octopus)
+        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             return FileVisitResult.SKIP_SUBTREE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Octopus octopus) throws OctopusIOException {
+        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
             throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -531,7 +531,7 @@ public class RealFileUtilsTest {
         }
 
         FileVisitor fv = new MyFileVisitor3();
-        FileUtils.walkFileTree(octopus, dirs[0], fv);
+        FileUtils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -546,21 +546,21 @@ public class RealFileUtilsTest {
         int countFiles = 0;
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             countFiles = 0;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Octopus octopus)
+        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             countFiles = 0;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Octopus octopus) throws OctopusIOException {
+        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
 
             if (countFiles == 0) {
                 countFiles = 1;
@@ -571,7 +571,7 @@ public class RealFileUtilsTest {
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -602,7 +602,7 @@ public class RealFileUtilsTest {
         }
 
         FileVisitor fv = new MyFileVisitor4();
-        FileUtils.walkFileTree(octopus, dirs[0], fv);
+        FileUtils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -616,24 +616,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor5 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Octopus octopus)
+        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Octopus octopus) throws OctopusIOException {
+        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
             return FileVisitResult.TERMINATE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -657,7 +657,7 @@ public class RealFileUtilsTest {
         }
 
         FileVisitor fv = new MyFileVisitor5();
-        FileUtils.walkFileTree(octopus, dirs[0], fv);
+        FileUtils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -670,24 +670,24 @@ public class RealFileUtilsTest {
     class MyFileVisitor6 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + dir.getPath());
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Octopus octopus)
+        public FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + dir.getPath());
         }
 
         @Override
-        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Octopus octopus) throws OctopusIOException {
+        public FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
 
         @Override
-        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Octopus octopus)
+        public FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
             throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
         }
@@ -702,7 +702,7 @@ public class RealFileUtilsTest {
         FileVisitor fv = new MyFileVisitor6();
 
         try {
-            FileUtils.walkFileTree(octopus, dir, fv);
+            FileUtils.walkFileTree(files, dir, fv);
             throw new Exception("test_walkFileTree6 did not throw an exception!");
         } catch (OctopusIOException e) {
             // expected

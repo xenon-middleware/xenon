@@ -70,7 +70,7 @@ public class RealSandboxTest {
 
     @AfterClass
     public static void cleanup() throws Exception {
-        FileUtils.recursiveDelete(octopus, testDir);
+        FileUtils.recursiveDelete(files, testDir);
         OctopusFactory.endOctopus(octopus);
     }
 

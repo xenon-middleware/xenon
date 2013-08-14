@@ -27,7 +27,7 @@ import java.util.Map;
 public interface Credential {
 
     /**
-     * Get the name of the adaptor attached to this Credential.
+     * Get the name of the adaptor that created this Credential.
      * 
      * @return the name of the adaptor.
      */

@@ -28,7 +28,7 @@ import java.util.Map;
 public interface FileSystem {
 
     /**
-     * Get the name of the adaptor attached to this FileSystem.
+     * Get the name of the adaptor that created this FileSystem.
      * 
      * @return the name of the adaptor.
      */

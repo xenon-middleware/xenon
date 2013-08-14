@@ -229,7 +229,7 @@ public class Sandbox {
 
     private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         for (Pair pair : pairs) {
-            FileUtils.recursiveCopy(octopus, pair.source, pair.destination, options);
+            FileUtils.recursiveCopy(octopus.files(), pair.source, pair.destination, options);
         }
     }
 
@@ -267,7 +267,7 @@ public class Sandbox {
      * @throws OctopusIOException
      */
     public void delete() throws OctopusIOException {
-        FileUtils.recursiveDelete(octopus, path);
+        FileUtils.recursiveDelete(octopus.files(), path);
     }
 
     @Override

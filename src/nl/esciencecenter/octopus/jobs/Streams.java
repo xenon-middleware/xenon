@@ -20,6 +20,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
+ * Streams is a container for the standard input, output and error streams of a {@link Job}.
+ * 
+ * Note that these standard streams are only available for interactive jobs. 
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0

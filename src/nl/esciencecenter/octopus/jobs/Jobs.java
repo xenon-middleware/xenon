@@ -23,7 +23,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
- * Jobs represents the Jobs interface of Octopus.
+ * The Jobs API of Octopus.
  * 
  * This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about
  * schedulers and jobs.

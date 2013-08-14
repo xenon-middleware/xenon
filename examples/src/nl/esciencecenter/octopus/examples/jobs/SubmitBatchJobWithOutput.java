@@ -82,13 +82,13 @@ public class SubmitBatchJobWithOutput {
                 AbsolutePath stderr = fs.getEntryPath().resolve(new RelativePath("stderr.txt"));
 
                 if (files.exists(stdout)) {
-                    String output = new String(FileUtils.readAllBytes(octopus, stdout));
+                    String output = new String(FileUtils.readAllBytes(files, stdout));
                     System.out.println(" STDOUT: " + output);
                     files.delete(stdout);
                 }
 
                 if (files.exists(stderr)) {
-                    String output = new String(FileUtils.readAllBytes(octopus, stderr));
+                    String output = new String(FileUtils.readAllBytes(files, stderr));
                     System.out.println(" STDERR: " + output);
                     files.delete(stderr);
                 }

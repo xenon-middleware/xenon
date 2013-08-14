@@ -28,7 +28,7 @@ import java.util.Map;
 public interface Scheduler {
 
     /**
-     * Get the name of the adaptor attached to this Scheduler.
+     * Get the name of the adaptor that created this Scheduler.
      * 
      * @return the name of the adaptor.
      */
@@ -59,7 +59,7 @@ public interface Scheduler {
      * Does this Scheduler supports the submission of interactive jobs ?
      * 
      * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
-     * the job to hang indefinately.
+     * the job to hang indefinitely.
      * 
      * @return if this scheduler supports the submission of interactive jobs ?
      */
