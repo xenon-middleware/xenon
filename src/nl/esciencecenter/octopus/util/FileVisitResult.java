@@ -15,6 +15,13 @@
  */
 package nl.esciencecenter.octopus.util;
 
+/**
+ * FileVisitResult enumerates the possible results that can be returned by the methods of {@link FileVisitor}.
+ * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @version 1.0 
+ * @since 1.0
+ */
 public enum FileVisitResult {
 
     /**
@@ -36,5 +43,4 @@ public enum FileVisitResult {
      * Terminate.
      */
     TERMINATE,
-
 }

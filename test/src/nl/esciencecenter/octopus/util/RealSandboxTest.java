@@ -87,13 +87,13 @@ public class RealSandboxTest {
     @Test(expected = OctopusException.class)
     public void testSandbox_WithNullPath() throws URISyntaxException, OctopusIOException, OctopusException {
         // throws exception
-        new Sandbox(octopus, null, getNextSandbox());
+        new Sandbox(files, null, getNextSandbox());
     }
 
     @Test
     public void testSandbox_WithName() throws URISyntaxException, OctopusIOException, OctopusException {
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         AbsolutePath expectedPath = testDir.resolve(new RelativePath(name));
         assertEquals(expectedPath, sandbox.getPath());
@@ -104,7 +104,7 @@ public class RealSandboxTest {
     @Test
     public void testSandbox_WithoutName() throws URISyntaxException, OctopusIOException, OctopusException {
 
-        Sandbox sandbox = new Sandbox(octopus, testDir, null);
+        Sandbox sandbox = new Sandbox(files, testDir, null);
 
         String sandboxPath = sandbox.getPath().getPath();
         String tmp = testDir.getPath();
@@ -116,7 +116,7 @@ public class RealSandboxTest {
     public void testAddUploadFile_SrcAndDst() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.addUploadFile(testInput1, "input");
 
@@ -132,7 +132,7 @@ public class RealSandboxTest {
     public void testSetUploadFiles() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.setUploadFiles(testInput1, testInput2);
 
@@ -154,7 +154,7 @@ public class RealSandboxTest {
     public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.addUploadFile(testInput1, null);
 
@@ -171,7 +171,7 @@ public class RealSandboxTest {
     public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         try {
             sandbox.addUploadFile(null);
@@ -185,7 +185,7 @@ public class RealSandboxTest {
     public void testAddDownloadFile() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.addDownloadFile("output1", testInput1);
 
@@ -203,7 +203,7 @@ public class RealSandboxTest {
     public void testAddDownloadFileSrcNull() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.addDownloadFile(null, testInput1);
 
@@ -221,7 +221,7 @@ public class RealSandboxTest {
     public void testAddDownloadFileDstNull() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         // throws exception
         sandbox.addDownloadFile("output", null);
@@ -231,7 +231,7 @@ public class RealSandboxTest {
     public void testUploadDelete() throws OctopusIOException, OctopusException, URISyntaxException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.addUploadFile(testInput1, "input");
         sandbox.upload(CopyOption.REPLACE);
@@ -252,7 +252,7 @@ public class RealSandboxTest {
     public void testUploadDownloadDelete() throws OctopusIOException, OctopusException, URISyntaxException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         AbsolutePath download = testDir.resolve(new RelativePath("download"));
 
@@ -282,7 +282,7 @@ public class RealSandboxTest {
     public void testDoubleUploadDelete() throws OctopusIOException, OctopusException, URISyntaxException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         sandbox.addUploadFile(testInput1, "input");
 
@@ -306,7 +306,7 @@ public class RealSandboxTest {
     public void testHashCode() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         final int prime = 31;
         int result = 1;
@@ -322,7 +322,7 @@ public class RealSandboxTest {
     public void testToString() throws URISyntaxException, OctopusIOException, OctopusException {
 
         String name = getNextSandbox();
-        Sandbox sandbox = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox = new Sandbox(files, testDir, name);
 
         assertTrue(sandbox.toString().startsWith("Sandbox"));
 
@@ -332,19 +332,19 @@ public class RealSandboxTest {
 
     @Test
     public void testEquals_sameObject_equal() throws URISyntaxException, OctopusIOException, OctopusException {
-        Sandbox sandbox = new Sandbox(octopus, testDir, getNextSandbox());
+        Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertEquals(sandbox, sandbox);
     }
 
     @Test
     public void testEquals_otherClass_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
-        Sandbox sandbox = new Sandbox(octopus, testDir, getNextSandbox());
+        Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(42));
     }
 
     @Test
     public void testEquals_otherNull_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
-        Sandbox sandbox = new Sandbox(octopus, testDir, getNextSandbox());
+        Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(null));
     }
 
@@ -355,8 +355,8 @@ public class RealSandboxTest {
 
         String name = getNextSandbox();
 
-        Sandbox sandbox1 = new Sandbox(octopus, testDir, name);
-        Sandbox sandbox2 = new Sandbox(octopus2, testDir, name);
+        Sandbox sandbox1 = new Sandbox(files, testDir, name);
+        Sandbox sandbox2 = new Sandbox(octopus2.files(), testDir, name);
 
         assertNotEquals(sandbox1, sandbox2);
 
@@ -370,8 +370,8 @@ public class RealSandboxTest {
 
         String name = getNextSandbox();
 
-        Sandbox sandbox1 = new Sandbox(octopus, testDir, name);
-        Sandbox sandbox2 = new Sandbox(octopus, path, name);
+        Sandbox sandbox1 = new Sandbox(files, testDir, name);
+        Sandbox sandbox2 = new Sandbox(files, path, name);
 
         assertNotEquals(sandbox1, sandbox2);
     }
@@ -381,8 +381,8 @@ public class RealSandboxTest {
 
         String name = getNextSandbox();
 
-        Sandbox sandbox1 = new Sandbox(octopus, testDir, name);
-        Sandbox sandbox2 = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox1 = new Sandbox(files, testDir, name);
+        Sandbox sandbox2 = new Sandbox(files, testDir, name);
 
         sandbox1.addUploadFile(testInput1);
         assertNotEquals(sandbox1, sandbox2);
@@ -393,8 +393,8 @@ public class RealSandboxTest {
 
         String name = getNextSandbox();
 
-        Sandbox sandbox1 = new Sandbox(octopus, testDir, name);
-        Sandbox sandbox2 = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox1 = new Sandbox(files, testDir, name);
+        Sandbox sandbox2 = new Sandbox(files, testDir, name);
 
         sandbox1.addDownloadFile("output", testInput1);
         assertNotEquals(sandbox1, sandbox2);
@@ -405,8 +405,8 @@ public class RealSandboxTest {
 
         String name = getNextSandbox();
 
-        Sandbox sandbox1 = new Sandbox(octopus, testDir, name);
-        Sandbox sandbox2 = new Sandbox(octopus, testDir, name);
+        Sandbox sandbox1 = new Sandbox(files, testDir, name);
+        Sandbox sandbox2 = new Sandbox(files, testDir, name);
 
         sandbox1.addUploadFile(testInput1);
         sandbox2.addUploadFile(testInput1);

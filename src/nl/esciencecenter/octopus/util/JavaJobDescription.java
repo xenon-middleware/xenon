@@ -25,11 +25,14 @@ import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 /**
- * JobDescription for a Java application. Will use the Java specific information provided by the user to build the command line
- * arguments of the JobDescription.
+ * A JobDescription specialized in Java applications. 
  * 
- * @author Niels Drost
+ * A JavaJobDescription will use the Java specific information provided by the user to build the command line arguments of the
+ * JobDescription.
  * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @version 1.0 
+ * @since 1.0
  */
 public class JavaJobDescription extends JobDescription {
 

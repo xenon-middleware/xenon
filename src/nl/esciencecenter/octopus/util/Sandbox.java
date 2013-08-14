@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
@@ -29,7 +28,17 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
- * Sandbox is a place where files/directories can be uploaded to or downloaded from.
+ * A sandbox is a (possibly remote and usually temporary) directory used for running jobs. 
+ * <p>
+ * A sandbox is typically create before the job is started. The input files (or directories) necessary to run the job are then 
+ * uploaded to the sandbox.
+ * </p>
+ * <p>
+ * Next the job is run using the sandbox as a working directory.
+ * </p>
+ * <p>
+ * After the job has terminated, the output files downloaded from the sandbox, and the sandbox is deleted.
+ * </p>       
  * 
  * Example to submit a job with input and output files:
  * 
@@ -37,7 +46,6 @@ import nl.esciencecenter.octopus.files.RelativePath;
  * 
  * <pre class="code">
  * {
- *     &#064;code
  *     Sandbox sandbox = new Sandbox(octopus, sandboxBase);
  *     sandbox.addUploadFile(inputfile);
  *     sandbox.addDownloadFile(outputfile);
@@ -49,22 +57,28 @@ import nl.esciencecenter.octopus.files.RelativePath;
  *     JobStatus = octopus.jobs().waitUntilDone(job, 60000);
  * 
  *     sandbox.download();
+ *     sandbox.delete();
  * }
  * </pre>
  * 
  * </blockquote>
  * 
+ * @author Stefan Verhoeven <S.Verhoeven@esciencecenter.nl>
+ * @version 1.0 
+ * @since 1.0
  */
 public class Sandbox {
 
-    private final Octopus octopus;
+    private final Files files;
 
     private final AbsolutePath path;
 
     private List<Pair> uploadFiles = new LinkedList<Pair>();
-
     private List<Pair> downloadFiles = new LinkedList<Pair>();
 
+    /**
+     * Pair represents the combination of a source and destination path
+     */
     public static class Pair {
 
         final AbsolutePath source;
@@ -122,10 +136,12 @@ public class Sandbox {
     }
 
     /**
-     * Creates a sandbox. Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
+     * Creates a sandbox. 
      * 
-     * @param octopus
-     *            An Octopus instance
+     * Root and sandboxName will be concatenated to a path into which files can be uploaded/downloaded.
+     * 
+     * @param files
+     *            A Files interface used to access the files.
      * @param root
      *            Directory in which sandbox will be created.
      * @param sandboxName
@@ -133,10 +149,10 @@ public class Sandbox {
      * @throws OctopusException
      * @throws OctopusIOException
      */
-    public Sandbox(Octopus octopus, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
+    public Sandbox(Files files, AbsolutePath root, String sandboxName) throws OctopusException, OctopusIOException {
 
-        if (octopus == null) {
-            throw new OctopusException("Sandbox", "Need an octopus to create a sandbox!");
+        if (files == null) {
+            throw new OctopusException("Sandbox", "Need an files interface to create a sandbox!");
         }
 
         if (root == null) {
@@ -147,24 +163,35 @@ public class Sandbox {
             sandboxName = "octopus_sandbox_" + UUID.randomUUID();
         }
 
-        this.octopus = octopus;
+        this.files = files;
         this.path = root.resolve(new RelativePath(sandboxName));
     }
 
     /**
-     * @return Path in which files will be uploaded and downloaded.
+     * The sandbox directory.
+     * 
+     * @return the sandbox directory.
      */
     public AbsolutePath getPath() {
         return path;
     }
 
     /**
-     * @return List of files that will be uploaded on execution of {@link #upload(CopyOption []) upload} method.
+     * Returns the list of files that will be uploaded when calling {@link #upload(CopyOption []) upload}.
+     * 
+     * @return list of files that will be uploaded.
      */
     public List<Pair> getUploadFiles() {
         return uploadFiles;
     }
 
+    /**
+     * Sets the list of files that will be uploaded to <code>files</code>. 
+     * 
+     * Any existing upload files will be discarded.
+     * 
+     * @param files the files to upload.
+     */
     public void setUploadFiles(AbsolutePath... files) {
         uploadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
@@ -176,7 +203,7 @@ public class Sandbox {
      * Add a file to the list of files to upload.
      * 
      * @param src
-     *            Source path of file. Can not be null.
+     *            Source path of file. May not be <code>null</code>.
      */
     public void addUploadFile(AbsolutePath src) {
         addUploadFile(src, null);
@@ -186,13 +213,13 @@ public class Sandbox {
      * Add a file to the list of files to upload.
      * 
      * @param src
-     *            Where file should be uploaded from. Can not be null.
+     *            The source file. May not be <code>null</code>.
      * @param dest
-     *            Name of file in sandbox. When null the src.getFilename() will be used.
+     *            The name of file in the sandbox. If <code>null</code> then <code>src.getFilename()</code> will be used.
      */
     public void addUploadFile(AbsolutePath src, String dest) {
         if (src == null) {
-            throw new IllegalArgumentException("the source path cannot be null when adding a preStaged file");
+            throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
         if (dest == null) {
             dest = src.getFileName();
@@ -202,23 +229,25 @@ public class Sandbox {
     }
 
     /**
-     * @return List of files that will be downloaded on execution of {@link #download(CopyOption []) download} method.
+     * Returns the list of files that will be downloaded when calling {@link #download(CopyOption []) download}.
+     * 
+     * @return list of files that will be downloaded.
      */
     public List<Pair> getDownloadFiles() {
         return downloadFiles;
     }
 
     /**
-     * Add file to the list of files to download.
+     * Add a file to the list of files to download.
      * 
      * @param src
-     *            Name of file in sandbox. When null the dest.getFilename() will be used.
+     *            Name of the source file in the sandbox. When <code>null</code> the <code>dest.getFilename()</code> will be used.
      * @param dest
-     *            Where file should be downloaded to. Can not be null.
+     *            The target file. May not be <code>null</code>.
      */
     public void addDownloadFile(String src, AbsolutePath dest) {
         if (dest == null) {
-            throw new IllegalArgumentException("the destination path cannot be null when adding a postStaged file");
+            throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
         if (src == null) {
             src = dest.getFileName();
@@ -229,21 +258,23 @@ public class Sandbox {
 
     private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         for (Pair pair : pairs) {
-            FileUtils.recursiveCopy(octopus.files(), pair.source, pair.destination, options);
+            FileUtils.recursiveCopy(files, pair.source, pair.destination, options);
         }
     }
 
     /**
-     * Copy uploaded files to sandbox.
+     * Upload files to sandbox.
      * 
-     * Creates sandbox directory when needed.
+     * Also creates sandbox directory if it does not exist yet.
      * 
      * @param options
-     * @throws OctopusIOException
+     *          the options to use while copying. See {@link CopyOption} for details.
      * @throws UnsupportedOperationException
+     *           if an invalid combination of options is used.
+     * @throws OctopusIOException
+     *           if an I/O error occurs during the copying
      */
     public void upload(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
-        Files files = octopus.files();
         if (!files.exists(path)) {
             files.createDirectory(path);
         }
@@ -251,30 +282,34 @@ public class Sandbox {
     }
 
     /**
-     * Copy downloaded files from sandbox.
+     * Download files from sandbox.
      * 
      * @param options
-     * @throws OctopusIOException
+     *          the options to use while copying. See {@link CopyOption} for details.
      * @throws UnsupportedOperationException
+     *           if an invalid combination of options is used.
+     * @throws OctopusIOException
+     *           if an I/O error occurs during the copying
      */
     public void download(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
         copy(downloadFiles, options);
     }
 
     /**
-     * Deletes all files in sandbox.
+     * Recursively delete the sandbox.
      * 
      * @throws OctopusIOException
+     *         if an I/O error occurs during deletion 
      */
     public void delete() throws OctopusIOException {
-        FileUtils.recursiveDelete(octopus.files(), path);
+        FileUtils.recursiveDelete(files, path);
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + octopus.hashCode();
+        result = prime * result + files.hashCode();
         result = prime * result + path.hashCode();
         result = prime * result + uploadFiles.hashCode();
         result = prime * result + downloadFiles.hashCode();
@@ -295,7 +330,7 @@ public class Sandbox {
 
         Sandbox other = (Sandbox) obj;
 
-        if (!octopus.equals(other.octopus)) {
+        if (!files.equals(other.files)) {
             return false;
         }
 
@@ -317,7 +352,7 @@ public class Sandbox {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Sandbox [octopus=").append(octopus).append(", path=").append(path).append(", uploadFiles=")
+        builder.append("Sandbox [files=").append(files).append(", path=").append(path).append(", uploadFiles=")
                 .append(uploadFiles).append(", downloadFiles=").append(downloadFiles).append("]");
         return builder.toString();
     }

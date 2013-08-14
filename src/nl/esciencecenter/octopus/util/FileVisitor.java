@@ -21,25 +21,86 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.AbsolutePath;
 
+/**
+ * FileVisitor contains various callback methods called by 
+ * {@link FileUtils#walkFileTree(Files, AbsolutePath, boolean, int, FileVisitor) FileUtils.walkTree}.
+ * 
+ * By using an implementation of this interface in combination with 
+ * {@link FileUtils#walkFileTree(Files, AbsolutePath, boolean, int, FileVisitor) FileUtils.walkTree}, an action can be defined for 
+ * each file and directory encountered during a tree walk.    
+ * 
+ * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0 
+ * @since 1.0
+ */
 public interface FileVisitor {
 
     /**
      * Invoked for a directory after entries in the directory, and all of their descendants, have been visited.
+     * 
+     * @param dir 
+     *          the directory that was visited.
+     * @param exception 
+     *          any exception thrown while visiting the directory, or <code>null</code> if there was no exception.
+     * @param files 
+     *          the {@link Files} used to access the directory.
+     * 
+     * @return the desired action. 
+     * 
+     * @throws OctopusIOException
+     *          if an I/O error occurs while visiting the directory.
      */
     FileVisitResult postVisitDirectory(AbsolutePath dir, OctopusIOException exception, Files files) throws OctopusIOException;
 
     /**
      * Invoked for a directory before entries in the directory are visited.
+     * 
+     * @param dir 
+     *          the directory to visit.
+     * @param attributes 
+     *          the attributes of the directory.
+     * @param files 
+     *          the {@link Files} used to access the directory.
+     *          
+     * @return the desired action.
+     * 
+     * @throws OctopusIOException
+     *          if an I/O error occurs while visiting the directory. 
      */
     FileVisitResult preVisitDirectory(AbsolutePath dir, FileAttributes attributes, Files files) throws OctopusIOException;
 
     /**
      * Invoked for a file in a directory.
+     * 
+     * @param file 
+     *          the file to visit.
+     * @param attributes 
+     *          the attributes of the file.
+     * @param files 
+     *          the {@link Files} used to access the file.
+     *          
+     * @return the desired action.
+     * 
+     * @throws OctopusIOException
+     *          if an I/O error occurs while visiting the directory. 
      */
     FileVisitResult visitFile(AbsolutePath file, FileAttributes attributes, Files files) throws OctopusIOException;
 
     /**
      * Invoked for a file that could not be visited.
-     */
+     *
+     * @param file 
+     *          the file that could not be visited.
+     * @param exception 
+     *          the exception thrown while visiting the file.
+     * @param files 
+     *          the {@link Files} used to access the file.
+     *          
+     * @return the desired action.
+     * 
+     * @throws OctopusIOException
+     *          if an I/O error occurs while visiting the directory. 
+     */     
     FileVisitResult visitFileFailed(AbsolutePath file, OctopusIOException exception, Files files) throws OctopusIOException;
 }

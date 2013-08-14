@@ -82,7 +82,7 @@ public class SandboxedLocalJobIT {
         // create sandbox
         String sandbox_id = "MIES" + UUID.randomUUID().toString();
         AbsolutePath sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(tmpdir));
-        Sandbox sandbox = new Sandbox(octopus, sandboxPath, sandbox_id);
+        Sandbox sandbox = new Sandbox(octopus.files(), sandboxPath, sandbox_id);
 
         sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
                 "lorem_ipsum.txt");
