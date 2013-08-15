@@ -612,7 +612,7 @@ public class OctopusPropertiesTest {
         
         OctopusProperties octprop = new OctopusProperties(supportedProperties, props).exclude("bla");
         
-        assertEquals("{<<aap.key=aap>>, <<noot.key=noot>>}", octprop.toString());
+        assertEquals("{<<noot.key=noot>>, <<aap.key=aap>>}", octprop.toString());
     }
     
     
