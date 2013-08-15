@@ -189,14 +189,14 @@ public class OctopusProperties {
                 Long.valueOf(value);
                 break;
             case SIZE:
-                getSizeProperty(value);
+                parseSizeValue(value);
                 break;
             case STRING:
                 break;
             }
         } catch (Exception e) {
-            throw new InvalidPropertyException(NAME,
-                    "Property " + key + " has invalid value: " + value + " (expected " + t + ")", e);
+            throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t 
+                    + ")", e);
         }
     }
 
@@ -430,6 +430,27 @@ public class OctopusProperties {
         return getProperty(name, Type.STRING);
     }
 
+    private long parseSizeValue(String value) throws InvalidPropertyException {  
+        try {
+            if (value.endsWith("G") || value.endsWith("g")) {
+                return Long.parseLong(value.substring(0, value.length() - 1)) * GIGA;
+            }
+
+            if (value.endsWith("M") || value.endsWith("m")) {
+                return Long.parseLong(value.substring(0, value.length() - 1)) * MEGA;
+            }
+
+            if (value.endsWith("K") || value.endsWith("k")) {
+                return Long.parseLong(value.substring(0, value.length() - 1)) * KILO;
+            }
+
+            return Long.parseLong(value);
+
+        } catch (NumberFormatException e) {
+            throw new InvalidPropertyException(NAME, "Invalid SIZE value: " + value, e);
+        }
+    }
+    
     /**
      * Retrieves the value of a size property with the given name.
      * 
@@ -448,27 +469,7 @@ public class OctopusProperties {
      *             if the property value cannot be converted into a long.
      */
     public long getSizeProperty(String name) throws UnknownPropertyException, PropertyTypeException, InvalidPropertyException {
-
-        String value = getProperty(name, Type.SIZE);
-
-        try {
-            if (value.endsWith("G") || value.endsWith("g")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * GIGA;
-            }
-
-            if (value.endsWith("M") || value.endsWith("m")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * MEGA;
-            }
-
-            if (value.endsWith("K") || value.endsWith("k")) {
-                return Long.parseLong(value.substring(0, value.length() - 1)) * KILO;
-            }
-
-            return Long.parseLong(value);
-
-        } catch (NumberFormatException e) {
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected SIZE)", e);
-        }
+        return parseSizeValue(getProperty(name, Type.SIZE));
     }
 
     /**

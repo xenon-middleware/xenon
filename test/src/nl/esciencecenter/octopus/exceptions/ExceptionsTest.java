@@ -466,4 +466,16 @@ public class ExceptionsTest {
         testException(new JobCanceledException("name", "message", t), t);
     }
 
+    @Test
+    public void testPropertyTypeException1() throws Exception {
+        testException(new PropertyTypeException("name", "message"));
+    }
+    
+    @Test
+    public void testPropertyTypeException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new PropertyTypeException("name", "message", t), t);
+    }
+
+    
 }
