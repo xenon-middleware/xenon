@@ -293,6 +293,28 @@ public class OctopusPropertiesTest {
         new OctopusProperties(valid, props);
     }
 
+    @Test(expected = InvalidPropertyException.class)
+    public void testGetBooleanProperty_invalidDefault() throws Exception {
+
+        ImmutableArray<OctopusPropertyDescription> valid = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.OCTOPUS), "aap", 
+                        "test property"));
+        
+        Map<String, String> props = new HashMap<>();
+        new OctopusProperties(valid, props).getBooleanProperty("key");
+    }
+
+    @Test(expected = UnknownPropertyException.class)
+    public void testGetBooleanProperty_invalidName() throws Exception {
+
+        ImmutableArray<OctopusPropertyDescription> valid = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.OCTOPUS), "true", 
+                        "test property"));
+        
+        Map<String, String> props = new HashMap<>();
+        new OctopusProperties(valid, props).getBooleanProperty("noot");
+    }
+    
     @Test(expected = PropertyTypeException.class)
     public void testGetBooleanProperty_wrongType() throws Exception {
 
@@ -471,9 +493,56 @@ public class OctopusPropertiesTest {
         octprop.getSizeProperty("key"); // throws exception
     }
 
+    @Test
+    public void testOctopusProperties_filter_withPropertiesSet() throws Exception {
+        
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "aap",
+                        "test property"),
+                new OctopusPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "noot",
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        props.put("aap.key", "aap2");
+        props.put("noot.key", "noot2");
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).filter("aap");
+        
+        assertEquals("{aap.key=aap2}", octprop.toString());
+    }
     
-    
-    
+    @Test
+    public void testOctopusProperties_filter_noPropertiesSet() throws Exception {
+        
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "aap",
+                        "test property"),
+                new OctopusPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "noot",
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).filter("aap");
+        
+        assertEquals("{<<aap.key=aap>>}", octprop.toString());
+    }
+
+    @Test
+    public void testOctopusProperties_filter_wrongPrefix() throws Exception {
+        
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "aap",
+                        "test property"),
+                new OctopusPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "noot",
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).filter("bla");
+        
+        assertEquals("{}", octprop.toString());
+    }
+
     
     
     

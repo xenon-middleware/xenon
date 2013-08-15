@@ -297,12 +297,13 @@ public class OctopusProperties {
             InvalidPropertyException {
 
         String value = getProperty(name, Type.BOOLEAN);
-
-        try {
-            return Boolean.parseBoolean(value);
-        } catch (Exception e) {
-            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected BOOLEAN)",
-                    e);
+            
+        if (value.equalsIgnoreCase("true")) { 
+            return true;
+        } else if (value.equalsIgnoreCase("false")) {
+            return false; 
+        } else { 
+            throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected BOOLEAN)");
         }
     }
 
