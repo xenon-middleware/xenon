@@ -565,6 +565,55 @@ public class OctopusPropertiesTest {
         assertEquals("{}", octprop.toString());
     }
 
+    @Test
+    public void testOctopusProperties_exclude_withPropertiesSet() throws Exception {
+        
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "aap",
+                        "test property"),
+                new OctopusPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "noot",
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        props.put("aap.key", "aap2");
+        props.put("noot.key", "noot2");
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).exclude("noot");
+        
+        assertEquals("{aap.key=aap2}", octprop.toString());
+    }
+    
+    @Test
+    public void testOctopusProperties_exclude_noPropertiesSet() throws Exception {
+        
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "aap",
+                        "test property"),
+                new OctopusPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "noot",
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).exclude("noot");
+        
+        assertEquals("{<<aap.key=aap>>}", octprop.toString());
+    }
+
+    @Test
+    public void testOctopusProperties_exclude_wrongPrefix() throws Exception {
+        
+        ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "aap",
+                        "test property"),
+                new OctopusPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.OCTOPUS), "noot",
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        
+        OctopusProperties octprop = new OctopusProperties(supportedProperties, props).exclude("bla");
+        
+        assertEquals("{<<aap.key=aap>>, <<noot.key=noot>>}", octprop.toString());
+    }
     
     
     
