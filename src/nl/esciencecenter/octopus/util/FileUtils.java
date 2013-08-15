@@ -524,7 +524,7 @@ public final class FileUtils {
                     // Can not replace directory, to replace have to do recursive delete and createDirectories
                     // because recursive delete can delete unwanted files
                 } else {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
                             + " already exists!");
                 }
             } else {
@@ -542,7 +542,7 @@ public final class FileUtils {
                 } else if (replace) {
                     files.copy(source, target, nl.esciencecenter.octopus.files.CopyOption.REPLACE);
                 } else {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target.getPath()
+                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
                             + " already exists!");
                 }
             } else {

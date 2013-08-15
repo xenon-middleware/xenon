@@ -189,12 +189,12 @@ public abstract class GenericFileAdaptorTestParent {
         throw new Exception(name + " did NOT throw Exception which was expected!");
     }
 
-    private void throwWrong(String name, String expected, String result) throws Exception {
+    private void throwWrong(String name, Object expected, Object result) throws Exception {
         cleanup();
         throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);
     }
 
-    private void throwUnexpectedElement(String name, String element) throws Exception {
+    private void throwUnexpectedElement(String name, Object element) throws Exception {
         cleanup();
         throw new Exception(name + " produced unexpected element: " + element);
     }
@@ -228,7 +228,7 @@ public abstract class GenericFileAdaptorTestParent {
         counter++;
 
         if (files.exists(dir)) {
-            throw new Exception("Generated test dir already exists! " + dir.getPath());
+            throw new Exception("Generated test dir already exists! " + dir);
         }
 
         return dir;
@@ -242,7 +242,7 @@ public abstract class GenericFileAdaptorTestParent {
         files.createDirectory(dir);
 
         if (!files.exists(dir)) {
-            throw new Exception("Failed to generate test dir! " + dir.getPath());
+            throw new Exception("Failed to generate test dir! " + dir);
         }
 
         return dir;
@@ -269,7 +269,7 @@ public abstract class GenericFileAdaptorTestParent {
         counter++;
 
         if (files.exists(file)) {
-            throw new Exception("Generated NEW test file already exists! " + file.getPath());
+            throw new Exception("Generated NEW test file already exists! " + file);
         }
 
         return file;
@@ -507,7 +507,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         if (result != expected) {
-            throwWrong("test01_isOpen", "" + expected, "" + result);
+            throwWrong("test01_isOpen", expected, result);
         }
     }
 
@@ -601,7 +601,7 @@ public abstract class GenericFileAdaptorTestParent {
         String result = null;
 
         try {
-            result = files.newPath(fs, path).getPath();
+            result = files.newPath(fs, path).getPathname().getAbsolutePath();
         } catch (Exception e) {
             if (mustFail) {
                 // expected exception
@@ -982,7 +982,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         if (result != expected) {
-            throwWrong("test08_exists", "" + expected, "" + result);
+            throwWrong("test08_exists", expected, result);
         }
     }
 
@@ -1223,7 +1223,7 @@ public abstract class GenericFileAdaptorTestParent {
                 tmp.remove(p);
             } else {
                 close(in);
-                throwUnexpectedElement("test11_newDirectoryStream", p.getPath());
+                throwUnexpectedElement("test11_newDirectoryStream", p);
             }
         }
 
@@ -1351,7 +1351,7 @@ public abstract class GenericFileAdaptorTestParent {
                 tmp.remove(p);
             } else {
                 close(in);
-                throwUnexpectedElement("test12_newDirectoryStream_with_filter", p.getPath());
+                throwUnexpectedElement("test12_newDirectoryStream_with_filter", p.toString());
             }
         }
 
@@ -1477,7 +1477,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwWrong("test13_getfileAttributes", "size=" + size, "size=" + result.size());
         }
 
-        System.err.println("File " + path.getPath() + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
+        System.err.println("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
                 + result.isExecutable() + " " + result.isSymbolicLink() + " " + result.isDirectory() + " "
                 + result.isRegularFile() + " " + result.isHidden() + " " + result.isOther() + " " + result.lastAccessTime() + " "
                 + result.lastModifiedTime() + " " + result.group() + " " + result.owner() + " " + result.permissions());
@@ -1560,7 +1560,7 @@ public abstract class GenericFileAdaptorTestParent {
         Set<PosixFilePermission> tmp = attributes.permissions();
 
         if (!permissions.equals(tmp)) {
-            throwWrong("test14_setPosixFilePermissions", permissions.toString(), tmp.toString());
+            throwWrong("test14_setPosixFilePermissions", permissions, tmp);
         }
     }
 
@@ -1669,13 +1669,13 @@ public abstract class GenericFileAdaptorTestParent {
 
         for (PathAttributesPair p : in) {
 
-            System.err.println("Got input " + p.path().getPath() + " " + p.attributes());
+            System.err.println("Got input " + p.path() + " " + p.attributes());
 
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
 
-                System.err.println("  Comparing to " + x.path().getPath() + " " + x.attributes());
+                System.err.println("  Comparing to " + x.path() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
                     System.err.println("Found!");
@@ -1691,7 +1691,7 @@ public abstract class GenericFileAdaptorTestParent {
             } else {
                 System.err.println("NOT Found!");
                 close(in);
-                throwUnexpectedElement("test15_newAttributesDirectoryStream", p.path().getPath());
+                throwUnexpectedElement("test15_newAttributesDirectoryStream", p.path());
 
             }
 
@@ -1818,13 +1818,13 @@ public abstract class GenericFileAdaptorTestParent {
 
         for (PathAttributesPair p : in) {
 
-            System.err.println("Got input " + p.path().getPath() + " " + p.attributes());
+            System.err.println("Got input " + p.path() + " " + p.attributes());
 
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
 
-                System.err.println("  Comparing to " + x.path().getPath() + " " + x.attributes());
+                System.err.println("  Comparing to " + x.path() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
                     System.err.println("Found!");
@@ -1840,7 +1840,7 @@ public abstract class GenericFileAdaptorTestParent {
             } else {
                 System.err.println("NOT Found!");
                 close(in);
-                throwUnexpectedElement("test16_newAttributesDirectoryStream_with_filter", p.path().getPath());
+                throwUnexpectedElement("test16_newAttributesDirectoryStream_with_filter", p.path());
 
             }
 
@@ -2770,7 +2770,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         // make sure the target is what was expected 
         if (expected != null && !target.equals(expected)) {
-            throwWrong("test28_readSymbolicLink", expected.getPath(), target.getPath());
+            throwWrong("test28_readSymbolicLink", expected, target);
         }
     }
 
@@ -2820,7 +2820,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path root = resolve(fs, "octopus_test/links");
         
         if (!files.exists(root)) {
-            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+            throw new Exception("Cannot find symbolic link test dir at " + root);
         }
 
         // prepare the test files 
@@ -2899,7 +2899,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path root = resolve(fs, "octopus_test/links");
 
         if (!files.exists(root)) {
-            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+            throw new Exception("Cannot find symbolic link test dir at " + root);
         }
 
         // prepare the test files 
@@ -2942,7 +2942,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path root = resolve(fs, "octopus_test/links");
 
         if (!files.exists(root)) {
-            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
+            throw new Exception("Cannot find symbolic link test dir at " + root);
         }
 
         // prepare the test files 

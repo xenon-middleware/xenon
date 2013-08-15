@@ -43,6 +43,46 @@ class BatchProcess implements InteractiveProcess {
     private StreamForwarder stdinForwarder;
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
+   
+    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory)
+            throws OctopusException, IOException {
+
+        JobDescription description = job.getJobDescription();
+
+        // Retrieve the filesystem that goes with the scheduler.
+        Path workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
+
+        if (!files.exists(workdir)) {
+            throw new IOException("Working directory " + workdir + " does not exist!");
+        }
+
+        // If needed create a file for stdin, and make sure it exists!
+        Path stdin = null;
+
+        if (description.getStdin() != null) {
+            stdin = processPath(files, workdir, description.getStdin());
+
+            if (!files.exists(stdin)) {
+                throw new IOException("Stdin cannot be redirected from " + stdin + " (file does not exist!)");
+            }
+        }
+
+        OutputStream out = createOutputStream(files, workdir, description.getStdout());
+        OutputStream err = createOutputStream(files, workdir, description.getStderr());
+
+        process = factory.createInteractiveProcess(job);
+        Streams streams = process.getStreams();
+
+        stdoutForwarder = new StreamForwarder(streams.getStdout(), out);
+        stderrForwarder = new StreamForwarder(streams.getStderr(), err);
+
+        if (stdin == null) {
+            stdinForwarder = null;
+            streams.getStdin().close();
+        } else {
+            stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin());
+        }
+    }
 
     private Path processPath(Files files, Path root, String path) throws OctopusIOException, OctopusException {
 
@@ -73,46 +113,6 @@ class BatchProcess implements InteractiveProcess {
 
         // Create the output stream and return it. 
         return files.newOutputStream(file, OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE);
-    }
-
-    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory)
-            throws OctopusException, IOException {
-
-        JobDescription description = job.getJobDescription();
-
-        // Retrieve the filesystem that goes with the scheduler.
-        Path workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
-
-        if (!files.exists(workdir)) {
-            throw new IOException("Working directory " + workdir + " does not exist!");
-        }
-
-        // If needed create a file for stdin, and make sure it exists!
-        Path stdin = null;
-
-        if (description.getStdin() != null) {
-            stdin = processPath(files, workdir, description.getStdin());
-
-            if (!files.exists(stdin)) {
-                throw new IOException("Stdin cannot be redirected from " + stdin.getPath() + " (file does not exist!)");
-            }
-        }
-
-        OutputStream out = createOutputStream(files, workdir, description.getStdout());
-        OutputStream err = createOutputStream(files, workdir, description.getStderr());
-
-        process = factory.createInteractiveProcess(job);
-        Streams streams = process.getStreams();
-
-        stdoutForwarder = new StreamForwarder(streams.getStdout(), out);
-        stderrForwarder = new StreamForwarder(streams.getStderr(), err);
-
-        if (stdin == null) {
-            stdinForwarder = null;
-            streams.getStdin().close();
-        } else {
-            stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin());
-        }
     }
 
     private synchronized void closeStreams() {

@@ -508,7 +508,8 @@ public class Pathname {
     /**
      * Create a relative path between the given path and this path.
      * 
-     * TODO: explain.
+     * Relativation is the inverse of resolution. This method returns a path that, when resolved against this path, results in
+     * the given path <code>other</code>.   
      * 
      * @param other
      *            the path to relativize.
@@ -536,13 +537,13 @@ public class Pathname {
 
         // The source may not be longer that target
         if (elts.length > eltsOther.length) {
-            throw new IllegalArgumentException("Cannot relativize " + other.getPath() + " to " + getPath());
+            throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
         }
 
         // If source and target must have the same start.
         for (int i = 0; i < elts.length; i++) {
             if (!elts[i].equals(eltsOther[i])) {
-                throw new IllegalArgumentException("Cannot relativize " + other.getPath() + " to " + getPath());
+                throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
             }
         }
 
@@ -565,14 +566,42 @@ public class Pathname {
     }
 
     /**
-     * Get a <code>String</code> representation of this path.
+     * Return a <code>String</code> representation of this interpreted as a relative path.
      * 
-     * @return a String representation of this path.
+     * A relative path does not start with a separator. 
+     * 
+     * @return a String representation of this path interpreted as a relative path.
      */
-    public String getPath() {
+    public String getRelativePath() {
 
         if (elements.length == 0) {
             return "";
+        }
+
+        StringBuilder tmp = new StringBuilder();
+
+        String sep = "";
+        
+        for (int i = 0; i < elements.length; i++) {
+            tmp.append(sep);
+            tmp.append(elements[i]);
+            sep = "" + separator;
+        }
+        
+        return tmp.toString();
+    }
+
+    /**
+     * Return a <code>String</code> representation of this interpreted as an absolute path.
+     * 
+     * An absolute path starts with a separator. 
+     * 
+     * @return a String representation of this path interpreted as an absolute path.
+     */
+    public String getAbsolutePath() {
+        
+        if (elements.length == 0) {
+            return "" + separator;
         }
 
         StringBuilder tmp = new StringBuilder();
@@ -585,6 +614,7 @@ public class Pathname {
         return tmp.toString();
     }
 
+    
     /**
      * Normalize this pathname by removing as many redundant path elements as possible.
      * 

@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFileAttributeView;
@@ -39,6 +38,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 /**
@@ -56,28 +56,6 @@ final class LocalUtils {
 
     private LocalUtils() { 
         // DO NOTE USE
-    }
-    
-    static String getHome() throws OctopusException {
-
-        String path = System.getProperty("user.home");
-
-        if (!LocalUtils.exists(path)) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Home directory does not exist: " + path);
-        }
-
-        return path;
-    }
-
-    static String getCWD() throws OctopusException {
-
-        String path = System.getProperty("user.dir");
-
-        if (!LocalUtils.exists(path)) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Current working directory does not exist: " + path);
-        }
-
-        return path;
     }
 
     static URI getURI(String uri) {
@@ -97,26 +75,52 @@ final class LocalUtils {
         return getURI(LOCAL_FILE_URI);
     }
 
-    private static String expandHome(String path) {
-
-        if (path.startsWith("~")) {
-            return System.getProperty("user.home") + "/" + (path.length() > 1 ? path.substring(1) : "");
+    static Pathname getHome() throws OctopusIOException { 
+        
+        String separator = System.getProperty("file.separator");
+        
+        if (separator == null || separator.length() > 1) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File seperator not supported: " + separator); 
         }
 
+        String home = System.getProperty("user.home");
+        
+        if (home == null || home.length() == 0) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Home directory property user.home not set!");
+        }
+
+        return new Pathname(separator.charAt(0), home);        
+    }
+    
+    static Pathname getCWD() throws OctopusIOException { 
+        
+        String separator = System.getProperty("file.separator");
+        
+        if (separator == null || separator.length() > 1) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File seperator not supported: " + separator); 
+        }
+
+        String home = System.getProperty("user.dir");
+        
+        if (home == null || home.length() == 0) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Current working directory property user.dir not set!");
+        }
+
+        return new Pathname(separator.charAt(0), home);        
+    }
+    
+    static Pathname expandHome(Pathname path) throws OctopusIOException { 
+        
+        if (path.startsWith("~")) { 
+            return new Pathname(getHome(), path);
+        } 
+        
         return path;
     }
-
-    static boolean exists(String path) {
-
-        if (path == null) {
-            return false;
-        }
-
-        return Files.exists(FileSystems.getDefault().getPath(expandHome(path)), LinkOption.NOFOLLOW_LINKS);
-    }
-
-    static java.nio.file.Path javaPath(Path path) {
-        return FileSystems.getDefault().getPath(expandHome(path.getPath()));
+    
+    static java.nio.file.Path javaPath(Path path) throws OctopusIOException {        
+        Pathname tmp = expandHome(path.getPathname());
+        return FileSystems.getDefault().getPath(tmp.getAbsolutePath());
     }
 
     static FileAttribute<Set<java.nio.file.attribute.PosixFilePermission>> javaPermissionAttribute(
@@ -256,10 +260,10 @@ final class LocalUtils {
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
-            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!", e1);
+            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
 
         } catch (java.nio.file.DirectoryNotEmptyException e2) {
-            throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path.getPath() + " not empty!", e2);
+            throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
 
         } catch (Exception e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);

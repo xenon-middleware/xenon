@@ -373,7 +373,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             //convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
                 Pathname scriptFile = fsEntryPath.resolve(customScriptFile);
-                customScriptFile = scriptFile.getPath();
+                customScriptFile = scriptFile.getAbsolutePath();
             }
 
             output = runCheckedCommand(null, "qsub", customScriptFile);

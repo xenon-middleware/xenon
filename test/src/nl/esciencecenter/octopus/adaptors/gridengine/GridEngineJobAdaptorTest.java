@@ -75,14 +75,14 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         Path script = resolve(root, "script");
         Path stdout = resolve(root, "stdout.txt");
 
-        String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
+        String scriptContent = "#!/bin/bash\n" + "#$ -o " + stdout.getPathname().getAbsolutePath() + "\n" + "#$ -e /dev/null\n" + "echo " + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
         writeFully(out, scriptContent);
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOption("job.script", script.getPath());
+        description.addJobOption("job.script", script.getPathname().getAbsolutePath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);

@@ -146,7 +146,7 @@ public class CopyEngine {
     private void append(Path source, long fromOffset, Path target, CopyInfo ac) throws OctopusIOException {
 
         // We need to append some bytes from source to target. 
-        LOGGER.debug("Appending from {} to {} starting at {}", source.getPath(), target.getPath(), fromOffset);
+        LOGGER.debug("Appending from {} to {} starting at {}", source, target, fromOffset);
 
         InputStream in = owner.newInputStream(source);
         OutputStream out = owner.newOutputStream(target, OpenOption.OPEN, OpenOption.APPEND);
@@ -159,7 +159,7 @@ public class CopyEngine {
                 long tmp = in.skip(fromOffset);
 
                 if (tmp <= 0) {
-                    throw new OctopusIOException(NAME, "Failed to seek file " + source.getPath() + " to " + fromOffset);
+                    throw new OctopusIOException(NAME, "Failed to seek file " + source + " to " + fromOffset);
                 }
 
                 skipped += tmp;
@@ -167,8 +167,7 @@ public class CopyEngine {
 
             streamCopy(in, out, ac);
         } catch (IOException e) {
-            throw new OctopusIOException(NAME, "Failed to copy " + source.getPath() + ":" + fromOffset + " to target "
-                    + target.getPath(), e);
+            throw new OctopusIOException(NAME, "Failed to copy " + source + ":" + fromOffset + " to target " + target, e);
         } finally {
             close(in);
             close(out);
@@ -198,7 +197,7 @@ public class CopyEngine {
 
     private boolean compareHead(CopyInfo ac, Path target, Path source) throws IOException {
 
-        LOGGER.debug("Compare head of {} to {}", target.getPath(), source.getPath());
+        LOGGER.debug("Compare head of {} to {}", target, source);
 
         byte[] buf1 = new byte[BUFFER_SIZE];
         byte[] buf2 = new byte[BUFFER_SIZE];
@@ -248,34 +247,34 @@ public class CopyEngine {
         Path source = copy.getSource();
         Path target = copy.getTarget();
 
-        LOGGER.debug("Resume copy from {} to {} verify={}", source.getPath(), target.getPath(), ac.mustVerify());
+        LOGGER.debug("Resume copy from {} to {} verify={}", source, target, ac.mustVerify());
 
         if (!owner.exists(source)) {
-            throw new NoSuchFileException(NAME, "Source " + source.getPath() + " does not exist!");
+            throw new NoSuchFileException(NAME, "Source " + source + " does not exist!");
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
 
         if (sourceAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source.getPath() + " is a directory");
+            throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
         }
 
         if (sourceAtt.isSymbolicLink()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source.getPath() + " is a link");
+            throw new IllegalSourcePathException(NAME, "Source " + source + " is a link");
         }
 
         if (!owner.exists(target)) {
-            throw new NoSuchFileException(NAME, "Target " + target.getPath() + " does not exist!");
+            throw new NoSuchFileException(NAME, "Target " + target + " does not exist!");
         }
 
         FileAttributes targetAtt = owner.getAttributes(target);
 
         if (targetAtt.isDirectory()) {
-            throw new IllegalTargetPathException(NAME, "Target " + target.getPath() + " is a directory");
+            throw new IllegalTargetPathException(NAME, "Target " + target + " is a directory");
         }
 
         if (targetAtt.isSymbolicLink()) {
-            throw new IllegalTargetPathException(NAME, "Target " + target.getPath() + " is a link");
+            throw new IllegalTargetPathException(NAME, "Target " + target + " is a link");
         }
 
         Pathname sourceName = source.getPathname().normalize();
@@ -294,23 +293,22 @@ public class CopyEngine {
             // check if the data in target corresponds to the head of source.
             try {
                 if (!compareHead(ac, target, source)) {
-                    throw new InvalidDataException(NAME, "Data in target " + target.getPath() + " does not match source "
-                            + source.getPath());
+                    throw new InvalidDataException(NAME, "Data in target " + target + " does not match source " + source);
                 }
             } catch (IOException e) {
-                throw new OctopusIOException(NAME, "Failed to compare " + source.getPath() + " to " + target.getPath(), e);
+                throw new OctopusIOException(NAME, "Failed to compare " + source + " to " + target, e);
             }
         }
 
         long targetSize = targetAtt.size();
         long sourceSize = sourceAtt.size();
 
-        LOGGER.debug("Resuming copy from {} to {} ? ", source.getPath(), target.getPath(), (sourceSize < targetSize));
+        LOGGER.debug("Resuming copy from {} to {} ? ", source, target, (sourceSize < targetSize));
 
         // If target is larger than source, they cannot be the same file.
         if (targetSize > sourceSize) {
-            throw new InvalidDataException(NAME, "Data in target " + target.getPath() + " does not match " + source + " "
-                    + source.getPath());
+            throw new InvalidDataException(NAME, "Data in target " + target + " does not match " + source + " "
+                    + source);
         }
 
         // If target is the same size as source we are done.
@@ -338,34 +336,34 @@ public class CopyEngine {
         Path source = copy.getSource();
         Path target = copy.getTarget();
         
-        LOGGER.debug("Append from {} to {} verify={}", source.getPath(), target.getPath());
+        LOGGER.debug("Append from {} to {} verify={}", source, target);
 
         if (!owner.exists(source)) {
-            throw new NoSuchFileException(NAME, "Source " + source.getPath() + " does not exist!");
+            throw new NoSuchFileException(NAME, "Source " + source + " does not exist!");
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
 
         if (sourceAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source.getPath() + " is a directory");
+            throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
         }
 
         if (!owner.exists(target)) {
-            throw new NoSuchFileException(NAME, "Target " + target.getPath() + " does not exist!");
+            throw new NoSuchFileException(NAME, "Target " + target + " does not exist!");
         }
 
         FileAttributes targetAtt = owner.getAttributes(target);
 
         if (targetAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Target " + target.getPath() + " is a directory");
+            throw new IllegalSourcePathException(NAME, "Target " + target + " is a directory");
         }
         
         Pathname sourceName = source.getPathname().normalize();
         Pathname targetName = target.getPathname().normalize();
         
         if (sourceName.equals(targetName)) {
-            throw new IllegalTargetPathException(NAME, "Can not append a file to itself (source " + source.getPath()
-                    + " equals target " + target.getPath() + ")");
+            throw new IllegalTargetPathException(NAME, "Can not append a file to itself (source " + source + " equals target " 
+                    + target + ")");
         }
 
         ac.setBytesToCopy(sourceAtt.size());
@@ -387,16 +385,16 @@ public class CopyEngine {
         boolean replace = (ac.getMode() == CopyOption.REPLACE);
         boolean ignore = (ac.getMode() == CopyOption.IGNORE);
 
-        LOGGER.debug("Copy from {} to {} replace={} ignore={}", source.getPath(), target.getPath(), replace, ignore);
+        LOGGER.debug("Copy from {} to {} replace={} ignore={}", source, target, replace, ignore);
 
         if (!owner.exists(source)) {
-            throw new NoSuchFileException(NAME, "Source " + source.getPath() + " does not exist!");
+            throw new NoSuchFileException(NAME, "Source " + source + " does not exist!");
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
 
         if (sourceAtt.isDirectory()) {
-            throw new IllegalSourcePathException(NAME, "Source " + source.getPath() + " is a directory");
+            throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
         }
 
         Pathname sourceName = source.getPathname().normalize();
@@ -411,7 +409,7 @@ public class CopyEngine {
                 return;
             }
             if (!replace) {
-                throw new FileAlreadyExistsException(NAME, "Target " + target.getPath() + " already exists!");
+                throw new FileAlreadyExistsException(NAME, "Target " + target + " already exists!");
             }
         }
 
@@ -419,7 +417,7 @@ public class CopyEngine {
         Path parent = owner.newPath(target.getFileSystem(), parentName);
         
         if (!owner.exists(parent)) {
-            throw new NoSuchFileException(NAME, "Target directory " + parentName.getPath() + " does not exist!");
+            throw new NoSuchFileException(NAME, "Target directory " + parent + " does not exist!");
         }
 
         ac.setBytesToCopy(sourceAtt.size());
@@ -439,7 +437,7 @@ public class CopyEngine {
             streamCopy(in, out, ac);
 
         } catch (IOException e) {
-            throw new OctopusIOException(NAME, "Failed to copy " + source.getPath() + " to " + target.getPath(), e);
+            throw new OctopusIOException(NAME, "Failed to copy " + source + " to " + target, e);
         } finally {
             close(in);
             close(out);

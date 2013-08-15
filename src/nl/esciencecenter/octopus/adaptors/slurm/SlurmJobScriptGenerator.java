@@ -40,7 +40,7 @@ public final class SlurmJobScriptGenerator {
             } else {
                 //make relative path absolute
                 Pathname workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                path = workingDirectory.getPath();
+                path = workingDirectory.getAbsolutePath();
             }
             script.format("#SBATCH --workdir='%s'\n", path);
 

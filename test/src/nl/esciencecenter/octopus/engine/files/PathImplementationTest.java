@@ -66,8 +66,8 @@ public class PathImplementationTest {
         
         assertTrue(result.getNameCount() == 2);
 
-        assertEquals("aap", result.getName(0).getPath());
-        assertEquals("noot", result.getName(1).getPath());
+        assertEquals("aap", result.getName(0).getRelativePath());
+        assertEquals("noot", result.getName(1).getRelativePath());
     }
 
     @Test

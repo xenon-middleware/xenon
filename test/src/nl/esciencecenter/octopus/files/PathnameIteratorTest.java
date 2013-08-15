@@ -40,7 +40,7 @@ public class PathnameIteratorTest {
 
         while (itt.hasNext()) {
             Pathname tmp = itt.next();
-            assert (s[i].equals(tmp.getPath()));
+            assert (s[i].equals(tmp.getRelativePath()));
             i++;
         }
 

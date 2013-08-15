@@ -107,8 +107,8 @@ public class RealSandboxTest {
 
         Sandbox sandbox = new Sandbox(files, testDir, null);
 
-        String sandboxPath = sandbox.getPath().getPath();
-        String tmp = testDir.getPath();
+        String sandboxPath = sandbox.getPath().getPathname().getAbsolutePath();
+        String tmp = testDir.getPathname().getAbsolutePath();
 
         assertTrue(sandboxPath.startsWith(tmp + "/octopus_sandbox_"));
     }

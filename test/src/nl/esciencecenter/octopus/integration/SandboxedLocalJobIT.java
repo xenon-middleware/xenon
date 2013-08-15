@@ -99,7 +99,7 @@ public class SandboxedLocalJobIT {
         description.setQueueName("single");
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-        description.setWorkingDirectory(sandbox.getPath().getPathname().getPath());
+        description.setWorkingDirectory(sandbox.getPath().getPathname().getAbsolutePath());
 
         URI sh_location = new URI("local:///");
         Scheduler scheduler = octopus.jobs().newScheduler(sh_location, null, null);
@@ -119,7 +119,7 @@ public class SandboxedLocalJobIT {
             throw status.getException();
         }
 
-        File stdout = new File(workdir.getPath() + "/stdout.txt");
+        File stdout = new File(workdir.getPathname().getAbsolutePath() + "/stdout.txt");
         assertThat(org.apache.commons.io.FileUtils.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
 
         FileUtils.recursiveDelete(octopus.files(), workdir);

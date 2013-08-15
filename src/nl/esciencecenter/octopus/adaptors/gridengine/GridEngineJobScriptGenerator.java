@@ -119,7 +119,7 @@ final class GridEngineJobScriptGenerator {
             } else {
                 //make relative path absolute
                 Pathname workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                script.format("#$ -wd '%s'\n", workingDirectory.getPath());
+                script.format("#$ -wd '%s'\n", workingDirectory.getAbsolutePath());
             }
         }
 

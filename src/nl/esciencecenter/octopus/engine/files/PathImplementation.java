@@ -22,8 +22,7 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Pathname;
 
 /**
- * Implementation of Path. Will create new Paths directly, using either an adaptor identical to the original in case of an
- * absolute path, or the local adaptor in case of a relative path.
+ * Implementation of Path. 
  */
 public final class PathImplementation implements Path {
 
@@ -93,92 +92,8 @@ public final class PathImplementation implements Path {
         return pathname;
     }
 
-//    @Override
-//    public boolean isLocal() {
-//        return filesystem.getAdaptorName().equals("local");
-//    }
-
-//    @Override
-//    public String getFileName() {
-//        return pathname.getFileName();
-//    }
-
-//    @Override
-//    public Path getParent() {
-//        Pathname path = pathname.getParent();
-//        if (path == null) {
-//            return null;
-//        }
-//        return new PathImplementation(filesystem, path);
-//    }
-
-//    @Override
-//    public int getNameCount() {
-//        return pathname.getNameCount();
-//    }
-
-//    @Override
-//    public String[] getNames() {
-//        return pathname.getNames();
-//    }
-
-//    @Override
-//    public String getName(int index) {
-//        return pathname.getName(index);
-//    }
-
-//    @Override
-//    public Path subpath(int beginIndex, int endIndex) {
-//        return new PathImplementation(filesystem, pathname.subpath(beginIndex, endIndex));
-//    }
-
-//    @Override
-//    public Path normalize() {
-//        return new PathImplementation(filesystem, pathname.normalize());
-//    }
-//
-//    @Override
-//    public boolean startsWith(Pathname other) {
-//        return pathname.startsWith(other);
-//    }
-//
-//    @Override
-//    public boolean endsWith(Pathname other) {
-//        return pathname.endsWith(other);
-//    }
-
-//    @Override
-//    public Path resolve(Pathname other) {
-//        return new PathImplementation(filesystem, pathname.resolve(other));
-//    }
-
-//    @Override
-//    public Path resolveSibling(Pathname other) {
-//        return new PathImplementation(filesystem, pathname.resolveSibling(other));
-//    }
-//
-//    @Override
-//    public Pathname relativize(Pathname other) {
-//        return pathname.relativize(other);
-//    }
-//
-//    @Override
-//    public Iterator<Path> iterator() {
-//        return new PathIterator(pathname.iterator());
-//    }
-
-    @Override
-    public String getPath() {
-
-        if (pathname.isEmpty()) {
-            return "" + pathname.getSeparator();
-        }
-
-        return pathname.getPath();
-    }
-
     public String toString() {
-        return filesystem.toString() + pathname.toString();
+        return filesystem.getUri() + pathname.getAbsolutePath();        
     }
 
     @Override

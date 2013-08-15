@@ -78,7 +78,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Path script = resolve(root, "script");
         Path stdout = resolve(root, "stdout.txt");
 
-        String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
+        String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPathname().getAbsolutePath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
                 + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
@@ -86,7 +86,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOption("job.script", script.getPath());
+        description.addJobOption("job.script", script.getPathname().getAbsolutePath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);

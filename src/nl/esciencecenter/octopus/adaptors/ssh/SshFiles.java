@@ -122,8 +122,7 @@ public class SshFiles implements Files {
         Path parent = newPath(path.getFileSystem(), parentName);
             
         if (!exists(parent)) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parentName.getPath() + 
-                    " does not exist!");
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
         }
     }
     
@@ -212,7 +211,7 @@ public class SshFiles implements Files {
     public Path createDirectory(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
+            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
 
         checkParent(dir);
@@ -221,7 +220,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            channel.mkdir(dir.getPath());
+            channel.mkdir(dir.getPathname().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -235,7 +234,7 @@ public class SshFiles implements Files {
     public Path createDirectories(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir.getPath() + " already exists!");
+            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
 
         Iterator<Pathname> itt = dir.getPathname().iterator();
@@ -255,7 +254,7 @@ public class SshFiles implements Files {
     public Path createFile(Path path) throws OctopusIOException {
 
         if (exists(path)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " already exists!");
+            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
         }
 
         checkParent(path);
@@ -295,9 +294,9 @@ public class SshFiles implements Files {
                             + " as it is not empty");
                 }
 
-                channel.rmdir(path.getPath());
+                channel.rmdir(path.getPathname().getAbsolutePath());
             } else {
-                channel.rm(path.getPath());
+                channel.rm(path.getPathname().getAbsolutePath());
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -340,7 +339,7 @@ public class SshFiles implements Files {
         }
 
         if (!exists(source)) {
-            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source.getPath() + " does not exist!");
+            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
         }
 
         Pathname sourceName = source.getPathname().normalize();
@@ -351,7 +350,7 @@ public class SshFiles implements Files {
         }
 
         if (exists(target)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target.getPath() + " already exists!");
+            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target + " already exists!");
         }
 
         checkParent(target);
@@ -361,8 +360,8 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            LOGGER.debug("move from " + source.getPath() + " to " + target.getPath());
-            channel.rename(source.getPath(), target.getPath());
+            LOGGER.debug("move from " + source + " to " + target);
+            channel.rename(source.getPathname().getAbsolutePath(), target.getPathname().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -391,7 +390,7 @@ public class SshFiles implements Files {
         List<LsEntry> result = null;
 
         try {
-            result = channel.ls(path.getPath());
+            result = channel.ls(path.getPathname().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -426,20 +425,20 @@ public class SshFiles implements Files {
     public InputStream newInputStream(Path path) throws OctopusIOException {
 
         if (!exists(path)) {
-            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File " + path.getPath() + " does not exist!");
+            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
         }
 
         FileAttributes att = getAttributes(path);
 
         if (att.isDirectory()) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path.getPath() + " is a directory!");
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
         }
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            InputStream in = channel.get(path.getPath());
+            InputStream in = channel.get(path.getPathname().getAbsolutePath());
             return new SshInputStream(in, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -466,11 +465,11 @@ public class SshFiles implements Files {
 
         if (tmp.getOpenMode() == OpenOption.CREATE) {
             if (exists(path)) {
-                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path.getPath());
+                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
             }
         } else if (tmp.getOpenMode() == OpenOption.OPEN) {
             if (!exists(path)) {
-                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path.getPath());
+                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
             }
         }
 
@@ -484,7 +483,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            OutputStream out = channel.put(path.getPath(), mode);
+            OutputStream out = channel.put(path.getPathname().getAbsolutePath(), mode);
             return new SshOutputStream(out, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -501,10 +500,11 @@ public class SshFiles implements Files {
         Path result = null;
 
         try {
-            String target = channel.readlink(path.getPath());
+            String target = channel.readlink(path.getPathname().getAbsolutePath());
 
-            if (!target.startsWith(File.separator)) {
-                result = new PathImplementation(path.getFileSystem(), path.getPathname().resolve(target));
+            if (!target.startsWith(File.separator)) {                
+                Pathname parent = path.getPathname().getParent();
+                result = new PathImplementation(path.getFileSystem(), parent.resolve(target));
             } else {
                 result = new PathImplementation(path.getFileSystem(), new Pathname(target));
             }
@@ -549,7 +549,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            channel.chmod(SshUtil.permissionsToBits(permissions), path.getPath());
+            channel.chmod(SshUtil.permissionsToBits(permissions), path.getPathname().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -566,7 +566,7 @@ public class SshFiles implements Files {
         SftpATTRS result = null;
 
         try {
-            result = channel.lstat(path.getPath());
+            result = channel.lstat(path.getPathname().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);

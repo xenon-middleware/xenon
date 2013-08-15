@@ -106,8 +106,8 @@ public class CopyInfo {
 
     @Override
     public String toString() {
-        return "CopyInfo [ID=" + copy.getUniqueID() + ", source=" + copy.getSource().getPath() + ", target="
-                + copy.getTarget().getPath() + ", mode=" + mode + ", verify=" + verify + ", bytesToCopy=" + getBytesToCopy()
+        return "CopyInfo [ID=" + copy.getUniqueID() + ", source=" + copy.getSource() + ", target="
+                + copy.getTarget() + ", mode=" + mode + ", verify=" + verify + ", bytesToCopy=" + getBytesToCopy()
                 + ", bytesCopied=" + getBytesCopied() + ", isCancelled=" + isCancelled() + "]";
     }
 

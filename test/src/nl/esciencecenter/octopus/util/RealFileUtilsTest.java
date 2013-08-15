@@ -373,7 +373,7 @@ public class RealFileUtilsTest {
                 }
             }
 
-            throw new OctopusIOException("", "Unexpected path: " + path.getPath());
+            throw new OctopusIOException("", "Unexpected path: " + path);
         }
 
         @Override
@@ -401,7 +401,7 @@ public class RealFileUtilsTest {
         @Override
         public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
 
     }
@@ -439,7 +439,7 @@ public class RealFileUtilsTest {
         @Override
         public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Unexpected visit of path: " + dir.getPath());
+            throw new OctopusIOException("", "Unexpected visit of path: " + dir);
         }
 
         @Override
@@ -450,13 +450,13 @@ public class RealFileUtilsTest {
 
         @Override
         public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
-            throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
+            throw new OctopusIOException("", "Unexpected visit of path: " + file);
         }
 
         @Override
         public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
     }
 
@@ -504,13 +504,13 @@ public class RealFileUtilsTest {
 
         @Override
         public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
-            throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
+            throw new OctopusIOException("", "Unexpected visit of path: " + file);
         }
 
         @Override
         public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
     }
 
@@ -568,13 +568,13 @@ public class RealFileUtilsTest {
                 return FileVisitResult.SKIP_SIBLINGS;
             }
 
-            throw new OctopusIOException("", "Unexpected visit of path: " + file.getPath());
+            throw new OctopusIOException("", "Unexpected visit of path: " + file);
         }
 
         @Override
         public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
     }
 
@@ -636,7 +636,7 @@ public class RealFileUtilsTest {
         @Override
         public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
     }
 
@@ -673,24 +673,24 @@ public class RealFileUtilsTest {
         @Override
         public FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + dir.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + dir);
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + dir.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + dir);
         }
 
         @Override
         public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
 
         @Override
         public FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files)
                 throws OctopusIOException {
-            throw new OctopusIOException("", "Visit failed of path: " + file.getPath());
+            throw new OctopusIOException("", "Visit failed of path: " + file);
         }
     }
 

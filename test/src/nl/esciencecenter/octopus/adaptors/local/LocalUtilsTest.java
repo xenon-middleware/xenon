@@ -79,17 +79,11 @@ public class LocalUtilsTest {
         LocalUtils.newInputStream(null);
     }
 
-    @org.junit.Test
-    public void test_exists_null() throws Exception {
-        boolean v = LocalUtils.exists(null);
-        assert (!v);
-    }
-
-    @org.junit.Test(expected = OctopusException.class)
-    public void test_broken_home() throws Exception {
+    @org.junit.Test(expected = OctopusIOException.class)
+    public void test_broken_home_null() throws Exception {
         String originalHome = System.getProperty("user.home");
 
-        System.setProperty("user.home", "/home/aap");
+        System.clearProperty("user.home");
 
         try {
             LocalUtils.getHome();
@@ -98,11 +92,11 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = OctopusException.class)
-    public void test_broken_cwd() throws Exception {
+    @org.junit.Test(expected = OctopusIOException.class)
+    public void test_broken_cwd_null() throws Exception {
         String originalCWD = System.getProperty("user.dir");
 
-        System.setProperty("user.dir", "/home/aap/noot");
+        System.clearProperty("user.dir");
 
         try {
             LocalUtils.getCWD();
@@ -111,6 +105,33 @@ public class LocalUtilsTest {
         }
     }
 
+    @org.junit.Test(expected = OctopusIOException.class)
+    public void test_broken_home_empty() throws Exception {
+        String originalHome = System.getProperty("user.home");
+
+        System.setProperty("user.home", "");
+
+        try {
+            LocalUtils.getHome();
+        } finally {
+            System.setProperty("user.home", originalHome);
+        }
+    }
+
+    @org.junit.Test(expected = OctopusIOException.class)
+    public void test_broken_cwd_empty() throws Exception {
+        String originalCWD = System.getProperty("user.dir");
+
+        System.setProperty("user.dir", "");
+
+        try {
+            LocalUtils.getCWD();
+        } finally {
+            System.setProperty("user.dir", originalCWD);
+        }
+    }
+
+    
     @org.junit.Test
     public void test_octopusPermissions_null() throws Exception {
         Set<PosixFilePermission> tmp = LocalUtils.octopusPermissions(null);
@@ -124,20 +145,7 @@ public class LocalUtilsTest {
         assert (tmp != null);
         assert (tmp.size() == 0);
     }
-
-    @org.junit.Test
-    public void test_exists_home() throws Exception {
-        boolean v = LocalUtils.exists("~");
-        assert (v);
-    }
-
-    @org.junit.Test
-    public void test_exists_bashrc() throws Exception {
-        // Assumes "aap" does not exist
-        boolean v = LocalUtils.exists("~/aap");
-        assert (!v);
-    }
-
+   
     @org.junit.Test
     public void test_javaPath_home() throws Exception {
 

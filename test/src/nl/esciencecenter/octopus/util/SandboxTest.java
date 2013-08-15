@@ -83,7 +83,7 @@ public class SandboxTest {
 
         Sandbox sandbox = new Sandbox(mock(Files.class), path, null);
 
-        String sandboxPath = sandbox.getPath().getPath();
+        String sandboxPath = sandbox.getPath().getPathname().getAbsolutePath();
         assertTrue(sandboxPath.startsWith("/tmp/octopus_sandbox_"));
     }
 

@@ -139,7 +139,7 @@ abstract public class AbstractFileTests {
 
     protected Path createSubdir(Path parentDirPath, String subDir) throws OctopusIOException, OctopusException {
         Path absPath = Util.resolve(octopus.files(), parentDirPath, subDir);
-        infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath.getPath());
+        infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
         return getFiles().createDirectory(absPath);
     }
 
@@ -161,7 +161,7 @@ abstract public class AbstractFileTests {
             Path absPath = Util.resolve(octopus.files(), parentDirPath, dirPrefix + "." + myid);
 
             if (getFiles().exists(absPath) == false) {
-                infoPrintf("createUniqueTestSubdir: '%s'+%d => '%s'\n", dirPrefix, myid, absPath.getPath());
+                infoPrintf("createUniqueTestSubdir: '%s'+%d => '%s'\n", dirPrefix, myid, absPath);
                 return getFiles().createDirectory(absPath);
             }
 
@@ -190,7 +190,7 @@ abstract public class AbstractFileTests {
 
             if (getFiles().exists(absPath) == false) {
 
-                infoPrintf("createUniqueTestFile: '%s'+%d => '%s'\n", filePrefix, myid, absPath.getPath());
+                infoPrintf("createUniqueTestFile: '%s'+%d => '%s'\n", filePrefix, myid, absPath);
                 if (createFile)
                     return getFiles().createFile(absPath);
                 else
@@ -210,7 +210,7 @@ abstract public class AbstractFileTests {
         for (Path path : paths) {
             getFiles().delete(path);
             if (assertDeletion)
-                assertFalse("After Files().delete(), the path may not exist:" + path.getPath(), getFiles().exists(path));
+                assertFalse("After Files().delete(), the path may not exist:" + path, getFiles().exists(path));
         }
     }
 
@@ -236,14 +236,14 @@ abstract public class AbstractFileTests {
     public void testGetTestDir() throws Exception {
         Path path = getTestDir();
         assertNotNull("TestPath returned NULL", path);
-        assertNotNull("Actual path element of Path may not be NULL", path.getPath());
+        assertNotNull("Actual path element of Path may not be NULL", path);
 
         infoPrintf("Test location path URI      =%s\n", path.getFileSystem().getUri());
-        infoPrintf("Test location path          =%s\n", path.getPath());
+        infoPrintf("Test location path          =%s\n", path.getPathname().getAbsolutePath());
         infoPrintf("Test location toString()    =%s\n", path.toString());
         infoPrintf("Test location getFileName() =%s\n", path.getPathname().getFileName());
 
-        assertTrue("Root test location must exists (won't create here):" + path.getPath(), getFiles().exists(path));
+        assertTrue("Root test location must exists (won't create here):" + path, getFiles().exists(path));
     }
 
     /**
@@ -288,7 +288,7 @@ abstract public class AbstractFileTests {
         Files files = getFiles();
 
         Path dirPath = Util.resolve(octopus.files(), getTestDir(), "testSubdir01");
-        assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath.getPath(),
+        assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath,
                 files.exists(dirPath));
 
         Path actualPath = getFiles().createDirectory(dirPath);
@@ -329,7 +329,7 @@ abstract public class AbstractFileTests {
 
         // resolve "/", for current filesystems this must equal to "/" ? 
         Path rootPath = getFiles().newPath(fs, new Pathname("/"));
-        assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath.getPath());
+        assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath);
     }
 
     @org.junit.Test
@@ -344,7 +344,7 @@ abstract public class AbstractFileTests {
             Path pathEl = iterator.next();
             URI fsUri = pathEl.getFileSystem().getUri();
             infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, pathEl);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, pathEl.getPath());
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, pathEl);
         }
     }
 
@@ -358,7 +358,7 @@ abstract public class AbstractFileTests {
         // Just test whether it works and directory is readable (other tests will fail if this doesn't work). 
         while (iterator.hasNext()) {
             PathAttributesPair pathEl = iterator.next();
-            infoPrintf(" -(PathAttributesPair)path='%s'\n", pathEl.path().getPath());
+            infoPrintf(" -(PathAttributesPair)path='%s'\n", pathEl.path());
         }
     }
 
@@ -384,7 +384,7 @@ abstract public class AbstractFileTests {
             Path pathEl = iterator.next();
             URI fsUri = pathEl.getFileSystem().getUri();
             infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, pathEl);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, pathEl.getPath());
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, pathEl);
             count++;
         }
 
@@ -420,7 +420,7 @@ abstract public class AbstractFileTests {
             Path path = el.path();
             URI fsUri = el.path().getFileSystem().getUri();
             infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, path);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, path.getPath());
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, path);
             count++;
         }
 
@@ -454,7 +454,7 @@ abstract public class AbstractFileTests {
             Path path = el.path();
             URI fsUri = el.path().getFileSystem().getUri();
             infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, path);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, path.getPath());
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, path);
             count++;
         }
 

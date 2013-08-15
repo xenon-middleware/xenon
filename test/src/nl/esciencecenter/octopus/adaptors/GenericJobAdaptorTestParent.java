@@ -1214,7 +1214,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStderr(null);
 
         //absolute working dir name used
-        description.setWorkingDirectory(root.getPath());
+        description.setWorkingDirectory(root.getPathname().getAbsolutePath());
 
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);

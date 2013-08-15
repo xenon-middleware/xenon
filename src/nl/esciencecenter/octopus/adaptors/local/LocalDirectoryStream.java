@@ -56,7 +56,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
             iterator = stream.iterator();
             this.filter = filter;
         } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir.getPath(), e);
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
         }
     }
 
