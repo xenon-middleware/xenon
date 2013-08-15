@@ -354,6 +354,16 @@ public class OctopusPropertiesTest {
         assertTrue(octprop.getIntegerProperty("key") == 42);
     }
 
+    @Test(expected = InvalidPropertyException.class)
+    public void testGetIntProperty_invalidDefault() throws Exception {
+
+        ImmutableArray<OctopusPropertyDescription> valid = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Component.OCTOPUS), "aap", 
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        new OctopusProperties(valid, props).getIntegerProperty("key"); // throws exception
+    }
 
     @Test
     public void testGetDoubleProperty_1() throws Exception {
@@ -382,6 +392,18 @@ public class OctopusPropertiesTest {
         assertTrue(octprop.getDoubleProperty("key") == 42.0);
     }
 
+    @Test(expected = InvalidPropertyException.class)
+    public void testGetDoubleProperty_invalidDefault() throws Exception {
+
+        ImmutableArray<OctopusPropertyDescription> valid = new ImmutableArray<OctopusPropertyDescription>(
+                new OctopusPropertyDescriptionImplementation("key", Type.DOUBLE, EnumSet.of(Component.OCTOPUS), "aap", 
+                        "test property"));
+
+        Map<String, String> props = new HashMap<>();
+        new OctopusProperties(valid, props).getDoubleProperty("key"); // throws exception
+    }
+
+    
     @Test
     public void testGetSizeProperty_g() throws Exception {
 
