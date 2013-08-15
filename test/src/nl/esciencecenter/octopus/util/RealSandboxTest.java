@@ -33,7 +33,6 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.Sandbox.Pair;
 
 import org.junit.AfterClass;
@@ -125,8 +124,8 @@ public class RealSandboxTest {
         Path dst = Util.resolve(files, testDir, name, "input");
 
         assertEquals(1, uploadfiles.size());
-        assertEquals(testInput1, uploadfiles.get(0).source);
-        assertEquals(dst, uploadfiles.get(0).destination);
+        assertEquals(testInput1, uploadfiles.get(0).getSource());
+        assertEquals(dst, uploadfiles.get(0).getDestination());
     }
 
     @Test
@@ -144,11 +143,11 @@ public class RealSandboxTest {
         Path dst2 = Util.resolve(files, sb, "input2");
 
         assertEquals(2, uploadfiles.size());
-        assertEquals(testInput1, uploadfiles.get(0).source);
-        assertEquals(dst1, uploadfiles.get(0).destination);
+        assertEquals(testInput1, uploadfiles.get(0).getSource());
+        assertEquals(dst1, uploadfiles.get(0).getDestination());
 
-        assertEquals(testInput2, uploadfiles.get(1).source);
-        assertEquals(dst2, uploadfiles.get(1).destination);
+        assertEquals(testInput2, uploadfiles.get(1).getSource());
+        assertEquals(dst2, uploadfiles.get(1).getDestination());
     }
 
     @Test
@@ -164,8 +163,8 @@ public class RealSandboxTest {
         Path dst = Util.resolve(files, testDir, name, "input1");
 
         assertEquals(1, uploadfiles.size());
-        assertEquals(testInput1, uploadfiles.get(0).source);
-        assertEquals(dst, uploadfiles.get(0).destination);
+        assertEquals(testInput1, uploadfiles.get(0).getSource());
+        assertEquals(dst, uploadfiles.get(0).getDestination());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -190,8 +189,8 @@ public class RealSandboxTest {
         Path src = Util.resolve(files, testDir, name, "output1");
 
         assertEquals(1, downfiles.size());
-        assertEquals(src, downfiles.get(0).source);
-        assertEquals(testInput1, downfiles.get(0).destination);
+        assertEquals(src, downfiles.get(0).getSource());
+        assertEquals(testInput1, downfiles.get(0).getDestination());
     }
 
     @Test
@@ -207,8 +206,8 @@ public class RealSandboxTest {
         Path src = Util.resolve(files, testDir, name, "input1");
         
         assertEquals(1, downfiles.size());
-        assertEquals(src, downfiles.get(0).source);
-        assertEquals(testInput1, downfiles.get(0).destination);
+        assertEquals(src, downfiles.get(0).getSource());
+        assertEquals(testInput1, downfiles.get(0).getDestination());
     }
 
     @Test(expected = IllegalArgumentException.class)

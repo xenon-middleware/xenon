@@ -80,14 +80,22 @@ public class Sandbox {
      */
     public static class Pair {
 
-        final Path source;
-        final Path destination;
+        private final Path source;
+        private final Path destination;
 
         public Pair(Path source, Path destination) {
             this.source = source;
             this.destination = destination;
         }
 
+        public Path getSource() {
+            return source;
+        }
+
+        public Path getDestination() {
+            return destination;
+        }
+        
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -166,7 +174,7 @@ public class Sandbox {
         this.path = resolve(files, root, sandboxName);
     }
 
-    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+    private static Path resolve(Files files, Path root, String path) throws OctopusIOException {
         return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
     }
     
