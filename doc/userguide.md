@@ -5,9 +5,9 @@ Copyright 2013 The Netherlands eScience Center
 
 Author: Jason Maassen (<J.Maassen@esciencecenter.nl>)
 
-Version: Userguide v0.1, Octopus v0.9
+Version: Userguide v0.2, Octopus v1.0rc1
 
-Last modified: 4 July 2013
+Last modified: 20 August 2013
 
 
 Copyrights & Disclaimers
@@ -116,7 +116,10 @@ each of the adaptors. When the schemes match, the adaptor is selected.
 Interfaces and datatypes
 ------------------------
 
-This section will explain each of the interfaces and related datatypes.
+This section will briefly explain each of the interfaces and related datatypes.
+Detailed information about Octopus can be found in the online JavaDOC: 
+
+<http://nlesc.github.io/octopus/javadoc/>
 
 ### Package Structure ##
 
@@ -129,15 +132,15 @@ The octopus API uses the following package structure:
 - `nl.esciencecenter.octopus.exeptions`  Exceptions used in octopus.
 - `nl.esciencecenter.octopus.util`  Various utilty classes (experimental).
 
-We will now describe the classes and interfaces of each of these packages in more detail. 
+We will now briefly describe the most important classes and interfaces of these packages.
 
 ### Octopus factory and interface ###
 
 The `nl.esciencecenter.octopus` contains the entry point into the octopus library. It 
-contains the `OctopusFactory` class and `Octopus` and `AdaptorStatus` interfaces.
+contains the `OctopusFactory` class and `Octopus` interface.
 
     public class OctopusFactory {
-       public static Octopus newOctopus(Properties properties) throws ...
+       public static Octopus newOctopus(Map<String,String> properties) throws ...
        public static void endOctopus(Octopus octopus) throws ...
        public static void endAll();
     }
@@ -155,29 +158,33 @@ Properties consist of a set of key-value pairs. In octopus all keys __must__ sta
 adaptor (for example `local` or `ssh`) and `<property>` is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
 `octopus.adaptors.local.a.b.c`. The available properties can be found in the documentation 
-of the individual adaptors.
+of the individual adaptors (see Appendix A). 
 
     public interface Octopus {
         Files files();
         Jobs jobs();
         Credentials credentials();
-        Properties getProperties();
+        Map<String,String> getProperties();
         AdaptorStatus getAdaptorInfo(String adaptorName) throws ...
         AdaptorStatus[] getAdaptorInfos();
     }
 
 Once an `Octopus` is created using the `newOctopus` method, the `files`, `jobs` and `credentials` 
 methods in this interface can be used to retrieve various interfaces that the octopus library 
-offers. They will be described in more detail below. The `getProperties` method can be used to 
-retrieve the properties used when the octopus was created. The `getAdaptorInfo` and 
-`getAdaptorInfos` methods can be used to retrieve information about the adaptors. This information 
-is returned in an `AdaptorStatus` object: 
+offers. They will be described in more detail below. 
+
+The `getProperties` method can be used to retrieve the properties used when the octopus was created. 
+Most objects created by octopus contain such a `getSupportedProperties` method. For brevity, we will 
+not explain these further.
+
+The `getAdaptorInfo` and `getAdaptorInfos` methods can be used to retrieve information about 
+the adaptors. This information is returned in an `AdaptorStatus` object: 
 
     public interface AdaptorStatus {
         String getName();
         String getDescription();
         String[] getSupportedSchemes();
-        Map<String, String> getSupportedProperties();
+        OctopusPropertyDescription[] getSupportedProperties();
         Map<String, String> getAdaptorSpecificInformation();
     }
     
@@ -186,15 +193,13 @@ An `AdaptorStatus` contains methods to retrieve the name of an adaptor (`getName
 retrieve a list of the schemes it supports (`getSupportedSchemes`). 
 
 The `getSupportedProperties` can be used to retrieve a list of configuration options the adaptor 
-supports. Each key in the returned `Map` contains a property name of the form 
-`"octopus.adaptors.<name>.<property>"`. Each associated value contains a (human readable) 
-description of the effect of that property.
-
-Most objects created by octopus contain such a `getSupportedProperties` method. For brevity, 
-we will not explain these further.
+supports. Each `OctopusPropertyDescription` gives a full description of a single property, 
+including its name (of the form `"octopus.adaptors.<name>.<property>"`), the expected type of its 
+value, a human readable description of its purpose, etc. More information can be found in 
+Appendix A.
 
 Finally, `getAdaptorSpecificInformation` can be used to retrieve status information from 
-the adaptor. Again, each key contains a property of the form described above. The possible
+the adaptor. Each key contains a property of the form described above. The possible
 returned properties can be found in the _Adaptor_ section below.  
 
 ### Credentials interface ###
@@ -204,23 +209,18 @@ octopus. The main entrypoint is `Credentials`:
 
     public interface Credentials {
 
-        Credential newCertificateCredential(String scheme, 
-            Properties properties, String keyfile, String certfile, 
-            String username, char [] password) throws ...;
+        Credential newCertificateCredential(String scheme, String keyfile, 
+            String certfile, String username, char [] password, 
+            Map<String,String> properties) throws ...;
 
-        Credential newPasswordCredential(String scheme, 
-            Properties properties, String username, 
-            char [] password) throws ...;
+        Credential newPasswordCredential(String scheme, String username, 
+            char [] password, Map<String,String> properties) throws ...;
 
-        Credential newProxyCredential(String scheme, 
-            Properties properties, String host, int port, 
-            String username, char [] password) throws ...;
-    
         Credential getDefaultCredential(String scheme) throws ...;
     }
 
-The `Credentials` interface contains various methods for creating credtentials, based 
-on certificates, passwords and proxies. For each method, the desired _scheme_ needs to be 
+The `Credentials` interface contains various methods for creating credentials, based 
+on certificates or passwords. For each method, the desired _scheme_ needs to be 
 provided as a parameter. This allows octopus to forward the call to the correct adaptor.
 Note that some types of credentials may not be supported by all adaptors. An exception 
 will be thrown when an unsupported `new<Type>Credential` methods is invoked. 
@@ -236,7 +236,7 @@ methods:
 
     public interface Credential {
        String getAdaptorName();
-       Properties getProperties();
+       Map<String,String> getProperties();
     }
 
 The `getAdaptorName` method can be used to retrieve the name of the adaptor that created 
@@ -252,7 +252,7 @@ into several parts:
     public interface Files {
 
        FileSystem newFileSystem(URI location, Credential credential, 
-           Properties properties) throws ...
+           Map<String,String> properties) throws ...
 
        FileSystem getLocalCWDFileSystem() throws ...
 
@@ -304,28 +304,29 @@ Once a `FileSystem` is created, it can be used to access files:
     public interface Files {
 
        AbsolutePath newPath(FileSystem filesystem, 
-           RelativePath location) throws ...
+           Pathname location) throws ...
 
-       AbsolutePath createFile(AbsolutePath path) throws ...
+       Path createFile(Path path) throws ...
 
-       AbsolutePath createDirectories(AbsolutePath dir) throws ...
+       Path createDirectories(Path dir) throws ...
 
-       AbsolutePath createDirectory(AbsolutePath dir) throws ...
+       Path createDirectory(Path dir) throws ...
 
-       boolean exists(AbsolutePath path) throws ...
+       boolean exists(Path path) throws ...
 
-       void delete(AbsolutePath path) throws ...
+       void delete(Path path) throws ...
 
-       FileAttributes getAttributes(AbsolutePath path) throws ...
+       FileAttributes getAttributes(Path path) throws ...
 
        // ... more follows
     }
 
-The `newPath` method can be used to create a new `AbsolutePath`. An `AbsolutePath` represents a path
-on a specific `FileSystem`. This path does not necessarily exists. To create an `AbsolutePath`, the 
-target `FileSystem` and a `RelativePath` are provided as parameter. A `RelativePath` represents a 
-path without a `FileSystem`. Both `AbsolutePath` and `RelativePath` contain many utility methods. 
-Their details can be found in the Javadoc.
+The `newPath` method can be used to create a new `Path`. An `Path` represents a path
+on a specific `FileSystem`. This path does not necessarily exists. To create an `Path`, both 
+the target `FileSystem` and a `Pathname` are needed. A `Pathname` contains a sequence of strings
+separated using a special _separator_ character, which is used to identify a location on a 
+file system. For example `/tmp/dir` or `c:\windows\Users`. `Pathname` contains many utility 
+methods for manipulating these string sequences. The details can be found in the Javadoc.
 
 `Files` contains several methods to create and delete files and directories. When creating files and 
 directories octopus checks if the target already exists. If so, an exception will be thrown. Similary, 
@@ -334,19 +335,15 @@ The `exists` method can be used to check if a path exists.
 
 Using the `getAttributes` method the attributes of a file can be retrieved. These `FileAttributes` 
 contain information on the type of file (regular file, directory, link, etc), it size, 
-creation time, access rights, etc. Several shortcut methods are available `Files` that can be used 
-to directly retrieve this information, such as `isDirectory` and `size`. Their details can be found 
-in the Javadoc.
+creation time, access rights, etc. 
 
 To list directories, the following methods are available:
 
     public interface Files {
 
-       DirectoryStream<AbsolutePath> 
-           newDirectoryStream(AbsolutePath dir) throws ...
+       DirectoryStream<Path> newDirectoryStream(Path dir) throws ...
 
-       DirectoryStream<PathAttributesPair> 
-           newAttributesDirectoryStream(AbsolutePath dir) throws ...
+       DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws ...
    
        // ... more follows
     }
@@ -360,23 +357,21 @@ To read or write files, the following methods are available:
 
     public interface Files {
 
-       InputStream newInputStream(AbsolutePath path) throws ...
+       InputStream newInputStream(Path path) throws ...
 
-       OutputStream newOutputStream(AbsolutePath path, 
-           OpenOption... options) throws ...
+       OutputStream newOutputStream(Path path, OpenOption... options) throws ...
     }
 
 Using these methods, an `InputStream` can be created to read a file, and an `OutputStream` can be 
 created to write a file. The `newOutputStream` method requires a `OpenOption... options` parameter 
 to specify how the file should be opened for writing (for example, should the data be append or 
-should the file be truncated first).
+should the file be truncated first). These options are describe in more detail in the Javadoc.
 
 To copy files, the following methods are available:
 
     public interface Files {
 
-       Copy copy(AbsolutePath source, AbsolutePath target, 
-           CopyOption... options) throws ...
+       Copy copy(Path source, Path target, CopyOption... options) throws ...
     
        CopyStatus getCopyStatus(Copy copy) throws ...
     
@@ -384,8 +379,8 @@ To copy files, the following methods are available:
 
     }
 
-The `copy` method supports various operations such as  regular copy, a resume or an append. The 
-`CopyOption...options` parameter can be used to specify the desired operation. The details can be 
+The `copy` method supports various copy operations such as a regular copy, a resume or an append. 
+The `CopyOption...options` parameter can be used to specify the desired operation. The details can be 
 found in the Javadoc.
 
 Normally, `copy` performs its operation _synchronously_, that is, the call blocks until the copy 
@@ -402,7 +397,7 @@ parts:
     public interface Jobs {
 
         Scheduler newScheduler(URI location, Credential credential, 
-           Properties properties) throws ...
+           Map<String,String> properties) throws ...
 
         Scheduler getLocalScheduler() throws ...
         void close(Scheduler scheduler) throws ...
@@ -411,13 +406,14 @@ parts:
         // ... more follows
     }
 
-The `Jobs` interface contains several methods to create a `Scheduler`. A `Scheduler` provides an
+The `Jobs` interface contains two methods to create a `Scheduler`. A `Scheduler` provides an
 abstraction for a (possibly remote) scheduler that can be used to run jobs. To create a new scheduler, 
-the `newScheduler` method can be used, which similar to `newFileSystem`, has `URI`, `Credential` and 
+the `newScheduler` method can be used, which, similar to `newFileSystem`, has `URI`, `Credential` and 
 `Properties` as parameters. For an explanation of these parameters see `newFileSystem`.
-
 `Jobs` also contains a shortcut method `getLocalScheduler` to create a new `Scheduler` for the local 
-machine. When a `Scheduler` is no longer used, is __must__ be closed using the `close` method. The 
+machine. 
+
+When a `Scheduler` is no longer used, is __must__ be closed using the `close` method. The 
 `isOpen` method can be use to check if a `Scheduler` is open or closed.
 
 A `Scheduler` contains the following:
@@ -435,18 +431,17 @@ A `Scheduler` contains the following:
 Each `Scheduler` contains one or more queues to which jobs can be submitted. Each queue has a name that 
 is unique to the `Scheduler`. The `getQueueNames` method can be used to retrieve all queue names. 
 
-The `isOnline` method can be used to determine if the `Scheduler` is an _online scheduler_. Online 
-schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that 
-were submitted to it. Offline schedulers do not need to remains active for their jobs to run. A submitted 
-job will typically be handed over to some external server that will manage the job for the rest of its 
-lifetime.
+The `isOnline` method can be used to determine if the `Scheduler` is an _online scheduler_ or an 
+_offline scheduler_. Online schedulers need to remain active for their jobs to run. Ending an online 
+scheduler will kill all jobs that were submitted to it. Offline schedulers do not need to remains active 
+for their jobs to run. A submitted job will typically be handed over to some external server that will 
+manage the job for the rest of its lifetime.
 
 The `supportsInteractive` and `supportsBatch` method can be use to check if the `Scheduler` supports 
 interactive and/or batch jobs. This will be explained below. 
 
 Once a `Scheduler` is created, `Jobs` contains several methods to retrieve information about the 
 `Scheduler`.
-
 
     public interface Jobs {
 
@@ -511,19 +506,20 @@ contains methods to determine is the `Job` is running on an online `Scheduler` (
 the `Job` is an interactive or batch job (`isInteractive`). 
 
 Interactive jobs are jobs where the user gets direct control over the standard streams of the job 
-(that is _stdin_, _stdout_ and _stderr_). The user __must__ retrieve these streams using the 
+(the _stdin_, _stdout_ and _stderr_ streams). The user __must__ retrieve these streams using the 
 `getStreams` method in `Jobs` and then provide input and output, or close the streams. Failing to do
 so may cause the job to block indefinately.
 
-Batch jobs are jobs where the standard streams are redirected form and to files. The source and targets 
+Batch jobs are jobs where the standard streams are redirected from and to files. The source and targets 
 for this redirection can be set in the `JobDescription`. See the Javadoc of `JobDescription` for details.
 
 After submitting a job, `waitUntilRunning` can be used to wait until a job is no longer waiting in the 
 queue and `waitUntilDone` can be used to wait until the job has finished.  
 
-For all methods returning a `JobStatus`, the following rule applies: after the job has finished, the 
+For all methods returning a `JobStatus`, the following rule applies: after a job has finished, the 
 status is only guarenteed to be returned _once_. Any subsequent calls to a method that returns a 
-`JobStatus` _may_ throw an exception. Some adaptors may return a result however.  
+`JobStatus` _may_ throw an exception stating that the job does not exist. Some adaptors may return 
+a result however.  
 
 ### Exceptions ###
 
@@ -534,7 +530,6 @@ octopus. See the Javadoc for the available exceptions.
 
 The `nl.esciencecenter.octopus.util` package contains various utility classes. 
 __This package is experimental and not yet ready for use!!__
-
 
 
 Examples

@@ -34,6 +34,27 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 public interface Octopus {
 
     /**
+     * Retrieve the <code>Files</code> interface.
+     * 
+     * @return a reference to the Files interface.
+     */
+    Files files();
+
+    /**
+     * Retrieve the <code>Jobs</code> interface.
+     * 
+     * @return a reference to the Files package interface.
+     */
+    Jobs jobs();
+
+    /**
+     * Retrieve the <code>Credentials</code> package interface.
+     * 
+     * @return a reference to the Credentials package interface.
+     */
+    Credentials credentials();
+
+    /**
      * Returns the properties that where used to create this Octopus.
      * 
      * @return the properties used to create this Octopus.
@@ -57,26 +78,5 @@ public interface Octopus {
      * @return information on all adaptors.
      */
     AdaptorStatus[] getAdaptorStatuses();
-
-    /**
-     * Retrieve the <code>Files</code> interface.
-     * 
-     * @return a reference to the Files interface.
-     */
-    Files files();
-
-    /**
-     * Retrieve the <code>Jobs</code> interface.
-     * 
-     * @return a reference to the Files package interface.
-     */
-    Jobs jobs();
-
-    /**
-     * Retrieve the <code>Credentials</code> package interface.
-     * 
-     * @return a reference to the Credentials package interface.
-     */
-    Credentials credentials();
 
 }
