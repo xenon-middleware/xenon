@@ -20,7 +20,7 @@ package nl.esciencecenter.octopus.engine.util;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public interface OctopusProcess {
+public interface Process {
 
     boolean isDone();
 

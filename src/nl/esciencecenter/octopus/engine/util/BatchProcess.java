@@ -36,7 +36,7 @@ import nl.esciencecenter.octopus.jobs.Streams;
  * @version 1.0
  * @since 1.0
  */
-class BatchProcess implements OctopusProcess {
+class BatchProcess implements Process {
 
     private final InteractiveProcess process;
 

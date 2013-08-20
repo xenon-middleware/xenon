@@ -296,7 +296,7 @@ public class JobExecutor implements Runnable {
     @Override
     public void run() {
 
-        OctopusProcess process = null;
+        Process process = null;
 
         JobDescription description = job.getJobDescription();
 

@@ -22,6 +22,6 @@ import nl.esciencecenter.octopus.jobs.Streams;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public interface InteractiveProcess extends OctopusProcess {
+public interface InteractiveProcess extends Process {
     Streams getStreams();
 }
