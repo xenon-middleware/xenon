@@ -23,7 +23,7 @@ import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 /**
  * Credentials represents the credentials interface of Octopus.
  * 
- * This interface contains various methods for creating certificates.
+ * This interface contains various methods for creating and closing credentials.
  * 
  * @author Rob van Nieuwpoort <R.vanNieuwpoort@esciencecenter.nl>
  * @version 1.0

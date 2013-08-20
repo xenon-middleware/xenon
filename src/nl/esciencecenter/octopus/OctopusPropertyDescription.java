@@ -59,17 +59,73 @@ import java.util.Set;
 public interface OctopusPropertyDescription {
 
     /**
-     * Component enum names all possible components for which a property can be provided.
+     * The Component enumeration lists all possible parts of octopus for which a property can be provided. 
      */
     public enum Component {
-        OCTOPUS, SCHEDULER, FILESYSTEM, CREDENTIALS,
+        /** 
+         * Properties for <code>OCTOPUS</code> components can be passed to 
+         * {@link nl.esciencecenter.octopus.OctopusFactory#newOctopus(Map)}. 
+         */        
+        OCTOPUS, 
+        
+        /** 
+         * Properties for <code>SCHEDULER</code> components can be passed to 
+         * {@link nl.esciencecenter.octopus.jobs.Jobs#newScheduler(URI, Credential, Map)}. 
+         */        
+        SCHEDULER, 
+        
+        /** 
+         * Properties for <code>FILESYSTEM</code> components can be passed to 
+         * {@link nl.esciencecenter.octopus.files.Files#newFileSystem(URI, Credential, Map)}. 
+         */        
+        FILESYSTEM, 
+        
+        /** 
+         * Properties for <code>CREDENTIAL</code> components can be passed to the various <code>newCredential</code> calls in 
+         * {@link nl.esciencecenter.octopus.credentials.Credentials}. 
+         */        
+        CREDENTIALS,
     }
 
     /**
-     * Type enum names all possible types of properties.
+     * This Type enumeration lists all possible types of properties recognized by octopus.
      */
     public enum Type {
-        BOOLEAN, INTEGER, LONG, DOUBLE, STRING, SIZE,
+        /** 
+         * Properties of type <code>BOOLEAN</code> can be either <code>"true"</code> or <code>"false"</code>.  
+         */        
+        BOOLEAN, 
+        
+        /** 
+         * Properties of type <code>INTEGER</code> can be converted into a 32-bit signed integer using 
+         * {@link java.lang.Integer#valueOf(String)}.  
+         */                
+        INTEGER, 
+
+        /** 
+         * Properties of type <code>LONG</code> can be converted into a 64-bit signed long using 
+         * {@link java.lang.Long#valueOf(String)}.  
+         */                
+        LONG, 
+        
+        /** 
+         * Properties of type <code>DOUBLE</code> can be converted into a 64-bit floating point number using 
+         * {@link java.lang.Double#valueOf(String)}.  
+         */                
+        DOUBLE, 
+
+        /** 
+         * Properties of type <code>STRING</code> are directly stored in a String without conversion. 
+         */                
+        STRING,
+        
+        /** 
+         * Properties of type <code>SIZE</code> can be converted into a 64-bit signed long using 
+         * {@link java.lang.Long#valueOf(String)}. In addition, the postfixes <code>"K"</code>, <code>"M"</code> and <code>"G"</code> may 
+         * be used to multiply the value by <code>1024</code>, <code>1024*1024</code>, or <code>1024*1024*1024</code> 
+         * respectively.   
+         */                
+        SIZE,
     }
 
     /**

@@ -19,8 +19,11 @@ package nl.esciencecenter.octopus.util;
 import java.net.URI;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * URIUtils contains various URI utilities.
  * 
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * @version 1.0 
+ * @since 1.0 
  */
 public final class URIUtils {
 
@@ -28,6 +31,16 @@ public final class URIUtils {
         // DO NOTE USE
     }
     
+    /**
+     * Strips the given URI from all elements that are not needed when creating a FileSystem. 
+     * 
+     * The new URI will only contain the scheme, host, user info and port number of the original URI.  
+     * 
+     * @param uri 
+     *          the original URI. 
+     * @return 
+     *          the stripped URI suitable to create a FileSystem.
+     */    
     public static URI getFileSystemURI(URI uri) {
 
         // Strip the URI of all the parts we do not need for octopus. 

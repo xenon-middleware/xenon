@@ -21,7 +21,10 @@ import java.util.Iterator;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
- * DirectoryStream represents an {@link Iterable} set of elements.
+ * DirectoryStream is a {@link Iterable} set of elements that represent the entries found in a directory. 
+ * 
+ * The elements typically consist of {@link Path} objects when returned by one of the <code>Files.newDirectoryStream</code> calls
+ * or {@link PathAttributesPair} objects when returned by one of the <code>Files.newAttributesDirectoryStream</code> calls. 
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0

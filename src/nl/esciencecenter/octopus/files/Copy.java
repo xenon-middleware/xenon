@@ -17,7 +17,7 @@
 package nl.esciencecenter.octopus.files;
 
 /**
- * Copy represents a (asynchronous) copy operation.
+ * Copy represents an asynchronous copy operation.
  * <p>
  * A <code>Copy</code> is returned as the result of the {@link Files#copy(Path, Path, CopyOption []) Files.copy} 
  * method, when the option {@link CopyOption#ASYNCHRONOUS CopyOption.ASYNCHRONOUS} is provided. This <copy>Copy</code> can then 
@@ -34,16 +34,16 @@ package nl.esciencecenter.octopus.files;
 public interface Copy {
 
     /**
-     * Retrieve the source to copy from.
+     * Retrieve the source of the copy.
      * 
-     * @return the source to copy from.
+     * @return the source of the copy.
      */
     Path getSource();
 
     /**
-     * Retrieve the target to copy to.
+     * Retrieve the target of the copy.
      * 
-     * @return the target to copy to.
+     * @return the target of the copy.
      */
     Path getTarget();
 }

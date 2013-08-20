@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class contains various stream utilities that are used in Octopus itself, other utilities, examples, etc.
+ * StreamUtils contains various stream utilities that are used in Octopus itself, by other utilities, in examples, etc.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0 
@@ -37,22 +37,30 @@ import java.util.List;
  */
 public class StreamUtils {
     
-    private static final int DEFAULT_BUFFER_SIZE = 4096;
+    /** 
+     * The default buffer size to use for copy operations.
+     */
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
+    
+    private StreamUtils() { 
+        // DO NOT USE
+    }
     
     /**
      * Copy all bytes from an input stream to an output stream.
      * 
-     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize <= 0</code> then the default buffer size
-     * will be used.  
-     * 
+     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize <= 0</code> then the 
+     * {@link #DEFAULT_BUFFER_SIZE} will be used.  
+     * <p>
      * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
+     * </p>
      * 
      * @param in
      *          the InputStream to read from.
      * @param out
      *          the OutputStream to write to.
      * @param bufferSize
-     *          the size of the temporary buffer, or <= 0 to use the default buffer size. 
+     *          the size of the temporary buffer, or <= 0 to use the {@link #DEFAULT_BUFFER_SIZE}. 
      * @return
      *          the number of bytes copied.
      * @throws IOException
@@ -82,9 +90,9 @@ public class StreamUtils {
     
     /**
      * Read all bytes from the input stream and return them in a byte array.
-     * 
-     * Note: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
-     * 
+     * <p>
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * </p>
      * @param in 
      *          the input stream to read. 
      * @return 
@@ -105,9 +113,9 @@ public class StreamUtils {
      * Read all bytes from the input stream and return them in as a single String.
      * 
      * The bytes are converted to a String using Charset <code>cs</code>. 
-     * 
-     * Note: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
-     * 
+     * <p>
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * </p>
      * @param in 
      *          the input stream to read.
      * @param cs
@@ -130,8 +138,9 @@ public class StreamUtils {
      * Read all bytes from the input stream and return them in as a single String. 
      * 
      * The bytes are converted to a String using the default Charset. 
-     *  
-     * Note: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * <p> 
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * </p>
      * 
      * @param in 
      *          the input stream to read.
@@ -147,7 +156,9 @@ public class StreamUtils {
     /**
      * Read all lines from a InputStream and return them in a {@link java.util.List}.
      * 
-     * Note: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * <p>
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * </p>
      * 
      * @param in
      *          the InputStream to read from 

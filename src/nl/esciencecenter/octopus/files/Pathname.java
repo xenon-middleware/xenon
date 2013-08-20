@@ -367,8 +367,8 @@ public class Pathname {
     /**
      * Tests if this path starts with the given path.
      *
-     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link Pathname(String)} and then uses 
-     * {@link #startsWith(Path)} to compare the paths.
+     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
+     * {@link #startsWith(Pathname)} to compare the result to this path.
      * 
      * @param other
      *            the path to test.
@@ -382,8 +382,8 @@ public class Pathname {
     /**
      * Tests if this path ends with the given path.
      * 
-     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link Pathname(String)} and then uses 
-     * {@link #endWith(Path)} to compare the paths.
+     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
+     * {@link #endsWith(Pathname)} to compare the result to this path.
      * 
      * @param other
      *            the path to test.
