@@ -17,9 +17,12 @@
 package nl.esciencecenter.octopus.examples.files;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -28,9 +31,9 @@ import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * A simple example of how to copy a file.
+ * An example of how to copy a file.
  * 
- * This example assumes the user provides the source URI and target URI command line. The target file must not exists yet!
+ * This example assumes the user provides the source URI and target URI on the command line. The target file must not exists yet!
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -41,16 +44,16 @@ public class CopyFile {
     public static void main(String[] args) {
 
         if (args.length != 2) {
-            System.out.println("Example requires an source and target URI a parameters!");
+            System.out.println("Example requires source and target URI as parameters!");
             System.exit(1);
         }
 
         try {
-            // We first turn the user provided argument into a URI.
+            // We first turn the user provided arguments into a URI.
             URI source = new URI(args[0]);
             URI target = new URI(args[1]);
 
-            // We create a new octopus using the OctopusFactory (without providing any properties).
+            // Next, we create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
@@ -74,8 +77,8 @@ public class CopyFile {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
-            System.out.println("CreatingFileSystem example failed: " + e.getMessage());
+        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+            System.out.println("CopyFile example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

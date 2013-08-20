@@ -36,7 +36,7 @@ import nl.esciencecenter.octopus.jobs.Streams;
  * @version 1.0
  * @since 1.0
  */
-class BatchProcess implements InteractiveProcess {
+class BatchProcess implements OctopusProcess {
 
     private final InteractiveProcess process;
 
@@ -118,17 +118,17 @@ class BatchProcess implements InteractiveProcess {
     private synchronized void closeStreams() {
 
         if (stdinForwarder != null) {
-            stdinForwarder.close();
+            stdinForwarder.terminate(1000);
             stdinForwarder = null;
         }
 
         if (stdoutForwarder != null) {
-            stdoutForwarder.close();
+            stdoutForwarder.terminate(1000);
             stdoutForwarder = null;
         }
 
         if (stderrForwarder != null) {
-            stderrForwarder.close();
+            stderrForwarder.terminate(1000);
             stderrForwarder = null;
         }
     }
@@ -150,10 +150,5 @@ class BatchProcess implements InteractiveProcess {
     public void destroy() {
         process.destroy();
         closeStreams();
-    }
-
-    @Override
-    public Streams getStreams() {
-        return null;
     }
 }

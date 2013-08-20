@@ -26,6 +26,8 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -287,9 +289,15 @@ final class LocalUtils {
     static void unixDestroy(java.lang.Process process) {
 
         try {
-            Field pidField = process.getClass().getDeclaredField("pid");
-            pidField.setAccessible(true);
-
+            final Field pidField = process.getClass().getDeclaredField("pid");
+            
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    pidField.setAccessible(true);
+                    return null; 
+                }
+            });
+            
             int pid = pidField.getInt(process);
 
             if (pid <= 0) {

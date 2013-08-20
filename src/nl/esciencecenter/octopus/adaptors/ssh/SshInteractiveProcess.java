@@ -67,12 +67,10 @@ public class SshInteractiveProcess implements InteractiveProcess {
 
         Map<String, String> environment = description.getEnvironment();
 
-        if (environment != null) {
-            for (Entry<String, String> entry : environment.entrySet()) {
-                channel.setEnv(entry.getKey(), entry.getValue());
-            }
+        for (Entry<String, String> entry : environment.entrySet()) {
+            channel.setEnv(entry.getKey(), entry.getValue());
         }
-
+    
         // set the streams first, then connect the channel.
         try {
             streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());

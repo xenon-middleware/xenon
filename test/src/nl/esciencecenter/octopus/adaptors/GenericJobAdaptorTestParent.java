@@ -763,12 +763,6 @@ public abstract class GenericJobAdaptorTestParent {
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
-        files.delete(out);
-        files.delete(err);
-        files.delete(root);
-
-        files.close(filesystem);
-
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
 
@@ -776,6 +770,12 @@ public abstract class GenericJobAdaptorTestParent {
         assertTrue(tmpout.length() > 0);
         assertTrue(tmpout.equals(message));
         assertTrue(tmperr.length() == 0);
+        
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
+
+        files.close(filesystem);
     }
 
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {

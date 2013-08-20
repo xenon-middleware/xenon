@@ -25,64 +25,50 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
-import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * An example of how to check if a file exists.
+ * A simple example of how to create a local {@link FileSystem}.
  * 
- * This example assumes the user provides a URI on the command line.
+ * This example is hard coded to use the local file system. A more generic example is shown in {@link CreateFileSystem}. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class FileExists {
+public class CreateLocalFileSystem {
 
     public static void main(String[] args) {
-
-        if (args.length != 1) {
-            System.out.println("Example requires a URI as a parameter!");
-            System.exit(1);
-        }
-
         try {
-            // We first turn the user provided argument into a URI.
-            URI uri = new URI(args[0]);
-        
-            // We create a new octopus using the OctopusFactory (without providing any properties).
+            // First , we create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
 
-            // Next we create a FileSystem  
-            Credential c = credentials.getDefaultCredential(uri.getScheme());
-            FileSystem fs = files.newFileSystem(URIUtils.getFileSystemURI(uri), c, null);
+            // To create a new FileSystem we need a URI indicating its location.
+            URI uri = new URI("file://localhost/");
 
-            // We now create an Path representing the file
-            Path path = files.newPath(fs, new Pathname(uri.getPath()));
+            // We also need a Credential that enable us to access the location. 
+            Credential c = credentials.getDefaultCredential("file");
 
-            // Check if the file exists 
-            if (files.exists(path)) {
-                System.out.println("File " + uri + " exists!");
-            } else {
-                System.out.println("File " + uri + " does not exist!");
-            }
+            // Now we can create a FileSystem (we don't provide any properties). 
+            FileSystem fs = files.newFileSystem(uri, c, null);
 
-            // If we are done we need to close the FileSystem ad the credential
-            files.close(fs);
+            // We can now uses the FileSystem to access files!
+            // ....
+
+            // If we are done we need to close the FileSystem and the credential
             credentials.close(c);
+            files.close(fs);
 
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
         } catch (URISyntaxException | OctopusException | OctopusIOException e) {
-            System.out.println("FileExists example failed: " + e.getMessage());
+            System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

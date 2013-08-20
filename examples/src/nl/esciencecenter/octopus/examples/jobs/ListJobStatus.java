@@ -17,10 +17,13 @@
 package nl.esciencecenter.octopus.examples.jobs;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -28,7 +31,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
- * A simple example of how to retrieve the job status.
+ * An example of how to retrieve the job status.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -47,7 +50,7 @@ public class ListJobStatus {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
 
-            // We create a new octopus using the OctopusFactory (without providing any properties).
+            // Next, create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs and Credentials API
@@ -76,8 +79,8 @@ public class ListJobStatus {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
-            System.out.println("ListQueueStatus example failed: " + e.getMessage());
+        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+            System.out.println("ListJobStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

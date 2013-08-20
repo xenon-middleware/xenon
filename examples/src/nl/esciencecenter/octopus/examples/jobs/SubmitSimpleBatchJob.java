@@ -17,9 +17,12 @@
 package nl.esciencecenter.octopus.examples.jobs;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -27,7 +30,9 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
- * A simple example of how to create an octopus and how to retrieve the various interfaces.
+ * An example of how to create and submit a simple batch job that does not produce output. 
+ * 
+ * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/sleep".
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -77,7 +82,7 @@ public class SubmitSimpleBatchJob {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
+        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

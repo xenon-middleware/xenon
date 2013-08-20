@@ -36,7 +36,7 @@ public class CreatingOctopusWithProperties {
         try {
 
             // We create some properties here to configure octopus. In this example 
-            // we set the polling delay of the local adaptor to 1000ms. We also set 
+            // we set the polling delay of the local adaptor to 1000 ms. We also set 
             // the strictHostKeyChecking property of the ssh adaptor to true. 
             Map<String, String> p = new HashMap<>();
             p.put("octopus.adaptors.local.queue.pollingDelay", "1000");

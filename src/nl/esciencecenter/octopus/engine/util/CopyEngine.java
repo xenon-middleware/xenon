@@ -54,7 +54,7 @@ import nl.esciencecenter.octopus.files.Pathname;
  * @version 1.0
  * @since 1.0
  */
-public class CopyEngine {
+public final class CopyEngine {
 
     class CopyThread extends Thread {
         public void run() {
@@ -108,7 +108,7 @@ public class CopyEngine {
             if (c != null) {
                 c.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // ignored
         }
     }

@@ -16,27 +16,23 @@
 
 package nl.esciencecenter.octopus.examples.jobs;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.util.StreamUtils;
 
 /**
- * An example of how to create and submit a batch job that produces output. 
+ * An example of how to create and submit an interactive job that produces output. 
  * 
  * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/uname".
  * 
@@ -44,7 +40,7 @@ import nl.esciencecenter.octopus.util.FileUtils;
  * @version 1.0
  * @since 1.0
  */
-public class SubmitBatchJobWithOutput {
+public class SubmitInteractiveJobWithOutput {
 
     public static void main(String[] args) {
         try {
@@ -52,55 +48,32 @@ public class SubmitBatchJobWithOutput {
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
-            // Next, we retrieve the Files and Jobs API
-            Files files = octopus.files();
+            // Next, we retrieve the Jobs API
             Jobs jobs = octopus.jobs();
 
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/uname");
             description.setArguments("-a");
-            description.setStdout("stdout.txt");
-            description.setStderr("stderr.txt");
-
+            description.setInteractive(true);
+            
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(new URI("local:///"), null, null);
 
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
 
-            // Wait for the job to finish
-            JobStatus status = jobs.waitUntilDone(job, 60000);
-
-            // Check if the job was successful. 
-            if (!status.isDone()) {
-                System.out.println("Job failed to run withing deadline.");
-            } else if (status.hasException()) {
-                Exception e = status.getException();
-                System.out.println("Job produced an exception: " + e.getMessage());
-                e.printStackTrace();
-            } else {
-
-                System.out.println("Job ran succesfully and produced:");
-
-                FileSystem fs = files.getLocalCWDFileSystem();
-                Pathname entryPath = fs.getEntryPath().getPathname();
-                
-                Path stdout = files.newPath(fs, entryPath.resolve("stdout.txt"));
-                Path stderr = files.newPath(fs, entryPath.resolve("stderr.txt"));
-
-                if (files.exists(stdout)) {
-                    String output = FileUtils.readToString(files, stdout, Charset.defaultCharset());
-                    System.out.println(" STDOUT: " + output);
-                    files.delete(stdout);
-                }
-
-                if (files.exists(stderr)) {
-                    String output = FileUtils.readToString(files, stderr, Charset.defaultCharset());
-                    System.out.println(" STDERR: " + output);
-                    files.delete(stderr);
-                }
-            }
+            // Retrieve the standard streams from the job.
+            Streams streams = jobs.getStreams(job);
+             
+            // Close stdin and stdout (we don't need them)
+            streams.getStdin().close();
+            streams.getStderr().close();
+            
+            // Read all bytes from stdout
+            String result = StreamUtils.readToString(streams.getStdout());
+            
+            System.out.println("Job ran succesfully and produced: " + result);
 
             // Close the scheduler
             jobs.close(scheduler);
@@ -108,7 +81,7 @@ public class SubmitBatchJobWithOutput {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e)  {
+        } catch (URISyntaxException | OctopusException | IOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

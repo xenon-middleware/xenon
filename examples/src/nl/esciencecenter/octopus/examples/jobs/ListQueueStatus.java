@@ -17,15 +17,18 @@
 package nl.esciencecenter.octopus.examples.jobs;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
- * A simple example of how to retrieve the queue status.
+ * An example of how to retrieve the queue status.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -69,7 +72,7 @@ public class ListQueueStatus {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
+        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }

@@ -23,7 +23,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
- * A simple example of how to create a credential.
+ * A simple example of how to create credentials.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -33,7 +33,7 @@ public class CreatingCredential {
 
     public static void main(String[] args) {
         try {
-            // We create a new octopus using the OctopusFactory (without providing any properties).
+            // First, we create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Credentials API
@@ -45,7 +45,7 @@ public class CreatingCredential {
             // We can also create other types of credentials
             Credential credential2 = credentials.newPasswordCredential("ssh", "username", "password".toCharArray(), null);
 
-            // Close the credentials once we're done.
+            // Close the credentials once we are done.
             credentials.close(credential1);
             credentials.close(credential2);
 
@@ -53,7 +53,7 @@ public class CreatingCredential {
             OctopusFactory.endOctopus(octopus);
 
         } catch (OctopusException e) {
-            System.out.println("CreatingOctopus example failed: " + e.getMessage());
+            System.out.println("CreatingCredential example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -16,12 +16,15 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
-import nl.esciencecenter.octopus.jobs.Streams;
-
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public interface InteractiveProcess extends OctopusProcess {
-    Streams getStreams();
+public interface OctopusProcess {
+
+    boolean isDone();
+
+    int getExitStatus();
+
+    void destroy();
 }

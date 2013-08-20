@@ -17,10 +17,13 @@
 package nl.esciencecenter.octopus.examples.files;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -29,9 +32,9 @@ import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * A simple example of how to check file attributes.
+ * An example of how to retrieve file attributes.
  * 
- * This example assumes the user provides a URI on the command line to check.
+ * This example assumes the user provides a URI on the command line.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -94,8 +97,8 @@ public class ShowFileAttributes {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
-            System.out.println("CreatingFileSystem example failed: " + e.getMessage());
+        } catch  (URISyntaxException | OctopusException | OctopusIOException e) {
+            System.out.println("ShowFileAttributes example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

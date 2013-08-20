@@ -82,7 +82,7 @@ public abstract class CredentialImplementation implements Credential {
     public char[] getPassword() {
 
         if (password == null) {
-            return null;
+            return new char[0];
         }
 
         return password.clone();

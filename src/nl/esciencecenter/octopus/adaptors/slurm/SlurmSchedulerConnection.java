@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
@@ -105,7 +106,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             //Not a failed state (non zero exit code does not count either), no error.
             exception = null;
         } else if (state.startsWith("CANCELLED")) {
-            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase());
+            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase(Locale.getDefault()));
         } else {
             exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
@@ -136,7 +137,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             //Not a failed state (non zero exit code does not count either), no error.
             exception = null;
         } else if (state.startsWith("CANCELLED")) {
-            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase());
+            exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase(Locale.getDefault()));
         } else if (!reason.equals("None")) {
             exception = new OctopusException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state + "\" and reason: "
                     + reason);

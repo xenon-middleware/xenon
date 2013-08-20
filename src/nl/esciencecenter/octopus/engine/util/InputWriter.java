@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author Niels Drost
  * 
  */
-public class InputWriter extends Thread {
+public final class InputWriter extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InputWriter.class);
 
@@ -70,7 +71,7 @@ public class InputWriter extends Thread {
     public void run() {
         try {
             if (content != null) {
-                destination.write(content.getBytes());
+                destination.write(content.getBytes(Charset.defaultCharset()));
             }
         } catch (IOException e) {
             LOGGER.error("Cannot write content to stream", e);

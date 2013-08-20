@@ -29,30 +29,30 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Pathname;
-import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * An example of how to check if a file exists.
+ * An example of how to check if a local file exists.
  * 
- * This example assumes the user provides a URI on the command line.
+ * This example is hard coded to use the local file system. A more generic example is shown in {@link FileExists}. 
+ * 
+ * This example assumes the user provides a path to check.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class FileExists {
+public class LocalFileExists {
 
     public static void main(String[] args) {
 
         if (args.length != 1) {
-            System.out.println("Example requires a URI as a parameter!");
+            System.out.println("Example required an absolute file path as a parameter!");
             System.exit(1);
         }
 
+        String filename = args[0];
+
         try {
-            // We first turn the user provided argument into a URI.
-            URI uri = new URI(args[0]);
-        
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -60,18 +60,19 @@ public class FileExists {
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
 
-            // Next we create a FileSystem  
-            Credential c = credentials.getDefaultCredential(uri.getScheme());
-            FileSystem fs = files.newFileSystem(URIUtils.getFileSystemURI(uri), c, null);
+            // Next we create a FileSystem 
+            URI uri = new URI("file://localhost/");
+            Credential c = credentials.getDefaultCredential("file");
+            FileSystem fs = files.newFileSystem(uri, c, null);
 
             // We now create an Path representing the file
-            Path path = files.newPath(fs, new Pathname(uri.getPath()));
+            Path path = files.newPath(fs, new Pathname(filename));
 
             // Check if the file exists 
             if (files.exists(path)) {
-                System.out.println("File " + uri + " exists!");
+                System.out.println("File " + filename + " exists!");
             } else {
-                System.out.println("File " + uri + " does not exist!");
+                System.out.println("File " + filename + " does not exist!");
             }
 
             // If we are done we need to close the FileSystem ad the credential
@@ -82,7 +83,7 @@ public class FileExists {
             OctopusFactory.endOctopus(octopus);
 
         } catch (URISyntaxException | OctopusException | OctopusIOException e) {
-            System.out.println("FileExists example failed: " + e.getMessage());
+            System.out.println("LocalFileExists example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

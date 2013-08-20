@@ -17,9 +17,12 @@
 package nl.esciencecenter.octopus.examples.files;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -29,7 +32,7 @@ import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
- * A simple example of how to list a directory.
+ * An example of how to list a directory.
  * 
  * This example assumes the user provides the URI of the directory on the command line.
  * 
@@ -42,7 +45,7 @@ public class DirectoryListing {
     public static void main(String[] args) {
 
         if (args.length != 1) {
-            System.out.println("Example requires an URI a parameter!");
+            System.out.println("Example requires a URI as parameter!");
             System.exit(1);
         }
 
@@ -92,8 +95,8 @@ public class DirectoryListing {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
-            System.out.println("CreatingFileSystem example failed: " + e.getMessage());
+        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+            System.out.println("DirectoryListing example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

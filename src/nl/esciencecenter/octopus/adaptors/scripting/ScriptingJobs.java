@@ -16,6 +16,7 @@
 package nl.esciencecenter.octopus.adaptors.scripting;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -198,7 +199,8 @@ public class ScriptingJobs implements Jobs {
             }
         }
 
-        return result.values().toArray(new SchedulerConnection[0]);
+        Collection<SchedulerConnection> tmp = result.values();
+        return tmp.toArray(new SchedulerConnection[tmp.size()]);
     }
 
     private void selectJobs(SchedulerConnection connection, Job[] in, Job[] out) {
@@ -271,7 +273,8 @@ public class ScriptingJobs implements Jobs {
         SchedulerConnection[] currentConnections;
 
         synchronized (this) {
-            currentConnections = connections.values().toArray(new SchedulerConnection[0]);
+            Collection<SchedulerConnection> tmp = connections.values();
+            currentConnections = tmp.toArray(new SchedulerConnection[tmp.size()]);
         }
 
         for (SchedulerConnection connection : currentConnections) {

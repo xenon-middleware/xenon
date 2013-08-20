@@ -17,16 +17,21 @@
 package nl.esciencecenter.octopus.examples.files;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
+import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 
 /**
- * A simple example of how to create a filesystem.
+ * A simple example of how to create a FileSystem.
+ *  
+ * This example assumes the user provides the URI of the file system on the command line.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -35,19 +40,25 @@ import nl.esciencecenter.octopus.files.Files;
 public class CreateFileSystem {
 
     public static void main(String[] args) {
+        
+        if (args.length != 1) {
+            System.out.println("Example requires a URI as parameter!");
+            System.exit(1);
+        }
+
         try {
-            // We create a new octopus using the OctopusFactory (without providing any properties).
+            // We first turn the user provided argument into a URI.
+            URI uri = new URI(args[0]);
+        
+            // Next, we create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
 
-            // To create a new FileSystem we need a URI indicating its location.
-            URI uri = new URI("file://localhost/");
-
             // We also need a Credential that enable us to access the location. 
-            Credential c = credentials.getDefaultCredential("file");
+            Credential c = credentials.getDefaultCredential(uri.getScheme());
 
             // Now we can create a FileSystem (we don't provide any properties). 
             FileSystem fs = files.newFileSystem(uri, c, null);
@@ -62,8 +73,8 @@ public class CreateFileSystem {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (Exception e) {
-            System.out.println("CreatingFileSystem example failed: " + e.getMessage());
+        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+            System.out.println("CreateFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

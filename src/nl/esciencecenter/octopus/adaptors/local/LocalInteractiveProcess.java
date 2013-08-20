@@ -70,7 +70,6 @@ class LocalInteractiveProcess implements InteractiveProcess {
         }
 
         builder.directory(new java.io.File(workingDirectory));
-
         process = builder.start();
         streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }

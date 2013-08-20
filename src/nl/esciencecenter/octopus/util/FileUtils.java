@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
@@ -64,7 +63,7 @@ public final class FileUtils {
             if (c != null) {
                 c.close();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             // ignored!
         }
     }
@@ -104,31 +103,21 @@ public final class FileUtils {
      */
     public static long copy(Files files, InputStream in, Path target, boolean truncate) throws OctopusException {
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-        long totalBytes = 0;
-
+        long bytes = 0;
         OutputStream out = null;
 
-        try {
-            out = files.newOutputStream(target, openOptionsForWrite(truncate));
-
-            while (true) {
-                int read = in.read(buffer);
-
-                if (read == -1) {
-                    out.close();
-                    return totalBytes;
-                }
-
-                out.write(buffer, 0, read);
-                totalBytes += read;
-            }
+        try { 
+            out = files.newOutputStream(target, openOptionsForWrite(truncate));            
+            bytes = StreamUtils.copy(in, out, BUFFER_SIZE);            
         } catch (IOException e) {
-            close(out);
             throw new OctopusException(NAME, "Failed to copy stream to file.", e);
+        } finally { 
+            close(out);
         }
+        
+        return bytes;
     }
-
+    
     /**
      * Copies all bytes from a file to an output stream.
      * 
@@ -146,30 +135,22 @@ public final class FileUtils {
      * 
      */
     public static long copy(Files files, Path source, OutputStream out) throws OctopusException {
-        byte[] buffer = new byte[BUFFER_SIZE];
-        long totalBytes = 0;
-
+        
+        long bytes = 0;
         InputStream in = null;
 
         try {
             in = files.newInputStream(source);
-
-            while (true) {
-                int read = in.read(buffer);
-
-                if (read == -1) {
-                    in.close();
-                    return totalBytes;
-                }
-                out.write(buffer, 0, read);
-                totalBytes += read;
-            }
+            bytes = StreamUtils.copy(in, out, BUFFER_SIZE);
         } catch (IOException e) {
-            close(in);
             throw new OctopusException(NAME, "Failed to copy stream to file.", e);
+        } finally { 
+            close(in);
         }
-    }
 
+        return bytes;
+    }
+        
     /**
      * Opens a file for reading, returning a {@link java.util.BufferedReader} that may be used to read text from the file in an 
      * efficient manner.
@@ -233,7 +214,36 @@ public final class FileUtils {
         copy(files, source, out);
         return out.toByteArray();
     }
-
+    
+    /**
+     * Read all the bytes from a file and return them as a <code>String<\code> using the <code>Charset</code> for conversion.
+     * 
+     * @param files
+     *          the files interface to use for file access.
+     * @param source
+     *          the file to read from.
+     * @param cs
+     *          the Charset to use.
+     *          
+     * @return a <code>String</code> containing all data from the file as converted using <code>cs</code>.
+     * 
+     * @throws OctopusIOException
+     *          if an I/O error occurs while opening or reading the file.
+     */
+    public static String readToString(Files files, Path source, Charset cs) throws OctopusIOException {
+        
+        InputStream in = null;
+        
+        try { 
+            in = files.newInputStream(source);
+            return StreamUtils.readToString(in, cs);
+        } catch (IOException e) {
+            throw new OctopusIOException(NAME, "Failed to read data", e);
+        } finally { 
+            close(in);
+        }
+    }
+    
     /**
      * Read all lines from a file and return them in a {@link java.util.List}.
      * 
@@ -251,26 +261,15 @@ public final class FileUtils {
      */
     public static List<String> readAllLines(Files files, Path source, Charset cs) throws OctopusIOException {
 
-        ArrayList<String> result = new ArrayList<String>();
-
-        BufferedReader reader = null;
-
-        try {
-            reader = newBufferedReader(files, source, cs);
-
-            while (true) {
-                String line = reader.readLine();
-
-                if (line == null) {
-                    reader.close();
-                    return result;
-                }
-
-                result.add(line);
-            }
+        InputStream in = null;
+        
+        try { 
+            in = files.newInputStream(source);
+            return StreamUtils.readLines(in, cs);
         } catch (IOException e) {
-            close(reader);
-            throw new OctopusIOException("FileUtils", "failed to read lines", e);
+            throw new OctopusIOException(NAME, "Failed to read lines", e);
+        } finally { 
+            close(in);
         }
     }
 
@@ -315,20 +314,15 @@ public final class FileUtils {
     public static void write(Files files, Path target, Iterable<? extends CharSequence> lines, Charset cs,
             boolean truncate) throws OctopusIOException {
 
-        BufferedWriter writer = null;
-
-        try {
-            writer = newBufferedWriter(files, target, cs, truncate);
-
-            for (CharSequence line : lines) {
-                writer.write(line.toString());
-                writer.newLine();
-            }
-
-            writer.close();
+        OutputStream out = null;
+        
+        try { 
+            out = files.newOutputStream(target, openOptionsForWrite(truncate));
+            StreamUtils.writeLines(lines, cs, out);
         } catch (IOException e) {
-            close(writer);
             throw new OctopusIOException("FileUtils", "failed to write lines", e);
+        } finally { 
+            close(out);
         }
     }
 
@@ -463,7 +457,7 @@ public final class FileUtils {
                     return FileVisitResult.SKIP_SIBLINGS;
                 } else if (visitResult == FileVisitResult.SKIP_SUBTREE) {
                     // skip visiting entries
-                    visitor.postVisitDirectory(path, exception, files);
+                    visitor.postVisitDirectory(path, null, files);
                     return FileVisitResult.CONTINUE;
                 } else {
                     // TERMINATE

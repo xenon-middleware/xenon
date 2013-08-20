@@ -295,7 +295,7 @@ public abstract class SchedulerConnection {
      * scheduler was created.
      */
     protected void checkQueueNames(String[] givenQueueNames) throws NoSuchQueueException {
-        //create a hashset with all given queues
+        //create a hash set with all given queues
         HashSet<String> invalidQueues = new HashSet<String>(Arrays.asList(givenQueueNames));
 
         //remove all valid queues from the set
@@ -304,7 +304,7 @@ public abstract class SchedulerConnection {
         //if anything remains, these are invalid. throw an exception with the invalid queues
         if (!invalidQueues.isEmpty()) {
             throw new NoSuchQueueException(adaptor.getName(), "Invalid queues given: "
-                    + Arrays.toString(invalidQueues.toArray(new String[0])));
+                    + Arrays.toString(invalidQueues.toArray(new String[invalidQueues.size()])));
         }
     }
 

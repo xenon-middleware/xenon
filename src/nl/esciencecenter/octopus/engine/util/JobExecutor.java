@@ -16,6 +16,8 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
+import java.io.IOException;
+
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
@@ -241,13 +243,22 @@ public class JobExecutor implements Runnable {
             return;
         }
 
-        try {
-            wait(maxDelay);
-        } catch (InterruptedException e) {
-            // ignored
+        long deadline = System.currentTimeMillis() + maxDelay;
+        long left = maxDelay > 0 ? maxDelay : 1000; 
+        
+        while (!done && updateSignal && left > 0) { 
+            try {
+                wait(left);
+            } catch (InterruptedException e) {
+                // ignored
+            }
+
+            if (maxDelay > 0) { 
+                left = deadline - System.currentTimeMillis();
+            } 
         }
     }
-
+    
     /**
      * Clear the update signal and wake up any waiting threads
      */
@@ -262,23 +273,30 @@ public class JobExecutor implements Runnable {
      * @param pollingDelay
      *            the maximum amount of time to wait
      */
-    private synchronized void sleep(long pollingDelay) {
+    private synchronized void sleep(long maxDelay) {
 
-        if (done || updateSignal) {
+        if (done || updateSignal || maxDelay <= 0) {
             return;
         }
+        
+        long deadline = System.currentTimeMillis() + maxDelay;
+        long left = maxDelay; 
+        
+        while (!done && !updateSignal && left > 0) { 
+            try {
+                wait(left);
+            } catch (InterruptedException e) {
+                // ignored
+            }
 
-        try {
-            wait(pollingDelay);
-        } catch (InterruptedException e) {
-            // ignored
+            left = deadline - System.currentTimeMillis();
         }
     }
 
     @Override
     public void run() {
 
-        InteractiveProcess process = null;
+        OctopusProcess process = null;
 
         JobDescription description = job.getJobDescription();
 
@@ -296,12 +314,13 @@ public class JobExecutor implements Runnable {
 
         try {
             if (description.isInteractive()) {
-                process = factory.createInteractiveProcess(job);
-                setStreams(process.getStreams());
+                InteractiveProcess p = factory.createInteractiveProcess(job);
+                setStreams(p.getStreams());
+                process = p; 
             } else {
                 process = new BatchProcess(files, filesytem, job, factory);
             }
-        } catch (Exception e) {
+        } catch (IOException | OctopusException e) {
             updateState("ERROR", -1, e);
             return;
         }

@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.engine.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +26,7 @@ import java.nio.charset.StandardCharsets;
  * @author Niels Drost
  * 
  */
-public class OutputReader extends Thread {
+public final class OutputReader extends Thread {
 
     public static final int BUFFER_SIZE = 1024;
 
@@ -100,7 +101,7 @@ public class OutputReader extends Thread {
         } finally {
             try {
                 source.close();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 // ignore
             }
         }

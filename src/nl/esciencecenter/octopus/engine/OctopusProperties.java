@@ -17,8 +17,10 @@ package nl.esciencecenter.octopus.engine;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -194,7 +196,7 @@ public class OctopusProperties {
             case STRING:
                 break;
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | InvalidPropertyException e) {
             throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t 
                     + ")", e);
         }
@@ -602,7 +604,8 @@ public class OctopusProperties {
      * @return the descriptions of all supported properties.
      */
     public OctopusPropertyDescription[] getSupportedProperties() {
-        return supportedProperties.values().toArray(new OctopusPropertyDescription[0]);
+        Collection<OctopusPropertyDescription> tmp = supportedProperties.values();
+        return tmp.toArray(new OctopusPropertyDescription[tmp.size()]);
     }
 
     /**
@@ -641,13 +644,13 @@ public class OctopusProperties {
             tmp = "";
         }
 
-        tmp = tmp.toLowerCase();
+        tmp = tmp.toLowerCase(Locale.getDefault());
 
         for (OctopusPropertyDescription d : supportedProperties.values()) {
 
             String key = d.getName();
 
-            if (key.toLowerCase().startsWith(tmp)) {
+            if (key.toLowerCase(Locale.getDefault()).startsWith(tmp)) {
 
                 String value = d.getDefaultValue();
 

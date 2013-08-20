@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Niels Drost
  * 
  */
-public class StreamForwarder extends Thread {
+public final class StreamForwarder extends Thread {
 
     static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
 
@@ -39,6 +39,8 @@ public class StreamForwarder extends Thread {
     private final InputStream in;
     private final OutputStream out;
 
+    private boolean done = false;
+    
     public StreamForwarder(InputStream in, OutputStream out) {
         this.in = in;
         this.out = out;
@@ -61,17 +63,51 @@ public class StreamForwarder extends Thread {
         }
     }
 
-    public void close() {
-        close(in, "Cannot close input stream");
-    }
+//    public void close() {
+//        close(in, "Cannot close input stream");
+//    }
 
+    private synchronized void done() { 
+        done = true;
+        notifyAll();
+    }
+    
+    public synchronized void terminate(long timeout) { 
+    
+        if (done) { 
+            return;
+        }
+        
+        if (timeout > 0) { 
+            long deadline = System.currentTimeMillis() + timeout;
+            long left = timeout;
+
+            while (!done && left > 0) { 
+            
+                try { 
+                    wait(left);
+                } catch (InterruptedException e) { 
+                    // ignored
+                }
+
+                left = deadline - System.currentTimeMillis();
+            }
+        }
+        
+        if (!done) { 
+            close(in, "InputStream did not close within " + timeout + " ms. Forcing close!");
+        }
+    }
+    
     public void run() {
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
+            
             while (true) {
                 int read = in.read(buffer);
 
                 if (read == -1) {
+                    done();
                     return;
                 }
 
