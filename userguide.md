@@ -160,11 +160,11 @@ any resources it has obtained.
 When creating an octopus using `newOctopus`, the `properties` parameter can be used to 
 configure the octopus instance. If no configuration is necessary, `null` can be used.
 Properties consist of a set of key-value pairs. In octopus all keys __must__ start with 
-_"octopus."_. To configure the adaptors, properties of the form 
-_"octopus.adaptors.<name>.<property>"_ can be used, where _"<name>"_ is the name of the 
-adaptor (for example _"local"_ or _"ssh"_) and _"<property>"_ is the name of the property to be 
+"octopus.". To configure the adaptors, properties of the form 
+"octopus.adaptors.<name>.<property>" can be used, where "<name>" is the name of the 
+adaptor (for example "local" or "ssh") and "<property>" is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
-_"octopus.adaptors.local.a.b.c"_. The available properties can be found in the documentation 
+"octopus.adaptors.local.a.b.c". The available properties can be found in the documentation 
 of the individual adaptors (see Appendix A). 
 
     public interface Octopus {
@@ -172,20 +172,21 @@ of the individual adaptors (see Appendix A).
         Jobs jobs();
         Credentials credentials();
         Map<String,String> getProperties();
-        AdaptorStatus getAdaptorInfo(String adaptorName) throws ...
-        AdaptorStatus[] getAdaptorInfos();
+        AdaptorStatus getAdaptorStatus(String adaptorName) throws ...
+        AdaptorStatus[] getAdaptorStatuses();
     }
 
 Once an `Octopus` is created using the `newOctopus` method, the `files`, `jobs` and `credentials` 
 methods in this interface can be used to retrieve various interfaces that the octopus library 
 offers. They will be described in more detail below. 
 
-The `getProperties` method can be used to retrieve the properties used when the octopus was created. 
-Most objects created by octopus contain such a `getSupportedProperties` method. For brevity, we will 
+The [getProperties](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getProperties%28%29)
+method can be used to retrieve the properties used when the octopus was created. 
+Most objects created by octopus contain such a `getProperties` method. For brevity, we will 
 not explain these further.
 
-The `getAdaptorInfo` and `getAdaptorInfos` methods can be used to retrieve information about 
-the adaptors. This information is returned in an `AdaptorStatus` object: 
+The [getAdaptorStatus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getAdaptorStatus%28java.lang.String%29) 
+method can be used to retrieve information about the adaptors. This information is returned in an `AdaptorStatus` object: 
 
     public interface AdaptorStatus {
         String getName();
@@ -195,9 +196,11 @@ the adaptors. This information is returned in an `AdaptorStatus` object:
         Map<String, String> getAdaptorSpecificInformation();
     }
     
-An `AdaptorStatus` contains methods to retrieve the name of an adaptor (`getName`), get a 
-(human readable) description of what functionality it has to offer (`getDescription`) and 
-retrieve a list of the schemes it supports (`getSupportedSchemes`). 
+An `AdaptorStatus` contains methods to retrieve the name of an adaptor ([getName](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getName%28%29)), 
+get a (human readable) description of what functionality it has to offer 
+([getDescription](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getDescription%28%29))
+and retrieve a list of the schemes it supports 
+([getSupportedSchemes](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedSchemes%28%29)). 
 
 The `getSupportedProperties` can be used to retrieve a list of configuration options the adaptor 
 supports. Each `OctopusPropertyDescription` gives a full description of a single property, 
