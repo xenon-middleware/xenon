@@ -140,8 +140,7 @@ We will now briefly describe the most important classes and interfaces of these 
 
 The `nl.esciencecenter.octopus` package contains the entry point into the octopus library
 [(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
-
-It contains the __OctopusFactory__ class and __Octopus__ interface.
+The main enty point is [__OctopusFactory__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html):
 
     public class OctopusFactory {
        public static Octopus newOctopus(Map<String,String> properties) throws ...
@@ -207,8 +206,8 @@ and retrieve a list of the schemes it supports
 
 The [__getSupportedProperties__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedProperties%28%29)
 method can be used to retrieve a list of configuration options the adaptor supports. 
-Each returned `OctopusPropertyDescription` gives a full description of a single property, 
-including its name (of the form "octopus.adaptors.<name>.<property>"), the expected type of its 
+Each returned __OctopusPropertyDescription__ gives a full description of a single property, 
+including its name (of the form "octopus.adaptors.(name).(property)"), the expected type of its 
 value, a human readable description of its purpose, etc. More information on the supported 
 properties can be found in Appendix A.
 
@@ -236,9 +235,9 @@ The main entrypoint is the __Credentials__ interface:
 
 The __Credentials__ interface contains various methods for creating credentials, based 
 on certificates or passwords. For each method, the desired _scheme_ needs to be 
-provided as a parameter. This allows octopus to forward the call to the correct adaptor.
-Note that some types of credentials may not be supported by all adaptors. An exception 
-will be thrown when an unsupported __new***Credential__ methods is invoked. 
+provided as a parameter (for example, "ssh" or "sftp"). This allows octopus to forward the 
+call to the correct adaptor. Note that some types of credentials may not be supported by
+all adaptors. An exception will be thrown when an unsupported __new**Credential__ methods is invoked. 
 
 Additional configuration can also be provides using the _properties_ parameter, which use 
 the same form as described in the _Octopus factory and interface_ section above. If no 
@@ -247,7 +246,7 @@ additional configuration is needed, `null` can be used. The
 method returns the default credential for the given scheme. All adaptors are guarenteed to 
 support this method. 
 
-All __new***Credential__ methods return a __Credential__ that contains the following 
+All __new**Credential__ methods return a __Credential__ that contains the following 
 methods: 
 
     public interface Credential {
@@ -264,7 +263,7 @@ For brevity we will not explain this further.
 
 The `nl.esciencecenter.octopus.files` package contains the files interface of octopus. 
 [(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html) 
-The main entrypoint is `Files`. For readability we will split the explanation of `Files` 
+The main entrypoint is __Files__. For readability we will split the explanation of __Files__ 
 into several parts:
 
     public interface Files {
@@ -284,9 +283,13 @@ into several parts:
 
     }
 
-The `Files` interface contains several method for creating and closing a `FileSystem`. A `FileSystem` provides an 
-abstraction for a (possibly remote) file system. To create a `FileSystem` the `newFileSystem` method can be used. 
-The `URI location` parameter provides the information on the location of the file system. The URI is expected to 
+The __Files__ interface contains several method for creating and closing a 
+[__FileSystem__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileSystem.html).
+A __FileSystem__ provides an abstraction for a (possibly remote) file system. To create a __FileSystem__ the 
+[__newFileSystem__]
+(http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Files.html#newFileSystem%28java.net.URI,%20nl.esciencecenter.octopus.credentials.Credential,%20java.util.Map%29) 
+method can be used. 
+The _location_ parameter provides the information on the location of the file system. The URI is expected to 
 contain at least a _scheme_. Most URIs will also contain _host_ information. Optionally, _user_ information may 
 also be provided. A file system URI may _not_ contain a path other than `"/"`. The following are all valid file 
 system URIs: 
@@ -295,10 +298,10 @@ system URIs:
     sftp://example.com
     sftp://test@example.com:8080/
 
-The `newFileSystem` method also has a `credential` parameter to provide the credential needed to access the file 
-system. If this parameter is set to `null` the default credentials will be used for the scheme. The `properties`
+The __newFileSystem__ method also has a _credential_ parameter to provide the credential needed to access the file 
+system. If this parameter is set to `null` the default credentials will be used for the scheme. The _properties_
 parameter can be used to provide additional configuration properties. Again, `null` can be used if no additional 
-configuration is required. The returned `FileSystem` contains the following:
+configuration is required. The returned __FileSystem__ contains the following:
 
     public interface FileSystem {
         /// ...
@@ -648,7 +651,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -659,7 +662,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -703,7 +706,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
