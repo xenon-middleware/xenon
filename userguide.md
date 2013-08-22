@@ -1,4 +1,4 @@
-![logo](images/OctopusLogo_NLeSC_blauw.png)
+![logo](images/OctopusLogo_NLeSC_blauw.png "Octopus Logo")
 
 Octopus
 =======
@@ -68,7 +68,7 @@ Design
 ------
 
 Octopus is designed with extensibility in mind. It uses a modular and layer design
-as shown in Figure 1. 
+as shown in the figure below:
 
 ![Octopus design](images/octopus-design.png "Octopus design.")
 	
@@ -119,7 +119,7 @@ Interfaces and datatypes
 ------------------------
 
 This section will briefly explain each of the interfaces and related datatypes.
-Detailed information about Octopus can be found in the online JavaDOC: 
+Detailed information about Octopus can be found in the online Javadoc: 
 
 <http://nlesc.github.io/octopus/javadoc/>
 
@@ -127,19 +127,21 @@ Detailed information about Octopus can be found in the online JavaDOC:
 
 The octopus API uses the following package structure:
 
-- `nl.esciencecenter.octopus`  Entry point into octopus.
-- `nl.esciencecenter.octopus.credentials`  Credential interface.
+- `nl.esciencecenter.octopus` Entry point into octopus.
+- `nl.esciencecenter.octopus.credentials` Credential interface.
 - `nl.esciencecenter.octopus.files`  Files interface.
 - `nl.esciencecenter.octopus.jobs`  Jobs interface.
 - `nl.esciencecenter.octopus.exeptions`  Exceptions used in octopus.
-- `nl.esciencecenter.octopus.util`  Various utilty classes (experimental).
+- `nl.esciencecenter.octopus.util`  Various utilty classes.
 
 We will now briefly describe the most important classes and interfaces of these packages.
 
 ### Octopus factory and interface ###
 
-The `nl.esciencecenter.octopus` contains the entry point into the octopus library. It 
-contains the `OctopusFactory` class and `Octopus` interface.
+The `nl.esciencecenter.octopus` package contains the entry point into the octopus library
+[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
+
+It contains the `OctopusFactory` class and `Octopus` interface.
 
     public class OctopusFactory {
        public static Octopus newOctopus(Map<String,String> properties) throws ...
@@ -207,7 +209,9 @@ returned properties can be found in the _Adaptor_ section below.
 ### Credentials interface ###
 
 The `nl.esciencecenter.octopus.credentials` package contains the credentials interface of 
-octopus. The main entrypoint is `Credentials`:
+octopus. 
+[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
+The main entrypoint is the `Credentials` interface:
 
     public interface Credentials {
 
@@ -248,6 +252,7 @@ For brevity we will not explain this further.
 ### Files interface ###
 
 The `nl.esciencecenter.octopus.files` package contains the files interface of octopus. 
+[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html) 
 The main entrypoint is `Files`. For readability we will split the explanation of `Files` 
 into several parts:
 
@@ -392,8 +397,9 @@ the status of the copy (using `getCopyStatus`) or cancel it (using `cancelCopy`)
 
 ### Jobs interface ###
 
-The `nl.esciencecenter.octopus.job` package contains the job interface of octopus. The main 
-entrypoint is `Jobs`. For readability we will split the explanation of `Jobs` into several 
+The `nl.esciencecenter.octopus.job` package contains the job interface of octopus. 
+[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/package-summary.html) 
+The main entrypoint is `Jobs`. For readability we will split the explanation of `Jobs` into several 
 parts:
 
     public interface Jobs {
@@ -526,18 +532,23 @@ a result however.
 ### Exceptions ###
 
 The `nl.esciencecenter.octopus.exceptions` package contains the exceptions that may be thrown by 
-octopus. See the Javadoc for the available exceptions.
+octopus. See the [Javadoc](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/exceptions/package-summary.html)
+for the available exceptions.
 
 ### Utilities classes ###
 
 The `nl.esciencecenter.octopus.util` package contains various utility classes. 
-__This package is experimental and not yet ready for use!!__
-
+See the [Javadoc](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/package-summary.html)
+for the available utilities.
 
 Examples
 --------
 
-Many examples of how to use octopus can be found online. They will be listed here in order of 
+Many examples of how to use octopus can be found 
+
+
+
+online. They will be listed here in order of 
 increasing complexity:
 
 ### Initializing Octopus ###
@@ -626,7 +637,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -637,7 +648,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -681,7 +692,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
