@@ -161,8 +161,8 @@ When creating an octopus using __newOctopus__, the _properties_ parameter can be
 configure the octopus instance. If no configuration is necessary, `null` can be used.
 Properties consist of a set of key-value pairs. In octopus all keys __must__ start with 
 "octopus.". To configure the adaptors, properties of the form 
-"octopus.adaptors.<name>.<property>" can be used, where "<name>" is the name of the 
-adaptor (for example "local" or "ssh") and "<property>" is the name of the property to be 
+"octopus.adaptors.(name).(property)" can be used, where "(name)" is the name of the 
+adaptor (for example "local" or "ssh") and "(property)" is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
 "octopus.adaptors.local.a.b.c". The available properties can be found in the documentation 
 of the individual adaptors (see Appendix A). 
