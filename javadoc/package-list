@@ -1,9 +1,0 @@
-nl.esciencecenter.octopus
-nl.esciencecenter.octopus.adaptors.gridengine
-nl.esciencecenter.octopus.adaptors.local
-nl.esciencecenter.octopus.adaptors.ssh
-nl.esciencecenter.octopus.credentials
-nl.esciencecenter.octopus.exceptions
-nl.esciencecenter.octopus.files
-nl.esciencecenter.octopus.jobs
-nl.esciencecenter.octopus.util
