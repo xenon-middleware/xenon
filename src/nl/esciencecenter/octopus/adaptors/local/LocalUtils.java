@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.jcraft.jsch.Logger;
+
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
@@ -288,6 +290,8 @@ final class LocalUtils {
 
     static void unixDestroy(java.lang.Process process) {
 
+        boolean success = false;
+        
         try {
             final Field pidField = process.getClass().getDeclaredField("pid");
             
@@ -300,18 +304,15 @@ final class LocalUtils {
             
             int pid = pidField.getInt(process);
 
-            if (pid <= 0) {
-                throw new Exception("Pid reported as 0 or negative: " + pid);
-            }
-
-            CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
-
-            if (killRunner.getExitCode() != 0) {
-                throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to kill process, exit code was "
-                        + killRunner.getExitCode() + " output: " + killRunner.getStdout() + " error: " + killRunner.getStderr());
-            }
+            if (pid > 0) { 
+                CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
+                success = (killRunner.getExitCode() == 0);
+            }            
         } catch (Exception e) {
             // Failed, so use the regular Java destroy.
+        }
+
+        if (!success) { 
             process.destroy();
         }
     }

@@ -131,7 +131,7 @@ public class JobExecutor implements Runnable {
         } else if (state.equals("RUNNING")) {
             hasRun = true;
         } else {
-            throw new RuntimeException("INTERNAL ERROR: Illegal state: " + state);
+            throw new InternalError("Illegal state: " + state);
         }
 
         this.state = state;

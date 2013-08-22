@@ -231,15 +231,6 @@ public class Pathname {
     }
 
     /**
-     * Get the number of name elements in the path.
-     * 
-     * @return the number of elements in the path, or 0 if this path is empty.
-     */
-   // public String[] getNames() {
-        //return elements.clone();
-    //}
-
-    /**
      * Get a name element of this path.
      * 
      * @param index

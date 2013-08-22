@@ -35,7 +35,7 @@ import java.util.List;
  * @version 1.0 
  * @since 1.0 
  */
-public class StreamUtils {
+public final class StreamUtils {
     
     /** 
      * The default buffer size to use for copy operations.

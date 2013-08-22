@@ -140,7 +140,7 @@ public class GridEngineSetup {
      *            parallel environments to use.
      */
     GridEngineSetup(String[] queueNames, Map<String, QueueInfo> queues, Map<String, ParallelEnvironmentInfo> parallelEnvironments) {
-        this.queueNames = queueNames;
+        this.queueNames = queueNames.clone();
         this.queues = queues;
         this.parallelEnvironments = parallelEnvironments;
     }

@@ -63,10 +63,6 @@ public final class StreamForwarder extends Thread {
         }
     }
 
-//    public void close() {
-//        close(in, "Cannot close input stream");
-//    }
-
     private synchronized void done() { 
         done = true;
         notifyAll();
