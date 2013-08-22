@@ -197,26 +197,26 @@ method can be used to retrieve information about the adaptors. This information 
     }
     
 An `AdaptorStatus` contains methods to retrieve the name of an adaptor ([getName](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getName%28%29)), 
-get a (human readable) description of what functionality it has to offer 
+get a human readable description of what functionality it has to offer 
 ([getDescription](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getDescription%28%29))
 and retrieve a list of the schemes it supports 
 ([getSupportedSchemes](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedSchemes%28%29)). 
 
-The `getSupportedProperties` can be used to retrieve a list of configuration options the adaptor 
-supports. Each `OctopusPropertyDescription` gives a full description of a single property, 
-including its name (of the form `"octopus.adaptors.<name>.<property>"`), the expected type of its 
-value, a human readable description of its purpose, etc. More information can be found in 
-Appendix A.
+The [getSupportedProperties](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedProperties%28%29)
+method can be used to retrieve a list of configuration options the adaptor supports. 
+Each returned `OctopusPropertyDescription` gives a full description of a single property, 
+including its name (of the form "octopus.adaptors.<name>.<property>"), the expected type of its 
+value, a human readable description of its purpose, etc. More information on the supported 
+properties can be found in Appendix A.
 
-Finally, `getAdaptorSpecificInformation` can be used to retrieve status information from 
-the adaptor. Each key contains a property of the form described above. The possible
-returned properties can be found in the _Adaptor_ section below.  
+Finally, [getAdaptorSpecificInformation](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getAdaptorSpecificInformation%28%29)
+can be used to retrieve status information from the adaptor. Each key contains a property of 
+the form described above. 
 
 ### Credentials interface ###
 
 The `nl.esciencecenter.octopus.credentials` package contains the credentials interface of 
-octopus. 
-[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
+octopus. [(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
 The main entrypoint is the `Credentials` interface:
 
     public interface Credentials {
@@ -251,7 +251,8 @@ methods:
        Map<String,String> getProperties();
     }
 
-The `getAdaptorName` method can be used to retrieve the name of the adaptor that created 
+The [getAdaptorName](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html#getAdaptorName%28%29)
+method can be used to retrieve the name of the adaptor that created 
 the credential. Many adaptor specific objects returned by octopus contain this method. 
 For brevity we will not explain this further.
 
@@ -279,7 +280,7 @@ into several parts:
 
     }
 
-The `Files` interface contains several method for creating an closing a `FileSystem`. A `FileSystem` provides an 
+The `Files` interface contains several method for creating and closing a `FileSystem`. A `FileSystem` provides an 
 abstraction for a (possibly remote) file system. To create a `FileSystem` the `newFileSystem` method can be used. 
 The `URI location` parameter provides the information on the location of the file system. The URI is expected to 
 contain at least a _scheme_. Most URIs will also contain _host_ information. Optionally, _user_ information may 
@@ -643,7 +644,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -654,7 +655,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -698,7 +699,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
