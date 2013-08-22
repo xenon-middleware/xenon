@@ -206,8 +206,8 @@ Each key contains a property of the form described above.
 
 ### Credentials interface ###
 
-The [`nl.esciencecenter.octopus.credentials`][6] package contains the credentials interface of octopus.
-The main entrypoint is [__Credentials__][7]:
+The [`nl.esciencecenter.octopus.credentials`][6] package contains the [__Credentials__][7] interface of 
+octopus:
 
     public interface Credentials {
 
@@ -233,7 +233,7 @@ additional configuration is needed, `null` can be used. The __getDefaultCredenti
 method returns the default credential for the given scheme. All adaptors are guarenteed to 
 support this method. 
 
-All __new**Credential__ methods return a __Credential__ that contains the following 
+All __new**Credential__ methods return a [__Credential__][13] that contains the following 
 methods: 
 
     public interface Credential {
@@ -247,8 +247,8 @@ brevity we will not explain this further.
 
 ### Files interface ###
 
-The [`nl.esciencecenter.octopus.files`][8] package contains the files interface of octopus. The main 
-entrypoint is [__Files__][9]. For readability we will split the explanation of __Files__ into several parts:
+The [`nl.esciencecenter.octopus.files`][8] package contains the [__Files__][9] interface of 
+octopus. For readability we will split the explanation of __Files__ into several parts:
 
     public interface Files {
 
@@ -582,6 +582,7 @@ increasing complexity:
 [10]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileSystem.html
 [11]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Path.html
 [12]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Pathname.html
+[13]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html
 
 Appendix A: Adaptor Documentation
 ---------------------------------
@@ -643,7 +644,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -654,7 +655,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -698,7 +699,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
