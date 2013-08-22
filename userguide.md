@@ -119,7 +119,7 @@ Interfaces and datatypes
 ------------------------
 
 This section will briefly explain each of the interfaces and related datatypes.
-Detailed information about Octopus can be found in the online Javadoc: 
+Detailed information about Octopus can be found in the online Javadoc at: 
 
 <http://nlesc.github.io/octopus/javadoc/>
 
@@ -139,7 +139,7 @@ We will now briefly describe the most important classes and interfaces of these 
 ### Octopus factory and interface ###
 
 The `nl.esciencecenter.octopus` package contains the entry point into the octopus library
-[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
+[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
 
 It contains the `OctopusFactory` class and `Octopus` interface.
 
@@ -149,19 +149,22 @@ It contains the `OctopusFactory` class and `Octopus` interface.
        public static void endAll();
     }
 
-The `OctopusFactory` class contains the `newOctopus` method to create a new octopus instance. 
-The `endOctopus` method can be used to end the octopus instance once it is no longer needed.
+The `OctopusFactory` class contains the 
+[newOctopus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#newOctopus%28java.util.Map%29) 
+method to create a new octopus instance. The 
+[endOctopus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#endOctopus%28nl.esciencecenter.octopus.Octopus%29) 
+method can be used to end the octopus instance once it is no longer needed.
 It is important to end the octopus when it is no longer needed, as this allows it to release 
 any resources it has obtained. 
 
 When creating an octopus using `newOctopus`, the `properties` parameter can be used to 
 configure the octopus instance. If no configuration is necessary, `null` can be used.
 Properties consist of a set of key-value pairs. In octopus all keys __must__ start with 
-`"octopus."`. To configure the adaptors, properties of the form 
-`"octopus.adaptors.<name>.<property>"` can be used, where `<name>` is the name of the 
-adaptor (for example `local` or `ssh`) and `<property>` is the name of the property to be 
+_"octopus."_. To configure the adaptors, properties of the form 
+_"octopus.adaptors.<name>.<property>"_ can be used, where _"<name>"_ is the name of the 
+adaptor (for example _"local"_ or _"ssh"_) and _"<property>"_ is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
-`octopus.adaptors.local.a.b.c`. The available properties can be found in the documentation 
+_"octopus.adaptors.local.a.b.c"_. The available properties can be found in the documentation 
 of the individual adaptors (see Appendix A). 
 
     public interface Octopus {
@@ -210,7 +213,7 @@ returned properties can be found in the _Adaptor_ section below.
 
 The `nl.esciencecenter.octopus.credentials` package contains the credentials interface of 
 octopus. 
-[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
+[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
 The main entrypoint is the `Credentials` interface:
 
     public interface Credentials {
@@ -252,7 +255,7 @@ For brevity we will not explain this further.
 ### Files interface ###
 
 The `nl.esciencecenter.octopus.files` package contains the files interface of octopus. 
-[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html) 
+[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html) 
 The main entrypoint is `Files`. For readability we will split the explanation of `Files` 
 into several parts:
 
@@ -398,7 +401,7 @@ the status of the copy (using `getCopyStatus`) or cancel it (using `cancelCopy`)
 ### Jobs interface ###
 
 The `nl.esciencecenter.octopus.job` package contains the job interface of octopus. 
-[(javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/package-summary.html) 
+[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/package-summary.html) 
 The main entrypoint is `Jobs`. For readability we will split the explanation of `Jobs` into several 
 parts:
 
