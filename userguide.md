@@ -162,7 +162,7 @@ configured. Note that this name can be futher qualified, for example
 "octopus.adaptors.local.a.b.c". The available properties can be found in the documentation 
 of the individual adaptors (see Appendix A). 
 
-A call to __newOctopus__ will return an [__Octopus__][3]
+A call to __newOctopus__ will return an [__Octopus__][3]:
 
     public interface Octopus {
         Files files();
@@ -181,7 +181,7 @@ created. Most objects created by octopus contain such a __getProperties__ method
 we will not explain these further.
 
 The __getAdaptorStatus__ method can be used to retrieve information about the adaptors. This 
-information is returned in an [__AdaptorStatus__][4]
+information is returned in an [__AdaptorStatus__][4]:
 
     public interface AdaptorStatus {
         String getName();
@@ -191,9 +191,9 @@ information is returned in an [__AdaptorStatus__][4]
         Map<String, String> getAdaptorSpecificInformation();
     }
     
-An __AdaptorStatus__ contains methods to retrieve the name of an adaptor (__getName__), get a human 
-readable description of what functionality it has to offer (__getDescription__) and retrieve a list 
-of the schemes it supports (__getSupportedSchemes__). 
+An __AdaptorStatus__ contains __getName__ to retrieve the name of an adaptor,  __getDescription__ to 
+get a human readable description of what functionality it has to offer and __getSupportedSchemes__
+to retrieve a list of the schemes it supports.
 
 The __getSupportedProperties__ method can be used to retrieve a list of configuration options the adaptor 
 supports. Each returned [__OctopusPropertyDescription__][5] gives a full description of a single property, 
@@ -643,7 +643,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -654,7 +654,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -698,7 +698,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
