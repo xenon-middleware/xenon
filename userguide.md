@@ -487,9 +487,8 @@ be provided as parameter. A __JobDescription__ contains all necessary informatio
 for example, the location of the executable, any command line arguments that are required, the working 
 directory, etc. See the Javadoc for details of the __JobDescription__.
 
-Once a job is submitted, a [__Job__][22] object is returned that can be used later to retrieve the status of the 
-job (__getJobStatus__ or __getJobStatuses__) or to cancel it (__cancelJob__). This __Job__ contains the 
-following:
+Once a job is submitted, a [__Job__][22] object is returned that can be used with __getJobStatus__ to 
+retrieve the status of the job, and with __cancelJob__ to cancel it. This __Job__ contains the following:
 
     public interface Job {
         JobDescription getJobDescription();
@@ -500,9 +499,9 @@ following:
     } 
 
 Besides methods for retrieveing the __JobDescription__ and __Scheduler__ that created it, each __Job__ also 
-contains methods to determine is the __Job__ is running on an online __Scheduler__ (__isOnline__) and whether 
-the __Job__ is an interactive or batch job (__isInteractive__). 
-
+contains the __isInteractive__ method to determine if the __Job__ is interactive, and the __isOnline__ 
+method to determine if the job is running on an _online scheduler_ (explained above).
+ 
 Interactive jobs are jobs where the user gets direct control over the standard streams of the job 
 (the _stdin_, _stdout_ and _stderr_ streams). The user __must__ retrieve these streams using the 
 __getStreams__ method in __Jobs__ and then provide input and output, or close the streams. Failing to do
