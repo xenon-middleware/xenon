@@ -138,9 +138,9 @@ We will now briefly describe the most important classes and interfaces of these 
 
 ### Octopus factory and interface ###
 
-The `nl.esciencecenter.octopus` package contains the entry point into the octopus library
-[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
-The main enty point is [__OctopusFactory__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html):
+The [`nl.esciencecenter.octopus`](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
+package contains the entry point into the octopus library The main enty point is 
+[__OctopusFactory__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html):
 
     public class OctopusFactory {
        public static Octopus newOctopus(Map<String,String> properties) throws ...
@@ -651,7 +651,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -662,7 +662,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -706,7 +706,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
