@@ -363,10 +363,10 @@ To read or write files, the following methods are available:
        OutputStream newOutputStream(Path path, OpenOption... options) throws ...
     }
 
-Using these methods, an `InputStream` can be created to read a file, and an `OutputStream` can be 
-created to write a file. The `newOutputStream` method requires a `OpenOption... options` parameter 
-to specify how the file should be opened for writing (for example, should the data be append or 
-should the file be truncated first). These options are describe in more detail in the Javadoc.
+Using these methods, an __InputStream__ can be created to read a file, and an __OutputStream__ can be 
+created to write a file. The __newOutputStream__ method requires a _options_ parameter to specify how 
+the file should be opened for writing (for example, should the data be append or should the file be 
+truncated first). These options are describe in more detail in the Javadoc.
 
 To copy files, the following methods are available:
 
