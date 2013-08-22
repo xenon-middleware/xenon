@@ -138,9 +138,8 @@ We will now briefly describe the most important classes and interfaces of these 
 
 ### Octopus factory and interface ###
 
-The [`nl.esciencecenter.octopus`](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html).
-package contains the entry point into the octopus library The main enty point is 
-[__OctopusFactory__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html):
+The [`nl.esciencecenter.octopus`][1] package contains the entry point into the octopus library: 
+[__OctopusFactory__][2]
 
     public class OctopusFactory {
        public static Octopus newOctopus(Map<String,String> properties) throws ...
@@ -148,11 +147,8 @@ package contains the entry point into the octopus library The main enty point is
        public static void endAll();
     }
 
-The __OctopusFactory__ class contains the 
-[__newOctopus__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#newOctopus%28java.util.Map%29) 
-method to create a new octopus instance. The 
-[__endOctopus__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#endOctopus%28nl.esciencecenter.octopus.Octopus%29) 
-method can be used to end the octopus instance once it is no longer needed.
+The __newOctopus__ method can be used to create a new octopus instance, while the 
+__endOctopus__ method can be used to release the octopus instance once it is no longer needed.
 It is important to end the octopus when it is no longer needed, as this allows it to release 
 any resources it has obtained. 
 
@@ -166,6 +162,8 @@ configured. Note that this name can be futher qualified, for example
 "octopus.adaptors.local.a.b.c". The available properties can be found in the documentation 
 of the individual adaptors (see Appendix A). 
 
+A call to __newOctopus__ will return an [__Octopus__][3]
+
     public interface Octopus {
         Files files();
         Jobs jobs();
@@ -175,20 +173,15 @@ of the individual adaptors (see Appendix A).
         AdaptorStatus[] getAdaptorStatuses();
     }
 
-Once an __Octopus__ is created using the __newOctopus__ method, the 
-[__files__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#files%28%29), 
-[__jobs__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#jobs%28%29) and 
-[__credentials__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#credentials%28%29) 
-methods in this interface can be used to retrieve various interfaces that the octopus library 
-offers. They will be described in more detail below. 
+The __files__, __jobs__ and __credentials__ methods in this interface can be used to retrieve 
+various interfaces that the octopus library offers. They will be described in more detail below. 
 
-The [__getProperties__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getProperties%28%29)
-method can be used to retrieve the properties used when the octopus was created. 
-Most objects created by octopus contain such a __getProperties__ method. For brevity, we will 
-not explain these further.
+The __getProperties__ method can be used to retrieve the properties used when the octopus was 
+created. Most objects created by octopus contain such a __getProperties__ method. For brevity, 
+we will not explain these further.
 
-The [__getAdaptorStatus__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getAdaptorStatus%28java.lang.String%29) 
-method can be used to retrieve information about the adaptors. This information is returned in an __AdaptorStatus__ object: 
+The __getAdaptorStatus__ method can be used to retrieve information about the adaptors. This 
+information is returned in an [__AdaptorStatus__][4]
 
     public interface AdaptorStatus {
         String getName();
@@ -198,28 +191,23 @@ method can be used to retrieve information about the adaptors. This information 
         Map<String, String> getAdaptorSpecificInformation();
     }
     
-An __AdaptorStatus__ contains methods to retrieve the name of an adaptor ([__getName__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getName%28%29)), 
-get a human readable description of what functionality it has to offer 
-([__getDescription__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getDescription%28%29))
-and retrieve a list of the schemes it supports 
-([__getSupportedSchemes__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedSchemes%28%29)). 
+An __AdaptorStatus__ contains methods to retrieve the name of an adaptor (__getName__), get a human 
+readable description of what functionality it has to offer (__getDescription__) and retrieve a list 
+of the schemes it supports (__getSupportedSchemes__). 
 
-The [__getSupportedProperties__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedProperties%28%29)
-method can be used to retrieve a list of configuration options the adaptor supports. 
-Each returned __OctopusPropertyDescription__ gives a full description of a single property, 
-including its name (of the form "octopus.adaptors.(name).(property)"), the expected type of its 
-value, a human readable description of its purpose, etc. More information on the supported 
-properties can be found in Appendix A.
+The __getSupportedProperties__ method can be used to retrieve a list of configuration options the adaptor 
+supports. Each returned [__OctopusPropertyDescription__][5] gives a full description of a single property, 
+including its name (of the form "octopus.adaptors.(name).(property)"), the expected type of its value, 
+a human readable description of its purpose, etc. More information on the supported properties can be 
+found in Appendix A.
 
-Finally, [__getAdaptorSpecificInformation__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getAdaptorSpecificInformation%28%29)
-can be used to retrieve status information from the adaptor. Each key contains a property of 
-the form described above. 
+Finally, __getAdaptorSpecificInformation__ can be used to retrieve status information from the adaptor. 
+Each key contains a property of the form described above. 
 
 ### Credentials interface ###
 
-The `nl.esciencecenter.octopus.credentials` package contains the credentials interface of 
-octopus. [(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
-The main entrypoint is the __Credentials__ interface:
+The [`nl.esciencecenter.octopus.credentials`][6] package contains the credentials interface of octopus.
+The main entrypoint is [__Credentials__][7]:
 
     public interface Credentials {
 
@@ -241,8 +229,7 @@ all adaptors. An exception will be thrown when an unsupported __new**Credential_
 
 Additional configuration can also be provides using the _properties_ parameter, which use 
 the same form as described in the _Octopus factory and interface_ section above. If no 
-additional configuration is needed, `null` can be used. The 
-[__getDefaultCredential__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credentials.html#getDefaultCredential%28java.lang.String%29) 
+additional configuration is needed, `null` can be used. The __getDefaultCredential__
 method returns the default credential for the given scheme. All adaptors are guarenteed to 
 support this method. 
 
@@ -254,17 +241,14 @@ methods:
        Map<String,String> getProperties();
     }
 
-The [__getAdaptorName__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html#getAdaptorName%28%29)
-method can be used to retrieve the name of the adaptor that created 
-the credential. Many adaptor specific objects returned by octopus contain this method. 
-For brevity we will not explain this further.
+The __getAdaptorName__ method can be used to retrieve the name of the adaptor that created 
+the credential. Many adaptor specific objects returned by octopus contain this method. For 
+brevity we will not explain this further.
 
 ### Files interface ###
 
-The `nl.esciencecenter.octopus.files` package contains the files interface of octopus. 
-[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html) 
-The main entrypoint is __Files__. For readability we will split the explanation of __Files__ 
-into several parts:
+The [`nl.esciencecenter.octopus.files`][8] package contains the files interface of octopus. The main 
+entrypoint is [__Files__][9]. For readability we will split the explanation of __Files__ into several parts:
 
     public interface Files {
 
@@ -283,16 +267,12 @@ into several parts:
 
     }
 
-The __Files__ interface contains several method for creating and closing a 
-[__FileSystem__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileSystem.html).
+The __Files__ interface contains several method for creating and closing a [__FileSystem__][10]. 
 A __FileSystem__ provides an abstraction for a (possibly remote) file system. To create a __FileSystem__ the 
-[__newFileSystem__]
-(http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Files.html#newFileSystem%28java.net.URI,%20nl.esciencecenter.octopus.credentials.Credential,%20java.util.Map%29) 
-method can be used. 
-The _location_ parameter provides the information on the location of the file system. The URI is expected to 
-contain at least a _scheme_. Most URIs will also contain _host_ information. Optionally, _user_ information may 
-also be provided. A file system URI may _not_ contain a path other than `"/"`. The following are all valid file 
-system URIs: 
+__newFileSystem__ method can be used. The _location_ parameter provides the information on the location of the 
+file system. The URI is expected to contain at least a _scheme_. Most URIs will also contain _host_ information. 
+Optionally, _user_ information may also be provided. A file system URI may _not_ contain a path other than `"/"`.
+The following are all valid file system URIs: 
 
     file:///
     sftp://example.com
@@ -309,18 +289,18 @@ configuration is required. The returned __FileSystem__ contains the following:
         AbsolutePath getEntryPath();
     }
 
-The `getUri` returns the `URI` used to create it. The `getEntryPath` method returns the 
-_path at which the file system was entered_. For example, when accessing a file system using `sftp` it is
+The __getUri__ method returns the `URI` used to create it. The __getEntryPath__ method returns the 
+_path at which the file system was entered_. For example, when accessing a file system using "sftp" it is
 customary (but not manditory) to enter the file system at the users' home directory. Therefore, the 
-entry path of the `FileSystem` will be `/home/username`. 
+entry path of the __FileSystem__ will be "/home/username". 
 
-The `getLocalCWDFileSystem` and `getLocalHomeFileSystem` methods of `Files` provide shortcuts to create a 
-`FileSystem` representing the _current working directory_ or _user home directory_ on the local machine. 
+The __getLocalCWDFileSystem__ and __getLocalHomeFileSystem__ methods of __Files__ provide shortcuts to create a 
+__FileSystem__ representing the _current working directory_ or _user home directory_ on the local machine. 
 
-When a `FileSystem` is no longer used, it __must__ be closed using `close`. this releases any resources 
-held by the `FileSystem`. The `isOpen` method can be used to check if a `FileSystem` is open or closed. 
+When a __FileSystem__ is no longer used, it __must__ be closed using __close__. this releases any resources 
+held by the __FileSystem__. The __isOpen__ method can be used to check if a __FileSystem__ is open or closed. 
 
-Once a `FileSystem` is created, it can be used to access files: 
+Once a __FileSystem__ is created, it can be used to access files: 
 
     public interface Files {
 
@@ -342,12 +322,12 @@ Once a `FileSystem` is created, it can be used to access files:
        // ... more follows
     }
 
-The `newPath` method can be used to create a new `Path`. An `Path` represents a path
-on a specific `FileSystem`. This path does not necessarily exists. To create an `Path`, both 
-the target `FileSystem` and a `Pathname` are needed. A `Pathname` contains a sequence of strings
-separated using a special _separator_ character, which is used to identify a location on a 
-file system. For example `/tmp/dir` or `c:\windows\Users`. `Pathname` contains many utility 
-methods for manipulating these string sequences. The details can be found in the Javadoc.
+The __newPath__ method can be used to create a new [__Path__][11]. An __Path__ represents a path
+on a specific __FileSystem__. This path does not necessarily exists. To create an __Path__, both 
+the target __FileSystem__ and a [__Pathname__][12] are needed. A __Pathname__ contains a sequence 
+of strings separated using a special _separator_ character, which is used to identify a location on a 
+file system (for example "/tmp/dir"). __Pathname__ contains many utility methods for manipulating 
+these string sequences. The details can be found in the Javadoc.
 
 `Files` contains several methods to create and delete files and directories. When creating files and 
 directories octopus checks if the target already exists. If so, an exception will be thrown. Similary, 
@@ -590,6 +570,18 @@ increasing complexity:
 <https://github.com/NLeSC/octopus/FIXME>
 
 
+[1]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html
+[2]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html
+[3]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html
+[4]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html
+[5]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusPropertyDescription.html
+[6]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html 
+[7]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credentials.html
+[8]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html
+[9]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Files.html 
+[10]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileSystem.html
+[11]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Path.html
+[12]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Pathname.html
 
 Appendix A: Adaptor Documentation
 ---------------------------------
