@@ -386,15 +386,13 @@ Javadoc.
 
 Normally, __copy__ performs its operation _synchronously_, that is, the call blocks until the copy 
 is completed. However, _asynchronous_ operations are also supported by providing the option 
-__CopyOption.ASYNCHRONOUS__. In that case a [__Copy__][16] object is returned that can be used to retrieve 
-the status of the copy (using __getCopyStatus__) or cancel it (using __cancelCopy__).
+[__CopyOption.ASYNCHRONOUS__][17]. In that case a [__Copy__][16] object is returned that can be used 
+to retrieve the status of the copy (using __getCopyStatus__) or cancel it (using __cancelCopy__).
 
 ### Jobs interface ###
 
-The `nl.esciencecenter.octopus.job` package contains the job interface of octopus. 
-[(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/package-summary.html) 
-The main entrypoint is `Jobs`. For readability we will split the explanation of `Jobs` into several 
-parts:
+The [`nl.esciencecenter.octopus.job`][18] package contains the [__Jobs__][19] interface of octopus.
+For readability we will split the explanation of __Jobs__ into several parts:
 
     public interface Jobs {
 
@@ -408,17 +406,14 @@ parts:
         // ... more follows
     }
 
-The `Jobs` interface contains two methods to create a `Scheduler`. A `Scheduler` provides an
-abstraction for a (possibly remote) scheduler that can be used to run jobs. To create a new scheduler, 
-the `newScheduler` method can be used, which, similar to `newFileSystem`, has `URI`, `Credential` and 
-`Properties` as parameters. For an explanation of these parameters see `newFileSystem`.
-`Jobs` also contains a shortcut method `getLocalScheduler` to create a new `Scheduler` for the local 
-machine. 
+The __Jobs__ interface contains two methods to create a [__Scheduler__][20]. A __Scheduler__ provides 
+an abstraction for a (possibly remote) scheduler that can be used to run jobs. To create a new scheduler, 
+the __newScheduler__ method can be used, which has similar parameters to __newFileSystem__. __Jobs__ also 
+contains a shortcut method __getLocalScheduler__ to create a new __Scheduler__ for the local machine. 
 
-When a `Scheduler` is no longer used, is __must__ be closed using the `close` method. The 
-`isOpen` method can be use to check if a `Scheduler` is open or closed.
-
-A `Scheduler` contains the following:
+When a __Scheduler__ is no longer used, is __must__ be closed using the __close__ method. The 
+__isOpen__ method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the 
+following:
 
     public interface Scheduler {
 
@@ -430,20 +425,20 @@ A `Scheduler` contains the following:
         // ... 
     }
 
-Each `Scheduler` contains one or more queues to which jobs can be submitted. Each queue has a name that 
-is unique to the `Scheduler`. The `getQueueNames` method can be used to retrieve all queue names. 
+Each __Scheduler__ contains one or more queues to which jobs can be submitted. Each queue has a name that 
+is unique to the __Scheduler__. The __getQueueNames__ method can be used to retrieve all queue names. 
 
-The `isOnline` method can be used to determine if the `Scheduler` is an _online scheduler_ or an 
+The __isOnline__ method can be used to determine if the __Scheduler__ is an _online scheduler_ or an 
 _offline scheduler_. Online schedulers need to remain active for their jobs to run. Ending an online 
 scheduler will kill all jobs that were submitted to it. Offline schedulers do not need to remains active 
 for their jobs to run. A submitted job will typically be handed over to some external server that will 
 manage the job for the rest of its lifetime.
 
-The `supportsInteractive` and `supportsBatch` method can be use to check if the `Scheduler` supports 
+The __supportsInteractive__ and __supportsBatch__ method can be use to check if the __Scheduler__ supports 
 interactive and/or batch jobs. This will be explained below. 
 
-Once a `Scheduler` is created, `Jobs` contains several methods to retrieve information about the 
-`Scheduler`.
+Once a __Scheduler__ is created, __Jobs__ contains several methods to retrieve information about the 
+__Scheduler__:
 
     public interface Jobs {
 
@@ -461,13 +456,13 @@ Once a `Scheduler` is created, `Jobs` contains several methods to retrieve infor
         // ... more follows
     }
 
-The `getQueueStatuses` method can be used to retrieve information about a queue. If no queue names 
+The __getQueueStatuses__ method can be used to retrieve information about a queue. If no queue names 
 are provided as a parameter, information on all queues in the scheduler will be returned. Using the 
-`getDefaultQueueName` the default queue can be retrieved for the `Scheduler`. The `getJobs` method 
+__getDefaultQueueName__ the default queue can be retrieved for the __Scheduler__. The __getJobs__ method 
 can be used to retrieve information on all jobs in a queue. Note that this may also include jobs
 from other users.
 
-To submit and manage jobs, the `Jobs` interface contains the following methods:
+To submit and manage jobs, the __Jobs__ interface contains the following methods:
 
     public interface Jobs {
 
@@ -487,13 +482,14 @@ To submit and manage jobs, the `Jobs` interface contains the following methods:
         JobStatus cancelJob(Job job) throws ...
     }    
 
-The `submitJob` method can be used to submit a job to a `Scheduler`. A `JobDescription` must be provided 
-as parameter. A `JobDescription` contains all necessary information on how to start the job, for example, 
-the location of the executable, any command line arguments that are required, the working directory, etc. 
-See the Javadoc for details of the `JobDescription`.
+The __submitJob__ method can be used to submit a job to a __Scheduler__. A [__JobDescription__][21] must 
+be provided as parameter. A __JobDescription__ contains all necessary information on how to start the job, 
+for example, the location of the executable, any command line arguments that are required, the working 
+directory, etc. See the Javadoc for details of the __JobDescription__.
 
-Once a job is submitted, a `Job` object is returned that can be used later to retrieve the status of the 
-job (`getJobStatus` or `getJobStatuses`) or to cancel it (`cancelJob`). This `Job` contains the following:
+Once a job is submitted, a [__Job__][22] object is returned that can be used later to retrieve the status of the 
+job (__getJobStatus__ or __getJobStatuses__) or to cancel it (__cancelJob__). This __Job__ contains the 
+following:
 
     public interface Job {
         JobDescription getJobDescription();
@@ -503,46 +499,40 @@ job (`getJobStatus` or `getJobStatuses`) or to cancel it (`cancelJob`). This `Jo
         boolean isOnline();
     } 
 
-Besides methods for retrieveing the `JobDescription` and `Scheduler` that created it, each `Job` also 
-contains methods to determine is the `Job` is running on an online `Scheduler` (`isOnline`) and whether 
-the `Job` is an interactive or batch job (`isInteractive`). 
+Besides methods for retrieveing the __JobDescription__ and __Scheduler__ that created it, each __Job__ also 
+contains methods to determine is the __Job__ is running on an online __Scheduler__ (__isOnline__) and whether 
+the __Job__ is an interactive or batch job (__isInteractive__). 
 
 Interactive jobs are jobs where the user gets direct control over the standard streams of the job 
 (the _stdin_, _stdout_ and _stderr_ streams). The user __must__ retrieve these streams using the 
-`getStreams` method in `Jobs` and then provide input and output, or close the streams. Failing to do
+__getStreams__ method in __Jobs__ and then provide input and output, or close the streams. Failing to do
 so may cause the job to block indefinately.
 
 Batch jobs are jobs where the standard streams are redirected from and to files. The source and targets 
-for this redirection can be set in the `JobDescription`. See the Javadoc of `JobDescription` for details.
+for this redirection can be set in the __JobDescription__. See the Javadoc of __JobDescription__ for details.
 
-After submitting a job, `waitUntilRunning` can be used to wait until a job is no longer waiting in the 
-queue and `waitUntilDone` can be used to wait until the job has finished.  
+After submitting a job, __waitUntilRunning__ can be used to wait until a job is no longer waiting in the 
+queue and __waitUntilDone__ can be used to wait until the job has finished.  
 
-For all methods returning a `JobStatus`, the following rule applies: after a job has finished, the 
+For all methods returning a [__JobStatus__][23], the following rule applies: after a job has finished, the 
 status is only guarenteed to be returned _once_. Any subsequent calls to a method that returns a 
-`JobStatus` _may_ throw an exception stating that the job does not exist. Some adaptors may return 
+__JobStatus__ _may_ throw an exception stating that the job does not exist. Some adaptors may return 
 a result however.  
 
 ### Exceptions ###
 
-The `nl.esciencecenter.octopus.exceptions` package contains the exceptions that may be thrown by 
-octopus. See the [Javadoc](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/exceptions/package-summary.html)
-for the available exceptions.
+The [`nl.esciencecenter.octopus.exceptions`][24] package contains the exceptions that may be thrown by 
+octopus. See the Javadoc for the available exceptions.
 
 ### Utilities classes ###
 
-The `nl.esciencecenter.octopus.util` package contains various utility classes. 
-See the [Javadoc](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/package-summary.html)
-for the available utilities.
+The [`nl.esciencecenter.octopus.util`][25] package contains various utility classes. See the Javadoc for the 
+available utilities.
 
 Examples
 --------
 
-Many examples of how to use octopus can be found 
-
-
-
-online. They will be listed here in order of 
+Many examples of how to use octopus can be found online. They will be listed here in order of 
 increasing complexity:
 
 ### Initializing Octopus ###
@@ -586,6 +576,15 @@ increasing complexity:
 [14]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileAttributes.html
 [15]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/DirectoryStream.html
 [16]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Copy.html
+[17]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/CopyOption.html
+[18]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/package-summary.html
+[19]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Jobs.html
+[20]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Scheduler.html
+[21]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobDescription.html
+[22]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Job.html
+[23]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobStatus.html
+[24]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/exceptions/package-summary.html
+[25]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/package-summary.html
 
 Appendix A: Adaptor Documentation
 ---------------------------------
