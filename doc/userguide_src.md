@@ -1,3 +1,5 @@
+![logo](images/OctopusLogo_NLeSC_blauw.png)
+
 Octopus
 =======
 
