@@ -152,12 +152,12 @@ It contains the __OctopusFactory__ class and __Octopus__ interface.
 The __OctopusFactory__ class contains the 
 [__newOctopus__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#newOctopus%28java.util.Map%29) 
 method to create a new octopus instance. The 
-[endOctopus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#endOctopus%28nl.esciencecenter.octopus.Octopus%29) 
+[__endOctopus__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#endOctopus%28nl.esciencecenter.octopus.Octopus%29) 
 method can be used to end the octopus instance once it is no longer needed.
 It is important to end the octopus when it is no longer needed, as this allows it to release 
 any resources it has obtained. 
 
-When creating an octopus using `newOctopus`, the `properties` parameter can be used to 
+When creating an octopus using __newOctopus__, the _properties_ parameter can be used to 
 configure the octopus instance. If no configuration is necessary, `null` can be used.
 Properties consist of a set of key-value pairs. In octopus all keys __must__ start with 
 "octopus.". To configure the adaptors, properties of the form 
@@ -176,17 +176,20 @@ of the individual adaptors (see Appendix A).
         AdaptorStatus[] getAdaptorStatuses();
     }
 
-Once an `Octopus` is created using the `newOctopus` method, the `files`, `jobs` and `credentials` 
+Once an __Octopus__ is created using the __newOctopus__ method, the 
+[__files__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#files%28%29), 
+[__jobs__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#jobs%28%29) and 
+[__credentials__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#credentials%28%29) 
 methods in this interface can be used to retrieve various interfaces that the octopus library 
 offers. They will be described in more detail below. 
 
-The [getProperties](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getProperties%28%29)
+The [__getProperties__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getProperties%28%29)
 method can be used to retrieve the properties used when the octopus was created. 
-Most objects created by octopus contain such a `getProperties` method. For brevity, we will 
+Most objects created by octopus contain such a __getProperties__ method. For brevity, we will 
 not explain these further.
 
-The [getAdaptorStatus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getAdaptorStatus%28java.lang.String%29) 
-method can be used to retrieve information about the adaptors. This information is returned in an `AdaptorStatus` object: 
+The [__getAdaptorStatus__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html#getAdaptorStatus%28java.lang.String%29) 
+method can be used to retrieve information about the adaptors. This information is returned in an __AdaptorStatus__ object: 
 
     public interface AdaptorStatus {
         String getName();
@@ -196,20 +199,20 @@ method can be used to retrieve information about the adaptors. This information 
         Map<String, String> getAdaptorSpecificInformation();
     }
     
-An `AdaptorStatus` contains methods to retrieve the name of an adaptor ([getName](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getName%28%29)), 
+An __AdaptorStatus__ contains methods to retrieve the name of an adaptor ([__getName__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getName%28%29)), 
 get a human readable description of what functionality it has to offer 
-([getDescription](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getDescription%28%29))
+([__getDescription__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getDescription%28%29))
 and retrieve a list of the schemes it supports 
-([getSupportedSchemes](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedSchemes%28%29)). 
+([__getSupportedSchemes__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedSchemes%28%29)). 
 
-The [getSupportedProperties](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedProperties%28%29)
+The [__getSupportedProperties__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getSupportedProperties%28%29)
 method can be used to retrieve a list of configuration options the adaptor supports. 
 Each returned `OctopusPropertyDescription` gives a full description of a single property, 
 including its name (of the form "octopus.adaptors.<name>.<property>"), the expected type of its 
 value, a human readable description of its purpose, etc. More information on the supported 
 properties can be found in Appendix A.
 
-Finally, [getAdaptorSpecificInformation](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getAdaptorSpecificInformation%28%29)
+Finally, [__getAdaptorSpecificInformation__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html#getAdaptorSpecificInformation%28%29)
 can be used to retrieve status information from the adaptor. Each key contains a property of 
 the form described above. 
 
@@ -217,7 +220,7 @@ the form described above.
 
 The `nl.esciencecenter.octopus.credentials` package contains the credentials interface of 
 octopus. [(Javadoc)](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html) 
-The main entrypoint is the `Credentials` interface:
+The main entrypoint is the __Credentials__ interface:
 
     public interface Credentials {
 
@@ -231,19 +234,20 @@ The main entrypoint is the `Credentials` interface:
         Credential getDefaultCredential(String scheme) throws ...;
     }
 
-The `Credentials` interface contains various methods for creating credentials, based 
+The __Credentials__ interface contains various methods for creating credentials, based 
 on certificates or passwords. For each method, the desired _scheme_ needs to be 
 provided as a parameter. This allows octopus to forward the call to the correct adaptor.
 Note that some types of credentials may not be supported by all adaptors. An exception 
-will be thrown when an unsupported `new<Type>Credential` methods is invoked. 
+will be thrown when an unsupported __new***Credential__ methods is invoked. 
 
-Additional configuration can also be provides using the `properties` parameter, which use 
+Additional configuration can also be provides using the _properties_ parameter, which use 
 the same form as described in the _Octopus factory and interface_ section above. If no 
-additional configuration is needed, `null` can be used. The `getDefaultCredential` 
-returns the default credential for the given scheme. All adaptors are guarenteed to 
+additional configuration is needed, `null` can be used. The 
+[__getDefaultCredential__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credentials.html#getDefaultCredential%28java.lang.String%29) 
+method returns the default credential for the given scheme. All adaptors are guarenteed to 
 support this method. 
 
-All `new<Type>Credential` methods return a `Credential` that contains the following 
+All __new***Credential__ methods return a __Credential__ that contains the following 
 methods: 
 
     public interface Credential {
@@ -251,7 +255,7 @@ methods:
        Map<String,String> getProperties();
     }
 
-The [getAdaptorName](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html#getAdaptorName%28%29)
+The [__getAdaptorName__](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html#getAdaptorName%28%29)
 method can be used to retrieve the name of the adaptor that created 
 the credential. Many adaptor specific objects returned by octopus contain this method. 
 For brevity we will not explain this further.
@@ -644,7 +648,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -655,7 +659,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -699,7 +703,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
