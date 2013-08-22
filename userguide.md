@@ -150,7 +150,7 @@ It contains the `OctopusFactory` class and `Octopus` interface.
     }
 
 The `OctopusFactory` class contains the 
-[newOctopus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#newOctopus%28java.util.Map%29) 
+[`newOctopus`](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#newOctopus%28java.util.Map%29) 
 method to create a new octopus instance. The 
 [endOctopus](http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html#endOctopus%28nl.esciencecenter.octopus.Octopus%29) 
 method can be used to end the octopus instance once it is no longer needed.
