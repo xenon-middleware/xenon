@@ -268,11 +268,12 @@ octopus. For readability we will split the explanation of __Files__ into several
     }
 
 The __Files__ interface contains several method for creating and closing a [__FileSystem__][10]. 
-A __FileSystem__ provides an abstraction for a (possibly remote) file system. To create a __FileSystem__ the 
-__newFileSystem__ method can be used. The _location_ parameter provides the information on the location of the 
-file system. The URI is expected to contain at least a _scheme_. Most URIs will also contain _host_ information. 
-Optionally, _user_ information may also be provided. A file system URI may _not_ contain a path other than `"/"`.
-The following are all valid file system URIs: 
+A __FileSystem__ provides an abstraction for a (possibly remote) file system. 
+
+To create a __FileSystem__ the __newFileSystem__ method can be used. The _location_ parameter provides 
+the information on the location of the file system. The URI is expected to contain at least a _scheme_. 
+Most URIs will also contain _host_ information. Optionally, _user_ information may also be provided. A 
+file system URI may _not_ contain a path other than `"/"`. The following are all valid file system URIs: 
 
     file:///
     sftp://example.com
@@ -292,14 +293,13 @@ configuration is required. The returned __FileSystem__ contains the following:
 The __getUri__ method returns the `URI` used to create it. The __getEntryPath__ method returns the 
 _path at which the file system was entered_. For example, when accessing a file system using "sftp" it is
 customary (but not manditory) to enter the file system at the users' home directory. Therefore, the 
-entry path of the __FileSystem__ will be "/home/username". 
+entry path of the __FileSystem__ will be similar to "/home/(username)". 
 
 The __getLocalCWDFileSystem__ and __getLocalHomeFileSystem__ methods of __Files__ provide shortcuts to create a 
 __FileSystem__ representing the _current working directory_ or _user home directory_ on the local machine. 
 
 When a __FileSystem__ is no longer used, it __must__ be closed using __close__. this releases any resources 
 held by the __FileSystem__. The __isOpen__ method can be used to check if a __FileSystem__ is open or closed. 
-
 Once a __FileSystem__ is created, it can be used to access files: 
 
     public interface Files {
@@ -329,14 +329,14 @@ of strings separated using a special _separator_ character, which is used to ide
 file system (for example "/tmp/dir"). __Pathname__ contains many utility methods for manipulating 
 these string sequences. The details can be found in the Javadoc.
 
-`Files` contains several methods to create and delete files and directories. When creating files and 
+__Files__ contains several methods to create and delete files and directories. When creating files and 
 directories octopus checks if the target already exists. If so, an exception will be thrown. Similary, 
 an exception is thrown when attempting to delete non-existing file or a directory that is not empty. 
-The `exists` method can be used to check if a path exists.
+The __exists__ method can be used to check if a path exists.
 
-Using the `getAttributes` method the attributes of a file can be retrieved. These `FileAttributes` 
-contain information on the type of file (regular file, directory, link, etc), it size, 
-creation time, access rights, etc. 
+Using the __getAttributes__ method the attributes of a file can be retrieved. The returned
+[__FileAttributes__][14] contains information on the type of file (regular file, directory, link, etc), 
+it size, creation time, access rights, etc. 
 
 To list directories, the following methods are available:
 
@@ -349,10 +349,10 @@ To list directories, the following methods are available:
        // ... more follows
     }
 
-Both `newDirectoryStream` and `newAttributesDirectoryStream` return a `DirectoryStream` which can be
-used to iterate over the contents of a directory. For the latter, the `FileAttributes` for each of 
-the files are also included. alternatively, these methods are also available with an extra `filter`
-parameter, which can be used to filter the stream in advance.
+Both __newDirectoryStream__ and __newAttributesDirectoryStream__ return a [__DirectoryStream__][15]
+which can be used to iterate over the contents of a directory. For the latter, the __FileAttributes__ 
+for each of the files are also included. alternatively, these methods are also available with an extra 
+_filter_ parameter, which can be used to filter the stream in advance.
 
 To read or write files, the following methods are available:
 
@@ -380,14 +380,14 @@ To copy files, the following methods are available:
 
     }
 
-The `copy` method supports various copy operations such as a regular copy, a resume or an append. 
-The `CopyOption...options` parameter can be used to specify the desired operation. The details can be 
-found in the Javadoc.
+The __copy__ method supports various copy operations such as a regular copy, a resume or an append. 
+The _options_ parameter can be used to specify the desired operation. The details can be found in the 
+Javadoc.
 
-Normally, `copy` performs its operation _synchronously_, that is, the call blocks until the copy 
+Normally, __copy__ performs its operation _synchronously_, that is, the call blocks until the copy 
 is completed. However, _asynchronous_ operations are also supported by providing the option 
-`CopyOption.ASYNCHRONOUS`. In that case a `Copy` object is returned that can be used to retrieve 
-the status of the copy (using `getCopyStatus`) or cancel it (using `cancelCopy`).
+__CopyOption.ASYNCHRONOUS__. In that case a [__Copy__][16] object is returned that can be used to retrieve 
+the status of the copy (using __getCopyStatus__) or cancel it (using __cancelCopy__).
 
 ### Jobs interface ###
 
@@ -583,6 +583,9 @@ increasing complexity:
 [11]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Path.html
 [12]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Pathname.html
 [13]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html
+[14]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileAttributes.html
+[15]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/DirectoryStream.html
+[16]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Copy.html
 
 Appendix A: Adaptor Documentation
 ---------------------------------
