@@ -665,10 +665,10 @@ The local adaptor implements all functionality with  standard java classes such 
 ### Supported schemes: ###
 local, file
 
-### Supported properties: ###
+#### Supported properties: ####
 
 
-### `octopus.adaptors.local.queue.pollingDelay` ###
+__`octopus.adaptors.local.queue.pollingDelay`__
 
 The polling delay for monitoring running jobs (in milliseconds).
 
