@@ -34,17 +34,23 @@ Details of the latest version can be found on the octopus project web site at
 Documentation
 -------------
 
-For an overview of octopus please consult the users guide in the docs directory 
-"docs/usersguide.pdf".
+For an overview of octopus please consult the online __users guide__:
+
+<https://github.com/NLeSC/octopus/blob/develop/doc/userguide.md>
+
+A pdf version of the user guide is also available in the docs directory 
+"docs/usersguide.pdf" or online at:
+
+<https://github.com/NLeSC/octopus/blob/develop/doc/userguide.pdf>
 
 See the file "INSTALL.txt" for a description of how to install octopus. 
 
-The javadoc of octopus library is available in "javadoc/index.html" or online at 
+The javadoc of octopus library is available online at: 
 
 http://nlesc.github.io/octopus/javadoc
 
-The source of octopus can be found in "src/". Example applications can be found 
-in "examples/src/".
+The source of octopus can be found in "src/". Example applications can be 
+found in "examples/src/".
 
 
 Copyrights & Disclaimers
