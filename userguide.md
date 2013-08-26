@@ -531,32 +531,61 @@ available utilities.
 Examples
 --------
 
-Many examples of how to use octopus can be found online. They will be listed here in order of 
-increasing complexity:
+Examples of how to use octopus can be found in the [examples][26] directory. We will list them here in 
+order of increasing complexity, and with a short description of each example.
 
 ### Initializing Octopus ###
 
-<https://github.com/NLeSC/octopus/FIXME>
+Creating an __Octopus__ and retrieving the __Credentials__, __Files__ and __Jobs__ interfaces: 
+[CreatingOctopus.java][27]
 
-<https://github.com/NLeSC/octopus/FIXME>
+Creating an __Octopus__ with configuration properties: 
+[CreatingOctopusWithProperties.java][28]
 
 ### Creating Credentials ###
 
-<https://github.com/NLeSC/octopus/FIXME>
-
-<https://github.com/NLeSC/octopus/FIXME>
+Creating a password and default __Credential__:
+[CreatingCredential.java][29]
 
 ### File Access ###
 
-<https://github.com/NLeSC/octopus/FIXME>
+Creating a local __FileSystem__:
+[CreateLocalFileSystem.java][30]
 
-<https://github.com/NLeSC/octopus/FIXME>
+Checking if a local file exists:
+[LocalFileExists.java][32]
+
+Creating a __FileSystem__ based on a URI. 
+[CreateFileSystem.java][31]
+
+Checking if a (possibly remote) file exists:
+[FileSystem.java][32]
+
+Listing a directory:
+[DirectoryListing.java][33]
+
+Copying a file:
+[CopyFile.java][34]
 
 ### Job Submission ###
 
-<https://github.com/NLeSC/octopus/FIXME>
+Creating a __Scheduler__ and retrieving the status of its queues:
+[ListQueueStatus.java][36]
 
-<https://github.com/NLeSC/octopus/FIXME>
+Creating a __Scheduler__ and retrieving the jobs:
+[ListJobs.java][37]
+
+Listing the status of a Job:
+[ListJobStatus.java][38]
+
+Submitting a batch job without output: 
+[SubmitSimpleBatchJob.java][39]
+
+Submitting a batch job with output: 
+[SubmitBatchJobWithOutput.java][40]
+
+Submitting an interactive job with output: 
+[SubmitInteractiveJobWithOutput.java][41]
 
 
 [1]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html
@@ -584,6 +613,22 @@ increasing complexity:
 [23]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobStatus.html
 [24]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/exceptions/package-summary.html
 [25]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/package-summary.html
+[26]: https://github.com/NLeSC/octopus/tree/develop/examples/src/nl/esciencecenter/octopus/examples
+[27]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/CreatingOctopus.java
+[28]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/CreatingOctopusWithProperties.java
+[29]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/credentials/CreatingCredential.java
+[30]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/CreateLocalFileSystem.java
+[31]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/CreateFileSystem.java
+[32]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/LocalFileExists.java  
+[33]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/FileExists.java
+[34]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/DirectoryListing.java
+[35]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/CopyFile.java 
+[36]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/ListQueueStatus.java
+[37]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/ListJobs.java
+[38]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/ListJobStatus.java
+[39]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/SubmitSimpleBatchJob.java
+[40]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/SubmitBatchJobWithOutput.java
+[41]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/SubmitInteractiveJobWithOutput.java
 
 Appendix A: Adaptor Documentation
 ---------------------------------
