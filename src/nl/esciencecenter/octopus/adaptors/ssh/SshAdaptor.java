@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -97,6 +98,15 @@ public class SshAdaptor extends Adaptor {
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
+    /** Ssh adaptor information start with this prefix. */
+    public static final String INFO = PREFIX + "info.";
+
+    /** Ssh job information start with this prefix. */
+    public static final String JOBS = INFO + "jobs.";
+    
+    /** How many jobs have been submitted using this adaptor. */
+    public static final String SUBMITTED = JOBS + "submitted";
+    
     /** List of properties supported by this SSH adaptor */
     private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = new ImmutableArray<OctopusPropertyDescription>(
             new OctopusPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
@@ -275,7 +285,8 @@ public class SshAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        // TODO Auto-generated method stub
-        return null;
+        Map<String,String> result = new HashMap<String, String>();
+        jobsAdaptor.getAdaptorSpecificInformation(result);
+        return result;
     }
 }

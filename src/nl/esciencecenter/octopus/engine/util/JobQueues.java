@@ -117,6 +117,10 @@ public class JobQueues {
     private synchronized int getNextJobID() {
         return jobID++;
     }
+    
+    public synchronized int getCurrentJobID() {
+        return jobID;
+    }
 
     private void checkScheduler(Scheduler scheduler) throws OctopusException {
 
@@ -473,6 +477,9 @@ public class JobQueues {
         return findJob(job).getStreams();
     }
 
+    
+    
+    
     public void end() {
         singleExecutor.shutdownNow();
         multiExecutor.shutdownNow();

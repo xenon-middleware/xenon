@@ -103,6 +103,6 @@ public class SshCredentials implements Credentials {
 
     @Override
     public void close(Credential credential) throws OctopusException {
-        // TODO: implement
+        // Nothing to do here.
     }
 }

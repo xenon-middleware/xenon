@@ -176,4 +176,13 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
         return jobQueues.getStreams(job);
     }
 
+    /**
+     * Add information about the local job adaptor to the map. 
+     * 
+     * @param result
+     *          the map to add information to. 
+     */
+    public void getAdaptorSpecificInformation(Map<String, String> result) {
+        result.put(LocalAdaptor.SUBMITTED, Long.toString(jobQueues.getCurrentJobID()));
+    }
 }

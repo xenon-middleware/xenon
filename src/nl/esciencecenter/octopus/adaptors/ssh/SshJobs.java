@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
+import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -86,6 +87,8 @@ public class SshJobs implements Jobs {
     private final SshAdaptor adaptor;
 
     private final OctopusProperties properties;
+    
+    private long submittedJobs = 0;
 
     private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
@@ -158,6 +161,14 @@ public class SshJobs implements Jobs {
         return getJobQueue(scheduler).getJobs(queueNames);
     }
 
+    private synchronized void addSubmittedJob() {
+        submittedJobs++;
+    }
+
+    private synchronized long getSubmittedJobs() {
+        return submittedJobs;
+    }
+    
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
 
@@ -165,7 +176,11 @@ public class SshJobs implements Jobs {
             throw new UnsupportedJobDescriptionException(SshAdaptor.ADAPTOR_NAME, "Environment variables not supported!");
         }
 
-        return getJobQueue(scheduler).submitJob(description);
+        Job job = getJobQueue(scheduler).submitJob(description);
+        
+        addSubmittedJob();
+        
+        return job;
     }
 
     @Override
@@ -268,4 +283,13 @@ public class SshJobs implements Jobs {
         return getJobQueue(job.getScheduler()).getStreams(job);
     }
 
+    /**
+     * Add information about the ssh job adaptor to the map. 
+     * 
+     * @param result
+     *          the map to add information to. 
+     */
+    public void getAdaptorSpecificInformation(Map<String, String> result) {
+        result.put(SshAdaptor.SUBMITTED, Long.toString(getSubmittedJobs()));
+    }
 }

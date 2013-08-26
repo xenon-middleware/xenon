@@ -17,6 +17,7 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
@@ -69,6 +70,15 @@ public class LocalAdaptor extends Adaptor {
     /** Property for the maximum number of concurrent jobs in the multi queue. */
     public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
 
+    /** Local queue information start with this prefix. */
+    public static final String INFO = PREFIX + "info.";
+
+    /** Local job information start with this prefix. */
+    public static final String JOBS = INFO + "jobs.";
+    
+    /** How many jobs have been submitted locally. */
+    public static final String SUBMITTED = JOBS + "submitted";
+    
     /** The schemes supported by the adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<String>("local", "file");
 
@@ -163,7 +173,8 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        // TODO: supply some info.
-        return null;
+        Map<String,String> result = new HashMap<String, String>();
+        localJobs.getAdaptorSpecificInformation(result);
+        return result;
     }
 }
