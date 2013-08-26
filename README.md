@@ -41,13 +41,13 @@ For an overview of octopus please consult the online __users guide__:
 A pdf version of the user guide is also available in the docs directory 
 "docs/usersguide.pdf" or online at:
 
-<https://github.com/NLeSC/octopus/blob/develop/doc/userguide.pdf>
+<https://nlesc.github.io/octopus/userguide.pdf>
 
 See the file "INSTALL.txt" for a description of how to install octopus. 
 
 The javadoc of octopus library is available online at: 
 
-http://nlesc.github.io/octopus/javadoc
+<http://nlesc.github.io/octopus/javadoc>
 
 The source of octopus can be found in "src/". Example applications can be 
 found in "examples/src/".
