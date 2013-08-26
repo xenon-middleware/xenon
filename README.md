@@ -43,7 +43,7 @@ For an overview of octopus please consult the __online users guide__:
 A pdf version of the user guide is also available in the docs directory 
 "docs/usersguide.pdf" or online at:
 
-<https://nlesc.github.io/octopus/userguide.pdf>
+<http://nlesc.github.io/octopus/userguide.pdf>
 
 See the file "INSTALL.txt" for a description of how to install octopus. 
 
