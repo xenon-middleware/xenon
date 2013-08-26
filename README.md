@@ -36,7 +36,7 @@ Details of the latest version can be found on the octopus project web site at
 Documentation
 -------------
 
-For an overview of octopus please consult the online __users guide__:
+For an overview of octopus please consult the __online users guide__:
 
 <https://github.com/NLeSC/octopus/blob/develop/doc/userguide.md>
 
