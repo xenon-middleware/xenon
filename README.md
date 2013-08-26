@@ -3,7 +3,7 @@ Octopus
 
 Copyright 2013 The Netherlands eScience Center
 
-Last modified: 27 June 2013
+Last modified: 26 Augustus 2013
 
 What is it?
 -----------
