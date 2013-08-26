@@ -1,18 +1,142 @@
+<!DOCTYPE html>
 <html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
 
-<head>
-<title>Octopus</title>
-</head>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-<h1>Octopus Library Javadoc</h1>
+    <title>Octopus by NLeSC</title>
+  </head>
 
-<p>Javadoc of the Octopus Library. See <a href="https://github.com/NLeSC/octopus">https://github.com/NLeSC/octopus</a> for more information on Octopus.</p>
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Octopus</h1>
+        <h2>Library to interface with different distributed compute and storage resources</h2>
+        <a href="https://github.com/NLeSC/octopus" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
 
-<p><a href="javadoc">User Javadoc</a></p>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p><img src="doc/images/NLeSC_Octopus_logo.png" alt="logo" title="Octopus Logo"></p>
 
-<p><a href="javadoc-devel">Developer Javadoc</a></p>
+<h1>
+<a name="octopus" class="anchor" href="#octopus"><span class="octicon octicon-link"></span></a>Octopus</h1>
 
-</body>
+<p>Copyright 2013 The Netherlands eScience Center</p>
+
+<p>Last modified: 26 August 2013</p>
+
+<h2>
+<a name="what-is-it" class="anchor" href="#what-is-it"><span class="octicon octicon-link"></span></a>What is it?</h2>
+
+<p>Octopus is a middleware abstraction library. It provides a simple programming 
+interface to various pieces of software that can be used to access distributed
+compute and storage resources. </p>
+
+<h2>
+<a name="why-octopus" class="anchor" href="#why-octopus"><span class="octicon octicon-link"></span></a>Why Octopus?</h2>
+
+<p>Octopus is developed by the Netherlands eScience Center as a support library 
+for our projects. Several projects develop end-user applications that require 
+access to distributed compute and storage resources. Octopus provides a simple 
+API to those resources, allowing those applications to be developed more 
+rapidly. The experience gained during end-user application development is used 
+to improve the Octopus API and implementation. </p>
+
+<h2>
+<a name="the-latest-version" class="anchor" href="#the-latest-version"><span class="octicon octicon-link"></span></a>The Latest Version</h2>
+
+<p>Details of the latest version can be found on the octopus project web site at
+<a href="https://github.com/NLeSC/octopus">https://github.com/NLeSC/octopus</a>.</p>
+
+<h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>For an overview of octopus please consult the <strong>online users guide</strong>:</p>
+
+<p><a href="https://github.com/NLeSC/octopus/blob/develop/doc/userguide.md">https://github.com/NLeSC/octopus/blob/develop/doc/userguide.md</a></p>
+
+<p>A pdf version of the user guide is also available in the docs directory 
+"docs/usersguide.pdf" or online at:</p>
+
+<p><a href="http://nlesc.github.io/octopus/userguide.pdf">http://nlesc.github.io/octopus/userguide.pdf</a></p>
+
+<p>See the file "INSTALL.txt" for a description of how to install octopus. </p>
+
+<p>The javadoc of octopus library is available online at: </p>
+
+<p><a href="http://nlesc.github.io/octopus/javadoc">http://nlesc.github.io/octopus/javadoc</a></p>
+
+<p>The source of octopus can be found in "src/". Example applications can be 
+found in "examples/src/".</p>
+
+<h2>
+<a name="copyrights--disclaimers" class="anchor" href="#copyrights--disclaimers"><span class="octicon octicon-link"></span></a>Copyrights &amp; Disclaimers</h2>
+
+<p>Octopus is copyrighted by the Netherlands eScience Center and releases under 
+the Apache License, Version 2.0.</p>
+
+<p>See <a href="http://www.esciencecenter.nl">http://www.esciencecenter.nl</a> for more information on the Netherlands
+eScience Center.</p>
+
+<p>See the "LICENSE" and "NOTICE" files for more information. </p>
+
+<h2>
+<a name="third-party-libraries" class="anchor" href="#third-party-libraries"><span class="octicon octicon-link"></span></a>Third party libraries</h2>
+
+<p>This product includes the SLF4J library, which is Copyright (c) 2004-2013
+QOS.ch See "notices/LICENSE.slf4j.txt" for the licence information of
+the SLF4J library.</p>
+
+<p>This product includes the JSch library, which is Copyright (c) 2002-2012
+Atsuhiko Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the
+licence information of the JSch library.</p>
+
+<p>This product includes the Logback library, which is Copyright (c)
+1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
+information of the Logback library.</p>
+
+<p>This product includes the JaCoCo library, which is Copyright
+(c) 2009, 2013 Mountainminds GmbH &amp; Co. KG and Contributors. See
+"notices/LICENSE.jacoco.txt" for the licence information of the JaCoCo
+library.</p>
+
+<p>This project includes the JUnit library. See "notices/LICENSE.junit.txt"
+for the licence information of the JUnit library.</p>
+
+<p>This project includes the Mockito library, which is Copyright (c) 2007
+Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
+information of the Mockito library.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/NLeSC/octopus/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/NLeSC/octopus/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/NLeSC/octopus"></a> is maintained by <a href="https://github.com/NLeSC">NLeSC</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
 </html>
-
-
