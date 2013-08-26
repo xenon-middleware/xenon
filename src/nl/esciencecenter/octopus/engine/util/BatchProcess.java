@@ -38,6 +38,9 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 class BatchProcess implements Process {
 
+    /** Time to wait for a StreamForwarder to terminate (in ms.) */ 
+    private final static long TERMINATION_DELAY = 1000L;
+    
     private final InteractiveProcess process;
 
     private StreamForwarder stdinForwarder;
@@ -118,17 +121,17 @@ class BatchProcess implements Process {
     private synchronized void closeStreams() {
 
         if (stdinForwarder != null) {
-            stdinForwarder.terminate(1000);
+            stdinForwarder.terminate(TERMINATION_DELAY);
             stdinForwarder = null;
         }
 
         if (stdoutForwarder != null) {
-            stdoutForwarder.terminate(1000);
+            stdoutForwarder.terminate(TERMINATION_DELAY);
             stdoutForwarder = null;
         }
 
         if (stderrForwarder != null) {
-            stderrForwarder.terminate(1000);
+            stderrForwarder.terminate(TERMINATION_DELAY);
             stderrForwarder = null;
         }
     }

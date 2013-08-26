@@ -32,12 +32,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.jcraft.jsch.Logger;
-
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
 import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.OpenOption;

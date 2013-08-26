@@ -206,9 +206,9 @@ public class Pathname {
     }
 
     /**
-     * Get the parent path, or <code>null</code> if this path does not have a parent.
+     * Get the parent pathname, or <code>null</code> if this pathname does not have a parent.
      * 
-     * @return a path representing the path's parent.
+     * @return a pathname representing this pathnames parent.
      */
     public Pathname getParent() {
 
@@ -222,16 +222,16 @@ public class Pathname {
     }
 
     /**
-     * Get the number of name elements in the path.
+     * Get the number of name elements in the pathname.
      * 
-     * @return the number of elements in the path, or 0 if this is empty.
+     * @return the number of elements in the pathname, or 0 if this is empty.
      */
     public int getNameCount() {
         return elements.length;
     }
 
     /**
-     * Get a name element of this path.
+     * Get a name element of this pathname.
      * 
      * @param index
      *            the index of the element
@@ -286,15 +286,15 @@ public class Pathname {
     }
 
     /**
-     * Tests if this path starts with the given path.
+     * Tests if this pathname starts with the given pathname.
      * 
-     * This method returns <code>true</code> if this path starts with the same name elements as the given path. If the given path
-     * has more name elements than this path then false is returned.
+     * This method returns <code>true</code> if this pathname starts with the name elements in the given pathname. If the 
+     * given pathname has more name elements than this path then false is returned.
      * 
      * @param other
-     *            the path to test.
+     *            the pathname to compare to.
      * 
-     * @return If this paths start with the other path.
+     * @return If this pathname start with the name elements in the other pathname.
      */
     public boolean startsWith(Pathname other) {
 
@@ -320,15 +320,15 @@ public class Pathname {
     }
 
     /**
-     * Tests if this path ends with the given path.
+     * Tests if this pathname ends with the given pathname.
      * 
-     * This method returns <code>true</code> if this path end with the same name elements as the given path. If the given path
-     * has more name elements than this path then false is returned.
+     * This method returns <code>true</code> if this pathname end with the name elements in the given pathname. If the given 
+     * pathname has more name elements than this pathname then false is returned.
      * 
      * @param other
-     *            the path to test.
+     *            the pathname to compare to.
      * 
-     * @return If this paths ends with the other path.
+     * @return If this pathname ends with the name elements in the other pathname.
      */
     public boolean endsWith(Pathname other) {
 
@@ -356,22 +356,22 @@ public class Pathname {
     }
 
     /**
-     * Tests if this path starts with the given path.
+     * Tests if this pathname starts with the given pathname.
      *
      * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
-     * {@link #startsWith(Pathname)} to compare the result to this path.
+     * {@link #startsWith(Pathname)} to compare the result to this pathname.
      * 
      * @param other
      *            the path to test.
      * 
-     * @return If this paths start with the other path.
+     * @return If this pathname start with the name elements in <code>other</code>.
      */
     public boolean startsWith(String other) {
         return startsWith(new Pathname(other));
     }
 
     /**
-     * Tests if this path ends with the given path.
+     * Tests if this pathname ends with the given pathname.
      * 
      * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
      * {@link #endsWith(Pathname)} to compare the result to this path.
@@ -379,7 +379,7 @@ public class Pathname {
      * @param other
      *            the path to test.
      * 
-     * @return If this paths ends with the other path.
+     * @return If this pathname ends with the elements in <code>other</code>.
      */
     public boolean endsWith(String other) {
         return endsWith(new Pathname(other));
@@ -408,14 +408,14 @@ public class Pathname {
     }
 
     /**
-     * Resolve a pathname against this path.
+     * Resolve a pathname against this pathname.
      * 
-     * If <code>other</code> represents an empty path, this path is returned.
+     * If <code>other</code> represents an empty pathname, this pathname is returned.
      * 
-     * If this path is empty, the <code>other</code> path is returned.
+     * If this pathname is empty, the <code>other</code> pathname is returned.
      * 
-     * Otherwise, a new pathname is returned that contains the concatenation of the path elements this path and the
-     * <code>other</code> path.
+     * Otherwise, a new pathname is returned that contains the concatenation of the path elements this pathname and the
+     * <code>other</code> pathname.
      * 
      * @param other
      *            the pathname.
@@ -436,15 +436,13 @@ public class Pathname {
     /**
      * Resolve a String containing a pathname against this path.
      * 
-     * If <code>other</code> represents an empty path, this path is returned.
-     * 
-     * If this path is empty, a pathname representing the <code>other</code> path is returned.
-     * 
-     * Otherwise, a new pathname is returned that contains the concatenation of the path elements this path and the
-     * <code>other</code> path.
+     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
+     * {@link #resolve(Pathname)} to resolve the result against this path.
+     *
+     * If <code>other</code> represents an empty path, or <code>null</code> this pathname is returned.
      * 
      * @param other
-     *            the pathname.
+     *            the path.
      */
     public Pathname resolve(String other) {
 
@@ -456,26 +454,32 @@ public class Pathname {
     }
 
     /**
-     * Is this path empty ?
+     * Is this pathname empty ?
      * 
-     * @return If this path is empty.
+     * @return If this pathname is empty.
      */
     public boolean isEmpty() {
         return elements.length == 0;
     }
 
     /**
-     * Resolves the given path to this paths parent path, thereby creating a sibling to this path.
+     * Resolves the given pathname to this paths parent pathname, thereby creating a sibling to this pathname.
      * 
-     * TODO: semantics ???
+     * If this pathname is empty, <code>other</code> will be returned, unless other is <code>null</code> in which case an empty 
+     * pathname is returned.
+     * 
+     * If this pathname is not empty, but <code>other</code> is <code>null</code> or empty, the parent of this pathname will be 
+     * returned. 
+     *    
+     * If neither this pathname and other are empty, <code>getParent.resolve(other)</code> will be returned.
      * 
      * @param other
-     *            the path to resolve as sibling.
+     *            the pathname to resolve as sibling.
      * 
      * @return a pathname representing the sibling.
      * 
      * @throws IllegalArgumentException
-     *             If the path can not be resolved as a sibling to this path.
+     *             If the pathname can not be resolved as a sibling to this pathname.
      */
     public Pathname resolveSibling(Pathname other) {
 
@@ -497,13 +501,13 @@ public class Pathname {
     }
 
     /**
-     * Create a relative path between the given path and this path.
+     * Create a relative pathname between the given pathname and this pathname.
      * 
-     * Relativation is the inverse of resolution. This method returns a path that, when resolved against this path, results in
-     * the given path <code>other</code>.   
+     * Relativation is the inverse of resolving. This method returns a pathname that, when resolved against this pathname, results
+     * in the given pathname <code>other</code>.   
      * 
      * @param other
-     *            the path to relativize.
+     *            the pathname to relativize.
      * 
      * @return a pathname representing a relative path between the given path and this path.
      * 
@@ -546,9 +550,9 @@ public class Pathname {
     }
 
     /**
-     * Create an {@link Iterator} that returns all possible sub paths of this path, in order of increasing length.
+     * Create an {@link Iterator} that returns all possible sub pathnames of this pathname, in order of increasing length.
      * 
-     * For example, for the path "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
+     * For example, for the pathname "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
      * 
      * @return the iterator.
      */
@@ -557,11 +561,11 @@ public class Pathname {
     }
 
     /**
-     * Return a <code>String</code> representation of this interpreted as a relative path.
+     * Return a <code>String</code> representation of this pathname interpreted as a relative path.
      * 
      * A relative path does not start with a separator. 
      * 
-     * @return a String representation of this path interpreted as a relative path.
+     * @return a String representation of this pathname interpreted as a relative path.
      */
     public String getRelativePath() {
 
@@ -583,7 +587,7 @@ public class Pathname {
     }
 
     /**
-     * Return a <code>String</code> representation of this interpreted as an absolute path.
+     * Return a <code>String</code> representation of this pathname interpreted as an absolute path.
      * 
      * An absolute path starts with a separator. 
      * 
@@ -643,17 +647,14 @@ public class Pathname {
                         stack.remove(i);
                         change = true;
 
-                    } else if (elt.equals("..")) {
+                    } else if (i > 0 && elt.equals("..")) {
+                        String parent = stack.get(i - 1);
 
-                        if (i > 0) {
-                            String parent = stack.get(i - 1);
-
-                            if (!(parent.equals(".") || parent.equals(".."))) {
-                                // NOTE: order is VERY important here!
-                                stack.remove(i);
-                                stack.remove(i - 1);
-                                change = true;
-                            }
+                        if (!(parent.equals(".") || parent.equals(".."))) {
+                            // NOTE: order is VERY important here!
+                            stack.remove(i);
+                            stack.remove(i - 1);
+                            change = true;
                         }
                     }
                 }

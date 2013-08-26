@@ -36,6 +36,10 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class JobExecutor implements Runnable {
 
+    /** Polling delay in ms. */
+    private static final long POLLING_DELAY = 1000L;
+    
+    /** Number of ms. per min. */
     private static final long MILLISECONDS_IN_MINUTE = 60 * 1000;
 
     private final JobImplementation job;
@@ -244,7 +248,7 @@ public class JobExecutor implements Runnable {
         }
 
         long deadline = System.currentTimeMillis() + maxDelay;
-        long left = maxDelay > 0 ? maxDelay : 1000; 
+        long left = maxDelay > 0 ? maxDelay : POLLING_DELAY; 
         
         while (!done && updateSignal && left > 0) { 
             try {
