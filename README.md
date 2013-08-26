@@ -1,9 +1,11 @@
+![logo](images/OctopusLogo_NLeSC_blauw.png "Octopus Logo")
+
 Octopus
 =======
 
 Copyright 2013 The Netherlands eScience Center
 
-Last modified: 26 Augustus 2013
+Last modified: 26 August 2013
 
 What is it?
 -----------
