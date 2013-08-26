@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
-import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;

@@ -1,4 +1,4 @@
-![logo](images/OctopusLogo_NLeSC_blauw.png "Octopus Logo")
+![logo](images/NLeSC_Octopus_logo.png "Octopus Logo")
 
 Octopus
 =======

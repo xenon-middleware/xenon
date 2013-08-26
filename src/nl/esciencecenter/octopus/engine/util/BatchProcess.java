@@ -39,7 +39,7 @@ import nl.esciencecenter.octopus.jobs.Streams;
 class BatchProcess implements Process {
 
     /** Time to wait for a StreamForwarder to terminate (in ms.) */ 
-    private final static long TERMINATION_DELAY = 1000L;
+    private static final long TERMINATION_DELAY = 1000L;
     
     private final InteractiveProcess process;
 
