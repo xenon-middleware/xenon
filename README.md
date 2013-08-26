@@ -1,4 +1,4 @@
-![logo](images/OctopusLogo_NLeSC_blauw.png "Octopus Logo")
+![logo](https://github.com/NLeSC/octopus/blob/develop/doc/images/OctopusLogo_NLeSC_blauw.png "Octopus Logo")
 
 Octopus
 =======
