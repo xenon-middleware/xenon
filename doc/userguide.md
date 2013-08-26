@@ -9,7 +9,7 @@ Author: Jason Maassen (<J.Maassen@esciencecenter.nl>)
 
 Version: Userguide v0.2, Octopus v1.0rc1
 
-Last modified: 22 August 2013
+Last modified: 26 August 2013
 
 
 Copyrights & Disclaimers
@@ -29,13 +29,33 @@ The octopus project web site can be found at:
 
 <https://github.com/NLeSC/octopus>.
 
-This product includes the SLF4J library, which is Copyright (c) 2004-2013 QOS.ch
-See "notices/LICENSE.slf4j.txt" for the licence information of the SLF4J library. 
 
-This product includes the JSch library, which is Copyright (c) 2002-2012 Atsuhiko 
-Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the licence information 
-of the JSch library.
+Third party libraries
+---------------------
 
+This product includes the SLF4J library, which is Copyright (c) 2004-2013
+QOS.ch See "notices/LICENSE.slf4j.txt" for the licence information of
+the SLF4J library.
+
+This product includes the JSch library, which is Copyright (c) 2002-2012
+Atsuhiko Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the
+licence information of the JSch library.
+
+This product includes the Logback library, which is Copyright (c)
+1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
+information of the Logback library.
+
+This product includes the JaCoCo library, which is Copyright
+(c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
+"notices/LICENSE.jacoco.txt" for the licence information of the JaCoCo
+library.
+
+This project includes the JUnit library. See "notices/LICENSE.junit.txt"
+for the licence information of the JUnit library.
+
+This project includes the Mockito library, which is Copyright (c) 2007
+Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
+information of the Mockito library.
 
 
 What is it?
@@ -690,7 +710,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.strictHostKeyChecking` ###
@@ -701,7 +721,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 ### `octopus.adaptors.ssh.loadKnownHosts` ###
@@ -745,7 +765,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
