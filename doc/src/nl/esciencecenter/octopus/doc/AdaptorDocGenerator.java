@@ -36,7 +36,7 @@ public class AdaptorDocGenerator {
     
     private static void printPropertyDescription(OctopusPropertyDescription d) {
 
-        out.println("### `" + d.getName() + "` ###\n");
+        out.println("__`" + d.getName() + "`__\n");
         out.println(d.getDescription() + "\n");
         out.println("- Expected type: " + d.getType() + "\n");
         out.println("- Default value: " + d.getDefaultValue() + "\n");
@@ -52,7 +52,7 @@ public class AdaptorDocGenerator {
         out.println(a.getDescription());
         out.println();
 
-        out.println("### Supported schemes: ###");
+        out.println("#### Supported schemes: ####");
 
         String[] schemes = a.getSupportedSchemes();
 
@@ -66,7 +66,7 @@ public class AdaptorDocGenerator {
         out.println();
         out.println();
 
-        out.println("### Supported properties: ###\n\n");
+        out.println("#### Supported properties: ####\n\n");
 
         OctopusPropertyDescription[] properties = a.getSupportedProperties();
 
