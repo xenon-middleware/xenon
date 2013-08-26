@@ -19,7 +19,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ import java.util.Map;
 import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 
-import org.apache.commons.io.Charsets;
+//import org.apache.commons.io.Charsets;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -38,7 +38,7 @@ public class GridEngineXmlParserTest {
 
     private static String readFile(String path) throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return Charsets.UTF_8.decode(ByteBuffer.wrap(encoded)).toString();
+        return new String(encoded, StandardCharsets.UTF_8);
     }
 
     @Test

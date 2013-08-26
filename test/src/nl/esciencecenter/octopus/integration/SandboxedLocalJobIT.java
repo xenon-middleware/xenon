@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Path;
@@ -120,7 +121,8 @@ public class SandboxedLocalJobIT {
         }
 
         File stdout = new File(workdir.getPathname().getAbsolutePath() + "/stdout.txt");
-        assertThat(org.apache.commons.io.FileUtils.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
+        
+        assertThat(Util.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
 
         FileUtils.recursiveDelete(octopus.files(), workdir);
     }
