@@ -48,8 +48,8 @@ public class PathAttributesPairImplementationTest {
 
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
-        filesystem = files.getLocalCWDFileSystem();
-        root = filesystem.getEntryPath();
+        root = files.getLocalCWD();
+        filesystem = root.getFileSystem();
         att = files.getAttributes(root);
     }
 

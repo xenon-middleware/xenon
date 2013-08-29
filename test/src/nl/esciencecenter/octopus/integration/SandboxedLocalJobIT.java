@@ -68,7 +68,7 @@ public class SandboxedLocalJobIT {
         Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
-        FileSystem localrootfs = octopus.files().newFileSystem(new URI("file:///"), credential, null);
+        FileSystem localrootfs = octopus.files().getLocalCWD().getFileSystem();
 
         // create workdir
         String workFn = tmpdir + "/AAP" + work_id;
@@ -102,8 +102,7 @@ public class SandboxedLocalJobIT {
         description.setStderr("stderr.txt");
         description.setWorkingDirectory(sandbox.getPath().getPathname().getAbsolutePath());
 
-        URI sh_location = new URI("local:///");
-        Scheduler scheduler = octopus.jobs().newScheduler(sh_location, null, null);
+        Scheduler scheduler = octopus.jobs().newScheduler("local", "", null, null);
 
         Job job = octopus.jobs().submitJob(scheduler, description);
 

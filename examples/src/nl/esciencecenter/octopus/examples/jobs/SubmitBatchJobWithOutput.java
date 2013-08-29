@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.octopus.examples.jobs;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
 import nl.esciencecenter.octopus.Octopus;
@@ -25,7 +23,6 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
@@ -64,7 +61,7 @@ public class SubmitBatchJobWithOutput {
             description.setStderr("stderr.txt");
 
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(new URI("local:///"), null, null);
+            Scheduler scheduler = jobs.newScheduler("local", "", null, null);
 
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
@@ -83,11 +80,11 @@ public class SubmitBatchJobWithOutput {
 
                 System.out.println("Job ran succesfully and produced:");
 
-                FileSystem fs = files.getLocalCWDFileSystem();
-                Pathname entryPath = fs.getEntryPath().getPathname();
+                Path cwd = files.getLocalCWD();
+                Pathname entryPath = cwd.getPathname();
                 
-                Path stdout = files.newPath(fs, entryPath.resolve("stdout.txt"));
-                Path stderr = files.newPath(fs, entryPath.resolve("stderr.txt"));
+                Path stdout = files.newPath(cwd.getFileSystem(), entryPath.resolve("stdout.txt"));
+                Path stderr = files.newPath(cwd.getFileSystem(), entryPath.resolve("stderr.txt"));
 
                 if (files.exists(stdout)) {
                     String output = FileUtils.readToString(files, stdout, Charset.defaultCharset());
@@ -108,7 +105,7 @@ public class SubmitBatchJobWithOutput {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e)  {
+        } catch (OctopusException | OctopusIOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

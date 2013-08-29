@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Map;
@@ -75,23 +74,25 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return fsID++;
     }
 
-    private final FileSystem cwd;
-    private final FileSystem home;
+    private final Path cwd;
+    private final Path home;
 
     public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) throws OctopusException {
         this.localAdaptor = localAdaptor;
         this.copyEngine = copyEngine;
 
-        try {            
-            cwd = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
-                    LocalUtils.getLocalFileURI(), LocalUtils.getCWD(), null, null);
+        try {          
+            Pathname cwdPathname = LocalUtils.getCWD();
+            cwd = new PathImplementation(new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
+                    "file", LocalUtils.getDefaultRoot(), cwdPathname, null, null), cwdPathname);
         } catch (OctopusIOException e) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create current working dir filesystem!", e);
         }
         
         try {
-            home = new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
-                    LocalUtils.getLocalFileURI(), LocalUtils.getHome(), null, null);
+            Pathname homePathname = LocalUtils.getHome();
+            home = new PathImplementation(new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
+                    "file", LocalUtils.getDefaultRoot(), homePathname, null, null), homePathname);
         } catch (OctopusIOException e) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create home filesystem!", e);
         }
@@ -286,22 +287,17 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
+    public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException {
 
-        localAdaptor.checkURI(location);
+        localAdaptor.checkLocation(location);
         localAdaptor.checkCredential(credential);
-
-        String path = location.getPath();
-
-        if (path != null && !path.equals("/")) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local file system with path!");
-        }
 
         OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), location, LocalUtils.getCWD(),
-                credential, p);
+        // FIXME: BUG CWD is WRONG!!!!        
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, location,  
+                LocalUtils.getCWD(), credential, p);
     }
 
     @Override
@@ -385,15 +381,21 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusIOException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
-
-    @Override
-    public FileSystem getLocalCWDFileSystem() throws OctopusException {
+    
+    @Override 
+    public Path getLocalCWD() throws OctopusException { 
         return cwd;
     }
 
     @Override
-    public FileSystem getLocalHomeFileSystem() throws OctopusException {
+    public Path getLocalHome() throws OctopusException { 
         return home;
+    }
+    
+    @Override
+    public FileSystem [] getLocalFileSystems() throws OctopusException { 
+        // TODO: implement!
+        return null;
     }
        
     @Override

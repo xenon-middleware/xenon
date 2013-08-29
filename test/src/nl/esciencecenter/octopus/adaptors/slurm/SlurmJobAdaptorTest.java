@@ -116,23 +116,23 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         assertTrue(outputContent.equals(message));
     }
 
-    @Test
-    public void slurm_test02_newScheduler_pathWithSlash() throws Exception {
-
-        URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
-
-        Scheduler s = jobs.newScheduler(uriWithSlash, null, null);
-        jobs.close(s);
-    }
-
-    @Test(expected = InvalidLocationException.class)
-    public void slurm_test03_newScheduler_pathWithFragment_Exception() throws Exception {
-
-        URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
-
-        Scheduler s = jobs.newScheduler(uriWithFragment, null, null);
-        jobs.close(s);
-    }
+//    @Test
+//    public void slurm_test02_newScheduler_pathWithSlash() throws Exception {
+//
+//        URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
+//
+//        Scheduler s = jobs.newScheduler(uriWithSlash, null, null);
+//        jobs.close(s);
+//    }
+//
+//    @Test(expected = InvalidLocationException.class)
+//    public void slurm_test03_newScheduler_pathWithFragment_Exception() throws Exception {
+//
+//        URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
+//
+//        Scheduler s = jobs.newScheduler(uriWithFragment, null, null);
+//        jobs.close(s);
+//    }
 
     @Test
     public void slurm_test04_parallel_batchJob() throws Exception {
@@ -198,7 +198,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE, "true");
 
-        Scheduler scheduler = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), properties);
+        Scheduler scheduler = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                config.getDefaultCredential(credentials), properties);
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
@@ -261,7 +262,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         //custom scheduler with accounting disabled
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE, "true");
-        Scheduler scheduler = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), properties);
+        Scheduler scheduler = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(),
+                config.getDefaultCredential(credentials), properties);
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 

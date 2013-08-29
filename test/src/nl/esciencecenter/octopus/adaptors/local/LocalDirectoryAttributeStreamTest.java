@@ -51,8 +51,7 @@ public class LocalDirectoryAttributeStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path root = fs.getEntryPath();
+        Path root = files.getLocalCWD();
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
 
@@ -73,8 +72,7 @@ public class LocalDirectoryAttributeStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path root = fs.getEntryPath();
+        Path root = files.getLocalCWD();
         Path testDir = resolve(files, root, TEST_DIR);
         Path file0 = resolve(files, testDir, "file0");
         Path file1 = resolve(files, testDir, "file2");
@@ -126,12 +124,11 @@ public class LocalDirectoryAttributeStreamTest {
 
     @org.junit.Before
     public void prepareTest() throws Exception {
-
         octopus = Util.createOctopusEngine(null);
         localAdaptor = new LocalAdaptor(octopus, new HashMap<String, String>());
         localFiles = new LocalFiles(localAdaptor, octopus.getCopyEngine());
-        fs = localFiles.getLocalCWDFileSystem();
-        root = fs.getEntryPath();
+        root = localFiles.getLocalCWD();
+        fs = root.getFileSystem();
         testDir = resolve(localFiles, root, TEST_DIR);
     }
 

@@ -166,78 +166,78 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
 
-    @Test
-    public void test03a_getSubSchedulerLocation_NoHost_LocalLocation() throws Exception {
-        URI input = new URI("fake:///");
-
-        URI expected = new URI("local:///");
-
-        URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void test03b_getSubSchedulerLocation_HostGiven_SSHLocation() throws Exception {
-        URI input = new URI("fake://some.host.nl");
-
-        URI expected = new URI("ssh://some.host.nl");
-
-        URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void test03c_getSubSchedulerLocation_SingleSlashPath_NoPathLocation() throws Exception {
-        URI input = new URI("fake://some.host.nl/");
-
-        //note the path has been stripped
-        URI expected = new URI("ssh://some.host.nl");
-
-        URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-
-        assertEquals(expected, result);
-    }
-
-    @Test(expected = InvalidLocationException.class)
-    public void test03d_getSubSchedulerLocation_LocationWithPath_ThrowsException() throws Exception {
-        URI input = new URI("fake://some.host.nl/some/path");
-
-        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-    }
-
-    @Test
-    /**
-     * Make sure the scheme check also works if there are multiple valid scheme for an adaptor.
-     * @throws Exception
-     */
-    public void test03e_getSubSchedulerLocation_MultipleValidSchemes_NoException() throws Exception {
-        URI input = new URI("valid://some.host.nl/");
-
-        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake", "other.scheme", "valid");
-    }
-
-    @Test(expected = InvalidLocationException.class)
-    public void test03f_getSubSchedulerLocation_InvalidScheme_ThrowsException() throws Exception {
-        URI input = new URI("illegal://some.host.nl/");
-
-        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-    }
-
-    @Test(expected = InvalidLocationException.class)
-    public void test03g_getSubSchedulerLocation_LocationWithFragment_ThrowsException() throws Exception {
-        URI input = new URI("fake://some.host.nl#fragment");
-
-        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-    }
-
-    @Test(expected = InvalidLocationException.class)
-    public void test03h_getSubSchedulerLocation_LocationWithQuery_ThrowsException() throws Exception {
-        URI input = new URI("fake://some.host.nl?whatsupdoc");
-
-        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
-    }
+//    @Test
+//    public void test03a_getSubSchedulerLocation_NoHost_LocalLocation() throws Exception {
+//        URI input = new URI("fake:///");
+//
+//        URI expected = new URI("local:///");
+//
+//        URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//
+//        assertEquals(expected, result);
+//    }
+//
+//    @Test
+//    public void test03b_getSubSchedulerLocation_HostGiven_SSHLocation() throws Exception {
+//        URI input = new URI("fake://some.host.nl");
+//
+//        URI expected = new URI("ssh://some.host.nl");
+//
+//        URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//
+//        assertEquals(expected, result);
+//    }
+//
+//    @Test
+//    public void test03c_getSubSchedulerLocation_SingleSlashPath_NoPathLocation() throws Exception {
+//        URI input = new URI("fake://some.host.nl/");
+//
+//        //note the path has been stripped
+//        URI expected = new URI("ssh://some.host.nl");
+//
+//        URI result = SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//
+//        assertEquals(expected, result);
+//    }
+//
+//    @Test(expected = InvalidLocationException.class)
+//    public void test03d_getSubSchedulerLocation_LocationWithPath_ThrowsException() throws Exception {
+//        URI input = new URI("fake://some.host.nl/some/path");
+//
+//        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//    }
+//
+//    @Test
+//    /**
+//     * Make sure the scheme check also works if there are multiple valid scheme for an adaptor.
+//     * @throws Exception
+//     */
+//    public void test03e_getSubSchedulerLocation_MultipleValidSchemes_NoException() throws Exception {
+//        URI input = new URI("valid://some.host.nl/");
+//
+//        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake", "other.scheme", "valid");
+//    }
+//
+//    @Test(expected = InvalidLocationException.class)
+//    public void test03f_getSubSchedulerLocation_InvalidScheme_ThrowsException() throws Exception {
+//        URI input = new URI("illegal://some.host.nl/");
+//
+//        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//    }
+//
+//    @Test(expected = InvalidLocationException.class)
+//    public void test03g_getSubSchedulerLocation_LocationWithFragment_ThrowsException() throws Exception {
+//        URI input = new URI("fake://some.host.nl#fragment");
+//
+//        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//    }
+//
+//    @Test(expected = InvalidLocationException.class)
+//    public void test03h_getSubSchedulerLocation_LocationWithQuery_ThrowsException() throws Exception {
+//        URI input = new URI("fake://some.host.nl?whatsupdoc");
+//
+//        SchedulerConnection.getSubSchedulerLocation(input, "fake", "fake");
+//    }
 
     @Test
     public void test04a_verifyJobInfoValidInfo_NoException() throws OctopusException {

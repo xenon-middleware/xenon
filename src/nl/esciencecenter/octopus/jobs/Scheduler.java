@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -35,11 +34,18 @@ public interface Scheduler {
     String getAdaptorName();
 
     /**
-     * Get the URI representing the location of the Scheduler.
+     * Get the location of this Scheduler.
      * 
      * @return the location of the Scheduler.
      */
-    URI getUri();
+    String getLocation();
+
+    /**
+     * Get the scheme used to access the Scheduler.
+     * 
+     * @return the scheme used to access the Scheduler.
+     */
+    String getScheme();
 
     /**
      * Get the properties used to create this Scheduler.

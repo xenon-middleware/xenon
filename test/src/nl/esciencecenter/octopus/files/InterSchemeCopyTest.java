@@ -40,8 +40,8 @@ public class InterSchemeCopyTest {
 
         Files files = octopus.files();
 
-        FileSystem localFS = files.getLocalCWDFileSystem();
-        FileSystem sshFS = files.newFileSystem(new URI("ssh://test@localhost"), null, null);
+        FileSystem localFS = files.getLocalCWD().getFileSystem();
+        FileSystem sshFS = files.newFileSystem("ssh", "test@localhost", null, null);
 
         String dirname = "octopus_test_" + System.currentTimeMillis();
 

@@ -38,14 +38,19 @@ public class SSHFileTestConfig extends FileTestConfig {
     private String username;
     private char[] passwd;
 
-    private URI correctURI;
-    private URI correctURIWithPath;
-    private URI correctFSURI;
+//    private URI correctURI;
+//    private URI correctURIWithPath;
+//    private URI correctFSURI;
+//
+//    private URI wrongUserURI;
+//    private URI wrongLocationURI;
+//    private URI wrongPathURI;
 
-    private URI wrongUserURI;
-    private URI wrongLocationURI;
-    private URI wrongPathURI;
-
+    private String scheme = "sftp";
+    private String correctLocation;
+    private String wrongLocation;
+    private String correctLocationWrongUser;
+    
     public SSHFileTestConfig(String configfile) throws Exception {
 
         super("ssh");
@@ -69,12 +74,17 @@ public class SSHFileTestConfig extends FileTestConfig {
         String wrongUser = getPropertyOrFail(p, "test.ssh.user.wrong");
         String wrongLocation = getPropertyOrFail(p, "test.ssh.location.wrong");
 
-        correctURI = new URI("ssh://" + username + "@" + location);
-        correctFSURI = new URI("sftp://" + username + "@" + location);
-        correctURIWithPath = new URI("ssh://" + username + "@" + location + "/");
-        wrongUserURI = new URI("ssh://" + wrongUser + "@" + location);
-        wrongLocationURI = new URI("ssh://" + username + "@" + wrongLocation);
-        wrongPathURI = new URI("ssh://" + username + "@" + location + "/aap/noot");
+        correctLocation = username + "@" + location;
+        wrongLocation = username + "@" + wrongLocation;
+        correctLocationWrongUser = wrongUser + "@" + location;
+//        
+//        
+//        correctURI = new URI("ssh://" + username + "@" + location);
+//        correctFSURI = new URI("sftp://" + username + "@" + location);
+//        correctURIWithPath = new URI("ssh://" + username + "@" + location + "/");
+//        wrongUserURI = new URI("ssh://" + wrongUser + "@" + location);
+//        wrongLocationURI = new URI("ssh://" + username + "@" + wrongLocation);
+//        wrongPathURI = new URI("ssh://" + username + "@" + location + "/aap/noot");
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
@@ -89,38 +99,13 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public URI getCorrectURI() throws Exception {
-        return correctURI;
-    }
-
-    @Override
-    public URI getCorrectURIWithPath() throws Exception {
-        return correctURIWithPath;
-    }
-
-    @Override
-    public boolean supportURILocation() {
+    public boolean supportLocation() {
         return true;
     }
 
     @Override
-    public URI getURIWrongLocation() throws Exception {
-        return wrongLocationURI;
-    }
-
-    @Override
-    public URI getURIWrongPath() throws Exception {
-        return wrongPathURI;
-    }
-
-    @Override
-    public boolean supportURIUser() {
+    public boolean supportUser() {
         return true;
-    }
-
-    @Override
-    public URI getURIWrongUser() throws Exception {
-        return wrongUserURI;
     }
 
     @Override
@@ -170,11 +155,36 @@ public class SSHFileTestConfig extends FileTestConfig {
 
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem(correctFSURI, getDefaultCredential(credentials), null);
+        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null);
     }
 
     @Override
     public void closeTestFileSystem(Files files, FileSystem fs) throws Exception {
         files.close(fs);
+    }
+
+    @Override
+    public String getScheme() throws Exception {
+        return scheme;
+    }
+
+    @Override
+    public String getCorrectLocation() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getWrongLocation() throws Exception {
+        return wrongLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithUser() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithWrongUser() throws Exception {
+        return correctLocationWrongUser;
     }
 }

@@ -93,13 +93,14 @@ public final class PathImplementation implements Path {
     }
 
     public String toString() {
-        return filesystem.getUri() + pathname.getAbsolutePath();        
+        return filesystem.getScheme() + "://" + filesystem.getLocation() + pathname.getAbsolutePath();        
     }
 
     @Override
     public int hashCode() {
         int result = 31 + filesystem.getAdaptorName().hashCode();
-        result = 31 * result + filesystem.getUri().hashCode();
+        result = 31 * result + filesystem.getScheme().hashCode();
+        result = 31 * result + filesystem.getLocation().hashCode();
         return 31 * result + pathname.hashCode();
     }
 
@@ -123,10 +124,14 @@ public final class PathImplementation implements Path {
             return false;
         }
 
-        if (!filesystem.getUri().equals(other.filesystem.getUri())) {
+        if (!filesystem.getScheme().equals(other.filesystem.getScheme())) {
             return false;
         }
 
+        if (!filesystem.getLocation().equals(other.filesystem.getLocation())) {
+            return false;
+        }
+        
         return pathname.equals(other.pathname);
     }
 }

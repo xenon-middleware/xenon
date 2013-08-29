@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.slurm;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -222,10 +221,11 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final SlurmSetup config;
 
-    SlurmSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
+    SlurmSchedulerConnection(ScriptingAdaptor adaptor, String location, Credential credential, OctopusProperties properties,
             OctopusEngine engine) throws OctopusIOException, OctopusException {
 
-        super(adaptor, location, credential, properties, engine, properties.getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
+        super(adaptor, "slurm", location, credential, properties, engine, 
+                properties.getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
 
         boolean ignoreVersion = getProperties().getBooleanProperty(SlurmAdaptor.IGNORE_VERSION_PROPERTY);
         boolean disableAccounting = getProperties().getBooleanProperty(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE);
@@ -250,7 +250,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         this.queueNames = foundQueueNames;
         this.defaultQueueName = foundDefaultQueueName;
 
-        scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), location, foundQueueNames, credential,
+        scheduler = new SchedulerImplementation(SlurmAdaptor.ADAPTOR_NAME, getID(), "slurm", location, foundQueueNames, credential,
                 getProperties(), false, false, true);
 
         LOGGER.debug("new slurm scheduler connection {}", scheduler);

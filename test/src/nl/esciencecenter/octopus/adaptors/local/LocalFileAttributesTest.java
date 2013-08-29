@@ -49,9 +49,7 @@ public class LocalFileAttributesTest {
     public void testNonExistingFile() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-
-        Path path = resolve(files, fs.getEntryPath(), "noot.txt");
+        Path path = resolve(files, files.getLocalCWD(), "noot.txt");
         new LocalFileAttributes(path);
     }
 
@@ -59,8 +57,7 @@ public class LocalFileAttributesTest {
     public void testCreationTime() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path path = resolve(files, fs.getEntryPath(), "aap.txt");
+        Path path = resolve(files, files.getLocalCWD(), "aap.txt");
 
         long now = System.currentTimeMillis();
 
@@ -83,8 +80,7 @@ public class LocalFileAttributesTest {
     public void testHashCode() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path path = resolve(files, fs.getEntryPath(), "aap.txt");
+        Path path = resolve(files, files.getLocalCWD(), "aap.txt");
         files.createFile(path);
 
         FileAttributes att = new LocalFileAttributes(path);
@@ -101,10 +97,10 @@ public class LocalFileAttributesTest {
     public void testEquals() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path path1 = resolve(files, fs.getEntryPath(), "aap.txt");
+        Path cwd = files.getLocalCWD();
+        Path path1 = resolve(files, cwd, "aap.txt");
         files.createFile(path1);
-        Path path2 = resolve(files, fs.getEntryPath(), "noot.txt");
+        Path path2 = resolve(files, cwd, "noot.txt");
         
         files.createFile(path2);
 

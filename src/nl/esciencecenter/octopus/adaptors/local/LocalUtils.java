@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -77,7 +78,7 @@ final class LocalUtils {
     }
 
     static Pathname getHome() throws OctopusIOException { 
-        
+        // TODO: Test this on windows!
         String separator = System.getProperty("file.separator");
         
         if (separator == null || separator.length() > 1) { 
@@ -94,7 +95,7 @@ final class LocalUtils {
     }
     
     static Pathname getCWD() throws OctopusIOException { 
-        
+        // TODO: Test this on windows!
         String separator = System.getProperty("file.separator");
         
         if (separator == null || separator.length() > 1) { 
@@ -117,6 +118,12 @@ final class LocalUtils {
         } 
         
         return path;
+    }
+
+    static String getDefaultRoot() {
+        // TODO: Test this on windows!
+        File [] roots = File.listRoots();
+        return roots[0].getPath();
     }
     
     static java.nio.file.Path javaPath(Path path) throws OctopusIOException {        
@@ -313,5 +320,6 @@ final class LocalUtils {
             process.destroy();
         }
     }
+
 
 }

@@ -16,9 +16,6 @@
 
 package nl.esciencecenter.octopus.examples.files;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -61,9 +58,8 @@ public class LocalFileExists {
             Credentials credentials = octopus.credentials();
 
             // Next we create a FileSystem 
-            URI uri = new URI("file://localhost/");
             Credential c = credentials.getDefaultCredential("file");
-            FileSystem fs = files.newFileSystem(uri, c, null);
+            FileSystem fs = files.newFileSystem("file", filename, c, null);
 
             // We now create an Path representing the file
             Path path = files.newPath(fs, new Pathname(filename));
@@ -82,7 +78,7 @@ public class LocalFileExists {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+        } catch (OctopusException | OctopusIOException e) {
             System.out.println("LocalFileExists example failed: " + e.getMessage());
             e.printStackTrace();
         }

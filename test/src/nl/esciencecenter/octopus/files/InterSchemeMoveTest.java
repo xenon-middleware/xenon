@@ -38,8 +38,8 @@ public class InterSchemeMoveTest {
 
         Files files = octopus.files();
 
-        FileSystem fs1 = files.getLocalCWDFileSystem();
-        FileSystem fs2 = files.newFileSystem(new URI("ssh://test@localhost"), null, null);
+        FileSystem fs1 = files.getLocalCWD().getFileSystem();
+        FileSystem fs2 = files.newFileSystem("ssh", "test@localhost", null, null);
 
         Path file1 = Util.resolve(files, fs1, "test");
         Path file2 = Util.resolve(files, fs2, "test");

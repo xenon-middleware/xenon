@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -28,11 +27,9 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -74,17 +71,15 @@ public class MultiJobTest {
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount + ")");
 
         String TEST_ROOT = "octopus_test_SSH_" + System.currentTimeMillis();
-        URI correctURI = new URI("ssh://test@localhost");
-        URI correctFSURI = new URI("sftp://test@localhost");
 
         Octopus octopus = OctopusFactory.newOctopus(null);
         Files files = octopus.files();
         Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
 
-        FileSystem filesystem = files.newFileSystem(correctFSURI, credentials.getDefaultCredential("sftp"),
+        FileSystem filesystem = files.newFileSystem("sftp", "test@localhost", credentials.getDefaultCredential("sftp"),
                 new HashMap<String, String>());
-        Scheduler scheduler = jobs.newScheduler(correctURI, credentials.getDefaultCredential("ssh"),
+        Scheduler scheduler = jobs.newScheduler("ssh", "test@localhost", credentials.getDefaultCredential("ssh"),
                 new HashMap<String, String>());
 
         String workingDir = TEST_ROOT + "/" + testName;

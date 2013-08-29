@@ -66,7 +66,7 @@ class SshMultiplexedSession {
 
     private List<SshSession> sessions = new ArrayList<>();
 
-    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, URI location, Credential cred, OctopusProperties properties)
+    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, String location, Credential cred, OctopusProperties properties)
             throws OctopusException, OctopusIOException {
 
         LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
@@ -75,9 +75,48 @@ class SshMultiplexedSession {
         this.properties = properties;
         credential = cred;
 
-        user = location.getUserInfo();
-        host = location.getHost();
-        port = location.getPort();
+        // Parse the location
+        String tmpLocation = location;
+        
+        int index = tmpLocation.indexOf('@');
+        
+        if (index == 0) { 
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid user: " + location);
+        }
+        
+        if (index > 0) { 
+            user = tmpLocation.substring(0, index);
+            tmpLocation = tmpLocation.substring(index+1);
+        } 
+        
+        index = tmpLocation.indexOf(':');
+        
+        if (index >= 0) {
+            
+            if (tmpLocation.length() < index+1) { 
+                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid port: " + location);
+            }
+            
+            String portAsString = tmpLocation.substring(index+1);
+            
+            if (portAsString.length() == 0) {
+                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid port: " + location);
+            }
+            
+            try { 
+                port = Integer.valueOf(portAsString);
+            } catch (NumberFormatException e) { 
+                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid port: " + location, e);
+            }
+            
+            tmpLocation = tmpLocation.substring(0, index);
+        }
+
+        if (tmpLocation.length() == 0) { 
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid host: " + location);
+        }
+        
+        host = tmpLocation;
 
         if (credential == null) {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");

@@ -33,18 +33,26 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class LocalJobTestConfig extends JobTestConfig {
 
-    private final URI correctURI;
-    private final URI correctURIWithPath;
-    private final URI wrongPathURI;
-    private final URI wrongLocationURI;
-
+//    private final URI correctURI;
+//    private final URI correctURIWithPath;
+//    private final URI wrongPathURI;
+//    private final URI wrongLocationURI;
+    
+    private final String scheme;
+    private final String correctLocation;
+    private final String wrongLocation;
+    
     public LocalJobTestConfig() throws Exception {
         super("local");
 
-        correctURI = new URI("local:///");
-        correctURIWithPath = new URI("local:////");
-        wrongPathURI = new URI("local:///aap/noot/mies/");
-        wrongLocationURI = new URI("file://machine/");
+        scheme = "local";
+        correctLocation = "/";
+        wrongLocation = "/aap";
+//        
+//        correctURI = new URI("local:///");
+//        correctURIWithPath = new URI("local:////");
+//        wrongPathURI = new URI("local:///aap/noot/mies/");
+//        wrongLocationURI = new URI("file://machine/");
     }
 
     @Override
@@ -54,7 +62,7 @@ public class LocalJobTestConfig extends JobTestConfig {
 
     @Override
     public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.getLocalCWDFileSystem();
+        return files.getLocalCWD().getFileSystem();
     }
 
     @Override
@@ -62,27 +70,8 @@ public class LocalJobTestConfig extends JobTestConfig {
         return "aap";
     }
 
-    @Override
-    public URI getCorrectURI() throws Exception {
-        return correctURI;
-    }
-
-    @Override
-    public URI getCorrectURIWithPath() throws Exception {
-        return correctURIWithPath;
-    }
-
-    public boolean supportURILocation() {
+    public boolean supportLocation() {
         return true;
-    }
-
-    public URI getURIWrongLocation() throws Exception {
-        return wrongLocationURI;
-    }
-
-    @Override
-    public URI getURIWrongPath() throws Exception {
-        return wrongPathURI;
     }
 
     @Override
@@ -113,5 +102,30 @@ public class LocalJobTestConfig extends JobTestConfig {
     @Override
     public boolean supportsParallelJobs() {
         return false;
+    }
+
+    @Override
+    public String getScheme() throws Exception {
+        return scheme;
+    }
+
+    @Override
+    public String getCorrectLocation() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getWrongLocation() throws Exception {
+        return wrongLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithUser() throws Exception {
+        return null;
+    }
+
+    @Override
+    public String getCorrectLocationWithWrongUser() throws Exception {
+        return null;
     }
 }

@@ -29,7 +29,6 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Pathname;
-import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
  * An example of how to retrieve file attributes.
@@ -53,12 +52,6 @@ public class ShowFileAttributes {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
 
-            // Next, extract the parts from the URI we need to access the FileSystem.
-            URI fsURI = URIUtils.getFileSystemURI(uri);
-
-            // Also get the (absolute) path to the file.
-            String filepath = uri.getPath();
-
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -66,10 +59,10 @@ public class ShowFileAttributes {
             Files files = octopus.files();
 
             // Next we create a FileSystem 
-            FileSystem fs = files.newFileSystem(fsURI, null, null);
+            FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), null, null);
 
             // We now create an Path representing the file.
-            Path path = files.newPath(fs, new Pathname(filepath));
+            Path path = files.newPath(fs, new Pathname(uri.getPath()));
 
             try {
                 // Retrieve the attributes of the file

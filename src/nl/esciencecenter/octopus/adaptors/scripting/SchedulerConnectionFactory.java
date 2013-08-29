@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.net.URI;
-
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -31,6 +29,6 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
  */
 public interface SchedulerConnectionFactory {
 
-    SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential,
+    SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential,
             OctopusProperties properties, OctopusEngine engine) throws OctopusIOException, OctopusException;
 }

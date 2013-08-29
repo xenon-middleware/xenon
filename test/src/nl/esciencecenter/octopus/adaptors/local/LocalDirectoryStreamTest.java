@@ -49,8 +49,7 @@ public class LocalDirectoryStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path root = fs.getEntryPath();
+        Path root = files.getLocalCWD();
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
 
@@ -71,8 +70,7 @@ public class LocalDirectoryStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        FileSystem fs = files.getLocalCWDFileSystem();
-        Path root = fs.getEntryPath();
+        Path root = files.getLocalCWD();
         Path testDir = resolve(files, root, TEST_DIR);
         
         Path file0 = resolve(files, testDir, "file0");
@@ -115,8 +113,8 @@ public class LocalDirectoryStreamTest {
         octopus = OctopusFactory.newOctopus(null);
 
         files = octopus.files();
-        fs = files.getLocalCWDFileSystem();
-        root = fs.getEntryPath();
+        root = files.getLocalCWD();
+        fs = root.getFileSystem();
         testDir = resolve(files, root, TEST_DIR);
     }
 

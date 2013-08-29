@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.local;
 
-import java.net.URI;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,7 +103,7 @@ public class LocalAdaptor extends Adaptor {
                 VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
-        localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWDFileSystem(), octopusEngine);
+        localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWD(), octopusEngine);
         localCredentials = new LocalCredentials();
     }
 
@@ -121,24 +120,40 @@ public class LocalAdaptor extends Adaptor {
         throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
     }
 
-    void checkURI(URI location) throws OctopusException {
+    /**
+     * Check is a location is a valid windows root such as "C:". 
+     * @param root the root to check. 
+     * @return if the location is a valid windows root.
+     */
+    private boolean isWindowsRoot(String root) {
+        return (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0)));
+    }
+    
+    /** 
+     * Check if a location string is valid for the local scheduler. 
+     * 
+     * The location should -only- contain a file system root, such as "/" or "C:". 
+     * 
+     * @param location
+     *          the location to check.
+     * @throws InvalidLocationException
+     *          if the location is invalid.                   
+     */
+    void checkLocation(String location) throws InvalidLocationException {
 
         if (location == null) {
+            throw new InvalidLocationException(ADAPTOR_NAME, "Location must contain a file system root! (not null)");
+        }
+
+        if (location.equals("/")) { 
             return;
         }
-
-        String scheme = location.getScheme();
-
-        if (scheme != null && !supports(scheme)) {
-            throw new OctopusException(ADAPTOR_NAME, "Adaptor does not support scheme " + scheme);
+        
+        if (isWindowsRoot(location)) { 
+            return;
         }
-
-        String host = location.getHost();
-
-        if (host != null && !host.equals("localhost")) {
-            throw new InvalidLocationException(ADAPTOR_NAME, "Adaptor only supports URI with empty host or \"localhost\", not \""
-                    + location.getHost() + "\"");
-        }
+        
+        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
     }
 
     @Override

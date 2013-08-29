@@ -41,14 +41,19 @@ public class SlurmJobTestConfig extends JobTestConfig {
     private String username;
     private char[] passwd;
 
-    private URI correctURI;
-    private URI correctURIWithPath;
-    private URI correctFSURI;
+//    private URI correctURI;
+//    private URI correctURIWithPath;
+//    private URI correctFSURI;
+//
+//    private URI wrongUserURI;
+//    private URI wrongLocationURI;
+//    private URI wrongPathURI;
 
-    private URI wrongUserURI;
-    private URI wrongLocationURI;
-    private URI wrongPathURI;
-
+    private String scheme = "slurm";
+    private String correctLocation;
+    private String wrongLocation;
+    private String correctLocationWrongUser;
+    
     private String defaultQueue;
     private String[] queues;
 
@@ -85,12 +90,16 @@ public class SlurmJobTestConfig extends JobTestConfig {
         queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.queue.wait.time"));
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.update.time"));
 
-        correctURI = new URI("slurm://" + username + "@" + location);
-        correctFSURI = new URI("sftp://" + username + "@" + location);
-        correctURIWithPath = new URI("slurm://" + username + "@" + location + "/");
-        wrongUserURI = new URI("slurm://" + wrongUser + "@" + location);
-        wrongLocationURI = new URI("slurm://" + username + "@" + wrongLocation);
-        wrongPathURI = new URI("slurm://" + username + "@" + location + "/aap/noot");
+        correctLocation = username + "@" + location;
+        wrongLocation = username + "@" + wrongLocation;
+        correctLocationWrongUser = wrongUser + "@" + location;
+        
+//        correctURI = new URI("slurm://" + username + "@" + location);
+//        correctFSURI = new URI("sftp://" + username + "@" + location);
+//        correctURIWithPath = new URI("slurm://" + username + "@" + location + "/");
+//        wrongUserURI = new URI("slurm://" + wrongUser + "@" + location);
+//        wrongLocationURI = new URI("slurm://" + username + "@" + wrongLocation);
+//        wrongPathURI = new URI("slurm://" + username + "@" + location + "/aap/noot");
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
@@ -129,38 +138,13 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public URI getCorrectURI() throws Exception {
-        return correctURI;
-    }
-
-    @Override
-    public URI getCorrectURIWithPath() throws Exception {
-        return correctURIWithPath;
-    }
-
-    @Override
-    public boolean supportURILocation() {
+    public boolean supportLocation() {
         return true;
     }
 
     @Override
-    public URI getURIWrongLocation() throws Exception {
-        return wrongLocationURI;
-    }
-
-    @Override
-    public URI getURIWrongPath() throws Exception {
-        return wrongPathURI;
-    }
-
-    @Override
-    public boolean supportURIUser() {
+    public boolean supportUser() {
         return true;
-    }
-
-    @Override
-    public URI getURIWrongUser() throws Exception {
-        return wrongUserURI;
     }
 
     @Override
@@ -218,12 +202,12 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception {
-        return jobs.newScheduler(correctURI, getDefaultCredential(credentials), getDefaultProperties());
+        return jobs.newScheduler("slurm", correctLocation, getDefaultCredential(credentials), getDefaultProperties());
     }
 
     @Override
     public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem(correctFSURI, getDefaultCredential(credentials), null);
+        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null);
     }
 
     @Override
@@ -259,5 +243,30 @@ public class SlurmJobTestConfig extends JobTestConfig {
     @Override
     public boolean supportsEnvironmentVariables() {
         return true;
+    }
+
+    @Override
+    public String getScheme() throws Exception {
+        return scheme;
+    }
+
+    @Override
+    public String getCorrectLocation() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getWrongLocation() throws Exception {
+        return wrongLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithUser() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithWrongUser() throws Exception {
+        return correctLocationWrongUser;
     }
 }

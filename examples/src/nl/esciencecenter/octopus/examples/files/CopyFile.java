@@ -28,7 +28,6 @@ import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Pathname;
-import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
  * An example of how to copy a file.
@@ -60,8 +59,8 @@ public class CopyFile {
             Files files = octopus.files();
 
             // Next we create a FileSystem 
-            FileSystem sourceFS = files.newFileSystem(URIUtils.getFileSystemURI(source), null, null);
-            FileSystem targetFS = files.newFileSystem(URIUtils.getFileSystemURI(target), null, null);
+            FileSystem sourceFS = files.newFileSystem(source.getScheme(), source.getAuthority(), null, null);
+            FileSystem targetFS = files.newFileSystem(target.getScheme(), target.getAuthority(), null, null);
 
             // We now create an Path representing both files.
             Path sourcePath = files.newPath(sourceFS, new Pathname(source.getPath()));

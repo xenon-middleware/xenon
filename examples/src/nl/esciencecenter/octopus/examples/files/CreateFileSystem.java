@@ -61,7 +61,7 @@ public class CreateFileSystem {
             Credential c = credentials.getDefaultCredential(uri.getScheme());
 
             // Now we can create a FileSystem (we don't provide any properties). 
-            FileSystem fs = files.newFileSystem(uri, c, null);
+            FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), c, null);
 
             // We can now uses the FileSystem to access files!
             // ....

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.files;
 
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -35,12 +34,19 @@ public interface FileSystem {
     String getAdaptorName();
 
     /**
-     * Get the URI representing the location of the FileSystem.
+     * Get the location of the FileSystem.
      * 
      * @return the location of the FileSystem.
      */
-    URI getUri();
+    String getLocation();
 
+    /**
+     * Get the scheme used to access the FileSystem.
+     * 
+     * @return the scheme used to access the FileSystem.
+     */
+    String getScheme();
+    
     /**
      * Get the properties used to create this FileSystem.
      * 

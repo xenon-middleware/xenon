@@ -31,8 +31,8 @@ import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -63,7 +63,7 @@ public class JobQueues {
 
     private final Scheduler myScheduler;
 
-    private final FileSystem myFileSystem;
+    private final Path workingDirectory;
 
     private final List<JobExecutor> singleQ;
 
@@ -83,7 +83,7 @@ public class JobQueues {
 
     private int jobID = 0;
 
-    public JobQueues(String adaptorName, Files myFiles, Scheduler myScheduler, FileSystem myFileSystem,
+    public JobQueues(String adaptorName, Files myFiles, Scheduler myScheduler, Path workingDirectory,
             InteractiveProcessFactory factory, int multiQThreads, long pollingDelay) throws BadParameterException {
 
         LOGGER.debug("Creating JobQueues for Adaptor {} with multiQThreads: {} and pollingDelay: {}", adaptorName, multiQThreads,
@@ -92,7 +92,7 @@ public class JobQueues {
         this.adaptorName = adaptorName;
         this.myFiles = myFiles;
         this.myScheduler = myScheduler;
-        this.myFileSystem = myFileSystem;
+        this.workingDirectory = workingDirectory;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
 
@@ -366,7 +366,7 @@ public class JobQueues {
 
         LOGGER.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
 
-        JobExecutor executor = new JobExecutor(adaptorName, myFiles, myFileSystem, factory, result, pollingDelay);
+        JobExecutor executor = new JobExecutor(adaptorName, myFiles, workingDirectory, factory, result, pollingDelay);
 
         String queueName = copyOfDescription.getQueueName();
 

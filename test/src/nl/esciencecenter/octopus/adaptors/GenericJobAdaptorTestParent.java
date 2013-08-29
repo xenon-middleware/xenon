@@ -177,28 +177,30 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test(expected = NullPointerException.class)
     public void test00_newScheduler() throws Exception {
-        jobs.newScheduler(null, null, null);
+        jobs.newScheduler(null, null, null, null);
     }
 
-    @Test
+    @Test(expected = OctopusException.class)
     public void test01_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), null, null);
+        Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
         jobs.close(s);
     }
-
-    @Test(expected = OctopusException.class)
+    
+    @Test
     public void test02a_newScheduler() throws Exception {
-        jobs.newScheduler(config.getURIWrongLocation(), null, null);
+        Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), null, null);
+        jobs.close(s);
     }
-
+    
     @Test(expected = OctopusException.class)
     public void test02b_newScheduler() throws Exception {
-        jobs.newScheduler(config.getURIWrongPath(), null, null);
+        jobs.newScheduler(config.getScheme(), config.getWrongLocation(), null, null);
     }
 
     @Test
     public void test03_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), null);
+        Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
+                null);
         jobs.close(s);
     }
 
@@ -206,7 +208,9 @@ public abstract class GenericJobAdaptorTestParent {
     public void test04a_newScheduler() throws Exception {
         if (config.supportsCredentials()) {
             try {
-                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getInvalidCredential(credentials), null);
+                Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                        config.getInvalidCredential(credentials), null);
+                
                 jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
             } catch (InvalidCredentialsException e) {
@@ -233,7 +237,7 @@ public abstract class GenericJobAdaptorTestParent {
                     }
                 };
 
-                Scheduler s = jobs.newScheduler(config.getCorrectURI(), c, null);
+                Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), c, null);
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw OctopusException");
@@ -246,23 +250,23 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test04c_newScheduler() throws Exception {
         if (config.supportsCredentials()) {
-            Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getPasswordCredential(credentials),
-                    config.getDefaultProperties());
+            Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                    config.getPasswordCredential(credentials), config.getDefaultProperties());
             jobs.close(s);
         }
     }
 
     @Test
     public void test05_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
-                new HashMap<String, String>());
+        Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                config.getDefaultCredential(credentials), new HashMap<String, String>());
         jobs.close(s);
     }
 
     @Test
     public void test06_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
-                config.getDefaultProperties());
+        Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                config.getDefaultCredential(credentials), config.getDefaultProperties());
         jobs.close(s);
     }
 
@@ -274,7 +278,8 @@ public abstract class GenericJobAdaptorTestParent {
 
             for (Map<String, String> p : tmp) {
                 try {
-                    Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
+                    Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                            config.getDefaultCredential(credentials), p);
                     jobs.close(s);
                     throw new Exception("newScheduler did NOT throw InvalidPropertyException");
                 } catch (InvalidPropertyException e) {
@@ -288,8 +293,8 @@ public abstract class GenericJobAdaptorTestParent {
     public void test08_newScheduler() throws Exception {
         if (config.supportsProperties()) {
             try {
-                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials),
-                        config.getUnknownProperties());
+                Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                        config.getDefaultCredential(credentials), config.getUnknownProperties());
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw UnknownPropertyException");
@@ -305,7 +310,8 @@ public abstract class GenericJobAdaptorTestParent {
             try {
                 Map<String, String> p = new HashMap<>();
                 p.put("aap", "noot");
-                Scheduler s = jobs.newScheduler(config.getCorrectURI(), config.getDefaultCredential(credentials), p);
+                Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
+                        config.getDefaultCredential(credentials), p);
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw OctopusException");
@@ -620,11 +626,11 @@ public abstract class GenericJobAdaptorTestParent {
             description.setArguments("-n", message);
             description.setInteractive(true);
 
-            System.err.println("Submitting interactive job to " + scheduler.getUri());
+            System.err.println("Submitting interactive job to " + scheduler.getScheme() + "://" + scheduler.getLocation());
 
             Job job = jobs.submitJob(scheduler, description);
 
-            System.err.println("Interactive job submitted to " + scheduler.getUri());
+            System.err.println("Interactive job submitted to " + scheduler.getScheme() + "://" + scheduler.getLocation());
 
             Streams streams = jobs.getStreams(job);
             streams.getStdin().close();

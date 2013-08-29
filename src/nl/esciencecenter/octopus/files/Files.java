@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.files;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,9 +63,12 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException;
+//    FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
+//            OctopusIOException;
 
+    FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException;
+    
     /**
      * Get a FileSystem that represents the local current working directory.
      * 
@@ -74,16 +76,15 @@ public interface Files {
      * 
      * @return a FileSystem that represents the local current working directory.
      * 
-     * @throws UnknownPropertyException
-     *             If a unknown property was provided.
-     * @throws InvalidPropertyException
-     *             If a known property was provided with an invalid value.
-     * 
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    FileSystem getLocalCWDFileSystem() throws OctopusException;
+    //FileSystem getLocalCWDFileSystem() throws OctopusException;
 
+    Path getLocalCWD() throws OctopusException;
+
+    Path getLocalHome() throws OctopusException;
+    
     /**
      * Get a FileSystem that represents the local home directory of the current user.
      * 
@@ -91,16 +92,23 @@ public interface Files {
      * 
      * @return a FileSystem that represents the local home directory of the current user.
      * 
-     * @throws UnknownPropertyException
-     *             If a unknown property was provided.
-     * @throws InvalidPropertyException
-     *             If a known property was provided with an invalid value.
-     * 
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    FileSystem getLocalHomeFileSystem() throws OctopusException;
+    //FileSystem getLocalHomeFileSystem() throws OctopusException;
 
+    /**
+     * Retrieve all local FileSystems.
+     * 
+     * Multiple invocations of this method may return the same FileSystems.
+     * 
+     * @return an array containing all local FileSystems.
+     * 
+     * @throws OctopusException
+     *             If the creation of a FileSystem failed.
+     */
+    FileSystem [] getLocalFileSystems() throws OctopusException; 
+    
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
      *  

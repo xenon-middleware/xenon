@@ -112,23 +112,23 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         assertTrue(outputContent.equals(message));
     }
 
-    @Test
-    public void ge_test02_newScheduler_pathWithSlash() throws Exception {
-
-        URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
-
-        Scheduler s = jobs.newScheduler(uriWithSlash, null, null);
-        jobs.close(s);
-    }
-
-    @Test(expected = InvalidLocationException.class)
-    public void ge_test03_newScheduler_pathWithFragment_Exception() throws Exception {
-
-        URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
-
-        Scheduler s = jobs.newScheduler(uriWithFragment, null, null);
-        jobs.close(s);
-    }
+//    @Test
+//    public void ge_test02_newScheduler_pathWithSlash() throws Exception {
+//
+//        URI uriWithSlash = new URI(config.getCorrectURI().toString() + "/");
+//
+//        Scheduler s = jobs.newScheduler(uriWithSlash, null, null);
+//        jobs.close(s);
+//    }
+//
+//    @Test(expected = InvalidLocationException.class)
+//    public void ge_test03_newScheduler_pathWithFragment_Exception() throws Exception {
+//
+//        URI uriWithFragment = new URI(config.getCorrectURI().toString() + "#somefragment");
+//
+//        Scheduler s = jobs.newScheduler(uriWithFragment, null, null);
+//        jobs.close(s);
+//    }
 
     @Test
     public void ge_test04_parallel_batchJob() throws Exception {

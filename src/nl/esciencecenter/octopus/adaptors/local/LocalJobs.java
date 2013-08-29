@@ -16,7 +16,6 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -30,7 +29,7 @@ import nl.esciencecenter.octopus.engine.util.JobQueues;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -50,21 +49,15 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
-    private final LocalAdaptor localAdaptor;
-
     private final Scheduler localScheduler;
 
     private final JobQueues jobQueues;
 
-    public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, FileSystem cwd, OctopusEngine engine)
+    public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, Path cwd, OctopusEngine engine)
             throws OctopusException {
 
-        this.localAdaptor = localAdaptor;
-
-        URI uri = LocalUtils.getLocalJobURI();
-
-        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", uri, new String[] { "single",
-                "multi", "unlimited" }, null, properties, true, true, true);
+        localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", "local", "/", 
+                new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
 
         int processors = Runtime.getRuntime().availableProcessors();
         int multiQThreads = properties.getIntegerProperty(LocalAdaptor.MULTIQ_MAX_CONCURRENT, processors);
@@ -80,15 +73,11 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
+    public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException {
 
-        localAdaptor.checkURI(location);
-
-        String path = location.getPath();
-
-        if (path != null && !path.equals("/")) {
-            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with path!");
+        if (location != null && !location.equals("/")) {
+            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with a path!");
         }
 
         if (credential != null) {

@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,39 +77,6 @@ public abstract class SchedulerConnection {
         }
 
         return false;
-    }
-
-    protected static URI getSubSchedulerLocation(URI location, String adaptorName, String... supportedSchemes)
-            throws InvalidLocationException {
-        if (!supportsScheme(location.getScheme(), supportedSchemes)) {
-            throw new InvalidLocationException(adaptorName, "Adaptor does not support scheme \"" + location.getScheme() + "\"");
-        }
-
-        //only null or "/" are allowed as paths
-        if (location.getPath() != null && location.getPath().length() != 0 && !location.getPath().equals("/")) {
-            throw new InvalidLocationException(adaptorName, "Paths are not allowed in a uri for this scheduler, uri given: "
-                    + location);
-        }
-
-        if (location.getFragment() != null) {
-            throw new InvalidLocationException(adaptorName, "Fragments are not allowed in a uri for this scheduler, uri given: "
-                    + location);
-        }
-
-        if (location.getQuery() != null) {
-            throw new InvalidLocationException(adaptorName, "Queries are not allowed in a uri for this scheduler, uri given: "
-                    + location);
-        }
-
-        try {
-            if (location.getHost() == null) {
-                return new URI("local:///");
-            }
-
-            return new URI("ssh", location.getAuthority(), null, null, null);
-        } catch (URISyntaxException e) {
-            throw new InvalidLocationException(adaptorName, "Failed to create URI for scheduler connection", e);
-        }
     }
 
     /**
@@ -228,29 +193,45 @@ public abstract class SchedulerConnection {
         return result;
     }
 
-    protected SchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
-            OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
+    protected SchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
+            OctopusProperties properties, OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
 
         this.adaptor = adaptor;
         this.engine = engine;
         this.properties = properties;
         this.pollDelay = pollDelay;
 
+        if (!supportsScheme(scheme, adaptor.getSupportedSchemes())) {
+            throw new InvalidLocationException(adaptor.getName(), "Adaptor does not support scheme \"" + scheme + "\"");
+        }
+        
         id = adaptor.getName() + "-" + getNextSchedulerID();
 
-        URI subSchedulerLocation = getSubSchedulerLocation(location, adaptor.getName(), adaptor.getSupportedSchemes());
-
-        LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), subSchedulerLocation);
+        String subJobScheme = null;
+        String subFileScheme = null;
+        String subLocation = null;
+        
+        if (location == null|| location.length() == 0 || location.equals("/")) {
+            subJobScheme = "local";
+            subFileScheme = "file";
+            subLocation = "/";
+        } else { 
+            subJobScheme = "ssh";
+            subFileScheme = "sftp";
+            subLocation = location;
+        }
+ 
+        LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), (subJobScheme + "://" + subLocation));
         Map<String, String> subSchedulerProperties = new HashMap<String, String>();
 
         //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
-        if (subSchedulerLocation.getScheme().equals("ssh")) {
+        if (subJobScheme.equals("ssh")) {
             subSchedulerProperties.put(SshAdaptor.POLLING_DELAY, "100");
         }
-        subScheduler = engine.jobs().newScheduler(subSchedulerLocation, credential, subSchedulerProperties);
+        subScheduler = engine.jobs().newScheduler(subJobScheme, subLocation, credential, subSchedulerProperties);
 
-        LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), subSchedulerLocation);
-        subFileSystem = engine.files().newFileSystem(subSchedulerLocation, credential, null);
+        LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), (subFileScheme + "://" + subLocation));
+        subFileSystem = engine.files().newFileSystem(subFileScheme, subLocation, credential, null);
     }
 
     protected Path getFsEntryPath() {

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,13 +102,13 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
+    public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException,OctopusIOException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
-        SchedulerConnection connection = connectionFactory
-                .newSchedulerConnection(adaptor, location, credential, p, octopusEngine);
+        SchedulerConnection connection = connectionFactory.newSchedulerConnection(adaptor, scheme, location, credential, p, 
+                octopusEngine);
 
         addConnection(connection);
 

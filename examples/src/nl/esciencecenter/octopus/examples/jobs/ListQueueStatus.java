@@ -54,7 +54,7 @@ public class ListQueueStatus {
             Jobs jobs = octopus.jobs();
 
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(location, null, null);
+            Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
 
             // Retrieve the status of all queues.
             QueueStatus[] result = jobs.getQueueStatuses(scheduler);

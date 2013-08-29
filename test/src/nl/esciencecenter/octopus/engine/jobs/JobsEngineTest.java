@@ -50,7 +50,7 @@ public class JobsEngineTest {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s = new SchedulerImplementation("test", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true,
+        Scheduler s = new SchedulerImplementation("test", "id1", "test", "", new String[] { "testq" }, null, null, true,
                 true, true);
 
         Job job = new JobImplementation(s, "id1", desc, true, true);
@@ -71,12 +71,12 @@ public class JobsEngineTest {
 
         JobDescription desc = new JobDescription();
 
-        Scheduler s = new SchedulerImplementation("test1", "id1", new URI("test:///"), new String[] { "testq" }, null, null,
+        Scheduler s = new SchedulerImplementation("test1", "id1", "test", "", new String[] { "testq" }, null, null,
                 true, true, true);
 
         Job job1 = new JobImplementation(s, "id1", desc, true, true);
 
-        s = new SchedulerImplementation("test1", "id1", new URI("test:///"), new String[] { "testq" }, null, null, true, true,
+        s = new SchedulerImplementation("test1", "id1", "test", "", new String[] { "testq" }, null, null, true, true,
                 true);
 
         Job job2 = new JobImplementation(s, "id2", desc, true, true);

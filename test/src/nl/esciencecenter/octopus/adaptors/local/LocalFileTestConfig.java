@@ -31,23 +31,30 @@ import nl.esciencecenter.octopus.files.Files;
  */
 public class LocalFileTestConfig extends FileTestConfig {
 
-    private final URI correctURI;
-    private final URI correctURIWithPath;
-    private final URI wrongPathURI;
-    private final URI wrongLocationURI;
+//    private final URI correctURI;
+//    private final URI correctURIWithPath;
+//    private final URI wrongPathURI;
+//    private final URI wrongLocationURI;
 
+    private final String scheme;
+    private final String correctLocation;
+    private final String wrongLocation;
+    
     public LocalFileTestConfig() throws Exception {
         super("local");
 
-        correctURI = new URI("file:///");
-        correctURIWithPath = new URI("file:////");
-        wrongPathURI = new URI("file:///aap/noot/mies/");
-        wrongLocationURI = new URI("file://machine/");
+        scheme = "file";
+        correctLocation = "/"; // FIXME: windows!
+        wrongLocation = "/aap";
+//        correctURI = new URI("file:///");
+//        correctURIWithPath = new URI("file:////");
+//        wrongPathURI = new URI("file:///aap/noot/mies/");
+//        wrongLocationURI = new URI("file://machine/");
     }
 
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.getLocalCWDFileSystem();
+        return files.getLocalCWD().getFileSystem();
     }
 
     @Override
@@ -55,27 +62,8 @@ public class LocalFileTestConfig extends FileTestConfig {
         // ignore
     }
 
-    @Override
-    public URI getCorrectURI() throws Exception {
-        return correctURI;
-    }
-
-    @Override
-    public URI getCorrectURIWithPath() throws Exception {
-        return correctURI;
-    }
-
-    @Override
-    public URI getURIWrongPath() throws Exception {
-        return wrongPathURI;
-    }
-
-    public boolean supportURILocation() {
+    public boolean supportLocation() {
         return true;
-    }
-
-    public URI getURIWrongLocation() throws Exception {
-        return wrongLocationURI;
     }
 
     @Override
@@ -90,5 +78,30 @@ public class LocalFileTestConfig extends FileTestConfig {
 
     public boolean supportNullCredential() {
         return true;
+    }
+
+    @Override
+    public String getScheme() throws Exception {
+        return scheme;
+    }
+
+    @Override
+    public String getCorrectLocation() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getWrongLocation() throws Exception {
+        return wrongLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithUser() throws Exception {
+        return null;
+    }
+
+    @Override
+    public String getCorrectLocationWithWrongUser() throws Exception {
+        return null;
     }
 }

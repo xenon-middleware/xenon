@@ -21,6 +21,7 @@ import java.net.URI;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -31,44 +32,44 @@ import nl.esciencecenter.octopus.jobs.Jobs;
  */
 public class LocalAdaptorTest {
 
-    @org.junit.Test
-    public void test_checkURI_null() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(null);
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_null() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation(null);
+    }
+
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_empty() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("");
     }
 
     @org.junit.Test
-    public void test_checkURI_empty() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI(""));
-    }
-
-    @org.junit.Test(expected = OctopusException.class)
-    public void test_checkURI_wrongScheme() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI("ssh:///"));
+    public void test_checkLocation_linuxRoot() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("/");
     }
 
     @org.junit.Test
-    public void test_checkURI_withPath() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI("local:///aap/noot/mies"));
+    public void test_checkLocation_windowsRoot() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:");
     }
 
-    @org.junit.Test
-    public void test_checkURI_withPath2() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI("/aap/noot/mies"));
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_wrong() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("ABC");
     }
 
-    @org.junit.Test(expected = OctopusException.class)
-    public void test_checkURI_wrongLocation() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI("file://google.com"));
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_withPath() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("/aap");
     }
 
-    @org.junit.Test
-    public void test_checkURI_correct1() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI("file:///"));
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_withWindowsPath() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:/aap");
     }
-
-    @org.junit.Test
-    public void test_checkURI_correct2() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkURI(new URI("file://localhost/"));
+    
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_withWindowsPath2() throws Exception {
+        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:\\aap");
     }
 
     @org.junit.Test

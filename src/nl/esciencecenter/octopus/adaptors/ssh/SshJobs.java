@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,10 +97,10 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
+    public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException {
 
-        adaptor.checkPath(location, "scheduler");
+//        adaptor.checkPath(location, "scheduler");
 
         String uniqueID = getNewUniqueID();
 
@@ -111,19 +110,19 @@ public class SshJobs implements Jobs {
 
         SshMultiplexedSession session = adaptor.createNewSession(location, credential, p);
 
-        SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location,
+        SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, scheme, location,
                 new String[] { "single", "multi", "unlimited" }, credential, p, true, true, true);
 
         SshInteractiveProcessFactory factory = new SshInteractiveProcessFactory(session);
 
         // Create a file system that uses the same SSH session as the scheduler.
         SshFiles files = (SshFiles) adaptor.filesAdaptor();
-        FileSystem fs = files.newFileSystem(session, location, credential, this.properties);
+        FileSystem fs = files.newFileSystem(session, "sftp", location, credential, this.properties);
 
         long pollingDelay = p.getLongProperty(SshAdaptor.POLLING_DELAY);
         int multiQThreads = p.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT);
 
-        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine.files(), scheduler, fs, factory,
+        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine.files(), scheduler, fs.getEntryPath(), factory,
                 multiQThreads, pollingDelay);
 
         synchronized (this) {

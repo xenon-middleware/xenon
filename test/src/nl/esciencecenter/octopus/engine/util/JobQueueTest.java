@@ -133,6 +133,7 @@ public class JobQueueTest {
 
     public static Scheduler scheduler;
     public static Octopus octopus;
+    public static Path cwd;
     public static Files files;
     public static FileSystem filesystem;
     public static JobQueues jobQueue;
@@ -153,9 +154,10 @@ public class JobQueueTest {
         octopus = OctopusFactory.newOctopus(null);
         scheduler = octopus.jobs().getLocalScheduler();
         files = octopus.files();
-        filesystem = files.getLocalCWDFileSystem();
+        cwd = files.getLocalCWD();
+        filesystem = cwd.getFileSystem();
         myFactory = new MyFactory();
-        jobQueue = new JobQueues("test", files, scheduler, filesystem, myFactory, 2, POLLING_DELAY);
+        jobQueue = new JobQueues("test", files, scheduler, cwd, myFactory, 2, POLLING_DELAY);
     }
 
     @AfterClass
@@ -196,19 +198,19 @@ public class JobQueueTest {
     @Test(expected = BadParameterException.class)
     public void test_constructor2() throws Exception {
         // throws exception
-        new JobQueues("test", files, scheduler, filesystem, myFactory, 0, POLLING_DELAY);
+        new JobQueues("test", files, scheduler, cwd, myFactory, 0, POLLING_DELAY);
     }
 
     @Test(expected = BadParameterException.class)
     public void test_constructor3() throws Exception {
         // throws exception
-        new JobQueues("test", files, scheduler, filesystem, myFactory, 2, 1);
+        new JobQueues("test", files, scheduler, cwd, myFactory, 2, 1);
     }
 
     @Test(expected = BadParameterException.class)
     public void test_constructor4() throws Exception {
         // throws exception
-        new JobQueues("test", files, scheduler, filesystem, myFactory, 2, 100000);
+        new JobQueues("test", files, scheduler, cwd, myFactory, 2, 100000);
     }
 
     @Test(expected = InvalidJobDescriptionException.class)

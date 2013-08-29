@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.engine.files;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,10 +78,11 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
-        Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
-        return adaptor.filesAdaptor().newFileSystem(location, credential, properties);
+    public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException {
+        
+        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        return adaptor.filesAdaptor().newFileSystem(scheme, location, credential, properties);
     }
 
     @Override
@@ -213,17 +213,23 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public FileSystem getLocalCWDFileSystem() throws OctopusException {
+    public Path getLocalCWD() throws OctopusException { 
         Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalCWDFileSystem();
+        return adaptor.filesAdaptor().getLocalCWD();
     }
 
     @Override
-    public FileSystem getLocalHomeFileSystem() throws OctopusException {
+    public Path getLocalHome() throws OctopusException { 
         Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalHomeFileSystem();
+        return adaptor.filesAdaptor().getLocalHome();        
     }
-
+    
+    @Override
+    public FileSystem [] getLocalFileSystems() throws OctopusException { 
+        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+        return adaptor.filesAdaptor().getLocalFileSystems();
+    }
+    
     @Override
     public String toString() {
         return "FilesEngine [octopusEngine=" + octopusEngine + "]";

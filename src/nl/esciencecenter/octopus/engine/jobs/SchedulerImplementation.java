@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -27,8 +26,9 @@ public class SchedulerImplementation implements Scheduler {
 
     private final String adaptorName;
     private final String uniqueID;
-
-    private final URI uri;
+    private final String scheme;
+    private final String location;
+    
     private final OctopusProperties properties;
     private final String[] queueNames;
     private final Credential credential;
@@ -37,8 +37,9 @@ public class SchedulerImplementation implements Scheduler {
     private final boolean supportsInteractive;
     private final boolean supportsBatch;
 
-    public SchedulerImplementation(String adaptorName, String uniqueID, URI uri, String[] queueNames, Credential credential,
-            OctopusProperties properties, boolean isOnline, boolean supportsInteractive, boolean supportsBatch) {
+    public SchedulerImplementation(String adaptorName, String uniqueID, String scheme, String location, String[] queueNames, 
+            Credential credential, OctopusProperties properties, boolean isOnline, boolean supportsInteractive, 
+            boolean supportsBatch) {
 
         if (adaptorName == null) {
             throw new IllegalArgumentException("AdaptorName may not be null!");
@@ -50,7 +51,8 @@ public class SchedulerImplementation implements Scheduler {
 
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
-        this.uri = uri;
+        this.scheme = scheme;
+        this.location = location;
         this.credential = credential;
         this.isOnline = isOnline;
         this.supportsInteractive = supportsInteractive;
@@ -78,10 +80,15 @@ public class SchedulerImplementation implements Scheduler {
     }
 
     @Override
-    public URI getUri() {
-        return uri;
+    public String getScheme() {
+        return scheme;
     }
 
+    @Override
+    public String getLocation() {
+        return location;
+    }
+    
     @Override
     public Map<String, String> getProperties() {
         return properties.toMap();
@@ -114,9 +121,10 @@ public class SchedulerImplementation implements Scheduler {
 
     @Override
     public String toString() {
-        return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", uri=" + uri
-                + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames) + ", isOnline=" + isOnline
-                + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" + supportsBatch + "]";
+        return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", scheme=" + scheme 
+                + ", location=" + location + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames) 
+                + ", isOnline=" + isOnline + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" + supportsBatch 
+                + "]";
     }
 
     @Override

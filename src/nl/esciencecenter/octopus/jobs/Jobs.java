@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.jobs;
 
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -62,9 +61,11 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException;
-
+//    Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
+//            OctopusIOException;
+    Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException;
+    
     /**
      * Get a Scheduler that represents the local machine.
      * 

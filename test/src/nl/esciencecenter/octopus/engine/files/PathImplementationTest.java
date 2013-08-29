@@ -34,7 +34,7 @@ public class PathImplementationTest {
     @Before
     public void setUp() throws URISyntaxException {
         // reuse same file system for every test
-        fs = new FileSystemImplementation("local", "local-fs-0", new URI("file:///"), new Pathname("/"), null, null);
+        fs = new FileSystemImplementation("local", "local-fs-0", "file", "/", new Pathname("/"), null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -182,9 +182,9 @@ public class PathImplementationTest {
     public void test_equals() throws Exception {
         Path path = new PathImplementation(fs, new Pathname("/aap/noot/mies/bla"));
 
-        FileSystem fs2 = new FileSystemImplementation("other", "other-fs-0", new URI("file:///"), new Pathname("/"), null,
+        FileSystem fs2 = new FileSystemImplementation("other", "other-fs-0", "file", "/", new Pathname("/"), null,
                 null);
-        FileSystem fs3 = new FileSystemImplementation("local", "local-fs-0", new URI("aap:///"), new Pathname("/"), null,
+        FileSystem fs3 = new FileSystemImplementation("local", "local-fs-0", "aap", "/", new Pathname("/"), null,
                 null);
 
         Path path2 = new PathImplementation(fs2, new Pathname("/aap/noot/mies/bla"));

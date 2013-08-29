@@ -16,9 +16,6 @@
 
 package nl.esciencecenter.octopus.examples.files;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -48,14 +45,11 @@ public class CreateLocalFileSystem {
             Files files = octopus.files();
             Credentials credentials = octopus.credentials();
 
-            // To create a new FileSystem we need a URI indicating its location.
-            URI uri = new URI("file://localhost/");
-
-            // We also need a Credential that enable us to access the location. 
+            // To create a new FileSystem we need a Credential that enable us to access the location. 
             Credential c = credentials.getDefaultCredential("file");
 
             // Now we can create a FileSystem (we don't provide any properties). 
-            FileSystem fs = files.newFileSystem(uri, c, null);
+            FileSystem fs = files.newFileSystem("file", "/", c, null);
 
             // We can now uses the FileSystem to access files!
             // ....
@@ -67,7 +61,7 @@ public class CreateLocalFileSystem {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+        } catch (OctopusException | OctopusIOException e) {
             System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

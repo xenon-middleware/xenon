@@ -57,7 +57,7 @@ public class SubmitSimpleBatchJob {
             description.setArguments("5");
 
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(location, null, null);
+            Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
 
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);

@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -38,26 +37,22 @@ public abstract class GenericTestConfig {
         return adaptorName;
     }
 
-    public abstract URI getCorrectURI() throws Exception;
-
-    public abstract URI getCorrectURIWithPath() throws Exception;
-
-    public abstract URI getURIWrongPath() throws Exception;
-
-    public boolean supportURIUser() {
+    public abstract String getScheme() throws Exception;
+    
+    public abstract String getCorrectLocation() throws Exception;
+    
+    public abstract String getWrongLocation() throws Exception;
+    
+    public abstract String getCorrectLocationWithUser() throws Exception;
+    
+    public abstract String getCorrectLocationWithWrongUser() throws Exception;
+    
+    public boolean supportUser() {
         return false;
     }
 
-    public URI getURIWrongUser() throws Exception {
-        throw new Exception("Adaptor " + adaptorName + " does not support user names!");
-    }
-
-    public boolean supportURILocation() {
+    public boolean supportLocation() {
         return false;
-    }
-
-    public URI getURIWrongLocation() throws Exception {
-        throw new Exception("Adaptor " + adaptorName + " does not support locations!");
     }
 
     public boolean supportsCredentials() {

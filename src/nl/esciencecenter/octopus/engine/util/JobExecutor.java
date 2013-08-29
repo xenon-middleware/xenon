@@ -23,8 +23,8 @@ import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -51,7 +51,7 @@ public class JobExecutor implements Runnable {
     private final String adaptorName;
 
     private final Files files;
-    private final FileSystem filesytem;
+    private final Path workingDirectory;
 
     private Streams streams;
 
@@ -67,12 +67,12 @@ public class JobExecutor implements Runnable {
 
     private Exception error;
 
-    public JobExecutor(String adaptorName, Files files, FileSystem filesytem, InteractiveProcessFactory factory,
+    public JobExecutor(String adaptorName, Files files, Path workingDirectory, InteractiveProcessFactory factory,
             JobImplementation job, long pollingDelay) throws BadParameterException {
 
         this.adaptorName = adaptorName;
         this.files = files;
-        this.filesytem = filesytem;
+        this.workingDirectory = workingDirectory;
         this.job = job;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
@@ -322,7 +322,7 @@ public class JobExecutor implements Runnable {
                 setStreams(p.getStreams());
                 process = p; 
             } else {
-                process = new BatchProcess(files, filesytem, job, factory);
+                process = new BatchProcess(files, workingDirectory, job, factory);
             }
         } catch (IOException | OctopusException e) {
             updateState("ERROR", -1, e);

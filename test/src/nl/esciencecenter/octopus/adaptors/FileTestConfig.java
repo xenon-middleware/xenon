@@ -38,15 +38,12 @@ public abstract class FileTestConfig extends GenericTestConfig {
         return false;
     }
 
-    public boolean supportsLocalCWDFileSystem() {
+    public boolean supportsLocalCWD() {
         return false;
     }
 
-    public boolean supportsLocalHomeFileSystem() {
+    public boolean supportsLocalHome() {
         return false;
     }
 
-    public boolean supportsNewByteChannel() {
-        return false;
-    }
 }

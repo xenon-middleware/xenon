@@ -22,7 +22,6 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Pathname;
@@ -47,13 +46,13 @@ class BatchProcess implements Process {
     private StreamForwarder stdoutForwarder;
     private StreamForwarder stderrForwarder;
    
-    public BatchProcess(Files files, FileSystem filesystem, JobImplementation job, InteractiveProcessFactory factory)
+    public BatchProcess(Files files, Path workingDirectory, JobImplementation job, InteractiveProcessFactory factory)
             throws OctopusException, IOException {
 
         JobDescription description = job.getJobDescription();
 
         // Retrieve the filesystem that goes with the scheduler.
-        Path workdir = processPath(files, filesystem.getEntryPath(), description.getWorkingDirectory());
+        Path workdir = processPath(files, workingDirectory, description.getWorkingDirectory());
 
         if (!files.exists(workdir)) {
             throw new IOException("Working directory " + workdir + " does not exist!");
@@ -93,7 +92,7 @@ class BatchProcess implements Process {
 
         if (path == null) {
             result = root;
-        } else if (path.startsWith("/")) {
+        } else if (path.startsWith("/")) {  // FIXME: windows! 
             result = files.newPath(root.getFileSystem(), new Pathname(path));
         } else {
             result = files.newPath(root.getFileSystem(), root.getPathname().resolve(path));

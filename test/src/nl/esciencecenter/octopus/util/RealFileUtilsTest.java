@@ -55,7 +55,7 @@ public class RealFileUtilsTest {
         octopus = OctopusFactory.newOctopus(null);
 
         files = octopus.files();
-        fileSystem = files.getLocalCWDFileSystem();
+        fileSystem = files.getLocalCWD().getFileSystem();
 
         testDir = files.newPath(fileSystem, new Pathname(ROOT));
         files.createDirectory(testDir);

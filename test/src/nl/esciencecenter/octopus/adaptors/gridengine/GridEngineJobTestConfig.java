@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -41,13 +40,20 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     private String username;
     private char[] passwd;
 
-    private URI correctURI;
-    private URI correctURIWithPath;
-    private URI correctFSURI;
-
-    private URI wrongUserURI;
-    private URI wrongLocationURI;
-    private URI wrongPathURI;
+    private String scheme;
+    private String fileScheme;
+    private String correctLocation;
+    private String wrongLocation;
+    private String correctLocationWrongUser;
+    
+//    
+//    private URI correctURI;
+//    private URI correctURIWithPath;
+//    private URI correctFSURI;
+//
+//    private URI wrongUserURI;
+//    private URI wrongLocationURI;
+//    private URI wrongPathURI;
 
     private String defaultQueue;
     private String[] queues;
@@ -72,6 +78,9 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         Properties p = new Properties();
         p.load(new FileInputStream(configfile));
 
+        scheme = "ge";
+        fileScheme = "sftp";
+        
         username = getPropertyOrFail(p, "test.gridengine.user");
         passwd = getPropertyOrFail(p, "test.gridengine.password").toCharArray();
 
@@ -89,12 +98,14 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         parallelEnvironment = p.getProperty("test.gridengine.parallel.environment");
 
-        correctURI = new URI("ge://" + username + "@" + location);
-        correctFSURI = new URI("sftp://" + username + "@" + location);
-        correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
-        wrongUserURI = new URI("ge://" + wrongUser + "@" + location);
-        wrongLocationURI = new URI("ge://" + username + "@" + wrongLocation);
-        wrongPathURI = new URI("ge://" + username + "@" + location + "/aap/noot");
+        correctLocation = username + "@" + location;
+        wrongLocation = username + "@" + wrongLocation;
+        correctLocationWrongUser = wrongUser + "@" + location;
+//        correctFSURI = new URI("sftp://" + username + "@" + location);
+//        correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
+//        wrongUserURI = new URI("ge://" + wrongUser + "@" + location);
+//        //wrongLocationURI = new URI("ge://" + username + "@" + wrongLocation);
+//        wrongPathURI = new URI("ge://" + username + "@" + location + "/aap/noot");
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
@@ -109,38 +120,28 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public URI getCorrectURI() throws Exception {
-        return correctURI;
+    public String getScheme() throws Exception {
+        return "ge";
     }
 
     @Override
-    public URI getCorrectURIWithPath() throws Exception {
-        return correctURIWithPath;
+    public String getCorrectLocation() throws Exception {
+        return correctLocation; 
     }
 
     @Override
-    public boolean supportURILocation() {
+    public boolean supportLocation() {
         return true;
     }
 
     @Override
-    public URI getURIWrongLocation() throws Exception {
-        return wrongLocationURI;
+    public String getWrongLocation() throws Exception {
+        return wrongLocation;
     }
-
+    
     @Override
-    public URI getURIWrongPath() throws Exception {
-        return wrongPathURI;
-    }
-
-    @Override
-    public boolean supportURIUser() {
+    public boolean supportUser() {
         return true;
-    }
-
-    @Override
-    public URI getURIWrongUser() throws Exception {
-        return wrongUserURI;
     }
 
     @Override
@@ -193,12 +194,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception {
-        return jobs.newScheduler(correctURI, getDefaultCredential(credentials), getDefaultProperties());
+        return jobs.newScheduler(scheme, correctLocation, getDefaultCredential(credentials), getDefaultProperties());
     }
 
     @Override
     public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem(correctFSURI, getDefaultCredential(credentials), null);
+        return files.newFileSystem(fileScheme, correctLocation, getDefaultCredential(credentials), null);
     }
 
     @Override
@@ -261,5 +262,15 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     public String getParallelEnvironment() {
         return parallelEnvironment;
+    }
+
+    @Override
+    public String getCorrectLocationWithUser() throws Exception {
+        return correctLocation;
+    }
+
+    @Override
+    public String getCorrectLocationWithWrongUser() throws Exception {
+        return correctLocationWrongUser;
     }
 }

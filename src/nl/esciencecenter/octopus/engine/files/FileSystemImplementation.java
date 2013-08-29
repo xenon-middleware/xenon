@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.engine.files;
 
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credential;
@@ -27,14 +26,15 @@ import nl.esciencecenter.octopus.files.Pathname;
 public class FileSystemImplementation implements FileSystem {
 
     private final String adaptorName;
+    private final String scheme;
+    private final String location;
     private final String uniqueID;
 
-    private final URI uri;
     private final Credential credential;
     private final OctopusProperties properties;
     private final Pathname entryPath;
 
-    public FileSystemImplementation(String adaptorName, String identifier, URI uri, Pathname entryPath,
+    public FileSystemImplementation(String adaptorName, String identifier, String scheme, String location, Pathname entryPath,
             Credential credential, OctopusProperties properties) {
 
         if (adaptorName == null) {
@@ -45,17 +45,22 @@ public class FileSystemImplementation implements FileSystem {
             throw new IllegalArgumentException("Identifier may not be null!");
         }
 
-        if (uri == null) {
-            throw new IllegalArgumentException("URI may not be null!");
+        if (scheme == null) {
+            throw new IllegalArgumentException("Scheme may not be null!");
         }
 
+        if (location == null) {
+            throw new IllegalArgumentException("Location may not be null!");
+        }
+        
         if (entryPath == null) {
             throw new IllegalArgumentException("EntryPath may not be null!");
         }
 
         this.adaptorName = adaptorName;
         this.uniqueID = identifier;
-        this.uri = uri;
+        this.scheme = scheme;
+        this.location = location;
         this.entryPath = entryPath;
         this.credential = credential;
 
@@ -80,10 +85,15 @@ public class FileSystemImplementation implements FileSystem {
     }
 
     @Override
-    public URI getUri() {
-        return uri;
+    public String getScheme() {
+        return scheme;
     }
 
+    @Override
+    public String getLocation() {
+        return location;
+    }
+    
     @Override
     public Map<String, String> getProperties() {
         return properties.toMap();
@@ -96,8 +106,8 @@ public class FileSystemImplementation implements FileSystem {
 
     @Override
     public String toString() {
-        return "FileSystemImplementation [adaptorName=" + adaptorName + ", uri=" + uri + ", entryPath=" + entryPath
-                + ", properties=" + properties + "]";
+        return "FileSystemImplementation [adaptorName=" + adaptorName + ", scheme=" + scheme + ", location=" + location 
+                + ", entryPath=" + entryPath + ", properties=" + properties + "]";
     }
 
     @Override
@@ -108,6 +118,7 @@ public class FileSystemImplementation implements FileSystem {
 
     @Override
     public boolean equals(Object obj) {
+        
         if (this == obj) {
             return true;
         }

@@ -101,8 +101,7 @@ abstract public class AbstractFileTests {
         synchronized (this) {
             if (fileSystem == null) {
                 URI uri = getTestLocation();
-                URI fsURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), "/", null, null);
-                fileSystem = getFiles().newFileSystem(fsURI, getCredentials(), null);
+                fileSystem = getFiles().newFileSystem(uri.getScheme(), uri.getAuthority(), getCredentials(), null);
             }
 
             return fileSystem;
@@ -238,7 +237,8 @@ abstract public class AbstractFileTests {
         assertNotNull("TestPath returned NULL", path);
         assertNotNull("Actual path element of Path may not be NULL", path);
 
-        infoPrintf("Test location path URI      =%s\n", path.getFileSystem().getUri());
+        infoPrintf("Test location path scheme      =%s\n", path.getFileSystem().getScheme());
+        infoPrintf("Test location path location    =%s\n", path.getFileSystem().getLocation());
         infoPrintf("Test location path          =%s\n", path.getPathname().getAbsolutePath());
         infoPrintf("Test location toString()    =%s\n", path.toString());
         infoPrintf("Test location getFileName() =%s\n", path.getPathname().getFileName());
@@ -342,9 +342,8 @@ abstract public class AbstractFileTests {
         // Just test whether it works and directory is readable (other tests will fail if this doesn't work). 
         while (iterator.hasNext()) {
             Path pathEl = iterator.next();
-            URI fsUri = pathEl.getFileSystem().getUri();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, pathEl);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, pathEl);
+            infoPrintf(" -(Path)Path     =%s:'%s'\n", pathEl.getFileSystem().getScheme(), pathEl);
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", pathEl.getFileSystem().getLocation(), pathEl);
         }
     }
 
@@ -382,9 +381,8 @@ abstract public class AbstractFileTests {
 
         while (iterator.hasNext()) {
             Path pathEl = iterator.next();
-            URI fsUri = pathEl.getFileSystem().getUri();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, pathEl);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, pathEl);
+            infoPrintf(" -(Path)Path     =%s:'%s'\n", pathEl.getFileSystem().getScheme(), pathEl);
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", pathEl.getFileSystem().getLocation(), pathEl);
             count++;
         }
 
@@ -418,9 +416,8 @@ abstract public class AbstractFileTests {
         while (iterator.hasNext()) {
             PathAttributesPair el = iterator.next();
             Path path = el.path();
-            URI fsUri = el.path().getFileSystem().getUri();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, path);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, path);
+            infoPrintf(" -(Path)Path     =%s:'%s'\n", path.getFileSystem().getScheme(), path);
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", path.getFileSystem().getLocation(), path);
             count++;
         }
 
@@ -452,9 +449,8 @@ abstract public class AbstractFileTests {
         while (iterator.hasNext()) {
             PathAttributesPair el = iterator.next();
             Path path = el.path();
-            URI fsUri = el.path().getFileSystem().getUri();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", fsUri, path);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", fsUri, path);
+            infoPrintf(" -(Path)Path     =%s:'%s'\n", path.getFileSystem().getScheme(), path);
+            infoPrintf(" -(Path)getPath()=%s:'%s'\n", path.getFileSystem().getLocation(), path);
             count++;
         }
 

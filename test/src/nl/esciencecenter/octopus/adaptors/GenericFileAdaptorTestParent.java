@@ -19,7 +19,6 @@ package nl.esciencecenter.octopus.adaptors;
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -399,10 +398,10 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(URI uri, Credential c, Map<String, String> p, boolean mustFail) throws Exception {
+    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p, boolean mustFail) throws Exception {
 
         try {
-            FileSystem fs = files.newFileSystem(uri, c, p);
+            FileSystem fs = files.newFileSystem(scheme, location, c, p);
             files.close(fs);
         } catch (Exception e) {
             if (mustFail) {
@@ -424,49 +423,52 @@ public abstract class GenericFileAdaptorTestParent {
     public void test00_newFileSystem() throws Exception {
 
         prepare();
-
+        
         // test with null URI and null credentials
-        test00_newFileSystem(null, null, null, true);
+        test00_newFileSystem(null, null, null, null, true);
 
-        // test with correct URI with default credential and without properties
-        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), null, false);
-
-        // test with correct URI with default credential and without properties
-        test00_newFileSystem(config.getCorrectURIWithPath(), config.getDefaultCredential(credentials), null, false);
-
-        // test with correct URI with default credential and without properties
-        test00_newFileSystem(config.getCorrectURIWithPath(), config.getDefaultCredential(credentials), null, false);
-
-        // test with wrong URI user with default credential and without properties
-        if (config.supportURIUser()) {
-            test00_newFileSystem(config.getURIWrongUser(), config.getDefaultCredential(credentials), null, true);
-        }
-
-        // test with wrong URI location with default credential and without properties
-        if (config.supportURILocation()) {
-            test00_newFileSystem(config.getURIWrongLocation(), config.getDefaultCredential(credentials), null, true);
-        }
-
-        // test with wrong URI path with default credential and without properties
-        test00_newFileSystem(config.getURIWrongPath(), config.getDefaultCredential(credentials), null, true);
+        // test with correct scheme with but null location
+        test00_newFileSystem(config.getScheme(), null, null, null, true);
 
         // test with correct URI without credential and without properties
         boolean allowNull = config.supportNullCredential();
-        test00_newFileSystem(config.getCorrectURI(), null, null, !allowNull);
+        
+        // test with correct scheme with, correct location, location
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null, !allowNull);
+
+        // test with correct scheme with, correct location, location
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null, false);
+
+        // test with correct scheme with, wrong location 
+        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null, true);
+
+        // test with correct scheme with default credential and without properties
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), 
+                null, false);
+
+        // test with user name in location
+        if (config.supportUser()) {
+            // location with correct user name
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocationWithUser(), null, null, false);
+            
+            // location with wrong user name
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocationWithWrongUser(), null, null, true);
+        }
 
         // test with correct URI with non-default credential and without properties
         if (config.supportNonDefaultCredential()) {
-            test00_newFileSystem(config.getCorrectURI(), config.getNonDefaultCredential(credentials), null, false);
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getNonDefaultCredential(credentials), 
+                    null, false);
         }
 
         // test with correct URI with default credential and with empty properties
-        test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), new HashMap<String, String>(),
-                false);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), 
+                new HashMap<String, String>(), false);
 
         // test with correct URI with default credential and with correct properties
         if (config.supportsProperties()) {
-            test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), config.getCorrectProperties(),
-                    false);
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), 
+                    config.getCorrectProperties(), false);
 
             // test with correct URI with default credential and with wrong properties
             // test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), getIncorrectProperties(), 
@@ -2611,16 +2613,16 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: 
 
     @org.junit.Test
-    public void test25_getLocalCWDFileSystem() throws Exception {
+    public void test25_getLocalCWD() throws Exception {
 
-        if (config.supportsLocalCWDFileSystem()) {
+        if (config.supportsLocalCWD()) {
 
             prepare();
 
             try {
-                files.getLocalCWDFileSystem();
+                files.getLocalCWD();
             } catch (Exception e) {
-                throwUnexpected("test25_getLocalCWDFileSystem", e);
+                throwUnexpected("test25_getLocalCWD", e);
             }
 
             cleanup();
@@ -2630,11 +2632,11 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test26_getLocalHomeFileSystem() throws Exception {
 
-        if (config.supportsLocalHomeFileSystem()) {
+        if (config.supportsLocalHome()) {
             prepare();
 
             try {
-                files.getLocalHomeFileSystem();
+                files.getLocalHome();
             } catch (Exception e) {
                 throwUnexpected("test26_getLocalHomeFileSystem", e);
             }

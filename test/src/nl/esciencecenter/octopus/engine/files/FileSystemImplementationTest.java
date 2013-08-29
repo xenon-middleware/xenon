@@ -19,7 +19,6 @@ package nl.esciencecenter.octopus.engine.files;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,32 +40,38 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_fail_adaptor_null() throws Exception {
-        new FileSystemImplementation(null, null, null, null, null, null);
+        new FileSystemImplementation(null, null, null, null, null, null, null);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_fail_identifier_null() throws Exception {
-        new FileSystemImplementation("AAP", null, null, null, null, null);
+        new FileSystemImplementation("AAP", null,null, null, null, null, null);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_fail_URI_null() throws Exception {
-        new FileSystemImplementation("AAP", "NOOT", null, null, null, null);
+        new FileSystemImplementation("AAP", "NOOT", null, null,null, null, null);
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
     public void test_fail_path_null() throws Exception {
-        new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), null, null, null);
+        new FileSystemImplementation("AAP", "NOOT", "file", null, null, null, null);
     }
 
     @org.junit.Test
     public void test_ok() throws Exception {
-        new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"), null, null);
+        new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"), null, null);
     }
 
     @org.junit.Test
+    public void test_ok2() throws Exception {
+        new FileSystemImplementation("AAP", "NOOT", "file", "C:", new Pathname("aap"), null, null);
+    }
+
+    
+    @org.junit.Test
     public void test_ID_ok() throws Exception {
-        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
 
         String tmp = fi.getUniqueID();
@@ -75,7 +80,7 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_getCredential() throws Exception {
-        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file","/", new Pathname("aap"),
                 null, null);
 
         Credential c = fi.getCredential();
@@ -98,7 +103,7 @@ public class FileSystemImplementationTest {
             }
         };
 
-        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 c, null);
 
         Credential c2 = fi.getCredential();
@@ -108,7 +113,7 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_name_ok() throws Exception {
-        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
 
         String tmp = fi.getAdaptorName();
@@ -127,7 +132,7 @@ public class FileSystemImplementationTest {
 
         OctopusProperties p = new OctopusProperties(valid, tmp);
 
-        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, p);
 
         Map<String, String> p2 = fi.getProperties();
@@ -139,7 +144,7 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_hashCode() throws Exception {
-        int tmp = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"), null, null)
+        int tmp = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"), null, null)
                 .hashCode();
 
         int result = 31 + "AAP".hashCode();
@@ -150,7 +155,7 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_equals1() throws Exception {
-        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
         boolean v = f1.equals(f1);
 
@@ -159,7 +164,7 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_equals2() throws Exception {
-        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
         boolean v = f1.equals(null);
         assert (!v);
@@ -167,7 +172,7 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_equals3() throws Exception {
-        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
         boolean v = f1.equals("Hello World");
         assert (!v);
@@ -175,9 +180,9 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_equals4() throws Exception {
-        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
-        FileSystemImplementation f2 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f2 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
         boolean v = f1.equals(f2);
 
@@ -186,9 +191,9 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_equals5() throws Exception {
-        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
-        FileSystemImplementation f2 = new FileSystemImplementation("MIES", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f2 = new FileSystemImplementation("MIES", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
         boolean v = f1.equals(f2);
 
@@ -197,9 +202,9 @@ public class FileSystemImplementationTest {
 
     @org.junit.Test
     public void test_equals6() throws Exception {
-        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new Pathname("aap"),
                 null, null);
-        FileSystemImplementation f2 = new FileSystemImplementation("AAP", "MIES", new URI("file:///"), new Pathname("aap"),
+        FileSystemImplementation f2 = new FileSystemImplementation("AAP", "MIES", "file", "/", new Pathname("aap"),
                 null, null);
         boolean v = f1.equals(f2);
 

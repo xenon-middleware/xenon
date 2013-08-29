@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -178,10 +177,10 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final GridEngineSetup setupInfo;
 
-    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, URI location, Credential credential, OctopusProperties properties,
+    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, OctopusProperties properties,
             OctopusEngine engine) throws OctopusIOException, OctopusException {
 
-        super(adaptor, location, credential, properties, engine, properties
+        super(adaptor, scheme, location, credential, properties, engine, properties
                 .getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
 
         boolean ignoreVersion = properties.getBooleanProperty(GridEngineAdaptor.IGNORE_VERSION_PROPERTY);
@@ -195,8 +194,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         //will run a few commands to fetch info
         setupInfo = new GridEngineSetup(this);
 
-        scheduler = new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), location, setupInfo.getQueueNames(),
-                credential, getProperties(), false, false, true);
+        scheduler = new SchedulerImplementation(GridEngineAdaptor.ADAPTOR_NAME, getID(), scheme, location, 
+                setupInfo.getQueueNames(), credential, getProperties(), false, false, true);
     }
 
     @Override

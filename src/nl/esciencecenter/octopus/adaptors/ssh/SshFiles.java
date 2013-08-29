@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -127,7 +126,7 @@ public class SshFiles implements Files {
     }
     
     
-    protected FileSystem newFileSystem(SshMultiplexedSession session, URI location, Credential credential,
+    protected FileSystem newFileSystem(SshMultiplexedSession session, String scheme, String location, Credential credential,
             OctopusProperties properties) throws OctopusException, OctopusIOException {
 
         String uniqueID = getNewUniqueID();
@@ -150,8 +149,8 @@ public class SshFiles implements Files {
 
         LOGGER.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
-        FileSystemImplementation result = new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, location, entryPath,
-                credential, properties);
+        FileSystemImplementation result = new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, scheme, location, 
+                entryPath, credential, properties);
 
         fileSystems.put(uniqueID, new FileSystemInfo(result, session));
 
@@ -159,16 +158,16 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
+    public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException {
 
-        adaptor.checkPath(location, "filesystem");
+        //adaptor.checkPath(location, "filesystem");
 
         OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         SshMultiplexedSession session = adaptor.createNewSession(location, credential, octopusProperties);
 
-        return newFileSystem(session, location, credential, octopusProperties);
+        return newFileSystem(session, scheme, location, credential, octopusProperties);
     }
 
     private SshMultiplexedSession getSession(Path path) throws OctopusIOException {
@@ -333,9 +332,9 @@ public class SshFiles implements Files {
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
-        if (!sourcefs.getUri().getHost().equals(targetfs.getUri().getHost())) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different sites: "
-                    + sourcefs.getUri().getHost() + " and " + targetfs.getUri().getHost());
+        if (!sourcefs.getLocation().equals(targetfs.getLocation())) {
+            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different FileSystems: "
+                    + sourcefs.getLocation() + " and " + targetfs.getLocation());
         }
 
         if (!exists(source)) {
@@ -531,16 +530,31 @@ public class SshFiles implements Files {
             }
         }
     }
-
+    
     @Override
-    public FileSystem getLocalCWDFileSystem() throws OctopusException {
-        throw new OctopusException(getClass().getName(), "getCWDFileSystem not supported!");
+    public Path getLocalCWD() throws OctopusException { 
+        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "getLocalCWD not supported!");
     }
 
     @Override
-    public FileSystem getLocalHomeFileSystem() throws OctopusException {
-        throw new OctopusException(getClass().getName(), "getLocalHomeFileSystem not supported!");
+    public Path getLocalHome() throws OctopusException {
+        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "getLocalHome not supported!");
     }
+    
+    @Override
+    public FileSystem [] getLocalFileSystems() throws OctopusException { 
+        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "getLocalFileSystems not supported!");
+    }
+    
+//    @Override
+//    public FileSystem getLocalCWDFileSystem() throws OctopusException {
+//        throw new OctopusException(getClass().getName(), "getCWDFileSystem not supported!");
+//    }
+//
+//    @Override
+//    public FileSystem getLocalHomeFileSystem() throws OctopusException {
+//        throw new OctopusException(getClass().getName(), "getLocalHomeFileSystem not supported!");
+//    }
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {

@@ -55,7 +55,7 @@ public class ListJobs {
             Jobs jobs = octopus.jobs();
 
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(location, null, null);
+            Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
 
             // Retrieve all jobs of all queues.
             Job[] result = jobs.getJobs(scheduler);

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.engine.jobs;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -44,11 +43,11 @@ public class JobsEngine implements Jobs {
         return octopusEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
-    public Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-            OctopusIOException {
+    public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+            throws OctopusException, OctopusIOException {
 
-        Adaptor adaptor = octopusEngine.getAdaptorFor(location.getScheme());
-        return adaptor.jobsAdaptor().newScheduler(location, credential, properties);
+        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
     }
 
     @Override

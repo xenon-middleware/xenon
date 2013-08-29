@@ -17,13 +17,10 @@
 package nl.esciencecenter.octopus.examples.jobs;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -58,7 +55,7 @@ public class SubmitInteractiveJobWithOutput {
             description.setInteractive(true);
             
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(new URI("local:///"), null, null);
+            Scheduler scheduler = jobs.newScheduler("local", "", null, null);
 
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
@@ -81,7 +78,7 @@ public class SubmitInteractiveJobWithOutput {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | IOException e)  {
+        } catch (OctopusException | IOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

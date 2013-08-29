@@ -36,11 +36,6 @@ public class FakeScriptingScheduler implements Scheduler {
     }
 
     @Override
-    public URI getUri() {
-        return null;
-    }
-
-    @Override
     public Map<String, String> getProperties() {
         return null;
     }
@@ -63,6 +58,16 @@ public class FakeScriptingScheduler implements Scheduler {
     @Override
     public boolean isOnline() {
         return false;
+    }
+
+    @Override
+    public String getLocation() {
+        return null;
+    }
+
+    @Override
+    public String getScheme() {
+        return null;
     }
 
 }

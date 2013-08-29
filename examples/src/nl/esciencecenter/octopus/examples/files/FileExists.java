@@ -29,7 +29,6 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Pathname;
-import nl.esciencecenter.octopus.util.URIUtils;
 
 /**
  * An example of how to check if a file exists.
@@ -62,7 +61,7 @@ public class FileExists {
 
             // Next we create a FileSystem  
             Credential c = credentials.getDefaultCredential(uri.getScheme());
-            FileSystem fs = files.newFileSystem(URIUtils.getFileSystemURI(uri), c, null);
+            FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), c, null);
 
             // We now create an Path representing the file
             Path path = files.newPath(fs, new Pathname(uri.getPath()));

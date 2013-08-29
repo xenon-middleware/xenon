@@ -278,7 +278,7 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected SshMultiplexedSession createNewSession(URI location, Credential credential, OctopusProperties properties)
+    protected SshMultiplexedSession createNewSession(String location, Credential credential, OctopusProperties properties)
             throws OctopusException, OctopusIOException {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
