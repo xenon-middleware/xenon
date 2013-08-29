@@ -232,6 +232,10 @@ public final class OctopusEngine implements Octopus {
      */
     public Adaptor getAdaptorFor(String scheme) throws OctopusException {
 
+        if (scheme == null || scheme.isEmpty()) { 
+            throw new OctopusException("engine", "Invalid scheme " + scheme);
+        }
+        
         for (Adaptor adaptor : adaptors) {
             if (adaptor.supports(scheme)) {
                 return adaptor;
