@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +48,6 @@ public class SSHJobTestConfig extends JobTestConfig {
 //    private URI wrongPathURI;
 
     private String scheme = "ssh";
-    private String fileScheme = "sftp";
     
     private String correctLocation;
     private String correctLocationWrongUser;
