@@ -34,6 +34,7 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
 import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
 import nl.esciencecenter.octopus.exceptions.JobCanceledException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
@@ -175,7 +176,7 @@ public abstract class GenericJobAdaptorTestParent {
     // credential: null / default / set / wrong
     // properties: null / empty / set / wrong
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = OctopusException.class)
     public void test00_newScheduler() throws Exception {
         jobs.newScheduler(null, null, null, null);
     }

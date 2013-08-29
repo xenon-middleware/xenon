@@ -76,8 +76,13 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws OctopusException, OctopusIOException {
 
-        if (location != null && !location.equals("/")) {
-            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with a path!");
+        if (location == null) { 
+            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler without a location!");
+        }
+        
+        if (!(location.isEmpty() || location.equals("/"))) {
+            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with location: " 
+                    + location);
         }
 
         if (credential != null) {
