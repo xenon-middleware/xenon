@@ -128,4 +128,9 @@ public class LocalJobTestConfig extends JobTestConfig {
     public String getCorrectLocationWithWrongUser() throws Exception {
         return null;
     }
+
+    @Override
+    public boolean supportsNullLocation() {
+        return true;
+    }
 }

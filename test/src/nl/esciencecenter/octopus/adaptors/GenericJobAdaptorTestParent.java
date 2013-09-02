@@ -181,10 +181,20 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.newScheduler(null, null, null, null);
     }
 
-    @Test(expected = OctopusException.class)
-    public void test01_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
-        jobs.close(s);
+    @Test(expected = InvalidLocationException.class)
+    public void test01a_newScheduler() throws Exception {
+        if (!config.supportsNullLocation()) { 
+            Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
+            jobs.close(s);
+        }
+    }
+
+    @Test
+    public void test01b_newScheduler() throws Exception {
+        if (config.supportsNullLocation()) { 
+            Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
+            jobs.close(s);
+        }
     }
     
     @Test

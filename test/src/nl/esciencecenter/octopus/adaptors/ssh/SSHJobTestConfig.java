@@ -220,4 +220,9 @@ public class SSHJobTestConfig extends JobTestConfig {
     public String getCorrectLocationWithWrongUser() throws Exception {
         return correctLocationWrongUser;
     }
+
+    @Override
+    public boolean supportsNullLocation() {
+        return false;
+    }
 }
