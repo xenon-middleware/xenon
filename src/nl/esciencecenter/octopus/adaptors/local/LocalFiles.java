@@ -82,15 +82,23 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         this.copyEngine = copyEngine;
 
         try {          
-            Pathname cwdPathname = LocalUtils.getCWD();
+            String cwdPath = LocalUtils.getCWD();
+            String root = LocalUtils.getRoot(cwdPath);
+            
+            Pathname cwdPathname = LocalUtils.getRelativePath(cwdPath, root);
+            
             cwd = new PathImplementation(new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
-                    "file", LocalUtils.getDefaultRoot(), cwdPathname, null, null), cwdPathname);
+                    "file", root, cwdPathname, null, null), cwdPathname);
         } catch (OctopusIOException e) {
             throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create current working dir filesystem!", e);
         }
         
         try {
-            Pathname homePathname = LocalUtils.getHome();
+            String homePath = LocalUtils.getHome();
+            String root = LocalUtils.getRoot(homePath);
+            
+            Pathname homePathname = LocalUtils.getRelativePath(homePath, root);
+            
             home = new PathImplementation(new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
                     "file", LocalUtils.getDefaultRoot(), homePathname, null, null), homePathname);
         } catch (OctopusIOException e) {
@@ -295,9 +303,11 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
-        // FIXME: BUG CWD is WRONG!!!!        
-        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, location,  
-                LocalUtils.getCWD(), credential, p);
+        String root = LocalUtils.getRoot(location);
+        Pathname relativePath = LocalUtils.getRelativePath(location, root);
+        
+        return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, root,  
+                relativePath, credential, p);
     }
 
     @Override

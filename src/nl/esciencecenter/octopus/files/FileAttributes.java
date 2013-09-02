@@ -33,121 +33,93 @@ public interface FileAttributes {
      * Does the path refer to a directory ?
      * 
      * @return If the path refers to a directory.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isDirectory() throws AttributeNotSupportedException;
+    boolean isDirectory(); 
 
     /**
      * Is the path not a file, link or directory ?
      * 
      * @return If the file is a directory.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isOther() throws AttributeNotSupportedException;
+    boolean isOther();
 
     /**
      * Does the path refer to a regular file ?
      * 
      * @return If the path refers to a regular file.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isRegularFile() throws AttributeNotSupportedException;
+    boolean isRegularFile();
 
     /**
      * Does the path refer to a symbolic link ?
      * 
      * @return If the path refers to a symbolic link.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isSymbolicLink() throws AttributeNotSupportedException;
+    boolean isSymbolicLink();
 
+    /**
+     * Get the creation time for this file.
+     * 
+     * If creationTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
+     * 
+     * @return The creation time for this file.
+     */
+    long creationTime();
+
+    /**
+     * Get the last access time for this file.
+     * 
+     * If lastAccessTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
+     *
+     * @return The last access time for this file.
+     */
+    long lastAccessTime();
+
+    /**
+     * Get the last modified time for this file.
+     * 
+     * If lastModifiedTime is not supported by the adaptor, <code>0</code> will be returned instead.
+     *
+     * @return The last modified time for this file.
+     */
+    long lastModifiedTime();
+
+    /**
+     * Get the size of this file.
+     * 
+     * If the file is not a regular file, <code>0</code> will be returned. 
+     * 
+     * @return The size of this file.
+     */
+    long size();
+    
     /**
      * Does the path refer to an executable file ?
      * 
      * @return If the path refers an executable file ?
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isExecutable() throws AttributeNotSupportedException;
+    boolean isExecutable();
 
     /**
      * Does the path refer to an hidden file ?
      * 
      * @return If the path refers an hidden file ?
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isHidden() throws AttributeNotSupportedException;
+    boolean isHidden();
 
     /**
      * Does the path refer to an readable file ?
      * 
      * @return If the path refers an readable file ?
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isReadable() throws AttributeNotSupportedException;
+    boolean isReadable();
 
     /**
      * Does the path refer to a writable file ?
      * 
      * @return If the path refers a writable file ?
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
      */
-    boolean isWritable() throws AttributeNotSupportedException;
-
-    /**
-     * Get the creation time for this file.
-     * 
-     * @return The creation time for this file.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
-     */
-    long creationTime() throws AttributeNotSupportedException;
-
-    /**
-     * Get the last access time for this file.
-     * 
-     * @return The last access time for this file.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
-     */
-    long lastAccessTime() throws AttributeNotSupportedException;
-
-    /**
-     * Get the last modified time for this file.
-     * 
-     * @return The last modified time for this file.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
-     */
-    long lastModifiedTime() throws AttributeNotSupportedException;
-
-    /**
-     * Get the size of this file.
-     * 
-     * @return The size of this file.
-     * 
-     * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
-     */
-    long size() throws AttributeNotSupportedException;
+    boolean isWritable();
 
     /**
      * Get the group of this file.

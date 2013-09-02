@@ -1482,7 +1482,7 @@ public abstract class GenericFileAdaptorTestParent {
         System.err.println("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
                 + result.isExecutable() + " " + result.isSymbolicLink() + " " + result.isDirectory() + " "
                 + result.isRegularFile() + " " + result.isHidden() + " " + result.isOther() + " " + result.lastAccessTime() + " "
-                + result.lastModifiedTime() + " " + result.group() + " " + result.owner() + " " + result.permissions());
+                + result.lastModifiedTime());
     }
 
     @org.junit.Test
@@ -1569,6 +1569,10 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test14_setPosixFilePermissions() throws Exception {
 
+        if (!config.supportsPosixPermissions()) { 
+            return;
+        }
+        
         prepare();
 
         // test with null, null
@@ -2751,7 +2755,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: 
 
     private void test28_readSymbolicLink(Path link, Path expected, boolean mustFail) throws Exception {
-
+        
         Path target = null;
 
         try {
@@ -2778,7 +2782,11 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test28_readSymbolicLink() throws Exception {
-
+        
+        if (!config.supportsSymboliclinks()) { 
+            return;
+        }
+        
         prepare();
 
         // test with null
@@ -2814,6 +2822,10 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test29_readSymbolicLink() throws Exception {
 
+        if (!config.supportsSymboliclinks()) { 
+            return;
+        }
+        
         prepare();
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
@@ -2892,7 +2904,11 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test31_newDirectoryStreamWithBrokenLinks() throws Exception {
-
+        
+        if (!config.supportsSymboliclinks()) { 
+            return;
+        }
+        
         prepare();
 
         FileSystem fs = config.getTestFileSystem(files, credentials);
@@ -2935,7 +2951,11 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test32_newAttributesDirectoryStreamWithBrokenLinks() throws Exception {
-
+        
+        if (!config.supportsSymboliclinks()) { 
+            return;
+        }
+        
         prepare();
 
         FileSystem fs = config.getTestFileSystem(files, credentials);

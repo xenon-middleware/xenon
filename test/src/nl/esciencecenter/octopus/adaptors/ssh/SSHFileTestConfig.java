@@ -37,14 +37,6 @@ public class SSHFileTestConfig extends FileTestConfig {
     private String username;
     private char[] passwd;
 
-//    private URI correctURI;
-//    private URI correctURIWithPath;
-//    private URI correctFSURI;
-//
-//    private URI wrongUserURI;
-//    private URI wrongLocationURI;
-//    private URI wrongPathURI;
-
     private String scheme = "sftp";
     private String correctLocation;
     private String wrongLocation;
@@ -185,5 +177,17 @@ public class SSHFileTestConfig extends FileTestConfig {
     @Override
     public String getCorrectLocationWithWrongUser() throws Exception {
         return correctLocationWrongUser;
+    }
+
+    @Override
+    public boolean supportsPosixPermissions() {
+        // Assumes an SSH connection to a posix machine!
+        return true;
+    }
+
+    @Override
+    public boolean supportsSymboliclinks() {
+        // Assumes an SSH connection to a posix machine!
+        return true;
     }
 }

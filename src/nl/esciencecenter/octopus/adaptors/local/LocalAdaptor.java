@@ -119,16 +119,7 @@ public class LocalAdaptor extends Adaptor {
 
         throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
     }
-
-    /**
-     * Check is a location is a valid windows root such as "C:". 
-     * @param root the root to check. 
-     * @return if the location is a valid windows root.
-     */
-    private boolean isWindowsRoot(String root) {
-        return (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0)));
-    }
-    
+   
     /** 
      * Check if a location string is valid for the local scheduler. 
      * 
@@ -145,11 +136,7 @@ public class LocalAdaptor extends Adaptor {
             throw new InvalidLocationException(ADAPTOR_NAME, "Location must contain a file system root! (not null)");
         }
 
-        if (location.equals("/")) { 
-            return;
-        }
-        
-        if (isWindowsRoot(location)) { 
+        if (LocalUtils.isLocalRoot(location)) { 
             return;
         }
         

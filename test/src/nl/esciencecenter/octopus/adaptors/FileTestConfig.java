@@ -34,6 +34,10 @@ public abstract class FileTestConfig extends GenericTestConfig {
 
     public abstract void closeTestFileSystem(Files files, FileSystem fs) throws Exception;
 
+    public abstract boolean supportsPosixPermissions();
+
+    public abstract boolean supportsSymboliclinks();
+    
     public boolean supportsClose() {
         return false;
     }
@@ -45,5 +49,6 @@ public abstract class FileTestConfig extends GenericTestConfig {
     public boolean supportsLocalHome() {
         return false;
     }
+
 
 }

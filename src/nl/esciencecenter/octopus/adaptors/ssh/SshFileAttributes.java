@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.util.Set;
 
-import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
@@ -47,77 +46,81 @@ public class SshFileAttributes implements FileAttributes {
     }
 
     @Override
-    public boolean isDirectory() throws AttributeNotSupportedException {
+    public boolean isDirectory() {
         return attributes.isDir();
     }
 
     @Override
-    public boolean isOther() throws AttributeNotSupportedException {
+    public boolean isOther() {
         return attributes.isBlk() || attributes.isChr() || attributes.isFifo() || attributes.isSock();
     }
 
     @Override
-    public boolean isRegularFile() throws AttributeNotSupportedException {
+    public boolean isRegularFile() {
         return attributes.isReg();
     }
 
     @Override
-    public boolean isSymbolicLink() throws AttributeNotSupportedException {
+    public boolean isSymbolicLink() {
         return attributes.isLink();
     }
 
     @Override
-    public long creationTime() throws AttributeNotSupportedException {
-        throw new AttributeNotSupportedException(SshAdaptor.ADAPTOR_NAME, "Attribute create time not supported");
+    public long creationTime() {
+        return lastModifiedTime();
     }
 
     @Override
-    public long lastAccessTime() throws AttributeNotSupportedException {
+    public long lastAccessTime()  {
         return (long) attributes.getATime() * MILLISECONDS_PER_SECOND;
     }
 
     @Override
-    public long lastModifiedTime() throws AttributeNotSupportedException {
+    public long lastModifiedTime() {
         return (long) attributes.getMTime() * MILLISECONDS_PER_SECOND;
     }
 
     @Override
-    public long size() throws AttributeNotSupportedException {
-        return attributes.getSize();
+    public long size() {
+        if (isRegularFile()) { 
+            return attributes.getSize();
+        } else { 
+            return 0;
+        }
     }
 
     @Override
-    public String group() throws AttributeNotSupportedException {
+    public String group() {
         return "" + attributes.getGId();
     }
 
     @Override
-    public String owner() throws AttributeNotSupportedException {
+    public String owner() {
         return "" + attributes.getUId();
     }
 
     @Override
-    public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
+    public Set<PosixFilePermission> permissions() {
         return SshUtil.bitsToPermissions(attributes.getPermissions());
     }
 
     @Override
-    public boolean isExecutable() throws AttributeNotSupportedException {
+    public boolean isExecutable() {
         return SshUtil.isExecutable(attributes.getPermissions());
     }
 
     @Override
-    public boolean isHidden() throws AttributeNotSupportedException {
+    public boolean isHidden() {
         return path.getPathname().startsWith(".");
     }
 
     @Override
-    public boolean isReadable() throws AttributeNotSupportedException {
+    public boolean isReadable() {
         return SshUtil.isReadable(attributes.getPermissions());
     }
 
     @Override
-    public boolean isWritable() throws AttributeNotSupportedException {
+    public boolean isWritable() {
         return SshUtil.isWritable(attributes.getPermissions());
     }
 

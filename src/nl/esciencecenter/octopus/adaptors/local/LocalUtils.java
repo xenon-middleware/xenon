@@ -28,6 +28,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.security.AccessController;
+import java.security.InvalidParameterException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Pathname;
@@ -77,48 +79,119 @@ final class LocalUtils {
         return getURI(LOCAL_FILE_URI);
     }
 
-    static Pathname getHome() throws OctopusIOException { 
-        // TODO: Test this on windows!
-        String separator = System.getProperty("file.separator");
-        
-        if (separator == null || separator.length() > 1) { 
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File seperator not supported: " + separator); 
-        }
-
+    static String getHome() throws OctopusIOException { 
         String home = System.getProperty("user.home");
         
         if (home == null || home.length() == 0) { 
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Home directory property user.home not set!");
         }
 
-        return new Pathname(separator.charAt(0), home);        
+        return home;        
     }
     
-    static Pathname getCWD() throws OctopusIOException { 
-        // TODO: Test this on windows!
-        String separator = System.getProperty("file.separator");
+    static String getCWD() throws OctopusIOException { 
+        String cwd = System.getProperty("user.dir");
         
-        if (separator == null || separator.length() > 1) { 
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "File seperator not supported: " + separator); 
-        }
-
-        String home = System.getProperty("user.dir");
-        
-        if (home == null || home.length() == 0) { 
+        if (cwd == null || cwd.length() == 0) { 
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Current working directory property user.dir not set!");
         }
 
-        return new Pathname(separator.charAt(0), home);        
+        return cwd;        
     }
     
-    static Pathname expandHome(Pathname path) throws OctopusIOException { 
+    static String getRoot(String absolutePath) { 
         
-        if (path.startsWith("~")) { 
-            return new Pathname(getHome(), path);
-        } 
+        if (isWindows()) { 
+            if (absolutePath != null && absolutePath.length() >= 2 && (absolutePath.charAt(1) == ':') && 
+                    Character.isLetter(absolutePath.charAt(0))) { 
+                return absolutePath.substring(0, 2).toUpperCase();
+            }
+            
+            throw new InvalidParameterException("Path is not absolute! " + absolutePath);
+        }
         
-        return path;
+        if (absolutePath != null && absolutePath.length() >= 1 && (absolutePath.charAt(0) == '/')) { 
+            return "/";
+        }
+            
+        throw new InvalidParameterException("Path is not absolute! " + absolutePath);
     }
+    
+    static boolean isWindows() { 
+        String os = System.getProperty("os.name");
+        return (os != null && os.startsWith("Windows"));
+    }
+    
+    static boolean isOSX() { 
+        String os = System.getProperty("os.name");
+        return (os != null && os.equals("MacOSX"));
+    }
+    
+    static boolean isLinux() { 
+        String os = System.getProperty("os.name");
+        return (os != null && os.equals("Linux"));
+    }
+    
+    /**
+     * Check is a location is a valid windows root such as "C:". 
+     * @param root the root to check. 
+     * @return if the location is a valid windows root.
+     */
+    static boolean isWindowsRoot(String root) {
+        
+        if (root == null) { 
+            return false;
+        }
+        
+        if (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0))) { 
+            return true;
+        }
+        
+        if (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\') { 
+            return true;
+        }
+        
+        return false;
+    }
+
+    static boolean isLinuxRoot(String root) {
+        return (root != null && root.equals("/"));
+    }
+    
+    static boolean isLocalRoot(String location) {
+        
+        if (isWindows()) { 
+            return isWindowsRoot(location);
+        }
+        
+        return isLinuxRoot(location);
+    }
+    
+    public static Pathname getRelativePath(String path, String root) throws OctopusIOException {
+        
+        if (!path.startsWith(root)) { 
+            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Path does not start with root: " + path + " " + root);
+        }
+
+        if (root.length() == path.length()) { 
+            return new Pathname(getLocalSeparator());
+        }
+       
+        return new Pathname(getLocalSeparator(), path.substring(root.length()));
+    }
+
+    private static char getLocalSeparator() {
+        return File.separatorChar;
+    }
+
+//    static Pathname expandHome(Pathname path) throws OctopusIOException { 
+//        
+//        if (path.startsWith("~")) { 
+//            return new Pathname(getHome(), path);
+//        } 
+//        
+//        return path;
+//    }
 
     static String getDefaultRoot() {
         // TODO: Test this on windows!
@@ -126,9 +199,14 @@ final class LocalUtils {
         return roots[0].getPath();
     }
     
-    static java.nio.file.Path javaPath(Path path) throws OctopusIOException {        
-        Pathname tmp = expandHome(path.getPathname());
-        return FileSystems.getDefault().getPath(tmp.getAbsolutePath());
+    static java.nio.file.Path javaPath(Path path) throws OctopusIOException {
+        
+        // Pathname tmp = expandHome(path.getPathname());
+       
+        FileSystem fs = path.getFileSystem();
+        Pathname tmp = path.getPathname();
+        
+        return FileSystems.getDefault().getPath(fs.getLocation() + tmp.getAbsolutePath());
     }
 
     static FileAttribute<Set<java.nio.file.attribute.PosixFilePermission>> javaPermissionAttribute(
@@ -320,6 +398,4 @@ final class LocalUtils {
             process.destroy();
         }
     }
-
-
 }

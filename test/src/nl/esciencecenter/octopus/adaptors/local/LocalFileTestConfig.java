@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.FileTestConfig;
@@ -31,25 +30,26 @@ import nl.esciencecenter.octopus.files.Files;
  */
 public class LocalFileTestConfig extends FileTestConfig {
 
-//    private final URI correctURI;
-//    private final URI correctURIWithPath;
-//    private final URI wrongPathURI;
-//    private final URI wrongLocationURI;
-
     private final String scheme;
     private final String correctLocation;
     private final String wrongLocation;
+    private final boolean supportPosix;
     
     public LocalFileTestConfig() throws Exception {
         super("local");
 
         scheme = "file";
-        correctLocation = "/"; // FIXME: windows!
-        wrongLocation = "/aap";
-//        correctURI = new URI("file:///");
-//        correctURIWithPath = new URI("file:////");
-//        wrongPathURI = new URI("file:///aap/noot/mies/");
-//        wrongLocationURI = new URI("file://machine/");
+        
+        String os = System.getProperty("os.name");
+        
+        if (os.startsWith("Windows")) {
+            correctLocation = "C:";
+            supportPosix = false;
+        } else { 
+            correctLocation = "/";
+            supportPosix = true;
+        }
+        wrongLocation = "aap";
     }
 
     @Override
@@ -103,5 +103,15 @@ public class LocalFileTestConfig extends FileTestConfig {
     @Override
     public String getCorrectLocationWithWrongUser() throws Exception {
         return null;
+    }
+
+    @Override
+    public boolean supportsPosixPermissions() {
+        return supportPosix;
+    }
+
+    @Override
+    public boolean supportsSymboliclinks() {
+        return supportPosix;
     }
 }
