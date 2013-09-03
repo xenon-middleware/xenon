@@ -56,9 +56,11 @@ public class RealSandboxTest {
     public static void prepare() throws Exception {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
-        fileSystem = FileUtils.getLocalCWD(files).getFileSystem();
         
-        testDir = Util.resolve(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
+        Path cwd = FileUtils.getLocalCWD(files);
+        
+        fileSystem = cwd.getFileSystem();
+        testDir = Util.resolve(files, cwd, "octopus_test_" + System.currentTimeMillis());
         files.createDirectory(testDir);
 
         testInput1 = Util.resolve(files, testDir, "input1");

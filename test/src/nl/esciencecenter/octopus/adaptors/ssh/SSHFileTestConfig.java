@@ -27,6 +27,7 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -150,11 +151,6 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public void closeTestFileSystem(Files files, FileSystem fs) throws Exception {
-        files.close(fs);
-    }
-
-    @Override
     public String getScheme() throws Exception {
         return scheme;
     }
@@ -189,5 +185,10 @@ public class SSHFileTestConfig extends FileTestConfig {
     public boolean supportsSymboliclinks() {
         // Assumes an SSH connection to a posix machine!
         return true;
+    }
+
+    @Override
+    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null).getEntryPath();
     }
 }

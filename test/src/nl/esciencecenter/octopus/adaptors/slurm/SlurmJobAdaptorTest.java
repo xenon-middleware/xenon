@@ -70,9 +70,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("slurm_test01");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
         files.createDirectories(root);
 
         Path script = resolve(root, "script");
@@ -111,7 +110,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         files.delete(root);
 
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         assertTrue(outputContent.equals(message));
     }
@@ -141,9 +140,8 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("slurm_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
         files.createDirectories(root);
 
         Path stdout = resolve(root, "stdout.txt");
@@ -177,7 +175,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         files.delete(root);
 
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         logger.debug("got back result: {}", outputContent);
 
@@ -201,9 +199,9 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
                 config.getDefaultCredential(credentials), properties);
 
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -243,7 +241,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         files.delete(err);
         files.delete(root);
 
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
@@ -265,9 +263,9 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Scheduler scheduler = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(),
                 config.getDefaultCredential(credentials), properties);
 
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        
         files.createDirectories(root);
 
         Path[] out = new Path[5];
@@ -352,7 +350,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     @org.junit.Test

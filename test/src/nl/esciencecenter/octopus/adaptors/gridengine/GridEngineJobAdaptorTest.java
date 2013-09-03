@@ -21,13 +21,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.OutputStream;
-import java.net.URI;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -67,9 +64,10 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("ge_test01");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem.getEntryPath(), workingDir);
+        
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        
         files.createDirectories(root);
 
         Path script = resolve(root, "script");
@@ -107,7 +105,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         files.delete(root);
 
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         assertTrue(outputContent.equals(message));
     }
@@ -142,9 +140,10 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("ge_test04");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem.getEntryPath(), workingDir);
+        
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        
         files.createDirectories(root);
 
         Path stdout = resolve(root, "stdout.txt");
@@ -180,7 +179,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         files.delete(root);
 
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         logger.debug("got back result: {}", outputContent);
 

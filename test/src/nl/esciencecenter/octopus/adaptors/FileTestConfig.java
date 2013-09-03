@@ -19,6 +19,7 @@ package nl.esciencecenter.octopus.adaptors;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -32,8 +33,8 @@ public abstract class FileTestConfig extends GenericTestConfig {
 
     public abstract FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception;
 
-    public abstract void closeTestFileSystem(Files files, FileSystem fs) throws Exception;
-
+    public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
+    
     public abstract boolean supportsPosixPermissions();
 
     public abstract boolean supportsSymboliclinks();
@@ -49,6 +50,7 @@ public abstract class FileTestConfig extends GenericTestConfig {
     public boolean supportsLocalHome() {
         return false;
     }
+
 
 
 }

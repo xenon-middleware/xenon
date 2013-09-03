@@ -26,8 +26,8 @@ import java.util.Properties;
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -206,8 +206,8 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null);
+    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+        return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null).getEntryPath();
     }
 
     @Override

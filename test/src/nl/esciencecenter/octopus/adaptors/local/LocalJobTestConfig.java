@@ -22,8 +22,8 @@ import java.util.Map;
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.util.FileUtils;
@@ -52,8 +52,8 @@ public class LocalJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return FileUtils.getLocalCWD(files).getFileSystem();
+    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+        return FileUtils.getLocalCWD(files);
     }
 
     @Override

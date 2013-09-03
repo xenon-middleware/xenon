@@ -17,8 +17,8 @@
 package nl.esciencecenter.octopus.adaptors;
 
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -52,7 +52,7 @@ public abstract class JobTestConfig extends GenericTestConfig {
 
     public abstract Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception;
 
-    public abstract FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception;
+    public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
 
     public abstract String getInvalidQueueName() throws Exception;
 

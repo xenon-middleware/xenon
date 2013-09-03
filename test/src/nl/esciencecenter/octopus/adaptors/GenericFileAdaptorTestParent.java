@@ -118,10 +118,9 @@ public abstract class GenericFileAdaptorTestParent {
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
 
-        FileSystem filesystem = config.getTestFileSystem(files, credentials);
-        RelativePath entryPath = filesystem.getEntryPath().getRelativePath();
-        Path root = files.newPath(filesystem, entryPath.resolve(TEST_ROOT));
-        
+        Path p = config.getWorkingDir(files, credentials);
+        Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
+
         if (files.exists(root)) {
             files.delete(root);
         }
@@ -129,14 +128,10 @@ public abstract class GenericFileAdaptorTestParent {
         OctopusFactory.endOctopus(octopus);
     }
 
-    public Path resolve(Path root, String... path) throws OctopusIOException { 
+    public Path resolve(Path root, String... path) throws OctopusIOException {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
-    
-    public Path resolve(FileSystem fs, String ... path) throws OctopusIOException {
-        return resolve(fs.getEntryPath(), path);
-    }
-    
+ 
     protected void prepare() throws Exception {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
@@ -249,17 +244,30 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: [createTestDir]
-    private void prepareTestDir(FileSystem fs, String testName) throws Exception {
+    private void prepareTestDir(String testName) throws Exception {
 
+        Path p = config.getWorkingDir(files, credentials);
+        
         if (testDir != null) {
             return;
         }
 
-        testDir = resolve(fs, TEST_ROOT, testName);
+        testDir = resolve(p, TEST_ROOT, testName);
 
         if (!files.exists(testDir)) {
             files.createDirectories(testDir);
         }
+    }
+    
+    // Depends on: [createTestDir]
+    private void closeTestFS() throws Exception {
+        
+        if (testDir == null) {
+            return;
+        }
+
+        files.close(testDir.getFileSystem());
+        testDir = null;
     }
 
     // Depends on: Path.resolve, RelativePath, exists 
@@ -399,7 +407,8 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p, boolean mustFail) throws Exception {
+    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p, boolean mustFail)
+            throws Exception {
 
         try {
             FileSystem fs = files.newFileSystem(scheme, location, c, p);
@@ -424,7 +433,7 @@ public abstract class GenericFileAdaptorTestParent {
     public void test00_newFileSystem() throws Exception {
 
         prepare();
-        
+
         // test with null URI and null credentials
         test00_newFileSystem(null, null, null, null, true);
 
@@ -433,42 +442,43 @@ public abstract class GenericFileAdaptorTestParent {
 
         // test with correct URI without credential and without properties
         boolean allowNull = config.supportNullCredential();
-        
+
         // test with correct scheme with, correct location, location
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null, !allowNull);
 
         // test with correct scheme with, correct location, location
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null, false);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null,
+                false);
 
         // test with correct scheme with, wrong location 
         test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null, true);
 
         // test with correct scheme with default credential and without properties
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), 
-                null, false);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null,
+                false);
 
         // test with user name in location
         if (config.supportUser()) {
             // location with correct user name
             test00_newFileSystem(config.getScheme(), config.getCorrectLocationWithUser(), null, null, false);
-            
+
             // location with wrong user name
             test00_newFileSystem(config.getScheme(), config.getCorrectLocationWithWrongUser(), null, null, true);
         }
 
         // test with correct URI with non-default credential and without properties
         if (config.supportNonDefaultCredential()) {
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getNonDefaultCredential(credentials), 
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getNonDefaultCredential(credentials),
                     null, false);
         }
 
         // test with correct URI with default credential and with empty properties
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), 
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
                 new HashMap<String, String>(), false);
 
         // test with correct URI with default credential and with correct properties
         if (config.supportsProperties()) {
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), 
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
                     config.getCorrectProperties(), false);
 
             // test with correct URI with default credential and with wrong properties
@@ -687,9 +697,8 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test04_createDirectory(null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-
-        Path root = resolve(fs, TEST_ROOT);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT);
 
         // test with non-existing dir
         test04_createDirectory(root, false);
@@ -710,9 +719,11 @@ public abstract class GenericFileAdaptorTestParent {
         // cleanup 
         deleteTestDir(root);
 
+        // close test FS
+        files.close(cwd.getFileSystem());    
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test04_createDirectory(root, true);
         }
 
@@ -766,9 +777,9 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test05_createDirectories(null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path cwd = config.getWorkingDir(files, credentials);
 
-        Path root = resolve(fs, TEST_ROOT, "test05_createDirectories");
+        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
 
         // test with non-existing dir
         test05_createDirectories(root, false);
@@ -796,9 +807,11 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(dir0);
         deleteTestDir(root);
 
+        // close test FS
+        files.close(cwd.getFileSystem());    
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test05_createDirectories(root, true);
         }
 
@@ -917,8 +930,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepare();
 
         // prepare
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test07_createFile");
+        prepareTestDir("test07_createFile");
 
         // test with null        
         test07_createFile(null, true);
@@ -942,7 +954,9 @@ public abstract class GenericFileAdaptorTestParent {
         // cleanup 
         files.delete(file0);
         deleteTestDir(testDir);
-        config.closeTestFileSystem(files, fs);
+
+        // close test FS
+        closeTestFS();
 
         if (config.supportsClose()) {
             // test with closed filesystem
@@ -995,8 +1009,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepare();
 
         // prepare
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test08_exists");
+        prepareTestDir("test08_exists");
 
         // test with null
         test08_exists(null, false, true);
@@ -1012,7 +1025,9 @@ public abstract class GenericFileAdaptorTestParent {
 
         // cleanup
         deleteTestDir(testDir);
-        config.closeTestFileSystem(files, fs);
+        
+        // close test FS
+        closeTestFS();
 
         cleanup();
     }
@@ -1061,8 +1076,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test09_delete(null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test09_delete");
+        prepareTestDir("test09_delete");
 
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
@@ -1094,9 +1108,11 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(dir1);
         deleteTestDir(testDir);
 
+        // Close test fs
+        closeTestFS();
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test09_delete(testDir, true);
         }
 
@@ -1245,8 +1261,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test11_newDirectoryStream(null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test11_newDirectoryStream");
+        prepareTestDir("test11_newDirectoryStream");
 
         // test with empty dir 
         test11_newDirectoryStream(testDir, null, false);
@@ -1288,9 +1303,11 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
 
+        // Close test fs
+        closeTestFS();
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test11_newDirectoryStream(testDir, null, true);
         }
 
@@ -1312,8 +1329,8 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    public void test12_newDirectoryStream(Path root, DirectoryStream.Filter filter, Set<Path> expected,
-            boolean mustFail) throws Exception {
+    public void test12_newDirectoryStream(Path root, DirectoryStream.Filter filter, Set<Path> expected, boolean mustFail)
+            throws Exception {
 
         Set<Path> tmp = new HashSet<Path>();
 
@@ -1375,8 +1392,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null 
         test12_newDirectoryStream(null, null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test12_newDirectoryStream_with_filter");
+        prepareTestDir("test12_newDirectoryStream_with_filter");
 
         // test with empty dir + null filter 
         test12_newDirectoryStream(testDir, null, null, true);
@@ -1429,10 +1445,12 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        
+        // Close test fs
+        closeTestFS();
 
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test12_newDirectoryStream(testDir, new AllTrue(), null, true);
         }
 
@@ -1494,8 +1512,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test13_getAttributes(null, false, -1, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test13_getAttributes");
+        prepareTestDir("test13_getAttributes");
 
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
@@ -1520,9 +1537,11 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file1);
         deleteTestDir(testDir);
 
+        // Close test fs
+        closeTestFS();
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test13_getAttributes(testDir, false, -1, true);
         }
     }
@@ -1570,17 +1589,16 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test14_setPosixFilePermissions() throws Exception {
 
-        if (!config.supportsPosixPermissions()) { 
+        if (!config.supportsPosixPermissions()) {
             return;
         }
-        
+
         prepare();
 
         // test with null, null
         test14_setPosixFilePermissions(null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test14_setPosixFilePermissions");
+        prepareTestDir("test14_setPosixFilePermissions");
 
         // test with existing file, null set
         Path file0 = createTestFile(testDir, null);
@@ -1623,10 +1641,12 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(dir0);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        
+        // Close test fs
+        closeTestFS();
 
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test14_setPosixFilePermissions(file0, permissions, true);
         }
     }
@@ -1728,8 +1748,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test15_newAttributesDirectoryStream(null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test15_newAttrributesDirectoryStream");
+        prepareTestDir("test15_newAttrributesDirectoryStream");
 
         // test with empty dir 
         test15_newAttributesDirectoryStream(testDir, null, false);
@@ -1771,9 +1790,11 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
 
+        // Close test fs
+        closeTestFS();
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test15_newAttributesDirectoryStream(testDir, null, true);
         }
 
@@ -1795,8 +1816,8 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories, 
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    public void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter,
-            Set<PathAttributesPair> expected, boolean mustFail) throws Exception {
+    public void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter, Set<PathAttributesPair> expected,
+            boolean mustFail) throws Exception {
 
         Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
 
@@ -1877,8 +1898,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null 
         test16_newAttributesDirectoryStream(null, null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
 
         // test with empty dir + null filter 
         test16_newAttributesDirectoryStream(testDir, null, null, true);
@@ -1940,10 +1960,12 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        
+        // Close test fs
+        closeTestFS();
 
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, true);
         }
 
@@ -2010,8 +2032,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test20_newInputStream(null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test20_newInputStream");
+        prepareTestDir("test20_newInputStream");
 
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
@@ -2035,9 +2056,11 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(dir0);
         deleteTestDir(testDir);
 
+        // Close test fs
+        closeTestFS();
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test20_newInputStream(file2, data, true);
         }
 
@@ -2112,8 +2135,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test21_newOutputStream(null, null, null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test21_newOuputStream");
+        prepareTestDir("test21_newOuputStream");
 
         // test with existing file and null options
         Path file0 = createTestFile(testDir, null);
@@ -2212,9 +2234,11 @@ public abstract class GenericFileAdaptorTestParent {
 
         deleteTestDir(testDir);
 
+        // Close test fs
+        closeTestFS();
+        
         if (config.supportsClose()) {
             // test with closed fs
-            config.closeTestFileSystem(files, fs);
             test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, null, null, true);
         }
 
@@ -2397,8 +2421,7 @@ public abstract class GenericFileAdaptorTestParent {
     // 
     // Depends on: 
 
-    private void test23_copy(Path source, Path target, CopyOption[] options, byte[] expected, boolean mustFail)
-            throws Exception {
+    private void test23_copy(Path source, Path target, CopyOption[] options, byte[] expected, boolean mustFail) throws Exception {
 
         Copy copy;
 
@@ -2441,8 +2464,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test23_copy(null, null, null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test23_copy");
+        prepareTestDir("test23_copy");
 
         Path file0 = createTestFile(testDir, data);
 
@@ -2552,7 +2574,9 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
-
+        
+        closeTestFS();
+        
         cleanup();
     }
 
@@ -2575,8 +2599,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         prepare();
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test24_copy_async");
+        prepareTestDir("test24_copy_async");
         Path file0 = createTestFile(testDir, data);
         Path file1 = createNewTestFileName(testDir);
 
@@ -2683,7 +2706,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         RelativePath sourceName = source.getRelativePath().normalize();
         RelativePath targetName = target.getRelativePath().normalize();
-        
+
         if (sourceName.equals(targetName)) {
             // source == target, so the move did nothing. 
             return;
@@ -2706,8 +2729,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         test27_move(null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test27_move");
+        prepareTestDir("test27_move");
 
         // test with non-existing source
         Path file0 = createNewTestFileName(testDir);
@@ -2741,6 +2763,8 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(file1);
         deleteTestDir(testDir);
 
+        closeTestFS();
+        
         cleanup();
     }
 
@@ -2756,7 +2780,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: 
 
     private void test28_readSymbolicLink(Path link, Path expected, boolean mustFail) throws Exception {
-        
+
         Path target = null;
 
         try {
@@ -2783,18 +2807,17 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test28_readSymbolicLink() throws Exception {
-        
-        if (!config.supportsSymboliclinks()) { 
+
+        if (!config.supportsSymboliclinks()) {
             return;
         }
-        
+
         prepare();
 
         // test with null
         test28_readSymbolicLink(null, null, true);
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        prepareTestDir(fs, "test28_readSybmolicLink");
+        prepareTestDir("test28_readSybmolicLink");
 
         // test with non-exising file
         Path file0 = createNewTestFileName(testDir);
@@ -2812,28 +2835,25 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(dir0);
         deleteTestDir(testDir);
 
-        if (config.supportsClose()) {
-            files.close(fs);
-            // TODO
-        }
-
+        closeTestFS();
+        
         cleanup();
     }
 
     @org.junit.Test
     public void test29_readSymbolicLink() throws Exception {
 
-        if (!config.supportsSymboliclinks()) { 
+        if (!config.supportsSymboliclinks()) {
             return;
         }
-        
+
         prepare();
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path cwd = config.getWorkingDir(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = resolve(fs, "octopus_test/links");
-        
+        Path root = resolve(cwd, "octopus_test/links");
+
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root);
         }
@@ -2905,18 +2925,18 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test31_newDirectoryStreamWithBrokenLinks() throws Exception {
-        
-        if (!config.supportsSymboliclinks()) { 
+
+        if (!config.supportsSymboliclinks()) {
             return;
         }
-        
-        prepare();
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        prepare();
+        
+        Path cwd = config.getWorkingDir(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = resolve(fs, "octopus_test/links");
-
+        Path root = resolve(cwd, "octopus_test/links");
+        
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root);
         }
@@ -2952,18 +2972,18 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test32_newAttributesDirectoryStreamWithBrokenLinks() throws Exception {
-        
-        if (!config.supportsSymboliclinks()) { 
+
+        if (!config.supportsSymboliclinks()) {
             return;
         }
-        
-        prepare();
 
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        prepare();
+        
+        Path cwd = config.getWorkingDir(files, credentials);
 
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = resolve(fs, "octopus_test/links");
-
+        Path root = resolve(cwd, "octopus_test/links");
+        
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root);
         }

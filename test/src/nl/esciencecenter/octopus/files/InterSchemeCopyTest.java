@@ -18,8 +18,6 @@ package nl.esciencecenter.octopus.files;
 
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
-
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.Util;
@@ -41,15 +39,15 @@ public class InterSchemeCopyTest {
 
         Files files = octopus.files();
 
-        FileSystem localFS = FileUtils.getLocalCWD(files).getFileSystem();
-        FileSystem sshFS = files.newFileSystem("ssh", "test@localhost", null, null);
+        Path localCWD = FileUtils.getLocalCWD(files);
+        Path sshCWD = files.newFileSystem("ssh", "test@localhost", null, null).getEntryPath();
 
         String dirname = "octopus_test_" + System.currentTimeMillis();
 
-        Path localDir = Util.resolve(files, localFS, dirname);
+        Path localDir = Util.resolve(files, localCWD, dirname);
         files.createDirectory(localDir);
 
-        Path sshDir = Util.resolve(files, sshFS, dirname);
+        Path sshDir = Util.resolve(files, sshCWD, dirname);
         files.createDirectory(sshDir);
 
         // Create file locally and copy to remote        

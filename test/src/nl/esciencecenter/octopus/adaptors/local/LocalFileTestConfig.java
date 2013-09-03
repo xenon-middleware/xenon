@@ -23,6 +23,7 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
@@ -56,11 +57,6 @@ public class LocalFileTestConfig extends FileTestConfig {
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
         return FileUtils.getLocalCWD(files).getFileSystem();
-    }
-
-    @Override
-    public void closeTestFileSystem(Files files, FileSystem fs) throws Exception {
-        // ignore
     }
 
     public boolean supportLocation() {
@@ -114,5 +110,10 @@ public class LocalFileTestConfig extends FileTestConfig {
     @Override
     public boolean supportsSymboliclinks() {
         return supportPosix;
+    }
+
+    @Override
+    public Path getWorkingDir(Files files, Credentials c) throws Exception {
+        return FileUtils.getLocalCWD(files);
     }
 }

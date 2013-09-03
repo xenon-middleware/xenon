@@ -17,8 +17,6 @@
 package nl.esciencecenter.octopus.adaptors.local;
 
 import java.lang.reflect.Constructor;
-import java.nio.file.attribute.FileAttribute;
-import java.util.HashSet;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.Octopus;
@@ -49,11 +47,6 @@ public class LocalUtilsTest {
     }
 
     @org.junit.Test(expected = OctopusIOException.class)
-    public void test_size_null() throws Exception {
-        LocalUtils.size(null);
-    }
-
-    @org.junit.Test(expected = OctopusIOException.class)
     public void test_createFile_null() throws Exception {
         LocalUtils.createFile(null);
     }
@@ -66,11 +59,6 @@ public class LocalUtilsTest {
     @org.junit.Test(expected = OctopusIOException.class)
     public void test_setPosixFilePermissions_null() throws Exception {
         LocalUtils.setPosixFilePermissions(null, null);
-    }
-
-    @org.junit.Test(expected = OctopusIOException.class)
-    public void test_newByteChannel_null() throws Exception {
-        LocalUtils.newByteChannel(null);
     }
 
     @org.junit.Test(expected = OctopusIOException.class)
@@ -160,14 +148,14 @@ public class LocalUtilsTest {
         assert (tmp.equals(System.getProperty("user.dir")));
     }
 
-    @org.junit.Test
-    public void test_javaPermissionAttribute() throws Exception {
-
-        Set<PosixFilePermission> tmp = new HashSet<>();
-        tmp.add(PosixFilePermission.OWNER_READ);
-
-        FileAttribute<Set<java.nio.file.attribute.PosixFilePermission>> out = LocalUtils.javaPermissionAttribute(tmp);
-
-        assert (out.value().contains(java.nio.file.attribute.PosixFilePermission.OWNER_READ));
-    }
+//    @org.junit.Test
+//    public void test_javaPermissionAttribute() throws Exception {
+//
+//        Set<PosixFilePermission> tmp = new HashSet<>();
+//        tmp.add(PosixFilePermission.OWNER_READ);
+//
+//        FileAttribute<Set<java.nio.file.attribute.PosixFilePermission>> out = LocalUtils.javaPermissionAttribute(tmp);
+//
+//        assert (out.value().contains(java.nio.file.attribute.PosixFilePermission.OWNER_READ));
+//    }
 }

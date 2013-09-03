@@ -43,11 +43,9 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -117,9 +115,9 @@ public abstract class GenericJobAdaptorTestParent {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
 
-    public Path resolve(FileSystem fs, String path) throws OctopusIOException {
-        return resolve(fs.getEntryPath(), path);
-    }
+//    public Path resolve(FileSystem fs, String path) throws OctopusIOException {
+//        return resolve(fs.getEntryPath(), path);
+//    }
 
     
     // MUST be invoked by a @BeforeClass method of the subclass! 
@@ -138,9 +136,8 @@ public abstract class GenericJobAdaptorTestParent {
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
 
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        RelativePath entryPath = filesystem.getEntryPath().getRelativePath();
-        Path root = files.newPath(filesystem, entryPath.resolve(TEST_ROOT));
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
             files.delete(root);
@@ -679,9 +676,8 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test31");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -728,7 +724,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(err);
         files.delete(root);
 
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
@@ -746,9 +742,9 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test32");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-
-        Path root = resolve(filesystem, workingDir);
+    
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
         
         files.createDirectories(root);
 
@@ -797,7 +793,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(err);
         files.delete(root);
 
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
@@ -806,10 +802,11 @@ public abstract class GenericJobAdaptorTestParent {
 
         String workingDir = getWorkingDir(testName);
 
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+
         files.createDirectories(root);
 
         Path[] out = new Path[jobCount];
@@ -894,7 +891,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     @org.junit.Test
@@ -921,9 +918,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test34");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+       
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -962,7 +960,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         assertTrue(status.hasException());
         Exception e = status.getException();
@@ -978,9 +976,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test35");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1026,7 +1025,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         assertTrue(status.hasException());
         Exception e = status.getException();
@@ -1041,9 +1040,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test36a");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+      
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         Path stdin = resolve(root, "stdin.txt");
@@ -1083,7 +1083,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(stdout);
         files.delete(stderr);
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
@@ -1101,9 +1101,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test36b");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+       
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         Path stdin = resolve(root, "stdin.txt");
@@ -1150,7 +1151,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(stdout);
         files.delete(stderr);
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
 
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
@@ -1188,9 +1189,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test37b");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
 
-        Path root = resolve(filesystem, workingDir);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1215,7 +1217,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         files.delete(root);
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     @org.junit.Test
@@ -1223,9 +1225,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test37c");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+        
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1251,7 +1254,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         files.delete(root);
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     @org.junit.Test
@@ -1301,9 +1304,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test 37b");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+       
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1328,7 +1332,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         files.delete(root);
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     //@org.junit.Test
@@ -1337,9 +1341,11 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test38");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+       
+        
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         Path stdin = resolve(root, "stdin.txt");
@@ -1389,7 +1395,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.delete(root);
 
         jobs.close(scheduler);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     @org.junit.Test
@@ -1524,9 +1530,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test41");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+       
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         //echo the given variable, to see if the va
@@ -1560,7 +1567,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         files.delete(stdout);
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 
     @org.junit.Test
@@ -1633,9 +1640,10 @@ public abstract class GenericJobAdaptorTestParent {
         String workingDir = getWorkingDir("test43");
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
-        FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
+       
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
 
-        Path root = resolve(filesystem, workingDir);
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
@@ -1665,6 +1673,6 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         files.delete(root);
-        files.close(filesystem);
+        files.close(cwd.getFileSystem());
     }
 }
