@@ -39,7 +39,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
@@ -86,7 +86,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Path newPath(FileSystem filesystem, Pathname location) throws OctopusIOException {
+    public Path newPath(FileSystem filesystem, RelativePath location) throws OctopusIOException {
         return getFilesAdaptor(filesystem).newPath(filesystem, location);
     }
 
@@ -212,23 +212,23 @@ public class FilesEngine implements Files {
         getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
     }
 
-    @Override
-    public Path getLocalCWD() throws OctopusException { 
-        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalCWD();
-    }
-
-    @Override
-    public Path getLocalHome() throws OctopusException { 
-        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalHome();        
-    }
-    
-    @Override
-    public FileSystem [] getLocalFileSystems() throws OctopusException { 
-        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-        return adaptor.filesAdaptor().getLocalFileSystems();
-    }
+//    @Override
+//    public Path getLocalCWD() throws OctopusException { 
+//        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+//        return adaptor.filesAdaptor().getLocalCWD();
+//    }
+//
+//    @Override
+//    public Path getLocalHome() throws OctopusException { 
+//        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+//        return adaptor.filesAdaptor().getLocalHome();        
+//    }
+//    
+//    @Override
+//    public FileSystem [] getLocalFileSystems() throws OctopusException { 
+//        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
+//        return adaptor.filesAdaptor().getLocalFileSystems();
+//    }
     
     @Override
     public String toString() {

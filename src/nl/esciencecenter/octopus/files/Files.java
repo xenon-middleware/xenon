@@ -38,8 +38,10 @@ public interface Files {
 
     /**
      * Create a new FileSystem that represents a (possibly remote) data store at the <code>location</code>, using the
-     * <code>credentials</code> to get access.
+     * <code>scheme</code> and <code>credentials</code> to get access.
      * 
+     * @param scheme
+     *            the scheme to use to access the FileSystem.
      * @param location
      *            the location of the FileSystem.
      * @param credential
@@ -53,6 +55,8 @@ public interface Files {
      *             If a unknown property was provided.
      * @throws InvalidPropertyException
      *             If a known property was provided with an invalid value.
+     * @throws InvalidSchemeException
+     *             If the scheme was invalid.
      * @throws InvalidLocationException
      *             If the location was invalid.
      * @throws InvalidCredentialsException
@@ -63,14 +67,11 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-//    FileSystem newFileSystem(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-//            OctopusIOException;
-
     FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws OctopusException, OctopusIOException;
     
     /**
-     * Get a FileSystem that represents the local current working directory.
+     * Get a FileSystem that represents the local current working directory (CWD).
      * 
      * Multiple invocations of this method may return the same FileSystem.
      * 
@@ -79,12 +80,8 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    //FileSystem getLocalCWDFileSystem() throws OctopusException;
+    //Path getLocalCWD() throws OctopusException;
 
-    Path getLocalCWD() throws OctopusException;
-
-    Path getLocalHome() throws OctopusException;
-    
     /**
      * Get a FileSystem that represents the local home directory of the current user.
      * 
@@ -95,8 +92,8 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
      */
-    //FileSystem getLocalHomeFileSystem() throws OctopusException;
-
+    //Path getLocalHome() throws OctopusException;
+    
     /**
      * Retrieve all local FileSystems.
      * 
@@ -107,7 +104,7 @@ public interface Files {
      * @throws OctopusException
      *             If the creation of a FileSystem failed.
      */
-    FileSystem [] getLocalFileSystems() throws OctopusException; 
+  //  FileSystem [] getLocalFileSystems() throws OctopusException; 
     
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
@@ -115,14 +112,14 @@ public interface Files {
      * @param filesystem
      *            the FileSystem for which to create the path.
      * @param location
-     *            the Pathname within the given FileSystem.
+     *            the location relative to the root of the given FileSystem.
      * 
      * @return the resulting Path.
      * 
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    Path newPath(FileSystem filesystem, Pathname location) throws OctopusIOException;
+    Path newPath(FileSystem filesystem, RelativePath location) throws OctopusIOException;
 
     /**
      * Close a FileSystem.

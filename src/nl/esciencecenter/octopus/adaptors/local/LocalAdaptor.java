@@ -32,8 +32,10 @@ import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
  * LocalAdaptor implements an Octopus adaptor for local operations.
@@ -98,12 +100,12 @@ public class LocalAdaptor extends Adaptor {
     /** Local implementation for Credentials */
     private final LocalCredentials localCredentials;
 
-    public LocalAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
+    public LocalAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException, OctopusIOException {
         super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
                 VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
-        localJobs = new LocalJobs(getProperties(), this, localFiles.getLocalCWD(), octopusEngine);
+        localJobs = new LocalJobs(getProperties(), this, FileUtils.getLocalCWD(localFiles), octopusEngine);
         localCredentials = new LocalCredentials();
     }
 
@@ -136,7 +138,7 @@ public class LocalAdaptor extends Adaptor {
             throw new InvalidLocationException(ADAPTOR_NAME, "Location must contain a file system root! (not null)");
         }
 
-        if (LocalUtils.isLocalRoot(location)) { 
+        if (FileUtils.isLocalRoot(location)) { 
             return;
         }
         

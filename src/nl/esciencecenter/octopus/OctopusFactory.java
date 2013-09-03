@@ -19,6 +19,7 @@ import java.util.Map;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * OctopusFactory is used to create and end Octopus instances.
@@ -53,8 +54,10 @@ public final class OctopusFactory {
      *             If a known property was passed with an illegal value.
      * @throws OctopusException
      *             If the Octopus failed initialize.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.  
      */
-    public static Octopus newOctopus(Map<String, String> properties) throws OctopusException {
+    public static Octopus newOctopus(Map<String, String> properties) throws OctopusException, OctopusIOException {
         return OctopusEngine.newOctopus(properties);
     }
 

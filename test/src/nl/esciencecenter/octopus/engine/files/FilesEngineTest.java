@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.engine.files;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.net.URI;
 import java.util.HashMap;
 
 import nl.esciencecenter.octopus.Util;
@@ -25,7 +24,7 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.CopyOption;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.junit.Test;
 
@@ -46,11 +45,11 @@ public class FilesEngineTest {
         OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
-        FileSystemImplementation fsi = new FileSystemImplementation("test", "test1", "test", "/", new Pathname(),
+        FileSystemImplementation fsi = new FileSystemImplementation("test", "test1", "test", "/", new RelativePath(),
                 null, null);
 
         // Should throw exception
-        engine.newPath(fsi, new Pathname("tmp/bla.txt"));
+        engine.newPath(fsi, new RelativePath("tmp/bla.txt"));
     }
 
     @Test(expected = OctopusIOException.class)
@@ -59,15 +58,15 @@ public class FilesEngineTest {
         OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
-        FileSystemImplementation fs1 = new FileSystemImplementation("aap", "test1", "test", "/", new Pathname(),
+        FileSystemImplementation fs1 = new FileSystemImplementation("aap", "test1", "test", "/", new RelativePath(),
                 null, null);
 
-        PathImplementation p1 = new PathImplementation(fs1, new Pathname("test"));
+        PathImplementation p1 = new PathImplementation(fs1, new RelativePath("test"));
 
-        FileSystemImplementation fs2 = new FileSystemImplementation("noot", "test1", "test", "/", new Pathname(),
+        FileSystemImplementation fs2 = new FileSystemImplementation("noot", "test1", "test", "/", new RelativePath(),
                 null, null);
 
-        PathImplementation p2 = new PathImplementation(fs2, new Pathname("test"));
+        PathImplementation p2 = new PathImplementation(fs2, new RelativePath("test"));
 
         // Should throw exception
         engine.copy(p1, p2, CopyOption.CREATE);

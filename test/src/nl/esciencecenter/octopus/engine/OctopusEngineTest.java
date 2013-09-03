@@ -32,34 +32,34 @@ import org.junit.Test;
 public class OctopusEngineTest {
 
     @Test
-    public void newEngine_NullProperties_Succeeds() throws OctopusException {
+    public void newEngine_NullProperties_Succeeds() throws Exception {
         Octopus octopus = OctopusEngine.newOctopus(null);
         assertEquals("Expected empty hashmap", new HashMap<String, String>(), octopus.getProperties());
     }
 
     @Test
-    public void newEngine_EmptyProperties_Succeeds() throws OctopusException {
+    public void newEngine_EmptyProperties_Succeeds() throws Exception {
         HashMap<String, String> tmp = new HashMap<String, String>();
         Octopus octopus = OctopusEngine.newOctopus(tmp);
         assertEquals("Expected empty hashmap", tmp, octopus.getProperties());
     }
 
     @Test(expected = UnknownPropertyException.class)
-    public void newEngine_UnknownProperties_ThrowsException() throws OctopusException {
+    public void newEngine_UnknownProperties_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("key", "value");
         OctopusEngine.newOctopus(properties);
     }
 
     @Test
-    public void newEngine_CorrectProperties_Success() throws OctopusException {
+    public void newEngine_CorrectProperties_Success() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         OctopusEngine.newOctopus(properties);
     }
 
     @Test(expected = UnknownPropertyException.class)
-    public void newEngine_CorrectPropertiesAtWrongLevel_ThrowsException() throws OctopusException {
+    public void newEngine_CorrectPropertiesAtWrongLevel_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
         // This property is valid at scheduler level, not at octopus level 
         properties.put("octopus.adaptors.ssh.queue.pollingDelay", "1500");
@@ -67,7 +67,7 @@ public class OctopusEngineTest {
     }
 
     @Test
-    public void newEngine_MultipleCorrectProperties_Success() throws OctopusException {
+    public void newEngine_MultipleCorrectProperties_Success() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         properties.put("octopus.adaptors.local.queue.pollingDelay", "1500");
@@ -75,7 +75,7 @@ public class OctopusEngineTest {
     }
 
     @Test(expected = UnknownPropertyException.class)
-    public void newEngine_CorrectAndIncorrectProperties_ThrowsException() throws OctopusException {
+    public void newEngine_CorrectAndIncorrectProperties_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
         properties.put("key", "value");
@@ -83,7 +83,7 @@ public class OctopusEngineTest {
     }
 
     @Test(expected = UnknownPropertyException.class)
-    public void newEngine_PropertiesAtCorrectAndWrongLevel_ThrowsException() throws OctopusException {
+    public void newEngine_PropertiesAtCorrectAndWrongLevel_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
         // These are octopus level properties
         properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
@@ -94,14 +94,14 @@ public class OctopusEngineTest {
     }
 
     @Test
-    public void getAdaptorInfo_LocalAdaptor_Succeeds() throws OctopusException {
+    public void getAdaptorInfo_LocalAdaptor_Succeeds() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         AdaptorStatus adaptorInfo = octopus.getAdaptorStatus("local");
         assertEquals("The adaptor info for the local adaptor should contain the name \"local\"", "local", adaptorInfo.getName());
     }
 
     @Test
-    public void getAdaptorInfo_UnknownAdaptor_ThrowsException() throws OctopusException {
+    public void getAdaptorInfo_UnknownAdaptor_ThrowsException() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         try {
             octopus.getAdaptorStatus("hupsefluts");
@@ -112,14 +112,14 @@ public class OctopusEngineTest {
     }
 
     @Test
-    public void getAdaptorFor_LocalFile_Succeeds() throws OctopusException {
+    public void getAdaptorFor_LocalFile_Succeeds() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         Adaptor adaptor = octopus.getAdaptorFor("file");
         assertEquals("The local adaptor should be returned", "local", adaptor.getName());
     }
 
     @Test
-    public void getAdaptorFor_UnknownScheme_ThrowsException() throws OctopusException {
+    public void getAdaptorFor_UnknownScheme_ThrowsException() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         try {
             octopus.getAdaptorFor("hupsefluts");
@@ -130,14 +130,14 @@ public class OctopusEngineTest {
     }
 
     @Test
-    public void getAdaptor_LocalAdaptor_Succeeds() throws OctopusException {
+    public void getAdaptor_LocalAdaptor_Succeeds() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         Adaptor adaptor = octopus.getAdaptor("local");
         assertEquals("The local adaptor should be returned", "local", adaptor.getName());
     }
 
     @Test
-    public void getAdaptor_UnknownAdaptor_ThrowsException() throws OctopusException {
+    public void getAdaptor_UnknownAdaptor_ThrowsException() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         try {
             octopus.getAdaptor("hupsefluts");
@@ -148,7 +148,7 @@ public class OctopusEngineTest {
     }
 
     //    @Test
-    //    public void testGetAdaptors() throws OctopusException {
+    //    public void testGetAdaptors() throws Exception {
     //        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
     //
     //        Adaptor[] tmp = octopus.getAdaptors();
@@ -158,7 +158,7 @@ public class OctopusEngineTest {
     //    }
 
     @Test
-    public void getAdaptorInfos_StandardAdaptors_Succeeds() throws OctopusException {
+    public void getAdaptorInfos_StandardAdaptors_Succeeds() throws Exception {
 
         // We currently have 4 adaptors, local, ssh, gridengine, slurm 
         int count = 4;
@@ -172,13 +172,13 @@ public class OctopusEngineTest {
     }
 
     @Test
-    public void close_SingleOctopus_Succeeds() throws OctopusException {
+    public void close_SingleOctopus_Succeeds() throws Exception {
         OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
         OctopusEngine.closeOctopus(octopus);
     }
 
     @Test
-    public void close_MultipleOctopus_Succeeds() throws OctopusException {
+    public void close_MultipleOctopus_Succeeds() throws Exception {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         OctopusEngine octopus2 = (OctopusEngine) OctopusEngine.newOctopus(null);
 
@@ -187,7 +187,7 @@ public class OctopusEngineTest {
     }
 
     @Test
-    public void endAll_MultipleOctopus_Succeeds() throws OctopusException {
+    public void endAll_MultipleOctopus_Succeeds() throws Exception {
         OctopusEngine.newOctopus(null);
         OctopusEngine.newOctopus(null);
 
@@ -195,14 +195,14 @@ public class OctopusEngineTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void closenIvokedTwice_SingleOctopus_ThrowsException() throws OctopusException {
+    public void closenIvokedTwice_SingleOctopus_ThrowsException() throws Exception {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         OctopusEngine.closeOctopus(octopus1);
         OctopusEngine.closeOctopus(octopus1);
     }
 
     @Test
-    public void toString_OctopusNoProperties_Succeeds() throws OctopusException {
+    public void toString_OctopusNoProperties_Succeeds() throws Exception {
         OctopusEngine octopus1 = (OctopusEngine) OctopusEngine.newOctopus(null);
         String tmp = octopus1.toString();
 

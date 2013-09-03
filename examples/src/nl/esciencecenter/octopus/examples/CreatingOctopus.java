@@ -20,6 +20,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
@@ -50,7 +51,7 @@ public class CreatingOctopus {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) {
+        } catch (OctopusException | OctopusIOException e) {
             System.out.println("CreatingOctopus example failed: " + e.getMessage());
             e.printStackTrace();
         }

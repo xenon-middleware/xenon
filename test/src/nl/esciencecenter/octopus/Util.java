@@ -32,7 +32,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -70,7 +70,7 @@ public class Util {
     }
     
     public static Path resolve(Files files, Path root, String... path) throws OctopusIOException { 
-        return files.newPath(root.getFileSystem(), root.getPathname().resolve(new Pathname(path)));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
     
     public static Path resolve(Files files, FileSystem fs, String ... path) throws OctopusIOException {

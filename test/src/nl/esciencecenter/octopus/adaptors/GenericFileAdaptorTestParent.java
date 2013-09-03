@@ -44,7 +44,8 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -118,7 +119,7 @@ public abstract class GenericFileAdaptorTestParent {
         Credentials credentials = octopus.credentials();
 
         FileSystem filesystem = config.getTestFileSystem(files, credentials);
-        Pathname entryPath = filesystem.getEntryPath().getPathname();
+        RelativePath entryPath = filesystem.getEntryPath().getRelativePath();
         Path root = files.newPath(filesystem, entryPath.resolve(TEST_ROOT));
         
         if (files.exists(root)) {
@@ -129,7 +130,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     public Path resolve(Path root, String... path) throws OctopusIOException { 
-        return files.newPath(root.getFileSystem(), root.getPathname().resolve(new Pathname(path)));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
     
     public Path resolve(FileSystem fs, String ... path) throws OctopusIOException {
@@ -220,7 +221,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    // Depends on: Path.resolve, Pathname, exists
+    // Depends on: Path.resolve, RelativePath, exists
     private Path createNewTestDirName(Path root) throws Exception {
 
         Path dir = resolve(root, "dir" + counter);
@@ -261,7 +262,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    // Depends on: Path.resolve, Pathname, exists 
+    // Depends on: Path.resolve, RelativePath, exists 
     private Path createNewTestFileName(Path root) throws Exception {
 
         Path file = resolve(root, "file" + counter);
@@ -592,18 +593,18 @@ public abstract class GenericFileAdaptorTestParent {
     // Possible parameters: 
     //
     // FileSystem - null / correct 
-    // Pathname - null / empty / value
+    // RelativePath - null / empty / value
     //
     // Total combinations : 2
     // 
-    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), Path.getPath(), Pathname, close
+    // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), Path.getPath(), RelativePath, close
 
-    private void test03_newPath(FileSystem fs, Pathname path, String expected, boolean mustFail) throws Exception {
+    private void test03_newPath(FileSystem fs, RelativePath path, String expected, boolean mustFail) throws Exception {
 
         String result = null;
 
         try {
-            result = files.newPath(fs, path).getPathname().getAbsolutePath();
+            result = files.newPath(fs, path).getRelativePath().getAbsolutePath();
         } catch (Exception e) {
             if (mustFail) {
                 // expected exception
@@ -637,10 +638,10 @@ public abstract class GenericFileAdaptorTestParent {
         test03_newPath(fs, null, null, true);
 
         // test with correct filesystem and empty relative path 
-        test03_newPath(fs, new Pathname(), root, false);
+        test03_newPath(fs, new RelativePath(), root, false);
 
         // test with correct filesystem and relativepath with value
-        test03_newPath(fs, new Pathname("test"), root + "test", false);
+        test03_newPath(fs, new RelativePath("test"), root + "test", false);
 
         files.close(fs);
 
@@ -2624,7 +2625,7 @@ public abstract class GenericFileAdaptorTestParent {
             prepare();
 
             try {
-                files.getLocalCWD();
+                FileUtils.getLocalCWD(files);
             } catch (Exception e) {
                 throwUnexpected("test25_getLocalCWD", e);
             }
@@ -2640,7 +2641,7 @@ public abstract class GenericFileAdaptorTestParent {
             prepare();
 
             try {
-                files.getLocalHome();
+                FileUtils.getLocalHome(files);
             } catch (Exception e) {
                 throwUnexpected("test26_getLocalHomeFileSystem", e);
             }
@@ -2680,8 +2681,8 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test27_move");
         }
 
-        Pathname sourceName = source.getPathname().normalize();
-        Pathname targetName = target.getPathname().normalize();
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
             // source == target, so the move did nothing. 
@@ -2883,20 +2884,20 @@ public abstract class GenericFileAdaptorTestParent {
     //        FileSystem fs = config.getTestFileSystem(files, credentials);
     //
     //        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-    //        Path root = fs.getEntryPath().resolve(new Pathname("octopus_test/links"));
+    //        Path root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
     //
     //        if (!files.exists(root)) {
     //            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
     //        }
     //
     //        // prepare the test files
-    //        boolean v = files.isSymbolicLink(root.resolve(new Pathname("file0")));
+    //        boolean v = files.isSymbolicLink(root.resolve(new RelativePath("file0")));
     //        assertFalse(v);
     //
-    //        v = files.isSymbolicLink(root.resolve(new Pathname("link0")));
+    //        v = files.isSymbolicLink(root.resolve(new RelativePath("link0")));
     //        assertTrue(v);
     //
-    //        v = files.isSymbolicLink(root.resolve(new Pathname("file2")));
+    //        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
     //        assertFalse(v);
     //
     //        cleanup();

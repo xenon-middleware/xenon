@@ -45,7 +45,7 @@ import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * A CopyEngine is responsible for performing the asynchronous copy operations.
@@ -277,8 +277,8 @@ public final class CopyEngine {
             throw new IllegalTargetPathException(NAME, "Target " + target + " is a link");
         }
 
-        Pathname sourceName = source.getPathname().normalize();
-        Pathname targetName = target.getPathname().normalize();
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
             return;
@@ -358,8 +358,8 @@ public final class CopyEngine {
             throw new IllegalSourcePathException(NAME, "Target " + target + " is a directory");
         }
         
-        Pathname sourceName = source.getPathname().normalize();
-        Pathname targetName = target.getPathname().normalize();
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
             throw new IllegalTargetPathException(NAME, "Can not append a file to itself (source " + source + " equals target " 
@@ -397,8 +397,8 @@ public final class CopyEngine {
             throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
         }
 
-        Pathname sourceName = source.getPathname().normalize();
-        Pathname targetName = target.getPathname().normalize();
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
             return;
@@ -413,7 +413,7 @@ public final class CopyEngine {
             }
         }
 
-        Pathname parentName = target.getPathname().getParent();
+        RelativePath parentName = target.getRelativePath().getParent();
         Path parent = owner.newPath(target.getFileSystem(), parentName);
         
         if (!owner.exists(parent)) {

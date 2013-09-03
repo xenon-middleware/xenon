@@ -24,7 +24,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
 
@@ -93,9 +93,9 @@ class BatchProcess implements Process {
         if (path == null) {
             result = root;
         } else if (path.startsWith("/")) {  // FIXME: windows! 
-            result = files.newPath(root.getFileSystem(), new Pathname(path));
+            result = files.newPath(root.getFileSystem(), new RelativePath(path));
         } else {
-            result = files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+            result = files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
         }
 
         return result;

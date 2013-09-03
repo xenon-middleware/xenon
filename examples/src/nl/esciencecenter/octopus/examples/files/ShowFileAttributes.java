@@ -28,7 +28,7 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * An example of how to retrieve file attributes.
@@ -62,7 +62,7 @@ public class ShowFileAttributes {
             FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), null, null);
 
             // We now create an Path representing the file.
-            Path path = files.newPath(fs, new Pathname(uri.getPath()));
+            Path path = files.newPath(fs, new RelativePath(uri.getPath()));
 
             try {
                 // Retrieve the attributes of the file

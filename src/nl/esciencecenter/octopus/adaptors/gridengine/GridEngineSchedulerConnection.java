@@ -42,7 +42,7 @@ import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
 import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -354,7 +354,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     @Override
     public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
         String output;
-        Pathname fsEntryPath = getFsEntryPath().getPathname();
+        RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
         
         verifyJobDescription(description);
 
@@ -370,7 +370,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
             //convert to absolute path if needed
             if (!customScriptFile.startsWith("/")) {
-                Pathname scriptFile = fsEntryPath.resolve(customScriptFile);
+                RelativePath scriptFile = fsEntryPath.resolve(customScriptFile);
                 customScriptFile = scriptFile.getAbsolutePath();
             }
 

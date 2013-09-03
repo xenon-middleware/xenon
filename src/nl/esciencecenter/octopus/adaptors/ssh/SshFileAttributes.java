@@ -111,7 +111,7 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean isHidden() {
-        return path.getPathname().startsWith(".");
+        return path.getRelativePath().startsWith(".");
     }
 
     @Override

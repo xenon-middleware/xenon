@@ -26,6 +26,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -33,11 +34,6 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public class LocalJobTestConfig extends JobTestConfig {
 
-//    private final URI correctURI;
-//    private final URI correctURIWithPath;
-//    private final URI wrongPathURI;
-//    private final URI wrongLocationURI;
-    
     private final String scheme;
     private final String correctLocation;
     private final String wrongLocation;
@@ -48,11 +44,6 @@ public class LocalJobTestConfig extends JobTestConfig {
         scheme = "local";
         correctLocation = "/";
         wrongLocation = "/aap";
-//        
-//        correctURI = new URI("local:///");
-//        correctURIWithPath = new URI("local:////");
-//        wrongPathURI = new URI("local:///aap/noot/mies/");
-//        wrongLocationURI = new URI("file://machine/");
     }
 
     @Override
@@ -62,7 +53,7 @@ public class LocalJobTestConfig extends JobTestConfig {
 
     @Override
     public FileSystem getDefaultFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.getLocalCWD().getFileSystem();
+        return FileUtils.getLocalCWD(files).getFileSystem();
     }
 
     @Override

@@ -33,7 +33,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -356,11 +356,11 @@ public abstract class SchedulerConnection {
 
         Path path;
         if (workingDirectory.startsWith("/")) {
-            path = engine.files().newPath(subFileSystem, new Pathname(workingDirectory));
+            path = engine.files().newPath(subFileSystem, new RelativePath(workingDirectory));
         } else {
             //make relative path absolute
             Path fsEntryPath = getFsEntryPath();
-            path = engine.files().newPath(fsEntryPath.getFileSystem(), fsEntryPath.getPathname().resolve(workingDirectory));
+            path = engine.files().newPath(fsEntryPath.getFileSystem(), fsEntryPath.getRelativePath().resolve(workingDirectory));
         }
         if (!engine.files().exists(path)) {
             throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Working directory does not exist: " + path);

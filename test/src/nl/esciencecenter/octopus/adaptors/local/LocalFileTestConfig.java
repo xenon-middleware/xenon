@@ -23,6 +23,7 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -54,7 +55,7 @@ public class LocalFileTestConfig extends FileTestConfig {
 
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
-        return files.getLocalCWD().getFileSystem();
+        return FileUtils.getLocalCWD(files).getFileSystem();
     }
 
     @Override

@@ -46,7 +46,7 @@ class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
-                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getPathname().resolve(filename));
+                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(filename));
 
                 if (filter.accept(tmp)) {
                     SshFileAttributes attributes = new SshFileAttributes(e.getAttrs(), tmp);

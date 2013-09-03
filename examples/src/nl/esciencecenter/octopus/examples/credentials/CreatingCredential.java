@@ -21,6 +21,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * A simple example of how to create credentials.
@@ -52,7 +53,7 @@ public class CreatingCredential {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) {
+        } catch (OctopusException | OctopusIOException e) {
             System.out.println("CreatingCredential example failed: " + e.getMessage());
             e.printStackTrace();
         }

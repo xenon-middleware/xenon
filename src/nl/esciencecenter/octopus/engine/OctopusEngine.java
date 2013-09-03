@@ -36,8 +36,10 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementat
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
+import nl.esciencecenter.octopus.exceptions.InvalidSchemeException;
 import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
@@ -81,8 +83,9 @@ public final class OctopusEngine implements Octopus {
      *             If a known property was passed with an illegal value.
      * @throws OctopusException
      *             If the Octopus failed initialize.
+     * @throws OctopusIOException 
      */
-    public static synchronized Octopus newOctopus(Map<String, String> properties) throws OctopusException {
+    public static synchronized Octopus newOctopus(Map<String, String> properties) throws OctopusException, OctopusIOException {
         OctopusEngine result = new OctopusEngine(properties);
         OCTOPUS_ENGINES.add(result);
         return result;
@@ -144,8 +147,9 @@ public final class OctopusEngine implements Octopus {
      *             If a known property was passed with an illegal value.
      * @throws OctopusException
      *             If the Octopus failed initialize.
+     * @throws OctopusIOException 
      */
-    private OctopusEngine(Map<String, String> properties) throws OctopusException {
+    private OctopusEngine(Map<String, String> properties) throws OctopusException, OctopusIOException {
 
         // Store the properties for later reference.
         if (properties == null) {
@@ -165,7 +169,7 @@ public final class OctopusEngine implements Octopus {
         LOGGER.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
-    private Adaptor[] loadAdaptors(Map<String, String> properties) throws OctopusException {
+    private Adaptor[] loadAdaptors(Map<String, String> properties) throws OctopusException, OctopusIOException {
 
         // Copy the map so we can manipulate it. 
         Map<String, String> tmp = new HashMap<>(properties);
@@ -230,10 +234,10 @@ public final class OctopusEngine implements Octopus {
      *            the scheme for which to get the adaptor
      * @return the adaptor
      */
-    public Adaptor getAdaptorFor(String scheme) throws OctopusException {
+    public Adaptor getAdaptorFor(String scheme) throws InvalidSchemeException {
 
         if (scheme == null || scheme.isEmpty()) { 
-            throw new OctopusException("engine", "Invalid scheme " + scheme);
+            throw new InvalidSchemeException("engine", "Invalid scheme " + scheme);
         }
         
         for (Adaptor adaptor : adaptors) {
@@ -241,7 +245,7 @@ public final class OctopusEngine implements Octopus {
                 return adaptor;
             }
         }
-        throw new OctopusException("engine", "Could not find adaptor for scheme " + scheme);
+        throw new InvalidSchemeException("engine", "Could not find adaptor for scheme " + scheme);
     }
 
     public Adaptor getAdaptor(String name) throws OctopusException {

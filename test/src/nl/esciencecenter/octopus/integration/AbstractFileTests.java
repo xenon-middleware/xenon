@@ -37,7 +37,7 @@ import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Abstract FileSystem tests. This class runs a set of test scenarios on the (remote) filesystem. This is one abstract test class
@@ -52,7 +52,7 @@ abstract public class AbstractFileTests {
      */
     protected static Octopus octopus = null;
 
-    protected static Files getFiles() throws OctopusException {
+    protected static Files getFiles() throws OctopusException, OctopusIOException {
 
         // class synchronization:
         synchronized (AbstractFileTests.class) {
@@ -133,7 +133,7 @@ abstract public class AbstractFileTests {
     protected Path getTestDir() throws Exception {
         FileSystem fs = getFileSystem();
         String testPath = this.getTestLocation().getPath();
-        return getFiles().newPath(fs, new Pathname(testPath));
+        return getFiles().newPath(fs, new RelativePath(testPath));
     }
 
     protected Path createSubdir(Path parentDirPath, String subDir) throws OctopusIOException, OctopusException {
@@ -239,9 +239,9 @@ abstract public class AbstractFileTests {
 
         infoPrintf("Test location path scheme      =%s\n", path.getFileSystem().getScheme());
         infoPrintf("Test location path location    =%s\n", path.getFileSystem().getLocation());
-        infoPrintf("Test location path          =%s\n", path.getPathname().getAbsolutePath());
+        infoPrintf("Test location path          =%s\n", path.getRelativePath().getAbsolutePath());
         infoPrintf("Test location toString()    =%s\n", path.toString());
-        infoPrintf("Test location getFileName() =%s\n", path.getPathname().getFileName());
+        infoPrintf("Test location getFileName() =%s\n", path.getRelativePath().getFileName());
 
         assertTrue("Root test location must exists (won't create here):" + path, getFiles().exists(path));
     }
@@ -328,7 +328,7 @@ abstract public class AbstractFileTests {
         FileSystem fs = getFileSystem();
 
         // resolve "/", for current filesystems this must equal to "/" ? 
-        Path rootPath = getFiles().newPath(fs, new Pathname("/"));
+        Path rootPath = getFiles().newPath(fs, new RelativePath("/"));
         assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath);
     }
 

@@ -61,7 +61,7 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     }
 
     private Path getPath(java.nio.file.Path path) {
-        return new PathImplementation(dir.getFileSystem(), dir.getPathname().resolve(path.getFileName().toString()));
+        return new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(path.getFileName().toString()));
     }
 
     @Override

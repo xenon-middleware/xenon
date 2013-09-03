@@ -29,7 +29,7 @@ import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -78,7 +78,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Path script = resolve(root, "script");
         Path stdout = resolve(root, "stdout.txt");
 
-        String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getPathname().getAbsolutePath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
+        String scriptContent = "#!/bin/bash\n" + "#SBATCH -o " + stdout.getRelativePath().getAbsolutePath() + "\n" + "#SBATCH -e /dev/null\n" + "echo "
                 + message;
 
         OutputStream out = files.newOutputStream(script, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
@@ -86,7 +86,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         JobDescription description = new JobDescription();
         description.setInteractive(false);
-        description.addJobOption("job.script", script.getPathname().getAbsolutePath());
+        description.addJobOption("job.script", script.getRelativePath().getAbsolutePath());
 
         //the executable should be allowed to be null, as this field is not used at all. Check if this works
         description.setExecutable(null);

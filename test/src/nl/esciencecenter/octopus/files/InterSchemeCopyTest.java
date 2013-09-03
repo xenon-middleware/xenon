@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 import org.junit.Test;
 
@@ -40,7 +41,7 @@ public class InterSchemeCopyTest {
 
         Files files = octopus.files();
 
-        FileSystem localFS = files.getLocalCWD().getFileSystem();
+        FileSystem localFS = FileUtils.getLocalCWD(files).getFileSystem();
         FileSystem sshFS = files.newFileSystem("ssh", "test@localhost", null, null);
 
         String dirname = "octopus_test_" + System.currentTimeMillis();

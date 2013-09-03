@@ -37,12 +37,13 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -154,7 +155,7 @@ public class JobQueueTest {
         octopus = OctopusFactory.newOctopus(null);
         scheduler = octopus.jobs().getLocalScheduler();
         files = octopus.files();
-        cwd = files.getLocalCWD();
+        cwd = FileUtils.getLocalCWD(files);
         filesystem = cwd.getFileSystem();
         myFactory = new MyFactory();
         jobQueue = new JobQueues("test", files, scheduler, cwd, myFactory, 2, POLLING_DELAY);
@@ -180,7 +181,7 @@ public class JobQueueTest {
     @After
     public void cleanupTest() throws Exception {
 
-        Pathname entryPath = filesystem.getEntryPath().getPathname();
+        RelativePath entryPath = filesystem.getEntryPath().getRelativePath();
         
         Path p = files.newPath(filesystem, entryPath.resolve("stderr.txt"));
 

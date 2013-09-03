@@ -21,327 +21,327 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-public class PathnameTest {
+public class RelativePathTest {
 
     @Test
-    public void testPathname1a() {
-        Pathname path = new Pathname();
+    public void testRelativePath1a() {
+        RelativePath path = new RelativePath();
         assertEquals(path.getRelativePath(), "");
     }
 
     @Test
-    public void testPathname1b() {
-        Pathname path = new Pathname();
+    public void testRelativePath1b() {
+        RelativePath path = new RelativePath();
         assertEquals(path.getAbsolutePath(), "" + path.getSeparator());
     }
 
     @Test
-    public void testPathname2a() {
-        Pathname path = new Pathname(new Pathname[0]);
+    public void testRelativePath2a() {
+        RelativePath path = new RelativePath(new RelativePath[0]);
         assertEquals(path.getRelativePath(), "");
     }
 
     @Test
-    public void testPathname2b() {
-        Pathname path = new Pathname(new Pathname[0]);
-        assertEquals(path.getAbsolutePath(), "" + path.getSeparator());
-    }
-    
-    @Test
-    public void testPathname3a() {
-        String s = null;
-        Pathname path = new Pathname(s, "");
-        assertEquals(path.getRelativePath(), "");
-    }
-
-    @Test
-    public void testPathname3b() {
-        String s = null;
-        Pathname path = new Pathname(s, "");
+    public void testRelativePath2b() {
+        RelativePath path = new RelativePath(new RelativePath[0]);
         assertEquals(path.getAbsolutePath(), "" + path.getSeparator());
     }
     
     @Test
-    public void testPathnameString() {
-        Pathname path = new Pathname("mydir/myfile");
+    public void testRelativePath3a() {
+        String s = null;
+        RelativePath path = new RelativePath(s, "");
+        assertEquals(path.getRelativePath(), "");
+    }
+
+    @Test
+    public void testRelativePath3b() {
+        String s = null;
+        RelativePath path = new RelativePath(s, "");
+        assertEquals(path.getAbsolutePath(), "" + path.getSeparator());
+    }
+    
+    @Test
+    public void testRelativePathString() {
+        RelativePath path = new RelativePath("mydir/myfile");
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
 
     @Test
-    public void testPathnameString2() {
-        Pathname path = new Pathname("mydir/myfile");
+    public void testRelativePathString2() {
+        RelativePath path = new RelativePath("mydir/myfile");
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
     
     @Test
-    public void testPathnameStringArray() {
+    public void testRelativePathStringArray() {
         String[] strings = new String[2];
         strings[0] = "mydir";
         strings[1] = "myfile";
-        Pathname path = new Pathname(strings);
+        RelativePath path = new RelativePath(strings);
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
 
     @Test
-    public void testPathnameStringArray2() {
+    public void testRelativePathStringArray2() {
         String[] strings = new String[2];
         strings[0] = "mydir";
         strings[1] = "myfile";
-        Pathname path = new Pathname(strings);
+        RelativePath path = new RelativePath(strings);
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathnameArray1a() {
-        Pathname[] paths = new Pathname[2];
-        paths[0] = new Pathname("mydir");
-        paths[1] = new Pathname("myfile");
-        Pathname path = new Pathname(paths);
+    public void testRelativePathRelativePathArray1a() {
+        RelativePath[] paths = new RelativePath[2];
+        paths[0] = new RelativePath("mydir");
+        paths[1] = new RelativePath("myfile");
+        RelativePath path = new RelativePath(paths);
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
     
     @Test
-    public void testPathnamePathnameArray1b() {
-        Pathname[] paths = new Pathname[2];
-        paths[0] = new Pathname("mydir");
-        paths[1] = new Pathname("myfile");
-        Pathname path = new Pathname(paths);
+    public void testRelativePathRelativePathArray1b() {
+        RelativePath[] paths = new RelativePath[2];
+        paths[0] = new RelativePath("mydir");
+        paths[1] = new RelativePath("myfile");
+        RelativePath path = new RelativePath(paths);
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathnameArray2a() {
-        Pathname[] paths = new Pathname[4];
-        paths[0] = new Pathname("mydir0");
-        paths[1] = new Pathname("mydir1");
-        paths[2] = new Pathname("mydir2");
-        paths[3] = new Pathname("myfile");
-        Pathname path = new Pathname(paths);
+    public void testRelativePathRelativePathArray2a() {
+        RelativePath[] paths = new RelativePath[4];
+        paths[0] = new RelativePath("mydir0");
+        paths[1] = new RelativePath("mydir1");
+        paths[2] = new RelativePath("mydir2");
+        paths[3] = new RelativePath("myfile");
+        RelativePath path = new RelativePath(paths);
         assertEquals(path.getRelativePath(), "mydir0/mydir1/mydir2/myfile");
     }
 
     @Test
-    public void testPathnamePathnameArray2b() {
-        Pathname[] paths = new Pathname[4];
-        paths[0] = new Pathname("mydir0");
-        paths[1] = new Pathname("mydir1");
-        paths[2] = new Pathname("mydir2");
-        paths[3] = new Pathname("myfile");
-        Pathname path = new Pathname(paths);
+    public void testRelativePathRelativePathArray2b() {
+        RelativePath[] paths = new RelativePath[4];
+        paths[0] = new RelativePath("mydir0");
+        paths[1] = new RelativePath("mydir1");
+        paths[2] = new RelativePath("mydir2");
+        paths[3] = new RelativePath("myfile");
+        RelativePath path = new RelativePath(paths);
         assertEquals(path.getAbsolutePath(), "/mydir0/mydir1/mydir2/myfile");
     }
 
     @Test
-    public void testPathnamePathnameMultiple1a() {
-        Pathname path1 = new Pathname("mydir");
-        Pathname path2 = new Pathname("myfile");
-        Pathname path = new Pathname(path1, path2);
+    public void testRelativePathRelativePathMultiple1a() {
+        RelativePath path1 = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("myfile");
+        RelativePath path = new RelativePath(path1, path2);
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathnameMultiple1b() {
-        Pathname path1 = new Pathname("mydir");
-        Pathname path2 = new Pathname("myfile");
-        Pathname path = new Pathname(path1, path2);
+    public void testRelativePathRelativePathMultiple1b() {
+        RelativePath path1 = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("myfile");
+        RelativePath path = new RelativePath(path1, path2);
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
     
     @Test
-    public void testPathnamePathname1a() {
-        Pathname path1 = new Pathname("mydir/myfile");
-        Pathname path = new Pathname(path1);
+    public void testRelativePathRelativePath1a() {
+        RelativePath path1 = new RelativePath("mydir/myfile");
+        RelativePath path = new RelativePath(path1);
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathname1b() {
-        Pathname path1 = new Pathname("mydir/myfile");
-        Pathname path = new Pathname(path1);
+    public void testRelativePathRelativePath1b() {
+        RelativePath path1 = new RelativePath("mydir/myfile");
+        RelativePath path = new RelativePath(path1);
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathSeperator1a() {
-        Pathname path = new Pathname('@', "mydir@myfile");
+    public void testRelativePathPathSeperator1a() {
+        RelativePath path = new RelativePath('@', "mydir@myfile");
         assertEquals(path.getRelativePath(), "mydir@myfile");
     }
 
     
     @Test
-    public void testPathnamePathSeperator1b() {
-        Pathname path = new Pathname('@', "mydir@myfile");
+    public void testRelativePathPathSeperator1b() {
+        RelativePath path = new RelativePath('@', "mydir@myfile");
         assertEquals(path.getAbsolutePath(), "@mydir@myfile");
     }
 
     @Test
-    public void testPathnamePathSeperator2a() {
-        Pathname path = new Pathname('/', "mydir", "myfile");
+    public void testRelativePathPathSeperator2a() {
+        RelativePath path = new RelativePath('/', "mydir", "myfile");
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
     
     @Test
-    public void testPathnamePathSeperator2() {
-        Pathname path = new Pathname('/', "mydir", "myfile");
+    public void testRelativePathPathSeperator2() {
+        RelativePath path = new RelativePath('/', "mydir", "myfile");
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathSeperator3a() {
-        Pathname path = new Pathname('/', "mydir", null, "myfile");
+    public void testRelativePathPathSeperator3a() {
+        RelativePath path = new RelativePath('/', "mydir", null, "myfile");
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathSeperator3b() {
-        Pathname path = new Pathname('/', "mydir", null, "myfile");
+    public void testRelativePathPathSeperator3b() {
+        RelativePath path = new RelativePath('/', "mydir", null, "myfile");
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathSeperator4a() {
-        Pathname path = new Pathname('/', "mydir", "", "myfile");
+    public void testRelativePathPathSeperator4a() {
+        RelativePath path = new RelativePath('/', "mydir", "", "myfile");
         assertEquals(path.getRelativePath(), "mydir/myfile");
     }
     
     @Test
-    public void testPathnamePathSeperator4b() {
-        Pathname path = new Pathname('/', "mydir", "", "myfile");
+    public void testRelativePathPathSeperator4b() {
+        RelativePath path = new RelativePath('/', "mydir", "", "myfile");
         assertEquals(path.getAbsolutePath(), "/mydir/myfile");
     }
 
     @Test
-    public void testPathnamePathSeperator5a() {
-        Pathname path = new Pathname('/', (String[]) null);
+    public void testRelativePathPathSeperator5a() {
+        RelativePath path = new RelativePath('/', (String[]) null);
         assertEquals(path.getRelativePath(), "");
     }
 
     @Test
-    public void testPathnamePathSeperator5b() {
-        Pathname path = new Pathname('/', (String[]) null);
+    public void testRelativePathPathSeperator5b() {
+        RelativePath path = new RelativePath('/', (String[]) null);
         assertEquals(path.getAbsolutePath(), "/");
     }
 
     @Test
-    public void testPathnamePathSeperator6a() {
-        Pathname path = new Pathname("mydir", null);
+    public void testRelativePathPathSeperator6a() {
+        RelativePath path = new RelativePath("mydir", null);
         assertEquals(path.getRelativePath(), "mydir");
     }
 
     @Test
-    public void testPathnamePathSeperator6b() {
-        Pathname path = new Pathname("mydir", null);
+    public void testRelativePathPathSeperator6b() {
+        RelativePath path = new RelativePath("mydir", null);
         assertEquals(path.getAbsolutePath(), "/mydir");
     }
 
     @Test
-    public void testPathnamePathSeperator7a() {
-        Pathname path = new Pathname("mydir", "");
+    public void testRelativePathPathSeperator7a() {
+        RelativePath path = new RelativePath("mydir", "");
         assertEquals(path.getRelativePath(), "mydir");
     }
 
     @Test
-    public void testPathnamePathSeperator7b() {
-        Pathname path = new Pathname("mydir", "");
+    public void testRelativePathPathSeperator7b() {
+        RelativePath path = new RelativePath("mydir", "");
         assertEquals(path.getAbsolutePath(), "/mydir");
     }
 
     @Test
-    public void testPathnamePathSeperator8a() {
-        Pathname path = new Pathname('/', new String[0]);
+    public void testRelativePathPathSeperator8a() {
+        RelativePath path = new RelativePath('/', new String[0]);
         assertEquals(path.getRelativePath(), "");
     }
 
     @Test
-    public void testPathnamePathSeperator8b() {
-        Pathname path = new Pathname('/', new String[0]);
+    public void testRelativePathPathSeperator8b() {
+        RelativePath path = new RelativePath('/', new String[0]);
         assertEquals(path.getAbsolutePath(), "/");
     }
     
     @Test
-    public void testPathnameStringArraySeperator1a() {
+    public void testRelativePathStringArraySeperator1a() {
         String[] strings = new String[] { "mydir", "myfile" };
-        Pathname path = new Pathname('@', strings);
+        RelativePath path = new RelativePath('@', strings);
         assertEquals(path.getRelativePath(), "mydir@myfile");
     }
 
     @Test
-    public void testPathnameStringArraySeperator1b() {
+    public void testRelativePathStringArraySeperator1b() {
         String[] strings = new String[] { "mydir", "myfile" };
-        Pathname path = new Pathname('@', strings);
+        RelativePath path = new RelativePath('@', strings);
         assertEquals(path.getAbsolutePath(), "@mydir@myfile");
     }
 
     
     @Test
     public void testGetFileName_WithFile_LastElement() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         String filename = path.getFileNameAsString();
         assertEquals(filename, "myfile");
     }
 
     @Test
     public void testGetFileName_EmptyPath_Null() {
-        Pathname path = new Pathname();
+        RelativePath path = new RelativePath();
         String filename = path.getFileNameAsString();
         assertNull(filename);
     }
 
     @Test
     public void testGetParent_MultiElement_EverythingExceptFilename() {
-        Pathname path = new Pathname("mydir/myfile");
-        Pathname parent = path.getParent();
-        assertEquals(parent, new Pathname("mydir"));
+        RelativePath path = new RelativePath("mydir/myfile");
+        RelativePath parent = path.getParent();
+        assertEquals(parent, new RelativePath("mydir"));
     }
 
     @Test
     public void testGetParent_SingleElement_EmptyPath() {
-        Pathname path = new Pathname("mydir");
-        Pathname parent = path.getParent();
-        assertEquals(parent, new Pathname());
+        RelativePath path = new RelativePath("mydir");
+        RelativePath parent = path.getParent();
+        assertEquals(parent, new RelativePath());
     }
 
     @Test
     public void testGetParent_EmptyPath_Null() {
-        Pathname path = new Pathname();
-        Pathname parent = path.getParent();
+        RelativePath path = new RelativePath();
+        RelativePath parent = path.getParent();
         assertNull(parent);
     }
 
     @Test
     public void testGetNameCount() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         int nr_elements = path.getNameCount();
         assertEquals(nr_elements, 2);
     }
 
     @Test
     public void testGetName_IndexWithinElements_ReturnsElement() {
-        Pathname path = new Pathname("mydir/myfile");
-        Pathname element = path.getName(1);
+        RelativePath path = new RelativePath("mydir/myfile");
+        RelativePath element = path.getName(1);
         assertEquals(element.getRelativePath(), "myfile");
     }
 
     @Test
     public void testGetName_IndexOutsideElements_IllegalArgmentException() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         try {
             path.getName(3);
             fail("Able to fetch index out of bounds");
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "index 3 not present in path Pathname [element=[mydir, myfile], seperator=/]");
+            assertEquals(e.getMessage(), "index 3 not present in path RelativePath [element=[mydir, myfile], seperator=/]");
         }
     }
 
     public void doSubPath(String[] input_path, int beginIndex, int endIndex, String[] epath) {
-        Pathname path = new Pathname(input_path);
-        Pathname expected_path = new Pathname(epath);
-        Pathname npath = path.subpath(beginIndex, endIndex);
+        RelativePath path = new RelativePath(input_path);
+        RelativePath expected_path = new RelativePath(epath);
+        RelativePath npath = path.subpath(beginIndex, endIndex);
         assertEquals(expected_path, npath);
     }
 
     public void doSubPathWithException(int beginIndex, int endIndex, String input_path, String expected_message) {
-        Pathname path = new Pathname(input_path);
+        RelativePath path = new RelativePath(input_path);
         try {
             path.subpath(beginIndex, endIndex);
             fail("IllegalArgumentException not thrown");
@@ -402,288 +402,288 @@ public class PathnameTest {
 
     @Test
     public void testStartsWith_False() {
-        Pathname path = new Pathname("mydir/myfile");
-        Pathname path2 = new Pathname("myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
+        RelativePath path2 = new RelativePath("myfile");
         assertFalse(path.startsWith(path2));
     }
 
     @Test
     public void testStartsWith_True() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         assertTrue(path.startsWith(path));
     }
 
     @Test
     public void testEndsWith_False() {
-        Pathname path = new Pathname("mydir/myfile");
-        Pathname path2 = new Pathname("mydir");
+        RelativePath path = new RelativePath("mydir/myfile");
+        RelativePath path2 = new RelativePath("mydir");
 
         assertFalse(path.endsWith(path2));
     }
 
     @Test
     public void testEndsWith_True() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         assertTrue(path.startsWith(path));
     }
 
     @Test
     public void testResolve1() {
 
-        Pathname path = new Pathname("mydir");
-        Pathname path2 = new Pathname("file");
-        Pathname path3 = new Pathname("mydir/file");
-        Pathname path4 = path.resolve(path2);
+        RelativePath path = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("file");
+        RelativePath path3 = new RelativePath("mydir/file");
+        RelativePath path4 = path.resolve(path2);
         assertEquals(path3, path4);
     }
 
     @Test
     public void testResolve2() {
 
-        Pathname path = new Pathname("mydir");
-        Pathname path2 = new Pathname("");
-        Pathname path4 = path.resolve(path2);
+        RelativePath path = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("");
+        RelativePath path4 = path.resolve(path2);
         assertEquals(path, path4);
     }
 
     @Test
     public void testResolve3() {
 
-        Pathname path = new Pathname("mydir");
-        Pathname path2 = null;
-        Pathname path4 = path.resolve(path2);
+        RelativePath path = new RelativePath("mydir");
+        RelativePath path2 = null;
+        RelativePath path4 = path.resolve(path2);
         assertEquals(path, path4);
     }
 
     @Test
     public void testResolve4() {
-        Pathname path = new Pathname();
-        Pathname path2 = new Pathname("mydir");
-        Pathname path4 = path.resolve(path2);
+        RelativePath path = new RelativePath();
+        RelativePath path2 = new RelativePath("mydir");
+        RelativePath path4 = path.resolve(path2);
         assertEquals(path2, path4);
     }
 
     @Test
     public void testResolve5() {
-        Pathname path = new Pathname("mydir");
+        RelativePath path = new RelativePath("mydir");
         String s = null;
-        Pathname path2 = path.resolve(s);
+        RelativePath path2 = path.resolve(s);
         assertEquals(path, path2);
     }
 
     @Test
     public void testResolve6() {
-        Pathname path = new Pathname("mydir");
+        RelativePath path = new RelativePath("mydir");
         String s = "";
-        Pathname path4 = path.resolve(s);
+        RelativePath path4 = path.resolve(s);
         assertEquals(path, path4);
     }
 
     @Test
     public void testResolve7() {
-        Pathname path = new Pathname("mydir");
-        Pathname path2 = new Pathname("mydir/test");
+        RelativePath path = new RelativePath("mydir");
+        RelativePath path2 = new RelativePath("mydir/test");
         String s = "test";
-        Pathname path4 = path.resolve(s);
+        RelativePath path4 = path.resolve(s);
         assertEquals(path2, path4);
     }
 
     @Test
     public void testResolveSibling() {
 
-        Pathname path = new Pathname("mydir/aap");
-        Pathname path2 = new Pathname("noot");
-        Pathname path3 = new Pathname("mydir/noot");
-        Pathname path4 = path.resolveSibling(path2);
+        RelativePath path = new RelativePath("mydir/aap");
+        RelativePath path2 = new RelativePath("noot");
+        RelativePath path3 = new RelativePath("mydir/noot");
+        RelativePath path4 = path.resolveSibling(path2);
         assertEquals(path3, path4);
     }
 
     @Test
     public void testResolveSibling2() {
 
-        Pathname path = new Pathname();
-        Pathname path2 = new Pathname("noot");
-        Pathname path4 = path.resolveSibling(path2);
+        RelativePath path = new RelativePath();
+        RelativePath path2 = new RelativePath("noot");
+        RelativePath path4 = path.resolveSibling(path2);
         assertEquals(path2, path4);
     }
 
     @Test
     public void testResolveSibling3() {
 
-        Pathname path = new Pathname();
-        Pathname path2 = null;
-        Pathname path4 = path.resolveSibling(path2);
+        RelativePath path = new RelativePath();
+        RelativePath path2 = null;
+        RelativePath path4 = path.resolveSibling(path2);
         assertEquals(path4, path);
     }
 
     @Test
     public void testResolveSibling4() {
 
-        Pathname path = new Pathname("a/b/c");
-        Pathname path2 = new Pathname("");
-        Pathname path3 = new Pathname("a/b");
-        Pathname path4 = path.resolveSibling(path2);
+        RelativePath path = new RelativePath("a/b/c");
+        RelativePath path2 = new RelativePath("");
+        RelativePath path3 = new RelativePath("a/b");
+        RelativePath path4 = path.resolveSibling(path2);
         assertEquals(path3, path4);
     }
 
     @Test
     public void testResolveSibling5() {
 
-        Pathname path = new Pathname("a/b/c");
-        Pathname path2 = null;
-        Pathname path3 = new Pathname("a/b");
-        Pathname path4 = path.resolveSibling(path2);
+        RelativePath path = new RelativePath("a/b/c");
+        RelativePath path2 = null;
+        RelativePath path3 = new RelativePath("a/b");
+        RelativePath path4 = path.resolveSibling(path2);
         assertEquals(path3, path4);
     }
 
     @Test
     public void testRelativize() {
-        Pathname path = new Pathname("/a/b");
-        Pathname path2 = new Pathname("/a/b/c/d");
-        Pathname path3 = new Pathname("/c/d");
-        Pathname path4 = path.relativize(path2);
+        RelativePath path = new RelativePath("/a/b");
+        RelativePath path2 = new RelativePath("/a/b/c/d");
+        RelativePath path3 = new RelativePath("/c/d");
+        RelativePath path4 = path.relativize(path2);
         assertEquals(path3, path4);
     }
 
     @Test
     public void testRelativize2() {
-        Pathname path = new Pathname();
-        Pathname path2 = new Pathname("/a/b");
-        Pathname path4 = path.relativize(path2);
+        RelativePath path = new RelativePath();
+        RelativePath path2 = new RelativePath("/a/b");
+        RelativePath path4 = path.relativize(path2);
         assertEquals(path2, path4);
     }
 
     @Test
     public void testRelativize3() {
-        Pathname path = new Pathname("a/b/c/d");
-        Pathname path2 = new Pathname();
-        Pathname path4 = path.relativize(path2);
+        RelativePath path = new RelativePath("a/b/c/d");
+        RelativePath path2 = new RelativePath();
+        RelativePath path4 = path.relativize(path2);
         assertEquals(path, path4);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRelativize4() {
-        Pathname path = new Pathname("/a/b/c/d");
-        Pathname path2 = new Pathname("/a/b");
+        RelativePath path = new RelativePath("/a/b/c/d");
+        RelativePath path2 = new RelativePath("/a/b");
         path.relativize(path2);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testRelativize5() {
-        Pathname path = new Pathname("/p/q");
-        Pathname path2 = new Pathname("/a/b/c/d");
+        RelativePath path = new RelativePath("/p/q");
+        RelativePath path2 = new RelativePath("/a/b/c/d");
         path.relativize(path2);
     }
 
     @Test
     public void testRelativize6() {
-        Pathname path = new Pathname("/a/b");
-        Pathname path2 = new Pathname("/a/b");
-        Pathname path3 = path.relativize(path2);
-        assertEquals(path3, new Pathname());
+        RelativePath path = new RelativePath("/a/b");
+        RelativePath path2 = new RelativePath("/a/b");
+        RelativePath path3 = path.relativize(path2);
+        assertEquals(path3, new RelativePath());
     }
 
     @Test
     public void testIterator() {
-        Pathname path = new Pathname("mydir/myfile");
-        Iterator<Pathname> iterator = path.iterator();
-        assertEquals(iterator.next(), new Pathname("mydir"));
-        assertEquals(iterator.next(), new Pathname("mydir/myfile"));
+        RelativePath path = new RelativePath("mydir/myfile");
+        Iterator<RelativePath> iterator = path.iterator();
+        assertEquals(iterator.next(), new RelativePath("mydir"));
+        assertEquals(iterator.next(), new RelativePath("mydir/myfile"));
         assertFalse(iterator.hasNext());
     }
 
     @Test
     public void testGetPath_MultiElement_FilledString() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         String path_as_string = path.getRelativePath();
         assertEquals(path_as_string, "mydir/myfile");
     }
 
     @Test
     public void testGetPath_OneElement_FilledString() {
-        Pathname path = new Pathname("myfile");
+        RelativePath path = new RelativePath("myfile");
         String path_as_string = path.getRelativePath();
         assertEquals(path_as_string, "myfile");
     }
 
     @Test
     public void testGetPath_NullElement_EmptyString() {
-        Pathname path = new Pathname();
+        RelativePath path = new RelativePath();
         String path_as_string = path.getRelativePath();
         assertEquals(path_as_string, "");
     }
 
     @Test
     public void testNormalize_EmptyIn_EmptyOut() {
-        Pathname path = new Pathname();
+        RelativePath path = new RelativePath();
         assertEquals(path.normalize(), path);
     }
 
     @Test
     public void testNormalize_NoDots_SamePath() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         assertEquals(path.normalize(), path);
     }
 
     @Test
     public void testNormalize_DoubleDotsAfterFirstElement_SamePath() {
-        Pathname path = new Pathname("mydir/../myfile");
-        Pathname epath = new Pathname("/myfile");
+        RelativePath path = new RelativePath("mydir/../myfile");
+        RelativePath epath = new RelativePath("/myfile");
         assertEquals(path.normalize(), epath);
     }
 
     @Test
     public void testNormalize_DoubleDotsAsFirstElement_SamePath() {
-        Pathname path = new Pathname("../mydir/myfile");
-        Pathname epath = new Pathname("../mydir/myfile");
+        RelativePath path = new RelativePath("../mydir/myfile");
+        RelativePath epath = new RelativePath("../mydir/myfile");
         assertEquals(path.normalize(), epath);
     }
 
     @Test
     public void testNormalize_DoubleDotsAsFirstTwoElement_SamePath() {
-        Pathname path = new Pathname("../../mydir/myfile");
-        Pathname epath = new Pathname("../../mydir/myfile");
+        RelativePath path = new RelativePath("../../mydir/myfile");
+        RelativePath epath = new RelativePath("../../mydir/myfile");
         assertEquals(path.normalize(), epath);
     }
 
     @Test
     public void testNormalize_DoubleDotsAsLastElement_SamePath() {
-        Pathname path = new Pathname("mydir/mydir/..");
-        Pathname epath = new Pathname("mydir");
+        RelativePath path = new RelativePath("mydir/mydir/..");
+        RelativePath epath = new RelativePath("mydir");
         assertEquals(path.normalize(), epath);
     }
 
     @Test
     public void testNormalize_SingleDotsAsFirstElement_SamePath() {
-        Pathname path = new Pathname("./mydir/myfile");
-        Pathname epath = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("./mydir/myfile");
+        RelativePath epath = new RelativePath("mydir/myfile");
         assertEquals(path.normalize(), epath);
     }
 
     @Test
     public void testNormalize_SingleAndDoubleDotsAsFirstElement_SamePath() {
-        Pathname path = new Pathname("./../mydir/myfile");
-        Pathname epath = new Pathname("../mydir/myfile");
+        RelativePath path = new RelativePath("./../mydir/myfile");
+        RelativePath epath = new RelativePath("../mydir/myfile");
         assertEquals(path.normalize(), epath);
     }
 
     @Test
     public void testToString() {
-        Pathname path = new Pathname("mydir/myfile");
+        RelativePath path = new RelativePath("mydir/myfile");
         String path_as_string = path.toString();
-        assertEquals(path_as_string, "Pathname [element=[mydir, myfile], seperator=/]");
+        assertEquals(path_as_string, "RelativePath [element=[mydir, myfile], seperator=/]");
     }
 
     @Test
     public void testEquals1() {
-        Pathname path = new Pathname("a/b/c");
+        RelativePath path = new RelativePath("a/b/c");
         boolean v = path.equals(null);
         assert (!v);
     }
 
     @Test
     public void testEquals2() {
-        Pathname path = new Pathname("a/b/c");
+        RelativePath path = new RelativePath("a/b/c");
         boolean v = path.equals("Hello world");
         assert (!v);
     }
@@ -692,8 +692,8 @@ public class PathnameTest {
     public void testEquals3() {
         String[] s = new String[] { "a", "b", "c" };
 
-        Pathname p1 = new Pathname('/', s);
-        Pathname p2 = new Pathname('@', s);
+        RelativePath p1 = new RelativePath('/', s);
+        RelativePath p2 = new RelativePath('@', s);
 
         boolean v = p1.equals(p2);
         assert (!v);
@@ -703,8 +703,8 @@ public class PathnameTest {
     public void testEquals4() {
         String[] s = new String[] { "a", "b", "c" };
 
-        Pathname p1 = new Pathname('/', s);
-        Pathname p2 = new Pathname(s);
+        RelativePath p1 = new RelativePath('/', s);
+        RelativePath p2 = new RelativePath(s);
 
         boolean v = p1.equals(p2);
         assert (v);
@@ -712,8 +712,8 @@ public class PathnameTest {
 
     @Test
     public void testEquals5() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("a");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("a");
 
         boolean v = p1.equals(p2);
         assert (!v);
@@ -721,8 +721,8 @@ public class PathnameTest {
 
     @Test
     public void testStartsWith1() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("");
 
         boolean v = p1.startsWith(p2);
         assert (v);
@@ -730,8 +730,8 @@ public class PathnameTest {
 
     @Test
     public void testStartsWith2() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("");
 
         boolean v = p2.startsWith(p1);
         assert (!v);
@@ -739,8 +739,8 @@ public class PathnameTest {
 
     @Test
     public void testStartsWith3() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("a");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("a");
 
         boolean v = p2.startsWith(p1);
         assert (!v);
@@ -748,8 +748,8 @@ public class PathnameTest {
 
     @Test
     public void testStartsWith4() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("a");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("a");
 
         boolean v = p1.startsWith(p2);
         assert (v);
@@ -757,8 +757,8 @@ public class PathnameTest {
 
     @Test
     public void testEndsWith1() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("");
 
         boolean v = p1.endsWith(p2);
         assert (v);
@@ -766,8 +766,8 @@ public class PathnameTest {
 
     @Test
     public void testEndsWith2() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("");
 
         boolean v = p2.endsWith(p1);
         assert (!v);
@@ -775,8 +775,8 @@ public class PathnameTest {
 
     @Test
     public void testEndsWith3() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("b");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("b");
 
         boolean v = p2.endsWith(p1);
         assert (!v);
@@ -784,8 +784,8 @@ public class PathnameTest {
 
     @Test
     public void testEndsWith4() {
-        Pathname p1 = new Pathname("a/b");
-        Pathname p2 = new Pathname("b");
+        RelativePath p1 = new RelativePath("a/b");
+        RelativePath p2 = new RelativePath("b");
 
         boolean v = p1.endsWith(p2);
         assert (v);
@@ -793,8 +793,8 @@ public class PathnameTest {
 
     @Test
     public void testEndsWith5() {
-        Pathname p1 = new Pathname("a/b/c");
-        Pathname p2 = new Pathname("c/c");
+        RelativePath p1 = new RelativePath("a/b/c");
+        RelativePath p2 = new RelativePath("c/c");
 
         boolean v = p1.endsWith(p2);
         assert (!v);

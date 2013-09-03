@@ -28,7 +28,7 @@ import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * An example of how to list a directory.
@@ -62,7 +62,7 @@ public class DirectoryListing {
             FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), null, null);
 
             // We now create an Path representing the directory we want to list.
-            Path path = files.newPath(fs, new Pathname(uri.getPath()));
+            Path path = files.newPath(fs, new RelativePath(uri.getPath()));
 
             // Retrieve the attributes of the file.
             FileAttributes att = files.getAttributes(path);
@@ -75,7 +75,7 @@ public class DirectoryListing {
                 DirectoryStream<Path> stream = files.newDirectoryStream(path);
 
                 for (Path p : stream) {
-                    System.out.println("   " + p.getPathname().getFileNameAsString());
+                    System.out.println("   " + p.getRelativePath().getFileNameAsString());
                 }
 
             } else {

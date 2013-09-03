@@ -26,6 +26,7 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +49,7 @@ public class PathAttributesPairImplementationTest {
 
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
-        root = files.getLocalCWD();
+        root = FileUtils.getLocalCWD(files);
         filesystem = root.getFileSystem();
         att = files.getAttributes(root);
     }

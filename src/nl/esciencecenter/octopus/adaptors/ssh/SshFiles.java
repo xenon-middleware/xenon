@@ -56,7 +56,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public class SshFiles implements Files {
 
     private void checkParent(Path path) throws OctopusIOException {
         
-        Pathname parentName = path.getPathname().getParent();
+        RelativePath parentName = path.getRelativePath().getParent();
         
         if (parentName == null) { 
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
@@ -145,7 +145,7 @@ public class SshFiles implements Files {
 
         session.releaseSftpChannel(channel);
 
-        Pathname entryPath = new Pathname(wd);
+        RelativePath entryPath = new RelativePath(wd);
 
         LOGGER.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
 
@@ -184,7 +184,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public Path newPath(FileSystem filesystem, Pathname location) {
+    public Path newPath(FileSystem filesystem, RelativePath location) {
         return new PathImplementation(filesystem, location);
     }
 
@@ -220,7 +220,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            channel.mkdir(dir.getPathname().getAbsolutePath());
+            channel.mkdir(dir.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -237,7 +237,7 @@ public class SshFiles implements Files {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
 
-        Iterator<Pathname> itt = dir.getPathname().iterator();
+        Iterator<RelativePath> itt = dir.getRelativePath().iterator();
 
         while (itt.hasNext()) {
             Path tmp = newPath(dir.getFileSystem(), itt.next());
@@ -294,9 +294,9 @@ public class SshFiles implements Files {
                             + " as it is not empty");
                 }
 
-                channel.rmdir(path.getPathname().getAbsolutePath());
+                channel.rmdir(path.getRelativePath().getAbsolutePath());
             } else {
-                channel.rm(path.getPathname().getAbsolutePath());
+                channel.rm(path.getRelativePath().getAbsolutePath());
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -342,8 +342,8 @@ public class SshFiles implements Files {
             throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
         }
 
-        Pathname sourceName = source.getPathname().normalize();
-        Pathname targetName = target.getPathname().normalize();
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
             return target;
@@ -361,7 +361,7 @@ public class SshFiles implements Files {
 
         try {
             LOGGER.debug("move from " + source + " to " + target);
-            channel.rename(source.getPathname().getAbsolutePath(), target.getPathname().getAbsolutePath());
+            channel.rename(source.getRelativePath().getAbsolutePath(), target.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -390,7 +390,7 @@ public class SshFiles implements Files {
         List<LsEntry> result = null;
 
         try {
-            result = channel.ls(path.getPathname().getAbsolutePath());
+            result = channel.ls(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -438,7 +438,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            InputStream in = channel.get(path.getPathname().getAbsolutePath());
+            InputStream in = channel.get(path.getRelativePath().getAbsolutePath());
             return new SshInputStream(in, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -483,7 +483,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            OutputStream out = channel.put(path.getPathname().getAbsolutePath(), mode);
+            OutputStream out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
             return new SshOutputStream(out, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -500,13 +500,13 @@ public class SshFiles implements Files {
         Path result = null;
 
         try {
-            String target = channel.readlink(path.getPathname().getAbsolutePath());
+            String target = channel.readlink(path.getRelativePath().getAbsolutePath());
 
             if (!target.startsWith(File.separator)) {                
-                Pathname parent = path.getPathname().getParent();
+                RelativePath parent = path.getRelativePath().getParent();
                 result = new PathImplementation(path.getFileSystem(), parent.resolve(target));
             } else {
-                result = new PathImplementation(path.getFileSystem(), new Pathname(target));
+                result = new PathImplementation(path.getFileSystem(), new RelativePath(target));
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
@@ -533,38 +533,13 @@ public class SshFiles implements Files {
     }
     
     @Override
-    public Path getLocalCWD() throws OctopusException { 
-        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "getLocalCWD not supported!");
-    }
-
-    @Override
-    public Path getLocalHome() throws OctopusException {
-        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "getLocalHome not supported!");
-    }
-    
-    @Override
-    public FileSystem [] getLocalFileSystems() throws OctopusException { 
-        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "getLocalFileSystems not supported!");
-    }
-    
-//    @Override
-//    public FileSystem getLocalCWDFileSystem() throws OctopusException {
-//        throw new OctopusException(getClass().getName(), "getCWDFileSystem not supported!");
-//    }
-//
-//    @Override
-//    public FileSystem getLocalHomeFileSystem() throws OctopusException {
-//        throw new OctopusException(getClass().getName(), "getLocalHomeFileSystem not supported!");
-//    }
-
-    @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            channel.chmod(SshUtil.permissionsToBits(permissions), path.getPathname().getAbsolutePath());
+            channel.chmod(SshUtil.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);
@@ -581,7 +556,7 @@ public class SshFiles implements Files {
         SftpATTRS result = null;
 
         try {
-            result = channel.lstat(path.getPathname().getAbsolutePath());
+            result = channel.lstat(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToOctopusException(e);

@@ -19,7 +19,7 @@ import java.util.Iterator;
 
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Implementation of Path. 
@@ -28,9 +28,9 @@ public final class PathImplementation implements Path {
 
     class PathIterator implements Iterator<Path> {
 
-        private final Iterator<Pathname> iterator;
+        private final Iterator<RelativePath> iterator;
 
-        PathIterator(Iterator<Pathname> iterator) {
+        PathIterator(Iterator<RelativePath> iterator) {
             this.iterator = iterator;
         }
 
@@ -51,23 +51,23 @@ public final class PathImplementation implements Path {
     }
 
     private final FileSystem filesystem;
-    private final Pathname pathname;
+    private final RelativePath relativePath;
 
-    public PathImplementation(FileSystem filesystem, Pathname pathname) {
+    public PathImplementation(FileSystem filesystem, RelativePath path) {
 
         if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
         }
 
-        if (pathname == null) {
-            throw new IllegalArgumentException("Pathname may not be null!");
+        if (path == null) {
+            throw new IllegalArgumentException("RelatvePath may not be null!");
         }
 
         this.filesystem = filesystem;
-        this.pathname = pathname;
+        this.relativePath = path;
     }
 
-    public PathImplementation(FileSystem filesystem, Pathname... pathnames) {
+    public PathImplementation(FileSystem filesystem, RelativePath... paths) {
 
         if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
@@ -75,11 +75,11 @@ public final class PathImplementation implements Path {
 
         this.filesystem = filesystem;
 
-        if (pathnames.length == 0) {
-            throw new IllegalArgumentException("PathImplementation requires at least one pathname");
+        if (paths.length == 0) {
+            throw new IllegalArgumentException("PathImplementation requires at least one RelativePath");
         }
 
-        this.pathname = new Pathname(pathnames);
+        this.relativePath = new RelativePath(paths);
     }
 
     @Override
@@ -88,12 +88,12 @@ public final class PathImplementation implements Path {
     }
 
     @Override
-    public Pathname getPathname() {
-        return pathname;
+    public RelativePath getRelativePath() {
+        return relativePath;
     }
 
     public String toString() {
-        return filesystem.getScheme() + "://" + filesystem.getLocation() + pathname.getAbsolutePath();        
+        return filesystem.getScheme() + "://" + filesystem.getLocation() + relativePath.getAbsolutePath();        
     }
 
     @Override
@@ -101,7 +101,7 @@ public final class PathImplementation implements Path {
         int result = 31 + filesystem.getAdaptorName().hashCode();
         result = 31 * result + filesystem.getScheme().hashCode();
         result = 31 * result + filesystem.getLocation().hashCode();
-        return 31 * result + pathname.hashCode();
+        return 31 * result + relativePath.hashCode();
     }
 
     @Override
@@ -132,6 +132,6 @@ public final class PathImplementation implements Path {
             return false;
         }
         
-        return pathname.equals(other.pathname);
+        return relativePath.equals(other.relativePath);
     }
 }

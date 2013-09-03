@@ -16,7 +16,7 @@
 package nl.esciencecenter.octopus.files;
 
 /**
- * Path represents a specific location on a FileSystem, as identified by a Pathname. 
+ * Path represents a specific location on a FileSystem, as by the FileSystems root plus a RelativePath. 
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -32,9 +32,9 @@ public interface Path {
     FileSystem getFileSystem();
 
     /**
-     * Get the Pathname on the FileSystem.
+     * Get the location relative to the root of the FileSystem.
      * 
-     * @return the Pathname.
+     * @return a RelativePath containing the location relative to the root of the FileSystem.
      */
-    Pathname getPathname();
+    RelativePath getRelativePath();
 }

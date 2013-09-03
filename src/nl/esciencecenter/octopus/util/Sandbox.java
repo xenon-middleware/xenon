@@ -175,7 +175,7 @@ public class Sandbox {
     }
 
     private static Path resolve(Files files, Path root, String path) throws OctopusIOException {
-        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
     /**
@@ -236,7 +236,7 @@ public class Sandbox {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
         if (dest == null) {
-            dest = src.getPathname().getFileNameAsString();
+            dest = src.getRelativePath().getFileNameAsString();
         }
 
         uploadFiles.add(new Pair(src, resolve(files, path, dest)));
@@ -265,7 +265,7 @@ public class Sandbox {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
         if (src == null) {
-            src = dest.getPathname().getFileNameAsString();
+            src = dest.getRelativePath().getFileNameAsString();
         }
 
         downloadFiles.add(new Pair(resolve(files, path, src), dest));

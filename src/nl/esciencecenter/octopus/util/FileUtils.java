@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,12 +33,14 @@ import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
+import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * Various file utilities implemented on top of the Octopus API.
@@ -76,6 +79,204 @@ public final class FileUtils {
         }
     }
 
+    public static String getHome() throws OctopusIOException { 
+        String home = System.getProperty("user.home");
+        
+        if (home == null || home.length() == 0) { 
+            throw new OctopusIOException(NAME, "Home directory property user.home not set!");
+        }
+
+        return home;        
+    }
+    
+    public static String getCWD() throws OctopusIOException { 
+        String cwd = System.getProperty("user.dir");
+        
+        if (cwd == null || cwd.length() == 0) { 
+            throw new OctopusIOException(NAME, "Current working directory property user.dir not set!");
+        }
+
+        return cwd;        
+    }
+    
+    public static String getRoot(String absolutePath) throws OctopusException { 
+        
+        if (isWindows()) { 
+            if (absolutePath != null && absolutePath.length() >= 2 && (absolutePath.charAt(1) == ':') && 
+                    Character.isLetter(absolutePath.charAt(0))) { 
+                return absolutePath.substring(0, 2).toUpperCase();
+            }
+            
+            throw new OctopusException(NAME, "Path is not absolute! " + absolutePath);
+        }
+        
+        if (absolutePath != null && absolutePath.length() >= 1 && (absolutePath.charAt(0) == '/')) { 
+            return "/";
+        }
+            
+        throw new OctopusException(NAME, "Path is not absolute! " + absolutePath);
+    }
+    
+    public static boolean isWindows() { 
+        String os = System.getProperty("os.name");
+        return (os != null && os.startsWith("Windows"));
+    }
+    
+    public static boolean isOSX() { 
+        String os = System.getProperty("os.name");
+        return (os != null && os.equals("MacOSX"));
+    }
+    
+    public static boolean isLinux() { 
+        String os = System.getProperty("os.name");
+        return (os != null && os.equals("Linux"));
+    }
+    
+    /**
+     * Check is a location is a valid windows root such as "C:". 
+     * @param root the root to check. 
+     * @return if the location is a valid windows root.
+     */
+    private static boolean isWindowsRoot(String root) {
+        
+        if (root == null) { 
+            return false;
+        }
+        
+        if (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0))) { 
+            return true;
+        }
+        
+        if (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\') { 
+            return true;
+        }
+        
+        return false;
+    }
+
+    private static boolean isLinuxRoot(String root) {
+        return (root != null && root.equals("/"));
+    }
+    
+    public static boolean isLocalRoot(String location) {
+        
+        if (isWindows()) { 
+            return isWindowsRoot(location);
+        }
+        
+        return isLinuxRoot(location);
+    }
+    
+    public static RelativePath getRelativePath(String path, String root) throws OctopusException {
+        
+        if (!path.startsWith(root)) { 
+            throw new OctopusException(NAME, "Path does not start with root: " + path + " " + root);
+        }
+
+        if (root.length() == path.length()) { 
+            return new RelativePath(getLocalSeparator());
+        }
+       
+        return new RelativePath(getLocalSeparator(), path.substring(root.length()));
+    }
+
+    public static char getLocalSeparator() {
+        return File.separatorChar;
+    }
+
+    /**
+     * Takes the String representation of a local path (for example "/bin/foo" or "C:\dir\test.txt") and converts it into a 
+     * <code>Path</code>.
+     *   
+     * <code>path</code> must contain an absolute path starting with a root such as "/" or "C:".   
+     *   
+     * @param files
+     *          the files interface used to create the <code>Path</code>.
+     * @param path
+     *          the local path to convert.
+     *           
+     * @return a <code>Path</code> representing the same location as <code>path</code>. 
+     *          
+     * @throws OctopusIOException   
+     *          If an I/O error occurred
+     * @throws OctopusException 
+     *          If the creation of the FileSystem failed.
+     */
+    public static Path fromLocalPath(Files files, String path) throws OctopusException, OctopusIOException { 
+        String root = getRoot(path);
+        FileSystem fs = files.newFileSystem("file", root, null, null);
+        return files.newPath(fs, getRelativePath(path, root));
+    }
+    
+    /**
+     * Returns a <code>Path</code> that represents the current working directory.
+     * 
+     * This method retrieves the current working directory using {@link #getCWD()}, and converts this into a path using 
+     * {@link #fromLocalPath(Files, String)}. 
+     * 
+     * @param files
+     *          the files interface used to create the <code>Path</code>.
+     * @return
+     *          a <code>Path</code> that represents the current working directory.
+     * 
+     * @throws OctopusIOException
+     *          If an I/O error occurred
+     * @throws OctopusException
+     *          If the creation of the FileSystem failed.
+     */    
+    public static Path getLocalCWD(Files files) throws OctopusException, OctopusIOException { 
+        return fromLocalPath(files, getCWD());
+    }
+
+    /**
+     * Returns a <code>Path</code> that represents the home directory of the current user.
+     * 
+     * This method retrieves the home directory using {@link #getHome()}, and converts this into a path using 
+     * {@link #fromLocalPath(Files, String)}. 
+     * 
+     * @param files
+     *          the files interface used to create the <code>Path</code>.
+     * @return
+     *          a <code>Path</code> that represents the home directory of the current user.
+     * 
+     * @throws OctopusIOException
+     *          If an I/O error occurred
+     * @throws OctopusException
+     *          If the creation of the FileSystem failed.
+     */    
+    public static Path getLocalHome(Files files) throws OctopusException, OctopusIOException { 
+        return fromLocalPath(files, getHome());
+    }
+    
+    /**
+     * Returns all local FileSystems. 
+     *   
+     * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of 
+     * these roots.   
+     *   
+     * @param files
+     *          the files interface to use to create the <code>FileSystems</code>.
+     * @return all local FileSystems.
+     * 
+     * @throws OctopusIOException
+     *          If an I/O error occurred
+     * @throws OctopusException
+     *          If the creation of the FileSystem failed.
+     */
+    public static FileSystem [] getLocalFileSystems(Files files) throws OctopusException, OctopusIOException {
+        
+        File [] roots = File.listRoots();
+        
+        FileSystem [] result = new FileSystem[roots.length]; 
+        
+        for (int i=0;i<result.length;i++) { 
+            result[i] = files.newFileSystem("file", roots[i].getPath(), null, null);
+        }
+        
+        return result;
+    }
+    
+    
     /**
      * Copies all bytes from an input stream to a file.
      * 
@@ -526,7 +727,7 @@ public final class FileUtils {
             }
             for (Path f : files.newDirectoryStream(source)) {
                 Path fsource = f;
-                Path ftarget = files.newPath(target.getFileSystem(), target.getPathname().resolve(f.getPathname().getFileName()));
+                Path ftarget = files.newPath(target.getFileSystem(), target.getRelativePath().resolve(f.getRelativePath().getFileName()));
                 recursiveCopy(files, fsource, ftarget, options);
             }
         } else {

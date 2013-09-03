@@ -47,7 +47,7 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -114,7 +114,7 @@ public abstract class GenericJobAdaptorTestParent {
     };
     
     public Path resolve(Path root, String path) throws OctopusIOException { 
-        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
 
     public Path resolve(FileSystem fs, String path) throws OctopusIOException {
@@ -139,7 +139,7 @@ public abstract class GenericJobAdaptorTestParent {
         Credentials credentials = octopus.credentials();
 
         FileSystem filesystem = config.getDefaultFileSystem(files, credentials);
-        Pathname entryPath = filesystem.getEntryPath().getPathname();
+        RelativePath entryPath = filesystem.getEntryPath().getRelativePath();
         Path root = files.newPath(filesystem, entryPath.resolve(TEST_ROOT));
 
         if (files.exists(root)) {
@@ -150,7 +150,7 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     @Before
-    public void prepare() throws OctopusException {
+    public void prepare() throws Exception {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
@@ -1236,7 +1236,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStderr(null);
 
         //absolute working dir name used
-        description.setWorkingDirectory(root.getPathname().getAbsolutePath());
+        description.setWorkingDirectory(root.getRelativePath().getAbsolutePath());
 
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);

@@ -22,24 +22,24 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 /**
- * Pathname contains a sequence of path elements separated by a separator.
+ * RelativePath contains a sequence of path elements separated by a separator.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class Pathname {
+public class RelativePath {
 
     /** The default separator to use. */
     public static final char DEFAULT_SEPARATOR = '/';
 
-    /** The path elements in this pathname */
+    /** The path elements in this relative path */
     private final String[] elements;
 
-    /** The separator used in this pathname */
+    /** The separator used in this relative path */
     private final char separator;
 
-    class PathnameIterator implements Iterator<Pathname> {
+    class RelativePathIterator implements Iterator<RelativePath> {
 
         private int index = 1;
 
@@ -49,13 +49,13 @@ public class Pathname {
         }
 
         @Override
-        public Pathname next() {
+        public RelativePath next() {
 
             if (index > elements.length) {
                 throw new NoSuchElementException("No more elements available!");
             }
 
-            return new Pathname(separator, Arrays.copyOf(elements, index++));
+            return new RelativePath(separator, Arrays.copyOf(elements, index++));
         }
 
         @Override
@@ -65,48 +65,49 @@ public class Pathname {
     }
 
     /**
-     * Create a new empty pathname using the default separator.
+     * Create a new empty RelativePath using the default separator.
      */
-    public Pathname() {
+    public RelativePath() {
         this(DEFAULT_SEPARATOR, new String[0]);
     }
 
     /**
-     * Create a new pathname using the path and the default separator.
+     * Create a new RelativePath using the path and the default separator.
      * 
-     * If the <code>path</code> is <code>null</code> or an empty String, the resulting pathname is empty.
+     * If <code>path</code> is <code>null</code> or an empty String, the resulting RelativePath is empty.
+     * If <code>path</code> contains the separator it will be split into multiple elements. 
      * 
      * @param path
      *            the path to use.
      */
-    public Pathname(String path) {
+    public RelativePath(String path) {
         this(DEFAULT_SEPARATOR, path);
     }
 
     /**
-     * Create a new pathname using the given path elements and the default separator.
+     * Create a new RelativePath using the given path elements and the default separator.
      * 
-     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting pathname is empty.
+     * If <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
+     * 
+     * Any elements that are <code>null</code> or an empty String will be ignored.
+     * Any elements that contain the separator will be split into multiple elements. 
      * 
      * @param elements
      *            the path elements to use.
-     * 
-     * @throws IllegalArgumentExeption If the elements arrays contains <code>null</code>, empty Strings, or Strings containing the
-     *        seperator.
      */
-    public Pathname(String... elements) {
+    public RelativePath(String... elements) {
         this(DEFAULT_SEPARATOR, elements);
     }
 
     /**
-     * Create a new pathname by appending the provided <code>paths</code>.
+     * Create a new RelativePath by appending the provided <code>paths</code>.
      * 
-     * If the <code>paths</code> is <code>null</code> the resulting pathname is empty.
+     * If the <code>paths</code> is <code>null</code> the resulting RelativePath is empty.
      * 
      * @param paths
      *            the path elements to use.
      */
-    public Pathname(Pathname... paths) {
+    public RelativePath(RelativePath... paths) {
 
         if (paths.length == 0) {
             elements = new String[0];
@@ -131,19 +132,19 @@ public class Pathname {
     }
 
     /**
-     * Create a new pathname using the given path elements and the separator.
+     * Create a new RelativePath using the given path elements and the separator.
      * 
-     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting pathname is empty.
+     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
      * 
      * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is
-     * encountered. Elements that are <code>null</code> or contain an empty string are ignored.
+     * encountered. Elements that are <code>null</code> or contain an empty String are ignored.
      * 
      * @param elements
      *            the path elements to use.
      * @param separator
      *            the separator to use.
      */
-    public Pathname(char separator, String... elements) {
+    public RelativePath(char separator, String... elements) {
 
         this.separator = separator;
 
@@ -171,20 +172,24 @@ public class Pathname {
     }
 
     /**
-     * Get the file name, or <code>null</code> if the pathname is empty.
+     * Get the file name, or <code>null</code> if the RelativePath is empty.
+     * 
+     * The file name is the last element of the RelativePath.
      * 
      * @return the resulting file name or <code>null</code>.
      */
-    public Pathname getFileName() {
+    public RelativePath getFileName() {
         if (elements.length == 0) {
             return null;
         }
         
-        return new Pathname(separator, elements[elements.length - 1]);
+        return new RelativePath(separator, elements[elements.length - 1]);
     }
 
     /**
-     * Get the file name as a <code>String</code>, or <code>null</code> if the pathname is empty.
+     * Get the file name as a <code>String</code>, or <code>null</code> if the RelativePath is empty.
+     * 
+     * The file name is the last element of the RelativePath.
      * 
      * @return the resulting file name or <code>null</code>.
      */
@@ -206,11 +211,11 @@ public class Pathname {
     }
 
     /**
-     * Get the parent pathname, or <code>null</code> if this pathname does not have a parent.
+     * Get the parent RelativePath, or <code>null</code> if this RelativePath does not have a parent.
      * 
-     * @return a pathname representing this pathnames parent.
+     * @return a RelativePath representing this RelativePaths parent.
      */
-    public Pathname getParent() {
+    public RelativePath getParent() {
 
         if (elements.length == 0) {
             return null;
@@ -218,20 +223,20 @@ public class Pathname {
 
         String[] parentElements = Arrays.copyOfRange(elements, 0, elements.length - 1);
 
-        return new Pathname(separator, parentElements);
+        return new RelativePath(separator, parentElements);
     }
 
     /**
-     * Get the number of name elements in the pathname.
+     * Get the number of name elements in the RelativePath.
      * 
-     * @return the number of elements in the pathname, or 0 if this is empty.
+     * @return the number of elements in the RelativePath, or 0 if this is empty.
      */
     public int getNameCount() {
         return elements.length;
     }
 
     /**
-     * Get a name element of this pathname.
+     * Get a name element of this RelativePath.
      * 
      * @param index
      *            the index of the element
@@ -241,28 +246,28 @@ public class Pathname {
      * @throws IllegalArgumentException
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
-    public Pathname getName(int index) {
+    public RelativePath getName(int index) {
         if (index < 0 || index >= elements.length) {
             throw new IllegalArgumentException("index " + index + " not present in path " + this);
         }
-        return new Pathname(separator, elements[index]);
+        return new RelativePath(separator, elements[index]);
     }
 
     /**
-     * Returns a pathname that is a subsequence of the name elements of this path.
+     * Returns a RelativePath that is a subsequence of the name elements of this path.
      * 
      * @param beginIndex
      *            the index of the first element, inclusive
      * @param endIndex
      *            the index of the last element, exclusive
      * 
-     * @return a new pathname that is a subsequence of the name elements in this path.
+     * @return a new RelativePath that is a subsequence of the name elements in this path.
      * 
      * @throws IllegalArgumentException
      *             If the beginIndex or endIndex is negative or greater or equal to the number of elements in the path, or if
      *             beginIndex is larger that or equal to the endIndex.
      */
-    public Pathname subpath(int beginIndex, int endIndex) {
+    public RelativePath subpath(int beginIndex, int endIndex) {
 
         if (beginIndex < 0 || beginIndex >= elements.length) {
             throw new IllegalArgumentException("beginIndex " + beginIndex + " not present in path " + this);
@@ -282,21 +287,21 @@ public class Pathname {
             tmp[i - beginIndex] = elements[i];
         }
 
-        return new Pathname(separator, tmp);
+        return new RelativePath(separator, tmp);
     }
 
     /**
-     * Tests if this pathname starts with the given pathname.
+     * Tests if this RelativePath starts with the given RelativePath.
      * 
-     * This method returns <code>true</code> if this pathname starts with the name elements in the given pathname. If the 
-     * given pathname has more name elements than this path then false is returned.
+     * This method returns <code>true</code> if this RelativePath starts with the name elements in the given RelativePath. If the 
+     * given RelativePath has more name elements than this path then false is returned.
      * 
      * @param other
-     *            the pathname to compare to.
+     *            the RelativePath to compare to.
      * 
-     * @return If this pathname start with the name elements in the other pathname.
+     * @return If this RelativePath start with the name elements in the other RelativePath.
      */
-    public boolean startsWith(Pathname other) {
+    public boolean startsWith(RelativePath other) {
 
         if (other.isEmpty()) {
             return true;
@@ -320,17 +325,17 @@ public class Pathname {
     }
 
     /**
-     * Tests if this pathname ends with the given pathname.
+     * Tests if this RelativePath ends with the given RelativePath.
      * 
-     * This method returns <code>true</code> if this pathname end with the name elements in the given pathname. If the given 
-     * pathname has more name elements than this pathname then false is returned.
+     * This method returns <code>true</code> if this RelativePath end with the name elements in the given RelativePath. If the 
+     * given RelativePath has more name elements than this RelativePath then false is returned.
      * 
      * @param other
-     *            the pathname to compare to.
+     *            the RelativePath to compare to.
      * 
-     * @return If this pathname ends with the name elements in the other pathname.
+     * @return If this RelativePath ends with the name elements in the other RelativePath.
      */
-    public boolean endsWith(Pathname other) {
+    public boolean endsWith(RelativePath other) {
 
         if (other.isEmpty()) {
             return true;
@@ -356,33 +361,33 @@ public class Pathname {
     }
 
     /**
-     * Tests if this pathname starts with the given pathname.
+     * Tests if this RelativePath starts with the given RelativePath.
      *
-     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
-     * {@link #startsWith(Pathname)} to compare the result to this pathname.
+     * This method converts <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
+     * {@link #startsWith(RelativePath)} to compare the result to this RelativePath.
      * 
      * @param other
      *            the path to test.
      * 
-     * @return If this pathname start with the name elements in <code>other</code>.
+     * @return If this RelativePath start with the name elements in <code>other</code>.
      */
     public boolean startsWith(String other) {
-        return startsWith(new Pathname(other));
+        return startsWith(new RelativePath(other));
     }
 
     /**
-     * Tests if this pathname ends with the given pathname.
+     * Tests if this RelativePath ends with the given RelativePath.
      * 
-     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
-     * {@link #endsWith(Pathname)} to compare the result to this path.
+     * This method converts the <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
+     * {@link #endsWith(RelativePath)} to compare the result to this path.
      * 
      * @param other
      *            the path to test.
      * 
-     * @return If this pathname ends with the elements in <code>other</code>.
+     * @return If this RelativePath ends with the elements in <code>other</code>.
      */
     public boolean endsWith(String other) {
-        return endsWith(new Pathname(other));
+        return endsWith(new RelativePath(other));
     }
     
     /**
@@ -408,19 +413,19 @@ public class Pathname {
     }
 
     /**
-     * Resolve a pathname against this pathname.
+     * Resolve a RelativePath against this RelativePath.
      * 
-     * If <code>other</code> represents an empty pathname, this pathname is returned.
+     * If <code>other</code> represents an empty RelativePath, this RelativePath is returned.
      * 
-     * If this pathname is empty, the <code>other</code> pathname is returned.
+     * If this RelativePath is empty, the <code>other</code> RelativePath is returned.
      * 
-     * Otherwise, a new pathname is returned that contains the concatenation of the path elements this pathname and the
-     * <code>other</code> pathname.
+     * Otherwise, a new RelativePath is returned that contains the concatenation of the path elements this RelativePath and the
+     * <code>other</code> RelativePath.
      * 
      * @param other
-     *            the pathname.
+     *            the RelativePath.
      */
-    public Pathname resolve(Pathname other) {
+    public RelativePath resolve(RelativePath other) {
 
         if (other == null || other.isEmpty()) {
             return this;
@@ -430,58 +435,58 @@ public class Pathname {
             return other;
         }
 
-        return new Pathname(separator, merge(elements, other.elements));
+        return new RelativePath(separator, merge(elements, other.elements));
     }
 
     /**
-     * Resolve a String containing a pathname against this path.
+     * Resolve a String containing a RelativePath against this path.
      * 
-     * This method converts the <code>other</code> into a <code>Pathname</code> using {@link #Pathname(String)} and then uses 
-     * {@link #resolve(Pathname)} to resolve the result against this path.
+     * This method converts the <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
+     * {@link #resolve(RelativePath)} to resolve the result against this path.
      *
-     * If <code>other</code> represents an empty path, or <code>null</code> this pathname is returned.
+     * If <code>other</code> represents an empty path, or <code>null</code> this RelativePath is returned.
      * 
      * @param other
      *            the path.
      */
-    public Pathname resolve(String other) {
+    public RelativePath resolve(String other) {
 
         if (other == null || other.length() == 0) {
             return this;
         }
 
-        return resolve(new Pathname(other));
+        return resolve(new RelativePath(other));
     }
 
     /**
-     * Is this pathname empty ?
+     * Is this RelativePath empty ?
      * 
-     * @return If this pathname is empty.
+     * @return If this RelativePath is empty.
      */
     public boolean isEmpty() {
         return elements.length == 0;
     }
 
     /**
-     * Resolves the given pathname to this paths parent pathname, thereby creating a sibling to this pathname.
+     * Resolves the given RelativePath to this paths parent RelativePath, thereby creating a sibling to this RelativePath.
      * 
-     * If this pathname is empty, <code>other</code> will be returned, unless other is <code>null</code> in which case an empty 
-     * pathname is returned.
+     * If this RelativePath is empty, <code>other</code> will be returned, unless other is <code>null</code> in which case an 
+     * empty RelativePath is returned.
      * 
-     * If this pathname is not empty, but <code>other</code> is <code>null</code> or empty, the parent of this pathname will be 
-     * returned. 
+     * If this RelativePath is not empty, but <code>other</code> is <code>null</code> or empty, the parent of this RelativePath 
+     * will be returned. 
      *    
-     * If neither this pathname and other are empty, <code>getParent.resolve(other)</code> will be returned.
+     * If neither this RelativePath and other are empty, <code>getParent.resolve(other)</code> will be returned.
      * 
      * @param other
-     *            the pathname to resolve as sibling.
+     *            the RelativePath to resolve as sibling.
      * 
-     * @return a pathname representing the sibling.
+     * @return a RelativePath representing the sibling.
      * 
      * @throws IllegalArgumentException
-     *             If the pathname can not be resolved as a sibling to this pathname.
+     *             If the RelativePath can not be resolved as a sibling to this RelativePath.
      */
-    public Pathname resolveSibling(Pathname other) {
+    public RelativePath resolveSibling(RelativePath other) {
 
         if (isEmpty()) {
             if (other == null) {
@@ -491,7 +496,7 @@ public class Pathname {
             }
         }
 
-        Pathname parent = getParent();
+        RelativePath parent = getParent();
 
         if (other == null || other.isEmpty()) {
             return parent;
@@ -501,20 +506,20 @@ public class Pathname {
     }
 
     /**
-     * Create a relative pathname between the given pathname and this pathname.
+     * Create a relative RelativePath between the given RelativePath and this RelativePath.
      * 
-     * Relativation is the inverse of resolving. This method returns a pathname that, when resolved against this pathname, results
-     * in the given pathname <code>other</code>.   
+     * Relativation is the inverse of resolving. This method returns a RelativePath that, when resolved against this RelativePath,
+     * results in the given RelativePath <code>other</code>.   
      * 
      * @param other
-     *            the pathname to relativize.
+     *            the RelativePath to relativize.
      * 
-     * @return a pathname representing a relative path between the given path and this path.
+     * @return a RelativePath representing a relative path between the given path and this path.
      * 
      * @throws IllegalArgumentException
      *             If the path can not be relativized to this path.
      */
-    public Pathname relativize(Pathname other) {
+    public RelativePath relativize(RelativePath other) {
 
         if (isEmpty()) {
             return other;
@@ -524,8 +529,8 @@ public class Pathname {
             return this;
         }
 
-        Pathname normalized = normalize();
-        Pathname normalizedOther = other.normalize();
+        RelativePath normalized = normalize();
+        RelativePath normalizedOther = other.normalize();
 
         String[] elts = normalized.elements;
         String[] eltsOther = normalizedOther.elements;
@@ -543,29 +548,29 @@ public class Pathname {
         }
 
         if (elts.length == eltsOther.length) {
-            return new Pathname(separator, new String[0]);
+            return new RelativePath(separator, new String[0]);
         }
 
-        return new Pathname(separator, Arrays.copyOfRange(eltsOther, elts.length, eltsOther.length));
+        return new RelativePath(separator, Arrays.copyOfRange(eltsOther, elts.length, eltsOther.length));
     }
 
     /**
-     * Create an {@link Iterator} that returns all possible sub pathnames of this pathname, in order of increasing length.
+     * Create an {@link Iterator} that returns all possible sub RelativePaths of this RelativePath, in order of increasing length.
      * 
-     * For example, for the pathname "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
+     * For example, for the RelativePath "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
      * 
      * @return the iterator.
      */
-    public Iterator<Pathname> iterator() {
-        return new PathnameIterator();
+    public Iterator<RelativePath> iterator() {
+        return new RelativePathIterator();
     }
 
     /**
-     * Return a <code>String</code> representation of this pathname interpreted as a relative path.
+     * Return a <code>String</code> representation of this RelativePath interpreted as a relative path.
      * 
      * A relative path does not start with a separator. 
      * 
-     * @return a String representation of this pathname interpreted as a relative path.
+     * @return a String representation of this RelativePath interpreted as a relative path.
      */
     public String getRelativePath() {
 
@@ -587,7 +592,7 @@ public class Pathname {
     }
 
     /**
-     * Return a <code>String</code> representation of this pathname interpreted as an absolute path.
+     * Return a <code>String</code> representation of this RelativePath interpreted as an absolute path.
      * 
      * An absolute path starts with a separator. 
      * 
@@ -611,7 +616,7 @@ public class Pathname {
 
     
     /**
-     * Normalize this pathname by removing as many redundant path elements as possible.
+     * Normalize this RelativePath by removing as many redundant path elements as possible.
      * 
      * Redundant path elements are <code>"."</code> (indicating the current directory) and <code>".."</code> (indicating the
      * parent directory).
@@ -620,7 +625,7 @@ public class Pathname {
      * 
      * @return the normalize path.
      */
-    public Pathname normalize() {
+    public RelativePath normalize() {
 
         if (isEmpty()) {
             return this;
@@ -662,7 +667,7 @@ public class Pathname {
         }
 
         String[] tmp = stack.toArray(new String[stack.size()]);
-        return new Pathname(separator, tmp);
+        return new RelativePath(separator, tmp);
     }
 
     /* Generated */
@@ -689,7 +694,7 @@ public class Pathname {
             return false;
         }
 
-        Pathname other = (Pathname) obj;
+        RelativePath other = (RelativePath) obj;
 
         if (separator != other.separator) {
             return false;
@@ -700,6 +705,6 @@ public class Pathname {
 
     @Override
     public String toString() {
-        return "Pathname [element=" + Arrays.toString(elements) + ", seperator=" + separator + "]";
+        return "RelativePath [element=" + Arrays.toString(elements) + ", seperator=" + separator + "]";
     }
 }

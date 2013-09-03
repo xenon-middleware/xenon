@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 public class FileSystemImplementation implements FileSystem {
 
@@ -32,9 +32,9 @@ public class FileSystemImplementation implements FileSystem {
 
     private final Credential credential;
     private final OctopusProperties properties;
-    private final Pathname entryPath;
+    private final RelativePath entryPath;
 
-    public FileSystemImplementation(String adaptorName, String identifier, String scheme, String location, Pathname entryPath,
+    public FileSystemImplementation(String adaptorName, String identifier, String scheme, String location, RelativePath entryPath,
             Credential credential, OctopusProperties properties) {
 
         if (adaptorName == null) {

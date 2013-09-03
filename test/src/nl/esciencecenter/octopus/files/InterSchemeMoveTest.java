@@ -22,6 +22,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class InterSchemeMoveTest {
 
         Files files = octopus.files();
 
-        FileSystem fs1 = files.getLocalCWD().getFileSystem();
+        FileSystem fs1 = FileUtils.getLocalCWD(files).getFileSystem();
         FileSystem fs2 = files.newFileSystem("ssh", "test@localhost", null, null);
 
         Path file1 = Util.resolve(files, fs1, "test");

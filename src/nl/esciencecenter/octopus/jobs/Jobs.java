@@ -36,8 +36,10 @@ public interface Jobs {
 
     /**
      * Create a new Scheduler that represents a (possibly remote) job scheduler at the <code>location</code>, using the
-     * <code>credentials</code> to get access.
+     * <code>scheme</code> and <code>credentials</code> to get access.
      * 
+     * @param scheme
+     *            the scheme used to access the Scheduler.
      * @param location
      *            the location of the Scheduler.
      * @param credential
@@ -61,8 +63,6 @@ public interface Jobs {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-//    Scheduler newScheduler(URI location, Credential credential, Map<String, String> properties) throws OctopusException,
-//            OctopusIOException;
     Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws OctopusException, OctopusIOException;
     

@@ -24,7 +24,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -80,8 +80,8 @@ public class SubmitBatchJobWithOutput {
 
                 System.out.println("Job ran succesfully and produced:");
 
-                Path cwd = files.getLocalCWD();
-                Pathname entryPath = cwd.getPathname();
+                Path cwd = FileUtils.getLocalCWD(files);
+                RelativePath entryPath = cwd.getRelativePath();
                 
                 Path stdout = files.newPath(cwd.getFileSystem(), entryPath.resolve("stdout.txt"));
                 Path stderr = files.newPath(cwd.getFileSystem(), entryPath.resolve("stderr.txt"));

@@ -29,7 +29,8 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -40,7 +41,7 @@ public class LocalDirectoryStreamTest {
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
 
     private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
-        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
     @org.junit.BeforeClass
@@ -49,7 +50,7 @@ public class LocalDirectoryStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        Path root = files.getLocalCWD();
+        Path root = FileUtils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
 
@@ -70,7 +71,7 @@ public class LocalDirectoryStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        Path root = files.getLocalCWD();
+        Path root = FileUtils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         
         Path file0 = resolve(files, testDir, "file0");
@@ -113,7 +114,7 @@ public class LocalDirectoryStreamTest {
         octopus = OctopusFactory.newOctopus(null);
 
         files = octopus.files();
-        root = files.getLocalCWD();
+        root = FileUtils.getLocalCWD(files);
         fs = root.getFileSystem();
         testDir = resolve(files, root, TEST_DIR);
     }
@@ -125,7 +126,7 @@ public class LocalDirectoryStreamTest {
 
     @org.junit.Test(expected = OctopusIOException.class)
     public void test_nonexistant_dir() throws Exception {
-        Path path = new PathImplementation(mock(FileSystem.class), new Pathname("aap"));
+        Path path = new PathImplementation(mock(FileSystem.class), new RelativePath("aap"));
         new LocalDirectoryStream(path, new AllTrue());
     }
 

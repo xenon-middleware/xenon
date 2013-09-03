@@ -27,7 +27,7 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * An example of how to copy a file.
@@ -63,8 +63,8 @@ public class CopyFile {
             FileSystem targetFS = files.newFileSystem(target.getScheme(), target.getAuthority(), null, null);
 
             // We now create an Path representing both files.
-            Path sourcePath = files.newPath(sourceFS, new Pathname(source.getPath()));
-            Path targetPath = files.newPath(targetFS, new Pathname(target.getPath()));
+            Path sourcePath = files.newPath(sourceFS, new RelativePath(source.getPath()));
+            Path targetPath = files.newPath(targetFS, new RelativePath(target.getPath()));
 
             // Copy the file. The CREATE options ensures the target does not exist yet. 
             files.copy(sourcePath, targetPath, CopyOption.CREATE);

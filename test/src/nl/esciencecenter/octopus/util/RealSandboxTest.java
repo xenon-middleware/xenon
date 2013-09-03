@@ -56,7 +56,7 @@ public class RealSandboxTest {
     public static void prepare() throws Exception {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
-        fileSystem = files.getLocalCWD().getFileSystem();
+        fileSystem = FileUtils.getLocalCWD(files).getFileSystem();
         
         testDir = Util.resolve(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
         files.createDirectory(testDir);
@@ -106,8 +106,8 @@ public class RealSandboxTest {
 
         Sandbox sandbox = new Sandbox(files, testDir, null);
 
-        String sandboxPath = sandbox.getPath().getPathname().getAbsolutePath();
-        String tmp = testDir.getPathname().getAbsolutePath();
+        String sandboxPath = sandbox.getPath().getRelativePath().getAbsolutePath();
+        String tmp = testDir.getRelativePath().getAbsolutePath();
 
         assertTrue(sandboxPath.startsWith(tmp + "/octopus_sandbox_"));
     }

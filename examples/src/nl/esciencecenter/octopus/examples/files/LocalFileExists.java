@@ -25,7 +25,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
  * An example of how to check if a local file exists.
@@ -62,7 +62,7 @@ public class LocalFileExists {
             FileSystem fs = files.newFileSystem("file", filename, c, null);
 
             // We now create an Path representing the file
-            Path path = files.newPath(fs, new Pathname(filename));
+            Path path = files.newPath(fs, new RelativePath(filename));
 
             // Check if the file exists 
             if (files.exists(path)) {

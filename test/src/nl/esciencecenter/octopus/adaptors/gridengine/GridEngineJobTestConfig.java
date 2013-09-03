@@ -87,7 +87,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         String location = getPropertyOrFail(p, "test.gridengine.location");
 
         String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
-        String wrongLocation = getPropertyOrFail(p, "test.gridengine.location.wrong");
+        String wrongLoc = getPropertyOrFail(p, "test.gridengine.location.wrong");
 
         defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
         String queueList = getPropertyOrFail(p, "test.gridengine.queues");
@@ -99,7 +99,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         parallelEnvironment = p.getProperty("test.gridengine.parallel.environment");
 
         correctLocation = username + "@" + location;
-        wrongLocation = username + "@" + wrongLocation;
+        wrongLocation = username + "@" + wrongLoc;
         correctLocationWrongUser = wrongUser + "@" + location;
 //        correctFSURI = new URI("sftp://" + username + "@" + location);
 //        correctURIWithPath = new URI("ge://" + username + "@" + location + "/");

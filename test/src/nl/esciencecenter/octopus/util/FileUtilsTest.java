@@ -18,23 +18,18 @@ package nl.esciencecenter.octopus.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Iterator;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.Path;
 
 import org.junit.Test;
 
@@ -103,7 +98,7 @@ public class FileUtilsTest {
 //        when(srcFile.getFileName()).thenReturn("myfile");
 //        Path dstDir = mock(Path.class); // bar
 //        Path dstFile = mock(Path.class); // bar/myfile        
-//        Pathname relSrcFile = new Pathname("myfile");
+//        RelativePathn relSrcFile = new RelativePath("myfile");
 //        when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
 //
 //        FileAttributes attributes = mock(FileAttributes.class);
@@ -216,7 +211,7 @@ public class FileUtilsTest {
 //        when(srcFile.getFileName()).thenReturn("myfile");
 //        Path dstDir = mock(Path.class); // bar
 //        Path dstFile = mock(Path.class); // bar/myfile
-//        Pathname relSrcFile = new Pathname("myfile");
+//        RelativePath relSrcFile = new RelativePath("myfile");
 //        when(dstDir.resolve(relSrcFile)).thenReturn(dstFile);
 //
 //        FileAttributes attributes = mock(FileAttributes.class);

@@ -44,7 +44,7 @@ public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path>
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
-                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getPathname().resolve(filename));
+                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(filename));
                 
                 if (filter.accept(tmp)) {
                     stream.add(tmp);

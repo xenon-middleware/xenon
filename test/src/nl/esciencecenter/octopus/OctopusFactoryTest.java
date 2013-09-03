@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
 
@@ -38,26 +39,26 @@ public class OctopusFactoryTest {
     }
 
     @Test
-    public void testNewOctopus() throws OctopusException {
+    public void testNewOctopus() throws OctopusException, OctopusIOException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         assertTrue(octopus.getProperties().equals(new Properties()));
     }
 
     @Test
-    public void testEndOctopus() throws OctopusException {
+    public void testEndOctopus() throws OctopusException, OctopusIOException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         OctopusFactory.endOctopus(octopus);
     }
 
     @Test(expected = NoSuchOctopusException.class)
-    public void testEndOctopus2() throws OctopusException {
+    public void testEndOctopus2() throws OctopusException, OctopusIOException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         OctopusFactory.endOctopus(octopus);
         OctopusFactory.endOctopus(octopus);
     }
 
     @Test(expected = NoSuchOctopusException.class)
-    public void testEndAll() throws OctopusException {
+    public void testEndAll() throws OctopusException, OctopusIOException {
         Octopus octopus1 = OctopusFactory.newOctopus(null);
         Octopus octopus2 = OctopusFactory.newOctopus(null);
 

@@ -28,7 +28,8 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Pathname;
+import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -37,7 +38,7 @@ import nl.esciencecenter.octopus.files.Pathname;
 public class LocalFileAttributesTest {
 
     private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
-        return files.newPath(root.getFileSystem(), root.getPathname().resolve(path));
+        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
     @org.junit.Test(expected = NullPointerException.class)
@@ -49,7 +50,7 @@ public class LocalFileAttributesTest {
     public void testNonExistingFile() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, files.getLocalCWD(), "noot.txt");
+        Path path = resolve(files, FileUtils.getLocalCWD(files), "noot.txt");
         new LocalFileAttributes(path);
     }
 
@@ -57,7 +58,7 @@ public class LocalFileAttributesTest {
     public void testCreationTime() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, files.getLocalCWD(), "aap.txt");
+        Path path = resolve(files, FileUtils.getLocalCWD(files), "aap.txt");
 
         long now = System.currentTimeMillis();
 
@@ -80,7 +81,7 @@ public class LocalFileAttributesTest {
     public void testHashCode() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, files.getLocalCWD(), "aap.txt");
+        Path path = resolve(files, FileUtils.getLocalCWD(files), "aap.txt");
         files.createFile(path);
 
         FileAttributes att = new LocalFileAttributes(path);
@@ -97,7 +98,7 @@ public class LocalFileAttributesTest {
     public void testEquals() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path cwd = files.getLocalCWD();
+        Path cwd = FileUtils.getLocalCWD(files);
         Path path1 = resolve(files, cwd, "aap.txt");
         files.createFile(path1);
         Path path2 = resolve(files, cwd, "noot.txt");

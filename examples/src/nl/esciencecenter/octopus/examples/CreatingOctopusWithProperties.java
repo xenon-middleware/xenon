@@ -22,6 +22,7 @@ import java.util.Map;
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * A simple example of how to configure an octopus with properties.
@@ -51,7 +52,7 @@ public class CreatingOctopusWithProperties {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) {
+        } catch (OctopusException | OctopusIOException e) {
             System.out.println("CreatingOctopusWithProperties example failed: " + e.getMessage());
             e.printStackTrace();
         }
