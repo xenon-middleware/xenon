@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +27,7 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.octopus.exceptions.BadParameterException;
 import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
+import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
@@ -55,69 +54,26 @@ class SshMultiplexedSession {
 
     private Credential credential;
 
-    private String user;
-    private String host;
-    private int port;
-
+    private SshLocation location;
+    private SshLocation gatewayLocation;
+    
     private SshSession gatewaySession;
-    private URI gatewayURI;
 
     private int nextSessionID = 0;
 
     private List<SshSession> sessions = new ArrayList<>();
 
-    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, String location, Credential cred, OctopusProperties properties)
+    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation location, Credential cred, OctopusProperties properties)
             throws OctopusException, OctopusIOException {
 
         LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
 
         this.jsch = jsch;
+        this.location = location;
         this.properties = properties;
+        
         credential = cred;
-
-        // Parse the location
-        String tmpLocation = location;
         
-        int index = tmpLocation.indexOf('@');
-        
-        if (index == 0) { 
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid user: " + location);
-        }
-        
-        if (index > 0) { 
-            user = tmpLocation.substring(0, index);
-            tmpLocation = tmpLocation.substring(index+1);
-        } 
-        
-        index = tmpLocation.indexOf(':');
-        
-        if (index >= 0) {
-            
-            if (tmpLocation.length() < index+1) { 
-                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid port: " + location);
-            }
-            
-            String portAsString = tmpLocation.substring(index+1);
-            
-            if (portAsString.length() == 0) {
-                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid port: " + location);
-            }
-            
-            try { 
-                port = Integer.valueOf(portAsString);
-            } catch (NumberFormatException e) { 
-                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid port: " + location, e);
-            }
-            
-            tmpLocation = tmpLocation.substring(0, index);
-        }
-
-        if (tmpLocation.length() == 0) { 
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse SSH location! Invalid host: " + location);
-        }
-        
-        host = tmpLocation;
-
         if (credential == null) {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");
         }
@@ -135,22 +91,14 @@ class SshMultiplexedSession {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
         }
 
-        if (port <= 0) {
-            port = SshAdaptor.DEFAULT_PORT;
-        }
-
-        if (host == null) {
-            host = "localhost";
-        }
-
         String credentialUserName = ((CredentialImplementation) credential).getUsername();
 
-        if (user == null) {
-            user = credentialUserName;
-        }
-
-        if (user == null) {
-            throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in URI or credential.");
+        if (location.getUser() == null) { 
+            if (credentialUserName == null) { 
+                throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in location or credential.");
+            }
+        
+            location = new SshLocation(credentialUserName, location.getHost(), location.getPort());
         }
 
         LOGGER.debug("Checking property: " + SshAdaptor.GATEWAY);
@@ -158,38 +106,19 @@ class SshMultiplexedSession {
         if (properties.propertySet(SshAdaptor.GATEWAY)) {
 
             try {
-                gatewayURI = new URI(properties.getStringProperty(SshAdaptor.GATEWAY));
-            } catch (URISyntaxException e) {
+                gatewayLocation = SshLocation.parse(properties.getStringProperty(SshAdaptor.GATEWAY));
+            } catch (InvalidLocationException e) {
                 throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to parse gateway URI!", e);
             }
 
-            connectToGateway();
+            if (gatewayLocation.getUser() == null) { 
+                gatewayLocation = new SshLocation(location.getUser(), gatewayLocation.getHost(), gatewayLocation.getPort());
+            }
+
+            gatewaySession = createSession(jsch, -1, gatewayLocation, credential, null, null, properties);
         }
 
         createSession();
-    }
-
-    private synchronized void connectToGateway() throws OctopusException, OctopusIOException {
-
-        String gatewayUser = gatewayURI.getUserInfo();
-
-        if (gatewayUser == null) {
-            gatewayUser = user;
-        }
-
-        String gatewayHost = gatewayURI.getHost();
-
-        if (gatewayHost == null) {
-            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Gateway URI does not contain hostname: " + gatewayURI);
-        }
-
-        int gatewayPort = gatewayURI.getPort();
-
-        if (port <= 0) {
-            port = SshAdaptor.DEFAULT_PORT;
-        }
-
-        gatewaySession = createSession(jsch, -1, gatewayUser, credential, gatewayHost, gatewayPort, null, null, properties);
     }
 
     private synchronized SshSession findSession(Channel c) throws OctopusIOException {
@@ -214,35 +143,33 @@ class SshMultiplexedSession {
     }
 
     private synchronized SshSession createSession() throws OctopusIOException, OctopusException {
-        SshSession s = createSession(jsch, nextSessionID++, user, credential, host, port, gatewaySession, gatewayURI, properties);
+        SshSession s = createSession(jsch, nextSessionID++, location, credential, gatewaySession, gatewayLocation, properties);
         sessions.add(s);
         return s;
     }
 
-    private static synchronized SshSession createSession(JSch jsch, int sessionID, String user, Credential credential,
-            String host, int port, SshSession gateway, URI gatewayURI, OctopusProperties properties) throws OctopusIOException,
-            OctopusException {
+    private static synchronized SshSession createSession(JSch jsch, int sessionID, SshLocation location, Credential credential,
+            SshSession gateway, SshLocation gatewayLocation, OctopusProperties properties) throws OctopusIOException, 
+                OctopusException {
 
-        String sessionHost = host;
-        int sessionPort = port;
+        String sessionHost = location.getHost();
+        int sessionPort = location.getPort();
         int tunnelPort = -1;
 
-        LOGGER.debug("SSHSESSION: Creating new session to " + user + "@" + host + ":" + port);
+        LOGGER.debug("SSHSESSION: Creating new session to " + location);
 
         if (gateway != null) {
-            LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayURI);
+            LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayLocation);
 
-            tunnelPort = gateway.addTunnel(0, host, port);
+            tunnelPort = gateway.addTunnel(0, location.getHost(), location.getPort());
             sessionPort = tunnelPort;
             sessionHost = "localhost";
-
-            LOGGER.debug("SSHSESSION: Rerouting session via " + user + "@" + sessionHost + ":" + sessionPort);
         }
 
         Session session = null;
 
         try {
-            session = jsch.getSession(user, sessionHost, sessionPort);
+            session = jsch.getSession(location.getUser(), sessionHost, sessionPort);
         } catch (JSchException e) {
             throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
         }

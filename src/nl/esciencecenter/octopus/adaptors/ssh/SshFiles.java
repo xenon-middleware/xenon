@@ -161,11 +161,12 @@ public class SshFiles implements Files {
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws OctopusException, OctopusIOException {
 
-        //adaptor.checkPath(location, "filesystem");
+        SshLocation sshLocation = SshLocation.parse(location);
+        
+        OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
+                properties);
 
-        OctopusProperties octopusProperties = new OctopusProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
-
-        SshMultiplexedSession session = adaptor.createNewSession(location, credential, octopusProperties);
+        SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, octopusProperties);
 
         return newFileSystem(session, scheme, location, credential, octopusProperties);
     }

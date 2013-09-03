@@ -39,14 +39,6 @@ public class SSHJobTestConfig extends JobTestConfig {
     private String username;
     private char[] passwd;
 
-//    private URI correctURI;
-//    private URI correctURIWithPath;
-//    private URI correctFSURI;
-//
-//    private URI wrongUserURI;
-//    private URI wrongLocationURI;
-//    private URI wrongPathURI;
-
     private String scheme = "ssh";
     
     private String correctLocation;
@@ -74,20 +66,11 @@ public class SSHJobTestConfig extends JobTestConfig {
         String location = getPropertyOrFail(p, "test.ssh.location");
 
         String wrongUser = getPropertyOrFail(p, "test.ssh.user.wrong");
-        String wrongLocation = getPropertyOrFail(p, "test.ssh.location.wrong");
+        String wrongLoc = getPropertyOrFail(p, "test.ssh.location.wrong");
 
         correctLocation = username + "@" + location;
         correctLocationWrongUser =  wrongUser + "@" + location;
-        wrongLocation = username + "@" + wrongLocation;
-        
-//        
-//        
-//        correctURI = new URI("ssh://" + username + "@" + location);
-//        correctFSURI = new URI("sftp://" + username + "@" + location);
-//        correctURIWithPath = new URI("ssh://" + username + "@" + location + "/");
-//        wrongUserURI = new URI("ssh://" + wrongUser + "@" + location);
-//        wrongLocationURI = new URI("ssh://" + username + "@" + wrongLocation);
-//        wrongPathURI = new URI("ssh://" + username + "@" + location + "/aap/noot");
+        wrongLocation = username + "@" + wrongLoc;
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {

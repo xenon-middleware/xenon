@@ -100,15 +100,15 @@ public class SshJobs implements Jobs {
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws OctopusException, OctopusIOException {
 
-//        adaptor.checkPath(location, "scheduler");
-
+        SshLocation sshLocation = SshLocation.parse(location);
+        
         String uniqueID = getNewUniqueID();
 
         LOGGER.debug("Starting ssh scheduler with properties {}", properties);
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
-        SshMultiplexedSession session = adaptor.createNewSession(location, credential, p);
+        SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, p);
 
         SchedulerImplementation scheduler = new SchedulerImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, scheme, location,
                 new String[] { "single", "multi", "unlimited" }, credential, p, true, true, true);

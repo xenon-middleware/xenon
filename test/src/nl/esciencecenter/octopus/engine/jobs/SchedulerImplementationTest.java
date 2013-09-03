@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.engine.jobs;
 
 import static org.junit.Assert.*;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -75,8 +74,8 @@ public class SchedulerImplementationTest {
         System.err.println("SI: " + si.toString());
 
         assertTrue(si.toString().equals(
-                "SchedulerImplementation [uniqueID=id1, adaptorName=test, uri=test:///, properties={},"
-                        + " queueNames=[aap, noot], isOnline=true, supportsInteractive=true, supportsBatch=true]"));
+                "SchedulerImplementation [uniqueID=id1, adaptorName=test, scheme=test, location=, properties={}, " +
+                "queueNames=[aap, noot], isOnline=true, supportsInteractive=true, supportsBatch=true]"));
     }
 
     @org.junit.Test

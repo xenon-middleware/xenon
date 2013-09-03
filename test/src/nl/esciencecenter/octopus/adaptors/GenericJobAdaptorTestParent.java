@@ -181,11 +181,16 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.newScheduler(null, null, null, null);
     }
 
-    @Test(expected = InvalidLocationException.class)
+    @Test
     public void test01a_newScheduler() throws Exception {
-        if (!config.supportsNullLocation()) { 
-            Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
-            jobs.close(s);
+        if (!config.supportsNullLocation()) {
+            try { 
+                Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
+                jobs.close(s);
+                fail("Expected InvalidLocationException");                
+            } catch (InvalidLocationException e) { 
+                // expected
+            }
         }
     }
 

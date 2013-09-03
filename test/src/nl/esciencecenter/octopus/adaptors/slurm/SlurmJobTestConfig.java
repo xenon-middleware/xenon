@@ -81,7 +81,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
         String location = getPropertyOrFail(p, "test.slurm.location");
 
         String wrongUser = getPropertyOrFail(p, "test.slurm.user.wrong");
-        String wrongLocation = getPropertyOrFail(p, "test.slurm.location.wrong");
+        String wrongLoc = getPropertyOrFail(p, "test.slurm.location.wrong");
 
         defaultQueue = getPropertyOrFail(p, "test.slurm.default.queue");
         String queueList = getPropertyOrFail(p, "test.slurm.queues");
@@ -91,7 +91,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.update.time"));
 
         correctLocation = username + "@" + location;
-        wrongLocation = username + "@" + wrongLocation;
+        wrongLocation = username + "@" + wrongLoc;
         correctLocationWrongUser = wrongUser + "@" + location;
         
 //        correctURI = new URI("slurm://" + username + "@" + location);

@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.net.URI;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,6 @@ import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
 import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
 import nl.esciencecenter.octopus.exceptions.EndOfFileException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
 import nl.esciencecenter.octopus.exceptions.NotConnectedException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -171,26 +169,7 @@ public class SshAdaptor extends Adaptor {
             }
         }
     }
-
-    void checkURI(URI location) throws InvalidLocationException {
-        if (!supports(location.getScheme())) {
-            throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "SSH adaptor does not support scheme "
-                    + location.getScheme());
-        }
-    }
-
-    void checkPath(URI location, String adaptor) throws InvalidLocationException {
-
-        String path = location.getPath();
-
-        if (path == null || path.length() == 0 || path.equals("/")) {
-            return;
-        }
-
-        throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, "Cannot create SSH " + adaptor + " with path (URI="
-                + location.getScheme() + ")");
-    }
-
+   
     @Override
     public OctopusPropertyDescription[] getSupportedProperties() {
         return VALID_PROPERTIES.asArray();
@@ -278,7 +257,7 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected SshMultiplexedSession createNewSession(String location, Credential credential, OctopusProperties properties)
+    protected SshMultiplexedSession createNewSession(SshLocation location, Credential credential, OctopusProperties properties)
             throws OctopusException, OctopusIOException {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }

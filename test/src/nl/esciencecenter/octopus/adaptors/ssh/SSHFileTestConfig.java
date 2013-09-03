@@ -63,10 +63,10 @@ public class SSHFileTestConfig extends FileTestConfig {
         String location = getPropertyOrFail(p, "test.ssh.location");
 
         String wrongUser = getPropertyOrFail(p, "test.ssh.user.wrong");
-        String wrongLocation = getPropertyOrFail(p, "test.ssh.location.wrong");
+        String wrongLoc = getPropertyOrFail(p, "test.ssh.location.wrong");
 
         correctLocation = username + "@" + location;
-        wrongLocation = username + "@" + wrongLocation;
+        wrongLocation = username + "@" + wrongLoc;
         correctLocationWrongUser = wrongUser + "@" + location;
 //        
 //        
