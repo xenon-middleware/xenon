@@ -80,7 +80,8 @@ class BatchProcess implements Process {
 
         if (stdin == null) {
             stdinForwarder = null;
-            streams.getStdin().close();
+            // NOTE: Retrieving this stream and closing it may cause some Windows applications to exit! 
+            // streams.getStdin().close();
         } else {
             stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin());
         }

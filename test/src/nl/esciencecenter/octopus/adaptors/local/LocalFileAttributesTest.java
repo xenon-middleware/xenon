@@ -26,9 +26,7 @@ import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
@@ -50,7 +48,7 @@ public class LocalFileAttributesTest {
     public void testNonExistingFile() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, FileUtils.getLocalCWD(files), "noot.txt");
+        Path path = resolve(files, FileUtils.getLocalCWD(files), "noot" + System.currentTimeMillis() + ".txt");
         new LocalFileAttributes(path);
     }
 
@@ -58,10 +56,11 @@ public class LocalFileAttributesTest {
     public void testCreationTime() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, FileUtils.getLocalCWD(files), "aap.txt");
-
+        
         long now = System.currentTimeMillis();
 
+        Path path = resolve(files, FileUtils.getLocalCWD(files), "aap" + now + ".txt");
+        
         files.createFile(path);
 
         FileAttributes att = new LocalFileAttributes(path);
@@ -82,7 +81,10 @@ public class LocalFileAttributesTest {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         Path path = resolve(files, FileUtils.getLocalCWD(files), "aap.txt");
-        files.createFile(path);
+        
+        if (!files.exists(path)) { 
+            files.createFile(path);
+        }
 
         FileAttributes att = new LocalFileAttributes(path);
 
@@ -96,13 +98,27 @@ public class LocalFileAttributesTest {
 
     @org.junit.Test
     public void testEquals() throws Exception {
+        
+        if (FileUtils.isWindows()) { 
+            return;
+        }
+        
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
         Path cwd = FileUtils.getLocalCWD(files);
         Path path1 = resolve(files, cwd, "aap.txt");
+
+        if (files.exists(path1)) { 
+            files.delete(path1);
+        }
+
         files.createFile(path1);
         Path path2 = resolve(files, cwd, "noot.txt");
         
+        if (files.exists(path2)) { 
+            files.delete(path2);
+        }
+
         files.createFile(path2);
 
         files.setPosixFilePermissions(path1, LocalUtils.octopusPermissions(PosixFilePermissions.fromString("rwxr--r--")));

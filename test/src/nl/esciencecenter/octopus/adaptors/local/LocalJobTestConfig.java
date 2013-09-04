@@ -124,4 +124,10 @@ public class LocalJobTestConfig extends JobTestConfig {
     public boolean supportsNullLocation() {
         return true;
     }
+    
+    @Override
+    public boolean targetIsWindows() {
+        return FileUtils.isWindows();
+    }
+
 }

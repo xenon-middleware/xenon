@@ -28,7 +28,7 @@ import nl.esciencecenter.octopus.jobs.Streams;
  */
 public class StreamsImplementation implements Streams {
 
-    private Job job;
+    private final Job job;
 
     private InputStream stdout;
 
@@ -54,7 +54,7 @@ public class StreamsImplementation implements Streams {
         this.stdin = stdin;
         this.stderr = stderr;
     }
-
+    
     /**
      * Get the job for which this Streams was created.
      * 

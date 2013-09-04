@@ -208,4 +208,9 @@ public class SSHJobTestConfig extends JobTestConfig {
     public boolean supportsNullLocation() {
         return false;
     }
+
+    @Override
+    public boolean targetIsWindows() {
+        return false;
+    }
 }

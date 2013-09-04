@@ -110,8 +110,8 @@ public class RealSandboxTest {
 
         String sandboxPath = sandbox.getPath().getRelativePath().getAbsolutePath();
         String tmp = testDir.getRelativePath().getAbsolutePath();
-
-        assertTrue(sandboxPath.startsWith(tmp + "/octopus_sandbox_"));
+        
+        assertTrue(sandboxPath.startsWith(tmp + testDir.getRelativePath().getSeparator() + "octopus_sandbox_"));
     }
 
     @Test

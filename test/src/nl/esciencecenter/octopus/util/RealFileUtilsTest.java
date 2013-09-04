@@ -33,7 +33,6 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,7 +40,7 @@ import org.junit.Test;
 
 public class RealFileUtilsTest {
 
-    public static String ROOT = "/tmp/octopus_RealFileUtilsTest_" + System.currentTimeMillis();
+    public static String ROOT = "octopus_RealFileUtilsTest_" + System.currentTimeMillis();
 
     public static Octopus octopus;
     public static Files files;
@@ -55,9 +54,12 @@ public class RealFileUtilsTest {
         octopus = OctopusFactory.newOctopus(null);
 
         files = octopus.files();
-        fileSystem = FileUtils.getLocalCWD(files).getFileSystem();
+        
+        Path cwd = FileUtils.getLocalCWD(files);
+        
+        fileSystem = cwd.getFileSystem();
 
-        testDir = files.newPath(fileSystem, new RelativePath(ROOT));
+        testDir = files.newPath(fileSystem, cwd.getRelativePath().resolve(ROOT));
         files.createDirectory(testDir);
     }
 

@@ -41,6 +41,8 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
  * Various file utilities implemented on top of the Octopus API.
@@ -52,15 +54,21 @@ import nl.esciencecenter.octopus.files.RelativePath;
  */
 public final class FileUtils {
 
+    /** Name of this class (used in Exceptions) */
     private static final String NAME = "FileUtils";
     
-    public static final int BUFFER_SIZE = 10240;
+    /** The default buffer size to use for copy operations */
+    public static final int BUFFER_SIZE = 16*1024;
 
     private FileUtils() { 
         // DO NOT USE
     }
     
-    private static void close(Closeable c) {
+    /** 
+     * Close a <code>Closable</code> and ignore any exceptions thrown. 
+     * @param c the <code>Closable</code> to close.
+     */
+    public static void close(Closeable c) {
 
         try {
             if (c != null) {
@@ -71,7 +79,17 @@ public final class FileUtils {
         }
     }
 
-    private static OpenOption[] openOptionsForWrite(boolean truncate) {
+    /**
+     * Return an {@link OpenOption} array containing all options needed to open a file for writing. 
+     *   
+     * The <code>truncate</code> parameter determines if an existing file will be truncated or appended. 
+     *   
+     * @param truncate 
+     *          Should an existing file be truncated ?
+     * @return
+     *          An {@link OpenOption} array containing all options needed to open a file for writing.  
+     */    
+    public static OpenOption[] openOptionsForWrite(boolean truncate) {
         if (truncate) {
             return new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE };
         } else {
@@ -79,6 +97,14 @@ public final class FileUtils {
         }
     }
 
+    /**
+     * Return the home directory of the current user as a String.
+     * 
+     * @return the home directory of the current user.
+     * 
+     * @throws OctopusIOException
+     *          If the home directory could not be retrieved. 
+     */
     public static String getHome() throws OctopusIOException { 
         String home = System.getProperty("user.home");
         
@@ -88,7 +114,15 @@ public final class FileUtils {
 
         return home;        
     }
-    
+
+    /**
+     * Return the current working directory as a String.
+     * 
+     * @return the current working directory.
+     * 
+     * @throws OctopusIOException
+     *          If the current working directory could not be retrieved. 
+     */
     public static String getCWD() throws OctopusIOException { 
         String cwd = System.getProperty("user.dir");
         
@@ -99,45 +133,80 @@ public final class FileUtils {
         return cwd;        
     }
     
-    public static String getRoot(String absolutePath) throws OctopusException { 
+    /**
+     * Return the locally valid root element of an <code>String</code> representation of an absolute path.
+     * 
+     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an 
+     * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception 
+     * on Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.   
+     * 
+     * @param path
+     *          The absolute path for which to determine the root element.
+     * @return 
+     *          The locally valid root element.
+     * @throws OctopusException
+     *          If the provided <code>path</code> is not absolute, or does not contain a locally valid root. 
+     */
+    public static String getLocalRoot(String path) throws OctopusException { 
         
         if (isWindows()) { 
-            if (absolutePath != null && absolutePath.length() >= 2 && (absolutePath.charAt(1) == ':') && 
-                    Character.isLetter(absolutePath.charAt(0))) { 
-                return absolutePath.substring(0, 2).toUpperCase();
+            if (path != null && path.length() >= 2 && (path.charAt(1) == ':') && 
+                    Character.isLetter(path.charAt(0))) { 
+                return path.substring(0, 2).toUpperCase();
             }
             
-            throw new OctopusException(NAME, "Path is not absolute! " + absolutePath);
+            throw new OctopusException(NAME, "Path is not absolute! " + path);
         }
         
-        if (absolutePath != null && absolutePath.length() >= 1 && (absolutePath.charAt(0) == '/')) { 
+        if (path != null && path.length() >= 1 && (path.charAt(0) == '/')) { 
             return "/";
         }
             
-        throw new OctopusException(NAME, "Path is not absolute! " + absolutePath);
+        throw new OctopusException(NAME, "Path is not absolute! " + path);
     }
     
+    /**
+     * Returns if we are currently running on Windows. 
+     * 
+     * @return if we are currently running on Window.
+     */
     public static boolean isWindows() { 
         String os = System.getProperty("os.name");
         return (os != null && os.startsWith("Windows"));
     }
     
+    /**
+     * Returns if we are currently running on OSX. 
+     * 
+     * @return if we are currently running on OSX.
+     */
     public static boolean isOSX() { 
         String os = System.getProperty("os.name");
         return (os != null && os.equals("MacOSX"));
     }
-    
+
+    /**
+     * Returns if we are currently running on Linux. 
+     * 
+     * @return if we are currently running on Linux.
+     */
     public static boolean isLinux() { 
         String os = System.getProperty("os.name");
         return (os != null && os.equals("Linux"));
     }
     
     /**
-     * Check is a location is a valid windows root such as "C:". 
-     * @param root the root to check. 
-     * @return if the location is a valid windows root.
+     * Check if <code>root</code> only contains a valid Windows root element such as "C:".
+     *
+     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.  
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
+     *  
+     * @param root 
+     *          The root to check.
+     * @return 
+     *          If <code>root</code> only contains a valid Windows root element.
      */
-    private static boolean isWindowsRoot(String root) {
+    public static boolean isWindowsRoot(String root) {
         
         if (root == null) { 
             return false;
@@ -154,19 +223,74 @@ public final class FileUtils {
         return false;
     }
 
-    private static boolean isLinuxRoot(String root) {
+    /**
+     * Check if <code>root</code> only contains a valid Linux root element, which is "/".
+     *
+     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.  
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
+     *  
+     * @param root 
+     *          The root to check.
+     * @return 
+     *          If <code>root</code> only contains a valid Linux root element.
+     */
+    public static boolean isLinuxRoot(String root) {
         return (root != null && root.equals("/"));
     }
     
-    public static boolean isLocalRoot(String location) {
-        
-        if (isWindows()) { 
-            return isWindowsRoot(location);
-        }
-        
-        return isLinuxRoot(location);
+    /**
+     * Check if <code>root</code> contains a valid OSX root element, which is "/".
+     *
+     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
+     *  
+     * @param root 
+     *          The root to check.
+     * @return 
+     *          If <code>root</code> only contains a valid OSX root element.
+     */
+    public static boolean isOSXRoot(String root) {
+        return (root != null && root.equals("/"));
     }
     
+    /**
+     * Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.
+     *
+     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
+     *  
+     * Note that the result of this method depends on the OS the application is running on.
+     *
+     * @param root 
+     *          The root to check.
+     * @return 
+     *          If <code>root</code> only contains a valid OSX root element.
+     */
+    public static boolean isLocalRoot(String root) {
+        
+        if (isWindows()) { 
+            return isWindowsRoot(root);
+        }
+        
+        return isLinuxRoot(root);
+    }
+
+    /**
+     * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
+     * represents the part of <code>path</code> that is realtive to the <code>root</code>.
+     * 
+     * For example, if "C:\dir\file" is provided as <code>path</code> and "C:" as <code>root</code>, a <code>RelativePath</code>
+     * will be returned that represents "dir\file".
+     * 
+     * @param path
+     *          The absolute path.
+     * @param root
+     *          The root element. 
+     * @return
+     *          A <code>RelativePath</code> that contains the part of <code>path</code> that is relative to <code>root</code>.
+     * @throws OctopusException
+     *          If the <code>path</code> does not start with <code>root</code>.
+     */
     public static RelativePath getRelativePath(String path, String root) throws OctopusException {
         
         if (!path.startsWith(root)) { 
@@ -180,6 +304,12 @@ public final class FileUtils {
         return new RelativePath(getLocalSeparator(), path.substring(root.length()));
     }
 
+    /**
+     * Returns the local file system path separator character.
+     *  
+     * @return
+     *          The local file system path separator character. 
+     */    
     public static char getLocalSeparator() {
         return File.separatorChar;
     }
@@ -203,7 +333,7 @@ public final class FileUtils {
      *          If the creation of the FileSystem failed.
      */
     public static Path fromLocalPath(Files files, String path) throws OctopusException, OctopusIOException { 
-        String root = getRoot(path);
+        String root = getLocalRoot(path);
         FileSystem fs = files.newFileSystem("file", root, null, null);
         return files.newPath(fs, getRelativePath(path, root));
     }
@@ -276,6 +406,44 @@ public final class FileUtils {
         return result;
     }
     
+    /**
+     * Returns a <code>Scheduler</code> that can be used to run jobs locally. 
+     * 
+     * @param jobs
+     *          the <code>Jobs</code> to use to instantiate the scheduler. 
+     * @return
+     *          the local <code>Scheduler</code>.
+     *          
+     * @throws OctopusIOException
+     *          If an I/O error occurred
+     * @throws OctopusException
+     *          If the creation of the Scheduler failed. 
+     */
+    public static Scheduler getLocalScheduler(Jobs jobs) throws OctopusIOException, OctopusException { 
+        return jobs.newScheduler("local", null, null, null);
+    }
+    
+    /**
+     * Create a <code>Scheduler</code> for the given scheme, but without using a location, credential, or properties. 
+     * 
+     * This methods is a shortcut for calling {@link Jobs.newScheduler(String, String, Credential, Map)} with only the 
+     * <code>scheme</code> set. 
+     * 
+     * @param jobs
+     *          the <code>Jobs</code> to use to instantiate the scheduler. 
+     * @param scheme
+     *          the scheme to use to access the scheduler.
+     * @return
+     *          the local <code>Scheduler</code>.
+     *          
+     * @throws OctopusIOException
+     *          If an I/O error occurred
+     * @throws OctopusException
+     *          If the creation of the Scheduler failed. 
+     */
+    public static Scheduler newScheduler(Jobs jobs, String scheme) throws OctopusIOException, OctopusException { 
+        return jobs.newScheduler("local", null, null, null);
+    }
     
     /**
      * Copies all bytes from an input stream to a file.

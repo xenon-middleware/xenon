@@ -63,6 +63,7 @@ public abstract class JobTestConfig extends GenericTestConfig {
     public abstract boolean supportsParallelJobs();
     
     public abstract boolean supportsNullLocation();
-    
+
+    public abstract boolean targetIsWindows();
     
 }

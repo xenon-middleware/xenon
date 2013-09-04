@@ -269,4 +269,9 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     public boolean supportsNullLocation() {
         return true;
     }
+    
+    @Override
+    public boolean targetIsWindows() {
+        return false;
+    }
 }

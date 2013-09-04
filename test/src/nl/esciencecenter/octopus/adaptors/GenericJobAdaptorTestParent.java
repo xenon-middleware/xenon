@@ -18,6 +18,8 @@ package nl.esciencecenter.octopus.adaptors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -53,6 +55,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -635,8 +638,13 @@ public abstract class GenericJobAdaptorTestParent {
             String message = "Hello World! test30";
 
             JobDescription description = new JobDescription();
-            description.setExecutable("/bin/echo");
-            description.setArguments("-n", message);
+            
+            if (config.targetIsWindows()) { 
+                description.setExecutable("hostname");
+            } else { 
+                description.setExecutable("/bin/echo");
+                description.setArguments("-n", message);
+            }
             description.setInteractive(true);
 
             System.err.println("Submitting interactive job to " + scheduler.getScheme() + "://" + scheduler.getLocation());
@@ -662,7 +670,15 @@ public abstract class GenericJobAdaptorTestParent {
                 throw new Exception("Job failed!", status.getException());
             }
 
-            assertTrue(out.equals(message));
+            assertNotNull(out);
+            assertNotNull(err);
+            
+            if (config.targetIsWindows()) { 
+                assertTrue(out.length() > 0);
+            } else { 
+                assertTrue(out.equals(message));
+            }
+            
             assertTrue(err.length() == 0);
         }
 
@@ -681,8 +697,13 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/echo");
-        description.setArguments("-n", message);
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("hostname");
+        } else { 
+            description.setExecutable("/bin/echo");
+            description.setArguments("-n", message);
+        }
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
@@ -730,8 +751,13 @@ public abstract class GenericJobAdaptorTestParent {
         System.err.println("STDERR: " + tmperr);
 
         assertTrue(tmpout != null);
-        assertTrue(tmpout.length() > 0);
-        assertTrue(tmpout.equals(message));
+
+        if (config.targetIsWindows()) { 
+            assertTrue(tmpout.length() > 0);
+        } else { 
+            assertTrue(tmpout.equals(message));
+        }
+
         assertTrue(tmperr.length() == 0);
     }
 
@@ -749,8 +775,14 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/echo");
-        description.setArguments("-n", message);
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("hostname");
+        } else { 
+            description.setExecutable("/bin/echo");
+            description.setArguments("-n", message);
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
@@ -784,9 +816,15 @@ public abstract class GenericJobAdaptorTestParent {
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
 
-        assertTrue(tmpout != null);
-        assertTrue(tmpout.length() > 0);
-        assertTrue(tmpout.equals(message));
+        assertNotNull(tmpout);
+        assertNotNull(tmperr);
+        
+        if (config.targetIsWindows()) { 
+            assertTrue(tmpout.length() > 0);
+        } else { 
+            assertTrue(tmpout.equals(message));
+        }
+
         assertTrue(tmperr.length() == 0);
         
         files.delete(out);
@@ -822,8 +860,15 @@ public abstract class GenericJobAdaptorTestParent {
             err[i] = resolve(root, "stderr" + i + ".txt");
 
             JobDescription description = new JobDescription();
-            description.setExecutable("/bin/sleep");
-            description.setArguments("1");
+            
+            if (config.targetIsWindows()) { 
+                description.setExecutable("ping");
+                description.setArguments("-n", "2", "127.0.0.1");
+            } else { 
+                description.setExecutable("/bin/sleep");
+                description.setArguments("1");
+            }
+            
             description.setWorkingDirectory(workingDir);
 
             description.setQueueName(queueName);
@@ -880,7 +925,10 @@ public abstract class GenericJobAdaptorTestParent {
             String tmperr = readFully(files.newInputStream(err[i]));
 
             assertTrue(tmpout != null);
-            assertTrue(tmpout.length() == 0);
+            
+            if (!config.targetIsWindows()) {
+                assertTrue(tmpout.length() == 0);
+            }
 
             assertTrue(tmperr != null);
             assertTrue(tmperr.length() == 0);
@@ -925,8 +973,15 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("60");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "61", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("60");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
@@ -983,8 +1038,15 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("60");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "61", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("60");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin(null);
@@ -1052,7 +1114,13 @@ public abstract class GenericJobAdaptorTestParent {
         writeFully(out, message);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/cat");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("c:\\Windows\\System32\\more.com");
+        } else { 
+            description.setExecutable("/bin/cat");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
@@ -1090,7 +1158,14 @@ public abstract class GenericJobAdaptorTestParent {
 
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
-        assertTrue(tmpout.equals(message));
+        
+        if (config.targetIsWindows()) { 
+            // Windows more.com tends to add whitespace at the end!
+            assertTrue(tmpout.startsWith(message));
+        } else { 
+            assertTrue(tmpout.equals(message));
+        }
+        
         assertTrue(tmperr.length() == 0);
     }
 
@@ -1113,7 +1188,13 @@ public abstract class GenericJobAdaptorTestParent {
         writeFully(out, message);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/cat");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("c:\\Windows\\System32\\more.com");
+        } else { 
+            description.setExecutable("/bin/cat");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
@@ -1155,7 +1236,14 @@ public abstract class GenericJobAdaptorTestParent {
 
         assertTrue(tmpout != null);
         assertTrue(tmpout.length() > 0);
-        assertTrue(tmpout.equals(message));
+        
+        if (config.targetIsWindows()) { 
+            // Windows more.com tends to add whitespace at the end!
+            assertTrue(tmpout.startsWith(message));
+        } else { 
+            assertTrue(tmpout.equals(message));
+        }
+        
         assertTrue(tmperr.length() == 0);
     }
 
@@ -1164,8 +1252,15 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(null);
         description.setStdout(null);
@@ -1196,8 +1291,15 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
         description.setStdout(null);
         description.setStderr(null);
@@ -1232,14 +1334,21 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
         description.setStdout(null);
         description.setStderr(null);
 
         //absolute working dir name used
-        description.setWorkingDirectory(root.getRelativePath().getAbsolutePath());
+        description.setWorkingDirectory(workingDir);
 
         Job job = jobs.submitJob(scheduler, description);
         JobStatus status = jobs.waitUntilDone(job, 60000);
@@ -1265,8 +1374,15 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
         description.setStdout(null);
         description.setStderr(null);
@@ -1311,8 +1427,15 @@ public abstract class GenericJobAdaptorTestParent {
         files.createDirectories(root);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
         description.setStdout(null);
         description.setStderr(null);
@@ -1354,7 +1477,13 @@ public abstract class GenericJobAdaptorTestParent {
         writeFully(out, message);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/cat");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("c:\\Windows\\System32\\more.com");
+        } else { 
+            description.setExecutable("/bin/cat");
+        }
+
         description.setInteractive(false);
         description.setProcessesPerNode(2);
         description.setWorkingDirectory(workingDir);
@@ -1384,7 +1513,14 @@ public abstract class GenericJobAdaptorTestParent {
 
             assertTrue(tmpout != null);
             assertTrue(tmpout.length() > 0);
-            assertTrue(tmpout.equals(message));
+            
+            if (config.targetIsWindows()) { 
+                // Windows more.com tends to add whitespace at the end!
+                assertTrue(tmpout.startsWith(message));
+            } else { 
+                assertTrue(tmpout.equals(message));
+            }
+            
             assertTrue(tmperr.length() == 0);
 
             files.delete(stdoutTmp);
@@ -1411,8 +1547,15 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(null);
 
@@ -1421,8 +1564,15 @@ public abstract class GenericJobAdaptorTestParent {
         j[0] = jobs.submitJob(scheduler, description);
 
         description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("2");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "3", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("2");
+        }
+
         description.setInteractive(false);
         description.setWorkingDirectory(null);
 
@@ -1463,8 +1613,15 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/sleep");
-        description.setArguments("1");
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("ping");
+            description.setArguments("-n", "2", "127.0.0.1");
+        } else { 
+            description.setExecutable("/bin/sleep");
+            description.setArguments("1");
+        }
+
         description.setInteractive(false);
 
         description.setWorkingDirectory(null);
@@ -1495,8 +1652,16 @@ public abstract class GenericJobAdaptorTestParent {
 
         //run an ls with a non existing file. This should make ls return exitcode 2
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/ls");
-        description.setArguments("non.existing.file");
+        
+        if (config.targetIsWindows()) { 
+            // Will always exit! 
+            description.setExecutable("timeout");
+            description.setArguments("1");
+        } else { 
+            description.setExecutable("/bin/cat");
+            description.setArguments("non.existing.file");
+        }
+
         description.setInteractive(false);
 
         description.setWorkingDirectory(null);
@@ -1517,13 +1682,19 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        assertTrue(status.getExitCode() == 2);
+        System.out.println("EXIT test40: " + status.getExitCode());
+        
+        assertTrue(status.getExitCode() != 0);
     }
 
     @org.junit.Test
     public void test41_batchJobSubmitWithEnvironmentVariable() throws Exception {
 
         if (!config.supportsEnvironmentVariables()) {
+            return;
+        }
+        
+        if (config.targetIsWindows()) { 
             return;
         }
 
@@ -1574,6 +1745,10 @@ public abstract class GenericJobAdaptorTestParent {
     public void test41b_batchJobSubmitWithEnvironmentVariable() throws Exception {
 
         if (config.supportsEnvironmentVariables()) {
+            return;
+        }
+        
+        if (config.targetIsWindows()) { 
             return;
         }
 

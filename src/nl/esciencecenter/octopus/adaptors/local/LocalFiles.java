@@ -286,7 +286,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
-        String root = FileUtils.getRoot(location);
+        String root = FileUtils.getLocalRoot(location);
         RelativePath relativePath = FileUtils.getRelativePath(location, root);
         
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, root,  
