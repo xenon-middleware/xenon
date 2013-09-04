@@ -75,38 +75,20 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         return fsID++;
     }
 
-//    private final Path cwd;
-//    private final Path home;
-
     public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) throws OctopusException {
         this.localAdaptor = localAdaptor;
         this.copyEngine = copyEngine;
-
-//        try {          
-//            String cwdPath = LocalUtils.getCWD();
-//            String root = LocalUtils.getRoot(cwdPath);
-//            
-//            RelativePath cwdRelativePath = LocalUtils.getRelativePath(cwdPath, root);
-//            
-//            cwd = new PathImplementation(new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
-//                    "file", root, cwdRelativePath, null, null), cwdRelativePath);
-//        } catch (OctopusIOException e) {
-//            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create current working dir filesystem!", e);
-//        }
-//        
-//        try {
-//            String homePath = LocalUtils.getHome();
-//            String root = LocalUtils.getRoot(homePath);
-//            
-//            RelativePath homeRelativePath = LocalUtils.getRelativePath(homePath, root);
-//            
-//            home = new PathImplementation(new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), 
-//                    "file", LocalUtils.getDefaultRoot(), homeRelativePath, null, null), homeRelativePath);
-//        } catch (OctopusIOException e) {
-//            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create home filesystem!", e);
-//        }
     }
 
+    /**
+     * Check if a parent directory exists and throw an exception if this is not the case.  
+     *  
+     * @param path the path of which the parent must be checked. 
+     *
+     * @throws OctopusIOException
+     *          If the parent does not exist. 
+     *  
+     */
     private void checkParent(Path path) throws OctopusIOException {
         
         RelativePath parentName = path.getRelativePath().getParent();
@@ -392,22 +374,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusIOException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
-//    
-//    @Override 
-//    public Path getLocalCWD() throws OctopusException { 
-//        return cwd;
-//    }
-//
-//    @Override
-//    public Path getLocalHome() throws OctopusException { 
-//        return home;
-//    }
-    
-//    @Override
-//    public FileSystem [] getLocalFileSystems() throws OctopusException { 
-//        // TODO: implement!
-//        return null;
-//    }
        
     @Override
     public Copy copy(Path source, Path target, CopyOption... options) throws OctopusIOException,

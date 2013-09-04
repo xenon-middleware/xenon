@@ -211,24 +211,6 @@ public class FilesEngine implements Files {
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
         getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
     }
-
-//    @Override
-//    public Path getLocalCWD() throws OctopusException { 
-//        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-//        return adaptor.filesAdaptor().getLocalCWD();
-//    }
-//
-//    @Override
-//    public Path getLocalHome() throws OctopusException { 
-//        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-//        return adaptor.filesAdaptor().getLocalHome();        
-//    }
-//    
-//    @Override
-//    public FileSystem [] getLocalFileSystems() throws OctopusException { 
-//        Adaptor adaptor = octopusEngine.getAdaptor(OctopusEngine.LOCAL_ADAPTOR_NAME);
-//        return adaptor.filesAdaptor().getLocalFileSystems();
-//    }
     
     @Override
     public String toString() {

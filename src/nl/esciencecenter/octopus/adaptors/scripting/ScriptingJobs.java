@@ -134,12 +134,6 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
-        throw new OctopusRuntimeException(adaptorName,
-                "Error in engine: getLocalScheduler() should not be called in this adaptor");
-    }
-
-    @Override
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);

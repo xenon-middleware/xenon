@@ -132,11 +132,6 @@ public class SshJobs implements Jobs {
         return scheduler;
     }
 
-    @Override
-    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
-        throw new OctopusException(getClass().getName(), "getLocalScheduler not supported!");
-    }
-
     private JobQueues getJobQueue(Scheduler scheduler) throws OctopusException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {

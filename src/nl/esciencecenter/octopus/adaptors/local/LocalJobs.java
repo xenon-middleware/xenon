@@ -93,11 +93,6 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public Scheduler getLocalScheduler() throws OctopusException, OctopusIOException {
-        return localScheduler;
-    }
-
-    @Override
     public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
         return jobQueues.getJobs(queueNames);
     }

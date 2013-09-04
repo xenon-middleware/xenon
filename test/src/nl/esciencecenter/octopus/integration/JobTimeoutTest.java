@@ -44,7 +44,7 @@ public class JobTimeoutTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Jobs jobs = octopus.jobs();
 
-        Job job = jobs.submitJob(jobs.getLocalScheduler(), description);
+        Job job = jobs.submitJob(jobs.newScheduler("local", null, null, null), description);
 
         long time = System.currentTimeMillis();
 

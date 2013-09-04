@@ -340,7 +340,7 @@ public abstract class GenericJobAdaptorTestParent {
         Scheduler s = null;
 
         try {
-            s = jobs.getLocalScheduler();
+            s = jobs.newScheduler("local", null, null, null);
             assertTrue(s != null);
             assertTrue(s.getAdaptorName().equals("local"));
         } finally {

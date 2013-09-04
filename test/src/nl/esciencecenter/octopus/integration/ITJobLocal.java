@@ -57,7 +57,7 @@ public class ITJobLocal {
         description.setQueueName("single");
         description.setWorkingDirectory(testdir.toString());
 
-        Scheduler scheduler = octopus.jobs().getLocalScheduler();
+        Scheduler scheduler = octopus.jobs().newScheduler("local", null, null, null);
         Job job = octopus.jobs().submitJob(scheduler, description);
 
         octopus.jobs().waitUntilDone(job, 5000);

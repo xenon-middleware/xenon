@@ -46,15 +46,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     private String wrongLocation;
     private String correctLocationWrongUser;
     
-//    
-//    private URI correctURI;
-//    private URI correctURIWithPath;
-//    private URI correctFSURI;
-//
-//    private URI wrongUserURI;
-//    private URI wrongLocationURI;
-//    private URI wrongPathURI;
-
     private String defaultQueue;
     private String[] queues;
 

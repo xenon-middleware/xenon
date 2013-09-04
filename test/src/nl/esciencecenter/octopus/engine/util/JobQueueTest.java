@@ -153,7 +153,7 @@ public class JobQueueTest {
     @BeforeClass
     public static void prepare() throws Exception {
         octopus = OctopusFactory.newOctopus(null);
-        scheduler = octopus.jobs().getLocalScheduler();
+        scheduler = octopus.jobs().newScheduler("local", null, null, null);
         files = octopus.files();
         cwd = FileUtils.getLocalCWD(files);
         filesystem = cwd.getFileSystem();

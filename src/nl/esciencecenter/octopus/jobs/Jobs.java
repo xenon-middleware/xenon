@@ -83,7 +83,7 @@ public interface Jobs {
      * @throws OctopusException
      *             If the creation of the Scheduler failed.
      */
-    Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
+   //Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
 
     /**
      * Close a Scheduler.

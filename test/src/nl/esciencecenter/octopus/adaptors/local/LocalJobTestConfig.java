@@ -48,7 +48,7 @@ public class LocalJobTestConfig extends JobTestConfig {
 
     @Override
     public Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception {
-        return jobs.getLocalScheduler();
+        return jobs.newScheduler("local", null, null, null);
     }
 
     @Override
