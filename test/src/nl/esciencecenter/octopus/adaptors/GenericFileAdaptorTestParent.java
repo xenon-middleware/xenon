@@ -45,7 +45,7 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
@@ -2648,7 +2648,7 @@ public abstract class GenericFileAdaptorTestParent {
             prepare();
 
             try {
-                FileUtils.getLocalCWD(files);
+                Utils.getLocalCWD(files);
             } catch (Exception e) {
                 throwUnexpected("test25_getLocalCWD", e);
             }
@@ -2664,7 +2664,7 @@ public abstract class GenericFileAdaptorTestParent {
             prepare();
 
             try {
-                FileUtils.getLocalHome(files);
+                Utils.getLocalHome(files);
             } catch (Exception e) {
                 throwUnexpected("test26_getLocalHomeFileSystem", e);
             }

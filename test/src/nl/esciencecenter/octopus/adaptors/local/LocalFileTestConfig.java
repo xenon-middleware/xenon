@@ -24,7 +24,7 @@ import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -56,7 +56,7 @@ public class LocalFileTestConfig extends FileTestConfig {
 
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
-        return FileUtils.getLocalCWD(files).getFileSystem();
+        return Utils.getLocalCWD(files).getFileSystem();
     }
 
     public boolean supportLocation() {
@@ -114,6 +114,6 @@ public class LocalFileTestConfig extends FileTestConfig {
 
     @Override
     public Path getWorkingDir(Files files, Credentials c) throws Exception {
-        return FileUtils.getLocalCWD(files);
+        return Utils.getLocalCWD(files);
     }
 }

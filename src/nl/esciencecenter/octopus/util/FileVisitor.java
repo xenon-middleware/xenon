@@ -23,10 +23,10 @@ import nl.esciencecenter.octopus.files.Path;
 
 /**
  * FileVisitor contains various callback methods called by 
- * {@link FileUtils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}.
+ * {@link Utils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}.
  * 
  * By using an implementation of this interface in combination with 
- * {@link FileUtils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}, an action can be defined for 
+ * {@link Utils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}, an action can be defined for 
  * each file and directory encountered during a tree walk.    
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>

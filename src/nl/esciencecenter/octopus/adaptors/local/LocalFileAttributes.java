@@ -27,7 +27,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * LocalFileAttributes implements a {@link FileAttributes} for local files.
@@ -96,7 +96,7 @@ public class LocalFileAttributes implements FileAttributes {
             writable = Files.isWritable(javaPath);
             hidden = Files.isHidden(javaPath);
 
-            isWindows = FileUtils.isWindows(); 
+            isWindows = Utils.isWindows(); 
 
             BasicFileAttributes basicAttributes = null;
             

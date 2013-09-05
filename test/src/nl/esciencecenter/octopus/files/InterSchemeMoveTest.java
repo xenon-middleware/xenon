@@ -16,13 +16,10 @@
 
 package nl.esciencecenter.octopus.files;
 
-import java.net.URI;
-
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.Test;
 
@@ -39,11 +36,11 @@ public class InterSchemeMoveTest {
 
         Files files = octopus.files();
 
-        FileSystem fs1 = FileUtils.getLocalCWD(files).getFileSystem();
+        FileSystem fs1 = Utils.getLocalCWD(files).getFileSystem();
         FileSystem fs2 = files.newFileSystem("ssh", "test@localhost", null, null);
 
-        Path file1 = Util.resolve(files, fs1, "test");
-        Path file2 = Util.resolve(files, fs2, "test");
+        Path file1 = Utils.resolveWithEntryPath(files, fs1, "test");
+        Path file2 = Utils.resolveWithEntryPath(files, fs2, "test");
 
         files.move(file1, file2);
     }

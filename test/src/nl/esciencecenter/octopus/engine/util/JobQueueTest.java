@@ -43,7 +43,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -155,7 +155,7 @@ public class JobQueueTest {
         octopus = OctopusFactory.newOctopus(null);
         scheduler = octopus.jobs().newScheduler("local", null, null, null);
         files = octopus.files();
-        cwd = FileUtils.getLocalCWD(files);
+        cwd = Utils.getLocalCWD(files);
         filesystem = cwd.getFileSystem();
         myFactory = new MyFactory();
         jobQueue = new JobQueues("test", files, scheduler, cwd, myFactory, 2, POLLING_DELAY);

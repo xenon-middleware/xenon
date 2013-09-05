@@ -50,10 +50,9 @@ import nl.esciencecenter.octopus.jobs.Streams;
 public class LocalJobs implements Jobs, InteractiveProcessFactory {
 
     private final Scheduler localScheduler;
-
     private final JobQueues jobQueues;
 
-    public LocalJobs(OctopusProperties properties, LocalAdaptor localAdaptor, Path cwd, OctopusEngine engine)
+    public LocalJobs(OctopusProperties properties, Path cwd, OctopusEngine engine)
             throws OctopusException {
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", "local", "/", 

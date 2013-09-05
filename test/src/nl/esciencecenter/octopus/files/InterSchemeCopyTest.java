@@ -20,9 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.Test;
 
@@ -39,29 +38,29 @@ public class InterSchemeCopyTest {
 
         Files files = octopus.files();
 
-        Path localCWD = FileUtils.getLocalCWD(files);
+        Path localCWD = Utils.getLocalCWD(files);
         Path sshCWD = files.newFileSystem("ssh", "test@localhost", null, null).getEntryPath();
 
         String dirname = "octopus_test_" + System.currentTimeMillis();
 
-        Path localDir = Util.resolve(files, localCWD, dirname);
+        Path localDir = Utils.resolveWithRoot(files, localCWD, dirname);
         files.createDirectory(localDir);
 
-        Path sshDir = Util.resolve(files, sshCWD, dirname);
+        Path sshDir = Utils.resolveWithRoot(files, sshCWD, dirname);
         files.createDirectory(sshDir);
 
         // Create file locally and copy to remote        
-        Path localFile = Util.resolve(files, localDir, "test");
+        Path localFile = Utils.resolveWithRoot(files, localDir, "test");
         files.createFile(localFile);
-        Path sshFile = Util.resolve(files, sshDir, "test");
+        Path sshFile = Utils.resolveWithRoot(files, sshDir, "test");
         files.copy(localFile, sshFile, CopyOption.CREATE);
 
         assertTrue(files.exists(localFile));
         assertTrue(files.exists(sshFile));
 
         // Create file remotely and copy to local        
-        Path localFile2 = Util.resolve(files, localDir, "test2");
-        Path sshFile2 = Util.resolve(files, sshDir, "test2");
+        Path localFile2 = Utils.resolveWithRoot(files, localDir, "test2");
+        Path sshFile2 = Utils.resolveWithRoot(files, sshDir, "test2");
         files.createFile(sshFile2);
         files.copy(sshFile2, localFile2, CopyOption.CREATE);
 

@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -73,7 +73,7 @@ public class LocalUtilsTest {
         System.clearProperty("user.home");
 
         try {
-            FileUtils.getHome();
+            Utils.getHome();
         } finally {
             System.setProperty("user.home", originalHome);
         }
@@ -86,7 +86,7 @@ public class LocalUtilsTest {
         System.clearProperty("user.dir");
 
         try {
-            FileUtils.getCWD();
+            Utils.getCWD();
         } finally {
             System.setProperty("user.dir", originalCWD);
         }
@@ -99,7 +99,7 @@ public class LocalUtilsTest {
         System.setProperty("user.home", "");
 
         try {
-            FileUtils.getHome();
+            Utils.getHome();
         } finally {
             System.setProperty("user.home", originalHome);
         }
@@ -112,7 +112,7 @@ public class LocalUtilsTest {
         System.setProperty("user.dir", "");
 
         try {
-            FileUtils.getCWD();
+            Utils.getCWD();
         } finally {
             System.setProperty("user.dir", originalCWD);
         }
@@ -139,7 +139,7 @@ public class LocalUtilsTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
         Files files = octopus.files();
         
-        Path cwd = FileUtils.getLocalCWD(files);
+        Path cwd = Utils.getLocalCWD(files);
         
         String tmp = LocalUtils.javaPath(files.newPath(cwd.getFileSystem(), new RelativePath("~"))).toString();
 

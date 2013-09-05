@@ -30,7 +30,7 @@ import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -50,7 +50,7 @@ public class LocalDirectoryStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        Path root = FileUtils.getLocalCWD(files);
+        Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
 
@@ -71,7 +71,7 @@ public class LocalDirectoryStreamTest {
         Octopus octopus = OctopusFactory.newOctopus(null);
 
         Files files = octopus.files();
-        Path root = FileUtils.getLocalCWD(files);
+        Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         
         Path file0 = resolve(files, testDir, "file0");
@@ -114,7 +114,7 @@ public class LocalDirectoryStreamTest {
         octopus = OctopusFactory.newOctopus(null);
 
         files = octopus.files();
-        root = FileUtils.getLocalCWD(files);
+        root = Utils.getLocalCWD(files);
         fs = root.getFileSystem();
         testDir = resolve(files, root, TEST_DIR);
     }

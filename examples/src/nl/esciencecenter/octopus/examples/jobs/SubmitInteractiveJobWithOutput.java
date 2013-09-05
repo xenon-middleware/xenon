@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
-import nl.esciencecenter.octopus.util.StreamUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * An example of how to create and submit an interactive job that produces output. 
@@ -68,7 +68,7 @@ public class SubmitInteractiveJobWithOutput {
             streams.getStderr().close();
             
             // Read all bytes from stdout
-            String result = StreamUtils.readToString(streams.getStdout());
+            String result = Utils.readToString(streams.getStdout());
             
             System.out.println("Job ran succesfully and produced: " + result);
 

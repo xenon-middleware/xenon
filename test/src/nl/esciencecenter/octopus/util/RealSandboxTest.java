@@ -26,7 +26,6 @@ import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
@@ -57,14 +56,14 @@ public class RealSandboxTest {
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
         
-        Path cwd = FileUtils.getLocalCWD(files);
+        Path cwd = Utils.getLocalCWD(files);
         
         fileSystem = cwd.getFileSystem();
-        testDir = Util.resolve(files, cwd, "octopus_test_" + System.currentTimeMillis());
+        testDir = Utils.resolveWithRoot(files, cwd, "octopus_test_" + System.currentTimeMillis());
         files.createDirectory(testDir);
 
-        testInput1 = Util.resolve(files, testDir, "input1");
-        testInput2 = Util.resolve(files, testDir, "input2");
+        testInput1 = Utils.resolveWithRoot(files, testDir, "input1");
+        testInput2 = Utils.resolveWithRoot(files, testDir, "input2");
 
         files.createFile(testInput1);
         files.createFile(testInput2);
@@ -72,7 +71,7 @@ public class RealSandboxTest {
 
     @AfterClass
     public static void cleanup() throws Exception {
-        FileUtils.recursiveDelete(files, testDir);
+        Utils.recursiveDelete(files, testDir);
         OctopusFactory.endOctopus(octopus);
     }
 
@@ -97,7 +96,7 @@ public class RealSandboxTest {
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
-        Path expectedPath = Util.resolve(files, testDir, name);
+        Path expectedPath = Utils.resolveWithRoot(files, testDir, name);
         assertEquals(expectedPath, sandbox.getPath());
         assertEquals(0, sandbox.getUploadFiles().size());
         assertEquals(0, sandbox.getDownloadFiles().size());
@@ -123,7 +122,7 @@ public class RealSandboxTest {
         sandbox.addUploadFile(testInput1, "input");
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
-        Path dst = Util.resolve(files, testDir, name, "input");
+        Path dst = Utils.resolveWithRoot(files, testDir, name, "input");
 
         assertEquals(1, uploadfiles.size());
         assertEquals(testInput1, uploadfiles.get(0).getSource());
@@ -140,9 +139,9 @@ public class RealSandboxTest {
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
 
-        Path sb = Util.resolve(files, testDir, name);
-        Path dst1 = Util.resolve(files, sb, "input1");
-        Path dst2 = Util.resolve(files, sb, "input2");
+        Path sb = Utils.resolveWithRoot(files, testDir, name);
+        Path dst1 = Utils.resolveWithRoot(files, sb, "input1");
+        Path dst2 = Utils.resolveWithRoot(files, sb, "input2");
 
         assertEquals(2, uploadfiles.size());
         assertEquals(testInput1, uploadfiles.get(0).getSource());
@@ -162,7 +161,7 @@ public class RealSandboxTest {
 
         List<Pair> uploadfiles = sandbox.getUploadFiles();
 
-        Path dst = Util.resolve(files, testDir, name, "input1");
+        Path dst = Utils.resolveWithRoot(files, testDir, name, "input1");
 
         assertEquals(1, uploadfiles.size());
         assertEquals(testInput1, uploadfiles.get(0).getSource());
@@ -188,7 +187,7 @@ public class RealSandboxTest {
 
         List<Pair> downfiles = sandbox.getDownloadFiles();
 
-        Path src = Util.resolve(files, testDir, name, "output1");
+        Path src = Utils.resolveWithRoot(files, testDir, name, "output1");
 
         assertEquals(1, downfiles.size());
         assertEquals(src, downfiles.get(0).getSource());
@@ -205,7 +204,7 @@ public class RealSandboxTest {
 
         List<Pair> downfiles = sandbox.getDownloadFiles();
 
-        Path src = Util.resolve(files, testDir, name, "input1");
+        Path src = Utils.resolveWithRoot(files, testDir, name, "input1");
         
         assertEquals(1, downfiles.size());
         assertEquals(src, downfiles.get(0).getSource());
@@ -231,8 +230,8 @@ public class RealSandboxTest {
         sandbox.addUploadFile(testInput1, "input");
         sandbox.upload(CopyOption.REPLACE);
 
-        Path dstDir = Util.resolve(files, testDir, name);
-        Path dstFile = Util.resolve(files, dstDir, "input");
+        Path dstDir = Utils.resolveWithRoot(files, testDir, name);
+        Path dstFile = Utils.resolveWithRoot(files, dstDir, "input");
 
         assertTrue(files.exists(dstDir));
         assertTrue(files.exists(dstFile));
@@ -249,15 +248,15 @@ public class RealSandboxTest {
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
-        Path download = Util.resolve(files, testDir, "download");
+        Path download = Utils.resolveWithRoot(files, testDir, "download");
 
         sandbox.addUploadFile(testInput1, "input");
         sandbox.addDownloadFile("input", download);
 
         sandbox.upload(CopyOption.REPLACE);
 
-        Path dstDir = Util.resolve(files, testDir, name);
-        Path dstFile = Util.resolve(files, dstDir, "input");
+        Path dstDir = Utils.resolveWithRoot(files, testDir, name);
+        Path dstFile = Utils.resolveWithRoot(files, dstDir, "input");
 
         assertTrue(files.exists(dstDir));
         assertTrue(files.exists(dstFile));
@@ -283,8 +282,8 @@ public class RealSandboxTest {
 
         sandbox.upload(CopyOption.REPLACE);
 
-        Path dstDir = Util.resolve(files, testDir, name);
-        Path dstFile = Util.resolve(files, dstDir, "input");
+        Path dstDir = Utils.resolveWithRoot(files, testDir, name);
+        Path dstFile = Utils.resolveWithRoot(files, dstDir, "input");
 
         assertTrue(files.exists(dstDir));
         assertTrue(files.exists(dstFile));
@@ -306,7 +305,7 @@ public class RealSandboxTest {
         final int prime = 31;
         int result = 1;
         result = prime * result + files.hashCode();
-        result = prime * result + Util.resolve(files, testDir, name).hashCode();
+        result = prime * result + Utils.resolveWithRoot(files, testDir, name).hashCode();
         result = prime * result + sandbox.getUploadFiles().hashCode();
         result = prime * result + sandbox.getDownloadFiles().hashCode();
 
@@ -361,7 +360,7 @@ public class RealSandboxTest {
     @Test
     public void testEquals_otherPath_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
 
-        Path path = Util.resolve(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
+        Path path = Utils.resolveWithEntryPath(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
 
         String name = getNextSandbox();
 

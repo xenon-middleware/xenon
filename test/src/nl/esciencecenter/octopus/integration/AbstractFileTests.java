@@ -27,7 +27,6 @@ import static org.junit.Assert.assertNotNull;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -38,6 +37,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * Abstract FileSystem tests. This class runs a set of test scenarios on the (remote) filesystem. This is one abstract test class
@@ -137,7 +137,7 @@ abstract public class AbstractFileTests {
     }
 
     protected Path createSubdir(Path parentDirPath, String subDir) throws OctopusIOException, OctopusException {
-        Path absPath = Util.resolve(octopus.files(), parentDirPath, subDir);
+        Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subDir);
         infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
         return getFiles().createDirectory(absPath);
     }
@@ -157,7 +157,7 @@ abstract public class AbstractFileTests {
             OctopusException {
         do {
             int myid = uniqueIdcounter++;
-            Path absPath = Util.resolve(octopus.files(), parentDirPath, dirPrefix + "." + myid);
+            Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, dirPrefix + "." + myid);
 
             if (getFiles().exists(absPath) == false) {
                 infoPrintf("createUniqueTestSubdir: '%s'+%d => '%s'\n", dirPrefix, myid, absPath);
@@ -185,7 +185,7 @@ abstract public class AbstractFileTests {
 
         do {
             int myid = uniqueIdcounter++;
-            Path absPath = Util.resolve(octopus.files(), parentDirPath, filePrefix + "." + myid);
+            Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, filePrefix + "." + myid);
 
             if (getFiles().exists(absPath) == false) {
 
@@ -200,7 +200,7 @@ abstract public class AbstractFileTests {
     }
 
     protected Path createFile(Path parentDirPath, String subFile) throws OctopusIOException, OctopusException {
-        Path absPath = Util.resolve(octopus.files(), parentDirPath, subFile);
+        Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subFile);
         return getFiles().createFile(absPath);
     }
 
@@ -251,7 +251,7 @@ abstract public class AbstractFileTests {
      */
     @org.junit.Test
     public void testCreateDeleteEmptyFile() throws Exception {
-        Path filePath = Util.resolve(octopus.files(), getTestDir(), "testFile01");
+        Path filePath = Utils.resolveWithRoot(octopus.files(), getTestDir(), "testFile01");
 
         Files files = getFiles();
 
@@ -287,7 +287,7 @@ abstract public class AbstractFileTests {
 
         Files files = getFiles();
 
-        Path dirPath = Util.resolve(octopus.files(), getTestDir(), "testSubdir01");
+        Path dirPath = Utils.resolveWithRoot(octopus.files(), getTestDir(), "testSubdir01");
         assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath,
                 files.exists(dirPath));
 

@@ -15,7 +15,7 @@
  */
 
 /**
- * This package is contains several utility classes that uses the Octopus API.
+ * This package is contains several utility classes.
  */
 package nl.esciencecenter.octopus.util;
 

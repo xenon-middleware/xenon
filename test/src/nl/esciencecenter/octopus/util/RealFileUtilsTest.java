@@ -27,7 +27,6 @@ import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
@@ -55,7 +54,7 @@ public class RealFileUtilsTest {
 
         files = octopus.files();
         
-        Path cwd = FileUtils.getLocalCWD(files);
+        Path cwd = Utils.getLocalCWD(files);
         
         fileSystem = cwd.getFileSystem();
 
@@ -74,11 +73,11 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_copyFromInputStream1.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_copyFromInputStream1.txt");
 
-        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        Utils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
 
-        byte[] tmp = FileUtils.readAllBytes(files, testFile);
+        byte[] tmp = Utils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -92,12 +91,12 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_copyFromInputStream2.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_copyFromInputStream2.txt");
 
-        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
-        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        Utils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        Utils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
 
-        byte[] tmp = FileUtils.readAllBytes(files, testFile);
+        byte[] tmp = Utils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -111,12 +110,12 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_copyFromInputStream3.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_copyFromInputStream3.txt");
 
-        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
-        FileUtils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, false);
+        Utils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, true);
+        Utils.copy(files, new ByteArrayInputStream(message.getBytes()), testFile, false);
 
-        byte[] tmp = FileUtils.readAllBytes(files, testFile);
+        byte[] tmp = Utils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -130,13 +129,13 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_copyToOutputStream1.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_copyToOutputStream1.txt");
 
-        FileUtils.write(files, testFile, message.getBytes(), true);
+        Utils.write(files, testFile, message.getBytes(), true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        FileUtils.copy(files, testFile, out);
+        Utils.copy(files, testFile, out);
 
         byte[] tmp = out.toByteArray();
 
@@ -152,14 +151,14 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_copyToOutputStream2.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_copyToOutputStream2.txt");
 
-        FileUtils.write(files, testFile, message.getBytes(), true);
-        FileUtils.write(files, testFile, message.getBytes(), true);
+        Utils.write(files, testFile, message.getBytes(), true);
+        Utils.write(files, testFile, message.getBytes(), true);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        FileUtils.copy(files, testFile, out);
+        Utils.copy(files, testFile, out);
 
         byte[] tmp = out.toByteArray();
 
@@ -175,14 +174,14 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_copyToOutputStream3.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_copyToOutputStream3.txt");
 
-        FileUtils.write(files, testFile, message.getBytes(), true);
-        FileUtils.write(files, testFile, message.getBytes(), false);
+        Utils.write(files, testFile, message.getBytes(), true);
+        Utils.write(files, testFile, message.getBytes(), false);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        FileUtils.copy(files, testFile, out);
+        Utils.copy(files, testFile, out);
 
         byte[] tmp = out.toByteArray();
 
@@ -198,13 +197,13 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_newBufferedWriter1.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_newBufferedWriter1.txt");
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = Utils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        byte[] tmp = FileUtils.readAllBytes(files, testFile);
+        byte[] tmp = Utils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -218,17 +217,17 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_newBufferedWriter2.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_newBufferedWriter2.txt");
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = Utils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
+        bw = Utils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        byte[] tmp = FileUtils.readAllBytes(files, testFile);
+        byte[] tmp = Utils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -242,17 +241,17 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_newBufferedWriter3.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_newBufferedWriter3.txt");
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = Utils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write(message);
         bw.close();
 
-        bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), false);
+        bw = Utils.newBufferedWriter(files, testFile, Charset.defaultCharset(), false);
         bw.write(message);
         bw.close();
 
-        byte[] tmp = FileUtils.readAllBytes(files, testFile);
+        byte[] tmp = Utils.readAllBytes(files, testFile);
 
         assertNotNull(tmp);
         assertTrue(tmp.length > 0);
@@ -266,11 +265,11 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!";
 
-        Path testFile = Util.resolve(files, testDir, "test_newBufferedReader1.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_newBufferedReader1.txt");
 
-        FileUtils.write(files, testFile, message.getBytes(), true);
+        Utils.write(files, testFile, message.getBytes(), true);
 
-        BufferedReader br = FileUtils.newBufferedReader(files, testFile, Charset.defaultCharset());
+        BufferedReader br = Utils.newBufferedReader(files, testFile, Charset.defaultCharset());
 
         String tmp = br.readLine();
         br.close();
@@ -286,12 +285,12 @@ public class RealFileUtilsTest {
 
         String message = "Hello World!\n";
 
-        Path testFile = Util.resolve(files, testDir, "test_newBufferedReader2.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_newBufferedReader2.txt");
 
-        FileUtils.write(files, testFile, message.getBytes(), true);
-        FileUtils.write(files, testFile, message.getBytes(), false);
+        Utils.write(files, testFile, message.getBytes(), true);
+        Utils.write(files, testFile, message.getBytes(), false);
 
-        BufferedReader br = FileUtils.newBufferedReader(files, testFile, Charset.defaultCharset());
+        BufferedReader br = Utils.newBufferedReader(files, testFile, Charset.defaultCharset());
 
         String tmp1 = br.readLine();
         String tmp2 = br.readLine();
@@ -309,16 +308,16 @@ public class RealFileUtilsTest {
     @Test
     public void test_readAllLines1() throws Exception {
 
-        Path testFile = Util.resolve(files, testDir, "test_readAllLines1.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_readAllLines1.txt");
 
-        BufferedWriter bw = FileUtils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
+        BufferedWriter bw = Utils.newBufferedWriter(files, testFile, Charset.defaultCharset(), true);
         bw.write("line1\n");
         bw.write("line2\n");
         bw.write("line3\n");
         bw.write("line4\n");
         bw.close();
 
-        List<String> tmp = FileUtils.readAllLines(files, testFile, Charset.defaultCharset());
+        List<String> tmp = Utils.readAllLines(files, testFile, Charset.defaultCharset());
 
         assertNotNull(tmp);
         assertTrue(tmp.size() == 4);
@@ -333,7 +332,7 @@ public class RealFileUtilsTest {
     @Test
     public void test_write1() throws Exception {
 
-        Path testFile = Util.resolve(files, testDir, "test_write1.txt");
+        Path testFile = Utils.resolveWithRoot(files, testDir, "test_write1.txt");
 
         LinkedList<String> tmp1 = new LinkedList<>();
         tmp1.add("line1");
@@ -341,9 +340,9 @@ public class RealFileUtilsTest {
         tmp1.add("line3");
         tmp1.add("line4");
 
-        FileUtils.write(files, testFile, tmp1, Charset.defaultCharset(), true);
+        Utils.write(files, testFile, tmp1, Charset.defaultCharset(), true);
 
-        List<String> tmp2 = FileUtils.readAllLines(files, testFile, Charset.defaultCharset());
+        List<String> tmp2 = Utils.readAllLines(files, testFile, Charset.defaultCharset());
 
         System.err.println("Read " + tmp2.size() + " lines");
 
@@ -413,20 +412,20 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree1");
-        dirs[1] = Util.resolve(files, dirs[0], "dir0");
+        dirs[0] = Utils.resolveWithRoot(files, testDir, "test_walkFileTree1");
+        dirs[1] = Utils.resolveWithRoot(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
+            tmp[i] = Utils.resolveWithRoot(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
         FileVisitor fv = new MyFileVisitor(dirs, tmp);
-        FileUtils.walkFileTree(files, dirs[0], fv);
+        Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -467,20 +466,20 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree2");
-        dirs[1] = Util.resolve(files, dirs[0], "dir0");
+        dirs[0] = Utils.resolveWithRoot(files, testDir, "test_walkFileTree2");
+        dirs[1] = Utils.resolveWithRoot(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
+            tmp[i] = Utils.resolveWithRoot(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
         FileVisitor fv = new MyFileVisitor2();
-        FileUtils.walkFileTree(files, dirs[0], fv);
+        Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -521,20 +520,20 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree3");
-        dirs[1] = Util.resolve(files, dirs[0], "dir0");
+        dirs[0] = Utils.resolveWithRoot(files, testDir, "test_walkFileTree3");
+        dirs[1] = Utils.resolveWithRoot(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < tmp.length; i++) {
-            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
+            tmp[i] = Utils.resolveWithRoot(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
         FileVisitor fv = new MyFileVisitor3();
-        FileUtils.walkFileTree(files, dirs[0], fv);
+        Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -585,9 +584,9 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[3];
 
-        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree4");
-        dirs[1] = Util.resolve(files, dirs[0], "dir0");
-        dirs[2] = Util.resolve(files, dirs[0], "dir1");
+        dirs[0] = Utils.resolveWithRoot(files, testDir, "test_walkFileTree4");
+        dirs[1] = Utils.resolveWithRoot(files, dirs[0], "dir0");
+        dirs[2] = Utils.resolveWithRoot(files, dirs[0], "dir1");
 
         files.createDirectories(dirs[1]);
         files.createDirectories(dirs[2]);
@@ -595,17 +594,17 @@ public class RealFileUtilsTest {
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < 5; i++) {
-            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
+            tmp[i] = Utils.resolveWithRoot(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
         for (int i = 0; i < 5; i++) {
-            tmp[5 + i] = Util.resolve(files, dirs[2], "file" + (5 + i));
+            tmp[5 + i] = Utils.resolveWithRoot(files, dirs[2], "file" + (5 + i));
             files.createFile(tmp[5 + i]);
         }
 
         FileVisitor fv = new MyFileVisitor4();
-        FileUtils.walkFileTree(files, dirs[0], fv);
+        Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -647,20 +646,20 @@ public class RealFileUtilsTest {
 
         Path[] dirs = new Path[2];
 
-        dirs[0] = Util.resolve(files, testDir, "test_walkFileTree5");
-        dirs[1] = Util.resolve(files, dirs[0], "dir0");
+        dirs[0] = Utils.resolveWithRoot(files, testDir, "test_walkFileTree5");
+        dirs[1] = Utils.resolveWithRoot(files, dirs[0], "dir0");
 
         files.createDirectories(dirs[1]);
 
         Path[] tmp = new Path[10];
 
         for (int i = 0; i < 10; i++) {
-            tmp[i] = Util.resolve(files, dirs[1], "file" + i);
+            tmp[i] = Utils.resolveWithRoot(files, dirs[1], "file" + i);
             files.createFile(tmp[i]);
         }
 
         FileVisitor fv = new MyFileVisitor5();
-        FileUtils.walkFileTree(files, dirs[0], fv);
+        Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
             files.delete(tmp[i]);
@@ -699,13 +698,13 @@ public class RealFileUtilsTest {
     @Test
     public void test_walkFileTree6() throws Exception {
 
-        Path dir = Util.resolve(files, testDir, "test_walkFileTree6");
+        Path dir = Utils.resolveWithRoot(files, testDir, "test_walkFileTree6");
         files.createDirectories(dir);
 
         FileVisitor fv = new MyFileVisitor6();
 
         try {
-            FileUtils.walkFileTree(files, dir, fv);
+            Utils.walkFileTree(files, dir, fv);
             throw new Exception("test_walkFileTree6 did not throw an exception!");
         } catch (OctopusIOException e) {
             // expected

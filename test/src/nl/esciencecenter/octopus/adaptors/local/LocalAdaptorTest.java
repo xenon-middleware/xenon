@@ -21,7 +21,7 @@ import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -41,14 +41,14 @@ public class LocalAdaptorTest {
 
     @org.junit.Test
     public void test_checkLocation_linuxRoot() throws Exception {
-        if (FileUtils.isLinux() || FileUtils.isOSX()) { 
+        if (Utils.isLinux() || Utils.isOSX()) { 
             new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("/");
         }
     }
 
     @org.junit.Test
     public void test_checkLocation_windowsRoot() throws Exception {
-        if (FileUtils.isWindows()) { 
+        if (Utils.isWindows()) { 
             new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:");
         }
     }

@@ -49,7 +49,7 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * LocalFiles implements an Octopus <code>Files</code> adaptor for local file operations.
@@ -286,8 +286,8 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
 
         OctopusProperties p = new OctopusProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
-        String root = FileUtils.getLocalRoot(location);
-        RelativePath relativePath = FileUtils.getRelativePath(location, root);
+        String root = Utils.getLocalRoot(location);
+        RelativePath relativePath = Utils.getRelativePath(location, root);
         
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, root,  
                 relativePath, credential, p);

@@ -30,7 +30,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * An example of how to create and submit a batch job that produces output. 
@@ -80,20 +80,20 @@ public class SubmitBatchJobWithOutput {
 
                 System.out.println("Job ran succesfully and produced:");
 
-                Path cwd = FileUtils.getLocalCWD(files);
+                Path cwd = Utils.getLocalCWD(files);
                 RelativePath entryPath = cwd.getRelativePath();
                 
                 Path stdout = files.newPath(cwd.getFileSystem(), entryPath.resolve("stdout.txt"));
                 Path stderr = files.newPath(cwd.getFileSystem(), entryPath.resolve("stderr.txt"));
 
                 if (files.exists(stdout)) {
-                    String output = FileUtils.readToString(files, stdout, Charset.defaultCharset());
+                    String output = Utils.readToString(files, stdout, Charset.defaultCharset());
                     System.out.println(" STDOUT: " + output);
                     files.delete(stdout);
                 }
 
                 if (files.exists(stderr)) {
-                    String output = FileUtils.readToString(files, stderr, Charset.defaultCharset());
+                    String output = Utils.readToString(files, stderr, Charset.defaultCharset());
                     System.out.println(" STDERR: " + output);
                     files.delete(stderr);
                 }

@@ -25,7 +25,6 @@ import java.util.HashMap;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -35,6 +34,7 @@ import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -84,7 +84,7 @@ public class MultiJobTest {
 
         String workingDir = TEST_ROOT + "/" + testName;
 
-        Path root = Util.resolve(files, filesystem, workingDir);
+        Path root = Utils.resolveWithEntryPath(files, filesystem, workingDir);
         
         files.createDirectories(root);
 
@@ -95,8 +95,8 @@ public class MultiJobTest {
 
         for (int i = 0; i < j.length; i++) {
 
-            out[i] = Util.resolve(files, root, "stdout" + i + ".txt");
-            err[i] = Util.resolve(files, root, "stderr" + i + ".txt");
+            out[i] = Utils.resolveWithRoot(files, root, "stdout" + i + ".txt");
+            err[i] = Utils.resolveWithRoot(files, root, "stderr" + i + ".txt");
 
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/sleep");

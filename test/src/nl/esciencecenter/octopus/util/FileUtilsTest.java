@@ -52,7 +52,7 @@ public class FileUtilsTest {
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(false);
 
-        FileUtils.recursiveCopy(files, srcFile, dstFile);
+        Utils.recursiveCopy(files, srcFile, dstFile);
 
         verify(files).copy(srcFile, dstFile);
     }
@@ -81,7 +81,7 @@ public class FileUtilsTest {
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(srcDir)).thenReturn(listing);
 
-        FileUtils.recursiveCopy(files, srcDir, dstDir);
+        Utils.recursiveCopy(files, srcDir, dstDir);
 
         verify(files).createDirectories(dstDir);
     }
@@ -322,7 +322,7 @@ public class FileUtilsTest {
         Path dstDir = mock(Path.class); // bar
 
         try {
-            FileUtils.recursiveCopy(files, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
+            Utils.recursiveCopy(files, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
             fail("UnsupportedOperationException not thrown");
         } catch (UnsupportedOperationException e) {
             assertEquals(e.getMessage(), "FileUtils adaptor: Can not replace and ignore existing files at the same time");
@@ -345,7 +345,7 @@ public class FileUtilsTest {
         when(files.exists(srcFile)).thenReturn(true);
         when(files.exists(dstFile)).thenReturn(true);
 
-        FileUtils.recursiveCopy(files, srcFile, dstFile, CopyOption.REPLACE);
+        Utils.recursiveCopy(files, srcFile, dstFile, CopyOption.REPLACE);
 
         verify(files).copy(srcFile, dstFile, CopyOption.REPLACE);
     }
@@ -368,7 +368,7 @@ public class FileUtilsTest {
         when(iterator.hasNext()).thenReturn(false);
         when(files.newDirectoryStream(directory)).thenReturn(listing);
 
-        FileUtils.recursiveDelete(files, directory);
+        Utils.recursiveDelete(files, directory);
 
         verify(files).delete(directory);
     }
@@ -398,7 +398,7 @@ public class FileUtilsTest {
         when(iterator.next()).thenReturn(myfile);
         when(files.newDirectoryStream(directory)).thenReturn(listing);
 
-        FileUtils.recursiveDelete(files, directory);
+        Utils.recursiveDelete(files, directory);
 
         verify(files).delete(directory);
         verify(files).delete(myfile);
@@ -415,7 +415,7 @@ public class FileUtilsTest {
 
         //        when(files.isDirectory(myfile)).thenReturn(false);
 
-        FileUtils.recursiveDelete(files, myfile);
+        Utils.recursiveDelete(files, myfile);
 
         verify(files).delete(myfile);
     }

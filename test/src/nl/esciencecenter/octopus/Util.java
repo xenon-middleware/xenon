@@ -20,19 +20,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -69,39 +63,7 @@ public class Util {
         method.invoke(e);
     }
     
-    public static Path resolve(Files files, Path root, String... path) throws OctopusIOException { 
-        return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
-    }
-    
-    public static Path resolve(Files files, FileSystem fs, String ... path) throws OctopusIOException {
-        return resolve(files, fs.getEntryPath(), path);
-    }
-    
     public static String readFileToString(File file) throws FileNotFoundException, IOException {
-        return readFully(new FileInputStream(file));
-    }
-    
-    public static String readFully(InputStream in) throws IOException {
-
-        byte[] buffer = new byte[1024];
-
-        int offset = 0;
-
-        int tmp = in.read(buffer, 0, buffer.length - offset);
-
-        while (tmp != -1) {
-
-            offset += tmp;
-
-            if (offset == buffer.length) {
-                buffer = Arrays.copyOf(buffer, buffer.length * 2);
-            }
-
-            tmp = in.read(buffer, offset, buffer.length - offset);
-        }
-
-        in.close();
-        return new String(buffer, 0, offset);
-    }
-    
+        return Utils.readToString(new FileInputStream(file));
+    }    
 }

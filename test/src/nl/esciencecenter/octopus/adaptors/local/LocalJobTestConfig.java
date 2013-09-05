@@ -26,7 +26,7 @@ import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -53,7 +53,7 @@ public class LocalJobTestConfig extends JobTestConfig {
 
     @Override
     public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
-        return FileUtils.getLocalCWD(files);
+        return Utils.getLocalCWD(files);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class LocalJobTestConfig extends JobTestConfig {
     
     @Override
     public boolean targetIsWindows() {
-        return FileUtils.isWindows();
+        return Utils.isWindows();
     }
 
 }

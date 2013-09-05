@@ -36,7 +36,7 @@ import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 import nl.esciencecenter.octopus.util.Sandbox;
 
 import org.junit.Test;
@@ -68,7 +68,7 @@ public class SandboxedLocalJobIT {
         Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
-        FileSystem localrootfs = FileUtils.getLocalCWD(octopus.files()).getFileSystem();
+        FileSystem localrootfs = Utils.getLocalCWD(octopus.files()).getFileSystem();
 
         // create workdir
         String workFn = tmpdir + "/AAP" + work_id;
@@ -123,6 +123,6 @@ public class SandboxedLocalJobIT {
         
         assertThat(Util.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
 
-        FileUtils.recursiveDelete(octopus.files(), workdir);
+        Utils.recursiveDelete(octopus.files(), workdir);
     }
 }

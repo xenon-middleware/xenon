@@ -27,7 +27,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -48,7 +48,7 @@ public class LocalFileAttributesTest {
     public void testNonExistingFile() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, FileUtils.getLocalCWD(files), "noot" + System.currentTimeMillis() + ".txt");
+        Path path = resolve(files, Utils.getLocalCWD(files), "noot" + System.currentTimeMillis() + ".txt");
         new LocalFileAttributes(path);
     }
 
@@ -59,7 +59,7 @@ public class LocalFileAttributesTest {
         
         long now = System.currentTimeMillis();
 
-        Path path = resolve(files, FileUtils.getLocalCWD(files), "aap" + now + ".txt");
+        Path path = resolve(files, Utils.getLocalCWD(files), "aap" + now + ".txt");
         
         files.createFile(path);
 
@@ -80,7 +80,7 @@ public class LocalFileAttributesTest {
     public void testHashCode() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path path = resolve(files, FileUtils.getLocalCWD(files), "aap.txt");
+        Path path = resolve(files, Utils.getLocalCWD(files), "aap.txt");
         
         if (!files.exists(path)) { 
             files.createFile(path);
@@ -99,13 +99,13 @@ public class LocalFileAttributesTest {
     @org.junit.Test
     public void testEquals() throws Exception {
         
-        if (FileUtils.isWindows()) { 
+        if (Utils.isWindows()) { 
             return;
         }
         
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();
-        Path cwd = FileUtils.getLocalCWD(files);
+        Path cwd = Utils.getLocalCWD(files);
         Path path1 = resolve(files, cwd, "aap.txt");
 
         if (files.exists(path1)) { 

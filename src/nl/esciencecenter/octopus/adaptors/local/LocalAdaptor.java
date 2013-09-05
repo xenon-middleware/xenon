@@ -35,7 +35,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.util.FileUtils;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * LocalAdaptor implements an Octopus adaptor for local operations.
@@ -105,7 +105,7 @@ public class LocalAdaptor extends Adaptor {
                 VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
-        localJobs = new LocalJobs(getProperties(), this, FileUtils.getLocalCWD(localFiles), octopusEngine);
+        localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), octopusEngine);
         localCredentials = new LocalCredentials();
     }
 
@@ -138,7 +138,7 @@ public class LocalAdaptor extends Adaptor {
             throw new InvalidLocationException(ADAPTOR_NAME, "Location must contain a file system root! (not null)");
         }
 
-        if (FileUtils.isLocalRoot(location)) { 
+        if (Utils.isLocalRoot(location)) { 
             return;
         }
         
