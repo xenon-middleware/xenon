@@ -69,43 +69,7 @@ public interface Files {
      */
     FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws OctopusException, OctopusIOException;
-    
-    /**
-     * Get a FileSystem that represents the local current working directory (CWD).
-     * 
-     * Multiple invocations of this method may return the same FileSystem.
-     * 
-     * @return a FileSystem that represents the local current working directory.
-     * 
-     * @throws OctopusException
-     *             If the creation of the FileSystem failed.
-     */
-    //Path getLocalCWD() throws OctopusException;
-
-    /**
-     * Get a FileSystem that represents the local home directory of the current user.
-     * 
-     * Multiple invocations of this method may return the same FileSystem.
-     * 
-     * @return a FileSystem that represents the local home directory of the current user.
-     * 
-     * @throws OctopusException
-     *             If the creation of the FileSystem failed.
-     */
-    //Path getLocalHome() throws OctopusException;
-    
-    /**
-     * Retrieve all local FileSystems.
-     * 
-     * Multiple invocations of this method may return the same FileSystems.
-     * 
-     * @return an array containing all local FileSystems.
-     * 
-     * @throws OctopusException
-     *             If the creation of a FileSystem failed.
-     */
-  //  FileSystem [] getLocalFileSystems() throws OctopusException; 
-    
+        
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
      *  

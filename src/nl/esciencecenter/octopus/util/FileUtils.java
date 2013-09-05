@@ -276,6 +276,52 @@ public final class FileUtils {
     }
 
     /**
+     * Checks if the provide path starts with a valid Linux root, that is "/".
+     * 
+     * @param path
+     *          The path to check. 
+     * @return
+     *          If the provide path starts with a valid Linux root.
+     */
+    public static boolean startsWithLinuxRoot(String path) {
+        
+        if (path == null) { 
+            return false;
+        }
+        
+        return path.startsWith("/");
+    }
+
+    /**
+     * Checks if the provide path starts with a valid Windows root, for example "C:".
+     * 
+     * @param path
+     *          The path to check. 
+     * @return
+     *          If the provide path starts with a valid Windows root.
+     */
+    public static boolean startWithWindowsRoot(String path) {
+
+        if (path == null) { 
+            return false;
+        }
+        
+        return path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
+    }
+   
+    /**
+     * Checks if the provide path starts with a valid root, such as "/" or "C:".
+     * 
+     * @param path
+     *          The path to check. 
+     * @return
+     *          If the provide path starts with a valid root.
+     */
+    public static boolean startWithRoot(String path) {
+        return startsWithLinuxRoot(path) || startWithWindowsRoot(path);
+    }
+    
+    /**
      * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
      * represents the part of <code>path</code> that is realtive to the <code>root</code>.
      * 

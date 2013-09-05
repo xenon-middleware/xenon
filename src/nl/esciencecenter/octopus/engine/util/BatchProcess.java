@@ -27,6 +27,7 @@ import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.util.FileUtils;
 
 /**
  * BatchProcess wraps an {@link InteractiveProcess} to emulate a batch process.
@@ -80,8 +81,7 @@ class BatchProcess implements Process {
 
         if (stdin == null) {
             stdinForwarder = null;
-            // NOTE: Retrieving this stream and closing it may cause some Windows applications to exit! 
-            // streams.getStdin().close();
+            streams.getStdin().close();
         } else {
             stdinForwarder = new StreamForwarder(files.newInputStream(stdin), streams.getStdin());
         }
@@ -93,7 +93,7 @@ class BatchProcess implements Process {
 
         if (path == null) {
             result = root;
-        } else if (path.startsWith("/")) {  // FIXME: windows! 
+        } else if (FileUtils.startWithRoot(path)) { 
             result = files.newPath(root.getFileSystem(), new RelativePath(path));
         } else {
             result = files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));

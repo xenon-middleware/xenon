@@ -232,14 +232,6 @@ public class LocalFileAttributes implements FileAttributes {
     public boolean isWritable() {
         return writable;
     }
-
-//    @Override
-//    public String toString() {
-//        return "LocalFileAttributes [executable=" + executable + ", readable=" + readable + ", writable=" + writable
-//                + ", hidden=" + hidden + ", attributes=" + attributes + " " + PosixFilePermissions.toString(attributes.permissions()) + "]";
-//    }
-
-    
     
     @Override
     public int hashCode() {
@@ -275,54 +267,46 @@ public class LocalFileAttributes implements FileAttributes {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) { 
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) { 
             return false;
+        }
+        
         LocalFileAttributes other = (LocalFileAttributes) obj;
-        if (creationTime != other.creationTime)
-            return false;
-        if (executable != other.executable)
-            return false;
+        
         if (group == null) {
-            if (other.group != null)
+            if (other.group != null) { 
                 return false;
-        } else if (!group.equals(other.group))
+            }
+        } else if (!group.equals(other.group)) { 
             return false;
-        if (hidden != other.hidden)
-            return false;
-        if (isDirectory != other.isDirectory)
-            return false;
-        if (isOther != other.isOther)
-            return false;
-        if (isRegular != other.isRegular)
-            return false;
-        if (isSymbolicLink != other.isSymbolicLink)
-            return false;
-        if (isWindows != other.isWindows)
-            return false;
-        if (lastAccessTime != other.lastAccessTime)
-            return false;
-        if (lastModifiedTime != other.lastModifiedTime)
-            return false;
+        }
+                
         if (owner == null) {
-            if (other.owner != null)
+            if (other.owner != null) { 
                 return false;
-        } else if (!owner.equals(other.owner))
+            }
+        } else if (!owner.equals(other.owner)) { 
             return false;
-        if (permissions == null) {
-            if (other.permissions != null)
+        }
+        
+        if (permissions == null) { 
+            if (other.permissions != null) { 
                 return false;
-        } else if (!permissions.equals(other.permissions))
+            }
+        } else if (!permissions.equals(other.permissions)) { 
             return false;
-        if (readable != other.readable)
-            return false;
-        if (size != other.size)
-            return false;
-        if (writable != other.writable)
-            return false;
-        return true;
+        }
+
+        return (hidden == other.hidden && isDirectory == other.isDirectory && isOther == other.isOther && 
+                isRegular == other.isRegular && isSymbolicLink == other.isSymbolicLink && isWindows == other.isWindows &&
+                lastAccessTime == other.lastAccessTime && lastModifiedTime == other.lastModifiedTime && 
+                readable == other.readable && size == other.size && writable == other.writable && 
+                creationTime == other.creationTime && executable == other.executable); 
     }
 }

@@ -67,25 +67,6 @@ public interface Jobs {
             throws OctopusException, OctopusIOException;
     
     /**
-     * Get a Scheduler that represents the local machine.
-     * 
-     * Multiple invocations of this method may return the same Scheduler.
-     * 
-     * @return the resulting Scheduler.
-     * 
-     * @throws NoSchedulerException
-     *             If the scheduler is not available.
-     * @throws UnknownPropertyException
-     *             If a unknown property was provided.
-     * @throws InvalidPropertyException
-     *             If a known property was provided with an invalid value.
-     * 
-     * @throws OctopusException
-     *             If the creation of the Scheduler failed.
-     */
-   //Scheduler getLocalScheduler() throws OctopusException, OctopusIOException;
-
-    /**
      * Close a Scheduler.
      * 
      * @param scheduler
