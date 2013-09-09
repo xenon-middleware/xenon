@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ -d octopus_test ]
+then
+	exit 0
+fi
+
+mkdir -p $PWD/octopus_test/links
+echo "Hello World" > $PWD/octopus_test/links/file0
+touch $PWD/octopus_test/links/file1
+
+ln -s $PWD/octopus_test/links/file0 $PWD/octopus_test/links/link0
+ln -s $PWD/octopus_test/links/file1 $PWD/octopus_test/links/link1
+ln -s $PWD/octopus_test/links/file2 $PWD/octopus_test/links/link2
+ln -s $PWD/octopus_test/links/link0 $PWD/octopus_test/links/link3
+ln -s $PWD/octopus_test/links/link2 $PWD/octopus_test/links/link4
+ln -s $PWD/octopus_test/links/link6 $PWD/octopus_test/links/link5
+ln -s $PWD/octopus_test/links/link5 $PWD/octopus_test/links/link6

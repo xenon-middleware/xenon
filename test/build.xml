@@ -2,6 +2,9 @@
 	<description>
       		Build file for tests
     	</description>
+ 
+        <!-- Read the test config property file --> 
+        <loadproperties srcFile="${user.home}/octopus.test.properties"/>
 
 	<property name="octopus.dist" location="../dist" />
 
@@ -42,9 +45,35 @@
 
 	<target name="build" description="build everything" depends="clean,compile" />
 
-	<target name="test" description="Run unit tests with coverage" depends="build">
+	<target name="prepare-test" description="Prepare for unit tests" depends="build">
+
+		<fail>
+			<condition>
+       			<not>
+         			<isset property="test.ssh.location"/>
+       			</not>
+     			</condition>
+   		</fail>
+
+                <!-- Prepare a local dir with symlinks for testing -->
+		<exec dir="${basedir}" executable="/bin/bash" os="Linux">
+ 			<arg line="${basedir}/scripts/create_symlinks"/>
+		</exec>
+
+		<exec dir="${basedir}" executable="/bin/bash" os="OSX">
+ 			<arg line="${basedir}/scripts/create_symlinks"/>
+		</exec>
+		
+		<sshexec host="${test.ssh.location}"
+			username="${test.ssh.user}"
+			password="${test.ssh.password}"
+			command="/bin/bash"
+			input="${basedir}/scripts/create_symlinks"/>
+	</target>
+
+	<target name="test" description="Run unit tests with coverage" depends="build,prepare-test">
 		<delete file="reports/jacoco/jacoco.exec" />
-        <mkdir dir="reports/jacoco" />
+	        <mkdir dir="reports/jacoco" />
 
 		<jacoco:coverage destfile="reports/jacoco/jacoco.exec">
 			<junit printsummary="yes" fork="yes">

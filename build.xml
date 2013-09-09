@@ -16,15 +16,15 @@
 	<target name="build" depends="clean, compile" description="build everything" />
 
 	<target name="test" description="run the unit tests with coverage" depends="build">
-		<ant dir="test" target="test" />
+		<ant dir="${basedir}/test" target="test" />
 	</target>
 
 	<target name="test-integration" description="run the integration tests" depends="build">
-		<ant dir="test" target="test-integration" />
+		<ant dir="${basedir}/test" target="test-integration" />
 	</target>
 
 	<target name="examples" description="compile the examples" depends="build">
-		<ant dir="examples" target="build" />
+		<ant dir="${basedir}/examples" target="build" />
 	</target>
 
 	<target name="compile" description="compile the source ">

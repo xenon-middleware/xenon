@@ -114,6 +114,6 @@ public class LocalFileTestConfig extends FileTestConfig {
 
     @Override
     public Path getWorkingDir(Files files, Credentials c) throws Exception {
-        return Utils.getLocalCWD(files);
+        return Utils.resolveWithRoot(files, Utils.getLocalCWD(files), "test");
     }
 }

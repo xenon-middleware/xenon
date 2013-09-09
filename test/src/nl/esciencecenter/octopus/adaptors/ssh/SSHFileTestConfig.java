@@ -69,14 +69,6 @@ public class SSHFileTestConfig extends FileTestConfig {
         correctLocation = username + "@" + location;
         wrongLocation = username + "@" + wrongLoc;
         correctLocationWrongUser = wrongUser + "@" + location;
-//        
-//        
-//        correctURI = new URI("ssh://" + username + "@" + location);
-//        correctFSURI = new URI("sftp://" + username + "@" + location);
-//        correctURIWithPath = new URI("ssh://" + username + "@" + location + "/");
-//        wrongUserURI = new URI("ssh://" + wrongUser + "@" + location);
-//        wrongLocationURI = new URI("ssh://" + username + "@" + wrongLocation);
-//        wrongPathURI = new URI("ssh://" + username + "@" + location + "/aap/noot");
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
