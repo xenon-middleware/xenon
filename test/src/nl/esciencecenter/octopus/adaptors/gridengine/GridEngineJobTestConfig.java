@@ -262,7 +262,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public boolean supportsNullLocation() {
-        return false;
+        return true;
     }
     
     @Override

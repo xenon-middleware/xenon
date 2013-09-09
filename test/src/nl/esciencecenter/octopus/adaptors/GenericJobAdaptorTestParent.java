@@ -195,14 +195,6 @@ public abstract class GenericJobAdaptorTestParent {
     }
 
     @Test
-    public void test01b_newScheduler() throws Exception {
-        if (config.supportsNullLocation()) { 
-            Scheduler s = jobs.newScheduler(config.getScheme(), null, null, null);
-            jobs.close(s);
-        }
-    }
-    
-    @Test
     public void test02a_newScheduler() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), null, null);
         jobs.close(s);

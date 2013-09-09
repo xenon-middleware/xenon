@@ -264,7 +264,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public boolean supportsNullLocation() {
-        return false;
+        return true;
     }
     
     @Override

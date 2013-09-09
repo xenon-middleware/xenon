@@ -177,8 +177,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private final GridEngineSetup setupInfo;
 
-    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, OctopusProperties properties,
-            OctopusEngine engine) throws OctopusIOException, OctopusException {
+    GridEngineSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
+            OctopusProperties properties, OctopusEngine engine) throws OctopusIOException, OctopusException {
 
         super(adaptor, scheme, location, credential, properties, engine, properties
                 .getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
