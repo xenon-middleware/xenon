@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
@@ -546,7 +547,7 @@ public final class Utils {
      */
     public static RelativePath getRelativePath(String path, String root) throws OctopusException {
         
-        if (!path.startsWith(root)) { 
+        if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) { 
             throw new OctopusException(NAME, "Path does not start with root: " + path + " " + root);
         }
 
