@@ -18,6 +18,10 @@ package nl.esciencecenter.octopus.files;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
+
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -31,15 +35,38 @@ import org.junit.Test;
  */
 public class InterSchemeCopyTest {
 
+    private String getPropertyOrFail(Properties p, String property) throws Exception {
+
+        String tmp = p.getProperty(property);
+
+        if (tmp == null) {
+            throw new Exception("Failed to retireve property " + property);
+        }
+
+        return tmp;
+    }
+    
     @Test
     public void test_copy_local_ssh() throws Exception {
 
         Octopus octopus = OctopusEngine.newOctopus(null);
 
+        String configfile = System.getProperty("test.config");
+        
+        if (configfile == null) {
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+        }
+        
+        Properties p = new Properties();
+        p.load(new FileInputStream(configfile));
+
+        String user = getPropertyOrFail(p, "test.ssh.user");
+        String location = getPropertyOrFail(p, "test.ssh.location");
+        
         Files files = octopus.files();
 
         Path localCWD = Utils.getLocalCWD(files);
-        Path sshCWD = files.newFileSystem("ssh", "test@localhost", null, null).getEntryPath();
+        Path sshCWD = files.newFileSystem("ssh", user + "@" + location, null, null).getEntryPath();
 
         String dirname = "octopus_test_" + System.currentTimeMillis();
 

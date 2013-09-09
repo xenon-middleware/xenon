@@ -18,10 +18,13 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
@@ -42,6 +45,17 @@ import nl.esciencecenter.octopus.util.Utils;
  */
 public class MultiJobTest {
 
+    private String getPropertyOrFail(Properties p, String property) throws Exception {
+
+        String tmp = p.getProperty(property);
+
+        if (tmp == null) {
+            throw new Exception("Failed to retireve property " + property);
+        }
+
+        return tmp;
+    }
+    
     private String readFully(InputStream in) throws IOException {
 
         byte[] buffer = new byte[1024];
@@ -70,6 +84,18 @@ public class MultiJobTest {
 
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount + ")");
 
+        String configfile = System.getProperty("test.config");
+        
+        if (configfile == null) {
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+        }
+        
+        Properties p = new Properties();
+        p.load(new FileInputStream(configfile));
+
+        String user = getPropertyOrFail(p, "test.ssh.user");
+        String location = getPropertyOrFail(p, "test.ssh.location");
+        
         String TEST_ROOT = "octopus_test_SSH_" + System.currentTimeMillis();
 
         Octopus octopus = OctopusFactory.newOctopus(null);
@@ -77,9 +103,9 @@ public class MultiJobTest {
         Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
 
-        FileSystem filesystem = files.newFileSystem("sftp", "test@localhost", credentials.getDefaultCredential("sftp"),
+        FileSystem filesystem = files.newFileSystem("sftp", user + "@" + location, credentials.getDefaultCredential("sftp"),
                 new HashMap<String, String>());
-        Scheduler scheduler = jobs.newScheduler("ssh", "test@localhost", credentials.getDefaultCredential("ssh"),
+        Scheduler scheduler = jobs.newScheduler("ssh", user + "@" + location, credentials.getDefaultCredential("ssh"),
                 new HashMap<String, String>());
 
         String workingDir = TEST_ROOT + "/" + testName;

@@ -16,6 +16,10 @@
 
 package nl.esciencecenter.octopus.files;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
+
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
@@ -28,16 +32,39 @@ import org.junit.Test;
  * 
  */
 public class InterSchemeMoveTest {
+    
+    private String getPropertyOrFail(Properties p, String property) throws Exception {
 
+        String tmp = p.getProperty(property);
+
+        if (tmp == null) {
+            throw new Exception("Failed to retireve property " + property);
+        }
+
+        return tmp;
+    }
+    
     @Test(expected = OctopusIOException.class)
     public void test_move() throws Exception {
 
+        String configfile = System.getProperty("test.config");
+        
+        if (configfile == null) {
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+        }
+        
+        Properties p = new Properties();
+        p.load(new FileInputStream(configfile));
+
+        String user = getPropertyOrFail(p, "test.ssh.user");
+        String location = getPropertyOrFail(p, "test.ssh.location");
+        
         Octopus octopus = OctopusEngine.newOctopus(null);
 
         Files files = octopus.files();
 
         FileSystem fs1 = Utils.getLocalCWD(files).getFileSystem();
-        FileSystem fs2 = files.newFileSystem("ssh", "test@localhost", null, null);
+        FileSystem fs2 = files.newFileSystem("ssh", user + "@" + location, null, null);
 
         Path file1 = Utils.resolveWithEntryPath(files, fs1, "test");
         Path file2 = Utils.resolveWithEntryPath(files, fs2, "test");
