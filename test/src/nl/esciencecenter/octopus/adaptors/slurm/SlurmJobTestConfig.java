@@ -41,14 +41,6 @@ public class SlurmJobTestConfig extends JobTestConfig {
     private String username;
     private char[] passwd;
 
-//    private URI correctURI;
-//    private URI correctURIWithPath;
-//    private URI correctFSURI;
-//
-//    private URI wrongUserURI;
-//    private URI wrongLocationURI;
-//    private URI wrongPathURI;
-
     private String scheme = "slurm";
     private String correctLocation;
     private String wrongLocation;
@@ -272,7 +264,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public boolean supportsNullLocation() {
-        return true;
+        return false;
     }
     
     @Override

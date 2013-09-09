@@ -92,11 +92,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         correctLocation = username + "@" + location;
         wrongLocation = username + "@" + wrongLoc;
         correctLocationWrongUser = wrongUser + "@" + location;
-//        correctFSURI = new URI("sftp://" + username + "@" + location);
-//        correctURIWithPath = new URI("ge://" + username + "@" + location + "/");
-//        wrongUserURI = new URI("ge://" + wrongUser + "@" + location);
-//        //wrongLocationURI = new URI("ge://" + username + "@" + wrongLocation);
-//        wrongPathURI = new URI("ge://" + username + "@" + location + "/aap/noot");
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
@@ -267,7 +262,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public boolean supportsNullLocation() {
-        return true;
+        return false;
     }
     
     @Override

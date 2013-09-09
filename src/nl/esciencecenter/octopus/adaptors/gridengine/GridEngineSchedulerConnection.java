@@ -286,6 +286,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                 } else if (runner.getExitCode() == 1) {
                     //sge returns "1" as the exit code if there is something wrong with the queue, ignore
                     LOGGER.warn("Failed to get queue status for queue " + runner);
+                    throw new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
+                            + queueName + "\": " + runner);                    
                 } else {
                     throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);
