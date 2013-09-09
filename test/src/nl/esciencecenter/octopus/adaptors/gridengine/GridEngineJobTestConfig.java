@@ -89,9 +89,15 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         parallelEnvironment = p.getProperty("test.gridengine.parallel.environment");
 
-        correctLocation = username + "@" + location;
-        wrongLocation = username + "@" + wrongLoc;
-        correctLocationWrongUser = wrongUser + "@" + location;
+        if (location == null || location.isEmpty() || location.equals("/")) { 
+            correctLocation = "";
+            wrongLocation = "aap";
+            correctLocationWrongUser = wrongUser + "@";
+        } else { 
+            correctLocation = username + "@" + location;
+            wrongLocation = username + "@" + wrongLoc;
+            correctLocationWrongUser = wrongUser + "@" + location;
+        }
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {

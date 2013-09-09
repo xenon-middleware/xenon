@@ -82,16 +82,15 @@ public class SlurmJobTestConfig extends JobTestConfig {
         queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.queue.wait.time"));
         updateTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.update.time"));
 
-        correctLocation = username + "@" + location;
-        wrongLocation = username + "@" + wrongLoc;
-        correctLocationWrongUser = wrongUser + "@" + location;
-        
-//        correctURI = new URI("slurm://" + username + "@" + location);
-//        correctFSURI = new URI("sftp://" + username + "@" + location);
-//        correctURIWithPath = new URI("slurm://" + username + "@" + location + "/");
-//        wrongUserURI = new URI("slurm://" + wrongUser + "@" + location);
-//        wrongLocationURI = new URI("slurm://" + username + "@" + wrongLocation);
-//        wrongPathURI = new URI("slurm://" + username + "@" + location + "/aap/noot");
+        if (location == null || location.isEmpty() || location.equals("/")) { 
+            correctLocation = "";
+            wrongLocation = "aap";
+            correctLocationWrongUser = wrongUser + "@";
+        } else { 
+            correctLocation = username + "@" + location;
+            wrongLocation = username + "@" + wrongLoc;
+            correctLocationWrongUser = wrongUser + "@" + location;
+        }
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
