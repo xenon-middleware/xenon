@@ -3,8 +3,8 @@
       		Build file for tests
     	</description>
  
-        <!-- Read the test config property file --> 
-        <loadproperties srcFile="${user.home}/octopus.test.properties"/>
+	<!-- NOTE: this operation is ignored if the property is already set on the command line! -->
+	<property name="test.config" location="${user.home}/octopus.test.properties"/>
 
 	<property name="octopus.dist" location="../dist" />
 
@@ -46,7 +46,11 @@
 	<target name="build" description="build everything" depends="clean,compile" />
 
 	<target name="prepare-test" description="Prepare for unit tests" depends="build">
-
+        	<!-- Read the test config property file --> 		
+		<loadproperties>
+			<file file="${test.config}"/>
+    		</loadproperties>
+	
 		<fail>
 			<condition>
        			<not>
