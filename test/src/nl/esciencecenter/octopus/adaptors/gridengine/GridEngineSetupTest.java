@@ -116,13 +116,28 @@ public class GridEngineSetupTest {
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
 
         //we expect the number of nodes
-        int expected = 2;
+        int expected = 1;
 
-        int result = testSetup.calculateSlots("some.pe", "some.q", 2);
+        int result = testSetup.calculateSlots("some.pe", "some.q", 1);
 
         assertEquals("round_robin pe allocation should return the number of nodes", expected, result);
     }
 
+    @Test(expected = OctopusException.class)
+    public void test02d_calculateSlots_roundRobinPe_tooManySlots_Fails() throws OctopusException {
+        String[] queueNames = new String[] { "some.q" };
+
+        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
+
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
+
+        GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
+        testSetup.calculateSlots("some.pe", "some.q", 2);
+        // Should fail.
+    }
+    
     @Test
     public void test02e_calculateSlots_integerPe_slots() throws OctopusException {
         String[] queueNames = new String[] { "some.q" };
