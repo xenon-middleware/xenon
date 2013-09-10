@@ -231,15 +231,13 @@ octopus:
 
     public interface Credentials {
 
-        Credential newCertificateCredential(String scheme, String keyfile, 
-            String certfile, String username, char [] password, 
-            Map<String,String> properties) 
+        Credential newCertificateCredential(String scheme, String keyfile, String certfile, 
+            String username, char [] password, Map<String,String> properties) 
 
-        Credential newPasswordCredential(String scheme, String username, 
-            char [] password, Map<String,String> properties)
+        Credential newPasswordCredential(String scheme, String username, char [] password, 
+	    Map<String,String> properties)
 
         Credential getDefaultCredential(String scheme)
-
         void close(Credential credential)
     }
 
@@ -277,16 +275,11 @@ The [`nl.esciencecenter.octopus.files`][8] package contains the [__Files__][9] i
 octopus. For readability we will split the explanation of __Files__ into several parts:
 
     public interface Files {
-
-       FileSystem newFileSystem(String scheme, String location, 
-           Credential credential, Map<String,String> properties)
+       FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String,String> properties)
 
        void close(FileSystem filesystem) 
-
        boolean isOpen(FileSystem filesystem)
-
        // ... more follows
-
     }
 
 The __Files__ interface contains several method for creating and closing a [__FileSystem__][10]. 

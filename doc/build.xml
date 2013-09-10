@@ -50,12 +50,13 @@
 			<fileset file="userguide_src.md" />
 			<fileset file="adaptors_generated.md" />
 		</concat>
-
+<!--
 		<exec executable="pandoc">
 			<arg value="userguide.md"/>
 			<arg value="-o"/>
 			<arg value="userguide.pdf"/>
 		</exec>
+-->
 	</target>
 		
 	<target name="build" description="build everything" depends="clean,userguide" />
