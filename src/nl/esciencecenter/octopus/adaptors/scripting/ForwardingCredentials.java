@@ -61,4 +61,10 @@ public class ForwardingCredentials implements Credentials {
     public void close(Credential credential) throws OctopusException {
         throw new OctopusException("scripting", "The Scripting Adaptor does not make credentials, and thus cannot close them");
     }
+
+    @Override
+    public boolean isOpen(Credential credential) throws OctopusException {
+        throw new OctopusException("scripting", "The Scripting Adaptor does not make credentials, and thus cannot check if " +
+        		"they are open");
+    }
 }

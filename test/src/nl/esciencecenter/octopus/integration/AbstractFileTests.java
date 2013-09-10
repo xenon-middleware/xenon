@@ -139,7 +139,8 @@ abstract public class AbstractFileTests {
     protected Path createSubdir(Path parentDirPath, String subDir) throws OctopusIOException, OctopusException {
         Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subDir);
         infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
-        return getFiles().createDirectory(absPath);
+        getFiles().createDirectory(absPath);
+        return absPath;
     }
 
     /**
@@ -161,7 +162,8 @@ abstract public class AbstractFileTests {
 
             if (getFiles().exists(absPath) == false) {
                 infoPrintf("createUniqueTestSubdir: '%s'+%d => '%s'\n", dirPrefix, myid, absPath);
-                return getFiles().createDirectory(absPath);
+                getFiles().createDirectory(absPath);
+                return absPath;
             }
 
         } while (true);
@@ -190,10 +192,10 @@ abstract public class AbstractFileTests {
             if (getFiles().exists(absPath) == false) {
 
                 infoPrintf("createUniqueTestFile: '%s'+%d => '%s'\n", filePrefix, myid, absPath);
-                if (createFile)
-                    return getFiles().createFile(absPath);
-                else
-                    return absPath;
+                if (createFile) {
+                    getFiles().createFile(absPath);
+                }
+                return absPath;
             }
 
         } while (true);
@@ -201,7 +203,8 @@ abstract public class AbstractFileTests {
 
     protected Path createFile(Path parentDirPath, String subFile) throws OctopusIOException, OctopusException {
         Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subFile);
-        return getFiles().createFile(absPath);
+        getFiles().createFile(absPath);
+        return absPath;
     }
 
     protected void deletePaths(Path[] paths, boolean assertDeletion) throws OctopusIOException, OctopusException {
@@ -269,9 +272,8 @@ abstract public class AbstractFileTests {
                     preExisting);
         }
 
-        Path actualPath = files.createFile(filePath);
+        files.createFile(filePath);
         // enforce ? 
-        assertEquals("createFile(): New path is not equal to given path", filePath, actualPath);
         boolean exists = files.exists(filePath);
         assertTrue("exist(): After createFile() exists() reports false.", exists);
 
@@ -291,12 +293,11 @@ abstract public class AbstractFileTests {
         assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath,
                 files.exists(dirPath));
 
-        Path actualPath = getFiles().createDirectory(dirPath);
+        getFiles().createDirectory(dirPath);
         // test both ? 
         boolean exists = files.exists(dirPath);
-        assertTrue("After createDirectory(), method exists() reports false for given path:" + dirPath, exists);
-        exists = files.exists(actualPath);
-        assertTrue("After createDirectory(), method exists() reports false for returned path:" + actualPath, exists);
+        exists = files.exists(dirPath);
+        assertTrue("After createDirectory(), method exists() reports false for path:" + dirPath, exists);
 
         assertDirIsEmpty(files, dirPath);
 

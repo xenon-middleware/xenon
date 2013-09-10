@@ -309,7 +309,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public Path createDirectories(Path dir) throws OctopusIOException {
+    public void createDirectories(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -324,12 +324,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
                 createDirectory(tmp);
             }
         }
-
-        return dir;
     }
 
     @Override
-    public Path createDirectory(Path dir) throws OctopusIOException {
+    public void createDirectory(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -342,12 +340,10 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         } catch (IOException e) {
             throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create directory " + dir, e);
         }
-
-        return dir;
     }
 
     @Override
-    public Path createFile(Path path) throws OctopusIOException {
+    public void createFile(Path path) throws OctopusIOException {
 
         if (exists(path)) {
             throw new FileAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
@@ -356,8 +352,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         checkParent(path);
 
         LocalUtils.createFile(path);
-
-        return path;
     }
 
     @Override

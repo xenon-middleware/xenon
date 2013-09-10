@@ -114,4 +114,17 @@ public interface Credentials {
      *             If the Credential failed to close.
      */
     void close(Credential credential) throws OctopusException;
+    
+    /**
+     * Test if a Credential is open.
+     * 
+     * @param credential
+     *            the Credential to test.
+     * 
+     * @throws OctopusException
+     *             If the test failed.
+     * @throws OctopusIOException
+     *             If an I/O error occurred.
+     */
+    boolean isOpen(Credential credential) throws OctopusException;    
 }

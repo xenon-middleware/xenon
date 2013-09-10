@@ -7,9 +7,9 @@ Copyright 2013 The Netherlands eScience Center
 
 Author: Jason Maassen (<J.Maassen@esciencecenter.nl>)
 
-Version: Userguide v0.2, Octopus v1.0rc1
+Version: Userguide v1.0rc1, Octopus v1.0rc1
 
-Last modified: 26 August 2013
+Last modified: 10 September 2013
 
 
 Copyrights & Disclaimers
@@ -121,7 +121,7 @@ translating each of these functions to *sftp* specific code and commands.
 
 For each interface in octopus there may be multiple adaptors translating 
 its functionality to different middlewares. To distinguises between these 
-adaptors, octopus uses the *scheme* they support, such as "sftp", "http" 
+adaptors octopus uses the *scheme* they support, such as "sftp", "http" 
 or "ssh". There can be only one adaptor for each scheme. 
 
 The *engine layer* of octopus contains the "glue" that connects each interface 
@@ -239,6 +239,8 @@ octopus:
             char [] password, Map<String,String> properties) throws ...;
 
         Credential getDefaultCredential(String scheme) throws ...;
+
+        void close(Credential credential) throws ...;
     }
 
 The __Credentials__ interface contains various methods for creating credentials, based 
@@ -265,6 +267,10 @@ The __getAdaptorName__ method can be used to retrieve the name of the adaptor th
 the credential. Many adaptor specific objects returned by octopus contain this method. For 
 brevity we will not explain this further.
 
+When a __Credential__ is no longer used, it __must__ be closed using __close__. This releases any 
+resources held by the __Credential__. The __isOpen__ method can be used to check if a __Credential__ 
+is open or closed. 
+
 ### Files interface ###
 
 The [`nl.esciencecenter.octopus.files`][8] package contains the [__Files__][9] interface of 
@@ -272,8 +278,8 @@ octopus. For readability we will split the explanation of __Files__ into several
 
     public interface Files {
 
-       FileSystem newFileSystem(URI location, Credential credential, 
-           Map<String,String> properties) throws ...
+       FileSystem newFileSystem(String scheme, String location, 
+           Credential credential, Map<String,String> properties) throws ...
 
        FileSystem getLocalCWDFileSystem() throws ...
 
@@ -290,48 +296,53 @@ octopus. For readability we will split the explanation of __Files__ into several
 The __Files__ interface contains several method for creating and closing a [__FileSystem__][10]. 
 A __FileSystem__ provides an abstraction for a (possibly remote) file system. 
 
-To create a __FileSystem__ the __newFileSystem__ method can be used. The _location_ parameter provides 
-the information on the location of the file system. The URI is expected to contain at least a _scheme_. 
-Most URIs will also contain _host_ information. Optionally, _user_ information may also be provided. A 
-file system URI may _not_ contain a path other than `"/"`. The following are all valid file system URIs: 
+To create a __FileSystem__ the __newFileSystem__ method can be used. As before, the desired __scheme__ 
+must be provided as a parameter. In addition, the _location_ parameter provides information on the 
+location of the file system using an adaptor specific string. For local file systems, the location 
+must contain the root of the file system to access, such as "/" on Linux or "C:" on Windows. For remote 
+file systems, the location typically contains the host name of the machine to connect to. The exact 
+format of accepted location strings can be found in the adaptor documentation. 
 
-    file:///
-    sftp://example.com
-    sftp://test@example.com:8080/
+The following are all valid combinations of file system schemes and locations:
+
+    "file"  "/"                        connect to the local file system on Linux
+    "file"  "C:"                       connect to the local C: drive on Windows  
+    "sftp"  "example.com"              connect to example.com using sftp 
+    "sftp"  "test@example.com:44"      connect to example.com using sftp on port 44
+                                       with "test" as user name.
 
 The __newFileSystem__ method also has a _credential_ parameter to provide the credential needed to access the file 
 system. If this parameter is set to `null` the default credentials will be used for the scheme. The _properties_
 parameter can be used to provide additional configuration properties. Again, `null` can be used if no additional 
-configuration is required. The returned __FileSystem__ contains the following:
+configuration is required. The returned __FileSystem__ contains the following methods:
 
     public interface FileSystem {
         /// ...
-        URI getUri();
-        AbsolutePath getEntryPath();
+        String getScheme();
+        String getLocation();
+        Path getEntryPath();
     }
 
-The __getUri__ method returns the `URI` used to create it. The __getEntryPath__ method returns the 
-_path at which the file system was entered_. For example, when accessing a file system using "sftp" it is
-customary (but not manditory) to enter the file system at the users' home directory. Therefore, the 
-entry path of the __FileSystem__ will be similar to "/home/(username)". 
+The __getScheme__ and __getLocation__ methods returns the scheme and location strings used to create the __FileSystem__. 
+The __getEntryPath__ method returns the _path at which the file system was entered_. For example, when accessing a file 
+system using "sftp" it is customary (but not manditory) to enter the file system at the users' home directory. Therefore, 
+the entry path of the __FileSystem__ will be similar to "/home/(username)". For local file systems the entry path is 
+typically set to the root of the file system (such as "/" or "C:").
 
-The __getLocalCWDFileSystem__ and __getLocalHomeFileSystem__ methods of __Files__ provide shortcuts to create a 
-__FileSystem__ representing the _current working directory_ or _user home directory_ on the local machine. 
-
-When a __FileSystem__ is no longer used, it __must__ be closed using __close__. this releases any resources 
+When a __FileSystem__ is no longer used, it __must__ be closed using __close__. This releases any resources 
 held by the __FileSystem__. The __isOpen__ method can be used to check if a __FileSystem__ is open or closed. 
 Once a __FileSystem__ is created, it can be used to access files: 
 
     public interface Files {
 
-       AbsolutePath newPath(FileSystem filesystem, 
-           Pathname location) throws ...
+       Path newPath(FileSystem filesystem, 
+           RelativePath location) throws ...
 
-       Path createFile(Path path) throws ...
+       void createFile(Path path) throws ...
 
-       Path createDirectories(Path dir) throws ...
+       void createDirectories(Path dir) throws ...
 
-       Path createDirectory(Path dir) throws ...
+       void createDirectory(Path dir) throws ...
 
        boolean exists(Path path) throws ...
 
@@ -344,10 +355,11 @@ Once a __FileSystem__ is created, it can be used to access files:
 
 The __newPath__ method can be used to create a new [__Path__][11]. An __Path__ represents a path
 on a specific __FileSystem__. This path does not necessarily exists. To create an __Path__, both 
-the target __FileSystem__ and a [__Pathname__][12] are needed. A __Pathname__ contains a sequence 
-of strings separated using a special _separator_ character, which is used to identify a location on a 
-file system (for example "/tmp/dir"). __Pathname__ contains many utility methods for manipulating 
-these string sequences. The details can be found in the Javadoc.
+the target __FileSystem__ and a [__RelativePath__][12] are needed. A __RelativePath__ contains a 
+sequence of strings separated using a special _separator_ character, which is used to identify a 
+location on a file system (for example "/tmp/dir"). __RelativePath__ contains many utility methods 
+for manipulating these string sequences. The details can be found in the Javadoc of 
+[__RelativePath__][12].
 
 __Files__ contains several methods to create and delete files and directories. When creating files and 
 directories octopus checks if the target already exists. If so, an exception will be thrown. Similary, 
@@ -401,13 +413,12 @@ To copy files, the following methods are available:
     }
 
 The __copy__ method supports various copy operations such as a regular copy, a resume or an append. 
-The _options_ parameter can be used to specify the desired operation. The details can be found in the 
-Javadoc.
-
+The _options_ parameter can be used to specify the desired operation. 
 Normally, __copy__ performs its operation _synchronously_, that is, the call blocks until the copy 
 is completed. However, _asynchronous_ operations are also supported by providing the option 
 [__CopyOption.ASYNCHRONOUS__][17]. In that case a [__Copy__][16] object is returned that can be used 
 to retrieve the status of the copy (using __getCopyStatus__) or cancel it (using __cancelCopy__).
+The details of the available copy operations can be found in the Javadoc of [__CopyOption__][17].
 
 ### Jobs interface ###
 
@@ -416,24 +427,33 @@ For readability we will split the explanation of __Jobs__ into several parts:
 
     public interface Jobs {
 
-        Scheduler newScheduler(URI location, Credential credential, 
-           Map<String,String> properties) throws ...
+        Scheduler newScheduler(String scheme, String location,
+           Credential credential, Map<String,String> properties) throws ...
 
-        Scheduler getLocalScheduler() throws ...
         void close(Scheduler scheduler) throws ...
         boolean isOpen(Scheduler scheduler) throws ...
 
         // ... more follows
     }
 
-The __Jobs__ interface contains two methods to create a [__Scheduler__][20]. A __Scheduler__ provides 
-an abstraction for a (possibly remote) scheduler that can be used to run jobs. To create a new scheduler, 
-the __newScheduler__ method can be used, which has similar parameters to __newFileSystem__. __Jobs__ also 
-contains a shortcut method __getLocalScheduler__ to create a new __Scheduler__ for the local machine. 
+The __Jobs__ interface contains the __newScheduler__ method that can be used to create a [__Scheduler__][20]. 
+A __Scheduler__ provides an abstraction for a (possibly remote) scheduler that can be used to run jobs. 
+The __newScheduler__ method has __scheme__ and __location__ parameters that specify how to access the 
+scheduler. As with __newFileSystem__ the __location__ is adaptor specific. To access the local scheduler, 
+passing `null` or an empty string is sufficient. To access remote schedulers, the location typically contains 
+the host name of the machine to connect to. The exact format of accepted location strings can be found in the 
+adaptor documentation.
 
-When a __Scheduler__ is no longer used, is __must__ be closed using the __close__ method. The 
-__isOpen__ method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the 
-following:
+The following are valid examples of scheduler schemes and locations:
+
+    "local" ""                     the local scheduler 
+    "ssh"   "example.com"          connect to a remote scheduler at example.com using SSH
+    "slurm" ""                     connect to a local slurm scheduler
+    "slurm" "test@example.com:44"  connect to a remote slurm scheduler at example.com by 
+                                   using SSH on port 44 with "test" as user name.
+
+When a __Scheduler__ is no longer used, is __must__ be closed using the __close__ method. The __isOpen__ 
+method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the following:
 
     public interface Scheduler {
 
@@ -449,13 +469,18 @@ Each __Scheduler__ contains one or more queues to which jobs can be submitted. E
 is unique to the __Scheduler__. The __getQueueNames__ method can be used to retrieve all queue names. 
 
 The __isOnline__ method can be used to determine if the __Scheduler__ is an _online scheduler_ or an 
-_offline scheduler_. Online schedulers need to remain active for their jobs to run. Ending an online 
+_offline scheduler_. Online schedulers need to remain active for their jobs to run. Closing an online 
 scheduler will kill all jobs that were submitted to it. Offline schedulers do not need to remains active 
 for their jobs to run. A submitted job will typically be handed over to some external server that will 
 manage the job for the rest of its lifetime.
 
-The __supportsInteractive__ and __supportsBatch__ method can be use to check if the __Scheduler__ supports 
-interactive and/or batch jobs. This will be explained below. 
+The __supportsInteractive__ and __supportsBatch__ method can be use to check if the __Scheduler__ supports
+interactive and/or batch jobs. Interactive jobs are jobs where the user gets direct control over the standard 
+streams of the job (the _stdin_, _stdout_ and _stderr_ streams). The user __must__ retrieve these streams 
+using the __getStreams__ method in __Jobs__ and then provide input and output, or close the streams. Failing
+to do so may cause the job to block indefinately. Batch jobs are jobs where the standard streams are redirected 
+from and to files. The location of these files must be set before the job is started, as will be explained 
+below.
 
 Once a __Scheduler__ is created, __Jobs__ contains several methods to retrieve information about the 
 __Scheduler__:
@@ -505,7 +530,8 @@ To submit and manage jobs, the __Jobs__ interface contains the following methods
 The __submitJob__ method can be used to submit a job to a __Scheduler__. A [__JobDescription__][21] must 
 be provided as parameter. A __JobDescription__ contains all necessary information on how to start the job, 
 for example, the location of the executable, any command line arguments that are required, the working 
-directory, etc. See the Javadoc for details of the __JobDescription__.
+directory, if the job is an interactive of batch job, the location of the files for stream redirection 
+(in case of a batch job), etc. See the Javadoc for details of the __JobDescription__.
 
 Once a job is submitted, a [__Job__][22] object is returned that can be used with __getJobStatus__ to 
 retrieve the status of the job, and with __cancelJob__ to cancel it. This __Job__ contains the following:
@@ -522,14 +548,6 @@ Besides methods for retrieveing the __JobDescription__ and __Scheduler__ that cr
 contains the __isInteractive__ method to determine if the __Job__ is interactive, and the __isOnline__ 
 method to determine if the job is running on an _online scheduler_ (explained above).
  
-Interactive jobs are jobs where the user gets direct control over the standard streams of the job 
-(the _stdin_, _stdout_ and _stderr_ streams). The user __must__ retrieve these streams using the 
-__getStreams__ method in __Jobs__ and then provide input and output, or close the streams. Failing to do
-so may cause the job to block indefinately.
-
-Batch jobs are jobs where the standard streams are redirected from and to files. The source and targets 
-for this redirection can be set in the __JobDescription__. See the Javadoc of __JobDescription__ for details.
-
 After submitting a job, __waitUntilRunning__ can be used to wait until a job is no longer waiting in the 
 queue and __waitUntilDone__ can be used to wait until the job has finished.  
 
@@ -548,11 +566,14 @@ octopus. See the Javadoc for the available exceptions.
 The [`nl.esciencecenter.octopus.util`][25] package contains various utility classes. See the Javadoc for the 
 available utilities.
 
+[EXPLAIN!]
+
+
 Examples
 --------
 
-Examples of how to use octopus can be found in the [examples][26] directory. We will list them here in 
-order of increasing complexity, and with a short description of each example.
+Examples of how to use octopus can be found in the [examples][26] directory. We will list the examples here 
+in order of increasing complexity, and with a short description of each example.
 
 ### Initializing Octopus ###
 
@@ -619,7 +640,7 @@ Submitting an interactive job with output:
 [9]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Files.html 
 [10]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileSystem.html
 [11]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Path.html
-[12]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Pathname.html
+[12]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/RelativePath.html
 [13]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html
 [14]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileAttributes.html
 [15]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/DirectoryStream.html

@@ -56,6 +56,11 @@ public class CredentialsEngineImplementation implements Credentials {
         getCredentialsAdaptor(credential).close(credential);
     }
 
+    @Override
+    public boolean isOpen(Credential credential) throws OctopusException {
+        return getCredentialsAdaptor(credential).isOpen(credential);
+    }
+
     private Credentials getCredentialsAdaptor(Credential credential) {
         try {
             Adaptor adaptor = octopusEngine.getAdaptor(credential.getAdaptorName());
@@ -67,4 +72,5 @@ public class CredentialsEngineImplementation implements Credentials {
                     e);
         }
     }
+
 }

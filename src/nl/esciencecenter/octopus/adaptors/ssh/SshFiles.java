@@ -208,7 +208,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public Path createDirectory(Path dir) throws OctopusIOException {
+    public void createDirectory(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -227,11 +227,10 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
-        return dir;
     }
 
     @Override
-    public Path createDirectories(Path dir) throws OctopusIOException {
+    public void createDirectories(Path dir) throws OctopusIOException {
 
         if (exists(dir)) {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -246,12 +245,10 @@ public class SshFiles implements Files {
                 createDirectory(tmp);
             }
         }
-
-        return dir;
     }
 
     @Override
-    public Path createFile(Path path) throws OctopusIOException {
+    public void createFile(Path path) throws OctopusIOException {
 
         if (exists(path)) {
             throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
@@ -272,7 +269,6 @@ public class SshFiles implements Files {
                 // ignore
             }
         }
-        return path;
     }
 
     @Override

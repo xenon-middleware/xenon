@@ -101,18 +101,18 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Path createDirectories(Path dir) throws OctopusIOException {
-        return getFilesAdaptor(dir).createDirectories(dir);
+    public void createDirectories(Path dir) throws OctopusIOException {
+        getFilesAdaptor(dir).createDirectories(dir);
     }
 
     @Override
-    public Path createDirectory(Path dir) throws OctopusIOException {
-        return getFilesAdaptor(dir).createDirectory(dir);
+    public void createDirectory(Path dir) throws OctopusIOException {
+        getFilesAdaptor(dir).createDirectory(dir);
     }
 
     @Override
-    public Path createFile(Path path) throws OctopusIOException {
-        return getFilesAdaptor(path).createFile(path);
+    public void createFile(Path path) throws OctopusIOException {
+        getFilesAdaptor(path).createFile(path);
     }
 
     @Override

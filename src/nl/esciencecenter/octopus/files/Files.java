@@ -263,7 +263,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    Path createDirectories(Path dir) throws OctopusIOException;
+    void createDirectories(Path dir) throws OctopusIOException;
 
     /**
      * Creates a new directory, failing if the directory already exists.
@@ -278,7 +278,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    Path createDirectory(Path dir) throws OctopusIOException;
+    void createDirectory(Path dir) throws OctopusIOException;
 
     /**
      * Creates a new empty file, failing if the file already exists.
@@ -293,7 +293,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If an I/O error occurred.
      */
-    Path createFile(Path path) throws OctopusIOException;
+    void createFile(Path path) throws OctopusIOException;
 
     /**
      * Deletes an existing path.

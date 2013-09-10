@@ -105,4 +105,10 @@ public class SshCredentials implements Credentials {
     public void close(Credential credential) throws OctopusException {
         // Nothing to do here.
     }
+
+    @Override
+    public boolean isOpen(Credential credential) throws OctopusException {
+        // Defaults to false
+        return false;
+    }
 }
