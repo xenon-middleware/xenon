@@ -324,7 +324,7 @@ public class SshFiles implements Files {
      *             If the move failed.
      */
     @Override
-    public Path move(Path source, Path target) throws OctopusIOException {
+    public void move(Path source, Path target) throws OctopusIOException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
@@ -342,7 +342,7 @@ public class SshFiles implements Files {
         RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
-            return target;
+            return;
         }
 
         if (exists(target)) {
@@ -364,7 +364,6 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
-        return target;
     }
 
     @SuppressWarnings("unchecked")

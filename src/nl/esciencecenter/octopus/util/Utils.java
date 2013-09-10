@@ -88,7 +88,7 @@ public final class Utils {
     /**
      * Create a <code>Scheduler</code> for the given scheme, but without using a location, credential, or properties. 
      * 
-     * This methods is a shortcut for calling {@link Jobs.newScheduler(String, String, Credential, Map)} with only the 
+     * This methods is a shortcut for calling {@link Jobs#newScheduler(String, String, Credential, Map)} with only the 
      * <code>scheme</code> set. 
      * 
      * @param jobs

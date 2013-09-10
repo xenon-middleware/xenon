@@ -211,7 +211,6 @@ public interface Files {
      *            the existing source path.
      * @param target
      *            the non existing target path.
-     * @return the target path.
      * 
      * @throws NoSuchFileException
      *             If the source file does not exist or the target parent directory does not exist.
@@ -220,7 +219,7 @@ public interface Files {
      * @throws OctopusIOException
      *             If the move failed.
      */
-    Path move(Path source, Path target) throws OctopusIOException;
+    void move(Path source, Path target) throws OctopusIOException;
 
     /**
      * Retrieve the status of an asynchronous copy.
@@ -255,7 +254,6 @@ public interface Files {
      * 
      * @param dir
      *            the directory to create.
-     * @return a Path representing the created directory.
      * 
      * @throws FileAlreadyExistsException
      *             If the directory already exists or if a parent directory could not be created because a file with the same name
@@ -271,8 +269,6 @@ public interface Files {
      * @param dir
      *            the directory to create.
      * 
-     * @return a Path representing the created directory.
-     * 
      * @throws FileAlreadyExistsException
      *             If the directory already exists.
      * @throws OctopusIOException
@@ -285,8 +281,6 @@ public interface Files {
      * 
      * @param path
      *            the file to create.
-     * 
-     * @return a Path representing the created file.
      * 
      * @throws FileAlreadyExistsException
      *             If the directory already exists.

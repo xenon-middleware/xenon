@@ -144,13 +144,14 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Path move(Path source, Path target) throws OctopusIOException {
+    public void move(Path source, Path target) throws OctopusIOException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            return getFilesAdaptor(source).move(source, target);
+            getFilesAdaptor(source).move(source, target);
+            return;
         }
 
         throw new OctopusIOException("FilesEngine", "Cannot do inter-scheme third party move!");

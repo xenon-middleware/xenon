@@ -126,7 +126,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
      *             If the move failed.
      */
     @Override
-    public Path move(Path source, Path target) throws OctopusIOException {
+    public void move(Path source, Path target) throws OctopusIOException {
 
         if (!exists(source)) {
             throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
@@ -136,7 +136,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         RelativePath targetName = target.getRelativePath().normalize();
         
         if (sourceName.equals(targetName)) {
-            return target;
+            return;
         }
 
         if (exists(target)) {
@@ -146,8 +146,6 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
         checkParent(target);
 
         LocalUtils.move(source, target);
-
-        return target;
     }
 
     @Override

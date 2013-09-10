@@ -70,13 +70,13 @@ public interface OctopusPropertyDescription {
         
         /** 
          * Properties for <code>SCHEDULER</code> components can be passed to 
-         * {@link nl.esciencecenter.octopus.jobs.Jobs#newScheduler(URI, Credential, Map)}. 
+         * {@link nl.esciencecenter.octopus.jobs.Jobs#newScheduler(String, String, Credential, Map)}. 
          */        
         SCHEDULER, 
         
         /** 
          * Properties for <code>FILESYSTEM</code> components can be passed to 
-         * {@link nl.esciencecenter.octopus.files.Files#newFileSystem(URI, Credential, Map)}. 
+         * {@link nl.esciencecenter.octopus.files.Files#newFileSystem(String, String, Credential, Map)}. 
          */        
         FILESYSTEM, 
         
