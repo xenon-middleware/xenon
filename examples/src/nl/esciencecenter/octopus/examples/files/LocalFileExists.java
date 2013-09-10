@@ -18,14 +18,11 @@ package nl.esciencecenter.octopus.examples.files;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * An example of how to check if a local file exists.
@@ -47,22 +44,18 @@ public class LocalFileExists {
             System.exit(1);
         }
 
+        // This should be a valid local path!
         String filename = args[0];
 
         try {
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
-            // Next, we retrieve the Files and Credentials interfaces
+            // Next, we retrieve the Files interfaces
             Files files = octopus.files();
-            Credentials credentials = octopus.credentials();
 
-            // Next we create a FileSystem 
-            Credential c = credentials.getDefaultCredential("file");
-            FileSystem fs = files.newFileSystem("file", filename, c, null);
-
-            // We now create an Path representing the file
-            Path path = files.newPath(fs, new RelativePath(filename));
+            // We now create an Path representing the local file
+            Path path = Utils.fromLocalPath(files, filename);
 
             // Check if the file exists 
             if (files.exists(path)) {
@@ -72,8 +65,7 @@ public class LocalFileExists {
             }
 
             // If we are done we need to close the FileSystem ad the credential
-            files.close(fs);
-            credentials.close(c);
+            files.close(path.getFileSystem());
 
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);

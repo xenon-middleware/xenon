@@ -39,12 +39,14 @@ public abstract class Adaptor {
     private final String name;
     private final String description;
     private final ImmutableArray<String> supportedSchemes;
+    private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<OctopusPropertyDescription> validProperties;
     private final OctopusProperties properties;
     private final OctopusEngine octopusEngine;
 
     protected Adaptor(OctopusEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<OctopusPropertyDescription> validProperties, OctopusProperties properties) throws OctopusException {
+            ImmutableArray<String> supportedLocations, ImmutableArray<OctopusPropertyDescription> validProperties, 
+            OctopusProperties properties) throws OctopusException {
 
         super();
 
@@ -52,6 +54,7 @@ public abstract class Adaptor {
         this.name = name;
         this.description = description;
         this.supportedSchemes = supportedSchemes;
+        this.supportedLocations = supportedLocations;
         
         if (validProperties == null) {
             this.validProperties = new ImmutableArray<>();
@@ -106,7 +109,7 @@ public abstract class Adaptor {
     }
 
     public AdaptorStatus getAdaptorStatus() {
-        return new AdaptorStatusImplementation(name, description, supportedSchemes, validProperties,
+        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedLocations, validProperties,
                 getAdaptorSpecificInformation());
     }
 
@@ -114,6 +117,10 @@ public abstract class Adaptor {
         return supportedSchemes.asArray();
     }
 
+    public String[] getSupportedLocations() {
+        return supportedLocations.asArray();
+    }
+    
     @Override
     public String toString() {
         return "Adaptor [name=" + name + "]";

@@ -66,6 +66,20 @@ public class AdaptorDocGenerator {
         out.println();
         out.println();
 
+        out.println("#### Supported locations: ####");
+
+        String[] locations = a.getSupportedLocations();
+
+        comma = "";
+
+        for (int i = 0; i < locations.length; i++) {
+            out.print(comma + locations[i]);
+            comma = ", ";
+        }
+
+        out.println();
+        out.println();
+        
         out.println("#### Supported properties: ####\n\n");
 
         OctopusPropertyDescription[] properties = a.getSupportedProperties();

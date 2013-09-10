@@ -24,6 +24,7 @@ import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.util.Utils;
 
 /**
  * A simple example of how to create a local {@link FileSystem}.
@@ -48,8 +49,17 @@ public class CreateLocalFileSystem {
             // To create a new FileSystem we need a Credential that enable us to access the location. 
             Credential c = credentials.getDefaultCredential("file");
 
+            // We need to know the OS to determine the root of the file system 
+            String root = null;
+            
+            if (Utils.isWindows()) { 
+                root = "C:";
+            } else { 
+                root = "/";
+            }
+            
             // Now we can create a FileSystem (we don't provide any properties). 
-            FileSystem fs = files.newFileSystem("file", "/", c, null);
+            FileSystem fs = files.newFileSystem("file", root, c, null);
 
             // We can now uses the FileSystem to access files!
             // ....

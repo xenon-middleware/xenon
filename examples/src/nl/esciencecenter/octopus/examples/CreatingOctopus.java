@@ -36,7 +36,6 @@ public class CreatingOctopus {
     @SuppressWarnings("unused")
     public static void main(String[] args) {
         try {
-
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 

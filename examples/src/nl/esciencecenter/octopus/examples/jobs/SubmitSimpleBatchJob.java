@@ -32,6 +32,8 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 /**
  * An example of how to create and submit a simple batch job that does not produce output. 
  * 
+ * This example assumes the user provides a URI with the scheduler location on the command line.
+ * 
  * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/sleep".
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>

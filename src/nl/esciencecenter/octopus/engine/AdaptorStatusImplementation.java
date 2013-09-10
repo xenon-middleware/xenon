@@ -26,11 +26,13 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     private final String name;
     private final String description;
     private final ImmutableArray<String> supportedSchemes;
+    private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<OctopusPropertyDescription> supportedProperties;
     private final Map<String, String> adaptorSpecificInformation;
 
     public AdaptorStatusImplementation(String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<OctopusPropertyDescription> supportedProperties, Map<String, String> adaptorSpecificInformation) {
+            ImmutableArray<String> supportedLocations, ImmutableArray<OctopusPropertyDescription> supportedProperties, 
+            Map<String, String> adaptorSpecificInformation) {
 
         super();
         this.name = name;
@@ -41,6 +43,7 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
         }
         
         this.supportedSchemes = supportedSchemes;
+        this.supportedLocations = supportedLocations;
         
         if (supportedProperties == null) { 
             throw new IllegalArgumentException("SupportedProperties is null!");
@@ -70,6 +73,11 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
         return supportedProperties.asArray();
     }
 
+    @Override
+    public String[] getSupportedLocations() {
+        return supportedLocations.asArray();
+    }
+    
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         return adaptorSpecificInformation;

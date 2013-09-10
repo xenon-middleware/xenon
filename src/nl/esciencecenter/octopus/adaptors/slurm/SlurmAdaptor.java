@@ -48,6 +48,10 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     /** The schemes supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<String>("slurm");
     
+    /** The locations supported by this adaptor */
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(locations supported by local)", 
+            "(locations supported by ssh)");
+    
     /** Should the slurm version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
@@ -85,8 +89,8 @@ public class SlurmAdaptor extends ScriptingAdaptor {
      *             if the adaptor creation fails.
      */
     public SlurmAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, new OctopusProperties(
-                VALID_PROPERTIES, Component.OCTOPUS, properties), new SlurmSchedulerConnectionFactory());
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+                new OctopusProperties(VALID_PROPERTIES, Component.OCTOPUS, properties), new SlurmSchedulerConnectionFactory());
     }
 
     @Override

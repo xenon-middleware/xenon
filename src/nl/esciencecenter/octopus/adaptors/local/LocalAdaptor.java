@@ -83,6 +83,9 @@ public class LocalAdaptor extends Adaptor {
     /** The schemes supported by the adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<String>("local", "file");
 
+    /** The locations supported by the adaptor */
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(null)", "(empty string)", "/");
+    
     /** The properties supported by this adaptor */
     private static final ImmutableArray<OctopusPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<OctopusPropertyDescription>(
@@ -101,8 +104,8 @@ public class LocalAdaptor extends Adaptor {
     private final LocalCredentials localCredentials;
 
     public LocalAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException, OctopusIOException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
-                VALID_PROPERTIES, Component.OCTOPUS, properties));
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+                new OctopusProperties(VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
         localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), octopusEngine);

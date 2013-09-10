@@ -17,6 +17,8 @@
 package nl.esciencecenter.octopus.examples.jobs;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusFactory;
@@ -31,7 +33,9 @@ import nl.esciencecenter.octopus.util.Utils;
 /**
  * An example of how to create and submit an interactive job that produces output. 
  * 
- * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/uname".
+ * This example assumes the user provides a URI with the scheduler location on the command line.
+ * 
+ * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/hostname".
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -41,7 +45,9 @@ public class SubmitInteractiveJobWithOutput {
 
     public static void main(String[] args) {
         try {
-
+            // Convert the command line parameter to a URI
+            URI location = new URI(args[0]);
+            
             // We create a new octopus using the OctopusFactory (without providing any properties).
             Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -50,12 +56,12 @@ public class SubmitInteractiveJobWithOutput {
 
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
-            description.setExecutable("/bin/uname");
+            description.setExecutable("/bin/hostname");
             description.setArguments("-a");
             description.setInteractive(true);
             
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler("local", "", null, null);
+            Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
 
             // Submit the job
             Job job = jobs.submitJob(scheduler, description);
@@ -78,7 +84,7 @@ public class SubmitInteractiveJobWithOutput {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException | IOException e)  {
+        } catch (URISyntaxException | OctopusException | IOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

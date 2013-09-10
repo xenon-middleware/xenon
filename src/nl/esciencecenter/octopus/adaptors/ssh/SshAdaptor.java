@@ -66,6 +66,9 @@ public class SshAdaptor extends Adaptor {
     /** The schemes supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ssh", "sftp");
 
+    /** The locations supported by this adaptor */
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
+    
     /** All our own properties start with this prefix. */
     public static final String PREFIX = OctopusEngine.ADAPTORS + "ssh.";
 
@@ -133,8 +136,8 @@ public class SshAdaptor extends Adaptor {
     }
 
     public SshAdaptor(OctopusEngine octopusEngine, JSch jsch, Map<String, String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, VALID_PROPERTIES, new OctopusProperties(
-                VALID_PROPERTIES, Component.OCTOPUS, properties));
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+                new OctopusProperties(VALID_PROPERTIES, Component.OCTOPUS, properties));
 
         this.filesAdaptor = new SshFiles(this, octopusEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);

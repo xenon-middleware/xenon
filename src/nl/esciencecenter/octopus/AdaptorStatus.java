@@ -34,6 +34,13 @@ public interface AdaptorStatus {
     String[] getSupportedSchemes();
 
     /**
+     * Get the supported locations for this adaptor.
+     * 
+     * @return the locations supported by this adaptor.
+     */
+    String[] getSupportedLocations();
+    
+    /**
      * Get the name of the adaptor.
      * 
      * @return the name of the adaptor.

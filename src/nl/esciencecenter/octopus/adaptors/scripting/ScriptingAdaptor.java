@@ -43,10 +43,11 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ForwardingCredentials credentialsAdaptor;
 
     protected ScriptingAdaptor(OctopusEngine octopusEngine, String name, String description, 
-            ImmutableArray<String> supportedSchemes, ImmutableArray<OctopusPropertyDescription> validProperties, 
+            ImmutableArray<String> supportedSchemes, ImmutableArray<String> supportedLocations, 
+            ImmutableArray<OctopusPropertyDescription> validProperties, 
             OctopusProperties properties, SchedulerConnectionFactory factory) throws OctopusException {
 
-        super(octopusEngine, name, description, supportedSchemes, validProperties, properties);
+        super(octopusEngine, name, description, supportedSchemes, supportedLocations, validProperties, properties);
 
         jobsAdaptor = new ScriptingJobs(this, octopusEngine, factory);
         credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");

@@ -33,7 +33,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
 /**
  * An example of how to retrieve file attributes.
  * 
- * This example assumes the user provides a URI on the command line.
+ * This example assumes the user provides a URI with a file location on the command line.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

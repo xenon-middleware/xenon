@@ -33,7 +33,7 @@ import nl.esciencecenter.octopus.files.RelativePath;
 /**
  * An example of how to list a directory.
  * 
- * This example assumes the user provides the URI of the directory on the command line.
+ * This example assumes the user provides the URI with the location of the directory on the command line.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

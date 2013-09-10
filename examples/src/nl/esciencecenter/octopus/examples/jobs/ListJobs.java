@@ -31,6 +31,8 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
 /**
  * An example of how to retrieve a list of jobs from a scheduler.
  * 
+ * This example assumes the user provides a URI with the scheduler location on the command line.
+ * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0

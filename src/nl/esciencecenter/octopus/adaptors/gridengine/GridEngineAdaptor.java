@@ -48,6 +48,10 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     /** The schemes supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("ge", "sge");
     
+    /** The locations supported by this adaptor */
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(locations supported by local)", 
+            "(locations supported by ssh)");
+    
     /** Should the grid engine version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
@@ -84,8 +88,8 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
      *             if the adaptor creation fails.
      */
     public GridEngineAdaptor(OctopusEngine octopusEngine, Map<String, String> properties) throws OctopusException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, VALID_PROPERTIES, new OctopusProperties(
-                VALID_PROPERTIES, Component.OCTOPUS, properties), new GridEngineSchedulerConnectionFactory());
+        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+                new OctopusProperties(VALID_PROPERTIES, Component.OCTOPUS, properties), new GridEngineSchedulerConnectionFactory());
     }
 
     @Override
