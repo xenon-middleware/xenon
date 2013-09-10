@@ -47,7 +47,7 @@ import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
 /**
- * This class contains various utilities for handling files, jobs, streams, and for getting OS specific information.
+ * Utils contains various utilities for handling files, jobs, streams, and for getting OS specific information.
  * 
  * These utilities are used inside Octopus, but may also be used by applications. 
  * 

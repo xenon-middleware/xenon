@@ -27,18 +27,21 @@ import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
 
 /**
- * A sandbox is a (possibly remote and usually temporary) directory used for running jobs. 
+ * Sandbox represents a (possibly remote and usually temporary) directory used for running jobs. 
  * <p>
- * A sandbox is typically create before the job is started. The input files (or directories) necessary to run the job are then 
- * uploaded to the sandbox.
- * </p>
- * <p>
+ * A Sandbox is created before the job is started. The input files (or directories) necessary to run the job are then
+ * added to the Sandbox using {@link #addUploadFile(Path, String)}. Once all files have been added they can be uploaded to the 
+ * Sandbox using {@link #upload(CopyOption...)}.
+ * </p><p>
+ * Similarly, the output files (or directories) produced by the job can be registered with the Sandbox using 
+ * {@link #addDownloadFile(String, Path)}. These may be added before or after the job runs. 
+ * </p><p>
  * Next the job is run using the sandbox as a working directory.
- * </p>
- * <p>
- * After the job has terminated, the output files downloaded from the sandbox, and the sandbox is deleted.
+ * </p><p>
+ * After the job has terminated, the output files can be downloaded using {@link #download(CopyOption...)}. 
+ * </p><p>
+ * Finally, the Sandbox can be deleted using {@link #delete()}. 
  * </p>       
- * 
  * Example to submit a job with input and output files:
  * 
  * <blockquote>
