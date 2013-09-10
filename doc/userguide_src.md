@@ -410,7 +410,7 @@ The following are valid examples of scheduler schemes and locations:
     "local",""                     the local scheduler 
     "ssh","example.com"            connect to a remote scheduler at example.com using SSH
     "slurm",""                     connect to a local slurm scheduler
-    "slurm","test@example.com:44"  connect to a remote slurm scheduler at example.com via SSH on port 44 with "test" as user name.
+    "slurm","test@example.com:44"  connect to a remote slurm scheduler at example.com via SSH on port 44 with user "test".
 
 When a __Scheduler__ is no longer used, is __must__ be closed using the __close__ method. The __isOpen__ 
 method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the following:
