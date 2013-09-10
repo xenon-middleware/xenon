@@ -230,13 +230,10 @@ The [`nl.esciencecenter.octopus.credentials`][6] package contains the [__Credent
 octopus:
 
     public interface Credentials {
+        Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, char [] password, 
+            Map<String,String> properties) 
 
-        Credential newCertificateCredential(String scheme, String keyfile, String certfile, 
-            String username, char [] password, Map<String,String> properties) 
-
-        Credential newPasswordCredential(String scheme, String username, char [] password, 
-	    Map<String,String> properties)
-
+        Credential newPasswordCredential(String scheme, String username, char [] password, Map<String,String> properties)
         Credential getDefaultCredential(String scheme)
         void close(Credential credential)
     }
@@ -276,7 +273,6 @@ octopus. For readability we will split the explanation of __Files__ into several
 
     public interface Files {
        FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String,String> properties)
-
        void close(FileSystem filesystem) 
        boolean isOpen(FileSystem filesystem)
        // ... more follows
@@ -306,7 +302,6 @@ parameter can be used to provide additional configuration properties. Again, `nu
 configuration is required. The returned __FileSystem__ contains the following methods:
 
     public interface FileSystem {
-        /// ...
         String getScheme()
         String getLocation()
         Path getEntryPath()
@@ -323,21 +318,13 @@ held by the __FileSystem__. The __isOpen__ method can be used to check if a __Fi
 Once a __FileSystem__ is created, it can be used to access files: 
 
     public interface Files {
-
        Path newPath(FileSystem filesystem, RelativePath location) 
-
        void createFile(Path path)
-
        void createDirectories(Path dir)
-
        void createDirectory(Path dir)
-
        boolean exists(Path path)
-
        void delete(Path path)
-
        FileAttributes getAttributes(Path path)
-
        // ... more follows
     }
 
@@ -361,11 +348,8 @@ it size, creation time, access rights, etc.
 To list directories, the following methods are available:
 
     public interface Files {
-
        DirectoryStream<Path> newDirectoryStream(Path dir)
-
-       DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir)
-   
+       DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir)  
        // ... more follows
     }
 
@@ -377,9 +361,7 @@ _filter_ parameter, which can be used to filter the stream in advance.
 To read or write files, the following methods are available:
 
     public interface Files {
-
        InputStream newInputStream(Path path)
-
        OutputStream newOutputStream(Path path, OpenOption... options)
     }
 
@@ -391,13 +373,9 @@ truncated first). These options are describe in more detail in the Javadoc.
 To copy files, the following methods are available:
 
     public interface Files {
-
        Copy copy(Path source, Path target, CopyOption... options)
-    
        CopyStatus getCopyStatus(Copy copy)
-    
        CopyStatus cancelCopy(Copy copy)
-
     }
 
 The __copy__ method supports various copy operations such as a regular copy, a resume or an append. 
@@ -414,13 +392,9 @@ The [`nl.esciencecenter.octopus.job`][18] package contains the [__Jobs__][19] in
 For readability we will split the explanation of __Jobs__ into several parts:
 
     public interface Jobs {
-
-        Scheduler newScheduler(String scheme, String location,
-           Credential credential, Map<String,String> properties)
-
+        Scheduler newScheduler(String scheme, String location, Credential credential, Map<String,String> properties)
         void close(Scheduler scheduler)
         boolean isOpen(Scheduler scheduler)
-
         // ... more follows
     }
 
@@ -444,13 +418,10 @@ When a __Scheduler__ is no longer used, is __must__ be closed using the __close_
 method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the following:
 
     public interface Scheduler {
-
         String[] getQueueNames()
         boolean isOnline()
         boolean supportsInteractive()
         boolean supportsBatch()
-
-        // ... 
     }
 
 Each __Scheduler__ contains one or more queues to which jobs can be submitted. Each queue has a name that 
@@ -474,15 +445,10 @@ Once a __Scheduler__ is created, __Jobs__ contains several methods to retrieve i
 __Scheduler__:
 
     public interface Jobs {
-
         String getDefaultQueueName(Scheduler scheduler)
-
         QueueStatus getQueueStatus(Scheduler scheduler, String queueName)
-
         QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames).
-
         Job[] getJobs(Scheduler scheduler, String... queueNames)
-
         // ... more follows
     }
 
@@ -495,19 +461,12 @@ from other users.
 To submit and manage jobs, the __Jobs__ interface contains the following methods:
 
     public interface Jobs {
-
         Job submitJob(Scheduler scheduler, JobDescription description)
-
         Streams getStreams(Job job)
-
         JobStatus getJobStatus(Job job)
-
         JobStatus[] getJobStatuses(Job... jobs)
-
         JobStatus waitUntilRunning(Job job, long timeout)
-
         JobStatus waitUntilDone(Job job, long timeout)
-
         JobStatus cancelJob(Job job)
     }    
 
@@ -591,17 +550,11 @@ directory and transfer files to and from this directory. A Sandbox is often used
 jobs that require input files and / or produce output files. Sandbox contains the following methods:
 
     public class Sandbox {
-
        Sandbox(Files files, Path root, String sandboxName)
-  
        void addUploadFile(Path src, String dest)
-
        void addDownloadFile(String src, Path dest)
-
        void upload(CopyOption... options)
-  
        void download(CopyOption... options)
-
        void delete()
     }
 
@@ -796,7 +749,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 __`octopus.adaptors.ssh.strictHostKeyChecking`__
@@ -807,7 +760,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 __`octopus.adaptors.ssh.loadKnownHosts`__
@@ -851,7 +804,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
