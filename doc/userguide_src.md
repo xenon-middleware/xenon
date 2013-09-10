@@ -230,8 +230,8 @@ The [`nl.esciencecenter.octopus.credentials`][6] package contains the [__Credent
 octopus:
 
     public interface Credentials {
-        Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, char [] password, 
-            Map<String,String> properties) 
+        Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, 
+            char [] password, Map<String,String> properties) 
 
         Credential newPasswordCredential(String scheme, String username, char [] password, Map<String,String> properties)
         Credential getDefaultCredential(String scheme)

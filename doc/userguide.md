@@ -230,8 +230,8 @@ The [`nl.esciencecenter.octopus.credentials`][6] package contains the [__Credent
 octopus:
 
     public interface Credentials {
-        Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, char [] password, 
-            Map<String,String> properties) 
+        Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, 
+            char [] password, Map<String,String> properties) 
 
         Credential newPasswordCredential(String scheme, String username, char [] password, Map<String,String> properties)
         Credential getDefaultCredential(String scheme)
@@ -749,7 +749,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 __`octopus.adaptors.ssh.strictHostKeyChecking`__
@@ -760,7 +760,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 __`octopus.adaptors.ssh.loadKnownHosts`__
@@ -804,7 +804,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
