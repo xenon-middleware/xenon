@@ -42,28 +42,6 @@ import nl.esciencecenter.octopus.files.Files;
  * </p><p>
  * Finally, the Sandbox can be deleted using {@link #delete()}. 
  * </p>       
- * Example to submit a job with input and output files:
- * 
- * <blockquote>
- * 
- * <pre class="code">
- * {
- *     Sandbox sandbox = new Sandbox(octopus, sandboxBase);
- *     sandbox.addUploadFile(inputfile);
- *     sandbox.addDownloadFile(outputfile);
- * 
- *     sandbox.upload();
- * 
- *     Job job = octopus.jobs().submitJob(description);
- * 
- *     JobStatus = octopus.jobs().waitUntilDone(job, 60000);
- * 
- *     sandbox.download();
- *     sandbox.delete();
- * }
- * </pre>
- * 
- * </blockquote>
  * 
  * @author Stefan Verhoeven <S.Verhoeven@esciencecenter.nl>
  * @version 1.0 
