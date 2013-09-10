@@ -44,9 +44,10 @@ public class AdaptorTest {
     class TestAdaptor extends Adaptor {
 
         public TestAdaptor(OctopusEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-                ImmutableArray<OctopusPropertyDescription> validProperties, OctopusProperties p) throws OctopusException {
+                ImmutableArray<String> supportedLocations, ImmutableArray<OctopusPropertyDescription> validProperties, 
+                OctopusProperties p) throws OctopusException {
 
-            super(octopusEngine, name, description, supportedSchemes, validProperties, p);
+            super(octopusEngine, name, description, supportedSchemes, supportedLocations, validProperties, p);
         }
 
         @Override
@@ -79,9 +80,10 @@ public class AdaptorTest {
     public void test0() throws OctopusException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes,  new ImmutableArray<OctopusPropertyDescription>(),
-                new OctopusProperties());
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, 
+                new ImmutableArray<OctopusPropertyDescription>(), new OctopusProperties());
 
         String[] tmp = t.getSupportedSchemes();
 
@@ -93,6 +95,7 @@ public class AdaptorTest {
     public void test1() throws OctopusException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.OCTOPUS),
@@ -102,7 +105,7 @@ public class AdaptorTest {
                         "noot2", "test property p2"));
 
         OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String, String>());
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
 
         OctopusPropertyDescription[] p = t.getSupportedProperties();
 
@@ -118,6 +121,7 @@ public class AdaptorTest {
     public void test2() throws OctopusException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.OCTOPUS),
@@ -131,7 +135,7 @@ public class AdaptorTest {
         m.put("octopus.adaptors.test.p2", "zus");
 
         OctopusProperties prop = new OctopusProperties(supportedProperties, new HashMap<String, String>());
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
 
         OctopusPropertyDescription[] p = t.getSupportedProperties();
 
@@ -147,6 +151,7 @@ public class AdaptorTest {
     public void test3() throws OctopusException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         ImmutableArray<OctopusPropertyDescription> supportedProperties = new ImmutableArray<OctopusPropertyDescription>(
                 new OctopusPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.OCTOPUS),
@@ -160,7 +165,7 @@ public class AdaptorTest {
 
         OctopusProperties prop = new OctopusProperties(supportedProperties, p);
 
-        new TestAdaptor(null, "test", "DESCRIPTION", schemes, supportedProperties, prop);
+        new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
     }
 
 }

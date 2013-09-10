@@ -33,7 +33,8 @@ public class AdaptorStatusImplementationTest {
     public void testGetters() {
 
         AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
-                new ImmutableArray<String>("SCHEME1", "SCHEME2"), new ImmutableArray<OctopusPropertyDescription>(), null);
+                new ImmutableArray<String>("SCHEME1", "SCHEME2"),new ImmutableArray<String>("L1", "L2"), 
+                new ImmutableArray<OctopusPropertyDescription>(), null);
 
         String name = a.getName();
 
@@ -50,6 +51,13 @@ public class AdaptorStatusImplementationTest {
         assert (schemes[0].equals("SCHEME1"));
         assert (schemes[1].equals("SCHEME2"));
 
+        String[] locations = a.getSupportedLocations();
+
+        assert (locations != null);
+        assert (locations.length == 2);
+        assert (locations[0].equals("L1"));
+        assert (locations[1].equals("L2"));
+        
         OctopusPropertyDescription[] props = a.getSupportedProperties();
 
         assert (props == null);
@@ -63,7 +71,7 @@ public class AdaptorStatusImplementationTest {
     public void testToString() {
 
         String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<String>("SCHEME1", "SCHEME2"), 
-                new ImmutableArray<OctopusPropertyDescription>(), null).toString();
+                new ImmutableArray<String>("L1", "L2"), new ImmutableArray<OctopusPropertyDescription>(), null).toString();
 
         assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, " +
         		"SCHEME2], supportedProperties=[], adaptorSpecificInformation=null]"));
