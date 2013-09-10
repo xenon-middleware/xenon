@@ -84,8 +84,8 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
         if (location == null || location.isEmpty() || location.equals("/")) { 
             correctLocation = "";
-            wrongLocation = "aap";
-            correctLocationWrongUser = wrongUser + "@";
+            wrongLocation = wrongLoc;
+            correctLocationWrongUser = wrongUser + "@/";
         } else { 
             correctLocation = username + "@" + location;
             wrongLocation = username + "@" + wrongLoc;

@@ -108,7 +108,7 @@ public class JobExecutor implements Runnable {
 
     public synchronized JobStatus getStatus() {
 
-        if (!done) {
+        if (!done && state.equals("RUNNING")) {
             triggerStatusUpdate();
             waitForStatusUpdate(pollingDelay);
         }

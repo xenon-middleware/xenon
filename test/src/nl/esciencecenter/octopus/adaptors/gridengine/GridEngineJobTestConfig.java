@@ -91,7 +91,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         if (location == null || location.isEmpty() || location.equals("/")) { 
             correctLocation = "";
-            wrongLocation = "aap";
+            wrongLocation = wrongLoc;
             correctLocationWrongUser = wrongUser + "@";
         } else { 
             correctLocation = username + "@" + location;
