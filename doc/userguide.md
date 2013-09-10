@@ -290,11 +290,10 @@ format of accepted location strings can be found in the adaptor documentation.
 
 The following are all valid combinations of file system schemes and locations:
 
-    "file"  "/"                        connect to the local file system on Linux
-    "file"  "C:"                       connect to the local C: drive on Windows  
-    "sftp"  "example.com"              connect to example.com using sftp 
-    "sftp"  "test@example.com:44"      connect to example.com using sftp on port 44
-                                       with "test" as user name.
+    "file","/"                        connect to the local file system on Linux
+    "file","C:"                       connect to the local C: drive on Windows  
+    "sftp","example.com"              connect to example.com using sftp 
+    "sftp","test@example.com:44"      connect to example.com using sftp on port 44 with "test" as user name.
 
 The __newFileSystem__ method also has a _credential_ parameter to provide the credential needed to access the file 
 system. If this parameter is set to `null` the default credentials will be used for the scheme. The _properties_
@@ -408,11 +407,10 @@ adaptor documentation.
 
 The following are valid examples of scheduler schemes and locations:
 
-    "local" ""                     the local scheduler 
-    "ssh"   "example.com"          connect to a remote scheduler at example.com using SSH
-    "slurm" ""                     connect to a local slurm scheduler
-    "slurm" "test@example.com:44"  connect to a remote slurm scheduler at example.com by 
-                                   using SSH on port 44 with "test" as user name.
+    "local",""                     the local scheduler 
+    "ssh","example.com"            connect to a remote scheduler at example.com using SSH
+    "slurm",""                     connect to a local slurm scheduler
+    "slurm","test@example.com:44"  connect to a remote slurm scheduler at example.com via SSH on port 44 with "test" as user name.
 
 When a __Scheduler__ is no longer used, is __must__ be closed using the __close__ method. The __isOpen__ 
 method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the following:
