@@ -75,7 +75,7 @@ Examples
 
 Octopus comes with a set of examples, located in the `examples` 
 directory. The examples are build as part of the compile process 
-described above. A short description of the examples can be found 
+described above. A list of the available examples can be found 
 in the user documentation.
 
 To run the examples, ensure that all jar files in the `dist` 
