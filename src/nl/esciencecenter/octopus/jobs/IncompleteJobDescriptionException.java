@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.jobs;
 import nl.esciencecenter.octopus.OctopusException;
 
 /**
- * Signals that a JobDescription is missing required fields.  
+ * Signals that a JobDescription is missing required options.  
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

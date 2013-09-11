@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.jobs;
 import nl.esciencecenter.octopus.OctopusException;
 
 /**
- * Signals that a JobDescription is not supported.  
+ * Signals that a combination of options used in a JobDescription is not supported by a resource.  
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

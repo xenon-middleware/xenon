@@ -9,7 +9,7 @@ Author: Jason Maassen (<J.Maassen@esciencecenter.nl>)
 
 Version: Userguide v1.0, Octopus v1.0
 
-Last modified: 10 September 2013
+Last modified: 11 September 2013
 
 
 Copyrights & Disclaimers
@@ -151,12 +151,11 @@ The octopus API uses the following package structure:
 - `nl.esciencecenter.octopus.credentials` Credential interface.
 - `nl.esciencecenter.octopus.files`  Files interface.
 - `nl.esciencecenter.octopus.jobs`  Jobs interface.
-- `nl.esciencecenter.octopus.exeptions`  Exceptions used in octopus.
 - `nl.esciencecenter.octopus.util`  Various utilty classes.
 
 We will now briefly describe the most important classes and interfaces of these packages.
 
-### Octopus factory and interface ###
+### Getting started ###
 
 The [`nl.esciencecenter.octopus`][1] package contains the entry point into the octopus library: 
 [__OctopusFactory__][2]
@@ -497,10 +496,6 @@ status is only guarenteed to be returned _once_. Any subsequent calls to a metho
 __JobStatus__ _may_ throw an exception stating that the job does not exist. Some adaptors may return 
 a result however.  
 
-### Exceptions ###
-
-The [`nl.esciencecenter.octopus.exceptions`][24] package contains the exceptions that may be thrown by 
-octopus. See the Javadoc for the available exceptions.
 
 ### Utilities classes ###
 
@@ -658,7 +653,6 @@ Submitting an interactive job with output:
 [21]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobDescription.html
 [22]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Job.html
 [23]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobStatus.html
-[24]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/exceptions/package-summary.html
 [25]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/package-summary.html
 [26]: https://github.com/NLeSC/octopus/tree/develop/examples/src/nl/esciencecenter/octopus/examples
 [27]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/CreatingOctopus.java

@@ -18,7 +18,7 @@ package nl.esciencecenter.octopus.jobs;
 import nl.esciencecenter.octopus.OctopusException;
 
 /**
- * Signals that an invalid JobDescription was provided.  
+ * Signals that a JobDescription contains invalid values for certain options.  
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
