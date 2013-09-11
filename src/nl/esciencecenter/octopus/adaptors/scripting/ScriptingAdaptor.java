@@ -16,13 +16,13 @@
 
 package nl.esciencecenter.octopus.adaptors.scripting;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 
 /**

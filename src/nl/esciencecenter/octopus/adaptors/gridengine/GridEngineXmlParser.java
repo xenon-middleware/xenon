@@ -25,9 +25,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.IncompatibleVersionException;
+import nl.esciencecenter.octopus.OctopusException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public class GridEngineXmlParser {
         }
     }
 
-    Document parseDocument(String data) throws OctopusException, OctopusIOException {
+    Document parseDocument(String data) throws OctopusException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
@@ -98,7 +97,7 @@ public class GridEngineXmlParser {
         } catch (SAXException e) {
             throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         } catch (IOException e) {
-            throw new OctopusIOException(GridEngineAdaptor.ADAPTOR_NAME, "could not read xml file", e);
+            throw new OctopusException(GridEngineAdaptor.ADAPTOR_NAME, "could not read xml file", e);
         }
     }
 
@@ -130,13 +129,13 @@ public class GridEngineXmlParser {
      * @param in
      *            the stream to get the xml data from
      * @return a list containing all queue names found
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             if the file could not be parsed
      * @throws OctopusException
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseQueueInfos(String input) throws OctopusException, OctopusIOException {
+    Map<String, Map<String, String>> parseQueueInfos(String input) throws OctopusException {
         Document document = parseDocument(input);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
@@ -173,13 +172,13 @@ public class GridEngineXmlParser {
      * @param in
      *            the stream to get the xml data from
      * @return a list containing all queue names found
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             if the file could not be parsed
      * @throws OctopusException
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusException, OctopusIOException {
+    Map<String, Map<String, String>> parseJobInfos(String data) throws OctopusException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         Document document = parseDocument(data);

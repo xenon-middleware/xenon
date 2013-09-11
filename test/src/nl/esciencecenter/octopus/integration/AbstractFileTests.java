@@ -15,26 +15,25 @@
  */
 package nl.esciencecenter.octopus.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
-
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.util.Utils;
@@ -52,7 +51,7 @@ abstract public class AbstractFileTests {
      */
     protected static Octopus octopus = null;
 
-    protected static Files getFiles() throws OctopusException, OctopusIOException {
+    protected static Files getFiles() throws OctopusException {
 
         // class synchronization:
         synchronized (AbstractFileTests.class) {
@@ -136,7 +135,7 @@ abstract public class AbstractFileTests {
         return getFiles().newPath(fs, new RelativePath(testPath));
     }
 
-    protected Path createSubdir(Path parentDirPath, String subDir) throws OctopusIOException, OctopusException {
+    protected Path createSubdir(Path parentDirPath, String subDir) throws OctopusException {
         Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subDir);
         infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
         getFiles().createDirectory(absPath);
@@ -154,7 +153,7 @@ abstract public class AbstractFileTests {
      *            - prefix of the sub-directory. An unique number will be append to this name,
      * @return AbsolutPath of new created directory
      */
-    protected Path createUniqueTestSubdir(Path parentDirPath, String dirPrefix) throws OctopusIOException,
+    protected Path createUniqueTestSubdir(Path parentDirPath, String dirPrefix) throws OctopusException,
             OctopusException {
         do {
             int myid = uniqueIdcounter++;
@@ -179,11 +178,11 @@ abstract public class AbstractFileTests {
      * @param createFile
      *            - actually create (empty) file on (remote) file system.
      * @return new Path, which points to existing file if createFile was true.
-     * @throws OctopusIOException
+     * @throws OctopusException
      * @throws OctopusException
      */
     protected Path createUniqueTestFile(Path parentDirPath, String filePrefix, boolean createFile)
-            throws OctopusIOException, OctopusException {
+            throws OctopusException {
 
         do {
             int myid = uniqueIdcounter++;
@@ -201,13 +200,13 @@ abstract public class AbstractFileTests {
         } while (true);
     }
 
-    protected Path createFile(Path parentDirPath, String subFile) throws OctopusIOException, OctopusException {
+    protected Path createFile(Path parentDirPath, String subFile) throws OctopusException {
         Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subFile);
         getFiles().createFile(absPath);
         return absPath;
     }
 
-    protected void deletePaths(Path[] paths, boolean assertDeletion) throws OctopusIOException, OctopusException {
+    protected void deletePaths(Path[] paths, boolean assertDeletion) throws OctopusException {
 
         for (Path path : paths) {
             getFiles().delete(path);

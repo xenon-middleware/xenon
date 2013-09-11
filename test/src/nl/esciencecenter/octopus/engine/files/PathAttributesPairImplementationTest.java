@@ -19,13 +19,12 @@ package nl.esciencecenter.octopus.engine.files;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.After;
@@ -45,7 +44,7 @@ public class PathAttributesPairImplementationTest {
     FileAttributes att;
 
     @Before
-    public void prepare() throws OctopusException, OctopusIOException {
+    public void prepare() throws OctopusException, OctopusException {
 
         octopus = OctopusFactory.newOctopus(null);
         files = octopus.files();
@@ -55,13 +54,13 @@ public class PathAttributesPairImplementationTest {
     }
 
     @After
-    public void cleanup() throws OctopusIOException, OctopusException {
+    public void cleanup() throws OctopusException, OctopusException {
         files.close(filesystem);
         OctopusFactory.endOctopus(octopus);
     }
 
     @Test
-    public void test_equals() throws OctopusIOException {
+    public void test_equals() throws OctopusException {
 
         PathAttributesPairImplementation tmp = new PathAttributesPairImplementation(root, att);
         PathAttributesPairImplementation tmp2 = new PathAttributesPairImplementation(root, null);
@@ -85,7 +84,7 @@ public class PathAttributesPairImplementationTest {
     }
 
     @Test
-    public void test_hashCode() throws OctopusIOException {
+    public void test_hashCode() throws OctopusException {
 
         final int prime = 31;
         int result = 1;

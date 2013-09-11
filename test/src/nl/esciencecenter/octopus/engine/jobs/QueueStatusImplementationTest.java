@@ -16,9 +16,10 @@
 
 package nl.esciencecenter.octopus.engine.jobs;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 

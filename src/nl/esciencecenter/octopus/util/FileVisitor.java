@@ -15,10 +15,9 @@
  */
 package nl.esciencecenter.octopus.util;
 
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-
-import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.files.FileAttributes;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 
 /**
@@ -48,10 +47,10 @@ public interface FileVisitor {
      * 
      * @return the desired action. 
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while visiting the directory.
      */
-    FileVisitResult postVisitDirectory(Path dir, OctopusIOException exception, Files files) throws OctopusIOException;
+    FileVisitResult postVisitDirectory(Path dir, OctopusException exception, Files files) throws OctopusException;
 
     /**
      * Invoked for a directory before entries in the directory are visited.
@@ -65,10 +64,10 @@ public interface FileVisitor {
      *          
      * @return the desired action.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while visiting the directory. 
      */
-    FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws OctopusIOException;
+    FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws OctopusException;
 
     /**
      * Invoked for a file in a directory.
@@ -82,10 +81,10 @@ public interface FileVisitor {
      *          
      * @return the desired action.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while visiting the directory. 
      */
-    FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusIOException;
+    FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws OctopusException;
 
     /**
      * Invoked for a file that could not be visited.
@@ -99,8 +98,8 @@ public interface FileVisitor {
      *          
      * @return the desired action.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while visiting the directory. 
      */     
-    FileVisitResult visitFileFailed(Path file, OctopusIOException exception, Files files) throws OctopusIOException;
+    FileVisitResult visitFileFailed(Path file, OctopusException exception, Files files) throws OctopusException;
 }

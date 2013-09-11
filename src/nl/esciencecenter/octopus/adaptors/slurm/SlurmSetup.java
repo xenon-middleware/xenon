@@ -17,11 +17,11 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.util.Map;
 
+import nl.esciencecenter.octopus.IncompatibleVersionException;
+import nl.esciencecenter.octopus.OctopusException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * @author Niels Drost <N.Drost@esciencecenter.nl>

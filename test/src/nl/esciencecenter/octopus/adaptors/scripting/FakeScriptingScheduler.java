@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.adaptors.scripting;
 
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.jobs.Scheduler;

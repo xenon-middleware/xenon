@@ -20,10 +20,10 @@ import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.Path;
 
 /**
  * LocalDirectoryStream implements a {@link DirectoryStream} for local directories.
@@ -49,14 +49,14 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     /** A buffer to read ahead. */
     private Path readAhead;
 
-    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException {
+    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException {
         try {
             this.dir = dir;
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
             this.filter = filter;
         } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
         }
     }
 
@@ -70,13 +70,13 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     }
 
     @Override
-    public void close() throws OctopusIOException {
+    public void close() throws IOException {
 
         try {
             stream.close();
         } catch (IOException e) {
             // NOTE: No unit test possible here, as this does not occur for local file system.
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to close stream.", e);
+            throw new IOException("Failed to close stream.", e);
         }
     }
 

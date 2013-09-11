@@ -20,23 +20,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.InvalidLocationException;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.octopus.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.jobs.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.NoSuchQueueException;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -194,7 +193,7 @@ public abstract class SchedulerConnection {
     }
 
     protected SchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
-            OctopusProperties properties, OctopusEngine engine, long pollDelay) throws OctopusIOException, OctopusException {
+            OctopusProperties properties, OctopusEngine engine, long pollDelay) throws OctopusException {
 
         this.adaptor = adaptor;
         this.engine = engine;
@@ -250,7 +249,7 @@ public abstract class SchedulerConnection {
      * Run a command on the remote scheduler machine.
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws OctopusException,
-            OctopusIOException {
+            OctopusException {
         return new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable, arguments);
     }
 
@@ -258,7 +257,7 @@ public abstract class SchedulerConnection {
      * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException,
-            OctopusIOException {
+            OctopusException {
         RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable,
                 arguments);
 
@@ -289,7 +288,7 @@ public abstract class SchedulerConnection {
         }
     }
 
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusIOException, OctopusException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException {
         long deadline = System.currentTimeMillis() + timeout;
 
         if (timeout == 0) {
@@ -316,7 +315,7 @@ public abstract class SchedulerConnection {
         return status;
     }
 
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusIOException, OctopusException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException {
         long deadline = System.currentTimeMillis() + timeout;
 
         if (timeout == 0) {
@@ -349,7 +348,7 @@ public abstract class SchedulerConnection {
      * @param workingDirectory
      *            the working directory (either absolute or relative) as given by the user.
      */
-    protected void checkWorkingDirectory(String workingDirectory) throws OctopusIOException, OctopusException {
+    protected void checkWorkingDirectory(String workingDirectory) throws OctopusException {
         if (workingDirectory == null) {
             return;
         }
@@ -367,7 +366,7 @@ public abstract class SchedulerConnection {
         }
     }
 
-    public void close() throws OctopusIOException, OctopusException {
+    public void close() throws OctopusException {
         engine.jobs().close(subScheduler);
     }
 
@@ -382,18 +381,18 @@ public abstract class SchedulerConnection {
 
     public abstract String getDefaultQueueName();
 
-    public abstract QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException;
+    public abstract QueueStatus getQueueStatus(String queueName) throws OctopusException;
 
-    public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusIOException, OctopusException;
+    public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusException;
 
-    public abstract Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException;
+    public abstract Job[] getJobs(String... queueNames) throws OctopusException;
 
-    public abstract Job submitJob(JobDescription description) throws OctopusIOException, OctopusException;
+    public abstract Job submitJob(JobDescription description) throws OctopusException;
 
-    public abstract JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException;
+    public abstract JobStatus cancelJob(Job job) throws OctopusException;
 
-    public abstract JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException;
+    public abstract JobStatus getJobStatus(Job job) throws OctopusException;
 
-    public abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException;
+    public abstract JobStatus[] getJobStatuses(Job... jobs) throws OctopusException;
 
 }

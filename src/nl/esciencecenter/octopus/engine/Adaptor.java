@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 

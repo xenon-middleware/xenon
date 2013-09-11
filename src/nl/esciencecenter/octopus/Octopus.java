@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 

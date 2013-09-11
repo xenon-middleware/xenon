@@ -16,10 +16,11 @@
 
 package nl.esciencecenter.octopus.engine.files;
 
-import static org.junit.Assert.*;
-
-import nl.esciencecenter.octopus.files.Path;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 import org.junit.Before;

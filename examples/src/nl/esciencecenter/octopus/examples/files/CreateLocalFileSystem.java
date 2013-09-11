@@ -17,11 +17,10 @@
 package nl.esciencecenter.octopus.examples.files;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.util.Utils;
@@ -71,7 +70,7 @@ public class CreateLocalFileSystem {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (OctopusException | OctopusIOException e) {
+        } catch (OctopusException e) {
             System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

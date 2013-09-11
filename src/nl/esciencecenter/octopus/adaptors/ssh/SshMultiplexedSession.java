@@ -20,16 +20,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import nl.esciencecenter.octopus.InvalidCredentialException;
+import nl.esciencecenter.octopus.InvalidLocationException;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
-import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +62,7 @@ class SshMultiplexedSession {
     private List<SshSession> sessions = new ArrayList<>();
 
     SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation location, Credential cred, OctopusProperties properties)
-            throws OctopusException, OctopusIOException {
+            throws OctopusException {
 
         LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
 
@@ -95,7 +93,7 @@ class SshMultiplexedSession {
 
         if (location.getUser() == null) { 
             if (credentialUserName == null) { 
-                throw new BadParameterException(SshAdaptor.ADAPTOR_NAME, "No user name given. Specify it in location or credential.");
+                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "No user name specified.");
             }
         
             location = new SshLocation(credentialUserName, location.getHost(), location.getPort());
@@ -121,15 +119,15 @@ class SshMultiplexedSession {
         createSession();
     }
 
-    private synchronized SshSession findSession(Channel c) throws OctopusIOException {
+    private synchronized SshSession findSession(Channel c) throws OctopusException {
         try {
             return findSession(c.getSession());
         } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to retrieve Session from SSH Channel!", e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to retrieve Session from SSH Channel!", e);
         }
     }
 
-    private synchronized SshSession findSession(Session s) throws OctopusIOException {
+    private synchronized SshSession findSession(Session s) throws OctopusException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession info = sessions.get(i);
@@ -139,17 +137,17 @@ class SshMultiplexedSession {
             }
         }
 
-        throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH Session not found!");
+        throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "SSH Session not found!");
     }
 
-    private synchronized SshSession createSession() throws OctopusIOException, OctopusException {
+    private synchronized SshSession createSession() throws OctopusException {
         SshSession s = createSession(jsch, nextSessionID++, location, credential, gatewaySession, gatewayLocation, properties);
         sessions.add(s);
         return s;
     }
 
     private static synchronized SshSession createSession(JSch jsch, int sessionID, SshLocation location, Credential credential,
-            SshSession gateway, SshLocation gatewayLocation, OctopusProperties properties) throws OctopusIOException, 
+            SshSession gateway, SshLocation gatewayLocation, OctopusProperties properties) throws OctopusException, 
                 OctopusException {
 
         String sessionHost = location.getHost();
@@ -171,7 +169,7 @@ class SshMultiplexedSession {
         try {
             session = jsch.getSession(location.getUser(), sessionHost, sessionPort);
         } catch (JSchException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
         }
 
         if (credential instanceof PasswordCredentialImplementation) {
@@ -208,9 +206,9 @@ class SshMultiplexedSession {
      * connecting.
      * 
      * @return the channel
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    synchronized ChannelExec getExecChannel() throws OctopusIOException {
+    synchronized ChannelExec getExecChannel() throws OctopusException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession s = sessions.get(i);
@@ -226,15 +224,15 @@ class SshMultiplexedSession {
             SshSession s = createSession();
             return s.getExecChannel();
         } catch (OctopusException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
         }
     }
 
-    synchronized void releaseExecChannel(ChannelExec channel) throws OctopusIOException {
+    synchronized void releaseExecChannel(ChannelExec channel) throws OctopusException {
         findSession(channel).releaseExecChannel(channel);
     }
 
-    synchronized void failedExecChannel(ChannelExec channel) throws OctopusIOException {
+    synchronized void failedExecChannel(ChannelExec channel) throws OctopusException {
         findSession(channel).failedExecChannel(channel);
     }
 
@@ -242,9 +240,9 @@ class SshMultiplexedSession {
      * Get a connected channel for doing sftp operations.
      * 
      * @return the channel
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    synchronized ChannelSftp getSftpChannel() throws OctopusIOException {
+    synchronized ChannelSftp getSftpChannel() throws OctopusException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession s = sessions.get(i);
@@ -260,15 +258,15 @@ class SshMultiplexedSession {
             SshSession s = createSession();
             return s.getSftpChannel();
         } catch (OctopusException e) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
         }
     }
 
-    synchronized void releaseSftpChannel(ChannelSftp channel) throws OctopusIOException {
+    synchronized void releaseSftpChannel(ChannelSftp channel) throws OctopusException {
         findSession(channel).releaseSftpChannel(channel);
     }
 
-    synchronized void failedSftpChannel(ChannelSftp channel) throws OctopusIOException {
+    synchronized void failedSftpChannel(ChannelSftp channel) throws OctopusException {
         findSession(channel).failedSftpChannel(channel);
     }
 
@@ -286,7 +284,7 @@ class SshMultiplexedSession {
                 if (tunnelPort > 0) {
                     try {
                         gatewaySession.removeTunnel(tunnelPort);
-                    } catch (OctopusIOException e) {
+                    } catch (OctopusException e) {
                         LOGGER.warn("Failed to remove SSH tunnel at localhost:" + tunnelPort);
                     }
                 }

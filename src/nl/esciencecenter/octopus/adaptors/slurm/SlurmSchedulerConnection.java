@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
@@ -31,16 +32,14 @@ import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.JobCanceledException;
-import nl.esciencecenter.octopus.exceptions.NoSuchJobException;
-import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobCanceledException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.NoSuchJobException;
+import nl.esciencecenter.octopus.jobs.NoSuchQueueException;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -222,7 +221,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private final SlurmSetup config;
 
     SlurmSchedulerConnection(ScriptingAdaptor adaptor, String location, Credential credential, OctopusProperties properties,
-            OctopusEngine engine) throws OctopusIOException, OctopusException {
+            OctopusEngine engine) throws OctopusException {
 
         super(adaptor, "slurm", location, credential, properties, engine, 
                 properties.getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
@@ -271,7 +270,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return defaultQueueName;
     }
 
-    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws OctopusIOException,
+    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws OctopusException,
             OctopusException {
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
@@ -283,7 +282,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job submitJob(JobDescription description) throws OctopusIOException, OctopusException {
+    public Job submitJob(JobDescription description) throws OctopusException {
         String output;
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
 
@@ -316,7 +315,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws OctopusIOException, OctopusException {
+    public JobStatus cancelJob(Job job) throws OctopusException {
         String identifier = job.getIdentifier();
         String output = runCheckedCommand(null, "scancel", identifier);
 
@@ -328,7 +327,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job[] getJobs(String... queueNames) throws OctopusIOException, OctopusException {
+    public Job[] getJobs(String... queueNames) throws OctopusException {
         String output;
 
         if (queueNames == null || queueNames.length == 0) {
@@ -353,7 +352,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    private Map<String, String> getSControlInfo(Job job) throws OctopusIOException, OctopusException {
+    private Map<String, String> getSControlInfo(Job job) throws OctopusException {
         RemoteCommandRunner runner = runCommand(null, "scontrol", "show", "job", job.getIdentifier());
 
         if (!runner.success()) {
@@ -365,7 +364,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return ScriptingParser.parseKeyValuePairs(runner.getStdout(), SlurmAdaptor.ADAPTOR_NAME, "WorkDir=", "Command=");
     }
 
-    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException, OctopusIOException {
+    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws OctopusException {
         String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs="
                 + SchedulerConnection.identifiersAsCSList(jobs));
 
@@ -373,7 +372,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 "*", "~");
     }
 
-    private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws OctopusIOException, OctopusException {
+    private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws OctopusException {
         String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
                 "--partition=" + CommandLineUtils.asCSList(partitions));
 
@@ -381,7 +380,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 "~");
     }
 
-    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws OctopusException, OctopusIOException {
+    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws OctopusException {
         if (!config.accountingAvailable()) {
             return new HashMap<String, Map<String, String>>();
         }
@@ -405,7 +404,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
+    public JobStatus getJobStatus(Job job) throws OctopusException {
 
         //try the queue first
         Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(job);
@@ -432,7 +431,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusIOException, OctopusException {
+    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException {
         JobStatus[] result = new JobStatus[jobs.length];
 
         //fetch queue info for all jobs in one go
@@ -473,7 +472,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus getQueueStatus(String queueName) throws OctopusIOException, OctopusException {
+    public QueueStatus getQueueStatus(String queueName) throws OctopusException {
         Map<String, Map<String, String>> info = getSinfoInfo(queueName);
 
         QueueStatus result = getQueueStatusFromSInfo(info, queueName, getScheduler());
@@ -487,7 +486,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws OctopusIOException, OctopusException {
+    public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws OctopusException {
         String[] targetQueueNames;
 
         if (requestedQueueNames == null) {

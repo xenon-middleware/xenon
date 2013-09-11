@@ -15,17 +15,18 @@
  */
 package nl.esciencecenter.octopus.engine;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
 import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.engine.Adaptor;
-import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 
 import org.junit.Test;
 

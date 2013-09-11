@@ -23,13 +23,12 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.InvalidPropertyException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
-import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
-import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 import org.junit.Test;
 

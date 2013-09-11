@@ -16,8 +16,7 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
-import java.io.IOException;
-
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 
 /**
@@ -25,5 +24,5 @@ import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
  * 
  */
 public interface InteractiveProcessFactory {
-    InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException;
+    InteractiveProcess createInteractiveProcess(JobImplementation job) throws OctopusException;
 }

@@ -16,16 +16,13 @@
 package nl.esciencecenter.octopus.adaptors.scripting;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.jobs.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 

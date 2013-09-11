@@ -26,7 +26,11 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import nl.esciencecenter.octopus.AdaptorStatus;
+import nl.esciencecenter.octopus.InvalidSchemeException;
+import nl.esciencecenter.octopus.NoSuchOctopusException;
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.adaptors.slurm.SlurmAdaptor;
@@ -36,11 +40,6 @@ import nl.esciencecenter.octopus.engine.credentials.CredentialsEngineImplementat
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
 import nl.esciencecenter.octopus.engine.jobs.JobsEngine;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
-import nl.esciencecenter.octopus.exceptions.InvalidSchemeException;
-import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 
@@ -79,13 +78,12 @@ public final class OctopusEngine implements Octopus {
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
-     * @throws IllegalPropertyException
+     * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
      * @throws OctopusException
      *             If the Octopus failed initialize.
-     * @throws OctopusIOException 
      */
-    public static synchronized Octopus newOctopus(Map<String, String> properties) throws OctopusException, OctopusIOException {
+    public static synchronized Octopus newOctopus(Map<String, String> properties) throws OctopusException {
         OctopusEngine result = new OctopusEngine(properties);
         OCTOPUS_ENGINES.add(result);
         return result;
@@ -147,9 +145,8 @@ public final class OctopusEngine implements Octopus {
      *             If a known property was passed with an illegal value.
      * @throws OctopusException
      *             If the Octopus failed initialize.
-     * @throws OctopusIOException 
      */
-    private OctopusEngine(Map<String, String> properties) throws OctopusException, OctopusIOException {
+    private OctopusEngine(Map<String, String> properties) throws OctopusException {
 
         // Store the properties for later reference.
         if (properties == null) {
@@ -169,7 +166,7 @@ public final class OctopusEngine implements Octopus {
         LOGGER.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
-    private Adaptor[] loadAdaptors(Map<String, String> properties) throws OctopusException, OctopusIOException {
+    private Adaptor[] loadAdaptors(Map<String, String> properties) throws OctopusException {
 
         // Copy the map so we can manipulate it. 
         Map<String, String> tmp = new HashMap<>(properties);

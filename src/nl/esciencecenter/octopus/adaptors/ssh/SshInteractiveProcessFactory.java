@@ -16,8 +16,7 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.io.IOException;
-
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcessFactory;
@@ -35,7 +34,7 @@ public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
     }
 
     @Override
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
+    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws OctopusException {
         return new SshInteractiveProcess(session, job);
     }
 }

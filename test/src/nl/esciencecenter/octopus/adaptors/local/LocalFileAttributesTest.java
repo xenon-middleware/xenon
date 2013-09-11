@@ -22,11 +22,11 @@ import static org.junit.Assert.assertTrue;
 import java.nio.file.attribute.PosixFilePermissions;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.util.Utils;
 
 /**
@@ -35,7 +35,7 @@ import nl.esciencecenter.octopus.util.Utils;
  */
 public class LocalFileAttributesTest {
 
-    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+    private static Path resolve(Files files, Path root, String path) throws OctopusException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
@@ -44,7 +44,7 @@ public class LocalFileAttributesTest {
         new LocalFileAttributes(null);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void testNonExistingFile() throws Exception {
         Octopus o = OctopusFactory.newOctopus(null);
         Files files = o.files();

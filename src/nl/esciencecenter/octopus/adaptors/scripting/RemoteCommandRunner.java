@@ -16,10 +16,9 @@
 package nl.esciencecenter.octopus.adaptors.scripting;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.util.InputWriter;
 import nl.esciencecenter.octopus.engine.util.OutputReader;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -62,11 +61,9 @@ public class RemoteCommandRunner {
      *            arguments for the command
      * @throws OctopusException
      *             if the job could not be run successfully.
-     * @throws OctopusIOException
-     *             if the job could not be run successfully.
      */
     public RemoteCommandRunner(Octopus octopus, Scheduler scheduler, String adaptorName, String stdin, String executable,
-            String... arguments) throws OctopusException, OctopusIOException {
+            String... arguments) throws OctopusException {
         long start = System.currentTimeMillis();
 
         JobDescription description = new JobDescription();

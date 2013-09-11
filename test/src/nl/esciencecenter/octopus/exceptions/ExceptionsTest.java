@@ -16,7 +16,42 @@
 
 package nl.esciencecenter.octopus.exceptions;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import nl.esciencecenter.octopus.IncompatibleVersionException;
+import nl.esciencecenter.octopus.InvalidCredentialException;
+import nl.esciencecenter.octopus.InvalidLocationException;
+import nl.esciencecenter.octopus.InvalidPropertyException;
+import nl.esciencecenter.octopus.NoSuchOctopusException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.OctopusRuntimeException;
+import nl.esciencecenter.octopus.UnknownPropertyException;
+import nl.esciencecenter.octopus.adaptors.ssh.ConnectionLostException;
+import nl.esciencecenter.octopus.adaptors.ssh.EndOfFileException;
+import nl.esciencecenter.octopus.adaptors.ssh.NotConnectedException;
+import nl.esciencecenter.octopus.adaptors.ssh.PermissionDeniedException;
+import nl.esciencecenter.octopus.adaptors.ssh.UnsupportedIOOperationException;
+import nl.esciencecenter.octopus.engine.PropertyTypeException;
+import nl.esciencecenter.octopus.engine.util.BadParameterException;
+import nl.esciencecenter.octopus.engine.util.CommandNotFoundException;
+import nl.esciencecenter.octopus.files.AttributeNotSupportedException;
+import nl.esciencecenter.octopus.files.DirectoryNotEmptyException;
+import nl.esciencecenter.octopus.files.IllegalSourcePathException;
+import nl.esciencecenter.octopus.files.IllegalTargetPathException;
+import nl.esciencecenter.octopus.files.InvalidResumeTargetException;
+import nl.esciencecenter.octopus.files.InvalidOpenOptionsException;
+import nl.esciencecenter.octopus.files.NoSuchCopyException;
+import nl.esciencecenter.octopus.files.NoSuchPathException;
+import nl.esciencecenter.octopus.files.PathAlreadyExistsException;
+import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
+import nl.esciencecenter.octopus.jobs.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
+import nl.esciencecenter.octopus.jobs.JobCanceledException;
+import nl.esciencecenter.octopus.jobs.NoSuchJobException;
+import nl.esciencecenter.octopus.jobs.NoSuchQueueException;
+import nl.esciencecenter.octopus.jobs.NoSuchSchedulerException;
+import nl.esciencecenter.octopus.jobs.UnsupportedJobDescriptionException;
 
 import org.junit.Test;
 
@@ -73,18 +108,18 @@ public class ExceptionsTest {
 
     @Test
     public void testOctopusIOException3() throws Exception {
-        testException(new OctopusIOException(null, "message"), null, "message", null);
+        testException(new OctopusException(null, "message"), null, "message", null);
     }
 
     @Test
     public void testOctopusIOException1() throws Exception {
-        testException(new OctopusIOException("name", "message"));
+        testException(new OctopusException("name", "message"));
     }
 
     @Test
     public void testOctopusIOException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new OctopusIOException("name", "message", t), t);
+        testException(new OctopusException("name", "message", t), t);
     }
 
     @Test
@@ -138,13 +173,13 @@ public class ExceptionsTest {
 
     @Test
     public void testDirectoryIteratorException1() throws Exception {
-        testException(new DirectoryIteratorException("name", "message"));
+        testException(new InvalidCopyOptionsException("name", "message"));
     }
 
     @Test
     public void testDirectoryIteratorException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new DirectoryIteratorException("name", "message", t), t);
+        testException(new InvalidCopyOptionsException("name", "message", t), t);
     }
 
     @Test
@@ -171,24 +206,13 @@ public class ExceptionsTest {
 
     @Test
     public void testFileAlreadyExistsException1() throws Exception {
-        testException(new FileAlreadyExistsException("name", "message"));
+        testException(new PathAlreadyExistsException("name", "message"));
     }
 
     @Test
     public void testFileAlreadyExistsException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new FileAlreadyExistsException("name", "message", t), t);
-    }
-
-    @Test
-    public void testIllegalPropertyException1() throws Exception {
-        testException(new IllegalPropertyException("name", "message"));
-    }
-
-    @Test
-    public void testIllegalPropertyException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new IllegalPropertyException("name", "message", t), t);
+        testException(new PathAlreadyExistsException("name", "message", t), t);
     }
 
     @Test
@@ -236,17 +260,6 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testInvalidCloseException1() throws Exception {
-        testException(new InvalidCloseException("name", "message"));
-    }
-
-    @Test
-    public void testInvalidCloseException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new InvalidCloseException("name", "message", t), t);
-    }
-
-    @Test
     public void testInvalidCredentialException1() throws Exception {
         testException(new InvalidCredentialException("name", "message"));
     }
@@ -258,25 +271,14 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testInvalidCredentialsException1() throws Exception {
-        testException(new InvalidCredentialsException("name", "message"));
-    }
-
-    @Test
-    public void testInvalidCredentialsException2() throws Exception {
-        Throwable t = new Throwable();
-        testException(new InvalidCredentialsException("name", "message", t), t);
-    }
-
-    @Test
     public void testInvalidDataException1() throws Exception {
-        testException(new InvalidDataException("name", "message"));
+        testException(new InvalidResumeTargetException("name", "message"));
     }
 
     @Test
     public void testInvalidDataException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new InvalidDataException("name", "message", t), t);
+        testException(new InvalidResumeTargetException("name", "message", t), t);
     }
 
     @Test
@@ -336,13 +338,13 @@ public class ExceptionsTest {
 
     @Test
     public void testNoSuchFileException1() throws Exception {
-        testException(new NoSuchFileException("name", "message"));
+        testException(new NoSuchPathException("name", "message"));
     }
 
     @Test
     public void testNoSuchFileException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new NoSuchFileException("name", "message", t), t);
+        testException(new NoSuchPathException("name", "message", t), t);
     }
 
     @Test
@@ -446,13 +448,13 @@ public class ExceptionsTest {
 
     @Test
     public void testUnsupportedOperationException1() throws Exception {
-        testException(new UnsupportedOperationException("name", "message"));
+        testException(new InvalidCopyOptionsException("name", "message"));
     }
 
     @Test
     public void testUnsupportedOperationException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new UnsupportedOperationException("name", "message", t), t);
+        testException(new InvalidCopyOptionsException("name", "message", t), t);
     }
 
     @Test

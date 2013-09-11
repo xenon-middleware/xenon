@@ -16,10 +16,10 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
-import  nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 /**
  * CopyInfo contains all necessary information needed for asynchronous copy operations.
@@ -113,10 +113,10 @@ public class CopyInfo {
 
     
     private static CopyOption checkMode(String adaptorName, CopyOption previous, CopyOption current) 
-            throws UnsupportedOperationException { 
+            throws InvalidCopyOptionsException { 
         
         if (previous != null && !previous.equals(current)) {
-            throw new UnsupportedOperationException(adaptorName, "Conflicting copy options: " + previous + " and " + 
+            throw new InvalidCopyOptionsException(adaptorName, "Conflicting copy options: " + previous + " and " + 
                     current);
         }
 
@@ -130,10 +130,10 @@ public class CopyInfo {
      * @param target
      * @param options
      * @return
-     * @throws UnsupportedOperationException 
+     * @throws InvalidCopyOptionsException 
      */
     public static CopyInfo createCopyInfo(String adaptorName, String nextID, Path source, Path target,
-            CopyOption ... options) throws UnsupportedOperationException {
+            CopyOption ... options) throws InvalidCopyOptionsException {
 
         boolean async = false;
         boolean verify = false;
@@ -163,7 +163,7 @@ public class CopyInfo {
         }
 
         if (verify && mode != CopyOption.RESUME) {
-            throw new UnsupportedOperationException(adaptorName, "Conflicting copy options: " + mode + " and VERIFY");
+            throw new InvalidCopyOptionsException(adaptorName, "Conflicting copy options: " + mode + " and VERIFY");
         }
 
         CopyImplementation copy = new CopyImplementation(adaptorName, nextID, source, target);

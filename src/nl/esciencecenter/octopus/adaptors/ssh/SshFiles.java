@@ -26,37 +26,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.engine.files.FileSystemImplementation;
 import nl.esciencecenter.octopus.engine.files.FilesEngine;
+import nl.esciencecenter.octopus.engine.files.PathImplementation;
 import nl.esciencecenter.octopus.engine.util.CopyEngine;
 import nl.esciencecenter.octopus.engine.util.CopyInfo;
 import nl.esciencecenter.octopus.engine.util.OpenOptions;
-import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
-import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
-import nl.esciencecenter.octopus.exceptions.InvalidOpenOptionsException;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.DirectoryStream.Filter;
+import nl.esciencecenter.octopus.files.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.InvalidOpenOptionsException;
+import nl.esciencecenter.octopus.files.NoSuchPathException;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.PathAlreadyExistsException;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,24 +109,24 @@ public class SshFiles implements Files {
         this.adaptor = sshAdaptor;
     }
 
-    private void checkParent(Path path) throws OctopusIOException {
+    private void checkParent(Path path) throws OctopusException {
         
         RelativePath parentName = path.getRelativePath().getParent();
         
         if (parentName == null) { 
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
         }
         
         Path parent = newPath(path.getFileSystem(), parentName);
             
         if (!exists(parent)) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
         }
     }
     
     
     protected FileSystem newFileSystem(SshMultiplexedSession session, String scheme, String location, Credential credential,
-            OctopusProperties properties) throws OctopusException, OctopusIOException {
+            OctopusProperties properties) throws OctopusException {
 
         String uniqueID = getNewUniqueID();
 
@@ -159,7 +158,7 @@ public class SshFiles implements Files {
 
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException, OctopusIOException {
+            throws OctopusException {
 
         SshLocation sshLocation = SshLocation.parse(location);
         
@@ -171,13 +170,13 @@ public class SshFiles implements Files {
         return newFileSystem(session, scheme, location, credential, octopusProperties);
     }
 
-    private SshMultiplexedSession getSession(Path path) throws OctopusIOException {
+    private SshMultiplexedSession getSession(Path path) throws OctopusException {
 
         FileSystemImplementation fs = (FileSystemImplementation) path.getFileSystem();
         FileSystemInfo info = fileSystems.get(fs.getUniqueID());
 
         if (info == null) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
         }
 
         return info.getSession();
@@ -189,29 +188,29 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void close(FileSystem filesystem) throws OctopusException, OctopusIOException {
+    public void close(FileSystem filesystem) throws OctopusException {
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
 
         FileSystemInfo info = fileSystems.remove(fs.getUniqueID());
 
         if (info == null) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "file system is already closed");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "file system is already closed");
         }
 
         info.getSession().disconnect();
     }
 
     @Override
-    public boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException {
+    public boolean isOpen(FileSystem filesystem) throws OctopusException {
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
         return (fileSystems.get(fs.getUniqueID()) != null);
     }
 
     @Override
-    public void createDirectory(Path dir) throws OctopusIOException {
+    public void createDirectory(Path dir) throws OctopusException {
 
         if (exists(dir)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
+            throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
 
         checkParent(dir);
@@ -230,10 +229,10 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void createDirectories(Path dir) throws OctopusIOException {
+    public void createDirectories(Path dir) throws OctopusException {
 
         if (exists(dir)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
+            throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
 
         Iterator<RelativePath> itt = dir.getRelativePath().iterator();
@@ -248,10 +247,10 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void createFile(Path path) throws OctopusIOException {
+    public void createFile(Path path) throws OctopusException {
 
         if (exists(path)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
+            throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
         }
 
         checkParent(path);
@@ -272,10 +271,10 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void delete(Path path) throws OctopusIOException {
+    public void delete(Path path) throws OctopusException {
 
         if (!exists(path)) {
-            throw new NoSuchFileException(getClass().getName(), "Cannot delete file, as it does not exist");
+            throw new NoSuchPathException(getClass().getName(), "Cannot delete file, as it does not exist");
         }
 
         SshMultiplexedSession session = getSession(path);
@@ -316,26 +315,26 @@ public class SshFiles implements Files {
      *            the non existing target path.
      * @return the target path.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If the source file does not exist or the target parent directory does not exist.
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             If the target file already exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If the move failed.
      */
     @Override
-    public void move(Path source, Path target) throws OctopusIOException {
+    public void move(Path source, Path target) throws OctopusException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
         if (!sourcefs.getLocation().equals(targetfs.getLocation())) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different FileSystems: "
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different FileSystems: "
                     + sourcefs.getLocation() + " and " + targetfs.getLocation());
         }
 
         if (!exists(source)) {
-            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
+            throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
         }
 
         RelativePath sourceName = source.getRelativePath().normalize();
@@ -346,7 +345,7 @@ public class SshFiles implements Files {
         }
 
         if (exists(target)) {
-            throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target + " already exists!");
+            throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Target " + target + " already exists!");
         }
 
         checkParent(target);
@@ -367,16 +366,16 @@ public class SshFiles implements Files {
     }
 
     @SuppressWarnings("unchecked")
-    private List<LsEntry> listDirectory(Path path, Filter filter) throws OctopusIOException {
+    private List<LsEntry> listDirectory(Path path, Filter filter) throws OctopusException {
 
         FileAttributes att = getAttributes(path);
 
         if (!att.isDirectory()) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
         if (filter == null) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
 
         SshMultiplexedSession session = getSession(path);
@@ -397,36 +396,36 @@ public class SshFiles implements Files {
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter)
-            throws OctopusIOException {
+            throws OctopusException {
         return new SshDirectoryAttributeStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws OctopusIOException {
+    public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws OctopusException {
         return new SshDirectoryStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusIOException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusException {
         return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusIOException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws OctopusIOException {
+    public InputStream newInputStream(Path path) throws OctopusException {
 
         if (!exists(path)) {
-            throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
+            throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
         }
 
         FileAttributes att = getAttributes(path);
 
         if (att.isDirectory()) {
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
         }
 
         SshMultiplexedSession session = getSession(path);
@@ -442,7 +441,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException {
 
         OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
 
@@ -460,11 +459,11 @@ public class SshFiles implements Files {
 
         if (tmp.getOpenMode() == OpenOption.CREATE) {
             if (exists(path)) {
-                throw new FileAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
+                throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
             }
         } else if (tmp.getOpenMode() == OpenOption.OPEN) {
             if (!exists(path)) {
-                throw new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
+                throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
             }
         }
 
@@ -487,7 +486,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public Path readSymbolicLink(Path path) throws OctopusIOException {
+    public Path readSymbolicLink(Path path) throws OctopusException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
@@ -521,14 +520,14 @@ public class SshFiles implements Files {
 
             try {
                 close(fs);
-            } catch (OctopusIOException | OctopusException e) {
+            } catch (OctopusException e) {
                 // ignore for now
             }
         }
     }
     
     @Override
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
@@ -543,7 +542,7 @@ public class SshFiles implements Files {
         session.releaseSftpChannel(channel);
     }
 
-    private SftpATTRS stat(Path path) throws OctopusIOException {
+    private SftpATTRS stat(Path path) throws OctopusException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
@@ -562,23 +561,23 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public FileAttributes getAttributes(Path path) throws OctopusIOException {
+    public FileAttributes getAttributes(Path path) throws OctopusException {
         return new SshFileAttributes(stat(path), path);
     }
 
     @Override
-    public boolean exists(Path path) throws OctopusIOException {
+    public boolean exists(Path path) throws OctopusException {
         try {
             stat(path);
             return true;
-        } catch (NoSuchFileException e) {
+        } catch (NoSuchPathException e) {
             return false;
         }
     }
     
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusIOException,
-            UnsupportedOperationException {
+    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException,
+            InvalidCopyOptionsException {
 
         CopyEngine ce = octopusEngine.getCopyEngine();
         
@@ -593,7 +592,7 @@ public class SshFiles implements Files {
             Exception e = info.getException();
 
             if (e != null) {
-                throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Copy failed!", e);
+                throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Copy failed!", e);
             }
 
             return null;
@@ -601,12 +600,12 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException {
+    public CopyStatus getCopyStatus(Copy copy) throws OctopusException {
         return octopusEngine.getCopyEngine().getStatus(copy);
     }
 
     @Override
-    public CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException {
+    public CopyStatus cancelCopy(Copy copy) throws OctopusException {
         return octopusEngine.getCopyEngine().cancel(copy);
     }
 }

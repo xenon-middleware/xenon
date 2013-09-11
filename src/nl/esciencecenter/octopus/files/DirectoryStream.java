@@ -16,9 +16,8 @@
 package nl.esciencecenter.octopus.files;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.util.Iterator;
-
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * DirectoryStream is a {@link Iterable} set of elements that represent the entries found in a directory. 
@@ -53,5 +52,5 @@ public interface DirectoryStream<T> extends Closeable, Iterable<T> {
     Iterator<T> iterator();
 
     @Override
-    void close() throws OctopusIOException;
+    void close() throws IOException;
 }

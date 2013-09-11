@@ -15,17 +15,17 @@
  */
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import java.io.IOException;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
-import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
+import nl.esciencecenter.octopus.files.Path;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
@@ -33,7 +33,7 @@ public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path>
 
     private final Deque<Path> stream;
 
-    SshDirectoryStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusIOException {
+    SshDirectoryStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws OctopusException {
 
         stream = new LinkedList<Path>();
 
@@ -59,7 +59,7 @@ public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path>
     }
 
     @Override
-    public synchronized void close() throws OctopusIOException {
+    public synchronized void close() throws IOException {
         stream.clear();
     }
 
@@ -80,6 +80,6 @@ public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path>
 
     @Override
     public void remove() {
-        throw new DirectoryIteratorException(SshAdaptor.ADAPTOR_NAME, "DirectoryStream iterator does not support remove");
+        throw new UnsupportedOperationException("DirectoryStream iterator does not support remove");
     }
 }

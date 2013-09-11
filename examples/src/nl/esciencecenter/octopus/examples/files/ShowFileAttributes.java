@@ -20,14 +20,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.NoSuchPathException;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
@@ -76,7 +75,7 @@ public class ShowFileAttributes {
                 System.out.println("  group: " + attributes.group());
                 System.out.println("  permissions: " + attributes.permissions());
 
-            } catch (NoSuchFileException e) {
+            } catch (NoSuchPathException e) {
                 System.out.println("File " + uri + " does not exist!");
 
             } catch (Exception e) {
@@ -90,7 +89,7 @@ public class ShowFileAttributes {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch  (URISyntaxException | OctopusException | OctopusIOException e) {
+        } catch  (URISyntaxException | OctopusException e) {
             System.out.println("ShowFileAttributes example failed: " + e.getMessage());
             e.printStackTrace();
         }

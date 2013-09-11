@@ -16,10 +16,10 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
+import nl.esciencecenter.octopus.adaptors.GenericFileAdaptorTestParent;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-
-import nl.esciencecenter.octopus.adaptors.GenericFileAdaptorTestParent;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>

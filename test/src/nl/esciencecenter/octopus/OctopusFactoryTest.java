@@ -15,16 +15,11 @@
  */
 package nl.esciencecenter.octopus;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.util.Properties;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.NoSuchOctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.junit.Test;
 
@@ -39,26 +34,26 @@ public class OctopusFactoryTest {
     }
 
     @Test
-    public void testNewOctopus() throws OctopusException, OctopusIOException {
+    public void testNewOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         assertTrue(octopus.getProperties().equals(new Properties()));
     }
 
     @Test
-    public void testEndOctopus() throws OctopusException, OctopusIOException {
+    public void testEndOctopus() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         OctopusFactory.endOctopus(octopus);
     }
 
     @Test(expected = NoSuchOctopusException.class)
-    public void testEndOctopus2() throws OctopusException, OctopusIOException {
+    public void testEndOctopus2() throws OctopusException {
         Octopus octopus = OctopusFactory.newOctopus(null);
         OctopusFactory.endOctopus(octopus);
         OctopusFactory.endOctopus(octopus);
     }
 
     @Test(expected = NoSuchOctopusException.class)
-    public void testEndAll() throws OctopusException, OctopusIOException {
+    public void testEndAll() throws OctopusException {
         Octopus octopus1 = OctopusFactory.newOctopus(null);
         Octopus octopus2 = OctopusFactory.newOctopus(null);
 

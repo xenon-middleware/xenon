@@ -3,8 +3,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
+import nl.esciencecenter.octopus.InvalidLocationException;
 
 import org.junit.Test;
 

@@ -18,8 +18,8 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.Arrays;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * Class that holds some info on queues used in Grid Engine.

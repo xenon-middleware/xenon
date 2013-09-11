@@ -18,13 +18,12 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.gridengine.ParallelEnvironmentInfo.AllocationRule;
 import nl.esciencecenter.octopus.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,14 +60,14 @@ public class GridEngineSetup {
         return result;
     }
     
-    private static String[] getQueueNames(SchedulerConnection schedulerConnection) throws OctopusIOException, OctopusException {
+    private static String[] getQueueNames(SchedulerConnection schedulerConnection) throws OctopusException {
         String queueListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sql");
 
         return ScriptingParser.parseList(queueListOutput);
     }
 
     private static Map<String, QueueInfo> getQueues(String[] queueNames, SchedulerConnection schedulerConnection)
-            throws OctopusIOException, OctopusException {
+            throws OctopusException {
         String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
@@ -84,7 +83,7 @@ public class GridEngineSetup {
         return result;
     }
 
-    public GridEngineSetup(SchedulerConnection schedulerConnection) throws OctopusIOException,
+    public GridEngineSetup(SchedulerConnection schedulerConnection) throws OctopusException,
             OctopusException {
 
         this.queueNames = getQueueNames(schedulerConnection);
@@ -97,7 +96,7 @@ public class GridEngineSetup {
     }
     
     private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(SchedulerConnection schedulerConnection)
-            throws OctopusIOException, OctopusException {
+            throws OctopusException {
         //first retrieve a list of parallel environments
         RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
 

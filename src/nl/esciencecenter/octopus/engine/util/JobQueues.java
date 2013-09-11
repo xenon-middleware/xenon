@@ -22,20 +22,18 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.QueueStatusImplementation;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
-import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.jobs.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
+import nl.esciencecenter.octopus.jobs.NoSuchQueueException;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
@@ -139,7 +137,7 @@ public class JobQueues {
         }
     }
 
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException {
         return "single";
     }
 
@@ -251,7 +249,7 @@ public class JobQueues {
         return result;
     }
 
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException {
 
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
@@ -274,7 +272,7 @@ public class JobQueues {
         return status;
     }
 
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException {
 
         LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, job.getIdentifier(), timeout);
 

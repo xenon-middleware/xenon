@@ -19,20 +19,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.OctopusRuntimeException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
-import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
@@ -91,7 +90,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public synchronized boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public synchronized boolean isOpen(Scheduler scheduler) throws OctopusException {
         if (!(scheduler instanceof SchedulerImplementation)) {
             throw new OctopusRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
         }
@@ -103,7 +102,7 @@ public class ScriptingJobs implements Jobs {
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException,OctopusIOException {
+            throws OctopusException,OctopusException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
@@ -116,7 +115,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -125,7 +124,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public void close(Scheduler scheduler) throws OctopusException {
         SchedulerConnection connection = getConnection(scheduler);
 
         connection.close();
@@ -134,7 +133,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -143,7 +142,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -152,7 +151,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -161,13 +160,13 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
         // Copy the JobDescription to ensure the user doesn't change it after we return.
         return getConnection(scheduler).submitJob(new JobDescription(description));
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
+    public JobStatus getJobStatus(Job job) throws OctopusException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.getJobStatus(job);
@@ -212,7 +211,7 @@ public class ScriptingJobs implements Jobs {
 
         try {
             result = connection.getJobStatuses(in);
-        } catch (OctopusException | OctopusIOException e) {
+        } catch (OctopusException e) {
             exception = e;
         }
 
@@ -256,7 +255,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
+    public JobStatus cancelJob(Job job) throws OctopusException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.cancelJob(job);
@@ -273,7 +272,7 @@ public class ScriptingJobs implements Jobs {
         for (SchedulerConnection connection : currentConnections) {
             try {
                 connection.close();
-            } catch (OctopusIOException | OctopusException e) {
+            } catch (OctopusException e) {
                 LOGGER.error("Error on closing connection to server", e);
             }
         }
@@ -285,14 +284,14 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.waitUntilRunning(job, timeout);

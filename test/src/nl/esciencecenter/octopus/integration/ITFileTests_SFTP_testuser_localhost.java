@@ -17,9 +17,9 @@ package nl.esciencecenter.octopus.integration;
 
 import java.net.URI;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class ITFileTests_SFTP_testuser_localhost extends AbstractFileTests {
 

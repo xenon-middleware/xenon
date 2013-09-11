@@ -19,10 +19,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.HashMap;
 
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.OctopusRuntimeException;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.RelativePath;
 
@@ -52,7 +52,7 @@ public class FilesEngineTest {
         engine.newPath(fsi, new RelativePath("tmp/bla.txt"));
     }
 
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void testInterSchemeCopy() throws Exception {
 
         OctopusEngine oe = Util.createOctopusEngine(new HashMap<String, String>());

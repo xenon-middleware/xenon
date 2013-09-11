@@ -24,13 +24,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nl.esciencecenter.octopus.InvalidPropertyException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
-import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
-import nl.esciencecenter.octopus.exceptions.PropertyTypeException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.

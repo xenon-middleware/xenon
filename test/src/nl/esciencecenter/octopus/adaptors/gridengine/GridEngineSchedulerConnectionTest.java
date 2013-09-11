@@ -23,11 +23,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.scripting.FakeScriptingJob;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.JobCanceledException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobCanceledException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 

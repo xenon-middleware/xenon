@@ -20,8 +20,8 @@ import java.lang.reflect.Constructor;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
@@ -41,32 +41,32 @@ public class LocalUtilsTest {
         constructor.newInstance();
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_delete_null() throws Exception {
         LocalUtils.delete(null);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_createFile_null() throws Exception {
         LocalUtils.createFile(null);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_move_null() throws Exception {
         LocalUtils.move(null, null);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_setPosixFilePermissions_null() throws Exception {
         LocalUtils.setPosixFilePermissions(null, null);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_newInputStream_null() throws Exception {
         LocalUtils.newInputStream(null);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_broken_home_null() throws Exception {
         String originalHome = System.getProperty("user.home");
 
@@ -79,7 +79,7 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_broken_cwd_null() throws Exception {
         String originalCWD = System.getProperty("user.dir");
 
@@ -92,7 +92,7 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_broken_home_empty() throws Exception {
         String originalHome = System.getProperty("user.home");
 
@@ -105,7 +105,7 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_broken_cwd_empty() throws Exception {
         String originalCWD = System.getProperty("user.dir");
 

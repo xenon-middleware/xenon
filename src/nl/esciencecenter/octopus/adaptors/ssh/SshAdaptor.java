@@ -19,12 +19,10 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
-import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
+import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.Adaptor;
@@ -32,16 +30,12 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
-import nl.esciencecenter.octopus.exceptions.ConnectionLostException;
-import nl.esciencecenter.octopus.exceptions.EndOfFileException;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.exceptions.NotConnectedException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.PermissionDeniedException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedIOOperationException;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.NoSuchPathException;
 import nl.esciencecenter.octopus.jobs.Jobs;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.HostKey;
@@ -235,20 +229,20 @@ public class SshAdaptor extends Adaptor {
        returned by the server if the server does not implement an
        operation).
     */
-    OctopusIOException sftpExceptionToOctopusException(SftpException e) {
+    OctopusException sftpExceptionToOctopusException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_EOF:
             return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, "Unexpected EOF", e);
         case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-            return new NoSuchFileException(SshAdaptor.ADAPTOR_NAME, "No such file", e);
+            return new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "No such file", e);
         case ChannelSftp.SSH_FX_PERMISSION_DENIED:
             return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, "Permission denied", e);
         case ChannelSftp.SSH_FX_FAILURE:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
+            return new OctopusException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
         case ChannelSftp.SSH_FX_BAD_MESSAGE:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
+            return new OctopusException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
         case ChannelSftp.SSH_FX_NO_CONNECTION:
             return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, "SSH does not have a connection!", e);
         case ChannelSftp.SSH_FX_CONNECTION_LOST:
@@ -256,12 +250,12 @@ public class SshAdaptor extends Adaptor {
         case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
             return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, "Unsupported operation", e);
         default:
-            return new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
+            return new OctopusException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
         }
     }
 
     protected SshMultiplexedSession createNewSession(SshLocation location, Credential credential, OctopusProperties properties)
-            throws OctopusException, OctopusIOException {
+            throws OctopusException {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
 

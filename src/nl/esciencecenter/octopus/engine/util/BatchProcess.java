@@ -18,12 +18,11 @@ package nl.esciencecenter.octopus.engine.util;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.Streams;
@@ -87,7 +86,7 @@ class BatchProcess implements Process {
         }
     }
 
-    private Path processPath(Files files, Path root, String path) throws OctopusIOException, OctopusException {
+    private Path processPath(Files files, Path root, String path) throws OctopusException {
 
         Path result = null;
 
@@ -102,7 +101,7 @@ class BatchProcess implements Process {
         return result;
     }
 
-    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws OctopusIOException,
+    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws OctopusException,
             OctopusException {
 
         if (filename == null) {

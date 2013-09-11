@@ -18,14 +18,13 @@ package nl.esciencecenter.octopus.engine.util;
 
 import java.io.IOException;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
-import nl.esciencecenter.octopus.exceptions.JobCanceledException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobCanceledException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Streams;
@@ -68,7 +67,7 @@ public class JobExecutor implements Runnable {
     private Exception error;
 
     public JobExecutor(String adaptorName, Files files, Path workingDirectory, InteractiveProcessFactory factory,
-            JobImplementation job, long pollingDelay) throws BadParameterException {
+            JobImplementation job, long pollingDelay) {
 
         this.adaptorName = adaptorName;
         this.files = files;

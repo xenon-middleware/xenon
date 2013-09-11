@@ -15,14 +15,13 @@
  */
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.octopus.adaptors.scripting.SchedulerConnectionFactory;
 import nl.esciencecenter.octopus.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 /**
  * Simple Factory class to create scheduler connections
@@ -34,8 +33,7 @@ public class GridEngineSchedulerConnectionFactory implements SchedulerConnection
 
     @Override
     public SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location,
-            Credential credential, OctopusProperties properties, OctopusEngine engine) throws OctopusIOException,
-            OctopusException {
+            Credential credential, OctopusProperties properties, OctopusEngine engine) throws OctopusException {
         return new GridEngineSchedulerConnection(adaptor, scheme, location, credential, properties, engine);
     }
 

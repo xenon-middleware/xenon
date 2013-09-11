@@ -18,6 +18,7 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -25,18 +26,16 @@ import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
-import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
+import nl.esciencecenter.octopus.jobs.UnsupportedJobDescriptionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +97,7 @@ public class SshJobs implements Jobs {
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException, OctopusIOException {
+            throws OctopusException {
 
         SshLocation sshLocation = SshLocation.parse(location);
         
@@ -150,7 +149,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException {
         return getJobQueue(scheduler).getJobs(queueNames);
     }
 
@@ -201,12 +200,12 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException {
         return getJobQueue(job.getScheduler()).waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException {
         return getJobQueue(job.getScheduler()).waitUntilRunning(job, timeout);
     }
 
@@ -235,7 +234,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public void close(Scheduler scheduler) throws OctopusException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
@@ -257,7 +256,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public boolean isOpen(Scheduler scheduler) throws OctopusException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {
             throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
@@ -267,7 +266,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException {
         return getJobQueue(scheduler).getDefaultQueueName(scheduler);
     }
 

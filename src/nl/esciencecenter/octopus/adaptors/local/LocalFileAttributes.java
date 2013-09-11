@@ -22,8 +22,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.files.AttributeNotSupportedException;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
@@ -87,7 +87,7 @@ public class LocalFileAttributes implements FileAttributes {
     private final boolean isWindows;
     
     
-    public LocalFileAttributes(Path path) throws OctopusIOException {
+    public LocalFileAttributes(Path path) throws OctopusException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
 
@@ -139,7 +139,7 @@ public class LocalFileAttributes implements FileAttributes {
             }
             
         } catch (IOException e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Cannot read attributes.", e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot read attributes.", e);
         }
     }
 

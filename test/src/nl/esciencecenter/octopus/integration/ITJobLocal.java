@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.octopus.integration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

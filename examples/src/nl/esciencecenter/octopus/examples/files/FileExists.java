@@ -20,14 +20,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
 
 /**
@@ -80,7 +79,7 @@ public class FileExists {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+        } catch (URISyntaxException | OctopusException e) {
             System.out.println("FileExists example failed: " + e.getMessage());
             e.printStackTrace();
         }

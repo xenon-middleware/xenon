@@ -1,6 +1,6 @@
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
+import nl.esciencecenter.octopus.InvalidLocationException;
 
 public class SshLocation {
 

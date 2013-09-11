@@ -17,7 +17,9 @@ package nl.esciencecenter.octopus.credentials;
 
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.InvalidPropertyException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 
 /**
  * Credentials represents the credentials interface of Octopus.

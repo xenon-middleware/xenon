@@ -26,26 +26,26 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.files.CopyImplementation;
 import nl.esciencecenter.octopus.engine.files.CopyStatusImplementation;
-import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
-import nl.esciencecenter.octopus.exceptions.IllegalSourcePathException;
-import nl.esciencecenter.octopus.exceptions.IllegalTargetPathException;
-import nl.esciencecenter.octopus.exceptions.InvalidDataException;
-import nl.esciencecenter.octopus.exceptions.NoSuchCopyException;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.IllegalSourcePathException;
+import nl.esciencecenter.octopus.files.IllegalTargetPathException;
+import nl.esciencecenter.octopus.files.InvalidResumeTargetException;
+import nl.esciencecenter.octopus.files.NoSuchCopyException;
+import nl.esciencecenter.octopus.files.NoSuchPathException;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.PathAlreadyExistsException;
 import nl.esciencecenter.octopus.files.RelativePath;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A CopyEngine is responsible for performing the asynchronous copy operations.
@@ -143,7 +143,7 @@ public final class CopyEngine {
         }
     }
 
-    private void append(Path source, long fromOffset, Path target, CopyInfo ac) throws OctopusIOException {
+    private void append(Path source, long fromOffset, Path target, CopyInfo ac) throws OctopusException {
 
         // We need to append some bytes from source to target. 
         LOGGER.debug("Appending from {} to {} starting at {}", source, target, fromOffset);
@@ -159,7 +159,7 @@ public final class CopyEngine {
                 long tmp = in.skip(fromOffset);
 
                 if (tmp <= 0) {
-                    throw new OctopusIOException(NAME, "Failed to seek file " + source + " to " + fromOffset);
+                    throw new OctopusException(NAME, "Failed to seek file " + source + " to " + fromOffset);
                 }
 
                 skipped += tmp;
@@ -167,7 +167,7 @@ public final class CopyEngine {
 
             streamCopy(in, out, ac);
         } catch (IOException e) {
-            throw new OctopusIOException(NAME, "Failed to copy " + source + ":" + fromOffset + " to target " + target, e);
+            throw new OctopusException(NAME, "Failed to copy " + source + ":" + fromOffset + " to target " + target, e);
         } finally {
             close(in);
             close(out);
@@ -195,7 +195,7 @@ public final class CopyEngine {
         return offset;
     }
 
-    private boolean compareHead(CopyInfo ac, Path target, Path source) throws IOException {
+    private boolean compareHead(CopyInfo ac, Path target, Path source) throws OctopusException, IOException {
 
         LOGGER.debug("Compare head of {} to {}", target, source);
 
@@ -209,7 +209,7 @@ public final class CopyEngine {
             while (true) {
 
                 if (ac.isCancelled()) {
-                    throw new IOException("Copy killed by user");
+                    throw new OctopusException(NAME, "Copy killed by user");
                 }
 
                 int size1 = readFully(in1, buf1);
@@ -235,7 +235,7 @@ public final class CopyEngine {
         }
     }
 
-    private void doResume(CopyInfo ac) throws OctopusIOException {
+    private void doResume(CopyInfo ac) throws OctopusException {
 
         if (ac.isCancelled()) {
             ac.setException(new IOException("Copy killed by user"));
@@ -250,7 +250,7 @@ public final class CopyEngine {
         LOGGER.debug("Resume copy from {} to {} verify={}", source, target, ac.mustVerify());
 
         if (!owner.exists(source)) {
-            throw new NoSuchFileException(NAME, "Source " + source + " does not exist!");
+            throw new NoSuchPathException(NAME, "Source " + source + " does not exist!");
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
@@ -264,7 +264,7 @@ public final class CopyEngine {
         }
 
         if (!owner.exists(target)) {
-            throw new NoSuchFileException(NAME, "Target " + target + " does not exist!");
+            throw new NoSuchPathException(NAME, "Target " + target + " does not exist!");
         }
 
         FileAttributes targetAtt = owner.getAttributes(target);
@@ -293,10 +293,10 @@ public final class CopyEngine {
             // check if the data in target corresponds to the head of source.
             try {
                 if (!compareHead(ac, target, source)) {
-                    throw new InvalidDataException(NAME, "Data in target " + target + " does not match source " + source);
+                    throw new InvalidResumeTargetException(NAME, "Data in target " + target + " does not match source " + source);
                 }
             } catch (IOException e) {
-                throw new OctopusIOException(NAME, "Failed to compare " + source + " to " + target, e);
+                throw new OctopusException(NAME, "Failed to compare " + source + " to " + target, e);
             }
         }
 
@@ -307,7 +307,7 @@ public final class CopyEngine {
 
         // If target is larger than source, they cannot be the same file.
         if (targetSize > sourceSize) {
-            throw new InvalidDataException(NAME, "Data in target " + target + " does not match " + source + " "
+            throw new InvalidResumeTargetException(NAME, "Data in target " + target + " does not match " + source + " "
                     + source);
         }
 
@@ -324,7 +324,7 @@ public final class CopyEngine {
         append(source, targetSize, target, ac);
     }
 
-    private void doAppend(CopyInfo ac) throws OctopusIOException {
+    private void doAppend(CopyInfo ac) throws OctopusException {
 
         if (ac.isCancelled()) {
             ac.setException(new IOException("Copy killed by user"));
@@ -339,7 +339,7 @@ public final class CopyEngine {
         LOGGER.debug("Append from {} to {} verify={}", source, target);
 
         if (!owner.exists(source)) {
-            throw new NoSuchFileException(NAME, "Source " + source + " does not exist!");
+            throw new NoSuchPathException(NAME, "Source " + source + " does not exist!");
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
@@ -349,7 +349,7 @@ public final class CopyEngine {
         }
 
         if (!owner.exists(target)) {
-            throw new NoSuchFileException(NAME, "Target " + target + " does not exist!");
+            throw new NoSuchPathException(NAME, "Target " + target + " does not exist!");
         }
 
         FileAttributes targetAtt = owner.getAttributes(target);
@@ -370,7 +370,7 @@ public final class CopyEngine {
         append(source, 0, target, ac);
     }
 
-    private void doCopy(CopyInfo ac) throws OctopusIOException {
+    private void doCopy(CopyInfo ac) throws OctopusException {
 
         if (ac.isCancelled()) {
             ac.setException(new IOException("Copy killed by user"));
@@ -388,7 +388,7 @@ public final class CopyEngine {
         LOGGER.debug("Copy from {} to {} replace={} ignore={}", source, target, replace, ignore);
 
         if (!owner.exists(source)) {
-            throw new NoSuchFileException(NAME, "Source " + source + " does not exist!");
+            throw new NoSuchPathException(NAME, "Source " + source + " does not exist!");
         }
 
         FileAttributes sourceAtt = owner.getAttributes(source);
@@ -409,7 +409,7 @@ public final class CopyEngine {
                 return;
             }
             if (!replace) {
-                throw new FileAlreadyExistsException(NAME, "Target " + target + " already exists!");
+                throw new PathAlreadyExistsException(NAME, "Target " + target + " already exists!");
             }
         }
 
@@ -417,7 +417,7 @@ public final class CopyEngine {
         Path parent = owner.newPath(target.getFileSystem(), parentName);
         
         if (!owner.exists(parent)) {
-            throw new NoSuchFileException(NAME, "Target directory " + parent + " does not exist!");
+            throw new NoSuchPathException(NAME, "Target directory " + parent + " does not exist!");
         }
 
         ac.setBytesToCopy(sourceAtt.size());
@@ -437,7 +437,7 @@ public final class CopyEngine {
             streamCopy(in, out, ac);
 
         } catch (IOException e) {
-            throw new OctopusIOException(NAME, "Failed to copy " + source + " to " + target, e);
+            throw new OctopusException(NAME, "Failed to copy " + source + " to " + target, e);
         } finally {
             close(in);
             close(out);
@@ -465,7 +465,7 @@ public final class CopyEngine {
                 doResume(info);
                 break;
             default:
-                throw new OctopusIOException(NAME, "INTERNAL ERROR: Failed to recognise copy mode! (" + mode + " "
+                throw new OctopusException(NAME, "INTERNAL ERROR: Failed to recognise copy mode! (" + mode + " "
                         + info.mustVerify() + ")");
             }
         } catch (Exception e) {

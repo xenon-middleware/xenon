@@ -19,8 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import nl.esciencecenter.octopus.exceptions.CommandNotFoundException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.OctopusException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

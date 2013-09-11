@@ -30,19 +30,20 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.FileAlreadyExistsException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
+import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.PathAlreadyExistsException;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 
@@ -76,12 +77,10 @@ public final class Utils {
      * @return
      *          the local <code>Scheduler</code>.
      *          
-     * @throws OctopusIOException
-     *          If an I/O error occurred
      * @throws OctopusException
      *          If the creation of the Scheduler failed. 
      */
-    public static Scheduler getLocalScheduler(Jobs jobs) throws OctopusIOException, OctopusException { 
+    public static Scheduler getLocalScheduler(Jobs jobs) throws OctopusException { 
         return jobs.newScheduler("local", null, null, null);
     }
     
@@ -98,12 +97,10 @@ public final class Utils {
      * @return
      *          the local <code>Scheduler</code>.
      *          
-     * @throws OctopusIOException
-     *          If an I/O error occurred
      * @throws OctopusException
      *          If the creation of the Scheduler failed. 
      */
-    public static Scheduler newScheduler(Jobs jobs, String scheme) throws OctopusIOException, OctopusException { 
+    public static Scheduler newScheduler(Jobs jobs, String scheme) throws OctopusException { 
         return jobs.newScheduler(scheme, null, null, null);
     }    
     
@@ -310,14 +307,14 @@ public final class Utils {
      * 
      * @return the home directory of the current user.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          If the home directory could not be retrieved. 
      */
-    public static String getHome() throws OctopusIOException { 
+    public static String getHome() throws OctopusException { 
         String home = System.getProperty("user.home");
         
         if (home == null || home.length() == 0) { 
-            throw new OctopusIOException(NAME, "Home directory property user.home not set!");
+            throw new OctopusException(NAME, "Home directory property user.home not set!");
         }
 
         return home;        
@@ -328,14 +325,14 @@ public final class Utils {
      * 
      * @return the current working directory.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          If the current working directory could not be retrieved. 
      */
-    public static String getCWD() throws OctopusIOException { 
+    public static String getCWD() throws OctopusException { 
         String cwd = System.getProperty("user.dir");
         
         if (cwd == null || cwd.length() == 0) { 
-            throw new OctopusIOException(NAME, "Current working directory property user.dir not set!");
+            throw new OctopusException(NAME, "Current working directory property user.dir not set!");
         }
 
         return cwd;        
@@ -581,12 +578,10 @@ public final class Utils {
      *           
      * @return a <code>Path</code> representing the same location as <code>path</code>. 
      *          
-     * @throws OctopusIOException   
-     *          If an I/O error occurred
      * @throws OctopusException 
      *          If the creation of the FileSystem failed.
      */
-    public static Path fromLocalPath(Files files, String path) throws OctopusException, OctopusIOException { 
+    public static Path fromLocalPath(Files files, String path) throws OctopusException { 
         String root = getLocalRoot(path);
         FileSystem fs = files.newFileSystem("file", root, null, null);
         return files.newPath(fs, getRelativePath(path, root));
@@ -603,12 +598,12 @@ public final class Utils {
      * @return
      *          a <code>Path</code> that represents the current working directory.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          If an I/O error occurred
      * @throws OctopusException
      *          If the creation of the FileSystem failed.
      */    
-    public static Path getLocalCWD(Files files) throws OctopusException, OctopusIOException { 
+    public static Path getLocalCWD(Files files) throws OctopusException { 
         return fromLocalPath(files, getCWD());
     }
 
@@ -623,12 +618,10 @@ public final class Utils {
      * @return
      *          a <code>Path</code> that represents the home directory of the current user.
      * 
-     * @throws OctopusIOException
-     *          If an I/O error occurred
      * @throws OctopusException
      *          If the creation of the FileSystem failed.
      */    
-    public static Path getLocalHome(Files files) throws OctopusException, OctopusIOException { 
+    public static Path getLocalHome(Files files) throws OctopusException { 
         return fromLocalPath(files, getHome());
     }
     
@@ -642,12 +635,10 @@ public final class Utils {
      *          the files interface to use to create the <code>FileSystems</code>.
      * @return all local FileSystems.
      * 
-     * @throws OctopusIOException
-     *          If an I/O error occurred
      * @throws OctopusException
      *          If the creation of the FileSystem failed.
      */
-    public static FileSystem [] getLocalFileSystems(Files files) throws OctopusException, OctopusIOException {
+    public static FileSystem [] getLocalFileSystems(Files files) throws OctopusException {
         
         File [] roots = File.listRoots();
         
@@ -675,16 +666,16 @@ public final class Utils {
      * 
      * @return the number of bytes copied.
      * 
-     * @throws OctopusException
-     *             if an I/O error occurs when reading or writing
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             if the target file exists but cannot be replaced because the {@code REPLACE_EXISTING} option is not specified
      *             <i>(optional specific exception)</i>
      * @throws DirectoryNotEmptyException
      *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
      *             directory <i>(optional specific exception)</i> *
-     * @throws UnsupportedOperationException
+     * @throws InvalidCopyOptionsException
      *             if {@code options} contains a copy option that is not supported
+     * @throws OctopusException
+     *             if an I/O error occurs when reading or writing
      */
     public static long copy(Files files, InputStream in, Path target, boolean truncate) throws OctopusException {
 
@@ -749,10 +740,10 @@ public final class Utils {
      *
      * @return the BufferedReader.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static BufferedReader newBufferedReader(Files files, Path source, Charset cs) throws OctopusIOException {
+    public static BufferedReader newBufferedReader(Files files, Path source, Charset cs) throws OctopusException {
         return new BufferedReader(new InputStreamReader(files.newInputStream(source), cs));
     }
 
@@ -771,11 +762,11 @@ public final class Utils {
      *          
      * @return the BufferedWriter.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while opening or writing the file.
      */
     public static BufferedWriter newBufferedWriter(Files files, Path target, Charset cs, boolean truncate)
-            throws OctopusIOException {
+            throws OctopusException {
 
         OutputStream out = files.newOutputStream(target, openOptionsForWrite(truncate));
         return new BufferedWriter(new OutputStreamWriter(out, cs));
@@ -791,7 +782,7 @@ public final class Utils {
      *          
      * @return a <code>byte[]</code> containing all bytes in the file.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while opening or reading the file.
      */
     public static byte[] readAllBytes(Files files, Path source) throws OctopusException {
@@ -812,10 +803,10 @@ public final class Utils {
      *          
      * @return a <code>String</code> containing all data from the file as converted using <code>cs</code>.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static String readToString(Files files, Path source, Charset cs) throws OctopusIOException {
+    public static String readToString(Files files, Path source, Charset cs) throws OctopusException {
         
         InputStream in = null;
         
@@ -823,7 +814,7 @@ public final class Utils {
             in = files.newInputStream(source);
             return readToString(in, cs);
         } catch (IOException e) {
-            throw new OctopusIOException(NAME, "Failed to read data", e);
+            throw new OctopusException(NAME, "Failed to read data", e);
         } finally { 
             close(in);
         }
@@ -841,10 +832,10 @@ public final class Utils {
      *           
      * @return a <code>List<String></code> containing all lines in the file.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static List<String> readAllLines(Files files, Path source, Charset cs) throws OctopusIOException {
+    public static List<String> readAllLines(Files files, Path source, Charset cs) throws OctopusException {
 
         InputStream in = null;
         
@@ -852,7 +843,7 @@ public final class Utils {
             in = files.newInputStream(source);
             return readLines(in, cs);
         } catch (IOException e) {
-            throw new OctopusIOException(NAME, "Failed to read lines", e);
+            throw new OctopusException(NAME, "Failed to read lines", e);
         } finally { 
             close(in);
         }
@@ -893,11 +884,11 @@ public final class Utils {
      * @param truncate
      *          should the file be truncated before writing data into it ?
      *          
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs while opening or writing to the file.
      */
     public static void write(Files files, Path target, Iterable<? extends CharSequence> lines, Charset cs,
-            boolean truncate) throws OctopusIOException {
+            boolean truncate) throws OctopusException {
 
         OutputStream out = null;
         
@@ -905,7 +896,7 @@ public final class Utils {
             out = files.newOutputStream(target, openOptionsForWrite(truncate));
             writeLines(lines, cs, out);
         } catch (IOException e) {
-            throw new OctopusIOException("FileUtils", "failed to write lines", e);
+            throw new OctopusException("FileUtils", "failed to write lines", e);
         } finally { 
             close(out);
         }
@@ -925,10 +916,10 @@ public final class Utils {
      *          the path to start from.
      * @param visitor
      *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs during the walk.
      */
-    public static void walkFileTree(Files files, Path start, FileVisitor visitor) throws OctopusIOException {
+    public static void walkFileTree(Files files, Path start, FileVisitor visitor) throws OctopusException {
         walkFileTree(files, start, false, Integer.MAX_VALUE, visitor);
     }
 
@@ -970,7 +961,7 @@ public final class Utils {
      * </li>
      * <li> 
      * If {@link FileVisitResult#SKIP_SUBTREE} is returned, the elements in the directory will not be visited. Instead 
-     * {@link FileVisitor#postVisitDirectory(Path, OctopusIOException, Files) visitor.postVisitDirectory} and  
+     * {@link FileVisitor#postVisitDirectory(Path, OctopusException, Files) visitor.postVisitDirectory} and  
      * {@link FileVisitResult#CONTINUE} is returned.
      * </li>
      * <li> 
@@ -981,7 +972,7 @@ public final class Utils {
      * If {@link FileVisitResult#CONTINUE} is returned <code>walkFileTree</code> is called on each of the elements 
      * in the directory.
      * If any of these calls returns {@link FileVisitResult#SKIP_SIBLINGS} the remaining elements will be 
-     * skipped, {@link FileVisitor#postVisitDirectory(Path, OctopusIOException, Files) visitor.postVisitDirectory} will be 
+     * skipped, {@link FileVisitor#postVisitDirectory(Path, OctopusException, Files) visitor.postVisitDirectory} will be 
      * called, and its result will be returned.  
      * If any of these calls returns {@link FileVisitResult#TERMINATE} the walk is terminated immediately and 
      * {@link FileVisitResult#TERMINATE} is returned.
@@ -1001,20 +992,20 @@ public final class Utils {
      * @param visitor
      *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
      *          
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs during the walk.
      */
     public static void walkFileTree(Files files, Path start, boolean followLinks, int maxDepth,
-            FileVisitor visitor) throws OctopusIOException {
+            FileVisitor visitor) throws OctopusException {
         FileAttributes attributes = files.getAttributes(start);
         walk(files, start, attributes, followLinks, maxDepth, visitor);
     }
 
     // Walk a file tree.
     private static FileVisitResult walk(Files files, Path path, FileAttributes attributes, boolean followLinks,
-            int maxDepth, FileVisitor visitor) throws OctopusIOException {
+            int maxDepth, FileVisitor visitor) throws OctopusException {
         FileVisitResult visitResult;
-        OctopusIOException exception = null;
+        OctopusException exception = null;
 
         try {
             if (attributes.isDirectory() && maxDepth > 0) {
@@ -1033,7 +1024,7 @@ public final class Utils {
                                 return FileVisitResult.TERMINATE;
                             }
                         }
-                    } catch (OctopusIOException e) {
+                    } catch (OctopusException e) {
                         exception = e;
                     }
                     return visitor.postVisitDirectory(path, exception, files);
@@ -1059,7 +1050,7 @@ public final class Utils {
             } else {
                 return visitor.visitFile(path, attributes, files);
             }
-        } catch (OctopusIOException e) {
+        } catch (OctopusException e) {
             return visitor.visitFileFailed(path, e, files);
         }
     }
@@ -1076,19 +1067,19 @@ public final class Utils {
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
      * 
-     * @throws UnsupportedOperationException
+     * @throws InvalidCopyOptionsException
      *           if an invalid combination of options is used.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *           if an I/O error occurs during the copying
      */
     public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options)
-            throws OctopusIOException, UnsupportedOperationException {
+            throws OctopusException, InvalidCopyOptionsException {
 
         boolean exist = files.exists(target);
         boolean replace = CopyOption.contains(CopyOption.REPLACE, options);
         boolean ignore = CopyOption.contains(CopyOption.IGNORE, options);
         if (replace && ignore) {
-            throw new UnsupportedOperationException("FileUtils", "Can not replace and ignore existing files at the same time");
+            throw new InvalidCopyOptionsException("FileUtils", "Can not replace and ignore existing files at the same time");
         }
 
         FileAttributes att = files.getAttributes(source);
@@ -1103,7 +1094,7 @@ public final class Utils {
                     // Can not replace directory, to replace have to do recursive delete and createDirectories
                     // because recursive delete can delete unwanted files
                 } else {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
+                    throw new PathAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
                             + " already exists!");
                 }
             } else {
@@ -1121,7 +1112,7 @@ public final class Utils {
                 } else if (replace) {
                     files.copy(source, target, nl.esciencecenter.octopus.files.CopyOption.REPLACE);
                 } else {
-                    throw new FileAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
+                    throw new PathAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
                             + " already exists!");
                 }
             } else {
@@ -1138,10 +1129,10 @@ public final class Utils {
      * @param path
      *          the path to delete.
      *          
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs during the copying
      */
-    public static void recursiveDelete(Files files, Path path) throws OctopusIOException {
+    public static void recursiveDelete(Files files, Path path) throws OctopusException {
 
         FileAttributes att = files.getAttributes(path);
 
@@ -1164,10 +1155,10 @@ public final class Utils {
      *          the relative path to resolve.
      * @return
      *          a new <code>Path</code> that represents the location.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs during the resolve.
      */
-    public static Path resolveWithRoot(Files files, Path root, String... path) throws OctopusIOException { 
+    public static Path resolveWithRoot(Files files, Path root, String... path) throws OctopusException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
 
@@ -1183,10 +1174,10 @@ public final class Utils {
      *          the relative path to resolve.
      * @return
      *          a new <code>Path</code> that represents the location.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *          if an I/O error occurs during the resolve.
      */
-    public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String ... path) throws OctopusIOException {
+    public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String ... path) throws OctopusException {
         return resolveWithRoot(files, fileSystem.getEntryPath(), path);
     }
 }

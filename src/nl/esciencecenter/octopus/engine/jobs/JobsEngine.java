@@ -18,11 +18,10 @@ package nl.esciencecenter.octopus.engine.jobs;
 import java.util.HashSet;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.Adaptor;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -44,29 +43,29 @@ public class JobsEngine implements Jobs {
     }
 
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException, OctopusIOException {
+            throws OctopusException {
 
         Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
         return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
     }
 
     @Override
-    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public void close(Scheduler scheduler) throws OctopusException {
         getAdaptor(scheduler).jobsAdaptor().close(scheduler);
     }
 
     @Override
-    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public boolean isOpen(Scheduler scheduler) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().isOpen(scheduler);
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().getDefaultQueueName(scheduler);
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusIOException {
+    public JobStatus getJobStatus(Job job) throws OctopusException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
     }
 
@@ -153,37 +152,37 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilRunning(job, timeout);
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws OctopusException, OctopusIOException {
+    public JobStatus cancelJob(Job job) throws OctopusException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().getJobs(scheduler, queueNames);
     }
 
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException, OctopusIOException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().submitJob(scheduler, description);
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException, OctopusIOException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatus(scheduler, queueName);
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws OctopusException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatuses(scheduler, queueNames);
     }
 

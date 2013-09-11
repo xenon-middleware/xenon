@@ -19,6 +19,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Type;
@@ -27,7 +28,6 @@ import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.OctopusPropertyDescriptionImplementation;
 import nl.esciencecenter.octopus.engine.util.ImmutableArray;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * Adaptor for Slurm scheduler.

@@ -19,18 +19,18 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
+import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
+import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
+import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobDescription;
+import nl.esciencecenter.octopus.jobs.Streams;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
-
-import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
-import nl.esciencecenter.octopus.engine.util.CommandLineUtils;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.Streams;
 
 /**
  * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes.
@@ -49,7 +49,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
     private final Streams streams;
     private boolean done = false;
     
-    public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws OctopusIOException {
+    public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws OctopusException {
 
         this.session = session;
         this.channel = session.getExecChannel();
@@ -76,14 +76,14 @@ public class SshInteractiveProcess implements InteractiveProcess {
             streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
         } catch (Exception e) {
             session.failedExecChannel(channel);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         try {
             channel.connect();
         } catch (Exception e) {
             session.failedExecChannel(channel);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 
@@ -95,7 +95,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
     private void cleanup() {
         try {
             session.releaseExecChannel(channel);
-        } catch (OctopusIOException e) {
+        } catch (OctopusException e) {
             LOGGER.warn("SshInteractiveProcess failed to release exec channel!", e);
         }
     }

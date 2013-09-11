@@ -19,12 +19,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
-import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 /**
  * Sandbox represents a (possibly remote and usually temporary) directory used for running jobs. 
@@ -135,9 +134,9 @@ public class Sandbox {
      * @param sandboxName
      *            Name of the sandbox. If null a random name will be used.
      * @throws OctopusException
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    public Sandbox(Files files, Path root, String sandboxName) throws OctopusException, OctopusIOException {
+    public Sandbox(Files files, Path root, String sandboxName) throws OctopusException {
 
         if (files == null) {
             throw new OctopusException("Sandbox", "Need an files interface to create a sandbox!");
@@ -155,7 +154,7 @@ public class Sandbox {
         this.path = resolve(files, root, sandboxName);
     }
 
-    private static Path resolve(Files files, Path root, String path) throws OctopusIOException {
+    private static Path resolve(Files files, Path root, String path) throws OctopusException {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
@@ -183,9 +182,9 @@ public class Sandbox {
      * Any existing upload files will be discarded.
      * 
      * @param files the files to upload.
-     * @throws OctopusIOException 
+     * @throws OctopusException 
      */
-    public void setUploadFiles(Path... files) throws OctopusIOException {
+    public void setUploadFiles(Path... files) throws OctopusException {
         uploadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
             addUploadFile(files[i]);
@@ -197,9 +196,9 @@ public class Sandbox {
      * 
      * @param src
      *            Source path of file. May not be <code>null</code>.
-     * @throws OctopusIOException 
+     * @throws OctopusException 
      */
-    public void addUploadFile(Path src) throws OctopusIOException {
+    public void addUploadFile(Path src) throws OctopusException {
         addUploadFile(src, null);
     }
 
@@ -210,9 +209,9 @@ public class Sandbox {
      *            The source file. May not be <code>null</code>.
      * @param dest
      *            The name of file in the sandbox. If <code>null</code> then <code>src.getFilename()</code> will be used.
-     * @throws OctopusIOException 
+     * @throws OctopusException 
      */
-    public void addUploadFile(Path src, String dest) throws OctopusIOException {
+    public void addUploadFile(Path src, String dest) throws OctopusException {
         if (src == null) {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
@@ -239,9 +238,9 @@ public class Sandbox {
      *            Name of the source file in the sandbox. When <code>null</code> the <code>dest.getFilename()</code> will be used.
      * @param dest
      *            The target file. May not be <code>null</code>.
-     * @throws OctopusIOException 
+     * @throws OctopusException 
      */
-    public void addDownloadFile(String src, Path dest) throws OctopusIOException {
+    public void addDownloadFile(String src, Path dest) throws OctopusException {
         if (dest == null) {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
@@ -252,7 +251,7 @@ public class Sandbox {
         downloadFiles.add(new Pair(resolve(files, path, src), dest));
     }
 
-    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusException, InvalidCopyOptionsException {
         for (Pair pair : pairs) {
             Utils.recursiveCopy(files, pair.source, pair.destination, options);
         }
@@ -265,12 +264,12 @@ public class Sandbox {
      * 
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
-     * @throws UnsupportedOperationException
+     * @throws InvalidCopyOptionsException
      *           if an invalid combination of options is used.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *           if an I/O error occurs during the copying
      */
-    public void upload(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+    public void upload(CopyOption... options) throws OctopusException, InvalidCopyOptionsException {
         if (!files.exists(path)) {
             files.createDirectory(path);
         }
@@ -282,22 +281,22 @@ public class Sandbox {
      * 
      * @param options
      *          the options to use while copying. See {@link CopyOption} for details.
-     * @throws UnsupportedOperationException
+     * @throws InvalidCopyOptionsException
      *           if an invalid combination of options is used.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *           if an I/O error occurs during the copying
      */
-    public void download(CopyOption... options) throws OctopusIOException, UnsupportedOperationException {
+    public void download(CopyOption... options) throws OctopusException, InvalidCopyOptionsException {
         copy(downloadFiles, options);
     }
 
     /**
      * Recursively delete the sandbox.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *         if an I/O error occurs during deletion 
      */
-    public void delete() throws OctopusIOException {
+    public void delete() throws OctopusException {
         Utils.recursiveDelete(files, path);
     }
 

@@ -27,17 +27,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.octopus.exceptions.BadParameterException;
-import nl.esciencecenter.octopus.exceptions.IncompleteJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.jobs.IncompleteJobDescriptionException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -117,11 +116,11 @@ public class JobQueueTest {
         }
 
         @Override
-        public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
+        public InteractiveProcess createInteractiveProcess(JobImplementation job) throws OctopusException {
 
             if (fail) {
                 setCurrentWrapper(null);
-                throw new IOException("Failed to create process!");
+                throw new OctopusException("JQT", "Failed to create process!");
             }
 
             MyProcessWrapper wrapper = new MyProcessWrapper(job, new byte[0], new byte[0]);

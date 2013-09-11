@@ -16,8 +16,8 @@
 
 package nl.esciencecenter.octopus.engine.files;
 
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
+import nl.esciencecenter.octopus.files.Path;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>

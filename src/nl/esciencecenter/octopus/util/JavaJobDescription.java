@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.OctopusRuntimeException;
+import nl.esciencecenter.octopus.OctopusRuntimeException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 /**

@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
-import java.net.URI;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.JobTestConfig;

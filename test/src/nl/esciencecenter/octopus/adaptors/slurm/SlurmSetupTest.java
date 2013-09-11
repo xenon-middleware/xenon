@@ -21,8 +21,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.IncompatibleVersionException;
+import nl.esciencecenter.octopus.OctopusException;
 
 import org.junit.Test;
 

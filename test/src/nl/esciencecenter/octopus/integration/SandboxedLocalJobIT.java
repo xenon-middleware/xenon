@@ -20,24 +20,23 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.util.Utils;
 import nl.esciencecenter.octopus.util.Sandbox;
+import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.Test;
 

@@ -20,16 +20,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.octopus.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.OpenOption;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;

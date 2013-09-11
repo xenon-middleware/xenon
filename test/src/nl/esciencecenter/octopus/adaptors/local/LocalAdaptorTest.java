@@ -16,9 +16,9 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
+import nl.esciencecenter.octopus.InvalidLocationException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription;
 import nl.esciencecenter.octopus.Util;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.util.Utils;

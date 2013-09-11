@@ -15,14 +15,15 @@
  */
 package nl.esciencecenter.octopus.adaptors.local;
 
+import java.io.IOException;
 import java.util.Iterator;
 
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.OctopusRuntimeException;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
-import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 
 /**
@@ -40,7 +41,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     /** The LocalDirectoryStream to retrieve the files */
     private final LocalDirectoryStream stream;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws OctopusIOException {
+    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws OctopusException {
         this.localFiles = localFiles;
         this.stream = stream;
     }
@@ -51,7 +52,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     }
 
     @Override
-    public void close() throws OctopusIOException {
+    public void close() throws IOException {
         stream.close();
     }
 
@@ -68,8 +69,8 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
         try {
             FileAttributes attributes = localFiles.getAttributes(path);
             return new PathAttributesPairImplementation(path, attributes);
-        } catch (Exception e) {
-            throw new DirectoryIteratorException(LocalAdaptor.ADAPTOR_NAME, "Failed to get next element.", e);
+        } catch (OctopusException e) {
+            throw new OctopusRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to get next element.", e);
         }
     }
 

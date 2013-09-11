@@ -18,9 +18,9 @@ package nl.esciencecenter.octopus.adaptors.local;
 
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * A Credentials for local use.

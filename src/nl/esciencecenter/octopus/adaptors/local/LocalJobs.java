@@ -15,9 +15,12 @@
  */
 package nl.esciencecenter.octopus.adaptors.local;
 
-import java.io.IOException;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.InvalidCredentialException;
+import nl.esciencecenter.octopus.InvalidLocationException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -26,9 +29,6 @@ import nl.esciencecenter.octopus.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcessFactory;
 import nl.esciencecenter.octopus.engine.util.JobQueues;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
@@ -67,13 +67,13 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws IOException {
+    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws OctopusException {
         return new LocalInteractiveProcess(job);
     }
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException, OctopusIOException {
+            throws OctopusException {
 
         if (!(location == null || location.isEmpty() || location.equals("/"))) {
             throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with location: " 
@@ -81,18 +81,18 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
         }
 
         if (credential != null) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with credentials!");
+            throw new InvalidCredentialException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with credentials!");
         }
 
         if (properties != null && properties.size() > 0) {
-            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
+            throw new UnknownPropertyException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
         }
 
         return localScheduler;
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException, OctopusIOException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws OctopusException {
         return jobQueues.getJobs(queueNames);
     }
 
@@ -107,12 +107,12 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws OctopusException {
         return jobQueues.waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException, OctopusIOException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws OctopusException {
         return jobQueues.waitUntilRunning(job, timeout);
     }
 
@@ -141,17 +141,17 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public void close(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public void close(Scheduler scheduler) throws OctopusException {
         // ignored
     }
 
     @Override
-    public boolean isOpen(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public boolean isOpen(Scheduler scheduler) throws OctopusException {
         return true;
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException, OctopusIOException {
+    public String getDefaultQueueName(Scheduler scheduler) throws OctopusException {
         return jobQueues.getDefaultQueueName(scheduler);
     }
 

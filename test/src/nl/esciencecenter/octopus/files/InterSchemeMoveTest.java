@@ -21,8 +21,8 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class InterSchemeMoveTest {
         return tmp;
     }
     
-    @Test(expected = OctopusIOException.class)
+    @Test(expected = OctopusException.class)
     public void test_move() throws Exception {
 
         String configfile = System.getProperty("test.config");

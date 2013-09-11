@@ -17,8 +17,8 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 
 import java.util.Set;
 
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.FileAttributes;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 
 import com.jcraft.jsch.SftpATTRS;

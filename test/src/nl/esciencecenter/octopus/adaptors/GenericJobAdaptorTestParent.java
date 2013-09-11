@@ -19,7 +19,6 @@ package nl.esciencecenter.octopus.adaptors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -30,32 +29,30 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.InvalidCredentialException;
+import nl.esciencecenter.octopus.InvalidLocationException;
+import nl.esciencecenter.octopus.InvalidPropertyException;
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.exceptions.InvalidCredentialsException;
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.InvalidLocationException;
-import nl.esciencecenter.octopus.exceptions.InvalidPropertyException;
-import nl.esciencecenter.octopus.exceptions.JobCanceledException;
-import nl.esciencecenter.octopus.exceptions.NoSuchQueueException;
-import nl.esciencecenter.octopus.exceptions.NoSuchSchedulerException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnknownPropertyException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedJobDescriptionException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.Job;
+import nl.esciencecenter.octopus.jobs.JobCanceledException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
 import nl.esciencecenter.octopus.jobs.Jobs;
+import nl.esciencecenter.octopus.jobs.NoSuchQueueException;
+import nl.esciencecenter.octopus.jobs.NoSuchSchedulerException;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
 import nl.esciencecenter.octopus.jobs.Streams;
-import nl.esciencecenter.octopus.util.Utils;
+import nl.esciencecenter.octopus.jobs.UnsupportedJobDescriptionException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -114,11 +111,11 @@ public abstract class GenericJobAdaptorTestParent {
 
     };
     
-    public Path resolve(Path root, String path) throws OctopusIOException { 
+    public Path resolve(Path root, String path) throws OctopusException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
 
-//    public Path resolve(FileSystem fs, String path) throws OctopusIOException {
+//    public Path resolve(FileSystem fs, String path) throws OctopusException {
 //        return resolve(fs.getEntryPath(), path);
 //    }
 
@@ -221,7 +218,7 @@ public abstract class GenericJobAdaptorTestParent {
                 
                 jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
-            } catch (InvalidCredentialsException e) {
+            } catch (InvalidCredentialException e) {
                 // expected
             } catch (OctopusException e) {
                 // allowed

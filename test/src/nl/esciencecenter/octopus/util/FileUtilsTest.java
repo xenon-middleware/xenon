@@ -23,21 +23,21 @@ import static org.mockito.Mockito.when;
 
 import java.util.Iterator;
 
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
+import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 import org.junit.Test;
 
 public class FileUtilsTest {
 
     @Test
-    public void testRecursiveCopy_SingleFile_CopiedFile() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleFile_CopiedFile() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
         Path dstFile = mock(Path.class);
@@ -58,8 +58,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcDir = mock(Path.class);
         Path dstDir = mock(Path.class);
@@ -87,8 +87,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
 // FIXME: 
 //        
 //        Files files = mock(Files.class);
@@ -133,8 +133,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -164,8 +164,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        
@@ -203,8 +203,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
 //        Files files = mock(Files.class);
 //        Path srcDir = mock(Path.class); // foo
 //        Path srcFile = mock(Path.class); // foo/myfile
@@ -253,8 +253,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreDir_DirNotCopied() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void recursiveCopy_IgnoreDir_DirNotCopied() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -288,8 +288,8 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreFile_FileNotCopied() throws OctopusIOException,
-            nl.esciencecenter.octopus.exceptions.UnsupportedOperationException {
+    public void recursiveCopy_IgnoreFile_FileNotCopied() throws OctopusException,
+            nl.esciencecenter.octopus.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -316,7 +316,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreAndReplace_UnsupporterOperationException() throws OctopusIOException {
+    public void recursiveCopy_IgnoreAndReplace_UnsupporterOperationException() throws OctopusException {
         Files files = mock(Files.class);
         Path srcDir = mock(Path.class); // foo
         Path dstDir = mock(Path.class); // bar
@@ -324,13 +324,13 @@ public class FileUtilsTest {
         try {
             Utils.recursiveCopy(files, srcDir, dstDir, CopyOption.IGNORE, CopyOption.REPLACE);
             fail("UnsupportedOperationException not thrown");
-        } catch (UnsupportedOperationException e) {
+        } catch (InvalidCopyOptionsException e) {
             assertEquals(e.getMessage(), "FileUtils adaptor: Can not replace and ignore existing files at the same time");
         }
     }
 
     @Test
-    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws OctopusIOException, UnsupportedOperationException {
+    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws OctopusException, InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
         Path dstFile = mock(Path.class);
@@ -351,7 +351,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveDelete_SingleDirectory_DeletedDirectory() throws OctopusIOException {
+    public void testRecursiveDelete_SingleDirectory_DeletedDirectory() throws OctopusException {
         Files files = mock(Files.class);
         Path directory = mock(Path.class);
 
@@ -374,7 +374,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveDelete_DirectoryWithFile_DeletedDirectoryAndFile() throws OctopusIOException {
+    public void testRecursiveDelete_DirectoryWithFile_DeletedDirectoryAndFile() throws OctopusException {
         Files files = mock(Files.class);
 
         Path directory = mock(Path.class);
@@ -405,7 +405,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveDelete_SingleFile_DeletedFile() throws OctopusIOException {
+    public void testRecursiveDelete_SingleFile_DeletedFile() throws OctopusException {
         Files files = mock(Files.class);
         Path myfile = mock(Path.class);
 

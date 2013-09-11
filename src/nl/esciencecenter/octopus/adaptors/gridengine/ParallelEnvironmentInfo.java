@@ -17,7 +17,7 @@ package nl.esciencecenter.octopus.adaptors.gridengine;
 
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.OctopusException;
 
 /**
  * Class that holds some info on parallel environments used in Grid Engine.

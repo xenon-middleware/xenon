@@ -19,20 +19,16 @@ package nl.esciencecenter.octopus.adaptors.local;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
-import ch.qos.logback.core.util.FileUtil;
-
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
 import nl.esciencecenter.octopus.engine.files.PathImplementation;
-import nl.esciencecenter.octopus.exceptions.DirectoryIteratorException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.DirectoryStream;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.RelativePath;
 import nl.esciencecenter.octopus.util.Utils;
 
@@ -44,12 +40,12 @@ public class LocalDirectoryAttributeStreamTest {
 
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
 
-    private static Path resolve(Files files, Path root, String path) throws OctopusIOException { 
+    private static Path resolve(Files files, Path root, String path) throws OctopusException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
     @org.junit.BeforeClass
-    public static void prepareClass() throws OctopusIOException, OctopusException {
+    public static void prepareClass() throws OctopusException, OctopusException {
 
         Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -70,7 +66,7 @@ public class LocalDirectoryAttributeStreamTest {
     }
 
     @org.junit.AfterClass
-    public static void cleanupClass() throws OctopusException, OctopusIOException {
+    public static void cleanupClass() throws OctopusException, OctopusException {
 
         Octopus octopus = OctopusFactory.newOctopus(null);
 
@@ -140,7 +136,7 @@ public class LocalDirectoryAttributeStreamTest {
         Util.endOctopusEngine(octopus);
     }
 
-    @org.junit.Test(expected = OctopusIOException.class)
+    @org.junit.Test(expected = OctopusException.class)
     public void test_nonexistant_dir() throws Exception {
         Path path = new PathImplementation(fs, new RelativePath("aap"));
         new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(path, new AllTrue()));
@@ -211,7 +207,7 @@ public class LocalDirectoryAttributeStreamTest {
         }
     }
 
-    @org.junit.Test(expected = DirectoryIteratorException.class)
+    @org.junit.Test(expected = UnsupportedOperationException.class)
     public void test_remove_file_halfway_allTrue() throws Exception {
 
         Path dir0 = resolve(localFiles, testDir, "dir0");

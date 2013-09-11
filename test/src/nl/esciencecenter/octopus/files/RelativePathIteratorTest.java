@@ -63,7 +63,7 @@ public class RelativePathIteratorTest {
         itt.next();
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test(expected = InvalidCopyOptionsException.class)
     public void test_remove() {
         RelativePath path = new RelativePath("aap", "noot", "mies");
         Iterator<RelativePath> itt = path.iterator();

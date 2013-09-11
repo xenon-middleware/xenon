@@ -20,8 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
 
@@ -30,13 +29,13 @@ import org.junit.Test;
 public class SandboxTest {
     
     @Test(expected = OctopusException.class)
-    public void testSandbox_WithNullOctopus() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithNullOctopus() throws URISyntaxException, OctopusException {
         // throws exception
         new Sandbox(null, mock(Path.class), "sandbox-1");
     }
 
     @Test(expected = OctopusException.class)
-    public void testSandbox_WithNullPath() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithNullPath() throws URISyntaxException, OctopusException {
         // throws exception
         new Sandbox(mock(Files.class), null, "sandbox-1");
     }

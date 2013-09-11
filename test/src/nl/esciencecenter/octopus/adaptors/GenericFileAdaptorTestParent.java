@@ -28,12 +28,11 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.files.PathAttributesPairImplementation;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.Copy;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.CopyStatus;
@@ -42,6 +41,7 @@ import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.OpenOption;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
@@ -128,7 +128,7 @@ public abstract class GenericFileAdaptorTestParent {
         OctopusFactory.endOctopus(octopus);
     }
 
-    public Path resolve(Path root, String... path) throws OctopusIOException {
+    public Path resolve(Path root, String... path) throws OctopusException {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
  
@@ -3018,9 +3018,9 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     /*        
-    public Path readSymbolicLink(Path link) throws OctopusIOException;
+    public Path readSymbolicLink(Path link) throws OctopusException;
 
-    public boolean isSymbolicLink(Path path) throws OctopusIOException;
+    public boolean isSymbolicLink(Path path) throws OctopusException;
     
      
     */

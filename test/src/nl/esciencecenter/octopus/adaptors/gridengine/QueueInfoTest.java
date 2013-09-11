@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.OctopusException;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.jobs.JobImplementation;
 import nl.esciencecenter.octopus.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.octopus.engine.util.InteractiveProcess;
@@ -42,7 +43,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
     private Streams streams;
 
-    LocalInteractiveProcess(JobImplementation job) throws IOException {
+    LocalInteractiveProcess(JobImplementation job) throws OctopusException {
 
         JobDescription description = job.getJobDescription();
 
@@ -70,7 +71,12 @@ class LocalInteractiveProcess implements InteractiveProcess {
         }
 
         builder.directory(new java.io.File(workingDirectory));
-        process = builder.start();
+        
+        try { 
+            process = builder.start();
+        } catch (IOException e) { 
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to start local process!", e);
+        }
         streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }
 

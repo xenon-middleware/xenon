@@ -23,8 +23,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Formatter;
 
-import nl.esciencecenter.octopus.exceptions.InvalidJobDescriptionException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 import org.junit.FixMethodOrder;

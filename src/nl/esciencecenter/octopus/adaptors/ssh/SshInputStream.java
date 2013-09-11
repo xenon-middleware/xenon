@@ -18,6 +18,8 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.io.IOException;
 import java.io.InputStream;
 
+import nl.esciencecenter.octopus.OctopusException;
+
 import com.jcraft.jsch.ChannelSftp;
 
 /**
@@ -83,7 +85,11 @@ public class SshInputStream extends InputStream {
         try {
             in.close();
         } finally {
-            session.releaseSftpChannel(channel);
+            try { 
+                session.releaseSftpChannel(channel);
+            } catch (OctopusException e) { 
+                throw new IOException("Failed to release SSH channel!", e);
+            }
         }
     }
 

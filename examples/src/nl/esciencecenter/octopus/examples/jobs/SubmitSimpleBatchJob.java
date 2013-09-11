@@ -20,9 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Job;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 import nl.esciencecenter.octopus.jobs.JobStatus;
@@ -84,7 +83,7 @@ public class SubmitSimpleBatchJob {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+        } catch (URISyntaxException | OctopusException e) {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

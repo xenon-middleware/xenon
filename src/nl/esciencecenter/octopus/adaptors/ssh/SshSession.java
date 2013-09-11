@@ -16,10 +16,10 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
+import nl.esciencecenter.octopus.OctopusException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
@@ -127,7 +127,7 @@ class SshSession {
         session.disconnect();
     }
 
-    ChannelExec getExecChannel() throws OctopusIOException {
+    ChannelExec getExecChannel() throws OctopusException {
 
         if (openChannels == MAX_OPEN_CHANNELS) {
             return null;
@@ -140,14 +140,14 @@ class SshSession {
             channel = (ChannelExec) session.openChannel("exec");
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to create EXEC channel {}", sessionID, openChannels, e);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         incOpenChannels("EXEC");
         return channel;
     }
 
-    ChannelSftp getSftpChannel() throws OctopusIOException {
+    ChannelSftp getSftpChannel() throws OctopusException {
 
         ChannelSftp channel = getSftpChannelFromCache();
 
@@ -166,32 +166,32 @@ class SshSession {
             channel.connect();
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to create SFTP channel {}", sessionID, openChannels, e);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         incOpenChannels("SFTP");
         return channel;
     }
 
-    int addTunnel(int localPort, String targetHost, int targetPort) throws OctopusIOException {
+    int addTunnel(int localPort, String targetHost, int targetPort) throws OctopusException {
 
         LOGGER.debug("SSHSESSION-{}: Creating tunnel from localhost:{} via {}:{} to {}:{}", sessionID, localPort,
                 session.getHost(), session.getPort(), targetHost, targetPort);
 
         if (tunnelPort > 0) {
             LOGGER.debug("SSHSESSION-{}: Tunnel already in used for this session!", sessionID);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, "Tunnel already in use!");
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, "Tunnel already in use!");
         }
 
         try {
             return session.setPortForwardingL(0, targetHost, targetPort);
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to create tunnel to {}:{}", sessionID, targetHost, targetPort, e);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 
-    void removeTunnel(int localPort) throws OctopusIOException {
+    void removeTunnel(int localPort) throws OctopusException {
 
         LOGGER.debug("SSHSESSION-{}: Removing tunnel at localhost:{}", sessionID, localPort);
 
@@ -199,7 +199,7 @@ class SshSession {
             session.delPortForwardingL(localPort);
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to remove tunnel at localhost:{}", sessionID, localPort, e);
-            throw new OctopusIOException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new OctopusException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 }

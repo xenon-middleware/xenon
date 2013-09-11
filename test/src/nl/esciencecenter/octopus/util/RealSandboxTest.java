@@ -25,13 +25,12 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.util.Sandbox.Pair;
 
 import org.junit.AfterClass;
@@ -80,19 +79,19 @@ public class RealSandboxTest {
     }
 
     @Test(expected = OctopusException.class)
-    public void testSandbox_WithNullOctopus() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithNullOctopus() throws URISyntaxException, OctopusException {
         // throws exception
         new Sandbox(null, testDir, getNextSandbox());
     }
 
     @Test(expected = OctopusException.class)
-    public void testSandbox_WithNullPath() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithNullPath() throws URISyntaxException, OctopusException {
         // throws exception
         new Sandbox(files, null, getNextSandbox());
     }
 
     @Test
-    public void testSandbox_WithName() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithName() throws URISyntaxException, OctopusException {
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
@@ -103,7 +102,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testSandbox_WithoutName() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSandbox_WithoutName() throws URISyntaxException, OctopusException {
 
         Sandbox sandbox = new Sandbox(files, testDir, null);
 
@@ -114,7 +113,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddUploadFile_SrcAndDst() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testAddUploadFile_SrcAndDst() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -130,7 +129,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testSetUploadFiles() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testSetUploadFiles() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -152,7 +151,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -169,7 +168,7 @@ public class RealSandboxTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -178,7 +177,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddDownloadFile() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testAddDownloadFile() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -195,7 +194,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddDownloadFileSrcNull() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testAddDownloadFileSrcNull() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -212,7 +211,7 @@ public class RealSandboxTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddDownloadFileDstNull() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testAddDownloadFileDstNull() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -222,7 +221,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testUploadDelete() throws OctopusIOException, OctopusException, URISyntaxException {
+    public void testUploadDelete() throws OctopusException, URISyntaxException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -243,7 +242,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testUploadDownloadDelete() throws OctopusIOException, OctopusException, URISyntaxException {
+    public void testUploadDownloadDelete() throws OctopusException, URISyntaxException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -273,7 +272,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testDoubleUploadDelete() throws OctopusIOException, OctopusException, URISyntaxException {
+    public void testDoubleUploadDelete() throws OctopusException, URISyntaxException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -297,7 +296,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testHashCode() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testHashCode() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -313,7 +312,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testToString() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testToString() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -325,25 +324,25 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_sameObject_equal() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_sameObject_equal() throws URISyntaxException, OctopusException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertEquals(sandbox, sandbox);
     }
 
     @Test
-    public void testEquals_otherClass_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_otherClass_notEqual() throws URISyntaxException, OctopusException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(42));
     }
 
     @Test
-    public void testEquals_otherNull_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_otherNull_notEqual() throws URISyntaxException, OctopusException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(null));
     }
 
     @Test
-    public void testEquals_otherOctopus_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_otherOctopus_notEqual() throws URISyntaxException, OctopusException {
 
         Octopus octopus2 = OctopusFactory.newOctopus(null);
 
@@ -358,7 +357,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_otherPath_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_otherPath_notEqual() throws URISyntaxException, OctopusException {
 
         Path path = Utils.resolveWithEntryPath(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
 
@@ -371,7 +370,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_otherUpload_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_otherUpload_notEqual() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
 
@@ -383,7 +382,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_otherDownload_notEqual() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_otherDownload_notEqual() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
 
@@ -395,7 +394,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_sameUpload_Equal() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testEquals_sameUpload_Equal() throws URISyntaxException, OctopusException {
 
         String name = getNextSandbox();
 
@@ -409,7 +408,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testPair_Equals() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testPair_Equals() throws URISyntaxException, OctopusException {
 
         Path src = testInput1;
         Path dst = testInput2;
@@ -438,7 +437,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testPair_hashCode() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testPair_hashCode() throws URISyntaxException, OctopusException {
 
         Path src = testInput1;
         Path dst = testInput2;
@@ -475,7 +474,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testPair_toString() throws URISyntaxException, OctopusIOException, OctopusException {
+    public void testPair_toString() throws URISyntaxException, OctopusException {
 
         Path src = testInput1;
         Path dst = testInput2;

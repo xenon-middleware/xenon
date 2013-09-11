@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.engine.util.CommandRunner;
-import nl.esciencecenter.octopus.exceptions.DirectoryNotEmptyException;
-import nl.esciencecenter.octopus.exceptions.NoSuchFileException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
+import nl.esciencecenter.octopus.files.DirectoryNotEmptyException;
 import nl.esciencecenter.octopus.files.FileSystem;
+import nl.esciencecenter.octopus.files.NoSuchPathException;
 import nl.esciencecenter.octopus.files.OpenOption;
 import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
@@ -51,7 +51,7 @@ final class LocalUtils {
         // DO NOTE USE
     }
 
-    static java.nio.file.Path javaPath(Path path) throws OctopusIOException {
+    static java.nio.file.Path javaPath(Path path) throws OctopusException {
         FileSystem fs = path.getFileSystem();
         RelativePath tmp = path.getRelativePath();
 
@@ -119,72 +119,72 @@ final class LocalUtils {
 
     /**
      * @param path
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    static InputStream newInputStream(Path path) throws OctopusIOException {
+    static InputStream newInputStream(Path path) throws OctopusException {
         try {
             return Files.newInputStream(javaPath(path));
         } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
         }
     }
 
     /**
      * @param path
      * @param permissions
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException {
+    static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
         } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to set permissions " + path, e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to set permissions " + path, e);
         }
     }
 
     /**
      * @param path
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    static void createFile(Path path) throws OctopusIOException {
+    static void createFile(Path path) throws OctopusException {
         try {
             Files.createFile(LocalUtils.javaPath(path));
         } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path, e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path, e);
         }
     }
 
     /**
      * @param path
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    static void delete(Path path) throws OctopusIOException {
+    static void delete(Path path) throws OctopusException {
 
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
-            throw new NoSuchFileException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
+            throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
 
         } catch (java.nio.file.DirectoryNotEmptyException e2) {
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
 
         } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
         }
     }
 
     /**
      * @param source
      * @param target
-     * @throws OctopusIOException
+     * @throws OctopusException
      */
-    static void move(Path source, Path target) throws OctopusIOException {
+    static void move(Path source, Path target) throws OctopusException {
 
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
         } catch (Exception e) {
-            throw new OctopusIOException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
+            throw new OctopusException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
         }
     }
 

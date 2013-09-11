@@ -20,9 +20,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import nl.esciencecenter.octopus.Octopus;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
 import nl.esciencecenter.octopus.jobs.Jobs;
 import nl.esciencecenter.octopus.jobs.QueueStatus;
 import nl.esciencecenter.octopus.jobs.Scheduler;
@@ -74,7 +73,7 @@ public class ListQueueStatus {
             // Finally, we end octopus to release all resources 
             OctopusFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | OctopusIOException e) {
+        } catch (URISyntaxException | OctopusException e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }

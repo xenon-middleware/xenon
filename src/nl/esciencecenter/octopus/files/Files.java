@@ -20,10 +20,13 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.octopus.InvalidCredentialException;
+import nl.esciencecenter.octopus.InvalidLocationException;
+import nl.esciencecenter.octopus.InvalidPropertyException;
+import nl.esciencecenter.octopus.InvalidSchemeException;
+import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
-import nl.esciencecenter.octopus.exceptions.OctopusIOException;
-import nl.esciencecenter.octopus.exceptions.UnsupportedOperationException;
 
 /**
  * Files represents the Files interface Octopus.
@@ -59,16 +62,14 @@ public interface Files {
      *             If the scheme was invalid.
      * @throws InvalidLocationException
      *             If the location was invalid.
-     * @throws InvalidCredentialsException
-     *             If the credentials where invalid to access the location.
+     * @throws InvalidCredentialException
+     *             If the credential is invalid to access the location.
      * 
      * @throws OctopusException
      *             If the creation of the FileSystem failed.
-     * @throws OctopusIOException
-     *             If an I/O error occurred.
      */
     FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException, OctopusIOException;
+            throws OctopusException;
         
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
@@ -80,10 +81,10 @@ public interface Files {
      * 
      * @return the resulting Path.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    Path newPath(FileSystem filesystem, RelativePath location) throws OctopusIOException;
+    Path newPath(FileSystem filesystem, RelativePath location) throws OctopusException;
 
     /**
      * Close a FileSystem.
@@ -95,10 +96,10 @@ public interface Files {
      *             If the FileSystem cannot be closed (for example a local FileSystem).
      * @throws OctopusException
      *             If the FileSystem failed to close.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    void close(FileSystem filesystem) throws OctopusException, OctopusIOException;
+    void close(FileSystem filesystem) throws OctopusException;
 
     /**
      * Test is a FileSystem is open.
@@ -108,10 +109,10 @@ public interface Files {
      * 
      * @throws OctopusException
      *             If the test failed.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    boolean isOpen(FileSystem filesystem) throws OctopusException, OctopusIOException;
+    boolean isOpen(FileSystem filesystem) throws OctopusException;
 
     /**
      * Copy an existing source file or symbolic link to a target file.
@@ -178,22 +179,24 @@ public interface Files {
      *            the target path.
      * @return a {@link CopyStatus} if the copy is asynchronous or <code>null</code> if it is blocking.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If the source file does not exist, the target parent directory does not exist, or the target file does not
      *             exist and the <code>APPEND</code> or <code>RESUME</code> option is provided.
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             If the target file already exists.
      * @throws IllegalSourcePathException
      *             If the source is a directory.
      * @throws IllegalTargetPathException
      *             If the target is a directory.
-     * @throws UnsupportedOperationException
+     * @throws InvalidCopyOptionsException
      *             If a conflicting set of copy options is provided.
-     * @throws OctopusIOException
+     * @throws InvalidResumeTargetException
+     *             If the data in the target of a resume does not match the data in the source. 
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    Copy copy(Path source, Path target, CopyOption... options) throws UnsupportedOperationException,
-            OctopusIOException;
+    Copy copy(Path source, Path target, CopyOption... options) throws InvalidCopyOptionsException,
+            OctopusException;
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -212,14 +215,14 @@ public interface Files {
      * @param target
      *            the non existing target path.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If the source file does not exist or the target parent directory does not exist.
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             If the target file already exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If the move failed.
      */
-    void move(Path source, Path target) throws OctopusIOException;
+    void move(Path source, Path target) throws OctopusException;
 
     /**
      * Retrieve the status of an asynchronous copy.
@@ -231,10 +234,10 @@ public interface Files {
      * 
      * @throws NoSuchCopyException
      *             If the copy is not known.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    CopyStatus getCopyStatus(Copy copy) throws OctopusException, OctopusIOException;
+    CopyStatus getCopyStatus(Copy copy) throws OctopusException;
 
     /**
      * Cancel a copy operation.
@@ -244,10 +247,10 @@ public interface Files {
      * 
      * @throws NoSuchCopyException
      *             If the copy is not known.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    CopyStatus cancelCopy(Copy copy) throws OctopusException, OctopusIOException;
+    CopyStatus cancelCopy(Copy copy) throws OctopusException;
 
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
@@ -255,13 +258,13 @@ public interface Files {
      * @param dir
      *            the directory to create.
      * 
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             If the directory already exists or if a parent directory could not be created because a file with the same name
      *             already exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    void createDirectories(Path dir) throws OctopusIOException;
+    void createDirectories(Path dir) throws OctopusException;
 
     /**
      * Creates a new directory, failing if the directory already exists.
@@ -269,12 +272,12 @@ public interface Files {
      * @param dir
      *            the directory to create.
      * 
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             If the directory already exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    void createDirectory(Path dir) throws OctopusIOException;
+    void createDirectory(Path dir) throws OctopusException;
 
     /**
      * Creates a new empty file, failing if the file already exists.
@@ -282,12 +285,12 @@ public interface Files {
      * @param path
      *            the file to create.
      * 
-     * @throws FileAlreadyExistsException
+     * @throws PathAlreadyExistsException
      *             If the directory already exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    void createFile(Path path) throws OctopusIOException;
+    void createFile(Path path) throws OctopusException;
 
     /**
      * Deletes an existing path.
@@ -299,10 +302,10 @@ public interface Files {
      * 
      * @throws NoSuchFileExistsException
      *             If the <code>path</code> does not exist.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    void delete(Path path) throws OctopusIOException;
+    void delete(Path path) throws OctopusException;
 
     /**
      * Tests if a path exists.
@@ -312,10 +315,10 @@ public interface Files {
      * 
      * @return If the path exists.
      * 
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    boolean exists(Path path) throws OctopusIOException;
+    boolean exists(Path path) throws OctopusException;
 
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
@@ -324,14 +327,14 @@ public interface Files {
      *            the target directory.
      * @return a new DirectoryStream that iterates over all entries in the given directory.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusIOException;
+    DirectoryStream<Path> newDirectoryStream(Path dir) throws OctopusException;
 
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code> that are accepted by the filter.
@@ -343,14 +346,14 @@ public interface Files {
      * 
      * @return a new DirectoryStream that iterates over all entries in the directory <code>dir</code>.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusIOException;
+    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException;
 
     /**
      * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code>.
@@ -360,14 +363,14 @@ public interface Files {
      * 
      * @return a new DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code>.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusIOException;
+    DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws OctopusException;
 
     /**
      * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code> that are
@@ -380,15 +383,15 @@ public interface Files {
      * 
      * @return a new DirectoryStream that iterates over all entries in the directory <code>dir</code>.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
     DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
-            throws OctopusIOException;
+            throws OctopusException;
 
     /**
      * Open an existing file and return an {@link InputStream} to read from this file.
@@ -398,14 +401,14 @@ public interface Files {
      * 
      * @return the {@link InputStream} to read from the file.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If a file does not exists.
      * @throws IllegalSourcePathException
      *             If path not file.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    InputStream newInputStream(Path path) throws OctopusIOException;
+    InputStream newInputStream(Path path) throws OctopusException;
 
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
@@ -458,10 +461,12 @@ public interface Files {
      * 
      * @throws IllegalSourcePathException
      *             If path is not a file.
-     * @throws OctopusIOException
+     * @throws InvalidOpenOptionsException
+     *             If an invalid combination of OpenOptions was provided.
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusIOException;
+    OutputStream newOutputStream(Path path, OpenOption... options) throws OctopusException;
 
     /**
      * Get the {@link FileAttributes} of an existing path.
@@ -471,12 +476,12 @@ public interface Files {
      * 
      * @return the FileAttributes of the path.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If a file does not exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    FileAttributes getAttributes(Path path) throws OctopusIOException;
+    FileAttributes getAttributes(Path path) throws OctopusException;
 
     /**
      * Reads the target of a symbolic link (optional operation).
@@ -486,14 +491,14 @@ public interface Files {
      * 
      * @return a Path representing the target of the link.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If the link does not exists.
      * @throws IllegalSourcePathException
      *             If the source is not a link.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    Path readSymbolicLink(Path link) throws OctopusIOException;
+    Path readSymbolicLink(Path link) throws OctopusException;
 
     /**
      * Sets the POSIX permissions of a path.
@@ -503,11 +508,11 @@ public interface Files {
      * @param permissions
      *            the permissions to set.
      * 
-     * @throws NoSuchFileException
+     * @throws NoSuchPathException
      *             If the target path does not exists.
-     * @throws OctopusIOException
+     * @throws OctopusException
      *             If an I/O error occurred.
      */
-    void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusIOException;
+    void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws OctopusException;
 
 }

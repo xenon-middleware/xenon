@@ -19,8 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.adaptors.gridengine.GridEngineAdaptor;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 /**
  * @author Niels Drost

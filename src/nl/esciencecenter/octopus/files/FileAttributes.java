@@ -17,7 +17,6 @@ package nl.esciencecenter.octopus.files;
 
 import java.util.Set;
 
-import nl.esciencecenter.octopus.exceptions.AttributeNotSupportedException;
 
 /**
  * FileAttributes represents a set of attributes of a path.
@@ -31,8 +30,6 @@ public interface FileAttributes {
 
     /**
      * Does the path refer to a directory ?
-     * 
-     * @return If the path refers to a directory.
      */
     boolean isDirectory(); 
 

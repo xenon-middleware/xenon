@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.octopus.engine.util;
 
-import nl.esciencecenter.octopus.exceptions.InvalidOpenOptionsException;
+import nl.esciencecenter.octopus.files.InvalidOpenOptionsException;
 import nl.esciencecenter.octopus.files.OpenOption;
 
 /**

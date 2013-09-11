@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.jobs.JobDescription;
 
 import org.junit.Test;

@@ -18,14 +18,14 @@ package nl.esciencecenter.octopus.adaptors.ssh;
 import java.io.File;
 import java.util.Map;
 
+import nl.esciencecenter.octopus.InvalidCredentialException;
+import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 import nl.esciencecenter.octopus.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.octopus.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.octopus.exceptions.InvalidCredentialException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
 
 public class SshCredentials implements Credentials {
 

@@ -18,7 +18,6 @@ package nl.esciencecenter.octopus.adaptors.slurm;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;

@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
 import java.util.HashMap;
 
 import nl.esciencecenter.octopus.Util;

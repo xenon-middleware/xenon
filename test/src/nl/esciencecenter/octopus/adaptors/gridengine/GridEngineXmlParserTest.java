@@ -25,13 +25,13 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
-import nl.esciencecenter.octopus.exceptions.IncompatibleVersionException;
-import nl.esciencecenter.octopus.exceptions.OctopusException;
+import nl.esciencecenter.octopus.IncompatibleVersionException;
+import nl.esciencecenter.octopus.OctopusException;
 
-//import org.apache.commons.io.Charsets;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+//import org.apache.commons.io.Charsets;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineXmlParserTest {
