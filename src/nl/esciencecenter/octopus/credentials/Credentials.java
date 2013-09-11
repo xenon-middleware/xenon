@@ -55,6 +55,8 @@ public interface Credentials {
      *             If an unknown property was passed.
      * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
+     * @throws CertificateNotFoundException
+     *             If the certificate file could not be found.
      * @throws OctopusException
      *             If the <code>Credential<code> could not be created.
      */

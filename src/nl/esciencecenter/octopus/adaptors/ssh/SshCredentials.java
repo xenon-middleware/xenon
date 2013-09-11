@@ -21,6 +21,7 @@ import java.util.Map;
 import nl.esciencecenter.octopus.InvalidCredentialException;
 import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.OctopusPropertyDescription.Component;
+import nl.esciencecenter.octopus.credentials.CertificateNotFoundException;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
@@ -56,6 +57,10 @@ public class SshCredentials implements Credentials {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
+        if (!new File(certfile).exists()) { 
+            throw new CertificateNotFoundException(SshAdaptor.ADAPTOR_NAME, "Certificate file not found: " + certfile);
+        }
+        
         return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, certfile, username, password);
     }
 
