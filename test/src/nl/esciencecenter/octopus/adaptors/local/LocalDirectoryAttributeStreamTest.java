@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 
 import nl.esciencecenter.octopus.Octopus;
 import nl.esciencecenter.octopus.OctopusException;
+import nl.esciencecenter.octopus.OctopusRuntimeException;
 import nl.esciencecenter.octopus.OctopusFactory;
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
@@ -207,7 +208,7 @@ public class LocalDirectoryAttributeStreamTest {
         }
     }
 
-    @org.junit.Test(expected = UnsupportedOperationException.class)
+    @org.junit.Test(expected = OctopusRuntimeException.class)
     public void test_remove_file_halfway_allTrue() throws Exception {
 
         Path dir0 = resolve(localFiles, testDir, "dir0");
