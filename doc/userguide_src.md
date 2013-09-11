@@ -15,11 +15,11 @@ Last modified: 11 September 2013
 Copyrights & Disclaimers
 ------------------------
 
-Octopus is copyrighted by the Netherlands eScience Center and releases under 
-the Apache License, Version 2.0.
+Octopus is copyrighted by the Netherlands eScience Center and 
+releases under the Apache License, Version 2.0.
 
-See the "LICENSE" and "NOTICE" files in the octopus distribution for more 
-information. 
+See the "LICENSE" and "NOTICE" files in the octopus distribution for
+more information. 
 
 For more information on the Netherlands eScience Center see:
 
@@ -33,79 +33,84 @@ The octopus project web site can be found at:
 Third party libraries
 ---------------------
 
-This product includes the SLF4J library, which is Copyright (c) 2004-2013
-QOS.ch See "notices/LICENSE.slf4j.txt" for the licence information of
-the SLF4J library.
+This product includes the SLF4J library, which is Copyright 
+(c) 2004-2013 QOS.ch See "notices/LICENSE.slf4j.txt" for the licence
+information of the SLF4J library.
 
-This product includes the JSch library, which is Copyright (c) 2002-2012
-Atsuhiko Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the
-licence information of the JSch library.
+This product includes the JSch library, which is Copyright 
+(c) 2002-2012 Atsuhiko Yamanaka, JCraft,Inc. 
+See "notices/LICENSE.jsch.txt" for the licence information of the 
+JSch library.
 
-This product includes the Logback library, which is Copyright (c)
-1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
-information of the Logback library.
+This product includes the Logback library, which is Copyright 
+(c) 1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the 
+licence information of the Logback library.
 
 This product includes the JaCoCo library, which is Copyright
 (c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
-"notices/LICENSE.jacoco.txt" for the licence information of the JaCoCo
-library.
+"notices/LICENSE.jacoco.txt" for the licence information of the 
+JaCoCo library.
 
-This project includes the JUnit library. See "notices/LICENSE.junit.txt"
-for the licence information of the JUnit library.
+This project includes the JUnit library. 
+See "notices/LICENSE.junit.txt" for the licence information of the 
+JUnit library.
 
-This project includes the Mockito library, which is Copyright (c) 2007
-Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
-information of the Mockito library.
+This project includes the Mockito library, which is Copyright 
+(c) 2007 Mockito contributors. See "notices/LICENSE.mockito.txt" for
+the licence information of the Mockito library.
 
 
 What is it?
 -----------
 
-Octopus is a middleware abstraction library. It provides a simple Java 
-programming interface to various pieces of software that can be used to 
-access distributed compute and storage resources. 
+Octopus is a middleware abstraction library. It provides a simple 
+Java programming interface to various pieces of software that can be
+used to access distributed compute and storage resources. 
 
 
 Why Octopus?
 ------------
 
-Octopus is developed by the Netherlands eScience Center as a support library 
-for our projects. Several projects develop end-user applications that require 
-access to distributed compute and storage resources. Octopus provides a simple 
-API to access those resources, allowing those applications to be developed more 
-rapidly. The experience gained during the development of these end-user 
+Octopus is developed by the Netherlands eScience Center as a support
+library for our projects. Several projects develop end-user
+applications that require access to distributed compute and storage
+resources. Octopus provides a simple API to access those resources,
+allowing those applications to be developed more rapidly. The
+experience gained during the development of these end-user 
 applications is used to improve the Octopus API and implementation. 
 
 
 Installation
 ------------
 
-The installation procedure and dependencies of the octopus library can be found 
-in the file "INSTALL.md" in the octopus distribution. 
+The installation procedure and dependencies of the octopus library
+can be found in the file "INSTALL.md" in the octopus distribution. 
 
 
 Design
 ------
 
-Octopus is designed with extensibility in mind. It uses a modular and layer design
-as shown in the figure below:
+Octopus is designed with extensibility in mind. It uses a modular
+and layered design as shown in the figure below:
 
 ![Octopus design](images/octopus-design.png "Octopus design.")
 	
-Octopus consists of three layers, an *interface layer*, an *engine layer* and an 
-*adaptor layer*. 
+Octopus consists of three layers, an *interface layer*, an 
+*engine layer* and an *adaptor layer*. 
 
-The *interface layer* is used by the application using octopus. It contains several 
-specialized interfaces:
+The *interface layer* is used by the application using octopus. It
+contains several specialized interfaces:
 
-- Octopus: this is the main entry point used to retrieve the other interfaces. 
-- Files: contains functionality related to files, e.g., creation, deletion, 
-  copying, reading, writing, obtaining directory listings, etc. 
-- Jobs: contains functionality related to job submission, e.g., submitting, 
-  polling status, cancelling, etc. 
-- Credentials: contains functionality related to credentials. Credentials 
-  (such as a username password combination) are often needed to gain access to 
-  files or to submit jobs. 
+- Octopus: this is the main entry point used to retrieve the other
+  interfaces. 
+- Files: contains functionality related to files, e.g., creation,
+  deletion, copying, reading, writing, obtaining directory listings,
+  etc. 
+- Jobs: contains functionality related to job submission, e.g.,
+  submitting, polling status, cancelling, etc. 
+- Credentials: contains functionality related to credentials.
+  Credentials (such as a username password combination) are often
+  needed to gain access to files or to submit jobs. 
 
 The modular design of octopus allows us to add additional interfaces in later 
 versions, e.g., a Clouds interface to manage virtual machines, or a Networks 
