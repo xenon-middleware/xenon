@@ -5,7 +5,7 @@ Octopus
 
 Copyright 2013 The Netherlands eScience Center
 
-Last modified: 26 August 2013
+Last modified: 11 September 2013
 
 What is it?
 -----------
@@ -29,7 +29,10 @@ to improve the Octopus API and implementation.
 The Latest Version
 ------------------
 
-Details of the latest version can be found on the octopus project web site at
+Details of the latest official release of Octopus can be found at:
+<https://github.com/NLeSC/octopus/releases>
+
+Alternatively, the latest development versions of Octopus can be found at:
 <https://github.com/NLeSC/octopus>.
 
 
@@ -45,7 +48,7 @@ A pdf version of the user guide is also available in the docs directory
 
 <http://nlesc.github.io/octopus/userguide.pdf>
 
-See the file "INSTALL.txt" for a description of how to install octopus. 
+See the file "INSTALL.md" for a description of how to install octopus. 
 
 The javadoc of octopus library is available online at: 
 
