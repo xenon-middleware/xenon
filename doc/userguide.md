@@ -15,11 +15,11 @@ Last modified: 11 September 2013
 Copyrights & Disclaimers
 ------------------------
 
-Octopus is copyrighted by the Netherlands eScience Center and releases under 
-the Apache License, Version 2.0.
+Octopus is copyrighted by the Netherlands eScience Center and 
+releases under the Apache License, Version 2.0.
 
-See the "LICENSE" and "NOTICE" files in the octopus distribution for more 
-information. 
+See the "LICENSE" and "NOTICE" files in the octopus distribution for
+more information. 
 
 For more information on the Netherlands eScience Center see:
 
@@ -33,113 +33,124 @@ The octopus project web site can be found at:
 Third party libraries
 ---------------------
 
-This product includes the SLF4J library, which is Copyright (c) 2004-2013
-QOS.ch See "notices/LICENSE.slf4j.txt" for the licence information of
-the SLF4J library.
+This product includes the SLF4J library, which is Copyright 
+(c) 2004-2013 QOS.ch See "notices/LICENSE.slf4j.txt" for the licence
+information of the SLF4J library.
 
-This product includes the JSch library, which is Copyright (c) 2002-2012
-Atsuhiko Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the
-licence information of the JSch library.
+This product includes the JSch library, which is Copyright 
+(c) 2002-2012 Atsuhiko Yamanaka, JCraft,Inc. 
+See "notices/LICENSE.jsch.txt" for the licence information of the 
+JSch library.
 
-This product includes the Logback library, which is Copyright (c)
-1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
-information of the Logback library.
+This product includes the Logback library, which is Copyright 
+(c) 1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the 
+licence information of the Logback library.
 
 This product includes the JaCoCo library, which is Copyright
 (c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
-"notices/LICENSE.jacoco.txt" for the licence information of the JaCoCo
-library.
+"notices/LICENSE.jacoco.txt" for the licence information of the 
+JaCoCo library.
 
-This project includes the JUnit library. See "notices/LICENSE.junit.txt"
-for the licence information of the JUnit library.
+This project includes the JUnit library. 
+See "notices/LICENSE.junit.txt" for the licence information of the 
+JUnit library.
 
-This project includes the Mockito library, which is Copyright (c) 2007
-Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
-information of the Mockito library.
+This project includes the Mockito library, which is Copyright 
+(c) 2007 Mockito contributors. See "notices/LICENSE.mockito.txt" for
+the licence information of the Mockito library.
 
 
 What is it?
 -----------
 
-Octopus is a middleware abstraction library. It provides a simple Java 
-programming interface to various pieces of software that can be used to 
-access distributed compute and storage resources. 
+Octopus is a middleware abstraction library. It provides a simple 
+Java programming interface to various pieces of software that can be
+used to access distributed compute and storage resources. 
 
 
 Why Octopus?
 ------------
 
-Octopus is developed by the Netherlands eScience Center as a support library 
-for our projects. Several projects develop end-user applications that require 
-access to distributed compute and storage resources. Octopus provides a simple 
-API to access those resources, allowing those applications to be developed more 
-rapidly. The experience gained during the development of these end-user 
+Octopus is developed by the Netherlands eScience Center as a support
+library for our projects. Several projects develop end-user
+applications that require access to distributed compute and storage
+resources. Octopus provides a simple API to access those resources,
+allowing those applications to be developed more rapidly. The
+experience gained during the development of these end-user 
 applications is used to improve the Octopus API and implementation. 
 
 
 Installation
 ------------
 
-The installation procedure and dependencies of the octopus library can be found 
-in the file "INSTALL.md" in the octopus distribution. 
+The installation procedure and dependencies of the octopus library
+can be found in the file "INSTALL.md" in the octopus distribution. 
 
 
 Design
 ------
 
-Octopus is designed with extensibility in mind. It uses a modular and layer design
-as shown in the figure below:
+Octopus is designed with extensibility in mind. It uses a modular
+and layered design as shown in the figure below:
 
 ![Octopus design](images/octopus-design.png "Octopus design.")
 	
-Octopus consists of three layers, an *interface layer*, an *engine layer* and an 
-*adaptor layer*. 
+Octopus consists of three layers, an *interface layer*, an 
+*engine layer* and an *adaptor layer*. 
 
-The *interface layer* is used by the application using octopus. It contains several 
-specialized interfaces:
+The *interface layer* is used by the application using octopus. It
+contains several specialized interfaces:
 
-- Octopus: this is the main entry point used to retrieve the other interfaces. 
-- Files: contains functionality related to files, e.g., creation, deletion, 
-  copying, reading, writing, obtaining directory listings, etc. 
-- Jobs: contains functionality related to job submission, e.g., submitting, 
-  polling status, cancelling, etc. 
-- Credentials: contains functionality related to credentials. Credentials 
-  (such as a username password combination) are often needed to gain access to 
-  files or to submit jobs. 
+- Octopus: this is the main entry point used to retrieve the other
+  interfaces. 
+- Files: contains functionality related to files, e.g., creation,
+  deletion, copying, reading, writing, obtaining directory listings,
+  etc. 
+- Jobs: contains functionality related to job submission, e.g.,
+  submitting, polling status, cancelling, etc. 
+- Credentials: contains functionality related to credentials.
+  Credentials (such as a username password combination) are often
+  needed to gain access to files or to submit jobs. 
 
-The modular design of octopus allows us to add additional interfaces in later 
-versions, e.g., a Clouds interface to manage virtual machines, or a Networks 
-interface to manage bandwidth-on-demand networks. 
+The modular design of octopus allows us to add additional interfaces
+in later versions, e.g., a Clouds interface to manage virtual
+machines, or a Networks interface to manage bandwidth-on-demand
+networks. 
 
-The *adaptor layer* contains the adaptors for the each of the middlewares that 
-octopus supports. An *adaptor* offers a middleware specific implementation 
-for the functionality offered by one of the interfaces in octopus.
+The *adaptor layer* contains the adaptors for the each of the
+middlewares that octopus supports. An *adaptor* offers a middleware
+specific implementation for the functionality offered by one of the
+interfaces in octopus.
  
-For example, an adaptor may provide an *sftp* specific implementation of the 
-functions in the octopus *file interface* (such as *copy* or *delete*) by 
-translating each of these functions to *sftp* specific code and commands.
+For example, an adaptor may provide an *sftp* specific implementation
+of the functions in the octopus *file interface* (such as *copy* or
+*delete*) by translating each of these functions to *sftp* specific
+code and commands.
 
-For each interface in octopus there may be multiple adaptors translating 
-its functionality to different middlewares. To distinguises between these 
-adaptors octopus uses the *scheme* they support, such as "sftp", "http" 
-or "ssh". There can be only one adaptor for each scheme. 
+For each interface in octopus there may be multiple adaptors
+translating its functionality to different middlewares. To
+distinguises between these adaptors octopus uses the *scheme* they
+support, such as "sftp", "http" or "ssh". There can be only one
+adaptor for each scheme. 
 
-The *engine layer* of octopus contains the "glue" that connects each interface 
-to the adaptors that implement its functionality. When a function of the 
-interface layer is invoked, the call will be forwarded to the engine layer. 
-It is then the responsibility of the engine layer to forward this call to the 
-right adaptor. 
+The *engine layer* of octopus contains the "glue" that connects each
+interface to the adaptors that implement its functionality. When a
+function of the interface layer is invoked, the call will be
+forwarded to the engine layer. It is then the responsibility of the
+engine layer to forward this call to the right adaptor. 
 
-To perform this selection, the engine layer matches the *scheme* of the object 
-on which the operation needs to be performed, to the *schemes* supported by 
-each of the adaptors. When the schemes match, the adaptor is selected. 
+To perform this selection, the engine layer matches the *scheme* of
+the object on which the operation needs to be performed, to the
+*schemes* supported by each of the adaptors. When the schemes match,
+the adaptor is selected. 
 
 
 Interfaces and datatypes
 ------------------------
 
-This section will briefly explain each of the interfaces and related datatypes.
-Detailed information about Octopus can be found in the online Javadoc at: 
+This section will briefly explain each of the interfaces and related
+datatypes. Detailed information about Octopus can be found in the
+online Javadoc at: 
 
 <http://nlesc.github.io/octopus/javadoc/>
 
@@ -153,12 +164,13 @@ The octopus API uses the following package structure:
 - `nl.esciencecenter.octopus.jobs`  Jobs interface.
 - `nl.esciencecenter.octopus.util`  Various utilty classes.
 
-We will now briefly describe the most important classes and interfaces of these packages.
+We will now briefly describe the most important classes and
+interfaces of these packages.
 
 ### Getting started ###
 
-The [`nl.esciencecenter.octopus`][1] package contains the entry point into the octopus library: 
-[__OctopusFactory__][2]
+The [`nl.esciencecenter.octopus`][1] package contains the entry
+point into the octopus library: [__OctopusFactory__][2]
 
     public class OctopusFactory {
        public static Octopus newOctopus(Map<String,String> properties) 
@@ -166,20 +178,24 @@ The [`nl.esciencecenter.octopus`][1] package contains the entry point into the o
        public static void endAll()
     }
 
-The __newOctopus__ method can be used to create a new octopus instance, while the 
-__endOctopus__ method can be used to release the octopus instance once it is no longer needed.
-It is important to end the octopus when it is no longer needed, as this allows it to release 
+The __newOctopus__ method can be used to create a new __Octopus__
+instance, while the __endOctopus__ method can be used to release the
+octopus instance once it is no longer needed. It is important to end
+the octopus when it is no longer needed, as this allows it to release 
 any resources it has obtained. 
 
-When creating an octopus using __newOctopus__, the _properties_ parameter can be used to 
-configure the octopus instance. If no configuration is necessary, `null` can be used.
-Properties consist of a set of key-value pairs. In octopus all keys __must__ start with 
-"octopus.". To configure the adaptors, properties of the form 
-"octopus.adaptors.(name).(property)" can be used, where "(name)" is the name of the 
-adaptor (for example "local" or "ssh") and "(property)" is the name of the property to be 
+When creating an octopus using __newOctopus__, the _properties_
+parameter can be used to configure the octopus instance. If no
+configuration is necessary, `null` can be used. 
+
+Properties consist of a set of key-value pairs. In octopus all keys
+__must__ start with "octopus.". To configure the adaptors,
+properties of the form "octopus.adaptors.(name).(property)" can be
+used, where "(name)" is the name of the adaptor (for example "local"
+or "ssh") and "(property)" is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
-"octopus.adaptors.local.a.b.c". The available properties can be found in the documentation 
-of the individual adaptors (see Appendix A). 
+"octopus.adaptors.local.a.b.c". The available properties can be found
+in the documentation of the individual adaptors (see Appendix A). 
 
 A call to __newOctopus__ will return an [__Octopus__][3]:
 
@@ -192,15 +208,18 @@ A call to __newOctopus__ will return an [__Octopus__][3]:
         AdaptorStatus[] getAdaptorStatuses()
     }
 
-The __files__, __jobs__ and __credentials__ methods in this interface can be used to retrieve 
-various interfaces that the octopus library offers. They will be described in more detail below. 
+The __files__, __jobs__ and __credentials__ methods in this
+interface can be used to retrieve various interfaces that the
+octopus library offers. They will be described in more detail below. 
 
-The __getProperties__ method can be used to retrieve the properties used when the octopus was 
-created. Most objects created by octopus contain such a __getProperties__ method. For brevity, 
-we will not explain these further.
+The __getProperties__ method can be used to retrieve the properties
+used when the octopus was created. Most objects created by octopus
+contain such a __getProperties__ method. For brevity, we will not
+explain these further.
 
-The __getAdaptorStatus__ method can be used to retrieve information about the adaptors. This 
-information is returned in an [__AdaptorStatus__][4]:
+The __getAdaptorStatus__ method can be used to retrieve information
+about the adaptors. This information is returned in an 
+[__AdaptorStatus__][4]:
 
     public interface AdaptorStatus {
         String getName()
@@ -210,23 +229,27 @@ information is returned in an [__AdaptorStatus__][4]:
         Map<String, String> getAdaptorSpecificInformation()
     }
     
-An __AdaptorStatus__ contains __getName__ to retrieve the name of an adaptor,  __getDescription__ to 
-get a human readable description of what functionality it has to offer and __getSupportedSchemes__
-to retrieve a list of the schemes it supports.
+An __AdaptorStatus__ contains __getName__ to retrieve the name of an
+adaptor,  __getDescription__ to get a human readable description of
+what functionality it has to offer and __getSupportedSchemes__ to
+retrieve a list of the schemes it supports.
 
-The __getSupportedProperties__ method can be used to retrieve a list of configuration options the adaptor 
-supports. Each returned [__OctopusPropertyDescription__][5] gives a full description of a single property, 
-including its name (of the form "octopus.adaptors.(name).(property)"), the expected type of its value, 
-a human readable description of its purpose, etc. More information on the supported properties can be 
-found in Appendix A.
+The __getSupportedProperties__ method can be used to retrieve a list
+of configuration options the adaptor supports. Each returned
+[__OctopusPropertyDescription__][5] gives a full description of a
+single property, including its name (of the form 
+"octopus.adaptors.(name).(property)"), the expected type of its 
+value, a human readable description of its purpose, etc. More
+information on the supported properties can be found in Appendix A.
 
-Finally, __getAdaptorSpecificInformation__ can be used to retrieve status information from the adaptor. 
-Each key contains a property of the form described above. 
+Finally, __getAdaptorSpecificInformation__ can be used to retrieve
+status information from the adaptor. Each key contains a property of
+the form described above. 
 
 ### Credentials interface ###
 
-The [`nl.esciencecenter.octopus.credentials`][6] package contains the [__Credentials__][7] interface of 
-octopus:
+The [`nl.esciencecenter.octopus.credentials`][6] package contains the
+[__Credentials__][7] interface of octopus:
 
     public interface Credentials {
         Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, 
@@ -237,17 +260,21 @@ octopus:
         void close(Credential credential)
     }
 
-The __Credentials__ interface contains various methods for creating credentials, based 
-on certificates or passwords. For each method, the desired _scheme_ needs to be 
-provided as a parameter (for example, "ssh" or "sftp"). This allows octopus to forward the 
-call to the correct adaptor. Note that some types of credentials may not be supported by
-all adaptors. An exception will be thrown when an unsupported __new**Credential__ methods is invoked. 
+The __Credentials__ interface contains various methods for creating
+credentials, based on certificates or passwords. For each method,
+the desired _scheme_ needs to be provided as a parameter (for example,
+"ssh" or "sftp"). This allows octopus to forward the call to the
+correct adaptor. Note that some types of credentials may not be
+supported by all adaptors. An exception will be thrown when an
+unsupported __new**Credential__ methods is invoked. 
 
-Additional configuration can also be provides using the _properties_ parameter, which use 
-the same form as described in the _Octopus factory and interface_ section above. If no 
-additional configuration is needed, `null` can be used. The __getDefaultCredential__
-method returns the default credential for the given scheme. All adaptors are guarenteed to 
-support this method. 
+Additional configuration can also be provides using the _properties_
+parameter, which use the same form as described in the
+_Octopus factory and interface_ section above. If no additional
+configuration is needed, `null` can be used. The 
+__getDefaultCredential__ method returns the default credential for
+ the given scheme. All adaptors are guarenteed to support this
+method. 
 
 All __new**Credential__ methods return a [__Credential__][13] that contains the following 
 methods: 
@@ -257,18 +284,21 @@ methods:
        Map<String,String> getProperties()
     }
 
-The __getAdaptorName__ method can be used to retrieve the name of the adaptor that created 
-the credential. Many adaptor specific objects returned by octopus contain this method. For 
-brevity we will not explain this further.
+The __getAdaptorName__ method can be used to retrieve the name of
+the adaptor that created the credential. Many adaptor specific
+objects returned by octopus contain this method. For brevity we will
+not explain this further.
 
-When a __Credential__ is no longer used, it __must__ be closed using __close__. This releases any 
-resources held by the __Credential__. The __isOpen__ method can be used to check if a __Credential__ 
-is open or closed. 
+When a __Credential__ is no longer used, it __must__ be closed using
+__close__. This releases any resources held by the __Credential__.
+The __isOpen__ method can be used to check if a __Credential__ is
+open or closed. 
 
 ### Files interface ###
 
-The [`nl.esciencecenter.octopus.files`][8] package contains the [__Files__][9] interface of 
-octopus. For readability we will split the explanation of __Files__ into several parts:
+The [`nl.esciencecenter.octopus.files`][8] package contains the
+[__Files__][9] interface of octopus. For readability we will split
+the explanation of __Files__ into several parts:
 
     public interface Files {
        FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String,String> properties)
@@ -277,27 +307,36 @@ octopus. For readability we will split the explanation of __Files__ into several
        // ... more follows
     }
 
-The __Files__ interface contains several method for creating and closing a [__FileSystem__][10]. 
-A __FileSystem__ provides an abstraction for a (possibly remote) file system. 
+The __Files__ interface contains several method for creating and
+closing a [__FileSystem__][10]. A __FileSystem__ provides an
+abstraction for a (possibly remote) file system. 
 
-To create a __FileSystem__ the __newFileSystem__ method can be used. As before, the desired __scheme__ 
-must be provided as a parameter. In addition, the _location_ parameter provides information on the 
-location of the file system using an adaptor specific string. For local file systems, the location 
-must contain the root of the file system to access, such as "/" on Linux or "C:" on Windows. For remote 
-file systems, the location typically contains the host name of the machine to connect to. The exact 
-format of accepted location strings can be found in the adaptor documentation. 
+To create a __FileSystem__ the __newFileSystem__ method can be used.
+As before, the desired __scheme__ must be provided as a parameter.
+In addition, the _location_ parameter provides information on the 
+location of the file system using an adaptor specific string. For
+local file systems, the location must contain the root of the file
+system to access, such as "/" on Linux or "C:" on Windows. For remote 
+file systems, the location typically contains the host name of the
+machine to connect to. The exact format of accepted location strings
+can be found in the adaptor documentation. 
 
-The following are all valid combinations of file system schemes and locations:
+The following are all valid combinations of file system schemes and
+locations:
 
-    "file","/"                        connect to the local file system on Linux
-    "file","C:"                       connect to the local C: drive on Windows  
-    "sftp","example.com"              connect to example.com using sftp 
-    "sftp","test@example.com:44"      connect to example.com using sftp on port 44 with "test" as user name.
+    "file","/"                   connect to local Linux file system
+    "file","C:"                  connect to local Windows C: drive
+    "sftp","example.com"         connect to example.com using sftp 
+    "sftp","test@example.com:44" connect to example.com using sftp 
+                                 on port 44 with "test" as user name.
 
-The __newFileSystem__ method also has a _credential_ parameter to provide the credential needed to access the file 
-system. If this parameter is set to `null` the default credentials will be used for the scheme. The _properties_
-parameter can be used to provide additional configuration properties. Again, `null` can be used if no additional 
-configuration is required. The returned __FileSystem__ contains the following methods:
+The __newFileSystem__ method also has a _credential_ parameter to
+provide the credential needed to access the file system. If this
+parameter is set to `null` the default credentials will be used for
+the scheme. The _properties_ parameter can be used to provide
+additional configuration properties. Again, `null` can be used if no
+additional configuration is required. The returned __FileSystem__
+contains the following methods:
 
     public interface FileSystem {
         String getScheme()
@@ -305,15 +344,21 @@ configuration is required. The returned __FileSystem__ contains the following me
         Path getEntryPath()
     }
 
-The __getScheme__ and __getLocation__ methods returns the scheme and location strings used to create the __FileSystem__. 
-The __getEntryPath__ method returns the _path at which the file system was entered_. For example, when accessing a file 
-system using "sftp" it is customary (but not manditory) to enter the file system at the users' home directory. Therefore, 
-the entry path of the __FileSystem__ will be similar to "/home/(username)". For local file systems the entry path is 
-typically set to the root of the file system (such as "/" or "C:").
+The __getScheme__ and __getLocation__ methods returns the scheme and
+location strings used to create the __FileSystem__. The
+__getEntryPath__ method returns the _path at which the file system
+was entered_. For example, when accessing a file system using "sftp"
+it is customary (but not manditory) to enter the file system at the
+users' home directory. Therefore, the entry path of the 
+__FileSystem__ will be similar to "/home/(username)". For local file
+systems the entry path is typically set to the root of the file
+system (such as "/" or "C:").
 
-When a __FileSystem__ is no longer used, it __must__ be closed using __close__. This releases any resources 
-held by the __FileSystem__. The __isOpen__ method can be used to check if a __FileSystem__ is open or closed. 
-Once a __FileSystem__ is created, it can be used to access files: 
+When a __FileSystem__ is no longer used, it __must__ be closed using
+__close__. This releases any resources held by the __FileSystem__.
+The __isOpen__ method can be used to check if a __FileSystem__ is
+open or closed. Once a __FileSystem__ is created, it can be used to
+access files: 
 
     public interface Files {
        Path newPath(FileSystem filesystem, RelativePath location) 
@@ -326,22 +371,27 @@ Once a __FileSystem__ is created, it can be used to access files:
        // ... more follows
     }
 
-The __newPath__ method can be used to create a new [__Path__][11]. An __Path__ represents a path
-on a specific __FileSystem__. This path does not necessarily exists. To create an __Path__, both 
-the target __FileSystem__ and a [__RelativePath__][12] are needed. A __RelativePath__ contains a 
-sequence of strings separated using a special _separator_ character, which is used to identify a 
-location on a file system (for example "/tmp/dir"). __RelativePath__ contains many utility methods 
-for manipulating these string sequences. The details can be found in the Javadoc of 
-[__RelativePath__][12].
+The __newPath__ method can be used to create a new [__Path__][11].
+A __Path__ represents a path on a specific __FileSystem__. This path
+does not necessarily exists. To create an __Path__, both the target
+__FileSystem__ and a [__RelativePath__][12] are needed. A
+__RelativePath__ contains a sequence of strings separated using a
+special _separator_ character, and is used to identify a location
+on a file system (for example "/tmp/dir"). __RelativePath__ contains
+many utility methods for manipulating these string sequences. The
+details can be found in the Javadoc of [__RelativePath__][12].
 
-__Files__ contains several methods to create and delete files and directories. When creating files and 
-directories octopus checks if the target already exists. If so, an exception will be thrown. Similary, 
-an exception is thrown when attempting to delete non-existing file or a directory that is not empty. 
-The __exists__ method can be used to check if a path exists.
+__Files__ contains several methods to create and delete files and
+directories. When creating files and directories octopus checks if
+the target already exists. If so, an exception will be thrown.
+Similary, an exception is thrown when attempting to delete
+non-existing file or a directory that is not empty. The __exists__
+method can be used to check if a path exists.
 
-Using the __getAttributes__ method the attributes of a file can be retrieved. The returned
-[__FileAttributes__][14] contains information on the type of file (regular file, directory, link, etc), 
-it size, creation time, access rights, etc. 
+Using the __getAttributes__ method the attributes of a file can be
+retrieved. The returned [__FileAttributes__][14] contains information
+on the type of file (regular file, directory, link, etc), it size,
+creation time, access rights, etc. 
 
 To list directories, the following methods are available:
 
@@ -351,10 +401,12 @@ To list directories, the following methods are available:
        // ... more follows
     }
 
-Both __newDirectoryStream__ and __newAttributesDirectoryStream__ return a [__DirectoryStream__][15]
-which can be used to iterate over the contents of a directory. For the latter, the __FileAttributes__ 
-for each of the files are also included. alternatively, these methods are also available with an extra 
-_filter_ parameter, which can be used to filter the stream in advance.
+Both __newDirectoryStream__ and __newAttributesDirectoryStream__
+return a [__DirectoryStream__][15] which can be used to iterate over
+the contents of a directory. For the latter, the __FileAttributes__ 
+for each of the files are also included. alternatively, these methods
+are also available with an extra _filter_ parameter, which can be
+used to filter the stream in advance.
 
 To read or write files, the following methods are available:
 
@@ -363,10 +415,12 @@ To read or write files, the following methods are available:
        OutputStream newOutputStream(Path path, OpenOption... options)
     }
 
-Using these methods, an __InputStream__ can be created to read a file, and an __OutputStream__ can be 
-created to write a file. The __newOutputStream__ method requires a _options_ parameter to specify how 
-the file should be opened for writing (for example, should the data be append or should the file be 
-truncated first). These options are describe in more detail in the Javadoc.
+Using these methods, an __InputStream__ can be created to read a
+file, and an __OutputStream__ can be created to write a file. The
+__newOutputStream__ method requires a _options_ parameter to specify
+how the file should be opened for writing (for example, should the
+data be append or should the file be truncated first). These options
+are describe in more detail in the Javadoc.
 
 To copy files, the following methods are available:
 
@@ -376,18 +430,22 @@ To copy files, the following methods are available:
        CopyStatus cancelCopy(Copy copy)
     }
 
-The __copy__ method supports various copy operations such as a regular copy, a resume or an append. 
-The _options_ parameter can be used to specify the desired operation. 
-Normally, __copy__ performs its operation _synchronously_, that is, the call blocks until the copy 
-is completed. However, _asynchronous_ operations are also supported by providing the option 
-[__CopyOption.ASYNCHRONOUS__][17]. In that case a [__Copy__][16] object is returned that can be used 
-to retrieve the status of the copy (using __getCopyStatus__) or cancel it (using __cancelCopy__).
-The details of the available copy operations can be found in the Javadoc of [__CopyOption__][17].
+The __copy__ method supports various copy operations such as a
+regular copy, a resume or an append. The _options_ parameter can be
+used to specify the desired operation. Normally, __copy__ performs
+its operation _synchronously_, that is, the call blocks until the
+copy is completed. However, _asynchronous_ operations are also
+supported by providing the option [__CopyOption.ASYNCHRONOUS__][17].
+In that case a [__Copy__][16] object is returned that can be used 
+to retrieve the status of the copy (using __getCopyStatus__) or
+cancel it (using __cancelCopy__). The details of the available copy
+operations can be found in the Javadoc of [__CopyOption__][17].
 
 ### Jobs interface ###
 
-The [`nl.esciencecenter.octopus.job`][18] package contains the [__Jobs__][19] interface of octopus.
-For readability we will split the explanation of __Jobs__ into several parts:
+The [`nl.esciencecenter.octopus.job`][18] package contains the
+[__Jobs__][19] interface of octopus. For readability we will split
+the explanation of __Jobs__ into several parts:
 
     public interface Jobs {
         Scheduler newScheduler(String scheme, String location, Credential credential, Map<String,String> properties)
@@ -396,13 +454,16 @@ For readability we will split the explanation of __Jobs__ into several parts:
         // ... more follows
     }
 
-The __Jobs__ interface contains the __newScheduler__ method that can be used to create a [__Scheduler__][20]. 
-A __Scheduler__ provides an abstraction for a (possibly remote) scheduler that can be used to run jobs. 
-The __newScheduler__ method has __scheme__ and __location__ parameters that specify how to access the 
-scheduler. As with __newFileSystem__ the __location__ is adaptor specific. To access the local scheduler, 
-passing `null` or an empty string is sufficient. To access remote schedulers, the location typically contains 
-the host name of the machine to connect to. The exact format of accepted location strings can be found in the 
-adaptor documentation.
+The __Jobs__ interface contains the __newScheduler__ method that can
+be used to create a [__Scheduler__][20]. A __Scheduler__ provides an
+abstraction for a (possibly remote) scheduler that can be used to
+run jobs. The __newScheduler__ method has __scheme__ and __location__
+parameters that specify how to access the scheduler. As with
+__newFileSystem__ the __location__ is adaptor specific. To access
+the local scheduler, passing `null` or an empty string is sufficient.
+To access remote schedulers, the location typically contains the
+host name of the machine to connect to. The exact format of accepted
+location strings can be found in the adaptor documentation.
 
 The following are valid examples of scheduler schemes and locations:
 
@@ -411,8 +472,10 @@ The following are valid examples of scheduler schemes and locations:
     "slurm",""                     connect to a local slurm scheduler
     "slurm","test@example.com:44"  connect to a remote slurm scheduler at example.com via SSH on port 44 with user "test".
 
-When a __Scheduler__ is no longer used, is __must__ be closed using the __close__ method. The __isOpen__ 
-method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__ contains the following:
+When a __Scheduler__ is no longer used, is __must__ be closed using
+the __close__ method. The __isOpen__ method can be use to check if a
+__Scheduler__ is open or closed. A __Scheduler__ contains the
+following:
 
     public interface Scheduler {
         String[] getQueueNames()
@@ -421,25 +484,31 @@ method can be use to check if a __Scheduler__ is open or closed. A __Scheduler__
         boolean supportsBatch()
     }
 
-Each __Scheduler__ contains one or more queues to which jobs can be submitted. Each queue has a name that 
-is unique to the __Scheduler__. The __getQueueNames__ method can be used to retrieve all queue names. 
+Each __Scheduler__ contains one or more queues to which jobs can be
+submitted. Each queue has a name that is unique to the __Scheduler__.
+The __getQueueNames__ method can be used to retrieve all queue names. 
 
-The __isOnline__ method can be used to determine if the __Scheduler__ is an _online scheduler_ or an 
-_offline scheduler_. Online schedulers need to remain active for their jobs to run. Closing an online 
-scheduler will kill all jobs that were submitted to it. Offline schedulers do not need to remains active 
-for their jobs to run. A submitted job will typically be handed over to some external server that will 
-manage the job for the rest of its lifetime.
+The __isOnline__ method can be used to determine if the __Scheduler__
+is an _online scheduler_ or an _offline scheduler_. Online schedulers
+need to remain active for their jobs to run. Closing an online 
+scheduler will kill all jobs that were submitted to it. Offline
+schedulers do not need to remains active for their jobs to run. A
+submitted job will typically be handed over to some external server
+that will manage the job for the rest of its lifetime.
 
-The __supportsInteractive__ and __supportsBatch__ method can be use to check if the __Scheduler__ supports
-interactive and/or batch jobs. Interactive jobs are jobs where the user gets direct control over the standard 
-streams of the job (the _stdin_, _stdout_ and _stderr_ streams). The user __must__ retrieve these streams 
-using the __getStreams__ method in __Jobs__ and then provide input and output, or close the streams. Failing
-to do so may cause the job to block indefinately. Batch jobs are jobs where the standard streams are redirected 
-from and to files. The location of these files must be set before the job is started, as will be explained 
-below.
+The __supportsInteractive__ and __supportsBatch__ method can be use
+to check if the __Scheduler__ supports interactive and/or batch jobs.
+Interactive jobs are jobs where the user gets direct control over
+the standard streams of the job (the _stdin_, _stdout_ and _stderr_
+streams). The user __must__ retrieve these streams using the
+__getStreams__ method in __Jobs__ and then provide input and output,
+or close the streams. Failing to do so may cause the job to block
+indefinately. Batch jobs are jobs where the standard streams are
+redirected from and to files. The location of these files must be
+set before the job is started, as will be explained below.
 
-Once a __Scheduler__ is created, __Jobs__ contains several methods to retrieve information about the 
-__Scheduler__:
+Once a __Scheduler__ is created, __Jobs__ contains several methods
+to retrieve information about the __Scheduler__:
 
     public interface Jobs {
         String getDefaultQueueName(Scheduler scheduler)
@@ -449,13 +518,16 @@ __Scheduler__:
         // ... more follows
     }
 
-The __getQueueStatuses__ method can be used to retrieve information about a queue. If no queue names 
-are provided as a parameter, information on all queues in the scheduler will be returned. Using the 
-__getDefaultQueueName__ the default queue can be retrieved for the __Scheduler__. The __getJobs__ method 
-can be used to retrieve information on all jobs in a queue. Note that this may also include jobs
-from other users.
+The __getQueueStatuses__ method can be used to retrieve information
+about a queue. If no queue names are provided as a parameter,
+information on all queues in the scheduler will be returned. Using
+the __getDefaultQueueName__ the default queue can be retrieved for
+the __Scheduler__. The __getJobs__ method can be used to retrieve
+information on all jobs in a queue. Note that this may also include
+jobs from other users.
 
-To submit and manage jobs, the __Jobs__ interface contains the following methods:
+To submit and manage jobs, the __Jobs__ interface contains the
+following methods:
 
     public interface Jobs {
         Job submitJob(Scheduler scheduler, JobDescription description)
@@ -467,14 +539,18 @@ To submit and manage jobs, the __Jobs__ interface contains the following methods
         JobStatus cancelJob(Job job)
     }    
 
-The __submitJob__ method can be used to submit a job to a __Scheduler__. A [__JobDescription__][21] must 
-be provided as parameter. A __JobDescription__ contains all necessary information on how to start the job, 
-for example, the location of the executable, any command line arguments that are required, the working 
-directory, if the job is an interactive of batch job, the location of the files for stream redirection 
-(in case of a batch job), etc. See the Javadoc for details of the __JobDescription__.
+The __submitJob__ method can be used to submit a job to a
+__Scheduler__. A [__JobDescription__][21] must be provided as
+parameter. A __JobDescription__ contains all necessary information
+on how to start the job, for example, the location of the executable,
+any command line arguments that are required, the working directory,
+if the job is an interactive of batch job, the location of the files
+for stream redirection (in case of a batch job), etc. See the Javadoc
+for details of the __JobDescription__.
 
-Once a job is submitted, a [__Job__][22] object is returned that can be used with __getJobStatus__ to 
-retrieve the status of the job, and with __cancelJob__ to cancel it. This __Job__ contains the following:
+Once a job is submitted, a [__Job__][22] object is returned that can
+be used with __getJobStatus__ to retrieve the status of the job, and
+with __cancelJob__ to cancel it. This __Job__ contains the following:
 
     public interface Job {
         JobDescription getJobDescription()
@@ -484,26 +560,32 @@ retrieve the status of the job, and with __cancelJob__ to cancel it. This __Job_
         boolean isOnline()
     } 
 
-Besides methods for retrieveing the __JobDescription__ and __Scheduler__ that created it, each __Job__ also 
-contains the __isInteractive__ method to determine if the __Job__ is interactive, and the __isOnline__ 
-method to determine if the job is running on an _online scheduler_ (explained above).
+Besides methods for retrieveing the __JobDescription__ and
+__Scheduler__ that created it, each __Job__ also contains the
+__isInteractive__ method to determine if the __Job__ is interactive,
+and the __isOnline__ method to determine if the job is running on an
+_online scheduler_ (explained above).
  
-After submitting a job, __waitUntilRunning__ can be used to wait until a job is no longer waiting in the 
-queue and __waitUntilDone__ can be used to wait until the job has finished.  
+After submitting a job, __waitUntilRunning__ can be used to wait
+until a job is no longer waiting in the queue and __waitUntilDone__
+can be used to wait until the job has finished.  
 
-For all methods returning a [__JobStatus__][23], the following rule applies: after a job has finished, the 
-status is only guarenteed to be returned _once_. Any subsequent calls to a method that returns a 
-__JobStatus__ _may_ throw an exception stating that the job does not exist. Some adaptors may return 
-a result however.  
+For all methods returning a [__JobStatus__][23], the following rule
+applies: after a job has finished, the status is only guarenteed to
+be returned _once_. Any subsequent calls to a method that returns a 
+__JobStatus__ _may_ throw an exception stating that the job does not
+exist. Some adaptors may return a result however.  
 
 
 ### Utilities classes ###
 
-The [`nl.esciencecenter.octopus.util`][25] package contains various utility classes. The main entry points 
-are __Utils__, __Sandbox__ and __JavaJobDescription__.
+The [`nl.esciencecenter.octopus.util`][25] package contains various
+utility classes. The main entry points are __Utils__, __Sandbox__
+and __JavaJobDescription__.
 
-In [__Utils__][42] various utility methods can be found that make it easier to use Octopus. Many methods provide 
-simple shortcuts to often used code constructs. Some examples are shown below:
+In [__Utils__][42] various utility methods can be found that make it
+easier to use Octopus. Many methods provide simple shortcuts to
+often used code constructs. Some examples are shown below:
 
     public class Utils {
         // Create a new local Scheduler.
@@ -534,13 +616,16 @@ simple shortcuts to often used code constructs. Some examples are shown below:
         public static boolean isOSX()                                   
     }
 
-In addition many methods are provided for reading data from files or streams to various output targets,
-writing data to files or streams from various input sources, recursive copying, recursive deletion, etc.
-See the Javadoc of [__Utils__][42] for details.
+In addition many methods are provided for reading data from files or
+streams to various output targets, writing data to files or streams
+from various input sources, recursive copying, recursive deletion,
+etc. See the Javadoc of [__Utils__][42] for details.
 
-A [__Sandbox__][43] is a utility class that makes is it easier to create a (possibly remote) temporary 
-directory and transfer files to and from this directory. A Sandbox is often used in when submitting 
-jobs that require input files and / or produce output files. Sandbox contains the following methods:
+A [__Sandbox__][43] is a utility class that makes is it easier to
+create a (possibly remote) temporary directory and transfer files to
+and from this directory. A Sandbox is often used in when submitting 
+jobs that require input files and / or produce output files. Sandbox
+contains the following methods:
 
     public class Sandbox {
        Sandbox(Files files, Path root, String sandboxName)
@@ -551,32 +636,41 @@ jobs that require input files and / or produce output files. Sandbox contains th
        void delete()
     }
 
-Creating a Sandbox requires an octopus __Files__ interface and a __root__ directory. The Sandbox will 
-then create a temporary directory __sandboxName__ in __root__. If __sandboxName__ is `null`, a random 
-name will be generated. Using __addUploadFile__ files can be added to the upload queue. These files will 
-be transferred to the Sandbox directory when __upload__ is invoked. Similarly, using __addDownloadFile__,
-files can be added to the download queue. They will be downloaded from the Sandbox directory when 
-__download__ is invoked. Finally, __delete__ can be used to delete the Sandbox directory.
+Creating a Sandbox requires an octopus __Files__ interface and a
+__root__ directory. The Sandbox will then create a temporary
+directory __sandboxName__ in __root__. If __sandboxName__ is `null`,
+a random name will be generated. Using __addUploadFile__ files can
+be added to the upload queue. These files will be transferred to the
+Sandbox directory when __upload__ is invoked. Similarly, using
+__addDownloadFile__, files can be added to the download queue. They
+will be downloaded from the Sandbox directory when __download__ is
+invoked. Finally, __delete__ can be used to delete the Sandbox
+directory.
 
-A [__JavaJobDescription__][44] is a utility class that makes is it easier to create a __JobDescription__ 
-for running a Java application. In addition to the command line arguments used by the application, Java 
-applications typically require a number of _special_ command line argument for the Java Virtual Machine 
-(JVM), such as a _class path_, _system properties_, and _JVM options_. 
+A [__JavaJobDescription__][44] is a utility class that makes is it
+easier to create a __JobDescription__ for running a Java application.
+In addition to the command line arguments used by the application,
+Java applications typically require a number of _special_ command
+line argument for the Java Virtual Machine (JVM), such as a
+_class path_, _system properties_, and _JVM options_. 
 
-The JavaJobDescription class extends the regular JobDescription with support for these additional 
-arguments. When a Job a submitted to an octopus Scheduler that uses a JavaJobDescription, the various 
-types of command line arguments will be merged automatically into a single arguments list. See the 
-Javadoc of [__JavaJobDescription__][44] for details.
+The JavaJobDescription class extends the regular JobDescription with
+support for these additional arguments. When a Job a submitted to an
+octopus Scheduler that uses a JavaJobDescription, the various types
+of command line arguments will be merged automatically into a single
+arguments list. See the Javadoc of [__JavaJobDescription__][44] for
+details.
 
 Examples
 --------
 
-Examples of how to use octopus can be found in the [examples][26] directory. We will list the examples here 
-in order of increasing complexity, and with a short description of each example.
+Examples of how to use octopus can be found in the [examples][26]
+directory. We will list the examples here in order of increasing
+complexity, and with a short description of each example.
 
 ### Initializing Octopus ###
 
-Creating an __Octopus__ and retrieving the __Credentials__, __Files__ and __Jobs__ interfaces: 
+Creating an __Octopus__: 
 [CreatingOctopus.java][27]
 
 Creating an __Octopus__ with configuration properties: 
