@@ -5,7 +5,7 @@
 
 	<property name="build.sysclasspath" value="ignore" />
 
-	<property name="version" value="" />
+	<property name="version" value="1.0" />
 
 	<path id="lib.jars">
 		<fileset dir="lib">
@@ -13,7 +13,7 @@
 		</fileset>
 	</path>
 
-	<target name="build" depends="clean, compile" description="build everything" />
+	<target name="build" depends="clean, compile, examples, javadoc" description="build everything" />
 
 	<target name="test" description="run the unit tests with coverage" depends="build">
 		<ant dir="${basedir}/test" target="test" />
@@ -23,8 +23,13 @@
 		<ant dir="${basedir}/test" target="test-integration" />
 	</target>
 
-	<target name="examples" description="compile the examples" depends="build">
+	<target name="examples" description="compile the examples" depends="compile">
 		<ant dir="${basedir}/examples" target="build" />
+
+		<!-- Copy examples jar to dist directory -->
+		<copy todir="dist">
+			<fileset dir="examples/dist" />
+		</copy>
 	</target>
 
 	<target name="compile" description="compile the source ">
@@ -37,11 +42,14 @@
 		</javac>
 
 		<!-- Put everything in classes into the jar file -->
-		<jar jarfile="dist/octopus${version}.jar" basedir="build/classes" />
+		<jar jarfile="dist/octopus-${version}.jar" basedir="build/classes" />
 
 		<!-- Copy external dependancies to dist directory -->
 		<copy todir="dist">
 			<fileset dir="lib" />
+		</copy>
+		<copy todir="dist">
+			<fileset file="logback.xml" />
 		</copy>
 	</target>
 
@@ -51,6 +59,7 @@
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 			<classpath refid="lib.jars" />
 		</javadoc>
+		<zip destfile="dist/octopus-javadoc-${version}.zip" basedir="doc/javadoc"/>
 	</target>
 
 	<target name="javadoc-devel" description="generate javadoc for developers">
@@ -58,7 +67,7 @@
 		<javadoc destdir="doc/javadoc-devel" access="private" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false">
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 			<classpath refid="lib.jars" />
-		</javadoc>
+		</javadoc>		
 	</target>
 
 	<target name="clean" description="clean up">

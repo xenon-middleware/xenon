@@ -21,7 +21,7 @@
 			<classpath refid="default.classpath" />
 		</javac>
 
-		<jar jarfile="dist/octopus-examples.jar" basedir="build/classes" includes="**" />
+		<jar jarfile="dist/octopus-examples-${version}.jar" basedir="build/classes" includes="**" />
 	</target>
 
 	<target name="clean" description="clean up">
