@@ -1,6 +1,5 @@
 nl.esciencecenter.octopus
 nl.esciencecenter.octopus.credentials
-nl.esciencecenter.octopus.exceptions
 nl.esciencecenter.octopus.files
 nl.esciencecenter.octopus.jobs
 nl.esciencecenter.octopus.util
