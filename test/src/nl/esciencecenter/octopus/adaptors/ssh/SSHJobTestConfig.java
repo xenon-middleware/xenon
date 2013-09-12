@@ -48,11 +48,8 @@ public class SSHJobTestConfig extends JobTestConfig {
 
         super("ssh", configfile);
 
-        Properties p = new Properties();
-        p.load(new FileInputStream(configfile));
-
         String location = getPropertyOrFail(p, "test.ssh.location");
-
+           
         username = getPropertyOrFail(p, "test.ssh.user");
         passwd = getPropertyOrFail(p, "test.ssh.password").toCharArray();
 

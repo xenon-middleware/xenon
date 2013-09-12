@@ -82,7 +82,7 @@ public class CredentialsEngineImplementationTest {
 
         assertEquals("ssh", cci.getAdaptorName());
         assertEquals("username", cci.getUsername());
-        assertEquals("certfile", cci.getCertfile());
+        assertEquals(certfile, cci.getCertfile());
         assertEquals(new HashMap<String, String>(), cci.getProperties());
 
         assertTrue(Arrays.equals(cci.getPassword(), "password".toCharArray()));
