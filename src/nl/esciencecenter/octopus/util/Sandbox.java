@@ -251,7 +251,7 @@ public class Sandbox {
         downloadFiles.add(new Pair(resolve(files, path, src), dest));
     }
 
-    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusException, InvalidCopyOptionsException {
+    private void copy(List<Pair> pairs, CopyOption... options) throws OctopusException {
         for (Pair pair : pairs) {
             Utils.recursiveCopy(files, pair.source, pair.destination, options);
         }
@@ -269,7 +269,7 @@ public class Sandbox {
      * @throws OctopusException
      *           if an I/O error occurs during the copying
      */
-    public void upload(CopyOption... options) throws OctopusException, InvalidCopyOptionsException {
+    public void upload(CopyOption... options) throws OctopusException {
         if (!files.exists(path)) {
             files.createDirectory(path);
         }
@@ -286,7 +286,7 @@ public class Sandbox {
      * @throws OctopusException
      *           if an I/O error occurs during the copying
      */
-    public void download(CopyOption... options) throws OctopusException, InvalidCopyOptionsException {
+    public void download(CopyOption... options) throws OctopusException {
         copy(downloadFiles, options);
     }
 

@@ -256,8 +256,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return deletedJobs.remove(Long.parseLong(job.getIdentifier()));
     }
 
-    private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws OctopusException,
-            OctopusException {
+    private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws OctopusException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
 
         updateJobsSeenMap(status.keySet());
