@@ -18,13 +18,16 @@ package nl.esciencecenter.octopus.engine.credentials;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import nl.esciencecenter.octopus.Util;
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusEngine;
+import nl.esciencecenter.octopus.util.Utils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -60,7 +63,18 @@ public class CredentialsEngineImplementationTest {
     public void testCertificate() throws Exception {
 
         CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
-        Credential c = ce.newCertificateCredential("ssh", "certfile", "username", "password".toCharArray(), null);
+        
+        String certfile = Utils.getHome() + Utils.getLocalSeparator() + ".ssh" + Utils.getLocalSeparator() + "id_rsa";  
+        
+        if (!new File(certfile).exists()) { 
+            certfile = Utils.getHome() + Utils.getLocalSeparator() + ".ssh" + Utils.getLocalSeparator() + "id_dsa";
+        }
+        
+        if (!new File(certfile).exists()) { 
+            fail("Failed to find valid certificate file!");
+        }
+        
+        Credential c = ce.newCertificateCredential("ssh", certfile, "username", "password".toCharArray(), null);
 
         assertTrue(c instanceof CertificateCredentialImplementation);
 
