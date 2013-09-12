@@ -52,23 +52,20 @@ public class SSHFileTestConfig extends FileTestConfig {
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
         }
 
         Properties p = new Properties();
         p.load(new FileInputStream(configfile));
 
-        username = getPropertyOrFail(p, "test.ssh.user");
-        passwd = getPropertyOrFail(p, "test.ssh.password").toCharArray();
-
         String location = getPropertyOrFail(p, "test.ssh.location");
 
-        String wrongUser = getPropertyOrFail(p, "test.ssh.user.wrong");
-        String wrongLoc = getPropertyOrFail(p, "test.ssh.location.wrong");
-
+        username = getPropertyOrFail(p, "test.ssh.user");
+        passwd = getPropertyOrFail(p, "test.ssh.password").toCharArray();
+        
         correctLocation = username + "@" + location;
-        wrongLocation = username + "@" + wrongLoc;
-        correctLocationWrongUser = wrongUser + "@" + location;
+        wrongLocation = username + "@doesnotexist.com";
+        correctLocationWrongUser = "incorrect@" + location;
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {

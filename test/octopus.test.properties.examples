@@ -1,0 +1,103 @@
+######################################################################
+#
+# This is a sample configuration file for the octopus test suite. 
+#
+# You can use this configuration by copying this file to 
+# "octopus.test.properties" in the this "test" directory and 
+# providing the correct values for each of fields.
+#
+# By running:
+#
+#   ant test 
+# 
+# in the main directory of octopus all tests will be run.
+#
+
+######################################################################
+#
+# This is the configuration of the SSH tests. To completely run 
+# these test the following setup is required:
+# 
+# An account on a machine that can be accessed via SSH using both 
+# public key authentication and a password.
+# 
+# An extra machine that can be accessed via SSH using public key 
+# authentication that can serve as a tunnel to the machine above.
+#
+####
+#
+# This is the location of the machine of the form host[:port], 
+# where both user and port are optional. In addition, a username and 
+# password must be provided to test password authentication to the 
+# host.
+#
+test.ssh.location=
+test.ssh.user=
+test.ssh.password=
+#
+# The hostname of an SSH tunnel that will be used to access the 
+# machine above in the the form [user@]host[:port]. This machine 
+# must be accessible via public key authentication.
+# 
+test.ssh.gateway=
+
+
+
+######################################################################
+#
+# This is the configuration of the Grid Engine tests. To completely 
+# run these test the following setup is required:
+#
+# An account on a machine that runs Grid Engine and can be accessed 
+# via SSH using both public key authentication and a password.
+#
+####
+#
+# This is the location of the machine of the form host[:port], 
+# where both user and port are optional. In addition, a username and 
+# password must be provided to test password authentication to the 
+# host.
+# 
+test.gridengine.location=
+test.gridengine.user=
+test.gridengine.password=
+#
+# The default queue to use in Grid Engine, a list of other queues to 
+# test, the update delay for the queues and Grid Engine commands 
+# (in ms), and the parallel environment to use. 
+#
+test.gridengine.default.queue=main.q
+test.gridengine.queues=main.q
+test.gridengine.queue.wait.time=60000
+test.gridengine.update.time=60000
+#test.gridengine.parallel.environment=make
+
+
+
+######################################################################
+#
+# This is the configuration of the Slurm tests. To completely 
+# run these test the following setup is required:
+# 
+# An account on a machine that runs Slurm and can be accessed 
+# via SSH using both public key authentication and a password.
+# 
+####
+#
+# This is the location of the machine of the form host[:port], 
+# where both user and port are optional. In addition, a username and 
+# password must be provided to test password authentication to the 
+# host.
+#
+test.slurm.user=
+test.slurm.password=
+test.slurm.location=
+#
+# The default queue to use in Slurm, a list of other queues to test, 
+# the update delay for the queues and the Slurm commands (in ms.), 
+# and the parallel environment to use. 
+#
+test.slurm.default.queue=otherpartition
+test.slurm.queues=mypartition,otherpartition
+test.slurm.queue.wait.time=4000
+test.slurm.update.time=10000

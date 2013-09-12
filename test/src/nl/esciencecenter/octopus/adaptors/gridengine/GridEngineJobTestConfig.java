@@ -63,7 +63,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
         }
 
         Properties p = new Properties();
@@ -77,9 +77,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         String location = getPropertyOrFail(p, "test.gridengine.location");
 
-        String wrongUser = getPropertyOrFail(p, "test.gridengine.user.wrong");
-        String wrongLoc = getPropertyOrFail(p, "test.gridengine.location.wrong");
-
         defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
         String queueList = getPropertyOrFail(p, "test.gridengine.queues");
         queues = queueList.split("\\s*,\\s*");
@@ -91,12 +88,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         if (location == null || location.isEmpty() || location.equals("/")) { 
             correctLocation = "";
-            wrongLocation = wrongLoc;
-            correctLocationWrongUser = wrongUser + "@";
+            wrongLocation = "doesnotexists.com";
+            correctLocationWrongUser = "incorrect@";
         } else { 
             correctLocation = username + "@" + location;
-            wrongLocation = username + "@" + wrongLoc;
-            correctLocationWrongUser = wrongUser + "@" + location;
+            wrongLocation = username + "@" + "doesnotexists.com";
+            correctLocationWrongUser = "incorrect@" + location;
         }
     }
 

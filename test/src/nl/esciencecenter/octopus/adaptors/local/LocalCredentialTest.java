@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.local;
 
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import nl.esciencecenter.octopus.adaptors.GenericCredentialsAdaptorTestParent;
