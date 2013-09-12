@@ -102,7 +102,7 @@ public class ScriptingJobs implements Jobs {
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws OctopusException,OctopusException {
+            throws OctopusException {
 
         OctopusProperties p = new OctopusProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 

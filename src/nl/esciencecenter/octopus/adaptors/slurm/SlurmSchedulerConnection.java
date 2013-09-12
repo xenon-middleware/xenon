@@ -270,8 +270,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return defaultQueueName;
     }
 
-    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws OctopusException,
-            OctopusException {
+    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws OctopusException {
+
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
         //Parse output. Ignore some header and footer lines.

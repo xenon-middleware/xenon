@@ -101,8 +101,7 @@ class BatchProcess implements Process {
         return result;
     }
 
-    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws OctopusException,
-            OctopusException {
+    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws OctopusException {
 
         if (filename == null) {
             return null;

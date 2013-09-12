@@ -83,9 +83,8 @@ public class GridEngineSetup {
         return result;
     }
 
-    public GridEngineSetup(SchedulerConnection schedulerConnection) throws OctopusException,
-            OctopusException {
-
+    public GridEngineSetup(SchedulerConnection schedulerConnection) throws OctopusException {
+            
         this.queueNames = getQueueNames(schedulerConnection);
 
         this.queues = getQueues(queueNames, schedulerConnection);

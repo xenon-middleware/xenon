@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.octopus.engine.credentials;
 
-import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.engine.OctopusProperties;
 
 /**

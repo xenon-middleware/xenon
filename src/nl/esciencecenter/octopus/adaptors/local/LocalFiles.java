@@ -47,7 +47,6 @@ import nl.esciencecenter.octopus.files.PathAlreadyExistsException;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 import nl.esciencecenter.octopus.util.Utils;
 
 /**
@@ -167,8 +166,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter)
-            throws OctopusException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws OctopusException {
 
         FileAttributes att = getAttributes(dir);
 
@@ -367,8 +365,7 @@ public class LocalFiles implements nl.esciencecenter.octopus.files.Files {
     }
        
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException,
-            InvalidCopyOptionsException {
+    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException {
 
         CopyInfo info = CopyInfo.createCopyInfo(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,
                 target, options);

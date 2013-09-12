@@ -30,10 +30,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.FileAttributes;
 import nl.esciencecenter.octopus.files.FileSystem;
@@ -1072,8 +1070,7 @@ public final class Utils {
      * @throws OctopusException
      *           if an I/O error occurs during the copying
      */
-    public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options)
-            throws OctopusException, InvalidCopyOptionsException {
+    public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options) throws OctopusException {
 
         boolean exist = files.exists(target);
         boolean replace = CopyOption.contains(CopyOption.REPLACE, options);

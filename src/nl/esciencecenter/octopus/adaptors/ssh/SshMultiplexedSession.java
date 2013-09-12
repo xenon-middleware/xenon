@@ -147,8 +147,7 @@ class SshMultiplexedSession {
     }
 
     private static synchronized SshSession createSession(JSch jsch, int sessionID, SshLocation location, Credential credential,
-            SshSession gateway, SshLocation gatewayLocation, OctopusProperties properties) throws OctopusException, 
-                OctopusException {
+            SshSession gateway, SshLocation gatewayLocation, OctopusProperties properties) throws OctopusException {
 
         String sessionHost = location.getHost();
         int sessionPort = location.getPort();

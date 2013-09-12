@@ -248,16 +248,14 @@ public abstract class SchedulerConnection {
     /**
      * Run a command on the remote scheduler machine.
      */
-    public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws OctopusException,
-            OctopusException {
+    public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws OctopusException {
         return new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable, arguments);
     }
 
     /**
      * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
      */
-    public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException,
-            OctopusException {
+    public String runCheckedCommand(String stdin, String executable, String... arguments) throws OctopusException { 
         RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable,
                 arguments);
 

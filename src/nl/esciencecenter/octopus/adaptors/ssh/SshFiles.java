@@ -55,7 +55,6 @@ import nl.esciencecenter.octopus.files.PathAlreadyExistsException;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -576,8 +575,7 @@ public class SshFiles implements Files {
     }
     
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException,
-            InvalidCopyOptionsException {
+    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException {
 
         CopyEngine ce = octopusEngine.getCopyEngine();
         

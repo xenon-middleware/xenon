@@ -20,12 +20,7 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.octopus.InvalidCredentialException;
-import nl.esciencecenter.octopus.InvalidLocationException;
-import nl.esciencecenter.octopus.InvalidPropertyException;
-import nl.esciencecenter.octopus.InvalidSchemeException;
 import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.credentials.Credential;
 
 /**
@@ -195,8 +190,7 @@ public interface Files {
      * @throws OctopusException
      *             If an I/O error occurred.
      */
-    Copy copy(Path source, Path target, CopyOption... options) throws InvalidCopyOptionsException,
-            OctopusException;
+    Copy copy(Path source, Path target, CopyOption... options) throws OctopusException;
 
     /**
      * Move or rename an existing source path to a non-existing target path.

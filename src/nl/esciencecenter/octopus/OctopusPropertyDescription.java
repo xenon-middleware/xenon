@@ -16,10 +16,7 @@
 
 package nl.esciencecenter.octopus;
 
-import java.util.Map;
 import java.util.Set;
-
-import nl.esciencecenter.octopus.credentials.Credential;
 
 /**
  * <p>OctopusPropertyDescription contains all necessary information about a property that is recognized by octopus or one of its

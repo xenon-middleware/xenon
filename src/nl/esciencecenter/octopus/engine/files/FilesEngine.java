@@ -38,7 +38,6 @@ import nl.esciencecenter.octopus.files.Path;
 import nl.esciencecenter.octopus.files.PathAttributesPair;
 import nl.esciencecenter.octopus.files.PosixFilePermission;
 import nl.esciencecenter.octopus.files.RelativePath;
-import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 /**
  * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
@@ -125,9 +124,7 @@ public class FilesEngine implements Files {
     }
 
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException,
-            InvalidCopyOptionsException {
-
+    public Copy copy(Path source, Path target, CopyOption... options) throws OctopusException {
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 

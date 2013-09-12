@@ -177,7 +177,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     private final GridEngineSetup setupInfo;
 
     GridEngineSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
-            OctopusProperties properties, OctopusEngine engine) throws OctopusException, OctopusException {
+            OctopusProperties properties, OctopusEngine engine) throws OctopusException {
 
         super(adaptor, scheme, location, credential, properties, engine, properties
                 .getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
@@ -269,7 +269,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job[] getJobs(String... queueNames) throws OctopusException, OctopusException {
+    public Job[] getJobs(String... queueNames) throws OctopusException {
         ArrayList<Job> result = new ArrayList<Job>();
 
         if (queueNames == null || queueNames.length == 0) {
@@ -300,7 +300,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus getQueueStatus(String queueName) throws OctopusException, OctopusException {
+    public QueueStatus getQueueStatus(String queueName) throws OctopusException {
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
@@ -316,7 +316,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusException, OctopusException {
+    public QueueStatus[] getQueueStatuses(String... queueNames) throws OctopusException {
         if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
@@ -353,7 +353,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job submitJob(JobDescription description) throws OctopusException, OctopusException {
+    public Job submitJob(JobDescription description) throws OctopusException {
         String output;
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
         
@@ -388,7 +388,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws OctopusException, OctopusException {
+    public JobStatus cancelJob(Job job) throws OctopusException {
         String identifier = job.getIdentifier();
         String qdelOutput = runCheckedCommand(null, "qdel", identifier);
 
@@ -408,7 +408,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return getJobStatus(job);
     }
 
-    private Map<String, Map<String, String>> getQstatInfo() throws OctopusException, OctopusException {
+    private Map<String, Map<String, String>> getQstatInfo() throws OctopusException {
         RemoteCommandRunner runner = runCommand(null, "qstat", "-xml");
 
         if (!runner.success()) {
@@ -424,7 +424,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    private Map<String, String> getQacctInfo(Job job) throws OctopusException, OctopusException {
+    private Map<String, String> getQacctInfo(Job job) throws OctopusException {
         RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
 
         if (!runner.success()) {
@@ -486,7 +486,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws OctopusException, OctopusException {
+    public JobStatus getJobStatus(Job job) throws OctopusException {
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus result = getJobStatus(info, job);
@@ -500,7 +500,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException, OctopusException {
+    public JobStatus[] getJobStatuses(Job... jobs) throws OctopusException {
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus[] result = new JobStatus[jobs.length];

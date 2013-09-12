@@ -17,11 +17,7 @@ package nl.esciencecenter.octopus.jobs;
 
 import java.util.Map;
 
-import nl.esciencecenter.octopus.InvalidCredentialException;
-import nl.esciencecenter.octopus.InvalidLocationException;
-import nl.esciencecenter.octopus.InvalidPropertyException;
 import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.UnknownPropertyException;
 import nl.esciencecenter.octopus.credentials.Credential;
 
 /**
