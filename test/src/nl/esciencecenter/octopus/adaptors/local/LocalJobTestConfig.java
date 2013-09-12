@@ -38,7 +38,7 @@ public class LocalJobTestConfig extends JobTestConfig {
     private final String wrongLocation;
     
     public LocalJobTestConfig() throws Exception {
-        super("local");
+        super("local", null);
 
         scheme = "local";
         correctLocation = "/";

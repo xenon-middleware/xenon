@@ -16,7 +16,12 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 import nl.esciencecenter.octopus.credentials.Credential;
 import nl.esciencecenter.octopus.credentials.Credentials;
@@ -29,8 +34,36 @@ public abstract class GenericTestConfig {
 
     private final String adaptorName;
 
-    protected GenericTestConfig(String adaptorName) {
+    protected Properties p = new Properties();
+
+    protected GenericTestConfig(String adaptorName, String configfile) throws FileNotFoundException, IOException {
         this.adaptorName = adaptorName;
+        
+        if (configfile == null) {
+            configfile = System.getProperty("test.config");
+        }
+
+        if (configfile == null) {
+            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
+            
+            if (!new File(configfile).exists()) { 
+                configfile = null;
+            }
+        }
+
+        if (configfile == null) {
+            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            
+            if (!new File(configfile).exists()) { 
+                configfile = null;
+            }
+        }
+
+        if (configfile == null) { 
+            p.putAll(System.getProperties());
+        } else { 
+            p.load(new FileInputStream(configfile));
+        }        
     }
 
     public String getAdaptorName() {

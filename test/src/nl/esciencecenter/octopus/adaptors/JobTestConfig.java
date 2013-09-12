@@ -16,6 +16,9 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
@@ -28,8 +31,8 @@ import nl.esciencecenter.octopus.jobs.Scheduler;
  */
 public abstract class JobTestConfig extends GenericTestConfig {
 
-    protected JobTestConfig(String adaptorName) {
-        super(adaptorName);
+    protected JobTestConfig(String adaptorName, String configfile) throws FileNotFoundException, IOException {
+        super(adaptorName, configfile);
     }
 
     public boolean supportsClose() throws Exception {

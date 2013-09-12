@@ -16,8 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.gridengine;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -56,19 +54,8 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     public GridEngineJobTestConfig(String configfile) throws Exception {
 
-        super("gridengine");
-
-        if (configfile == null) {
-            configfile = System.getProperty("test.config");
-        }
-
-        if (configfile == null) {
-            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
-        }
-
-        Properties p = new Properties();
-        p.load(new FileInputStream(configfile));
-
+        super("gridengine", configfile);
+        
         scheme = "ge";
         fileScheme = "sftp";
         

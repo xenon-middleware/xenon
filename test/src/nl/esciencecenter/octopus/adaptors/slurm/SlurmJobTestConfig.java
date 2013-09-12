@@ -53,18 +53,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     public SlurmJobTestConfig(String configfile) throws Exception {
 
-        super("slurm");
-
-        if (configfile == null) {
-            configfile = System.getProperty("test.config");
-        }
-
-        if (configfile == null) {
-            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
-        }
-
-        Properties p = new Properties();
-        p.load(new FileInputStream(configfile));
+        super("slurm", configfile);
 
         username = getPropertyOrFail(p, "test.slurm.user");
         passwd = getPropertyOrFail(p, "test.slurm.password").toCharArray();

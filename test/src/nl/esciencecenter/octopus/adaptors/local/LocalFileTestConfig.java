@@ -38,7 +38,7 @@ public class LocalFileTestConfig extends FileTestConfig {
     private final boolean supportPosix;
     
     public LocalFileTestConfig() throws Exception {
-        super("local");
+        super("local", null);
 
         scheme = "file";
         

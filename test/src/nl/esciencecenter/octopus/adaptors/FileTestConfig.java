@@ -16,6 +16,9 @@
 
 package nl.esciencecenter.octopus.adaptors;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import nl.esciencecenter.octopus.credentials.Credentials;
 import nl.esciencecenter.octopus.files.FileSystem;
 import nl.esciencecenter.octopus.files.Files;
@@ -27,8 +30,8 @@ import nl.esciencecenter.octopus.files.Path;
  */
 public abstract class FileTestConfig extends GenericTestConfig {
 
-    protected FileTestConfig(String adaptorName) {
-        super(adaptorName);
+    protected FileTestConfig(String adaptorName, String configfile) throws FileNotFoundException, IOException {
+        super(adaptorName, configfile);
     }
 
     public abstract FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception;

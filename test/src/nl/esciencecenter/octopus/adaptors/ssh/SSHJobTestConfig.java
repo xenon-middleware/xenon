@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.octopus.adaptors.ssh;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,15 +46,7 @@ public class SSHJobTestConfig extends JobTestConfig {
 
     public SSHJobTestConfig(String configfile) throws Exception {
 
-        super("ssh");
-
-        if (configfile == null) {
-            configfile = System.getProperty("test.config");
-        }
-
-        if (configfile == null) {
-            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
-        }
+        super("ssh", configfile);
 
         Properties p = new Properties();
         p.load(new FileInputStream(configfile));
