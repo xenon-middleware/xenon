@@ -19,14 +19,14 @@ package nl.esciencecenter.octopus.examples.files;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.files.CopyOption;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.RelativePath;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.files.CopyOption;
+import nl.esciencecenter.cobalt.files.FileSystem;
+import nl.esciencecenter.cobalt.files.Files;
+import nl.esciencecenter.cobalt.files.Path;
+import nl.esciencecenter.cobalt.files.RelativePath;
 
 /**
  * An example of how to copy a file.
@@ -52,7 +52,7 @@ public class CopyFile {
             URI target = new URI(args[1]);
 
             // Next, we create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
@@ -73,9 +73,9 @@ public class CopyFile {
             files.close(targetFS);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException e) {
+        } catch (URISyntaxException | CobaltException e) {
             System.out.println("CopyFile example failed: " + e.getMessage());
             e.printStackTrace();
         }

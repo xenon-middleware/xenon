@@ -20,15 +20,15 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.jobs.Streams;
-import nl.esciencecenter.octopus.util.Utils;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.jobs.Job;
+import nl.esciencecenter.cobalt.jobs.JobDescription;
+import nl.esciencecenter.cobalt.jobs.Jobs;
+import nl.esciencecenter.cobalt.jobs.Scheduler;
+import nl.esciencecenter.cobalt.jobs.Streams;
+import nl.esciencecenter.cobalt.util.Utils;
 
 /**
  * An example of how to create and submit an interactive job that produces output. 
@@ -49,7 +49,7 @@ public class SubmitInteractiveJobWithOutput {
             URI location = new URI(args[0]);
             
             // We create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs API
             Jobs jobs = octopus.jobs();
@@ -82,9 +82,9 @@ public class SubmitInteractiveJobWithOutput {
             jobs.close(scheduler);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException | IOException e)  {
+        } catch (URISyntaxException | CobaltException | IOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

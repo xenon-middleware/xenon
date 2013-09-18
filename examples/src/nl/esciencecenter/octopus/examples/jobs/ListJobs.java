@@ -19,12 +19,12 @@ package nl.esciencecenter.octopus.examples.jobs;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.jobs.Job;
+import nl.esciencecenter.cobalt.jobs.Jobs;
+import nl.esciencecenter.cobalt.jobs.Scheduler;
 
 /**
  * An example of how to retrieve a list of jobs from a scheduler.
@@ -49,7 +49,7 @@ public class ListJobs {
             URI location = new URI(args[0]);
 
             // Next, we create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
@@ -71,9 +71,9 @@ public class ListJobs {
             jobs.close(scheduler);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException e) {
+        } catch (URISyntaxException | CobaltException e) {
             System.out.println("ListJobs example failed: " + e.getMessage());
             e.printStackTrace();
         }

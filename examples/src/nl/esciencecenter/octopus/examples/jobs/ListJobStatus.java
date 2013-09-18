@@ -20,13 +20,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobStatus;
-import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.jobs.Scheduler;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.jobs.Job;
+import nl.esciencecenter.cobalt.jobs.JobStatus;
+import nl.esciencecenter.cobalt.jobs.Jobs;
+import nl.esciencecenter.cobalt.jobs.Scheduler;
 
 /**
  * An example of how to retrieve the job status.
@@ -51,7 +51,7 @@ public class ListJobStatus {
             URI location = new URI(args[0]);
 
             // Next, create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
@@ -77,9 +77,9 @@ public class ListJobStatus {
             jobs.close(scheduler);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException e) {
+        } catch (URISyntaxException | CobaltException e) {
             System.out.println("ListJobStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }

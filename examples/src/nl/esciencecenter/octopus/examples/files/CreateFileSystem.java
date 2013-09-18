@@ -19,13 +19,13 @@ package nl.esciencecenter.octopus.examples.files;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.credentials.Credential;
+import nl.esciencecenter.cobalt.credentials.Credentials;
+import nl.esciencecenter.cobalt.files.FileSystem;
+import nl.esciencecenter.cobalt.files.Files;
 
 /**
  * A simple example of how to create a FileSystem.
@@ -50,7 +50,7 @@ public class CreateFileSystem {
             URI uri = new URI(args[0]);
         
             // Next, we create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
@@ -70,9 +70,9 @@ public class CreateFileSystem {
             files.close(fs);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException e) {
+        } catch (URISyntaxException | CobaltException e) {
             System.out.println("CreateFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

@@ -20,18 +20,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.jobs.Job;
-import nl.esciencecenter.octopus.jobs.JobDescription;
-import nl.esciencecenter.octopus.jobs.JobStatus;
-import nl.esciencecenter.octopus.jobs.Jobs;
-import nl.esciencecenter.octopus.jobs.Scheduler;
-import nl.esciencecenter.octopus.util.Utils;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.files.FileSystem;
+import nl.esciencecenter.cobalt.files.Files;
+import nl.esciencecenter.cobalt.files.Path;
+import nl.esciencecenter.cobalt.jobs.Job;
+import nl.esciencecenter.cobalt.jobs.JobDescription;
+import nl.esciencecenter.cobalt.jobs.JobStatus;
+import nl.esciencecenter.cobalt.jobs.Jobs;
+import nl.esciencecenter.cobalt.jobs.Scheduler;
+import nl.esciencecenter.cobalt.util.Utils;
 
 /**
  * An example of how to create and submit a batch job that produces output. 
@@ -52,7 +52,7 @@ public class SubmitBatchJobWithOutput {
             URI location = new URI(args[0]);
 
             // We create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Jobs API
             Files files = octopus.files();
@@ -115,9 +115,9 @@ public class SubmitBatchJobWithOutput {
             jobs.close(scheduler);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (URISyntaxException | OctopusException e)  {
+        } catch (URISyntaxException | CobaltException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

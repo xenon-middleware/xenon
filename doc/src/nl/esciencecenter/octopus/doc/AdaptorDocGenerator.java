@@ -21,10 +21,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import nl.esciencecenter.octopus.AdaptorStatus;
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.OctopusPropertyDescription;
+import nl.esciencecenter.cobalt.AdaptorStatus;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.CobaltPropertyDescription;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -34,7 +34,7 @@ public class AdaptorDocGenerator {
     
     private static PrintWriter out = null;
     
-    private static void printPropertyDescription(OctopusPropertyDescription d) {
+    private static void printPropertyDescription(CobaltPropertyDescription d) {
 
         out.println("__`" + d.getName() + "`__\n");
         out.println(d.getDescription() + "\n");
@@ -82,9 +82,9 @@ public class AdaptorDocGenerator {
         
         out.println("#### Supported properties: ####\n\n");
 
-        OctopusPropertyDescription[] properties = a.getSupportedProperties();
+        CobaltPropertyDescription[] properties = a.getSupportedProperties();
 
-        for (OctopusPropertyDescription d : properties) {
+        for (CobaltPropertyDescription d : properties) {
             printPropertyDescription(d);
         }
 
@@ -107,7 +107,7 @@ public class AdaptorDocGenerator {
         }
 
         try { 
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
             AdaptorStatus[] adaptors = octopus.getAdaptorStatuses();
 
             out.println("Appendix A: Adaptor Documentation");
@@ -132,7 +132,7 @@ public class AdaptorDocGenerator {
                 printAdaptorDoc(a);
             }
 
-            OctopusFactory.endAll();
+            CobaltFactory.endAll();
 
         } catch (Exception e) {
             System.err.println("Failed to generate adaptor documentation: " + e.getMessage());

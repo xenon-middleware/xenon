@@ -16,14 +16,14 @@
 
 package nl.esciencecenter.octopus.examples.files;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.credentials.Credential;
-import nl.esciencecenter.octopus.credentials.Credentials;
-import nl.esciencecenter.octopus.files.FileSystem;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.util.Utils;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.credentials.Credential;
+import nl.esciencecenter.cobalt.credentials.Credentials;
+import nl.esciencecenter.cobalt.files.FileSystem;
+import nl.esciencecenter.cobalt.files.Files;
+import nl.esciencecenter.cobalt.util.Utils;
 
 /**
  * A simple example of how to create a local {@link FileSystem}.
@@ -39,7 +39,7 @@ public class CreateLocalFileSystem {
     public static void main(String[] args) {
         try {
             // First , we create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
@@ -68,9 +68,9 @@ public class CreateLocalFileSystem {
             files.close(fs);
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) {
+        } catch (CobaltException e) {
             System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

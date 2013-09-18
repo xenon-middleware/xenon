@@ -16,12 +16,12 @@
 
 package nl.esciencecenter.octopus.examples.files;
 
-import nl.esciencecenter.octopus.Octopus;
-import nl.esciencecenter.octopus.OctopusException;
-import nl.esciencecenter.octopus.OctopusFactory;
-import nl.esciencecenter.octopus.files.Files;
-import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.util.Utils;
+import nl.esciencecenter.cobalt.Cobalt;
+import nl.esciencecenter.cobalt.CobaltException;
+import nl.esciencecenter.cobalt.CobaltFactory;
+import nl.esciencecenter.cobalt.files.Files;
+import nl.esciencecenter.cobalt.files.Path;
+import nl.esciencecenter.cobalt.util.Utils;
 
 /**
  * An example of how to check if a local file exists.
@@ -48,7 +48,7 @@ public class LocalFileExists {
 
         try {
             // We create a new octopus using the OctopusFactory (without providing any properties).
-            Octopus octopus = OctopusFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newOctopus(null);
 
             // Next, we retrieve the Files interfaces
             Files files = octopus.files();
@@ -67,9 +67,9 @@ public class LocalFileExists {
             files.close(path.getFileSystem());
 
             // Finally, we end octopus to release all resources 
-            OctopusFactory.endOctopus(octopus);
+            CobaltFactory.endOctopus(octopus);
 
-        } catch (OctopusException e) {
+        } catch (CobaltException e) {
             System.out.println("LocalFileExists example failed: " + e.getMessage());
             e.printStackTrace();
         }
