@@ -52,7 +52,7 @@ public class ShowFileAttributes {
             URI uri = new URI(args[0]);
 
             // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
@@ -87,7 +87,7 @@ public class ShowFileAttributes {
             files.close(fs);
 
             // Finally, we end octopus to release all resources 
-            CobaltFactory.endOctopus(octopus);
+            CobaltFactory.endCobalt(octopus);
 
         } catch  (URISyntaxException | CobaltException e) {
             System.out.println("ShowFileAttributes example failed: " + e.getMessage());

@@ -48,7 +48,7 @@ public class LocalFileExists {
 
         try {
             // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files interfaces
             Files files = octopus.files();
@@ -67,7 +67,7 @@ public class LocalFileExists {
             files.close(path.getFileSystem());
 
             // Finally, we end octopus to release all resources 
-            CobaltFactory.endOctopus(octopus);
+            CobaltFactory.endCobalt(octopus);
 
         } catch (CobaltException e) {
             System.out.println("LocalFileExists example failed: " + e.getMessage());

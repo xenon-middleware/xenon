@@ -51,7 +51,7 @@ public class ListJobStatus {
             URI location = new URI(args[0]);
 
             // Next, create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = octopus.jobs();
@@ -77,7 +77,7 @@ public class ListJobStatus {
             jobs.close(scheduler);
 
             // Finally, we end octopus to release all resources 
-            CobaltFactory.endOctopus(octopus);
+            CobaltFactory.endCobalt(octopus);
 
         } catch (URISyntaxException | CobaltException e) {
             System.out.println("ListJobStatus example failed: " + e.getMessage());

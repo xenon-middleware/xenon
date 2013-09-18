@@ -34,7 +34,7 @@ public class CreatingCredential {
     public static void main(String[] args) {
         try {
             // First, we create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Credentials API
             Credentials credentials = octopus.credentials();
@@ -50,7 +50,7 @@ public class CreatingCredential {
             credentials.close(credential2);
 
             // Finally, we end octopus to release all resources 
-            CobaltFactory.endOctopus(octopus);
+            CobaltFactory.endCobalt(octopus);
 
         } catch (CobaltException e) {
             System.out.println("CreatingCredential example failed: " + e.getMessage());

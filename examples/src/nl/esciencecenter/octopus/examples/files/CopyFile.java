@@ -52,7 +52,7 @@ public class CopyFile {
             URI target = new URI(args[1]);
 
             // Next, we create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newOctopus(null);
+            Cobalt octopus = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = octopus.files();
@@ -73,7 +73,7 @@ public class CopyFile {
             files.close(targetFS);
 
             // Finally, we end octopus to release all resources 
-            CobaltFactory.endOctopus(octopus);
+            CobaltFactory.endCobalt(octopus);
 
         } catch (URISyntaxException | CobaltException e) {
             System.out.println("CopyFile example failed: " + e.getMessage());
