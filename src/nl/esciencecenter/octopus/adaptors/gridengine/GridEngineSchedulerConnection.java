@@ -450,8 +450,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
      * @throws OctopusException
      *             in case an additional command fails to run.
      */
-    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, Job job) throws OctopusException,
-            OctopusException {
+    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, Job job) throws OctopusException {
+
         if (job == null) {
             return null;
         }

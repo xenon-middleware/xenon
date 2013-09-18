@@ -23,7 +23,6 @@ import nl.esciencecenter.octopus.OctopusException;
 import nl.esciencecenter.octopus.files.CopyOption;
 import nl.esciencecenter.octopus.files.Files;
 import nl.esciencecenter.octopus.files.Path;
-import nl.esciencecenter.octopus.files.InvalidCopyOptionsException;
 
 /**
  * Sandbox represents a (possibly remote and usually temporary) directory used for running jobs. 
