@@ -35,22 +35,22 @@ public class CreatingCobalt {
     @SuppressWarnings("unused")
     public static void main(String[] args) {
         try {
-            // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // We create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files, Jobs and Credentials API
-            Files files = octopus.files();
-            Jobs jobs = octopus.jobs();
-            Credentials credentials = octopus.credentials();
+            Files files = cobalt.files();
+            Jobs jobs = cobalt.jobs();
+            Credentials credentials = cobalt.credentials();
 
             // We can now uses the interfaces to get some work done!
             // ....
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (CobaltException e) {
-            System.out.println("CreatingOctopus example failed: " + e.getMessage());
+            System.out.println("CreatingCobalt example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

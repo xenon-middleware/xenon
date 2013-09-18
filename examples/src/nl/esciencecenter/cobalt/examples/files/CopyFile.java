@@ -51,11 +51,11 @@ public class CopyFile {
             URI source = new URI(args[0]);
             URI target = new URI(args[1]);
 
-            // Next, we create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // Next, we create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = octopus.files();
+            Files files = cobalt.files();
 
             // Next we create a FileSystem 
             FileSystem sourceFS = files.newFileSystem(source.getScheme(), source.getAuthority(), null, null);
@@ -72,8 +72,8 @@ public class CopyFile {
             files.close(sourceFS);
             files.close(targetFS);
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (URISyntaxException | CobaltException e) {
             System.out.println("CopyFile example failed: " + e.getMessage());

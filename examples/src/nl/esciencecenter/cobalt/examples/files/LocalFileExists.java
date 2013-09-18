@@ -47,11 +47,11 @@ public class LocalFileExists {
         String filename = args[0];
 
         try {
-            // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // We create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files interfaces
-            Files files = octopus.files();
+            Files files = cobalt.files();
 
             // We now create an Path representing the local file
             Path path = Utils.fromLocalPath(files, filename);
@@ -66,8 +66,8 @@ public class LocalFileExists {
             // If we are done we need to close the FileSystem ad the credential
             files.close(path.getFileSystem());
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (CobaltException e) {
             System.out.println("LocalFileExists example failed: " + e.getMessage());

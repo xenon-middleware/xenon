@@ -38,12 +38,12 @@ public class CreateLocalFileSystem {
 
     public static void main(String[] args) {
         try {
-            // First , we create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // First , we create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = octopus.files();
-            Credentials credentials = octopus.credentials();
+            Files files = cobalt.files();
+            Credentials credentials = cobalt.credentials();
 
             // To create a new FileSystem we need a Credential that enable us to access the location. 
             Credential c = credentials.getDefaultCredential("file");
@@ -67,8 +67,8 @@ public class CreateLocalFileSystem {
             credentials.close(c);
             files.close(fs);
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (CobaltException e) {
             System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());

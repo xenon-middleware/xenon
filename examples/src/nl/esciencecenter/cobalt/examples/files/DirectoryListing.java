@@ -51,11 +51,11 @@ public class DirectoryListing {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
 
-            // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // We create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = octopus.files();
+            Files files = cobalt.files();
 
             // Next we create a FileSystem. Note that both credential and properties are null (which means: use default)
             FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), null, null);
@@ -84,8 +84,8 @@ public class DirectoryListing {
             // If we are done we need to close the FileSystem
             files.close(fs);
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (URISyntaxException | CobaltException e) {
             System.out.println("DirectoryListing example failed: " + e.getMessage());

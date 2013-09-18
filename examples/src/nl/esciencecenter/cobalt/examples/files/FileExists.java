@@ -52,11 +52,11 @@ public class FileExists {
             URI uri = new URI(args[0]);
         
             // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = octopus.files();
-            Credentials credentials = octopus.credentials();
+            Files files = cobalt.files();
+            Credentials credentials = cobalt.credentials();
 
             // Next we create a FileSystem  
             Credential c = credentials.getDefaultCredential(uri.getScheme());
@@ -77,7 +77,7 @@ public class FileExists {
             credentials.close(c);
 
             // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (URISyntaxException | CobaltException e) {
             System.out.println("FileExists example failed: " + e.getMessage());

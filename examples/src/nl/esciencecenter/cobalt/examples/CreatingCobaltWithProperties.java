@@ -24,7 +24,7 @@ import nl.esciencecenter.cobalt.CobaltException;
 import nl.esciencecenter.cobalt.CobaltFactory;
 
 /**
- * A simple example of how to configure an octopus with properties.
+ * A simple example of how to configure an Cobalt with properties.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -35,24 +35,24 @@ public class CreatingCobaltWithProperties {
     public static void main(String[] args) {
         try {
 
-            // We create some properties here to configure octopus. In this example 
+            // We create some properties here to configure Cobalt. In this example 
             // we set the polling delay of the local adaptor to 1000 ms. We also set 
             // the strictHostKeyChecking property of the ssh adaptor to true. 
             Map<String, String> p = new HashMap<>();
-            p.put("octopus.adaptors.local.queue.pollingDelay", "1000");
-            p.put("octopus.adaptors.ssh.loadKnownHosts", "true");
+            p.put("cobalt.adaptors.local.queue.pollingDelay", "1000");
+            p.put("cobalt.adaptors.ssh.loadKnownHosts", "true");
 
-            // We now create a new octopus with the properties using the OctopusFactory.
-            Cobalt octopus = CobaltFactory.newCobalt(p);
+            // We now create a new Cobalt with the properties using the CobaltFactory.
+            Cobalt cobalt = CobaltFactory.newCobalt(p);
 
-            // We can now uses the octopus to get some work done!
+            // We can now uses the Cobalt to get some work done!
             // ....
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (CobaltException e) {
-            System.out.println("CreatingOctopusWithProperties example failed: " + e.getMessage());
+            System.out.println("CreatingCobaltWithProperties example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
