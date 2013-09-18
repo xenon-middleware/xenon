@@ -40,7 +40,7 @@ import nl.esciencecenter.cobalt.files.RelativePath;
 import nl.esciencecenter.cobalt.files.DirectoryStream.Filter;
 
 /**
- * Engine for File operations. Implements functionality using File operations, Octopus create functions, and Adaptors' Files
+ * Engine for File operations. Implements functionality using File operations, Cobalt create functions, and Adaptors' Files
  * object.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
@@ -54,15 +54,15 @@ public class FilesEngine implements Files {
         }
     };
 
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
 
-    public FilesEngine(CobaltEngine octopusEngine) {
-        this.octopusEngine = octopusEngine;
+    public FilesEngine(CobaltEngine cobaltEngine) {
+        this.cobaltEngine = cobaltEngine;
     }
 
     private Files getFilesAdaptor(FileSystem filesystem) {
         try {
-            Adaptor adaptor = octopusEngine.getAdaptor(filesystem.getAdaptorName());
+            Adaptor adaptor = cobaltEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
         } catch (CobaltException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
@@ -79,7 +79,7 @@ public class FilesEngine implements Files {
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws CobaltException {
         
-        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.filesAdaptor().newFileSystem(scheme, location, credential, properties);
     }
 
@@ -211,6 +211,6 @@ public class FilesEngine implements Files {
     
     @Override
     public String toString() {
-        return "FilesEngine [octopusEngine=" + octopusEngine + "]";
+        return "FilesEngine [cobaltEngine=" + cobaltEngine + "]";
     }
 }

@@ -32,20 +32,20 @@ import nl.esciencecenter.cobalt.jobs.Streams;
 
 public class JobsEngine implements Jobs {
 
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
 
-    public JobsEngine(CobaltEngine octopusEngine) {
-        this.octopusEngine = octopusEngine;
+    public JobsEngine(CobaltEngine cobaltEngine) {
+        this.cobaltEngine = cobaltEngine;
     }
 
     private Adaptor getAdaptor(Scheduler scheduler) throws CobaltException {
-        return octopusEngine.getAdaptor(scheduler.getAdaptorName());
+        return cobaltEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws CobaltException {
 
-        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
     }
 
@@ -98,7 +98,7 @@ public class JobsEngine implements Jobs {
         CobaltException exception = null;
 
         try {
-            result = octopusEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in);
+            result = cobaltEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in);
         } catch (CobaltException e) {
             exception = e;
         }
@@ -193,7 +193,7 @@ public class JobsEngine implements Jobs {
 
     @Override
     public String toString() {
-        return "JobsEngine [octopusEngine=" + octopusEngine + "]";
+        return "JobsEngine [cobaltEngine=" + cobaltEngine + "]";
     }
 
 }

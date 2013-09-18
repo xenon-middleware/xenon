@@ -25,29 +25,29 @@ import nl.esciencecenter.cobalt.engine.Adaptor;
 import nl.esciencecenter.cobalt.engine.CobaltEngine;
 
 public class CredentialsEngineImplementation implements Credentials {
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
 
-    public CredentialsEngineImplementation(CobaltEngine octopusEngine) {
-        this.octopusEngine = octopusEngine;
+    public CredentialsEngineImplementation(CobaltEngine cobaltEngine) {
+        this.cobaltEngine = cobaltEngine;
     }
 
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws CobaltException {
-        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, certfile, username, password, properties);
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws CobaltException {
-        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, username, password, properties);
     }
 
     @Override
     public Credential getDefaultCredential(String scheme) throws CobaltException {
-        Adaptor adaptor = octopusEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().getDefaultCredential(scheme);
     }
 
@@ -63,7 +63,7 @@ public class CredentialsEngineImplementation implements Credentials {
 
     private Credentials getCredentialsAdaptor(Credential credential) {
         try {
-            Adaptor adaptor = octopusEngine.getAdaptor(credential.getAdaptorName());
+            Adaptor adaptor = cobaltEngine.getAdaptor(credential.getAdaptorName());
             return adaptor.credentialsAdaptor();
         } catch (CobaltException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.

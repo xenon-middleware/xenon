@@ -22,7 +22,7 @@ import java.util.Set;
 import nl.esciencecenter.cobalt.CobaltPropertyDescription;
 
 /**
- * OctopusPropertyDescription contains a description of an octopus property.
+ * CobaltPropertyDescription contains a description of an Cobalt property.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -92,7 +92,7 @@ public class CobaltPropertyDescriptionImplementation implements CobaltPropertyDe
 
     @Override
     public String toString() {
-        return "OctopusPropertyDescriptionImplementation [name=" + name + ", type=" + type + ", levels=" + levels
+        return "CobaltPropertyDescriptionImplementation [name=" + name + ", type=" + type + ", levels=" + levels
                 + ", defaultValue=" + defaultValue + ", description=" + description + "]";
     }
 }
