@@ -28,7 +28,7 @@ import nl.esciencecenter.cobalt.files.Files;
 import nl.esciencecenter.cobalt.jobs.Jobs;
 
 /**
- * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Octopus interface,
+ * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Cobalt interface,
  * depending on which functionality they provide.
  * 
  * @author Jason Maassen
@@ -42,15 +42,15 @@ public abstract class Adaptor {
     private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<CobaltPropertyDescription> validProperties;
     private final CobaltProperties properties;
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
 
-    protected Adaptor(CobaltEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+    protected Adaptor(CobaltEngine cobaltEngine, String name, String description, ImmutableArray<String> supportedSchemes,
             ImmutableArray<String> supportedLocations, ImmutableArray<CobaltPropertyDescription> validProperties, 
             CobaltProperties properties) throws CobaltException {
 
         super();
 
-        this.octopusEngine = octopusEngine;
+        this.cobaltEngine = cobaltEngine;
         this.name = name;
         this.description = description;
         this.supportedSchemes = supportedSchemes;
@@ -65,8 +65,8 @@ public abstract class Adaptor {
         this.properties = properties;
     }
 
-    protected CobaltEngine getOctopusEngine() {
-        return octopusEngine;
+    protected CobaltEngine getCobaltEngine() {
+        return cobaltEngine;
     }
 
     public CobaltProperties getProperties() {

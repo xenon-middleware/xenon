@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OctopusEngine implements the Octopus Interface class by redirecting all calls to {@link Adaptor}s.
+ * CobaltEngine implements the Cobalt Interface class by redirecting all calls to {@link Adaptor}s.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
@@ -61,31 +61,31 @@ public final class CobaltEngine implements Cobalt {
     public static final String LOCAL_ADAPTOR_NAME = "local";
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = "octopus.";
+    public static final String PREFIX = "cobalt.";
 
     /** All our own queue properties start with this prefix. */
     public static final String ADAPTORS = PREFIX + "adaptors.";
 
-    /** All OctopusEngines created so far */
-    private static final List<CobaltEngine> OCTOPUS_ENGINES = new ArrayList<CobaltEngine>();
+    /** All CobaltEngines created so far */
+    private static final List<CobaltEngine> COBALT_ENGINES = new ArrayList<CobaltEngine>();
 
     /**
-     * Create a new Octopus using the given properties.
+     * Create a new Cobalt using the given properties.
      * 
      * @param properties
-     *            the properties used to create the Octopus.
-     * @return the newly created Octopus created.
+     *            the properties used to create the Cobalt.
+     * @return the newly created Cobalt created.
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
      * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
      * @throws CobaltException
-     *             If the Octopus failed initialize.
+     *             If the Cobalt failed initialize.
      */
     public static synchronized Cobalt newCobalt(Map<String, String> properties) throws CobaltException {
         CobaltEngine result = new CobaltEngine(properties);
-        OCTOPUS_ENGINES.add(result);
+        COBALT_ENGINES.add(result);
         return result;
     }
 
@@ -93,15 +93,15 @@ public final class CobaltEngine implements Cobalt {
 
         CobaltEngine result = null;
 
-        for (int i = 0; i < OCTOPUS_ENGINES.size(); i++) {
-            if (OCTOPUS_ENGINES.get(i) == engine) {
-                result = OCTOPUS_ENGINES.remove(i);
+        for (int i = 0; i < COBALT_ENGINES.size(); i++) {
+            if (COBALT_ENGINES.get(i) == engine) {
+                result = COBALT_ENGINES.remove(i);
                 break;
             }
         }
 
         if (result == null) {
-            throw new NoSuchCobaltException("engine", "No such OctopusEngine");
+            throw new NoSuchCobaltException("engine", "No such CobaltEngine");
         }
 
         result.end();
@@ -112,11 +112,11 @@ public final class CobaltEngine implements Cobalt {
     }
 
     public static synchronized void endAll() {
-        for (int i = 0; i < OCTOPUS_ENGINES.size(); i++) {
-            OCTOPUS_ENGINES.get(i).end();
+        for (int i = 0; i < COBALT_ENGINES.size(); i++) {
+            COBALT_ENGINES.get(i).end();
         }
 
-        OCTOPUS_ENGINES.clear();
+        COBALT_ENGINES.clear();
     }
 
     private boolean ended = false;
@@ -134,7 +134,7 @@ public final class CobaltEngine implements Cobalt {
     private final CopyEngine copyEngine;
 
     /**
-     * Constructs a OctopusEngine.
+     * Constructs a CobaltEngine.
      * 
      * @param properties
      *            the properties to use. Will NOT be copied.
@@ -144,7 +144,7 @@ public final class CobaltEngine implements Cobalt {
      * @throws IllegalPropertyException
      *             If a known property was passed with an illegal value.
      * @throws CobaltException
-     *             If the Octopus failed initialize.
+     *             If the Cobalt failed initialize.
      */
     private CobaltEngine(Map<String, String> properties) throws CobaltException {
 
@@ -163,7 +163,7 @@ public final class CobaltEngine implements Cobalt {
 
         adaptors = loadAdaptors(this.properties);
 
-        LOGGER.info("Octopus engine initialized with adaptors: " + Arrays.toString(adaptors));
+        LOGGER.info("Cobalt engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
     private Adaptor[] loadAdaptors(Map<String, String> properties) throws CobaltException {
@@ -180,7 +180,7 @@ public final class CobaltEngine implements Cobalt {
 
         // Check if there are any properties left. If so, this is a problem. 
         if (tmp.size() != 0) {
-            throw new UnknownPropertyException("OctopusEngine", "Unknown properties: " + tmp);
+            throw new UnknownPropertyException("CobaltEngine", "Unknown properties: " + tmp);
         }
 
         return result.toArray(new Adaptor[result.size()]);
@@ -205,7 +205,7 @@ public final class CobaltEngine implements Cobalt {
         return tmp;
     }
 
-    // ************** Octopus Interface Implementation ***************\\
+    // ************** Cobalt Interface Implementation ***************\\
 
     @Override
     public AdaptorStatus[] getAdaptorStatuses() {
@@ -302,6 +302,6 @@ public final class CobaltEngine implements Cobalt {
 
     @Override
     public String toString() {
-        return "OctopusEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
+        return "CobaltEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
     }
 }
