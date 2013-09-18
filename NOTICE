@@ -1,4 +1,4 @@
-Octopus
+Cobalt
 
 Copyright 2013 The Netherlands eScience Center
 
@@ -10,18 +10,9 @@ This product includes the JSch library, which is Copyright (c) 2002-2012
 Atsuhiko Yamanaka, JCraft,Inc. See "notices/LICENSE.jsch.txt" for the
 licence information of the JSch library.
 
-This product includes the APIviz library, which is Copyright (c) 2008,
-Red Hat Middleware LLC and contributers. See "notices/LICENSE.apiviz.txt"
-for the licence information of the apiviz library.
-
 This product includes the Logback library, which is Copyright (c)
 1999-2012, QOS.ch. See "notices/LICENSE.logback.txt" for the licence
 information of the Logback library.
-
-This product includes the Apache Commons IO library, which
-is Copyright (c) 2002-2012 The Apache Software Foundation. See
-"notices/LICENSE.commons-io.txt" for the licence information of the
-Apache Commons IO library.
 
 This product includes the JaCoCo library, which is Copyright
 (c) 2009, 2013 Mountainminds GmbH & Co. KG and Contributors. See
