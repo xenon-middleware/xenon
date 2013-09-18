@@ -122,7 +122,7 @@ public class LocalUtilsTest {
     
     @org.junit.Test
     public void test_octopusPermissions_null() throws Exception {
-        Set<PosixFilePermission> tmp = LocalUtils.octopusPermissions(null);
+        Set<PosixFilePermission> tmp = LocalUtils.cobaltPermissions(null);
         assert (tmp == null);
     }
 

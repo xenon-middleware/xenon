@@ -51,12 +51,12 @@ public class SubmitBatchJobWithOutput {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
 
-            // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // We create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Jobs API
-            Files files = octopus.files();
-            Jobs jobs = octopus.jobs();
+            Files files = cobalt.files();
+            Jobs jobs = cobalt.jobs();
 
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
@@ -114,8 +114,8 @@ public class SubmitBatchJobWithOutput {
             // Close the scheduler
             jobs.close(scheduler);
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (URISyntaxException | CobaltException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());

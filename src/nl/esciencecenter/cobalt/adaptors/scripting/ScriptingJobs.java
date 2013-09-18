@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of Octopus Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
+ * Implementation of Cobalt Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
  * in the adaptors.
  * 
  * @author Niels Drost

@@ -48,11 +48,11 @@ public class ListQueueStatus {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
 
-            // We create a new octopus using the OctopusFactory (without providing any properties).
-            Cobalt octopus = CobaltFactory.newCobalt(null);
+            // We create a new Cobalt using the CobaltFactory (without providing any properties).
+            Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Jobs and Credentials API
-            Jobs jobs = octopus.jobs();
+            Jobs jobs = cobalt.jobs();
 
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
@@ -70,8 +70,8 @@ public class ListQueueStatus {
             // Close the scheduler
             jobs.close(scheduler);
 
-            // Finally, we end octopus to release all resources 
-            CobaltFactory.endCobalt(octopus);
+            // Finally, we end Cobalt to release all resources 
+            CobaltFactory.endCobalt(cobalt);
 
         } catch (URISyntaxException | CobaltException e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());

@@ -39,7 +39,7 @@ import nl.esciencecenter.cobalt.jobs.Scheduler;
 import nl.esciencecenter.cobalt.jobs.Streams;
 
 /**
- * LocalFiles implements an Octopus <code>Jobs</code> adaptor for local job operations.
+ * LocalFiles implements an Cobalt <code>Jobs</code> adaptor for local job operations.
  * 
  * @see nl.esciencecenter.cobalt.jobs.Jobs
  * 

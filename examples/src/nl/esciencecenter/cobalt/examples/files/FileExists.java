@@ -51,7 +51,7 @@ public class FileExists {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
         
-            // We create a new octopus using the OctopusFactory (without providing any properties).
+            // We create a new Cobalt using the CobaltFactory (without providing any properties).
             Cobalt cobalt = CobaltFactory.newCobalt(null);
 
             // Next, we retrieve the Files and Credentials interfaces
@@ -76,7 +76,7 @@ public class FileExists {
             files.close(fs);
             credentials.close(c);
 
-            // Finally, we end octopus to release all resources 
+            // Finally, we end Cobalt to release all resources 
             CobaltFactory.endCobalt(cobalt);
 
         } catch (URISyntaxException | CobaltException e) {

@@ -50,7 +50,7 @@ import nl.esciencecenter.cobalt.files.RelativePath;
 import nl.esciencecenter.cobalt.util.Utils;
 
 /**
- * LocalFiles implements an Octopus <code>Files</code> adaptor for local file operations.
+ * LocalFiles implements an Cobalt <code>Files</code> adaptor for local file operations.
  * 
  * @see nl.esciencecenter.cobalt.files.Files
  * 

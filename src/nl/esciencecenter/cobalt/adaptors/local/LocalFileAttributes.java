@@ -120,7 +120,7 @@ public class LocalFileAttributes implements FileAttributes {
     
                 owner = posixAttributes.owner().getName();
                 group = posixAttributes.group().getName();
-                permissions = LocalUtils.octopusPermissions(posixAttributes.permissions());
+                permissions = LocalUtils.cobaltPermissions(posixAttributes.permissions());
             }
             
             creationTime = basicAttributes.creationTime().toMillis();

@@ -24,7 +24,7 @@ import nl.esciencecenter.cobalt.files.Files;
 import nl.esciencecenter.cobalt.jobs.Jobs;
 
 /**
- * A simple example of how to create an octopus and how to retrieve the various interfaces.
+ * A simple example of how to create an Cobalt and how to retrieve the various interfaces.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
