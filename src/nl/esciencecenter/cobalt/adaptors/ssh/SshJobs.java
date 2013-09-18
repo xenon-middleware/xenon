@@ -79,7 +79,7 @@ public class SshJobs implements Jobs {
         }
     }
 
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
 
     private final SshAdaptor adaptor;
 
@@ -89,8 +89,8 @@ public class SshJobs implements Jobs {
 
     private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
-    public SshJobs(CobaltProperties properties, SshAdaptor sshAdaptor, CobaltEngine octopusEngine) throws CobaltException {
-        this.octopusEngine = octopusEngine;
+    public SshJobs(CobaltProperties properties, SshAdaptor sshAdaptor, CobaltEngine cobaltEngine) throws CobaltException {
+        this.cobaltEngine = cobaltEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
     }
@@ -121,7 +121,7 @@ public class SshJobs implements Jobs {
         long pollingDelay = p.getLongProperty(SshAdaptor.POLLING_DELAY);
         int multiQThreads = p.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT);
 
-        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, octopusEngine.files(), scheduler, fs.getEntryPath(), factory,
+        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, cobaltEngine.files(), scheduler, fs.getEntryPath(), factory,
                 multiQThreads, pollingDelay);
 
         synchronized (this) {

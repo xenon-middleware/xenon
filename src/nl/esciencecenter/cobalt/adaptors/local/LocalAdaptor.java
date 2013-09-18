@@ -37,7 +37,7 @@ import nl.esciencecenter.cobalt.jobs.Jobs;
 import nl.esciencecenter.cobalt.util.Utils;
 
 /**
- * LocalAdaptor implements an Octopus adaptor for local operations.
+ * LocalAdaptor implements an Cobalt adaptor for local operations.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -102,12 +102,12 @@ public class LocalAdaptor extends Adaptor {
     /** Local implementation for Credentials */
     private final LocalCredentials localCredentials;
 
-    public LocalAdaptor(CobaltEngine octopusEngine, Map<String, String> properties) throws CobaltException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+    public LocalAdaptor(CobaltEngine cobaltEngine, Map<String, String> properties) throws CobaltException {
+        super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new CobaltProperties(VALID_PROPERTIES, Component.COBALT, properties));
 
-        localFiles = new LocalFiles(this, octopusEngine.getCopyEngine());
-        localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), octopusEngine);
+        localFiles = new LocalFiles(this, cobaltEngine.getCopyEngine());
+        localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), cobaltEngine);
         localCredentials = new LocalCredentials();
     }
 

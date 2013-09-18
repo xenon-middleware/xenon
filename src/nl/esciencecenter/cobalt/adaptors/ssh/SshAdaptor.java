@@ -125,16 +125,16 @@ public class SshAdaptor extends Adaptor {
 
     private JSch jsch;
 
-    public SshAdaptor(CobaltEngine octopusEngine, Map<String, String> properties) throws CobaltException {
-        this(octopusEngine, new JSch(), properties);
+    public SshAdaptor(CobaltEngine cobaltEngine, Map<String, String> properties) throws CobaltException {
+        this(cobaltEngine, new JSch(), properties);
     }
 
-    public SshAdaptor(CobaltEngine octopusEngine, JSch jsch, Map<String, String> properties) throws CobaltException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+    public SshAdaptor(CobaltEngine cobaltEngine, JSch jsch, Map<String, String> properties) throws CobaltException {
+        super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new CobaltProperties(VALID_PROPERTIES, Component.COBALT, properties));
 
-        this.filesAdaptor = new SshFiles(this, octopusEngine);
-        this.jobsAdaptor = new SshJobs(getProperties(), this, octopusEngine);
+        this.filesAdaptor = new SshFiles(this, cobaltEngine);
+        this.jobsAdaptor = new SshJobs(getProperties(), this, cobaltEngine);
         this.credentialsAdaptor = new SshCredentials(getProperties(), this);
         this.jsch = jsch;
 
@@ -229,7 +229,7 @@ public class SshAdaptor extends Adaptor {
        returned by the server if the server does not implement an
        operation).
     */
-    CobaltException sftpExceptionToOctopusException(SftpException e) {
+    CobaltException sftpExceptionToCobaltException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
             return new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);

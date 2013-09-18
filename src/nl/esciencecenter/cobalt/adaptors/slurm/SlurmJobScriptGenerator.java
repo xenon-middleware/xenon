@@ -29,8 +29,8 @@ public final class SlurmJobScriptGenerator {
 
         script.format("#!/bin/sh\n");
 
-        //set name of job to octopus
-        script.format("#SBATCH --job-name octopus\n");
+        //set name of job to Cobalt
+        script.format("#SBATCH --job-name cobalt\n");
 
         //set working directory
         if (description.getWorkingDirectory() != null) {

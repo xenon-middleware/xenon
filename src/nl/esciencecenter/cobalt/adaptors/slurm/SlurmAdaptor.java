@@ -83,13 +83,13 @@ public class SlurmAdaptor extends ScriptingAdaptor {
      * 
      * @param properties
      *            the properties to use when creating the adaptor.
-     * @param octopusEngine
+     * @param cobaltEngine
      *            the engine to which this adaptor belongs.
      * @throws CobaltException
      *             if the adaptor creation fails.
      */
-    public SlurmAdaptor(CobaltEngine octopusEngine, Map<String, String> properties) throws CobaltException {
-        super(octopusEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+    public SlurmAdaptor(CobaltEngine cobaltEngine, Map<String, String> properties) throws CobaltException {
+        super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new CobaltProperties(VALID_PROPERTIES, Component.COBALT, properties), new SlurmSchedulerConnectionFactory());
     }
 

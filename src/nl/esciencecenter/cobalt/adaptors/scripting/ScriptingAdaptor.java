@@ -42,15 +42,15 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ScriptingJobs jobsAdaptor;
     private final ForwardingCredentials credentialsAdaptor;
 
-    protected ScriptingAdaptor(CobaltEngine octopusEngine, String name, String description, 
+    protected ScriptingAdaptor(CobaltEngine cobaltEngine, String name, String description, 
             ImmutableArray<String> supportedSchemes, ImmutableArray<String> supportedLocations, 
             ImmutableArray<CobaltPropertyDescription> validProperties, 
             CobaltProperties properties, SchedulerConnectionFactory factory) throws CobaltException {
 
-        super(octopusEngine, name, description, supportedSchemes, supportedLocations, validProperties, properties);
+        super(cobaltEngine, name, description, supportedSchemes, supportedLocations, validProperties, properties);
 
-        jobsAdaptor = new ScriptingJobs(this, octopusEngine, factory);
-        credentialsAdaptor = new ForwardingCredentials(octopusEngine, "ssh");
+        jobsAdaptor = new ScriptingJobs(this, cobaltEngine, factory);
+        credentialsAdaptor = new ForwardingCredentials(cobaltEngine, "ssh");
     }
 
     @Override

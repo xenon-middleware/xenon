@@ -51,15 +51,15 @@ public class ScriptingJobs implements Jobs {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptingJobs.class);
 
     private final ScriptingAdaptor adaptor;
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
     private final String adaptorName;
     private final SchedulerConnectionFactory connectionFactory;
 
     private final Map<String, SchedulerConnection> connections;
 
-    public ScriptingJobs(ScriptingAdaptor adaptor, CobaltEngine octopusEngine, SchedulerConnectionFactory connectionFactory) {
+    public ScriptingJobs(ScriptingAdaptor adaptor, CobaltEngine cobaltEngine, SchedulerConnectionFactory connectionFactory) {
         this.adaptor = adaptor;
-        this.octopusEngine = octopusEngine;
+        this.cobaltEngine = cobaltEngine;
         this.adaptorName = adaptor.getName();
         this.connectionFactory = connectionFactory;
 
@@ -107,7 +107,7 @@ public class ScriptingJobs implements Jobs {
         CobaltProperties p = new CobaltProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
         SchedulerConnection connection = connectionFactory.newSchedulerConnection(adaptor, scheme, location, credential, p, 
-                octopusEngine);
+                cobaltEngine);
 
         addConnection(connection);
 

@@ -47,8 +47,8 @@ public class RemoteCommandRunner {
     /**
      * Run a command remotely, and save stdout, stderr, and exit code for later processing.
      * 
-     * @param octopus
-     *            the octopus to use
+     * @param cobalt
+     *            the Cobalt to use
      * @param scheduler
      *            the scheduler to submit the job to
      * @param adaptorName
@@ -62,7 +62,7 @@ public class RemoteCommandRunner {
      * @throws CobaltException
      *             if the job could not be run successfully.
      */
-    public RemoteCommandRunner(Cobalt octopus, Scheduler scheduler, String adaptorName, String stdin, String executable,
+    public RemoteCommandRunner(Cobalt cobalt, Scheduler scheduler, String adaptorName, String stdin, String executable,
             String... arguments) throws CobaltException {
         long start = System.currentTimeMillis();
 
@@ -72,9 +72,9 @@ public class RemoteCommandRunner {
         description.setArguments(arguments);
         description.setQueueName("unlimited");
 
-        Job job = octopus.jobs().submitJob(scheduler, description);
+        Job job = cobalt.jobs().submitJob(scheduler, description);
 
-        Streams streams = octopus.jobs().getStreams(job);
+        Streams streams = cobalt.jobs().getStreams(job);
 
         InputWriter in = new InputWriter(stdin, streams.getStdin());
 
@@ -86,10 +86,10 @@ public class RemoteCommandRunner {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        JobStatus status = octopus.jobs().getJobStatus(job);
+        JobStatus status = cobalt.jobs().getJobStatus(job);
 
         if (!status.isDone()) {
-            status = octopus.jobs().waitUntilDone(job, 0);
+            status = cobalt.jobs().waitUntilDone(job, 0);
         }
 
         if (status.hasException()) {

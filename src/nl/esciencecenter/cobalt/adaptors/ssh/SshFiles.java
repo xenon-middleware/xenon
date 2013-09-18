@@ -98,13 +98,13 @@ public class SshFiles implements Files {
         }
     }
 
-    private final CobaltEngine octopusEngine;
+    private final CobaltEngine cobaltEngine;
     private final SshAdaptor adaptor;
 
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
-    public SshFiles(SshAdaptor sshAdaptor, CobaltEngine octopusEngine) {
-        this.octopusEngine = octopusEngine;
+    public SshFiles(SshAdaptor sshAdaptor, CobaltEngine cobaltEngine) {
+        this.cobaltEngine = cobaltEngine;
         this.adaptor = sshAdaptor;
     }
 
@@ -138,7 +138,7 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             session.disconnect();
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -161,12 +161,12 @@ public class SshFiles implements Files {
 
         SshLocation sshLocation = SshLocation.parse(location);
         
-        CobaltProperties octopusProperties = new CobaltProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
+        CobaltProperties cobaltProperties = new CobaltProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
                 properties);
 
-        SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, octopusProperties);
+        SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, cobaltProperties);
 
-        return newFileSystem(session, scheme, location, credential, octopusProperties);
+        return newFileSystem(session, scheme, location, credential, cobaltProperties);
     }
 
     private SshMultiplexedSession getSession(Path path) throws CobaltException {
@@ -221,7 +221,7 @@ public class SshFiles implements Files {
             channel.mkdir(dir.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -294,7 +294,7 @@ public class SshFiles implements Files {
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -358,7 +358,7 @@ public class SshFiles implements Files {
             channel.rename(source.getRelativePath().getAbsolutePath(), target.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -386,7 +386,7 @@ public class SshFiles implements Files {
             result = channel.ls(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -435,7 +435,7 @@ public class SshFiles implements Files {
             return new SshInputStream(in, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
     }
 
@@ -480,7 +480,7 @@ public class SshFiles implements Files {
             return new SshOutputStream(out, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
     }
 
@@ -503,7 +503,7 @@ public class SshFiles implements Files {
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -535,7 +535,7 @@ public class SshFiles implements Files {
             channel.chmod(SshUtil.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -552,7 +552,7 @@ public class SshFiles implements Files {
             result = channel.lstat(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToOctopusException(e);
+            throw adaptor.sftpExceptionToCobaltException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -577,7 +577,7 @@ public class SshFiles implements Files {
     @Override
     public Copy copy(Path source, Path target, CopyOption... options) throws CobaltException {
 
-        CopyEngine ce = octopusEngine.getCopyEngine();
+        CopyEngine ce = cobaltEngine.getCopyEngine();
         
         CopyInfo info = CopyInfo.createCopyInfo(SshAdaptor.ADAPTOR_NAME, ce.getNextID("SSH_COPY_"), source, target, options);
          
@@ -599,11 +599,11 @@ public class SshFiles implements Files {
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws CobaltException {
-        return octopusEngine.getCopyEngine().getStatus(copy);
+        return cobaltEngine.getCopyEngine().getStatus(copy);
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws CobaltException {
-        return octopusEngine.getCopyEngine().cancel(copy);
+        return cobaltEngine.getCopyEngine().cancel(copy);
     }
 }
