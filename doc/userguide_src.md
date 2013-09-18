@@ -1,7 +1,7 @@
-![logo](images/NLeSC_Octopus_logo.png "Octopus Logo")
+![logo](images/NLeSC_Cobalt_logo.png "Cobalt Logo")
 
-Octopus
-=======
+Cobalt
+======
 
 Copyright 2013 The Netherlands eScience Center
 
@@ -15,7 +15,7 @@ Last modified: 11 September 2013
 Copyrights & Disclaimers
 ------------------------
 
-Octopus is copyrighted by the Netherlands eScience Center and 
+Cobalt is copyrighted by the Netherlands eScience Center and 
 releases under the Apache License, Version 2.0.
 
 See the "LICENSE" and "NOTICE" files in the octopus distribution for
@@ -25,9 +25,9 @@ For more information on the Netherlands eScience Center see:
 
 <http://www.esciencecenter.nl> 
 
-The octopus project web site can be found at:
+The Cobalt project web site can be found at:
 
-<https://github.com/NLeSC/octopus>.
+<https://github.com/NLeSC/Cobalt>.
 
 
 Third party libraries
