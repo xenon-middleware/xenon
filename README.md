@@ -1,6 +1,6 @@
-![logo](doc/images/NLeSC_Cobalt_logo.png "Cobalt Logo")
+![logo](doc/images/NLeSC_Xenon_logo.png "Xenon Logo")
 
-Cobalt
+Xenon
 ======
 
 Copyright 2013 The Netherlands eScience Center
@@ -10,63 +10,63 @@ Last modified: 18 September 2013
 What is it?
 -----------
 
-Cobalt is a middleware abstraction library. It provides a simple 
+Xenon is a middleware abstraction library. It provides a simple 
 programming interface to various pieces of software that can be used
 to access distributed compute and storage resources. 
 
 
-Why Cobalt?
-------------
+Why Xenon?
+----------
 
-Cobalt is developed by the Netherlands eScience Center as a support
+Xenon is developed by the Netherlands eScience Center as a support
 library for our projects. Several projects develop end-user 
 applications that require access to distributed compute and storage
-resources. Cobalt provides a simple API to those resources, allowing
+resources. Xenon provides a simple API to those resources, allowing
 those applications to be developed more rapidly. The experience 
 gained during end-user application development is used to improve 
-the Cobalt API and implementation. 
+the Xenon API and implementation. 
 
 
 The Latest Version
 ------------------
 
-Details of the latest official release of Cobalt can be found at:
+Details of the latest official release of Xenon can be found at:
 
-<https://github.com/NLeSC/Cobalt/releases>
+<https://github.com/NLeSC/Xenon/releases>
 
-Alternatively, the latest development versions of Cobalt can be 
+Alternatively, the latest development versions of Xenon can be 
 found at:
 
-<https://github.com/NLeSC/Cobalt>.
+<https://github.com/NLeSC/Xenon>.
 
 
 Documentation
 -------------
 
-For an overview of Cobalt please consult the __online users guide__:
+For an overview of Xenon please consult the __online users guide__:
 
-<https://github.com/NLeSC/Cobalt/blob/develop/doc/userguide.md>
+<https://github.com/NLeSC/Xenon/blob/develop/doc/userguide.md>
 
 A pdf version of the user guide is also available in the docs 
 directory "docs/usersguide.pdf" or online at:
 
-<http://nlesc.github.io/Cobalt/userguide.pdf>
+<http://nlesc.github.io/Xenon/userguide.pdf>
 
 See the file "INSTALL.md" for a description of how to install 
-Cobalt. 
+Xenon. 
 
-The javadoc of Cobalt library is available online at: 
+The javadoc of Xenon library is available online at: 
 
-<http://nlesc.github.io/Cobalt/javadoc>
+<http://nlesc.github.io/Xenon/javadoc>
 
-The source of Cobalt can be found in "src/". Example applications
+The source of Xenon can be found in "src/". Example applications
 can be found in "examples/src/".
 
 
 Copyrights & Disclaimers
 ------------------------
 
-Cobalt is copyrighted by the Netherlands eScience Center and 
+Xenon is copyrighted by the Netherlands eScience Center and 
 releases under the Apache License, Version 2.0.
 
 See <http://www.esciencecenter.nl> for more information on the 
