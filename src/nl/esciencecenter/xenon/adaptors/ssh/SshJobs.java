@@ -18,11 +18,11 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.xenon.engine.util.JobQueues;
@@ -79,17 +79,17 @@ public class SshJobs implements Jobs {
         }
     }
 
-    private final CobaltEngine cobaltEngine;
+    private final XenonEngine cobaltEngine;
 
     private final SshAdaptor adaptor;
 
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
     
     private long submittedJobs = 0;
 
     private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
-    public SshJobs(CobaltProperties properties, SshAdaptor sshAdaptor, CobaltEngine cobaltEngine) throws CobaltException {
+    public SshJobs(XenonProperties properties, SshAdaptor sshAdaptor, XenonEngine cobaltEngine) throws XenonException {
         this.cobaltEngine = cobaltEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
@@ -97,7 +97,7 @@ public class SshJobs implements Jobs {
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
 
         SshLocation sshLocation = SshLocation.parse(location);
         
@@ -105,7 +105,7 @@ public class SshJobs implements Jobs {
 
         LOGGER.debug("Starting ssh scheduler with properties {}", properties);
 
-        CobaltProperties p = new CobaltProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
+        XenonProperties p = new XenonProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
         SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, p);
 
@@ -131,7 +131,7 @@ public class SshJobs implements Jobs {
         return scheduler;
     }
 
-    private JobQueues getJobQueue(Scheduler scheduler) throws CobaltException {
+    private JobQueues getJobQueue(Scheduler scheduler) throws XenonException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {
             throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
@@ -149,7 +149,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
         return getJobQueue(scheduler).getJobs(queueNames);
     }
 
@@ -162,7 +162,7 @@ public class SshJobs implements Jobs {
     }
     
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws CobaltException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
 
         if (description.getEnvironment().size() != 0) {
             throw new UnsupportedJobDescriptionException(SshAdaptor.ADAPTOR_NAME, "Environment variables not supported!");
@@ -176,7 +176,7 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
         return getJobQueue(job.getScheduler()).getJobStatus(job);
     }
 
@@ -191,7 +191,7 @@ public class SshJobs implements Jobs {
                 } else {
                     result[i] = null;
                 }
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }
         }
@@ -200,17 +200,17 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         return getJobQueue(job.getScheduler()).waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
         return getJobQueue(job.getScheduler()).waitUntilRunning(job, timeout);
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
         return getJobQueue(job.getScheduler()).cancelJob(job);
     }
 
@@ -224,20 +224,20 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
         return getJobQueue(scheduler).getQueueStatus(scheduler, queueName);
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
         return getJobQueue(scheduler).getQueueStatuses(scheduler, queueNames);
     }
 
     @Override
-    public void close(Scheduler scheduler) throws CobaltException {
+    public void close(Scheduler scheduler) throws XenonException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
         }
 
         SchedulerImplementation s = (SchedulerImplementation) scheduler;
@@ -256,22 +256,22 @@ public class SshJobs implements Jobs {
     }
 
     @Override
-    public boolean isOpen(Scheduler scheduler) throws CobaltException {
+    public boolean isOpen(Scheduler scheduler) throws XenonException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Illegal scheduler type.");
         }
 
         return schedulers.containsKey(((SchedulerImplementation) scheduler).getUniqueID());
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws CobaltException {
+    public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
         return getJobQueue(scheduler).getDefaultQueueName(scheduler);
     }
 
     @Override
-    public Streams getStreams(Job job) throws CobaltException {
+    public Streams getStreams(Job job) throws XenonException {
         return getJobQueue(job.getScheduler()).getStreams(job);
     }
 

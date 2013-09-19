@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.engine.credentials;
 
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
  * A {@link Credential} based on a user name and password.
@@ -30,7 +30,7 @@ public class PasswordCredentialImplementation extends CredentialImplementation {
      * @param password
      *            the password for the given user name
      */
-    public PasswordCredentialImplementation(String adaptorName, String uniqueID, CobaltProperties properties, String username,
+    public PasswordCredentialImplementation(String adaptorName, String uniqueID, XenonProperties properties, String username,
             char[] password) {
         super(adaptorName, uniqueID, properties, username, password);
     }

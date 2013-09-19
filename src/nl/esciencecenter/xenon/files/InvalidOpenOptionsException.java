@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.files;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that an invalid combination of OpenOptions have been specified.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class InvalidOpenOptionsException extends CobaltException {
+public class InvalidOpenOptionsException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

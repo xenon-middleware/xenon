@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.engine;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 public class AdaptorStatusImplementation implements AdaptorStatus {
@@ -27,11 +27,11 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     private final String description;
     private final ImmutableArray<String> supportedSchemes;
     private final ImmutableArray<String> supportedLocations;
-    private final ImmutableArray<CobaltPropertyDescription> supportedProperties;
+    private final ImmutableArray<XenonPropertyDescription> supportedProperties;
     private final Map<String, String> adaptorSpecificInformation;
 
     public AdaptorStatusImplementation(String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<CobaltPropertyDescription> supportedProperties, 
+            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> supportedProperties, 
             Map<String, String> adaptorSpecificInformation) {
 
         super();
@@ -69,7 +69,7 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     }
 
     @Override
-    public CobaltPropertyDescription[] getSupportedProperties() {
+    public XenonPropertyDescription[] getSupportedProperties() {
         return supportedProperties.asArray();
     }
 

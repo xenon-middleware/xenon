@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.xenon.credentials;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a certificate file could not be found.  
@@ -26,7 +26,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @since 1.0
  *
  */
-public class CertificateNotFoundException extends CobaltException {
+public class CertificateNotFoundException extends XenonException {
     
     private static final long serialVersionUID = 1L;
 

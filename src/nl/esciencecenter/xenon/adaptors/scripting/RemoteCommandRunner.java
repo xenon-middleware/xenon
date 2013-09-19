@@ -15,8 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.scripting;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.InputWriter;
 import nl.esciencecenter.xenon.engine.util.OutputReader;
 import nl.esciencecenter.xenon.jobs.Job;
@@ -59,11 +59,11 @@ public class RemoteCommandRunner {
      *            command to run
      * @param arguments
      *            arguments for the command
-     * @throws CobaltException
+     * @throws XenonException
      *             if the job could not be run successfully.
      */
-    public RemoteCommandRunner(Cobalt cobalt, Scheduler scheduler, String adaptorName, String stdin, String executable,
-            String... arguments) throws CobaltException {
+    public RemoteCommandRunner(Xenon cobalt, Scheduler scheduler, String adaptorName, String stdin, String executable,
+            String... arguments) throws XenonException {
         long start = System.currentTimeMillis();
 
         JobDescription description = new JobDescription();
@@ -93,7 +93,7 @@ public class RemoteCommandRunner {
         }
 
         if (status.hasException()) {
-            throw new CobaltException(adaptorName, "Could not run command remotely", status.getException());
+            throw new XenonException(adaptorName, "Could not run command remotely", status.getException());
         }
 
         this.exitCode = status.getExitCode();

@@ -18,13 +18,13 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.io.File;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
 
@@ -38,10 +38,10 @@ public class SshCredentials implements Credentials {
         return res;
     }
 
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
     private final SshAdaptor adaptor;
 
-    public SshCredentials(CobaltProperties properties, SshAdaptor sshAdaptor) {
+    public SshCredentials(XenonProperties properties, SshAdaptor sshAdaptor) {
         this.properties = properties;
 
         if (sshAdaptor == null) {
@@ -53,9 +53,9 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
-            Map<String, String> properties) throws CobaltException {
+            Map<String, String> properties) throws XenonException {
 
-        CobaltProperties p = new CobaltProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
+        XenonProperties p = new XenonProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
         if (!new File(certfile).exists()) { 
             throw new CertificateNotFoundException(SshAdaptor.ADAPTOR_NAME, "Certificate file not found: " + certfile);
@@ -66,15 +66,15 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
-            throws CobaltException {
+            throws XenonException {
 
-        CobaltProperties p = new CobaltProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
+        XenonProperties p = new XenonProperties(adaptor.getSupportedProperties(Component.CREDENTIALS), properties);
 
         return new PasswordCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, username, password);
     }
 
     @Override
-    public Credential getDefaultCredential(String scheme) throws CobaltException {
+    public Credential getDefaultCredential(String scheme) throws XenonException {
 
         String userHome = System.getProperty("user.home");
 
@@ -107,12 +107,12 @@ public class SshCredentials implements Credentials {
     }
 
     @Override
-    public void close(Credential credential) throws CobaltException {
+    public void close(Credential credential) throws XenonException {
         // Nothing to do here.
     }
 
     @Override
-    public boolean isOpen(Credential credential) throws CobaltException {
+    public boolean isOpen(Credential credential) throws XenonException {
         // Defaults to false
         return false;
     }

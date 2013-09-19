@@ -23,7 +23,7 @@ package nl.esciencecenter.xenon;
  * @version 1.0
  * @since 1.0
  */
-public class InvalidSchemeException extends CobaltException {
+public class InvalidSchemeException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

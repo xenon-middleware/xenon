@@ -21,8 +21,8 @@ import static org.junit.Assert.assertTrue;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Scheduler;
@@ -46,7 +46,7 @@ public class ITJobLocal {
      */
     @Test
     public void WorkingDirectoryRelativlyToCwd() throws Exception {
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
         Path testdir = testFolder.newFolder("octopustest").toPath();
         // testdir == /tmp/junit<random>/octopustest/
         logger.info("Absolute tmp dir {}", testdir);
@@ -69,6 +69,6 @@ public class ITJobLocal {
         assertTrue(Files.exists(testdir.resolve("stdout.txt")));
         assertTrue(Files.exists(testdir.resolve("stderr.txt")));
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 }

@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.engine.util;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.OpenOption;
@@ -47,7 +47,7 @@ class BatchProcess implements Process {
     private StreamForwarder stderrForwarder;
    
     public BatchProcess(Files files, Path workingDirectory, JobImplementation job, InteractiveProcessFactory factory)
-            throws CobaltException, IOException {
+            throws XenonException, IOException {
 
         JobDescription description = job.getJobDescription();
 
@@ -86,7 +86,7 @@ class BatchProcess implements Process {
         }
     }
 
-    private Path processPath(Files files, Path root, String path) throws CobaltException {
+    private Path processPath(Files files, Path root, String path) throws XenonException {
 
         Path result = null;
 
@@ -101,7 +101,7 @@ class BatchProcess implements Process {
         return result;
     }
 
-    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws CobaltException {
+    private OutputStream createOutputStream(Files files, Path workdir, String filename) throws XenonException {
 
         if (filename == null) {
             return null;

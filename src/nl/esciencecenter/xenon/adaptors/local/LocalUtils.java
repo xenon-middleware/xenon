@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandRunner;
 import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -51,7 +51,7 @@ final class LocalUtils {
         // DO NOTE USE
     }
 
-    static java.nio.file.Path javaPath(Path path) throws CobaltException {
+    static java.nio.file.Path javaPath(Path path) throws XenonException {
         FileSystem fs = path.getFileSystem();
         RelativePath tmp = path.getRelativePath();
 
@@ -119,47 +119,47 @@ final class LocalUtils {
 
     /**
      * @param path
-     * @throws CobaltException
+     * @throws XenonException
      */
-    static InputStream newInputStream(Path path) throws CobaltException {
+    static InputStream newInputStream(Path path) throws XenonException {
         try {
             return Files.newInputStream(javaPath(path));
         } catch (Exception e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
         }
     }
 
     /**
      * @param path
      * @param permissions
-     * @throws CobaltException
+     * @throws XenonException
      */
-    static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws CobaltException {
+    static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
         } catch (Exception e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to set permissions " + path, e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to set permissions " + path, e);
         }
     }
 
     /**
      * @param path
-     * @throws CobaltException
+     * @throws XenonException
      */
-    static void createFile(Path path) throws CobaltException {
+    static void createFile(Path path) throws XenonException {
         try {
             Files.createFile(LocalUtils.javaPath(path));
         } catch (Exception e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path, e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path, e);
         }
     }
 
     /**
      * @param path
-     * @throws CobaltException
+     * @throws XenonException
      */
-    static void delete(Path path) throws CobaltException {
+    static void delete(Path path) throws XenonException {
 
         try {
             Files.delete(LocalUtils.javaPath(path));
@@ -170,21 +170,21 @@ final class LocalUtils {
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
 
         } catch (Exception e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
         }
     }
 
     /**
      * @param source
      * @param target
-     * @throws CobaltException
+     * @throws XenonException
      */
-    static void move(Path source, Path target) throws CobaltException {
+    static void move(Path source, Path target) throws XenonException {
 
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
         } catch (Exception e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
         }
     }
 

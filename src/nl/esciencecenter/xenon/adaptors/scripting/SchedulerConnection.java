@@ -20,13 +20,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -60,11 +60,11 @@ public abstract class SchedulerConnection {
 
     private final ScriptingAdaptor adaptor;
     private final String id;
-    private final CobaltEngine engine;
+    private final XenonEngine engine;
     private final Scheduler subScheduler;
     private final FileSystem subFileSystem;
 
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
 
     private final long pollDelay;
 
@@ -90,7 +90,7 @@ public abstract class SchedulerConnection {
      * @throws InvalidJobDescription
      *             if the description contains illegal values.
      */
-    protected static void verifyJobDescription(JobDescription description, String adaptorName) throws CobaltException {
+    protected static void verifyJobDescription(JobDescription description, String adaptorName) throws XenonException {
         String executable = description.getExecutable();
 
         if (executable == null) {
@@ -149,30 +149,30 @@ public abstract class SchedulerConnection {
      *            the field which contains the job id.
      * @param additionalFields
      *            any additional fields to check the presence of.
-     * @throws CobaltException
+     * @throws XenonException
      *             if any fields are missing or incorrect
      */
     protected static void verifyJobInfo(Map<String, String> jobInfo, Job job, String adaptorName, String jobIDField,
-            String... additionalFields) throws CobaltException {
+            String... additionalFields) throws XenonException {
         if (jobInfo == null) {
             //redundant check, calling functions usually already check for this and return null.
-            throw new CobaltException(adaptorName, "Job " + job.getIdentifier() + " not found in job info");
+            throw new XenonException(adaptorName, "Job " + job.getIdentifier() + " not found in job info");
         }
 
         String jobID = jobInfo.get(jobIDField);
 
         if (jobID == null) {
-            throw new CobaltException(adaptorName, "Invalid job info. Info does not contain job id");
+            throw new XenonException(adaptorName, "Invalid job info. Info does not contain job id");
         }
 
         if (!jobID.equals(job.getIdentifier())) {
-            throw new CobaltException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match "
+            throw new XenonException(adaptorName, "Invalid job info. Found job id \"" + jobID + "\" does not match "
                     + job.getIdentifier());
         }
 
         for (String field : additionalFields) {
             if (!jobInfo.containsKey(field)) {
-                throw new CobaltException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field
+                throw new XenonException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field
                         + "\"");
             }
         }
@@ -193,7 +193,7 @@ public abstract class SchedulerConnection {
     }
 
     protected SchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
-            CobaltProperties properties, CobaltEngine engine, long pollDelay) throws CobaltException {
+            XenonProperties properties, XenonEngine engine, long pollDelay) throws XenonException {
 
         this.adaptor = adaptor;
         this.engine = engine;
@@ -237,7 +237,7 @@ public abstract class SchedulerConnection {
         return subFileSystem.getEntryPath();
     }
 
-    public CobaltProperties getProperties() {
+    public XenonProperties getProperties() {
         return properties;
     }
 
@@ -248,19 +248,19 @@ public abstract class SchedulerConnection {
     /**
      * Run a command on the remote scheduler machine.
      */
-    public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws CobaltException {
+    public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws XenonException {
         return new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable, arguments);
     }
 
     /**
      * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
      */
-    public String runCheckedCommand(String stdin, String executable, String... arguments) throws CobaltException { 
+    public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException { 
         RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable,
                 arguments);
 
         if (!runner.success()) {
-            throw new CobaltException(adaptor.getName(), "could not run command \"" + executable + "\" with arguments \""
+            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with arguments \""
                     + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = " + runner.getExitCode()
                     + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
@@ -286,7 +286,7 @@ public abstract class SchedulerConnection {
         }
     }
 
-    public JobStatus waitUntilDone(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         long deadline = System.currentTimeMillis() + timeout;
 
         if (timeout == 0) {
@@ -313,7 +313,7 @@ public abstract class SchedulerConnection {
         return status;
     }
 
-    public JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
         long deadline = System.currentTimeMillis() + timeout;
 
         if (timeout == 0) {
@@ -346,7 +346,7 @@ public abstract class SchedulerConnection {
      * @param workingDirectory
      *            the working directory (either absolute or relative) as given by the user.
      */
-    protected void checkWorkingDirectory(String workingDirectory) throws CobaltException {
+    protected void checkWorkingDirectory(String workingDirectory) throws XenonException {
         if (workingDirectory == null) {
             return;
         }
@@ -364,7 +364,7 @@ public abstract class SchedulerConnection {
         }
     }
 
-    public void close() throws CobaltException {
+    public void close() throws XenonException {
         engine.jobs().close(subScheduler);
     }
 
@@ -379,18 +379,18 @@ public abstract class SchedulerConnection {
 
     public abstract String getDefaultQueueName();
 
-    public abstract QueueStatus getQueueStatus(String queueName) throws CobaltException;
+    public abstract QueueStatus getQueueStatus(String queueName) throws XenonException;
 
-    public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws CobaltException;
+    public abstract QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException;
 
-    public abstract Job[] getJobs(String... queueNames) throws CobaltException;
+    public abstract Job[] getJobs(String... queueNames) throws XenonException;
 
-    public abstract Job submitJob(JobDescription description) throws CobaltException;
+    public abstract Job submitJob(JobDescription description) throws XenonException;
 
-    public abstract JobStatus cancelJob(Job job) throws CobaltException;
+    public abstract JobStatus cancelJob(Job job) throws XenonException;
 
-    public abstract JobStatus getJobStatus(Job job) throws CobaltException;
+    public abstract JobStatus getJobStatus(Job job) throws XenonException;
 
-    public abstract JobStatus[] getJobStatuses(Job... jobs) throws CobaltException;
+    public abstract JobStatus[] getJobStatuses(Job... jobs) throws XenonException;
 
 }

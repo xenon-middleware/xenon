@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.local;
 
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
@@ -100,7 +100,7 @@ public class LocalAdaptorTest {
 
     @org.junit.Test
     public void test_getSupportedProperties() throws Exception {
-        CobaltPropertyDescription[] p = new LocalAdaptor(Util.createOctopusEngine(null), null).getSupportedProperties();
+        XenonPropertyDescription[] p = new LocalAdaptor(Util.createOctopusEngine(null), null).getSupportedProperties();
         assert (p != null);
     }
 

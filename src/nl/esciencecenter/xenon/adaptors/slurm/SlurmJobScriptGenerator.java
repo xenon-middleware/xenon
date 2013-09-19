@@ -4,7 +4,7 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.JobDescription;
@@ -23,7 +23,7 @@ public final class SlurmJobScriptGenerator {
         //DO NOT USE
     }
 
-    static String generate(JobDescription description, RelativePath fsEntryPath) throws CobaltException {
+    static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 

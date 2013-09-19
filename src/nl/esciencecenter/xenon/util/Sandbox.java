@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -132,17 +132,17 @@ public class Sandbox {
      *            Directory in which sandbox will be created.
      * @param sandboxName
      *            Name of the sandbox. If null a random name will be used.
-     * @throws CobaltException
-     * @throws CobaltException
+     * @throws XenonException
+     * @throws XenonException
      */
-    public Sandbox(Files files, Path root, String sandboxName) throws CobaltException {
+    public Sandbox(Files files, Path root, String sandboxName) throws XenonException {
 
         if (files == null) {
-            throw new CobaltException("Sandbox", "Need an files interface to create a sandbox!");
+            throw new XenonException("Sandbox", "Need an files interface to create a sandbox!");
         }
 
         if (root == null) {
-            throw new CobaltException("Sandbox", "Need an root directory to create a sandbox!");
+            throw new XenonException("Sandbox", "Need an root directory to create a sandbox!");
         }
 
         if (sandboxName == null) {
@@ -153,7 +153,7 @@ public class Sandbox {
         this.path = resolve(files, root, sandboxName);
     }
 
-    private static Path resolve(Files files, Path root, String path) throws CobaltException {
+    private static Path resolve(Files files, Path root, String path) throws XenonException {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
@@ -181,9 +181,9 @@ public class Sandbox {
      * Any existing upload files will be discarded.
      * 
      * @param files the files to upload.
-     * @throws CobaltException 
+     * @throws XenonException 
      */
-    public void setUploadFiles(Path... files) throws CobaltException {
+    public void setUploadFiles(Path... files) throws XenonException {
         uploadFiles = new LinkedList<Pair>();
         for (int i = 0; i < files.length; i++) {
             addUploadFile(files[i]);
@@ -195,9 +195,9 @@ public class Sandbox {
      * 
      * @param src
      *            Source path of file. May not be <code>null</code>.
-     * @throws CobaltException 
+     * @throws XenonException 
      */
-    public void addUploadFile(Path src) throws CobaltException {
+    public void addUploadFile(Path src) throws XenonException {
         addUploadFile(src, null);
     }
 
@@ -208,9 +208,9 @@ public class Sandbox {
      *            The source file. May not be <code>null</code>.
      * @param dest
      *            The name of file in the sandbox. If <code>null</code> then <code>src.getFilename()</code> will be used.
-     * @throws CobaltException 
+     * @throws XenonException 
      */
-    public void addUploadFile(Path src, String dest) throws CobaltException {
+    public void addUploadFile(Path src, String dest) throws XenonException {
         if (src == null) {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
@@ -237,9 +237,9 @@ public class Sandbox {
      *            Name of the source file in the sandbox. When <code>null</code> the <code>dest.getFilename()</code> will be used.
      * @param dest
      *            The target file. May not be <code>null</code>.
-     * @throws CobaltException 
+     * @throws XenonException 
      */
-    public void addDownloadFile(String src, Path dest) throws CobaltException {
+    public void addDownloadFile(String src, Path dest) throws XenonException {
         if (dest == null) {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
@@ -250,7 +250,7 @@ public class Sandbox {
         downloadFiles.add(new Pair(resolve(files, path, src), dest));
     }
 
-    private void copy(List<Pair> pairs, CopyOption... options) throws CobaltException {
+    private void copy(List<Pair> pairs, CopyOption... options) throws XenonException {
         for (Pair pair : pairs) {
             Utils.recursiveCopy(files, pair.source, pair.destination, options);
         }
@@ -265,10 +265,10 @@ public class Sandbox {
      *          the options to use while copying. See {@link CopyOption} for details.
      * @throws InvalidCopyOptionsException
      *           if an invalid combination of options is used.
-     * @throws CobaltException
+     * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public void upload(CopyOption... options) throws CobaltException {
+    public void upload(CopyOption... options) throws XenonException {
         if (!files.exists(path)) {
             files.createDirectory(path);
         }
@@ -282,20 +282,20 @@ public class Sandbox {
      *          the options to use while copying. See {@link CopyOption} for details.
      * @throws InvalidCopyOptionsException
      *           if an invalid combination of options is used.
-     * @throws CobaltException
+     * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public void download(CopyOption... options) throws CobaltException {
+    public void download(CopyOption... options) throws XenonException {
         copy(downloadFiles, options);
     }
 
     /**
      * Recursively delete the sandbox.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *         if an I/O error occurs during deletion 
      */
-    public void delete() throws CobaltException {
+    public void delete() throws XenonException {
         Utils.recursiveDelete(files, path);
     }
 

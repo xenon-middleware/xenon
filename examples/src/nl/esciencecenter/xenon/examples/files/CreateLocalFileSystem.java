@@ -16,9 +16,9 @@
 
 package nl.esciencecenter.xenon.examples.files;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -39,7 +39,7 @@ public class CreateLocalFileSystem {
     public static void main(String[] args) {
         try {
             // First , we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = cobalt.files();
@@ -68,9 +68,9 @@ public class CreateLocalFileSystem {
             files.close(fs);
 
             // Finally, we end Cobalt to release all resources 
-            CobaltFactory.endCobalt(cobalt);
+            XenonFactory.endXenon(cobalt);
 
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());
             e.printStackTrace();
         }

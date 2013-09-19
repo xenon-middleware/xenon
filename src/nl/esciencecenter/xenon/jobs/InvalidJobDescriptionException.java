@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.jobs;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a JobDescription contains invalid values for certain options.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class InvalidJobDescriptionException extends CobaltException {
+public class InvalidJobDescriptionException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

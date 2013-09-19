@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 
 import com.jcraft.jsch.ChannelSftp;
@@ -78,7 +78,7 @@ public class SshOutputStream extends OutputStream {
         } finally {
             try { 
                 session.releaseSftpChannel(channel);
-            } catch (CobaltException e) { 
+            } catch (XenonException e) { 
                 throw new IOException("Failed to release SSH channel!", e);
             }
         } 

@@ -21,8 +21,8 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Properties;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -59,7 +59,7 @@ public class SSHTunnelTest {
         String gateway = getPropertyOrFail(p, "test.ssh.gateway");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
 
@@ -70,7 +70,7 @@ public class SSHTunnelTest {
         FileSystem filesystem = files.newFileSystem("ssh", location, credentials.getDefaultCredential("sftp"), properties);
 
         files.close(filesystem);
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
 }

@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.engine.util;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a command could not be found.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class CommandNotFoundException extends CobaltException {
+public class CommandNotFoundException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

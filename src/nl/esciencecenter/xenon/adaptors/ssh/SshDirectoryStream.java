@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.Path;
@@ -33,7 +33,7 @@ public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path>
 
     private final Deque<Path> stream;
 
-    SshDirectoryStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws CobaltException {
+    SshDirectoryStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws XenonException {
 
         stream = new LinkedList<Path>();
 

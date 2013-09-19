@@ -19,13 +19,13 @@ package nl.esciencecenter.xenon.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.NoSuchCobaltException;
+import nl.esciencecenter.xenon.NoSuchXenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.adaptors.ssh.ConnectionLostException;
 import nl.esciencecenter.xenon.adaptors.ssh.EndOfFileException;
@@ -81,50 +81,50 @@ public class ExceptionsTest {
 
     @Test
     public void testOctopusException1() throws Exception {
-        testException(new CobaltException("name", "message"));
+        testException(new XenonException("name", "message"));
     }
 
     @Test
     public void testOctopusException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new CobaltException("name", "message", t), t);
+        testException(new XenonException("name", "message", t), t);
     }
 
     @Test
     public void testOctopusException3() throws Exception {
-        testException(new CobaltException(null, "message"), null, "message", null);
+        testException(new XenonException(null, "message"), null, "message", null);
     }
 
     @Test
     public void testOctopusRuntimeException1() throws Exception {
-        testException(new CobaltRuntimeException("name", "message"));
+        testException(new XenonRuntimeException("name", "message"));
     }
 
     @Test
     public void testOctopusRuntimeException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new CobaltRuntimeException("name", "message", t), t);
+        testException(new XenonRuntimeException("name", "message", t), t);
     }
 
     @Test
     public void testOctopusIOException3() throws Exception {
-        testException(new CobaltException(null, "message"), null, "message", null);
+        testException(new XenonException(null, "message"), null, "message", null);
     }
 
     @Test
     public void testOctopusIOException1() throws Exception {
-        testException(new CobaltException("name", "message"));
+        testException(new XenonException("name", "message"));
     }
 
     @Test
     public void testOctopusIOException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new CobaltException("name", "message", t), t);
+        testException(new XenonException("name", "message", t), t);
     }
 
     @Test
     public void testOctopusRuntimeException3() throws Exception {
-        testException(new CobaltRuntimeException(null, "message"), null, "message", null);
+        testException(new XenonRuntimeException(null, "message"), null, "message", null);
     }
 
     @Test
@@ -360,13 +360,13 @@ public class ExceptionsTest {
 
     @Test
     public void testNoSuchOctopusException1() throws Exception {
-        testException(new NoSuchCobaltException("name", "message"));
+        testException(new NoSuchXenonException("name", "message"));
     }
 
     @Test
     public void testNoSuchOctopusException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new NoSuchCobaltException("name", "message", t), t);
+        testException(new NoSuchXenonException("name", "message", t), t);
     }
 
     @Test

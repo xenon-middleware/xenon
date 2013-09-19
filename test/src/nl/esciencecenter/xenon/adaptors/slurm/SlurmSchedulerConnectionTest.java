@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.FakeScriptingJob;
 import nl.esciencecenter.xenon.adaptors.scripting.FakeScriptingScheduler;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmSchedulerConnection;
@@ -48,7 +48,7 @@ import org.junit.runners.MethodSorters;
 public class SlurmSchedulerConnectionTest {
 
     @Test
-    public void test01a_exitcodeFromString_SomeExitcode_Integer() throws CobaltException {
+    public void test01a_exitcodeFromString_SomeExitcode_Integer() throws XenonException {
         String input = "5";
 
         Integer expected = 5;
@@ -59,7 +59,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test01b_exitcodeFromString_SomeExitcodeWithSignal_Integer() throws CobaltException {
+    public void test01b_exitcodeFromString_SomeExitcodeWithSignal_Integer() throws XenonException {
         String input = "5:43";
 
         Integer expected = 5;
@@ -70,7 +70,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test01c_exitcodeFromString_NullInput_NullOutput() throws CobaltException {
+    public void test01c_exitcodeFromString_NullInput_NullOutput() throws XenonException {
         String input = null;
 
         Integer expected = null;
@@ -80,8 +80,8 @@ public class SlurmSchedulerConnectionTest {
         assertEquals("Null input should lead to Null output", expected, result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test01d_exitcodeFromString_NotANumber_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test01d_exitcodeFromString_NotANumber_ExceptionThrown() throws XenonException {
         String input = "five";
 
         SlurmSchedulerConnection.exitcodeFromString(input);
@@ -90,7 +90,7 @@ public class SlurmSchedulerConnectionTest {
     //new JobStatusImplementation(inputJob, state, exitCode, error, running, done, jobInfo);
 
     @Test
-    public void test02a_getJobStatusFromSacctInfo_CompletedJob_JobStatus() throws CobaltException {
+    public void test02a_getJobStatusFromSacctInfo_CompletedJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -112,7 +112,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test02b_getJobStatusFromSacctInfo_RunningJob_JobStatus() throws CobaltException {
+    public void test02b_getJobStatusFromSacctInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -134,7 +134,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test02c_getJobStatusFromSacctInfo_CanceledJob_JobStatusWithException() throws CobaltException {
+    public void test02c_getJobStatusFromSacctInfo_CanceledJob_JobStatusWithException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -157,7 +157,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test02d_getJobStatusFromSacctInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws CobaltException {
+    public void test02d_getJobStatusFromSacctInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -179,7 +179,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test02e_getJobStatusFromSacctInfo_FailedJobWithZeroExitCode_JobStatusWithException() throws CobaltException {
+    public void test02e_getJobStatusFromSacctInfo_FailedJobWithZeroExitCode_JobStatusWithException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);
@@ -195,7 +195,7 @@ public class SlurmSchedulerConnectionTest {
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(0), result.getExitCode());
         assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof CobaltException);
+        assertTrue(result.getException() instanceof XenonException);
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
@@ -203,7 +203,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test02f_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws CobaltException {
+    public void test02f_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         Job job = new FakeScriptingJob(jobID);
@@ -212,8 +212,8 @@ public class SlurmSchedulerConnectionTest {
         assertNull(result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test02g_getJobStatusFromSacctInfo_InvalidJobInfo_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test02g_getJobStatusFromSacctInfo_InvalidJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
         //very invalid info, no info at all
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -227,7 +227,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03a_getJobStatusFromScontrolInfo_CompletedJob_JobStatus() throws CobaltException {
+    public void test03a_getJobStatusFromScontrolInfo_CompletedJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobId", jobID);
@@ -248,7 +248,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03b_getJobStatusFromScontrolInfo_RunningJob_JobStatus() throws CobaltException {
+    public void test03b_getJobStatusFromScontrolInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobId", jobID);
@@ -269,7 +269,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03c_getJobStatusFromScontrolInfo_CanceledJob_JobStatusWithException() throws CobaltException {
+    public void test03c_getJobStatusFromScontrolInfo_CanceledJob_JobStatusWithException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobId", jobID);
@@ -291,7 +291,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03d_getJobStatusFromScontrolInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws CobaltException {
+    public void test03d_getJobStatusFromScontrolInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobId", jobID);
@@ -312,7 +312,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03e_getJobStatusFromScontrolInfo_FailedJob_JobStatusWithException() throws CobaltException {
+    public void test03e_getJobStatusFromScontrolInfo_FailedJob_JobStatusWithException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobId", jobID);
@@ -327,7 +327,7 @@ public class SlurmSchedulerConnectionTest {
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof CobaltException);
+        assertTrue(result.getException() instanceof XenonException);
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
@@ -335,7 +335,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03f_getJobStatusFromScontrolInfo_FailedJobWithNoReason_JobStatusWithException() throws CobaltException {
+    public void test03f_getJobStatusFromScontrolInfo_FailedJobWithNoReason_JobStatusWithException() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobId", jobID);
@@ -350,7 +350,7 @@ public class SlurmSchedulerConnectionTest {
         assertEquals("FAILED", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof CobaltException);
+        assertTrue(result.getException() instanceof XenonException);
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
@@ -358,7 +358,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test03g_getJobStatusFromScontrolInfo_NullInput_NullReturned() throws CobaltException {
+    public void test03g_getJobStatusFromScontrolInfo_NullInput_NullReturned() throws XenonException {
         String jobID = "555";
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromScontrolInfo(null, job);
@@ -366,8 +366,8 @@ public class SlurmSchedulerConnectionTest {
         assertNull(result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
         //empty job info
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -378,7 +378,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test04a_getJobStatusFromSqueueInfo_PendingJob_JobStatus() throws CobaltException {
+    public void test04a_getJobStatusFromSqueueInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JOBID", jobID);
@@ -399,7 +399,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test04b_getJobStatusFromSqueueInfo_RunningJob_JobStatus() throws CobaltException {
+    public void test04b_getJobStatusFromSqueueInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JOBID", jobID);
@@ -420,7 +420,7 @@ public class SlurmSchedulerConnectionTest {
     }
 
     @Test
-    public void test04c_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws CobaltException {
+    public void test04c_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         Job job = new FakeScriptingJob(jobID);
@@ -429,8 +429,8 @@ public class SlurmSchedulerConnectionTest {
         assertNull(result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test04d_getJobStatusFromSqueueInfo_IncompleteJobInfo_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test04d_getJobStatusFromSqueueInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
 
         //very incomplete job info

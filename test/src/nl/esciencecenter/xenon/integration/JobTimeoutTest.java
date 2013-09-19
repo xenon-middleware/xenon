@@ -16,8 +16,8 @@
 
 package nl.esciencecenter.xenon.integration;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
@@ -41,7 +41,7 @@ public class JobTimeoutTest {
         description.setMaxTime(1);
         description.setWorkingDirectory(System.getProperty("java.io.tmpdir"));
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
         Jobs jobs = octopus.jobs();
 
         Job job = jobs.submitJob(jobs.newScheduler("local", null, null, null), description);
@@ -73,6 +73,6 @@ public class JobTimeoutTest {
             throw new Exception("Job terminated after " + (deltat / 1000.0) + " seconds (not 60)");
         }
 
-        CobaltFactory.endAll();
+        XenonFactory.endAll();
     }
 }

@@ -19,9 +19,9 @@ package nl.esciencecenter.xenon.examples.jobs;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
@@ -49,7 +49,7 @@ public class ListQueueStatus {
             URI location = new URI(args[0]);
 
             // We create a new Cobalt using the CobaltFactory (without providing any properties).
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = cobalt.jobs();
@@ -71,9 +71,9 @@ public class ListQueueStatus {
             jobs.close(scheduler);
 
             // Finally, we end Cobalt to release all resources 
-            CobaltFactory.endCobalt(cobalt);
+            XenonFactory.endXenon(cobalt);
 
-        } catch (URISyntaxException | CobaltException e) {
+        } catch (URISyntaxException | XenonException e) {
             System.out.println("ListQueueStatus example failed: " + e.getMessage());
             e.printStackTrace();
         }

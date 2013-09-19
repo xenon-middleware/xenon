@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.engine.files;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -31,11 +31,11 @@ public class FileSystemImplementation implements FileSystem {
     private final String uniqueID;
 
     private final Credential credential;
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
     private final RelativePath entryPath;
 
     public FileSystemImplementation(String adaptorName, String identifier, String scheme, String location, RelativePath entryPath,
-            Credential credential, CobaltProperties properties) {
+            Credential credential, XenonProperties properties) {
 
         if (adaptorName == null) {
             throw new IllegalArgumentException("AdaptorName may not be null!");
@@ -65,7 +65,7 @@ public class FileSystemImplementation implements FileSystem {
         this.credential = credential;
 
         if (properties == null) {
-            this.properties = new CobaltProperties();
+            this.properties = new XenonProperties();
         } else {
             this.properties = properties;
         }

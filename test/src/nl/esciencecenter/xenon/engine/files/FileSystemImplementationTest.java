@@ -23,12 +23,12 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Type;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
-import nl.esciencecenter.xenon.engine.CobaltPropertyDescriptionImplementation;
+import nl.esciencecenter.xenon.engine.XenonProperties;
+import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -127,11 +127,11 @@ public class FileSystemImplementationTest {
         Map<String, String> tmp = new HashMap<>();
         tmp.put("test", "test");
 
-        ImmutableArray<CobaltPropertyDescription> valid = new ImmutableArray<CobaltPropertyDescription>(
-                new CobaltPropertyDescriptionImplementation(
-                "test", Type.STRING, EnumSet.of(Component.COBALT), "test", "test property"));
+        ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
+                new XenonPropertyDescriptionImplementation(
+                "test", Type.STRING, EnumSet.of(Component.XENON), "test", "test property"));
 
-        CobaltProperties p = new CobaltProperties(valid, tmp);
+        XenonProperties p = new XenonProperties(valid, tmp);
 
         FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, p);

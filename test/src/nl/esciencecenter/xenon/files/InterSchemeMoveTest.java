@@ -20,9 +20,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -47,7 +47,7 @@ public class InterSchemeMoveTest {
         return tmp;
     }
     
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_move() throws Exception {
 
         String configfile = System.getProperty("test.config");
@@ -62,7 +62,7 @@ public class InterSchemeMoveTest {
         String user = getPropertyOrFail(p, "test.ssh.user");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
-        Cobalt octopus = CobaltEngine.newCobalt(null);
+        Xenon octopus = XenonEngine.newXenon(null);
 
         Files files = octopus.files();
 

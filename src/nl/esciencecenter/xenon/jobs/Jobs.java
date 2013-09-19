@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.jobs;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
 /**
@@ -57,11 +57,11 @@ public interface Jobs {
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the creation of the Scheduler failed.
      */
     Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException;
+            throws XenonException;
     
     /**
      * Close a Scheduler.
@@ -71,10 +71,10 @@ public interface Jobs {
      * 
      * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Scheduler failed to close.
      */
-    void close(Scheduler scheduler) throws CobaltException;
+    void close(Scheduler scheduler) throws XenonException;
 
     /**
      * Test if a Scheduler is open.
@@ -82,12 +82,12 @@ public interface Jobs {
      * @param scheduler
      *            the Scheduler to test.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the test failed.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    boolean isOpen(Scheduler scheduler) throws CobaltException;
+    boolean isOpen(Scheduler scheduler) throws XenonException;
 
     /**
      * Get the name of the default queue for the <code>scheduler</code>.
@@ -99,12 +99,12 @@ public interface Jobs {
      * 
      * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Scheduler failed to get its status.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    String getDefaultQueueName(Scheduler scheduler) throws CobaltException;
+    String getDefaultQueueName(Scheduler scheduler) throws XenonException;
 
     /**
      * Get all jobs currently in (one ore more) queues of <code>scheduler</code>.
@@ -124,10 +124,10 @@ public interface Jobs {
      *             If the scheduler is not known.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Scheduler failed to get jobs.
      */
-    Job[] getJobs(Scheduler scheduler, String... queueNames) throws CobaltException;
+    Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException;
 
     /**
      * Get the status of the <code>queue</code> of <code>scheduler</code>.
@@ -143,10 +143,10 @@ public interface Jobs {
      *             If the scheduler is not known.
      * @throws NoSuchQueueException
      *             If the queue does not exist in the scheduler.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Scheduler failed to get its status.
      */
-    QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws CobaltException;
+    QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException;
 
     /**
      * Get the status of all <code>queues</code> of <code>scheduler</code>.
@@ -165,10 +165,10 @@ public interface Jobs {
      * 
      * @throws NoSuchSchedulerException
      *             If the scheduler is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Scheduler failed to get the statusses.
      */
-    QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws CobaltException;
+    QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException;
 
     /**
      * Submit a job to a Scheduler.
@@ -188,10 +188,10 @@ public interface Jobs {
      *             If the description contains illegal or conflicting values.
      * @throws UnsupportedJobDescriptionException
      *             If the description is not legal for this scheduler.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Scheduler failed to get submit the job.
      */
-    Job submitJob(Scheduler scheduler, JobDescription description) throws CobaltException;
+    Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException;
 
     /**
      * Get the status of a Job.
@@ -203,10 +203,10 @@ public interface Jobs {
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    JobStatus getJobStatus(Job job) throws CobaltException;
+    JobStatus getJobStatus(Job job) throws XenonException;
 
     /**
      * Get the status of all specified <code>jobs</code>.
@@ -222,7 +222,7 @@ public interface Jobs {
      * 
      * @return an array of the resulting JobStatusses.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the statuses of the job could not be retrieved.
      */
     JobStatus[] getJobStatuses(Job... jobs);
@@ -236,10 +236,10 @@ public interface Jobs {
      *            the interactive job for which to retrieve the streams.
      * @return the streams of the job.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             if the job is not interactive.
      */
-    Streams getStreams(Job job) throws CobaltException;
+    Streams getStreams(Job job) throws XenonException;
 
     /**
      * Cancel a job.
@@ -258,10 +258,10 @@ public interface Jobs {
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    JobStatus cancelJob(Job job) throws CobaltException;
+    JobStatus cancelJob(Job job) throws XenonException;
 
     /**
      * Wait until a job is done or until a timeout expires.
@@ -283,10 +283,10 @@ public interface Jobs {
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    JobStatus waitUntilDone(Job job, long timeout) throws CobaltException;
+    JobStatus waitUntilDone(Job job, long timeout) throws XenonException;
 
     /**
      * Wait for as long a job is waiting in a queue, or until a timeout expires.
@@ -309,8 +309,8 @@ public interface Jobs {
      * 
      * @throws NoSuchJobException
      *             If the job is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the status of the job could not be retrieved.
      */
-    JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException;
+    JobStatus waitUntilRunning(Job job, long timeout) throws XenonException;
 }

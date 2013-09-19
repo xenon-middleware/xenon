@@ -19,12 +19,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.xenon.jobs.Job;
@@ -51,13 +51,13 @@ public class ScriptingJobs implements Jobs {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptingJobs.class);
 
     private final ScriptingAdaptor adaptor;
-    private final CobaltEngine cobaltEngine;
+    private final XenonEngine cobaltEngine;
     private final String adaptorName;
     private final SchedulerConnectionFactory connectionFactory;
 
     private final Map<String, SchedulerConnection> connections;
 
-    public ScriptingJobs(ScriptingAdaptor adaptor, CobaltEngine cobaltEngine, SchedulerConnectionFactory connectionFactory) {
+    public ScriptingJobs(ScriptingAdaptor adaptor, XenonEngine cobaltEngine, SchedulerConnectionFactory connectionFactory) {
         this.adaptor = adaptor;
         this.cobaltEngine = cobaltEngine;
         this.adaptorName = adaptor.getName();
@@ -68,7 +68,7 @@ public class ScriptingJobs implements Jobs {
 
     private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws NoSuchSchedulerException {
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new CobaltRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
+            throw new XenonRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
         }
 
         String schedulerID = ((SchedulerImplementation) scheduler).getUniqueID();
@@ -90,9 +90,9 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public synchronized boolean isOpen(Scheduler scheduler) throws CobaltException {
+    public synchronized boolean isOpen(Scheduler scheduler) throws XenonException {
         if (!(scheduler instanceof SchedulerImplementation)) {
-            throw new CobaltRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
+            throw new XenonRuntimeException(adaptorName, "scheduler " + scheduler.toString() + " not created by this adaptor");
         }
 
         String schedulerID = ((SchedulerImplementation) scheduler).getUniqueID();
@@ -102,9 +102,9 @@ public class ScriptingJobs implements Jobs {
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
 
-        CobaltProperties p = new CobaltProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
+        XenonProperties p = new XenonProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
         SchedulerConnection connection = connectionFactory.newSchedulerConnection(adaptor, scheme, location, credential, p, 
                 cobaltEngine);
@@ -115,7 +115,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws CobaltException {
+    public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -124,7 +124,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public void close(Scheduler scheduler) throws CobaltException {
+    public void close(Scheduler scheduler) throws XenonException {
         SchedulerConnection connection = getConnection(scheduler);
 
         connection.close();
@@ -133,7 +133,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -142,7 +142,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -151,7 +151,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
         //find connection
         SchedulerConnection connection = getConnection(scheduler);
 
@@ -160,13 +160,13 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws CobaltException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
         // Copy the JobDescription to ensure the user doesn't change it after we return.
         return getConnection(scheduler).submitJob(new JobDescription(description));
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.getJobStatus(job);
@@ -179,7 +179,7 @@ public class ScriptingJobs implements Jobs {
             if (job != null) {
                 Scheduler scheduler = job.getScheduler();
                 if (!(scheduler instanceof SchedulerImplementation)) {
-                    throw new CobaltRuntimeException(adaptorName, "scheduler " + scheduler.toString()
+                    throw new XenonRuntimeException(adaptorName, "scheduler " + scheduler.toString()
                             + " not created by this adaptor");
                 }
 
@@ -211,7 +211,7 @@ public class ScriptingJobs implements Jobs {
 
         try {
             result = connection.getJobStatuses(in);
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             exception = e;
         }
 
@@ -255,7 +255,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.cancelJob(job);
@@ -272,26 +272,26 @@ public class ScriptingJobs implements Jobs {
         for (SchedulerConnection connection : currentConnections) {
             try {
                 connection.close();
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 LOGGER.error("Error on closing connection to server", e);
             }
         }
     }
 
     @Override
-    public Streams getStreams(Job job) throws CobaltException {
-        throw new CobaltException(adaptorName, "Interactive jobs not supported");
+    public Streams getStreams(Job job) throws XenonException {
+        throw new XenonException(adaptorName, "Interactive jobs not supported");
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
         SchedulerConnection connection = getConnection(job.getScheduler());
 
         return connection.waitUntilRunning(job, timeout);

@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.adaptors.slurm;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
 
 import org.slf4j.Logger;
@@ -37,11 +37,11 @@ public class SlurmSetup {
     private final boolean accountingAvailable;
     private final String version;
 
-    SlurmSetup(Map<String, String> info, boolean ignoreVersion, boolean disableAccounting) throws CobaltException {
+    SlurmSetup(Map<String, String> info, boolean ignoreVersion, boolean disableAccounting) throws XenonException {
         version = info.get("SLURM_VERSION");
 
         if (version == null) {
-            throw new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Slurm config does not contain version info");
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Slurm config does not contain version info");
         }
 
         checkVersion(ignoreVersion);
@@ -49,7 +49,7 @@ public class SlurmSetup {
         String accountingType = info.get("AccountingStorageType");
 
         if (accountingType == null) {
-            throw new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Slurm config does not contain expected accounting info");
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Slurm config does not contain expected accounting info");
         }
 
         accountingAvailable = !(accountingType.equals("accounting_storage/none") || disableAccounting);

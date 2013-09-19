@@ -19,16 +19,16 @@ package nl.esciencecenter.xenon.adaptors.local;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.adaptors.local.LocalDirectoryAttributeStream;
 import nl.esciencecenter.xenon.adaptors.local.LocalDirectoryStream;
 import nl.esciencecenter.xenon.adaptors.local.LocalFiles;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -45,14 +45,14 @@ public class LocalDirectoryAttributeStreamTest {
 
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
 
-    private static Path resolve(Files files, Path root, String path) throws CobaltException { 
+    private static Path resolve(Files files, Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
     @org.junit.BeforeClass
-    public static void prepareClass() throws CobaltException, CobaltException {
+    public static void prepareClass() throws XenonException, XenonException {
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
 
         Files files = octopus.files();
         Path root = Utils.getLocalCWD(files);
@@ -67,13 +67,13 @@ public class LocalDirectoryAttributeStreamTest {
         files.createFile(file1);
         files.createFile(file2);
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     @org.junit.AfterClass
-    public static void cleanupClass() throws CobaltException, CobaltException {
+    public static void cleanupClass() throws XenonException, XenonException {
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
 
         Files files = octopus.files();
         Path root = Utils.getLocalCWD(files);
@@ -101,10 +101,10 @@ public class LocalDirectoryAttributeStreamTest {
             files.delete(testDir);
         }
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
-    private CobaltEngine octopus;
+    private XenonEngine octopus;
     private FileSystem fs;
     private Path root;
     private Path testDir;
@@ -141,7 +141,7 @@ public class LocalDirectoryAttributeStreamTest {
         Util.endOctopusEngine(octopus);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_nonexistant_dir() throws Exception {
         Path path = new PathImplementation(fs, new RelativePath("aap"));
         new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(path, new AllTrue()));
@@ -212,7 +212,7 @@ public class LocalDirectoryAttributeStreamTest {
         }
     }
 
-    @org.junit.Test(expected = CobaltRuntimeException.class)
+    @org.junit.Test(expected = XenonRuntimeException.class)
     public void test_remove_file_halfway_allTrue() throws Exception {
 
         Path dir0 = resolve(localFiles, testDir, "dir0");

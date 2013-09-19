@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.jobs;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a Job was not found. 
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class NoSuchJobException extends CobaltException {
+public class NoSuchJobException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

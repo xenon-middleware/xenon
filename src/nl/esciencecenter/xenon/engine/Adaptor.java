@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
@@ -40,13 +40,13 @@ public abstract class Adaptor {
     private final String description;
     private final ImmutableArray<String> supportedSchemes;
     private final ImmutableArray<String> supportedLocations;
-    private final ImmutableArray<CobaltPropertyDescription> validProperties;
-    private final CobaltProperties properties;
-    private final CobaltEngine cobaltEngine;
+    private final ImmutableArray<XenonPropertyDescription> validProperties;
+    private final XenonProperties properties;
+    private final XenonEngine cobaltEngine;
 
-    protected Adaptor(CobaltEngine cobaltEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<CobaltPropertyDescription> validProperties, 
-            CobaltProperties properties) throws CobaltException {
+    protected Adaptor(XenonEngine cobaltEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
+            XenonProperties properties) throws XenonException {
 
         super();
 
@@ -65,11 +65,11 @@ public abstract class Adaptor {
         this.properties = properties;
     }
 
-    protected CobaltEngine getCobaltEngine() {
+    protected XenonEngine getCobaltEngine() {
         return cobaltEngine;
     }
 
-    public CobaltProperties getProperties() {
+    public XenonProperties getProperties() {
         return properties;
     }
 
@@ -88,24 +88,24 @@ public abstract class Adaptor {
         return false;
     }
 
-    public CobaltPropertyDescription[] getSupportedProperties() {
+    public XenonPropertyDescription[] getSupportedProperties() {
         return validProperties.asArray();
     }
 
-    public ImmutableArray<CobaltPropertyDescription> getSupportedProperties(Component level) {
+    public ImmutableArray<XenonPropertyDescription> getSupportedProperties(Component level) {
 
-        ArrayList<CobaltPropertyDescription> tmp = new ArrayList<>();
+        ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
 
         for (int i = 0; i < validProperties.length(); i++) {
 
-            CobaltPropertyDescription d = validProperties.get(i);
+            XenonPropertyDescription d = validProperties.get(i);
 
             if (d.getLevels().contains(level)) {
                 tmp.add(d);
             }
         }
 
-        return new ImmutableArray<>(tmp.toArray(new CobaltPropertyDescription[tmp.size()]));
+        return new ImmutableArray<>(tmp.toArray(new XenonPropertyDescription[tmp.size()]));
     }
 
     public AdaptorStatus getAdaptorStatus() {
@@ -128,11 +128,11 @@ public abstract class Adaptor {
 
     public abstract Map<String, String> getAdaptorSpecificInformation();
 
-    public abstract Files filesAdaptor() throws CobaltException;
+    public abstract Files filesAdaptor() throws XenonException;
 
-    public abstract Jobs jobsAdaptor() throws CobaltException;
+    public abstract Jobs jobsAdaptor() throws XenonException;
 
-    public abstract Credentials credentialsAdaptor() throws CobaltException;
+    public abstract Credentials credentialsAdaptor() throws XenonException;
 
     public abstract void end();
 }

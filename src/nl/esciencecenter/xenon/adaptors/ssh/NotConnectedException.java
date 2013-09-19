@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that there was no connection.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class NotConnectedException extends CobaltException {
+public class NotConnectedException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

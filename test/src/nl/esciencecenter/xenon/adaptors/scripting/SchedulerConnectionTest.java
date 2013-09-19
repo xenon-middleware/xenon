@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.jobs.IncompleteJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
@@ -238,7 +238,7 @@ public class SchedulerConnectionTest {
 //    }
 
     @Test
-    public void test04a_verifyJobInfoValidInfo_NoException() throws CobaltException {
+    public void test04a_verifyJobInfoValidInfo_NoException() throws XenonException {
         String jobID = "555";
 
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -250,8 +250,8 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID", "AdditionalField");
     }
 
-    @Test(expected = CobaltException.class)
-    public void test04b_verifyJobInfo_NullInfoMap_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test04b_verifyJobInfo_NullInfoMap_ExceptionThrown() throws XenonException {
         String jobID = "555";
 
         Job job = new FakeScriptingJob(jobID);
@@ -259,8 +259,8 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobInfo(null, job, "fake", "JobID");
     }
 
-    @Test(expected = CobaltException.class)
-    public void test04c_verifyJobInfo_NoJobID_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test04c_verifyJobInfo_NoJobID_ExceptionThrown() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
 
@@ -269,8 +269,8 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID");
     }
 
-    @Test(expected = CobaltException.class)
-    public void test04d_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test04d_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws XenonException {
         String jobID = "555";
 
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -282,8 +282,8 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobInfo(jobInfo, job, "fake", "JobID");
     }
 
-    @Test(expected = CobaltException.class)
-    public void test04e_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test04e_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JobID", jobID);

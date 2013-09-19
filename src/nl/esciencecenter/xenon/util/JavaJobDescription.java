@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 
 /**
@@ -182,7 +182,7 @@ public class JavaJobDescription extends JobDescription {
      * @param arguments
      */
     public void setArguments(String... arguments) {
-        throw new CobaltRuntimeException("Utils", "Setting arguments not supported by the JavaJobDescription");
+        throw new XenonRuntimeException("Utils", "Setting arguments not supported by the JavaJobDescription");
     }
 
     /**

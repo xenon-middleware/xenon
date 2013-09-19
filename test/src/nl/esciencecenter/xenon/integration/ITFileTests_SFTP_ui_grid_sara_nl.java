@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.integration;
 
 import java.net.URI;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -34,7 +34,7 @@ public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
         return new URI("sftp://" + user + "@ui.grid.sara.nl/tmp/" + user);
     }
 
-    public Credential getCredentials() throws CobaltException {
+    public Credential getCredentials() throws XenonException {
 
         // use home of user which runs the test which can be different then remote test user: 
         String userHome = System.getProperty("user.home");

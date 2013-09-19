@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors.local;
 import java.io.IOException;
 import java.util.Iterator;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
@@ -41,7 +41,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     /** The LocalDirectoryStream to retrieve the files */
     private final LocalDirectoryStream stream;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws CobaltException {
+    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws XenonException {
         this.localFiles = localFiles;
         this.stream = stream;
     }
@@ -69,8 +69,8 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
         try {
             FileAttributes attributes = localFiles.getAttributes(path);
             return new PathAttributesPairImplementation(path, attributes);
-        } catch (CobaltException e) {
-            throw new CobaltRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to get next element.", e);
+        } catch (XenonException e) {
+            throw new XenonRuntimeException(LocalAdaptor.ADAPTOR_NAME, "Failed to get next element.", e);
         }
     }
 

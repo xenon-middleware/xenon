@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
@@ -98,34 +98,34 @@ public class SshFiles implements Files {
         }
     }
 
-    private final CobaltEngine cobaltEngine;
+    private final XenonEngine cobaltEngine;
     private final SshAdaptor adaptor;
 
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
-    public SshFiles(SshAdaptor sshAdaptor, CobaltEngine cobaltEngine) {
+    public SshFiles(SshAdaptor sshAdaptor, XenonEngine cobaltEngine) {
         this.cobaltEngine = cobaltEngine;
         this.adaptor = sshAdaptor;
     }
 
-    private void checkParent(Path path) throws CobaltException {
+    private void checkParent(Path path) throws XenonException {
         
         RelativePath parentName = path.getRelativePath().getParent();
         
         if (parentName == null) { 
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
         }
         
         Path parent = newPath(path.getFileSystem(), parentName);
             
         if (!exists(parent)) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
         }
     }
     
     
     protected FileSystem newFileSystem(SshMultiplexedSession session, String scheme, String location, Credential credential,
-            CobaltProperties properties) throws CobaltException {
+            XenonProperties properties) throws XenonException {
 
         String uniqueID = getNewUniqueID();
 
@@ -157,11 +157,11 @@ public class SshFiles implements Files {
 
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
 
         SshLocation sshLocation = SshLocation.parse(location);
         
-        CobaltProperties cobaltProperties = new CobaltProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
+        XenonProperties cobaltProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
                 properties);
 
         SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, cobaltProperties);
@@ -169,13 +169,13 @@ public class SshFiles implements Files {
         return newFileSystem(session, scheme, location, credential, cobaltProperties);
     }
 
-    private SshMultiplexedSession getSession(Path path) throws CobaltException {
+    private SshMultiplexedSession getSession(Path path) throws XenonException {
 
         FileSystemImplementation fs = (FileSystemImplementation) path.getFileSystem();
         FileSystemInfo info = fileSystems.get(fs.getUniqueID());
 
         if (info == null) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "File system is already closed");
         }
 
         return info.getSession();
@@ -187,26 +187,26 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void close(FileSystem filesystem) throws CobaltException {
+    public void close(FileSystem filesystem) throws XenonException {
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
 
         FileSystemInfo info = fileSystems.remove(fs.getUniqueID());
 
         if (info == null) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "file system is already closed");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "file system is already closed");
         }
 
         info.getSession().disconnect();
     }
 
     @Override
-    public boolean isOpen(FileSystem filesystem) throws CobaltException {
+    public boolean isOpen(FileSystem filesystem) throws XenonException {
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
         return (fileSystems.get(fs.getUniqueID()) != null);
     }
 
     @Override
-    public void createDirectory(Path dir) throws CobaltException {
+    public void createDirectory(Path dir) throws XenonException {
 
         if (exists(dir)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -228,7 +228,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void createDirectories(Path dir) throws CobaltException {
+    public void createDirectories(Path dir) throws XenonException {
 
         if (exists(dir)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -246,7 +246,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void createFile(Path path) throws CobaltException {
+    public void createFile(Path path) throws XenonException {
 
         if (exists(path)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
@@ -270,7 +270,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public void delete(Path path) throws CobaltException {
+    public void delete(Path path) throws XenonException {
 
         if (!exists(path)) {
             throw new NoSuchPathException(getClass().getName(), "Cannot delete file, as it does not exist");
@@ -318,17 +318,17 @@ public class SshFiles implements Files {
      *             If the source file does not exist or the target parent directory does not exist.
      * @throws PathAlreadyExistsException
      *             If the target file already exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the move failed.
      */
     @Override
-    public void move(Path source, Path target) throws CobaltException {
+    public void move(Path source, Path target) throws XenonException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
         if (!sourcefs.getLocation().equals(targetfs.getLocation())) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different FileSystems: "
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot move between different FileSystems: "
                     + sourcefs.getLocation() + " and " + targetfs.getLocation());
         }
 
@@ -365,16 +365,16 @@ public class SshFiles implements Files {
     }
 
     @SuppressWarnings("unchecked")
-    private List<LsEntry> listDirectory(Path path, Filter filter) throws CobaltException {
+    private List<LsEntry> listDirectory(Path path, Filter filter) throws XenonException {
 
         FileAttributes att = getAttributes(path);
 
         if (!att.isDirectory()) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
         if (filter == null) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
 
         SshMultiplexedSession session = getSession(path);
@@ -395,27 +395,27 @@ public class SshFiles implements Files {
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter)
-            throws CobaltException {
+            throws XenonException {
         return new SshDirectoryAttributeStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws CobaltException {
+    public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws XenonException {
         return new SshDirectoryStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws CobaltException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
         return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws CobaltException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws CobaltException {
+    public InputStream newInputStream(Path path) throws XenonException {
 
         if (!exists(path)) {
             throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
@@ -424,7 +424,7 @@ public class SshFiles implements Files {
         FileAttributes att = getAttributes(path);
 
         if (att.isDirectory()) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
         }
 
         SshMultiplexedSession session = getSession(path);
@@ -440,7 +440,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws CobaltException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
 
         OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
 
@@ -485,7 +485,7 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public Path readSymbolicLink(Path path) throws CobaltException {
+    public Path readSymbolicLink(Path path) throws XenonException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
@@ -519,14 +519,14 @@ public class SshFiles implements Files {
 
             try {
                 close(fs);
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 // ignore for now
             }
         }
     }
     
     @Override
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws CobaltException {
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
@@ -541,7 +541,7 @@ public class SshFiles implements Files {
         session.releaseSftpChannel(channel);
     }
 
-    private SftpATTRS stat(Path path) throws CobaltException {
+    private SftpATTRS stat(Path path) throws XenonException {
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
@@ -560,12 +560,12 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public FileAttributes getAttributes(Path path) throws CobaltException {
+    public FileAttributes getAttributes(Path path) throws XenonException {
         return new SshFileAttributes(stat(path), path);
     }
 
     @Override
-    public boolean exists(Path path) throws CobaltException {
+    public boolean exists(Path path) throws XenonException {
         try {
             stat(path);
             return true;
@@ -575,7 +575,7 @@ public class SshFiles implements Files {
     }
     
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws CobaltException {
+    public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
 
         CopyEngine ce = cobaltEngine.getCopyEngine();
         
@@ -590,7 +590,7 @@ public class SshFiles implements Files {
             Exception e = info.getException();
 
             if (e != null) {
-                throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Copy failed!", e);
+                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Copy failed!", e);
             }
 
             return null;
@@ -598,12 +598,12 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public CopyStatus getCopyStatus(Copy copy) throws CobaltException {
+    public CopyStatus getCopyStatus(Copy copy) throws XenonException {
         return cobaltEngine.getCopyEngine().getStatus(copy);
     }
 
     @Override
-    public CopyStatus cancelCopy(Copy copy) throws CobaltException {
+    public CopyStatus cancelCopy(Copy copy) throws XenonException {
         return cobaltEngine.getCopyEngine().cancel(copy);
     }
 }

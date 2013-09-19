@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.xenon.engine.util;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 
 /**
@@ -24,5 +24,5 @@ import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
  * 
  */
 public interface InteractiveProcessFactory {
-    InteractiveProcess createInteractiveProcess(JobImplementation job) throws CobaltException;
+    InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException;
 }

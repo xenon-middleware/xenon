@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.jobs;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a unknown scheduler was provided.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class NoSuchSchedulerException extends CobaltException {
+public class NoSuchSchedulerException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

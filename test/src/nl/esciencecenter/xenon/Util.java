@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -43,8 +43,8 @@ public class Util {
      * @throws Exception
      *             if the OctopusEngine could not be created or throws an exception.
      */
-    public static CobaltEngine createOctopusEngine(HashMap<String, String> properties) throws Exception {
-        Constructor<CobaltEngine> constructor = CobaltEngine.class.getDeclaredConstructor(Map.class);
+    public static XenonEngine createOctopusEngine(HashMap<String, String> properties) throws Exception {
+        Constructor<XenonEngine> constructor = XenonEngine.class.getDeclaredConstructor(Map.class);
         constructor.setAccessible(true);
         return constructor.newInstance(properties);
     }
@@ -57,8 +57,8 @@ public class Util {
      * @throws Exception
      *             if the method could not be invoked.
      */
-    public static void endOctopusEngine(CobaltEngine e) throws Exception {
-        Method method = CobaltEngine.class.getDeclaredMethod("end");
+    public static void endOctopusEngine(XenonEngine e) throws Exception {
+        Method method = XenonEngine.class.getDeclaredMethod("end");
         method.setAccessible(true);
         method.invoke(e);
     }

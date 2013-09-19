@@ -16,9 +16,9 @@
 
 package nl.esciencecenter.xenon.examples.files;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Utils;
@@ -48,7 +48,7 @@ public class LocalFileExists {
 
         try {
             // We create a new Cobalt using the CobaltFactory (without providing any properties).
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files interfaces
             Files files = cobalt.files();
@@ -67,9 +67,9 @@ public class LocalFileExists {
             files.close(path.getFileSystem());
 
             // Finally, we end Cobalt to release all resources 
-            CobaltFactory.endCobalt(cobalt);
+            XenonFactory.endXenon(cobalt);
 
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             System.out.println("LocalFileExists example failed: " + e.getMessage());
             e.printStackTrace();
         }

@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.Path;
@@ -49,14 +49,14 @@ class LocalDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
     /** A buffer to read ahead. */
     private Path readAhead;
 
-    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws CobaltException {
+    LocalDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException {
         try {
             this.dir = dir;
             stream = Files.newDirectoryStream(LocalUtils.javaPath(dir));
             iterator = stream.iterator();
             this.filter = filter;
         } catch (IOException e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Could not create directory stream for " + dir, e);
         }
     }
 

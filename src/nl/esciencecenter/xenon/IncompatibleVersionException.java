@@ -23,7 +23,7 @@ package nl.esciencecenter.xenon;
  * @version 1.0
  * @since 1.0
  */
-public class IncompatibleVersionException extends CobaltException {
+public class IncompatibleVersionException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

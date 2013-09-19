@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmSetup;
 
@@ -34,7 +34,7 @@ import org.junit.Test;
 public class SlurmSetupTest {
 
     @Test
-    public void test_validConfig() throws CobaltException {
+    public void test_validConfig() throws XenonException {
 
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
@@ -47,7 +47,7 @@ public class SlurmSetupTest {
     }
 
     @Test
-    public void test_versionNumberWithPostfix() throws CobaltException {
+    public void test_versionNumberWithPostfix() throws XenonException {
 
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
@@ -60,7 +60,7 @@ public class SlurmSetupTest {
     }
 
     @Test
-    public void test_accountingDisabled() throws CobaltException {
+    public void test_accountingDisabled() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "2.3.4");
@@ -72,7 +72,7 @@ public class SlurmSetupTest {
     }
 
     @Test
-    public void test_forcedAccountingDisabled() throws CobaltException {
+    public void test_forcedAccountingDisabled() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "2.3.4");
@@ -83,8 +83,8 @@ public class SlurmSetupTest {
         assertFalse(config.accountingAvailable());
     }
 
-    @Test(expected = CobaltException.class)
-    public void test_noVersion_Exception() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test_noVersion_Exception() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
@@ -93,7 +93,7 @@ public class SlurmSetupTest {
     }
 
     @Test(expected = IncompatibleVersionException.class)
-    public void test_invalidVersion_Exception() throws CobaltException {
+    public void test_invalidVersion_Exception() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "1.2.3");
@@ -103,7 +103,7 @@ public class SlurmSetupTest {
     }
 
     @Test(expected = IncompatibleVersionException.class)
-    public void test_invalidVersionWithNoPeriod_Exception() throws CobaltException {
+    public void test_invalidVersionWithNoPeriod_Exception() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "2.5thereisnoperiodhere");
@@ -113,7 +113,7 @@ public class SlurmSetupTest {
     }
 
     @Test
-    public void test_invalidVersion_Ignored() throws CobaltException {
+    public void test_invalidVersion_Ignored() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "1.2.3");
@@ -125,8 +125,8 @@ public class SlurmSetupTest {
         assertTrue(config.accountingAvailable());
     }
 
-    @Test(expected = CobaltException.class)
-    public void test_noAccountingConfig_Exception() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test_noAccountingConfig_Exception() throws XenonException {
         //Relevant part of config used in current implementation
         Map<String, String> configInfo = new HashMap<String, String>();
         configInfo.put("SLURM_VERSION", "2.3.4");

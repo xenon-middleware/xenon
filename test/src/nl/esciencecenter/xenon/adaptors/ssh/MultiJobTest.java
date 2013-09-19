@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -98,7 +98,7 @@ public class MultiJobTest {
         
         String TEST_ROOT = "octopus_test_SSH_" + System.currentTimeMillis();
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
         Files files = octopus.files();
         Jobs jobs = octopus.jobs();
         Credentials credentials = octopus.credentials();
@@ -196,7 +196,7 @@ public class MultiJobTest {
         files.delete(root);
         files.close(filesystem);
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     @org.junit.Test

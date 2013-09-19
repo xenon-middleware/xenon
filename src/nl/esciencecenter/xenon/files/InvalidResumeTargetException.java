@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.files;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that the data in the target of a resume does not match the data in the source.   
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class InvalidResumeTargetException extends CobaltException {
+public class InvalidResumeTargetException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

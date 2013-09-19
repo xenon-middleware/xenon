@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.engine.credentials;
 
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
  * A container for security Information based upon certificates. Contexts based upon these mechanisms can be used by adaptors to
@@ -39,7 +39,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      * @param password
      *            the password or passphrase belonging to the key and certificate.
      */
-    public CertificateCredentialImplementation(String adaptorName, String uniqueID, CobaltProperties properties,
+    public CertificateCredentialImplementation(String adaptorName, String uniqueID, XenonProperties properties,
             String certfile, String username, char[] password) {
 
         super(adaptorName, uniqueID, properties, username, password);

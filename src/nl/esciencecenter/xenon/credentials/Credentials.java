@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.credentials;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Credentials represents the credentials interface of Cobalt.
@@ -55,11 +55,11 @@ public interface Credentials {
      *             If a known property was passed with an illegal value.
      * @throws CertificateNotFoundException
      *             If the certificate file could not be found.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the <code>Credential<code> could not be created.
      */
     Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
-            Map<String, String> properties) throws CobaltException;
+            Map<String, String> properties) throws XenonException;
 
     /**
      * Constructs a password credential.
@@ -81,11 +81,11 @@ public interface Credentials {
      *             If an unknown property was passed.
      * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the <code>Credential<code> could not be created.
      */
     Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
-            throws CobaltException;
+            throws XenonException;
 
     /**
      * Creates a default credential for the given scheme.
@@ -101,10 +101,10 @@ public interface Credentials {
      *             If an unknown property was passed.
      * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the <code>Credential<code> could not be created.
      */
-    Credential getDefaultCredential(String scheme) throws CobaltException;
+    Credential getDefaultCredential(String scheme) throws XenonException;
 
     /**
      * Close a Credential
@@ -112,10 +112,10 @@ public interface Credentials {
      * @param credential
      *            the Credential to close.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the Credential failed to close.
      */
-    void close(Credential credential) throws CobaltException;
+    void close(Credential credential) throws XenonException;
     
     /**
      * Test if a Credential is open.
@@ -123,8 +123,8 @@ public interface Credentials {
      * @param credential
      *            the Credential to test.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the test failed.
      */
-    boolean isOpen(Credential credential) throws CobaltException;    
+    boolean isOpen(Credential credential) throws XenonException;    
 }

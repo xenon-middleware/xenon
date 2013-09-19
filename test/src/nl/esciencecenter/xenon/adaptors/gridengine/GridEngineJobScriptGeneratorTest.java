@@ -23,7 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Formatter;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineJobScriptGenerator;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSchedulerConnection;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
@@ -46,7 +46,7 @@ public class GridEngineJobScriptGeneratorTest {
     }
 
     @Test
-    public void test01a_generate_EmptyDescription_Result() throws CobaltException {
+    public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
@@ -62,7 +62,7 @@ public class GridEngineJobScriptGeneratorTest {
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      * @throws OctopusException
      */
-    public void test01b_generate__FilledDescription_Result() throws CobaltException {
+    public void test01b_generate__FilledDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
@@ -95,7 +95,7 @@ public class GridEngineJobScriptGeneratorTest {
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      * @throws OctopusException
      */
-    public void test01c_generate__ParallelDescription_Result() throws CobaltException {
+    public void test01c_generate__ParallelDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
         description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
@@ -135,7 +135,7 @@ public class GridEngineJobScriptGeneratorTest {
         assertEquals(expected, result);
     }
 
-    public void test02a__generateParallelEnvironmentSpecification_SlotsProvided_Result() throws CobaltException {
+    public void test02a__generateParallelEnvironmentSpecification_SlotsProvided_Result() throws XenonException {
         JobDescription description = new JobDescription();
         description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "5");
@@ -150,7 +150,7 @@ public class GridEngineJobScriptGeneratorTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void test02b__generateParallelEnvironmentSpecification_ParallelSlotsNotProvided_SetupUsed() throws CobaltException {
+    public void test02b__generateParallelEnvironmentSpecification_ParallelSlotsNotProvided_SetupUsed() throws XenonException {
         //this should trigger the usage of the GridEngineSetup to calculate the slots 
         JobDescription description = new JobDescription();
         description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
@@ -165,7 +165,7 @@ public class GridEngineJobScriptGeneratorTest {
 
     @Test(expected = InvalidJobDescriptionException.class)
     public void test02c__generateParallelEnvironmentSpecification_InvalidParallelSlotsOption_ExceptionThrown()
-            throws CobaltException {
+            throws XenonException {
         JobDescription description = new JobDescription();
         description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
         description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "five");

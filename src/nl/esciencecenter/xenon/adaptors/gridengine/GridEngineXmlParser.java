@@ -25,7 +25,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
 
 import org.slf4j.Logger;
@@ -56,14 +56,14 @@ public class GridEngineXmlParser {
 
     private final boolean ignoreVersion;
 
-    GridEngineXmlParser(boolean ignoreVersion) throws CobaltException {
+    GridEngineXmlParser(boolean ignoreVersion) throws XenonException {
         this.ignoreVersion = ignoreVersion;
 
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException e) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "could not create parser for xml files", e);
         }
     }
 
@@ -85,7 +85,7 @@ public class GridEngineXmlParser {
         }
     }
 
-    Document parseDocument(String data) throws CobaltException {
+    Document parseDocument(String data) throws XenonException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
@@ -95,9 +95,9 @@ public class GridEngineXmlParser {
 
             return result;
         } catch (SAXException e) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "could not parse qstat xml file", e);
         } catch (IOException e) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "could not read xml file", e);
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "could not read xml file", e);
         }
     }
 
@@ -129,13 +129,13 @@ public class GridEngineXmlParser {
      * @param in
      *            the stream to get the xml data from
      * @return a list containing all queue names found
-     * @throws CobaltException
+     * @throws XenonException
      *             if the file could not be parsed
-     * @throws CobaltException
+     * @throws XenonException
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseQueueInfos(String input) throws CobaltException {
+    Map<String, Map<String, String>> parseQueueInfos(String input) throws XenonException {
         Document document = parseDocument(input);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
@@ -152,7 +152,7 @@ public class GridEngineXmlParser {
                 String queueName = queueInfo.get("name");
 
                 if (queueName == null || queueName.length() == 0) {
-                    throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
+                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "found queue in queue list with no name");
                 }
 
                 result.put(queueName, queueInfo);
@@ -160,7 +160,7 @@ public class GridEngineXmlParser {
         }
 
         if (result.size() == 0) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "server seems to have no queues");
         }
 
         return result;
@@ -172,13 +172,13 @@ public class GridEngineXmlParser {
      * @param in
      *            the stream to get the xml data from
      * @return a list containing all queue names found
-     * @throws CobaltException
+     * @throws XenonException
      *             if the file could not be parsed
-     * @throws CobaltException
+     * @throws XenonException
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(String data) throws CobaltException {
+    Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         Document document = parseDocument(data);
@@ -203,7 +203,7 @@ public class GridEngineXmlParser {
                 String jobID = jobInfo.get("JB_job_number");
 
                 if (jobID == null || jobID.length() == 0) {
-                    throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
+                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
                 result.put(jobID, jobInfo);

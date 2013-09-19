@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.engine;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a property has a different type than the get method it was retrieved with.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class PropertyTypeException extends CobaltException {
+public class PropertyTypeException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

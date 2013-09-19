@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.files;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that an invalid combination of CopyOptions have been specified.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class InvalidCopyOptionsException extends CobaltException {
+public class InvalidCopyOptionsException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

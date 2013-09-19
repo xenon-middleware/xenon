@@ -19,7 +19,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
@@ -49,7 +49,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
     private final Streams streams;
     private boolean done = false;
     
-    public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws CobaltException {
+    public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws XenonException {
 
         this.session = session;
         this.channel = session.getExecChannel();
@@ -76,14 +76,14 @@ public class SshInteractiveProcess implements InteractiveProcess {
             streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
         } catch (Exception e) {
             session.failedExecChannel(channel);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         try {
             channel.connect();
         } catch (Exception e) {
             session.failedExecChannel(channel);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 
@@ -95,7 +95,7 @@ public class SshInteractiveProcess implements InteractiveProcess {
     private void cleanup() {
         try {
             session.releaseExecChannel(channel);
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             LOGGER.warn("SshInteractiveProcess failed to release exec channel!", e);
         }
     }

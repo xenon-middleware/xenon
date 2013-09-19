@@ -19,7 +19,7 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
@@ -48,7 +48,7 @@ final class GridEngineJobScriptGenerator {
     private static final int MINUTES_PER_HOUR = 60;
 
     protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup,
-            Formatter script) throws CobaltException {
+            Formatter script) throws XenonException {
         Map<String, String> options = description.getJobOptions();
 
         String pe = options.get(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT);
@@ -99,7 +99,7 @@ final class GridEngineJobScriptGenerator {
     }
 
     protected static String generate(JobDescription description, RelativePath fsEntryPath, GridEngineSetup setup)
-            throws CobaltException {
+            throws XenonException {
         
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);

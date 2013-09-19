@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.files;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a unknown Copy handle was provided.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class NoSuchCopyException extends CobaltException {
+public class NoSuchCopyException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

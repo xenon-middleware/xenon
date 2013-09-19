@@ -59,7 +59,7 @@ public interface AdaptorStatus {
      * 
      * @return an array containing all properties this adaptor supports.
      */
-    CobaltPropertyDescription[] getSupportedProperties();
+    XenonPropertyDescription[] getSupportedProperties();
 
     /**
      * Returns a map containing adaptor specific status information.

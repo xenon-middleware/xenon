@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
 /**
@@ -60,11 +60,11 @@ public interface Files {
      * @throws InvalidCredentialException
      *             If the credential is invalid to access the location.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the creation of the FileSystem failed.
      */
     FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException;
+            throws XenonException;
         
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
@@ -76,10 +76,10 @@ public interface Files {
      * 
      * @return the resulting Path.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    Path newPath(FileSystem filesystem, RelativePath location) throws CobaltException;
+    Path newPath(FileSystem filesystem, RelativePath location) throws XenonException;
 
     /**
      * Close a FileSystem.
@@ -89,12 +89,12 @@ public interface Files {
      * 
      * @throws CannotClosedException
      *             If the FileSystem cannot be closed (for example a local FileSystem).
-     * @throws CobaltException
+     * @throws XenonException
      *             If the FileSystem failed to close.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    void close(FileSystem filesystem) throws CobaltException;
+    void close(FileSystem filesystem) throws XenonException;
 
     /**
      * Test is a FileSystem is open.
@@ -102,12 +102,12 @@ public interface Files {
      * @param filesystem
      *            the FileSystem to test.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If the test failed.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    boolean isOpen(FileSystem filesystem) throws CobaltException;
+    boolean isOpen(FileSystem filesystem) throws XenonException;
 
     /**
      * Copy an existing source file or symbolic link to a target file.
@@ -187,10 +187,10 @@ public interface Files {
      *             If a conflicting set of copy options is provided.
      * @throws InvalidResumeTargetException
      *             If the data in the target of a resume does not match the data in the source. 
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    Copy copy(Path source, Path target, CopyOption... options) throws CobaltException;
+    Copy copy(Path source, Path target, CopyOption... options) throws XenonException;
 
     /**
      * Move or rename an existing source path to a non-existing target path.
@@ -213,10 +213,10 @@ public interface Files {
      *             If the source file does not exist or the target parent directory does not exist.
      * @throws PathAlreadyExistsException
      *             If the target file already exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the move failed.
      */
-    void move(Path source, Path target) throws CobaltException;
+    void move(Path source, Path target) throws XenonException;
 
     /**
      * Retrieve the status of an asynchronous copy.
@@ -228,10 +228,10 @@ public interface Files {
      * 
      * @throws NoSuchCopyException
      *             If the copy is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    CopyStatus getCopyStatus(Copy copy) throws CobaltException;
+    CopyStatus getCopyStatus(Copy copy) throws XenonException;
 
     /**
      * Cancel a copy operation.
@@ -241,10 +241,10 @@ public interface Files {
      * 
      * @throws NoSuchCopyException
      *             If the copy is not known.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    CopyStatus cancelCopy(Copy copy) throws CobaltException;
+    CopyStatus cancelCopy(Copy copy) throws XenonException;
 
     /**
      * Creates a new directory, failing if the directory already exists. All nonexistent parent directories are also created.
@@ -255,10 +255,10 @@ public interface Files {
      * @throws PathAlreadyExistsException
      *             If the directory already exists or if a parent directory could not be created because a file with the same name
      *             already exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    void createDirectories(Path dir) throws CobaltException;
+    void createDirectories(Path dir) throws XenonException;
 
     /**
      * Creates a new directory, failing if the directory already exists.
@@ -268,10 +268,10 @@ public interface Files {
      * 
      * @throws PathAlreadyExistsException
      *             If the directory already exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    void createDirectory(Path dir) throws CobaltException;
+    void createDirectory(Path dir) throws XenonException;
 
     /**
      * Creates a new empty file, failing if the file already exists.
@@ -281,10 +281,10 @@ public interface Files {
      * 
      * @throws PathAlreadyExistsException
      *             If the directory already exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    void createFile(Path path) throws CobaltException;
+    void createFile(Path path) throws XenonException;
 
     /**
      * Deletes an existing path.
@@ -296,10 +296,10 @@ public interface Files {
      * 
      * @throws NoSuchFileExistsException
      *             If the <code>path</code> does not exist.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    void delete(Path path) throws CobaltException;
+    void delete(Path path) throws XenonException;
 
     /**
      * Tests if a path exists.
@@ -309,10 +309,10 @@ public interface Files {
      * 
      * @return If the path exists.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    boolean exists(Path path) throws CobaltException;
+    boolean exists(Path path) throws XenonException;
 
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code>.
@@ -325,10 +325,10 @@ public interface Files {
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir) throws CobaltException;
+    DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException;
 
     /**
      * Create a DirectoryStream that iterates over all entries in the directory <code>dir</code> that are accepted by the filter.
@@ -344,10 +344,10 @@ public interface Files {
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws CobaltException;
+    DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException;
 
     /**
      * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code>.
@@ -361,10 +361,10 @@ public interface Files {
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws CobaltException;
+    DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException;
 
     /**
      * Create a DirectoryStream that iterates over all PathAttributePair entries in the directory <code>dir</code> that are
@@ -381,11 +381,11 @@ public interface Files {
      *             If a directory does not exists.
      * @throws IllegalSourcePathException
      *             If dir is not a directory.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
     DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
-            throws CobaltException;
+            throws XenonException;
 
     /**
      * Open an existing file and return an {@link InputStream} to read from this file.
@@ -399,10 +399,10 @@ public interface Files {
      *             If a file does not exists.
      * @throws IllegalSourcePathException
      *             If path not file.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    InputStream newInputStream(Path path) throws CobaltException;
+    InputStream newInputStream(Path path) throws XenonException;
 
     /**
      * Open an file and return an {@link OutputStream} to write to this file.
@@ -457,10 +457,10 @@ public interface Files {
      *             If path is not a file.
      * @throws InvalidOpenOptionsException
      *             If an invalid combination of OpenOptions was provided.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    OutputStream newOutputStream(Path path, OpenOption... options) throws CobaltException;
+    OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException;
 
     /**
      * Get the {@link FileAttributes} of an existing path.
@@ -472,10 +472,10 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If a file does not exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    FileAttributes getAttributes(Path path) throws CobaltException;
+    FileAttributes getAttributes(Path path) throws XenonException;
 
     /**
      * Reads the target of a symbolic link (optional operation).
@@ -489,10 +489,10 @@ public interface Files {
      *             If the link does not exists.
      * @throws IllegalSourcePathException
      *             If the source is not a link.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    Path readSymbolicLink(Path link) throws CobaltException;
+    Path readSymbolicLink(Path link) throws XenonException;
 
     /**
      * Sets the POSIX permissions of a path.
@@ -504,9 +504,9 @@ public interface Files {
      * 
      * @throws NoSuchPathException
      *             If the target path does not exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If an I/O error occurred.
      */
-    void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws CobaltException;
+    void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException;
 
 }

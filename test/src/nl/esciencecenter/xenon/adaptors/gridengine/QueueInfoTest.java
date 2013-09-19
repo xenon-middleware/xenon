@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.QueueInfo;
 
 import org.junit.FixMethodOrder;
@@ -37,7 +37,7 @@ import org.junit.runners.MethodSorters;
 public class QueueInfoTest {
 
     @Test
-    public void test01a_queueInfoFromMap_Map_Result() throws CobaltException {
+    public void test01a_queueInfoFromMap_Map_Result() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("qname", "some.q");
@@ -54,8 +54,8 @@ public class QueueInfoTest {
         assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    @Test(expected = CobaltException.class)
-    public void test01b_queueInfoFromMap_NoName_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test01b_queueInfoFromMap_NoName_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         //input.put("qname", "some.q");
@@ -72,8 +72,8 @@ public class QueueInfoTest {
         assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    @Test(expected = CobaltException.class)
-    public void test01c_queueInfoFromMap_NoSlots_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test01c_queueInfoFromMap_NoSlots_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("qname", "some.q");
@@ -90,8 +90,8 @@ public class QueueInfoTest {
         assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    @Test(expected = CobaltException.class)
-    public void test01d_queueInfoFromMap_IncorrectSlots_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test01d_queueInfoFromMap_IncorrectSlots_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("qname", "some.q");
@@ -108,8 +108,8 @@ public class QueueInfoTest {
         assertArrayEquals("queue pe list incorrect", expectedPeList, result.getParallelEnvironments());
     }
 
-    @Test(expected = CobaltException.class)
-    public void test01e_queueInfoFromMap_NoPeList_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test01e_queueInfoFromMap_NoPeList_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("qname", "some.q");
@@ -127,7 +127,7 @@ public class QueueInfoTest {
     }
 
     @Test
-    public void test02_toString_SomeInfo_Result() throws CobaltException {
+    public void test02_toString_SomeInfo_Result() throws XenonException {
         QueueInfo info = new QueueInfo("some.name", 4, "some.pe", "other.pe");
 
         String result = info.toString();

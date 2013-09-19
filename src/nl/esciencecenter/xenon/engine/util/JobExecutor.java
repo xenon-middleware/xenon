@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.engine.util;
 
 import java.io.IOException;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.files.Files;
@@ -81,7 +81,7 @@ public class JobExecutor implements Runnable {
         return hasRun;
     }
 
-    public synchronized boolean kill() throws CobaltException {
+    public synchronized boolean kill() throws XenonException {
 
         if (done) {
             return true;
@@ -150,13 +150,13 @@ public class JobExecutor implements Runnable {
         this.streams = streams;
     }
 
-    public synchronized Streams getStreams() throws CobaltException {
+    public synchronized Streams getStreams() throws XenonException {
 
         if (job.getJobDescription().isInteractive()) {
             return streams;
         }
 
-        throw new CobaltException(adaptorName, "Job is not interactive!");
+        throw new XenonException(adaptorName, "Job is not interactive!");
     }
 
     public synchronized JobStatus waitUntilRunning(long timeout) {
@@ -323,7 +323,7 @@ public class JobExecutor implements Runnable {
             } else {
                 process = new BatchProcess(files, workingDirectory, job, factory);
             }
-        } catch (IOException | CobaltException e) {
+        } catch (IOException | XenonException e) {
             updateState("ERROR", -1, e);
             return;
         }

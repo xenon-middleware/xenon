@@ -24,9 +24,9 @@ import static org.junit.Assert.assertTrue;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -41,7 +41,7 @@ import org.junit.Test;
 
 public class RealSandboxTest {
 
-    private static Cobalt octopus;
+    private static Xenon octopus;
     private static Files files;
     private static FileSystem fileSystem;
 
@@ -54,7 +54,7 @@ public class RealSandboxTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
         files = octopus.files();
         
         Path cwd = Utils.getLocalCWD(files);
@@ -73,27 +73,27 @@ public class RealSandboxTest {
     @AfterClass
     public static void cleanup() throws Exception {
         Utils.recursiveDelete(files, testDir);
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     public static synchronized String getNextSandbox() {
         return "sandbox-" + counter++;
     }
 
-    @Test(expected = CobaltException.class)
-    public void testSandbox_WithNullOctopus() throws URISyntaxException, CobaltException {
+    @Test(expected = XenonException.class)
+    public void testSandbox_WithNullOctopus() throws URISyntaxException, XenonException {
         // throws exception
         new Sandbox(null, testDir, getNextSandbox());
     }
 
-    @Test(expected = CobaltException.class)
-    public void testSandbox_WithNullPath() throws URISyntaxException, CobaltException {
+    @Test(expected = XenonException.class)
+    public void testSandbox_WithNullPath() throws URISyntaxException, XenonException {
         // throws exception
         new Sandbox(files, null, getNextSandbox());
     }
 
     @Test
-    public void testSandbox_WithName() throws URISyntaxException, CobaltException {
+    public void testSandbox_WithName() throws URISyntaxException, XenonException {
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
 
@@ -104,7 +104,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testSandbox_WithoutName() throws URISyntaxException, CobaltException {
+    public void testSandbox_WithoutName() throws URISyntaxException, XenonException {
 
         Sandbox sandbox = new Sandbox(files, testDir, null);
 
@@ -115,7 +115,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddUploadFile_SrcAndDst() throws URISyntaxException, CobaltException {
+    public void testAddUploadFile_SrcAndDst() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -131,7 +131,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testSetUploadFiles() throws URISyntaxException, CobaltException {
+    public void testSetUploadFiles() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -153,7 +153,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, CobaltException {
+    public void testAddUploadFile_DstNull_DstSameFileName() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -170,7 +170,7 @@ public class RealSandboxTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, CobaltException {
+    public void testAddUploadFile_SrcNull_NullPointerException() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -179,7 +179,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddDownloadFile() throws URISyntaxException, CobaltException {
+    public void testAddDownloadFile() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -196,7 +196,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testAddDownloadFileSrcNull() throws URISyntaxException, CobaltException {
+    public void testAddDownloadFileSrcNull() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -213,7 +213,7 @@ public class RealSandboxTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAddDownloadFileDstNull() throws URISyntaxException, CobaltException {
+    public void testAddDownloadFileDstNull() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -223,7 +223,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testUploadDelete() throws CobaltException, URISyntaxException {
+    public void testUploadDelete() throws XenonException, URISyntaxException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -244,7 +244,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testUploadDownloadDelete() throws CobaltException, URISyntaxException {
+    public void testUploadDownloadDelete() throws XenonException, URISyntaxException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -274,7 +274,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testDoubleUploadDelete() throws CobaltException, URISyntaxException {
+    public void testDoubleUploadDelete() throws XenonException, URISyntaxException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -298,7 +298,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testHashCode() throws URISyntaxException, CobaltException {
+    public void testHashCode() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -314,7 +314,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testToString() throws URISyntaxException, CobaltException {
+    public void testToString() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
         Sandbox sandbox = new Sandbox(files, testDir, name);
@@ -326,27 +326,27 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_sameObject_equal() throws URISyntaxException, CobaltException {
+    public void testEquals_sameObject_equal() throws URISyntaxException, XenonException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertEquals(sandbox, sandbox);
     }
 
     @Test
-    public void testEquals_otherClass_notEqual() throws URISyntaxException, CobaltException {
+    public void testEquals_otherClass_notEqual() throws URISyntaxException, XenonException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(42));
     }
 
     @Test
-    public void testEquals_otherNull_notEqual() throws URISyntaxException, CobaltException {
+    public void testEquals_otherNull_notEqual() throws URISyntaxException, XenonException {
         Sandbox sandbox = new Sandbox(files, testDir, getNextSandbox());
         assertFalse(sandbox.equals(null));
     }
 
     @Test
-    public void testEquals_otherOctopus_notEqual() throws URISyntaxException, CobaltException {
+    public void testEquals_otherOctopus_notEqual() throws URISyntaxException, XenonException {
 
-        Cobalt octopus2 = CobaltFactory.newCobalt(null);
+        Xenon octopus2 = XenonFactory.newXenon(null);
 
         String name = getNextSandbox();
 
@@ -355,11 +355,11 @@ public class RealSandboxTest {
 
         assertNotEquals(sandbox1, sandbox2);
 
-        CobaltFactory.endCobalt(octopus2);
+        XenonFactory.endXenon(octopus2);
     }
 
     @Test
-    public void testEquals_otherPath_notEqual() throws URISyntaxException, CobaltException {
+    public void testEquals_otherPath_notEqual() throws URISyntaxException, XenonException {
 
         Path path = Utils.resolveWithEntryPath(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
 
@@ -372,7 +372,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_otherUpload_notEqual() throws URISyntaxException, CobaltException {
+    public void testEquals_otherUpload_notEqual() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
 
@@ -384,7 +384,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_otherDownload_notEqual() throws URISyntaxException, CobaltException {
+    public void testEquals_otherDownload_notEqual() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
 
@@ -396,7 +396,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_sameUpload_Equal() throws URISyntaxException, CobaltException {
+    public void testEquals_sameUpload_Equal() throws URISyntaxException, XenonException {
 
         String name = getNextSandbox();
 
@@ -410,7 +410,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testPair_Equals() throws URISyntaxException, CobaltException {
+    public void testPair_Equals() throws URISyntaxException, XenonException {
 
         Path src = testInput1;
         Path dst = testInput2;
@@ -439,7 +439,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testPair_hashCode() throws URISyntaxException, CobaltException {
+    public void testPair_hashCode() throws URISyntaxException, XenonException {
 
         Path src = testInput1;
         Path dst = testInput2;
@@ -476,7 +476,7 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testPair_toString() throws URISyntaxException, CobaltException {
+    public void testPair_toString() throws URISyntaxException, XenonException {
 
         Path src = testInput1;
         Path dst = testInput2;

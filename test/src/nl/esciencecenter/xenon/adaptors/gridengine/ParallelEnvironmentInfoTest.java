@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.ParallelEnvironmentInfo;
 import nl.esciencecenter.xenon.adaptors.gridengine.ParallelEnvironmentInfo.AllocationRule;
 
@@ -37,7 +37,7 @@ import org.junit.runners.MethodSorters;
 public class ParallelEnvironmentInfoTest {
 
     @Test
-    public void test01a_parallelEnvironmentInfoFromMap_IntegerRule_Result() throws CobaltException {
+    public void test01a_parallelEnvironmentInfoFromMap_IntegerRule_Result() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -54,7 +54,7 @@ public class ParallelEnvironmentInfoTest {
     }
 
     @Test
-    public void test01b_parallelEnvironmentInfoFromMap_PeSlotsRule_Result() throws CobaltException {
+    public void test01b_parallelEnvironmentInfoFromMap_PeSlotsRule_Result() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -70,7 +70,7 @@ public class ParallelEnvironmentInfoTest {
     }
 
     @Test
-    public void test01c_parallelEnvironmentInfoFromMap_RoundRobinRule_Result() throws CobaltException {
+    public void test01c_parallelEnvironmentInfoFromMap_RoundRobinRule_Result() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -86,7 +86,7 @@ public class ParallelEnvironmentInfoTest {
     }
 
     @Test
-    public void test01d_parallelEnvironmentInfoFromMap_RoundRobinRule_Result() throws CobaltException {
+    public void test01d_parallelEnvironmentInfoFromMap_RoundRobinRule_Result() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -101,8 +101,8 @@ public class ParallelEnvironmentInfoTest {
                 result.getAllocationRule());
     }
     
-    @Test(expected=CobaltException.class)
-    public void test01e_parallelEnvironmentInfoFromMap_IncorrectAllocationRule_ExceptionThrown() throws CobaltException {
+    @Test(expected=XenonException.class)
+    public void test01e_parallelEnvironmentInfoFromMap_IncorrectAllocationRule_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -112,8 +112,8 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
     
-    @Test(expected=CobaltException.class)
-    public void test01f_parallelEnvironmentInfoFromMap_NoName_ExceptionThrown() throws CobaltException {
+    @Test(expected=XenonException.class)
+    public void test01f_parallelEnvironmentInfoFromMap_NoName_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("slots", "200");
@@ -122,8 +122,8 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
     
-    @Test(expected=CobaltException.class)
-    public void test01g_parallelEnvironmentInfoFromMap_NoSlots_ExceptionThrown() throws CobaltException {
+    @Test(expected=XenonException.class)
+    public void test01g_parallelEnvironmentInfoFromMap_NoSlots_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -132,8 +132,8 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
     
-    @Test(expected=CobaltException.class)
-    public void test01h_parallelEnvironmentInfoFromMap_IncorrectSlots_ExceptionThrown() throws CobaltException {
+    @Test(expected=XenonException.class)
+    public void test01h_parallelEnvironmentInfoFromMap_IncorrectSlots_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -143,8 +143,8 @@ public class ParallelEnvironmentInfoTest {
         new ParallelEnvironmentInfo(input);
     }
     
-    @Test(expected=CobaltException.class)
-    public void test01i_parallelEnvironmentInfoFromMap_NoAllocationRule_ExceptionThrown() throws CobaltException {
+    @Test(expected=XenonException.class)
+    public void test01i_parallelEnvironmentInfoFromMap_NoAllocationRule_ExceptionThrown() throws XenonException {
         Map<String, String> input = new HashMap<String, String>();
 
         input.put("pe_name", "some.pe");
@@ -154,7 +154,7 @@ public class ParallelEnvironmentInfoTest {
     }
 
     @Test
-    public void test02_toString_SomeInfo_Result() throws CobaltException {
+    public void test02_toString_SomeInfo_Result() throws XenonException {
         ParallelEnvironmentInfo info = new ParallelEnvironmentInfo("some.name", 4, AllocationRule.INTEGER, 2);
         
         String result = info.toString();

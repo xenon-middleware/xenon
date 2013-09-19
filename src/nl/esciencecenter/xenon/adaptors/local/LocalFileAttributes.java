@@ -22,7 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
@@ -87,7 +87,7 @@ public class LocalFileAttributes implements FileAttributes {
     private final boolean isWindows;
     
     
-    public LocalFileAttributes(Path path) throws CobaltException {
+    public LocalFileAttributes(Path path) throws XenonException {
         try {
             java.nio.file.Path javaPath = LocalUtils.javaPath(path);
 
@@ -139,7 +139,7 @@ public class LocalFileAttributes implements FileAttributes {
             }
             
         } catch (IOException e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Cannot read attributes.", e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Cannot read attributes.", e);
         }
     }
 

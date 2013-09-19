@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
 public class SchedulerImplementation implements Scheduler {
@@ -29,7 +29,7 @@ public class SchedulerImplementation implements Scheduler {
     private final String scheme;
     private final String location;
     
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
     private final String[] queueNames;
     private final Credential credential;
 
@@ -38,7 +38,7 @@ public class SchedulerImplementation implements Scheduler {
     private final boolean supportsBatch;
 
     public SchedulerImplementation(String adaptorName, String uniqueID, String scheme, String location, String[] queueNames, 
-            Credential credential, CobaltProperties properties, boolean isOnline, boolean supportsInteractive, 
+            Credential credential, XenonProperties properties, boolean isOnline, boolean supportsInteractive, 
             boolean supportsBatch) {
 
         if (adaptorName == null) {
@@ -59,7 +59,7 @@ public class SchedulerImplementation implements Scheduler {
         this.supportsBatch = supportsBatch;
 
         if (properties == null) {
-            this.properties = new CobaltProperties();
+            this.properties = new XenonProperties();
         } else {
             this.properties = properties;
         }

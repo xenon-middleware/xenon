@@ -22,9 +22,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltFactory;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -52,7 +52,7 @@ public class InterSchemeCopyTest {
     @Test
     public void test_copy_local_ssh() throws Exception {
 
-        Cobalt octopus = CobaltEngine.newCobalt(null);
+        Xenon octopus = XenonEngine.newXenon(null);
 
         String configfile = System.getProperty("test.config");
         
@@ -107,6 +107,6 @@ public class InterSchemeCopyTest {
         files.delete(localDir);
         files.delete(sshDir);
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 }

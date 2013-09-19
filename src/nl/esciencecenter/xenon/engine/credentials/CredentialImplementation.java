@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
  * A container for security Information.
@@ -39,9 +39,9 @@ public abstract class CredentialImplementation implements Credential {
 
     private final String adaptorName;
 
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
 
-    protected CredentialImplementation(String adaptorName, String uniqueID, CobaltProperties properties, String username,
+    protected CredentialImplementation(String adaptorName, String uniqueID, XenonProperties properties, String username,
             char[] password) {
 
         this.adaptorName = adaptorName;
@@ -55,7 +55,7 @@ public abstract class CredentialImplementation implements Credential {
         }
 
         if (properties == null) {
-            this.properties = new CobaltProperties();
+            this.properties = new XenonProperties();
         } else {
             this.properties = properties;
         }

@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.gridengine;
 import java.util.Arrays;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 
 /**
@@ -32,30 +32,30 @@ class QueueInfo {
     private final int slots;
     private final String[] parallelEnvironments;
 
-    QueueInfo(Map<String, String> info) throws CobaltException {
+    QueueInfo(Map<String, String> info) throws XenonException {
         name = info.get("qname");
 
         if (name == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in output");
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name of queue in output");
         }
 
         String slotsValue = info.get("slots");
 
         if (slotsValue == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue \"" + name + "\"");
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for queue \"" + name + "\"");
         }
 
         try {
             slots = Integer.parseInt(slotsValue);
         } catch (NumberFormatException e) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue \"" + name + "\", got \""
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for queue \"" + name + "\", got \""
                     + slotsValue + "\"", e);
         }
 
         String peValue = info.get("pe_list");
 
         if (peValue == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue \"" + name + "\"");
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue \"" + name + "\"");
         }
         parallelEnvironments = peValue.split(ScriptingParser.WHITESPACE_REGEX);
     }

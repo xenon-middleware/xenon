@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.FakeScriptingJob;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
@@ -190,7 +190,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test03a_getJobStatusFromQacctInfo_doneJob_JobStatus() throws CobaltException {
+    public void test03a_getJobStatusFromQacctInfo_doneJob_JobStatus() throws XenonException {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("jobnumber", jobnumber);
@@ -210,7 +210,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test03b_getJobStatusFromQacctInfo_CanceledJob_JobStatusWithException() throws CobaltException {
+    public void test03b_getJobStatusFromQacctInfo_CanceledJob_JobStatusWithException() throws XenonException {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("jobnumber", jobnumber);
@@ -231,7 +231,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test03c_getJobStatusFromQacctInfo_JobWithNonZeroexit_status_JobStatusWithNoException() throws CobaltException {
+    public void test03c_getJobStatusFromQacctInfo_JobWithNonZeroexit_status_JobStatusWithNoException() throws XenonException {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("jobnumber", jobnumber);
@@ -251,7 +251,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test03d_getJobStatusFromQacctInfo_FailedJob_JobStatusWithException() throws CobaltException {
+    public void test03d_getJobStatusFromQacctInfo_FailedJob_JobStatusWithException() throws XenonException {
         String jobnumber = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("jobnumber", jobnumber);
@@ -265,7 +265,7 @@ public class GridEngineSchedulerConnectionTest {
         assertEquals("done", result.getState());
         assertEquals(new Integer(4), result.getExitCode());
         assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof CobaltException);
+        assertTrue(result.getException() instanceof XenonException);
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
@@ -273,7 +273,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test03e_getJobStatusFromQacctInfo_NullInput_NullReturned() throws CobaltException {
+    public void test03e_getJobStatusFromQacctInfo_NullInput_NullReturned() throws XenonException {
         String jobnumber = "555";
         Job job = new FakeScriptingJob(jobnumber);
         JobStatus result = GridEngineSchedulerConnection.getJobStatusFromQacctInfo(null, job);
@@ -281,8 +281,8 @@ public class GridEngineSchedulerConnectionTest {
         assertNull(result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test03f_getJobStatusFromQacctInfo_IncompleteJobInfo_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test03f_getJobStatusFromQacctInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobnumber = "555";
         //empty job info
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -292,8 +292,8 @@ public class GridEngineSchedulerConnectionTest {
         GridEngineSchedulerConnection.getJobStatusFromQacctInfo(jobInfo, job);
     }
     
-    @Test(expected = CobaltException.class)
-    public void test03g_getJobStatusFromQacctInfo_ExitCodeNotANumber_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test03g_getJobStatusFromQacctInfo_ExitCodeNotANumber_ExceptionThrown() throws XenonException {
         String jobnumber = "555";
         //empty job info
         Map<String, String> jobInfo = new HashMap<String, String>();
@@ -307,7 +307,7 @@ public class GridEngineSchedulerConnectionTest {
     }
     
     @Test
-    public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws CobaltException {
+    public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JB_job_number", jobID);
@@ -329,7 +329,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test04b_getJobStatusFromQstatInfo_RunningJob_JobStatus() throws CobaltException {
+    public void test04b_getJobStatusFromQstatInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JB_job_number", jobID);
@@ -351,7 +351,7 @@ public class GridEngineSchedulerConnectionTest {
     }
     
     @Test
-    public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws CobaltException {
+    public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws XenonException {
         String jobID = "555";
         Map<String, String> jobInfo = new HashMap<String, String>();
         jobInfo.put("JB_job_number", jobID);
@@ -367,7 +367,7 @@ public class GridEngineSchedulerConnectionTest {
         assertEquals("error", result.getState());
         assertNull(result.getExitCode());
         assertTrue(result.hasException());
-        assertTrue(result.getException() instanceof CobaltException);
+        assertTrue(result.getException() instanceof XenonException);
         assertFalse(result.getException() instanceof JobCanceledException);
         assertFalse(result.isRunning());
         assertTrue(result.isDone());
@@ -375,7 +375,7 @@ public class GridEngineSchedulerConnectionTest {
     }
 
     @Test
-    public void test04d_getJobStatusFromQstatInfo_JobNotInMap_NullReturned() throws CobaltException {
+    public void test04d_getJobStatusFromQstatInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
         Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
         Job job = new FakeScriptingJob(jobID);
@@ -384,8 +384,8 @@ public class GridEngineSchedulerConnectionTest {
         assertNull(result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test04e_getJobStatusFromQstatInfo_IncompleteJobInfo_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test04e_getJobStatusFromQstatInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
 
         //very incomplete job info

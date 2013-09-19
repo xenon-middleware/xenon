@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineXmlParser;
 
@@ -78,7 +78,7 @@ public class GridEngineXmlParserTest {
         parser.parseDocument(input);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test01c_checkVersion_EmptyFile_ExceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/jobs-empty.xml");
 
@@ -102,7 +102,7 @@ public class GridEngineXmlParserTest {
         assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
     }
     
-    @Test(expected=CobaltException.class)
+    @Test(expected=XenonException.class)
     public void test02b_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
         String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
@@ -112,7 +112,7 @@ public class GridEngineXmlParserTest {
         parser.parseQueueInfos(input);
     }
     
-    @Test(expected=CobaltException.class)
+    @Test(expected=XenonException.class)
     public void test02c_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
         String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
@@ -122,7 +122,7 @@ public class GridEngineXmlParserTest {
         parser.parseQueueInfos(input);
     }
     
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test02d_parseQueueInfo_queueEmptyName_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/queues-queue-empty-name.xml");
 
@@ -134,7 +134,7 @@ public class GridEngineXmlParserTest {
     }
 
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test02e_parseQueueInfo_queueWithoutName_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/queues-queue-without-name.xml");
 
@@ -170,7 +170,7 @@ public class GridEngineXmlParserTest {
     }
     
     
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/jobs-empty-jobnumber.xml");
 
@@ -182,7 +182,7 @@ public class GridEngineXmlParserTest {
     }
 
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test03c_parseJobInfo_jobWithoutJobNumber_exceptionThrown() throws Throwable {
         String input = readFile("test/fixtures/gridengine/jobs-without-jobnumber.xml");
 

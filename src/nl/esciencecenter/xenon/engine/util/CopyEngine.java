@@ -26,7 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.files.CopyImplementation;
 import nl.esciencecenter.xenon.engine.files.CopyStatusImplementation;
 import nl.esciencecenter.xenon.files.Copy;
@@ -143,7 +143,7 @@ public final class CopyEngine {
         }
     }
 
-    private void append(Path source, long fromOffset, Path target, CopyInfo ac) throws CobaltException {
+    private void append(Path source, long fromOffset, Path target, CopyInfo ac) throws XenonException {
 
         // We need to append some bytes from source to target. 
         LOGGER.debug("Appending from {} to {} starting at {}", source, target, fromOffset);
@@ -159,7 +159,7 @@ public final class CopyEngine {
                 long tmp = in.skip(fromOffset);
 
                 if (tmp <= 0) {
-                    throw new CobaltException(NAME, "Failed to seek file " + source + " to " + fromOffset);
+                    throw new XenonException(NAME, "Failed to seek file " + source + " to " + fromOffset);
                 }
 
                 skipped += tmp;
@@ -167,7 +167,7 @@ public final class CopyEngine {
 
             streamCopy(in, out, ac);
         } catch (IOException e) {
-            throw new CobaltException(NAME, "Failed to copy " + source + ":" + fromOffset + " to target " + target, e);
+            throw new XenonException(NAME, "Failed to copy " + source + ":" + fromOffset + " to target " + target, e);
         } finally {
             close(in);
             close(out);
@@ -195,7 +195,7 @@ public final class CopyEngine {
         return offset;
     }
 
-    private boolean compareHead(CopyInfo ac, Path target, Path source) throws CobaltException, IOException {
+    private boolean compareHead(CopyInfo ac, Path target, Path source) throws XenonException, IOException {
 
         LOGGER.debug("Compare head of {} to {}", target, source);
 
@@ -209,7 +209,7 @@ public final class CopyEngine {
             while (true) {
 
                 if (ac.isCancelled()) {
-                    throw new CobaltException(NAME, "Copy killed by user");
+                    throw new XenonException(NAME, "Copy killed by user");
                 }
 
                 int size1 = readFully(in1, buf1);
@@ -235,7 +235,7 @@ public final class CopyEngine {
         }
     }
 
-    private void doResume(CopyInfo ac) throws CobaltException {
+    private void doResume(CopyInfo ac) throws XenonException {
 
         if (ac.isCancelled()) {
             ac.setException(new IOException("Copy killed by user"));
@@ -296,7 +296,7 @@ public final class CopyEngine {
                     throw new InvalidResumeTargetException(NAME, "Data in target " + target + " does not match source " + source);
                 }
             } catch (IOException e) {
-                throw new CobaltException(NAME, "Failed to compare " + source + " to " + target, e);
+                throw new XenonException(NAME, "Failed to compare " + source + " to " + target, e);
             }
         }
 
@@ -324,7 +324,7 @@ public final class CopyEngine {
         append(source, targetSize, target, ac);
     }
 
-    private void doAppend(CopyInfo ac) throws CobaltException {
+    private void doAppend(CopyInfo ac) throws XenonException {
 
         if (ac.isCancelled()) {
             ac.setException(new IOException("Copy killed by user"));
@@ -370,7 +370,7 @@ public final class CopyEngine {
         append(source, 0, target, ac);
     }
 
-    private void doCopy(CopyInfo ac) throws CobaltException {
+    private void doCopy(CopyInfo ac) throws XenonException {
 
         if (ac.isCancelled()) {
             ac.setException(new IOException("Copy killed by user"));
@@ -437,7 +437,7 @@ public final class CopyEngine {
             streamCopy(in, out, ac);
 
         } catch (IOException e) {
-            throw new CobaltException(NAME, "Failed to copy " + source + " to " + target, e);
+            throw new XenonException(NAME, "Failed to copy " + source + " to " + target, e);
         } finally {
             close(in);
             close(out);
@@ -465,7 +465,7 @@ public final class CopyEngine {
                 doResume(info);
                 break;
             default:
-                throw new CobaltException(NAME, "INTERNAL ERROR: Failed to recognise copy mode! (" + mode + " "
+                throw new XenonException(NAME, "INTERNAL ERROR: Failed to recognise copy mode! (" + mode + " "
                         + info.mustVerify() + ")");
             }
         } catch (Exception e) {

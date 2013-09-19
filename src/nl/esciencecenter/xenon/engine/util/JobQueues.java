@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.engine.jobs.QueueStatusImplementation;
@@ -120,14 +120,14 @@ public class JobQueues {
         return jobID;
     }
 
-    private void checkScheduler(Scheduler scheduler) throws CobaltException {
+    private void checkScheduler(Scheduler scheduler) throws XenonException {
 
         if (scheduler == null) {
             throw new IllegalArgumentException("Adaptor " + adaptorName + ": Scheduler is null!");
         }
 
         if (scheduler != myScheduler) {
-            throw new CobaltException(adaptorName, "Scheduler mismatch! " + scheduler + " != " + myScheduler);
+            throw new XenonException(adaptorName, "Scheduler mismatch! " + scheduler + " != " + myScheduler);
         }
     }
 
@@ -137,7 +137,7 @@ public class JobQueues {
         }
     }
 
-    public String getDefaultQueueName(Scheduler scheduler) throws CobaltException {
+    public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
         return "single";
     }
 
@@ -170,7 +170,7 @@ public class JobQueues {
         return out.toArray(new Job[out.size()]);
     }
 
-    private List<JobExecutor> findQueue(String queueName) throws CobaltException {
+    private List<JobExecutor> findQueue(String queueName) throws XenonException {
 
         if (queueName == null || queueName.equals("single")) {
             return singleQ;
@@ -179,11 +179,11 @@ public class JobQueues {
         } else if (queueName.equals("unlimited")) {
             return unlimitedQ;
         } else {
-            throw new CobaltException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
+            throw new XenonException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
         }
     }
 
-    private JobExecutor findJob(List<JobExecutor> queue, Job job) throws CobaltException {
+    private JobExecutor findJob(List<JobExecutor> queue, Job job) throws XenonException {
 
         for (JobExecutor e : queue) {
             if (e.getJob().equals(job)) {
@@ -191,10 +191,10 @@ public class JobQueues {
             }
         }
 
-        throw new CobaltException(adaptorName, "Job not found: " + job.getIdentifier());
+        throw new XenonException(adaptorName, "Job not found: " + job.getIdentifier());
     }
 
-    private JobExecutor findJob(Job job) throws CobaltException {
+    private JobExecutor findJob(Job job) throws XenonException {
         return findJob(findQueue(job.getJobDescription().getQueueName()), job);
     }
 
@@ -212,7 +212,7 @@ public class JobQueues {
         }
     }
 
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
 
         LOGGER.debug("{}: getJobStatus for job {}", adaptorName, job.getIdentifier());
 
@@ -241,7 +241,7 @@ public class JobQueues {
                 } else {
                     result[i] = null;
                 }
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 result[i] = new JobStatusImplementation(jobs[i], null, null, e, false, false, null);
             }
         }
@@ -249,12 +249,12 @@ public class JobQueues {
         return result;
     }
 
-    public JobStatus waitUntilDone(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
 
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
         if (timeout < 0) {
-            throw new CobaltException(adaptorName, "Illegal timeout " + timeout);
+            throw new XenonException(adaptorName, "Illegal timeout " + timeout);
         }
 
         checkScheduler(job.getScheduler());
@@ -272,12 +272,12 @@ public class JobQueues {
         return status;
     }
 
-    public JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
 
         LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
         if (timeout < 0) {
-            throw new CobaltException(adaptorName, "Illegal timeout " + timeout);
+            throw new XenonException(adaptorName, "Illegal timeout " + timeout);
         }
 
         checkScheduler(job.getScheduler());
@@ -295,7 +295,7 @@ public class JobQueues {
         return status;
     }
 
-    private void verifyJobDescription(JobDescription description) throws CobaltException {
+    private void verifyJobDescription(JobDescription description) throws XenonException {
 
         String queue = description.getQueueName();
 
@@ -348,7 +348,7 @@ public class JobQueues {
         }
     }
 
-    public Job submitJob(JobDescription description) throws CobaltException {
+    public Job submitJob(JobDescription description) throws XenonException {
 
         LOGGER.debug("{}: Submitting job", adaptorName);
 
@@ -388,14 +388,14 @@ public class JobQueues {
 
             if (executor.isDone() && !executor.hasRun()) {
                 cleanupJob(findQueue(queueName), result);
-                throw new CobaltException(adaptorName, "Job failed to start!", executor.getError());
+                throw new XenonException(adaptorName, "Job failed to start!", executor.getError());
             }
         }
 
         return result;
     }
 
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
 
         LOGGER.debug("{}: Cancel job {}", adaptorName, job);
 
@@ -422,7 +422,7 @@ public class JobQueues {
         return status;
     }
 
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
 
         LOGGER.debug("{}: getQueueStatus {}:{}", adaptorName, scheduler, queueName);
 
@@ -443,7 +443,7 @@ public class JobQueues {
         }
     }
 
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
 
         String[] names = queueNames;
 
@@ -462,7 +462,7 @@ public class JobQueues {
         for (int i = 0; i < names.length; i++) {
             try {
                 result[i] = getQueueStatus(scheduler, names[i]);
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 result[i] = new QueueStatusImplementation(scheduler, names[i], e, null);
             }
         }
@@ -470,7 +470,7 @@ public class JobQueues {
         return result;
     }
 
-    public Streams getStreams(Job job) throws CobaltException {
+    public Streams getStreams(Job job) throws XenonException {
         checkScheduler(job.getScheduler());
         return findJob(job).getStreams();
     }

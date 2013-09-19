@@ -19,16 +19,16 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Type;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
-import nl.esciencecenter.xenon.engine.CobaltPropertyDescriptionImplementation;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
+import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
@@ -64,7 +64,7 @@ public class SshAdaptor extends Adaptor {
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
     
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = CobaltEngine.ADAPTORS + "ssh.";
+    public static final String PREFIX = XenonEngine.ADAPTORS + "ssh.";
 
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
@@ -103,18 +103,18 @@ public class SshAdaptor extends Adaptor {
     public static final String SUBMITTED = JOBS + "submitted";
     
     /** List of properties supported by this SSH adaptor */
-    private static final ImmutableArray<CobaltPropertyDescription> VALID_PROPERTIES = new ImmutableArray<CobaltPropertyDescription>(
-            new CobaltPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
+            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
                     Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-            new CobaltPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
                     Component.FILESYSTEM), "true", "Enable strict host key checking."), 
-            new CobaltPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.COBALT), 
+            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON), 
                     "true", "Load the standard known_hosts file."), 
-            new CobaltPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
+            new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
-            new CobaltPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4", 
+            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4", 
                     "The maximum number of concurrent jobs in the multiq.."), 
-            new CobaltPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), 
+            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), 
                     null, "The gateway machine used to create an SSH tunnel to the target."));
 
     private final SshFiles filesAdaptor;
@@ -125,13 +125,13 @@ public class SshAdaptor extends Adaptor {
 
     private JSch jsch;
 
-    public SshAdaptor(CobaltEngine cobaltEngine, Map<String, String> properties) throws CobaltException {
+    public SshAdaptor(XenonEngine cobaltEngine, Map<String, String> properties) throws XenonException {
         this(cobaltEngine, new JSch(), properties);
     }
 
-    public SshAdaptor(CobaltEngine cobaltEngine, JSch jsch, Map<String, String> properties) throws CobaltException {
+    public SshAdaptor(XenonEngine cobaltEngine, JSch jsch, Map<String, String> properties) throws XenonException {
         super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
-                new CobaltProperties(VALID_PROPERTIES, Component.COBALT, properties));
+                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         this.filesAdaptor = new SshFiles(this, cobaltEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, cobaltEngine);
@@ -145,11 +145,11 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    private void setKnownHostsFile(String knownHostsFile) throws CobaltException {
+    private void setKnownHostsFile(String knownHostsFile) throws XenonException {
         try {
             jsch.setKnownHosts(knownHostsFile);
         } catch (JSchException e) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
         }
 
         if (LOGGER.isDebugEnabled()) {
@@ -168,7 +168,7 @@ public class SshAdaptor extends Adaptor {
     }
    
     @Override
-    public CobaltPropertyDescription[] getSupportedProperties() {
+    public XenonPropertyDescription[] getSupportedProperties() {
         return VALID_PROPERTIES.asArray();
     }
 
@@ -229,10 +229,10 @@ public class SshAdaptor extends Adaptor {
        returned by the server if the server does not implement an
        operation).
     */
-    CobaltException sftpExceptionToCobaltException(SftpException e) {
+    XenonException sftpExceptionToCobaltException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
-            return new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            return new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         case ChannelSftp.SSH_FX_EOF:
             return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, "Unexpected EOF", e);
         case ChannelSftp.SSH_FX_NO_SUCH_FILE:
@@ -240,9 +240,9 @@ public class SshAdaptor extends Adaptor {
         case ChannelSftp.SSH_FX_PERMISSION_DENIED:
             return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, "Permission denied", e);
         case ChannelSftp.SSH_FX_FAILURE:
-            return new CobaltException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
+            return new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
         case ChannelSftp.SSH_FX_BAD_MESSAGE:
-            return new CobaltException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
+            return new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
         case ChannelSftp.SSH_FX_NO_CONNECTION:
             return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, "SSH does not have a connection!", e);
         case ChannelSftp.SSH_FX_CONNECTION_LOST:
@@ -250,12 +250,12 @@ public class SshAdaptor extends Adaptor {
         case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
             return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, "Unsupported operation", e);
         default:
-            return new CobaltException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
+            return new XenonException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
         }
     }
 
-    protected SshMultiplexedSession createNewSession(SshLocation location, Credential credential, CobaltProperties properties)
-            throws CobaltException {
+    protected SshMultiplexedSession createNewSession(SshLocation location, Credential credential, XenonProperties properties)
+            throws XenonException {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
 

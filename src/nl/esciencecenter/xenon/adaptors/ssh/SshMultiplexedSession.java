@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
@@ -48,7 +48,7 @@ class SshMultiplexedSession {
     private static final Logger LOGGER = LoggerFactory.getLogger(SshMultiplexedSession.class);
 
     private final JSch jsch;
-    private final CobaltProperties properties;
+    private final XenonProperties properties;
 
     private Credential credential;
 
@@ -61,8 +61,8 @@ class SshMultiplexedSession {
 
     private List<SshSession> sessions = new ArrayList<>();
 
-    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation location, Credential cred, CobaltProperties properties)
-            throws CobaltException {
+    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation location, Credential cred, XenonProperties properties)
+            throws XenonException {
 
         LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
 
@@ -106,7 +106,7 @@ class SshMultiplexedSession {
             try {
                 gatewayLocation = SshLocation.parse(properties.getStringProperty(SshAdaptor.GATEWAY));
             } catch (InvalidLocationException e) {
-                throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Failed to parse gateway URI!", e);
+                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to parse gateway URI!", e);
             }
 
             if (gatewayLocation.getUser() == null) { 
@@ -119,15 +119,15 @@ class SshMultiplexedSession {
         createSession();
     }
 
-    private synchronized SshSession findSession(Channel c) throws CobaltException {
+    private synchronized SshSession findSession(Channel c) throws XenonException {
         try {
             return findSession(c.getSession());
         } catch (JSchException e) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Failed to retrieve Session from SSH Channel!", e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to retrieve Session from SSH Channel!", e);
         }
     }
 
-    private synchronized SshSession findSession(Session s) throws CobaltException {
+    private synchronized SshSession findSession(Session s) throws XenonException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession info = sessions.get(i);
@@ -137,17 +137,17 @@ class SshMultiplexedSession {
             }
         }
 
-        throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "SSH Session not found!");
+        throw new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH Session not found!");
     }
 
-    private synchronized SshSession createSession() throws CobaltException {
+    private synchronized SshSession createSession() throws XenonException {
         SshSession s = createSession(jsch, nextSessionID++, location, credential, gatewaySession, gatewayLocation, properties);
         sessions.add(s);
         return s;
     }
 
     private static synchronized SshSession createSession(JSch jsch, int sessionID, SshLocation location, Credential credential,
-            SshSession gateway, SshLocation gatewayLocation, CobaltProperties properties) throws CobaltException {
+            SshSession gateway, SshLocation gatewayLocation, XenonProperties properties) throws XenonException {
 
         String sessionHost = location.getHost();
         int sessionPort = location.getPort();
@@ -168,7 +168,7 @@ class SshMultiplexedSession {
         try {
             session = jsch.getSession(location.getUser(), sessionHost, sessionPort);
         } catch (JSchException e) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to create SSH session!", e);
         }
 
         if (credential instanceof PasswordCredentialImplementation) {
@@ -194,7 +194,7 @@ class SshMultiplexedSession {
         try {
             session.connect();
         } catch (JSchException e) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         return new SshSession(session, tunnelPort, sessionID);
@@ -205,9 +205,9 @@ class SshMultiplexedSession {
      * connecting.
      * 
      * @return the channel
-     * @throws CobaltException
+     * @throws XenonException
      */
-    synchronized ChannelExec getExecChannel() throws CobaltException {
+    synchronized ChannelExec getExecChannel() throws XenonException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession s = sessions.get(i);
@@ -222,16 +222,16 @@ class SshMultiplexedSession {
         try {
             SshSession s = createSession();
             return s.getExecChannel();
-        } catch (CobaltException e) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
+        } catch (XenonException e) {
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
         }
     }
 
-    synchronized void releaseExecChannel(ChannelExec channel) throws CobaltException {
+    synchronized void releaseExecChannel(ChannelExec channel) throws XenonException {
         findSession(channel).releaseExecChannel(channel);
     }
 
-    synchronized void failedExecChannel(ChannelExec channel) throws CobaltException {
+    synchronized void failedExecChannel(ChannelExec channel) throws XenonException {
         findSession(channel).failedExecChannel(channel);
     }
 
@@ -239,9 +239,9 @@ class SshMultiplexedSession {
      * Get a connected channel for doing sftp operations.
      * 
      * @return the channel
-     * @throws CobaltException
+     * @throws XenonException
      */
-    synchronized ChannelSftp getSftpChannel() throws CobaltException {
+    synchronized ChannelSftp getSftpChannel() throws XenonException {
 
         for (int i = 0; i < sessions.size(); i++) {
             SshSession s = sessions.get(i);
@@ -256,16 +256,16 @@ class SshMultiplexedSession {
         try {
             SshSession s = createSession();
             return s.getSftpChannel();
-        } catch (CobaltException e) {
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
+        } catch (XenonException e) {
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to create new SSH session!", e);
         }
     }
 
-    synchronized void releaseSftpChannel(ChannelSftp channel) throws CobaltException {
+    synchronized void releaseSftpChannel(ChannelSftp channel) throws XenonException {
         findSession(channel).releaseSftpChannel(channel);
     }
 
-    synchronized void failedSftpChannel(ChannelSftp channel) throws CobaltException {
+    synchronized void failedSftpChannel(ChannelSftp channel) throws XenonException {
         findSession(channel).failedSftpChannel(channel);
     }
 
@@ -283,7 +283,7 @@ class SshMultiplexedSession {
                 if (tunnelPort > 0) {
                     try {
                         gatewaySession.removeTunnel(tunnelPort);
-                    } catch (CobaltException e) {
+                    } catch (XenonException e) {
                         LOGGER.warn("Failed to remove SSH tunnel at localhost:" + tunnelPort);
                     }
                 }

@@ -16,12 +16,12 @@
 
 package nl.esciencecenter.xenon.adaptors.scripting;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 
@@ -42,10 +42,10 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ScriptingJobs jobsAdaptor;
     private final ForwardingCredentials credentialsAdaptor;
 
-    protected ScriptingAdaptor(CobaltEngine cobaltEngine, String name, String description, 
+    protected ScriptingAdaptor(XenonEngine cobaltEngine, String name, String description, 
             ImmutableArray<String> supportedSchemes, ImmutableArray<String> supportedLocations, 
-            ImmutableArray<CobaltPropertyDescription> validProperties, 
-            CobaltProperties properties, SchedulerConnectionFactory factory) throws CobaltException {
+            ImmutableArray<XenonPropertyDescription> validProperties, 
+            XenonProperties properties, SchedulerConnectionFactory factory) throws XenonException {
 
         super(cobaltEngine, name, description, supportedSchemes, supportedLocations, validProperties, properties);
 
@@ -64,12 +64,12 @@ public abstract class ScriptingAdaptor extends Adaptor {
     }
 
     @Override
-    public Files filesAdaptor() throws CobaltException {
-        throw new CobaltException(getName(), "Adaptor does not support files.");
+    public Files filesAdaptor() throws XenonException {
+        throw new XenonException(getName(), "Adaptor does not support files.");
     }
 
     @Override
-    public Credentials credentialsAdaptor() throws CobaltException {
+    public Credentials credentialsAdaptor() throws XenonException {
         return credentialsAdaptor;
     }
 }

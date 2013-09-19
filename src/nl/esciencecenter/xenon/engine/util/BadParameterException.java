@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.engine.util;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that a parameter has an invalid value.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class BadParameterException extends CobaltException {
+public class BadParameterException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

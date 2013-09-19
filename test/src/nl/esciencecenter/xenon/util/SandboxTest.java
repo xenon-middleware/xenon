@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Sandbox;
@@ -29,14 +29,14 @@ import org.junit.Test;
 
 public class SandboxTest {
     
-    @Test(expected = CobaltException.class)
-    public void testSandbox_WithNullOctopus() throws URISyntaxException, CobaltException {
+    @Test(expected = XenonException.class)
+    public void testSandbox_WithNullOctopus() throws URISyntaxException, XenonException {
         // throws exception
         new Sandbox(null, mock(Path.class), "sandbox-1");
     }
 
-    @Test(expected = CobaltException.class)
-    public void testSandbox_WithNullPath() throws URISyntaxException, CobaltException {
+    @Test(expected = XenonException.class)
+    public void testSandbox_WithNullPath() throws URISyntaxException, XenonException {
         // throws exception
         new Sandbox(mock(Files.class), null, "sandbox-1");
     }

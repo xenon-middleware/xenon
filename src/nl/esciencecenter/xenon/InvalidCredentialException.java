@@ -23,7 +23,7 @@ package nl.esciencecenter.xenon;
  * @version 1.0
  * @since 1.0
  */
-public class InvalidCredentialException extends CobaltException {
+public class InvalidCredentialException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

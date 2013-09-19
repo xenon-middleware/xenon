@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.adaptors.gridengine;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Class that holds some info on parallel environments used in Grid Engine.
@@ -40,30 +40,30 @@ class ParallelEnvironmentInfo {
     private final AllocationRule allocationRule;
     private final int ppn;
 
-    ParallelEnvironmentInfo(Map<String, String> info) throws CobaltException {
+    ParallelEnvironmentInfo(Map<String, String> info) throws XenonException {
         name = info.get("pe_name");
 
         if (name == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name for parallel environment");
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find name for parallel environment");
         }
 
         String slotsValue = info.get("slots");
 
         if (slotsValue == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for parallel environment " + name);
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find slots for parallel environment " + name);
         }
 
         try {
             slots = Integer.parseInt(slotsValue);
         } catch (NumberFormatException e) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for parallel environment " + name
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse slots for parallel environment " + name
                     + ", got " + slotsValue, e);
         }
 
         String allocationValue = info.get("allocation_rule");
 
         if (allocationValue == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for parallel environment "
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find allocation rule for parallel environment "
                     + name);
         } else if (allocationValue.equals(ALLOCATION_PE_SLOTS)) {
             allocationRule = AllocationRule.PE_SLOTS;
@@ -79,7 +79,7 @@ class ParallelEnvironmentInfo {
             try {
                 ppn = Integer.parseInt(allocationValue);
             } catch (NumberFormatException e) {
-                throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse allocation for parallel environment \""
+                throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot parse allocation for parallel environment \""
                         + name + "\", expected a number, got \"" + allocationValue + "\"", e);
             }
         }

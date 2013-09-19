@@ -23,10 +23,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
@@ -73,7 +73,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         return fsID++;
     }
 
-    public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) throws CobaltException {
+    public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) throws XenonException {
         this.localAdaptor = localAdaptor;
         this.copyEngine = copyEngine;
     }
@@ -83,22 +83,22 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      *  
      * @param path the path of which the parent must be checked. 
      *
-     * @throws CobaltException
+     * @throws XenonException
      *          If the parent does not exist. 
      *  
      */
-    private void checkParent(Path path) throws CobaltException {
+    private void checkParent(Path path) throws XenonException {
         
         RelativePath parentName = path.getRelativePath().getParent();
         
         if (parentName == null) { 
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Parent directory does not exist!");
         }
         
         Path parent = newPath(path.getFileSystem(), parentName);
             
         if (!exists(parent)) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
         }
     }
     
@@ -120,11 +120,11 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      *             If the source file does not exist or the target parent directory does not exist.
      * @throws PathAlreadyExistsException
      *             If the target file already exists.
-     * @throws CobaltException
+     * @throws XenonException
      *             If the move failed.
      */
     @Override
-    public void move(Path source, Path target) throws CobaltException {
+    public void move(Path source, Path target) throws XenonException {
 
         if (!exists(source)) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
@@ -147,7 +147,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws CobaltException {
+    public Path readSymbolicLink(Path link) throws XenonException {
 
         try {
             java.nio.file.Path path = LocalUtils.javaPath(link);
@@ -161,21 +161,21 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
             return newPath(link.getFileSystem(), parent.resolve(new RelativePath(target.toString())));
         } catch (IOException e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to read symbolic link.", e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to read symbolic link.", e);
         }
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws CobaltException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException {
 
         FileAttributes att = getAttributes(dir);
 
         if (!att.isDirectory()) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
         if (filter == null) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Filter is null.");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
 
         return new LocalDirectoryStream(dir, filter);
@@ -183,23 +183,23 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, DirectoryStream.Filter filter)
-            throws CobaltException {
+            throws XenonException {
 
         FileAttributes att = getAttributes(dir);
 
         if (!att.isDirectory()) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "File is not a directory.");
         }
 
         if (filter == null) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Filter is null.");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Filter is null.");
         }
 
         return new LocalDirectoryAttributeStream(this, new LocalDirectoryStream(dir, filter));
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws CobaltException {
+    public InputStream newInputStream(Path path) throws XenonException {
 
         if (!exists(path)) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
@@ -208,14 +208,14 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         FileAttributes att = getAttributes(path);
 
         if (att.isDirectory()) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
         }
 
         return LocalUtils.newInputStream(path);
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws CobaltException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
 
         OpenOptions tmp = OpenOptions.processOptions(LocalAdaptor.ADAPTOR_NAME, options);
 
@@ -244,29 +244,29 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         try {
             return Files.newOutputStream(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
         } catch (IOException e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to create OutputStream.", e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }
     }
 
     @Override
-    public FileAttributes getAttributes(Path path) throws CobaltException {
+    public FileAttributes getAttributes(Path path) throws XenonException {
         return new LocalFileAttributes(path);
     }
 
     @Override
-    public boolean exists(Path path) throws CobaltException {
+    public boolean exists(Path path) throws XenonException {
         return Files.exists(LocalUtils.javaPath(path));
     }
 
     @Override
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws CobaltException {
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 
         if (!exists(path)) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
         }
 
         if (permissions == null) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Permissions is null!");
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Permissions is null!");
         }
 
         LocalUtils.setPosixFilePermissions(path, permissions);
@@ -274,12 +274,12 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
 
         localAdaptor.checkLocation(location);
         localAdaptor.checkCredential(credential);
 
-        CobaltProperties p = new CobaltProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
+        XenonProperties p = new XenonProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         String root = Utils.getLocalRoot(location);
         RelativePath relativePath = Utils.getRelativePath(location, root);
@@ -294,17 +294,17 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     }
 
     @Override
-    public void close(FileSystem filesystem) throws CobaltException {
+    public void close(FileSystem filesystem) throws XenonException {
         // ignored!
     }
 
     @Override
-    public boolean isOpen(FileSystem filesystem) throws CobaltException {
+    public boolean isOpen(FileSystem filesystem) throws XenonException {
         return true;
     }
 
     @Override
-    public void createDirectories(Path dir) throws CobaltException {
+    public void createDirectories(Path dir) throws XenonException {
 
         if (exists(dir)) {
             throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -322,7 +322,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     }
 
     @Override
-    public void createDirectory(Path dir) throws CobaltException {
+    public void createDirectory(Path dir) throws XenonException {
 
         if (exists(dir)) {
             throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
@@ -333,12 +333,12 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         try {
             java.nio.file.Files.createDirectory(LocalUtils.javaPath(dir));
         } catch (IOException e) {
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to create directory " + dir, e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create directory " + dir, e);
         }
     }
 
     @Override
-    public void createFile(Path path) throws CobaltException {
+    public void createFile(Path path) throws XenonException {
 
         if (exists(path)) {
             throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
@@ -350,22 +350,22 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     }
 
     @Override
-    public void delete(Path path) throws CobaltException {
+    public void delete(Path path) throws XenonException {
         LocalUtils.delete(path);
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws CobaltException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
         return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws CobaltException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
        
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws CobaltException {
+    public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
 
         CopyInfo info = CopyInfo.createCopyInfo(LocalAdaptor.ADAPTOR_NAME, copyEngine.getNextID("LOCAL_COPY_"), source,
                 target, options);
@@ -379,7 +379,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
             Exception e = info.getException();
 
             if (e != null) {
-                throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Copy failed!", e);
+                throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Copy failed!", e);
             }
 
             return null;
@@ -387,12 +387,12 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     }
 
     @Override
-    public CopyStatus getCopyStatus(Copy copy) throws CobaltException {
+    public CopyStatus getCopyStatus(Copy copy) throws XenonException {
         return copyEngine.getStatus(copy);
     }
 
     @Override
-    public CopyStatus cancelCopy(Copy copy) throws CobaltException {
+    public CopyStatus cancelCopy(Copy copy) throws XenonException {
         return copyEngine.cancel(copy);
     }
 }

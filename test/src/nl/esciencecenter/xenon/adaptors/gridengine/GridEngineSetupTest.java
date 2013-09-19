@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSetup;
 import nl.esciencecenter.xenon.adaptors.gridengine.ParallelEnvironmentInfo;
 import nl.esciencecenter.xenon.adaptors.gridengine.QueueInfo;
@@ -53,7 +53,7 @@ public class GridEngineSetupTest {
     }
 
     @Test
-    public void test02a_calculateSlots_singleNodePe_slots() throws CobaltException {
+    public void test02a_calculateSlots_singleNodePe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -71,8 +71,8 @@ public class GridEngineSetupTest {
         assertEquals("pe_slots pe allocation should always return 1", expected, result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test02b_calculateSlots_singleNodePeMultipleNodes_exceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test02b_calculateSlots_singleNodePeMultipleNodes_exceptionThrown() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -87,7 +87,7 @@ public class GridEngineSetupTest {
     }
 
     @Test
-    public void test02c_calculateSlots_fillUpPe_slots() throws CobaltException {
+    public void test02c_calculateSlots_fillUpPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -107,7 +107,7 @@ public class GridEngineSetupTest {
     }
 
     @Test
-    public void test02d_calculateSlots_roundRobinPe_slots() throws CobaltException {
+    public void test02d_calculateSlots_roundRobinPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -126,8 +126,8 @@ public class GridEngineSetupTest {
         assertEquals("round_robin pe allocation should return the number of nodes", expected, result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test02d_calculateSlots_roundRobinPe_tooManySlots_Fails() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test02d_calculateSlots_roundRobinPe_tooManySlots_Fails() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -142,7 +142,7 @@ public class GridEngineSetupTest {
     }
     
     @Test
-    public void test02e_calculateSlots_integerPe_slots() throws CobaltException {
+    public void test02e_calculateSlots_integerPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -161,8 +161,8 @@ public class GridEngineSetupTest {
         assertEquals("normal pe allocation should always return node*slots", expected, result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test02e_calculateSlots_InvalidPe_exceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test02e_calculateSlots_InvalidPe_exceptionThrown() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
@@ -175,8 +175,8 @@ public class GridEngineSetupTest {
         testSetup.calculateSlots("some.pe", "some.q", 2);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test02e_calculateSlots_InvalidQueue_exceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test02e_calculateSlots_InvalidQueue_exceptionThrown() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
         Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();

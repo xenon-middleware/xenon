@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.integration;
 
 import java.net.URI;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -35,7 +35,7 @@ public class ITFileTests_SFTP_testuser_localhost extends AbstractFileTests {
         return new URI("sftp://" + user + "@localhost/tmp/testuser");
     }
 
-    public Credential getCredentials() throws CobaltException {
+    public Credential getCredentials() throws XenonException {
 
         // use home user which runs the test:
         String userHome = System.getProperty("user.home");

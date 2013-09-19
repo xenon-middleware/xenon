@@ -19,14 +19,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.engine.jobs.QueueStatusImplementation;
@@ -68,7 +68,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private static final String RUNNING_STATE = "RUNNING";
 
     //get an exit code from the scontrol "ExitCode" output field
-    static Integer exitcodeFromString(String value) throws CobaltException {
+    static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
             return null;
         }
@@ -79,12 +79,12 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         try {
             return Integer.parseInt(exitCodeString);
         } catch (NumberFormatException e) {
-            throw new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "job exit code \"" + exitCodeString + "\" is not a number", e);
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "job exit code \"" + exitCodeString + "\" is not a number", e);
         }
 
     }
 
-    static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws CobaltException {
+    static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
         if (jobInfo == null) {
@@ -106,7 +106,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         } else if (state.startsWith("CANCELLED")) {
             exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase(Locale.getDefault()));
         } else {
-            exception = new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
+            exception = new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
         JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals(RUNNING_STATE),
@@ -117,7 +117,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws CobaltException {
+    static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws XenonException {
         if (jobInfo == null) {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
@@ -137,10 +137,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         } else if (state.startsWith("CANCELLED")) {
             exception = new JobCanceledException(SlurmAdaptor.ADAPTOR_NAME, "Job " + state.toLowerCase(Locale.getDefault()));
         } else if (!reason.equals("None")) {
-            exception = new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state + "\" and reason: "
+            exception = new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state + "\" and reason: "
                     + reason);
         } else {
-            exception = new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state
+            exception = new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Job failed with state \"" + state
                     + "\" for unknown reason");
         }
 
@@ -152,7 +152,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws CobaltException {
+    static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
 
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
@@ -195,7 +195,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return false;
     }
 
-    static void verifyJobDescription(JobDescription description) throws CobaltException {
+    static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, SlurmAdaptor.ADAPTOR_NAME);
 
         if (description.isInteractive()) {
@@ -220,8 +220,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final SlurmSetup config;
 
-    SlurmSchedulerConnection(ScriptingAdaptor adaptor, String location, Credential credential, CobaltProperties properties,
-            CobaltEngine engine) throws CobaltException {
+    SlurmSchedulerConnection(ScriptingAdaptor adaptor, String location, Credential credential, XenonProperties properties,
+            XenonEngine engine) throws XenonException {
 
         super(adaptor, "slurm", location, credential, properties, engine, 
                 properties.getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
@@ -270,7 +270,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return defaultQueueName;
     }
 
-    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws CobaltException {
+    private SlurmSetup getConfiguration(boolean ignoreVersion, boolean disableAccounting) throws XenonException {
 
         String output = runCheckedCommand(null, "scontrol", "show", "config");
 
@@ -282,7 +282,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job submitJob(JobDescription description) throws CobaltException {
+    public Job submitJob(JobDescription description) throws XenonException {
         String output;
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
 
@@ -315,19 +315,19 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
         String identifier = job.getIdentifier();
         String output = runCheckedCommand(null, "scancel", identifier);
 
         if (!output.isEmpty()) {
-            throw new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Got unexpected output on cancelling job: " + output);
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Got unexpected output on cancelling job: " + output);
         }
 
         return getJobStatus(job);
     }
 
     @Override
-    public Job[] getJobs(String... queueNames) throws CobaltException {
+    public Job[] getJobs(String... queueNames) throws XenonException {
         String output;
 
         if (queueNames == null || queueNames.length == 0) {
@@ -352,7 +352,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    private Map<String, String> getSControlInfo(Job job) throws CobaltException {
+    private Map<String, String> getSControlInfo(Job job) throws XenonException {
         RemoteCommandRunner runner = runCommand(null, "scontrol", "show", "job", job.getIdentifier());
 
         if (!runner.success()) {
@@ -364,7 +364,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return ScriptingParser.parseKeyValuePairs(runner.getStdout(), SlurmAdaptor.ADAPTOR_NAME, "WorkDir=", "Command=");
     }
 
-    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws CobaltException {
+    private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws XenonException {
         String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R", "--jobs="
                 + SchedulerConnection.identifiersAsCSList(jobs));
 
@@ -372,7 +372,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 "*", "~");
     }
 
-    private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws CobaltException {
+    private Map<String, Map<String, String>> getSinfoInfo(String... partitions) throws XenonException {
         String output = runCheckedCommand(null, "sinfo", "--format=%P %a %l %F %N %C %D",
                 "--partition=" + CommandLineUtils.asCSList(partitions));
 
@@ -380,7 +380,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 "~");
     }
 
-    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws CobaltException {
+    private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws XenonException {
         if (!config.accountingAvailable()) {
             return new HashMap<String, Map<String, String>>();
         }
@@ -392,7 +392,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 + "Suspended,Comment,Start,User,End,NNodes,Timelimit,Priority", "--jobs=" + SchedulerConnection.identifiersAsCSList(jobs));
 
         if (runner.getExitCode() != 0) {
-            throw new CobaltException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
         }
 
         if (!runner.getStderr().isEmpty()) {
@@ -404,7 +404,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
 
         //try the queue first
         Map<String, Map<String, String>> sQueueInfo = getSqueueInfo(job);
@@ -431,7 +431,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws CobaltException {
+    public JobStatus[] getJobStatuses(Job... jobs) throws XenonException {
         JobStatus[] result = new JobStatus[jobs.length];
 
         //fetch queue info for all jobs in one go
@@ -472,7 +472,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus getQueueStatus(String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(String queueName) throws XenonException {
         Map<String, Map<String, String>> info = getSinfoInfo(queueName);
 
         QueueStatus result = getQueueStatusFromSInfo(info, queueName, getScheduler());
@@ -486,7 +486,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(String... requestedQueueNames) throws XenonException {
         String[] targetQueueNames;
 
         if (requestedQueueNames == null) {

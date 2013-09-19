@@ -17,9 +17,9 @@
 package nl.esciencecenter.xenon.adaptors;
 
 import static org.junit.Assert.fail;
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -80,16 +80,16 @@ public class GenericCredentialsAdaptorTestParent {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
         credentials = octopus.credentials();
     }
 
     @After
     public void cleanup() throws Exception {
-        CobaltFactory.endAll();
+        XenonFactory.endAll();
     }
    
-    protected Cobalt octopus;
+    protected Xenon octopus;
     protected Credentials credentials;
     
     @Test
@@ -119,7 +119,7 @@ public class GenericCredentialsAdaptorTestParent {
                 try { 
                     credentials.newCertificateCredential(schemes[i], certfile, username, password, null);
                     fail("Expected exception for incorrect certificate file!");
-                } catch (CobaltException e) { 
+                } catch (XenonException e) { 
                     // expected
                 }
             }
@@ -135,7 +135,7 @@ public class GenericCredentialsAdaptorTestParent {
                 try { 
                     credentials.newCertificateCredential(schemes[i], "cert", "username", "password".toCharArray(), null);
                     fail("Expected exception for unsupported newCertificateCredential!");
-                } catch (CobaltException e) { 
+                } catch (XenonException e) { 
                     // expected
                 }
             }
@@ -166,7 +166,7 @@ public class GenericCredentialsAdaptorTestParent {
                 try { 
                     credentials.newPasswordCredential(schemes[i], "username", "password".toCharArray(), null);
                     fail("Expected exception for unsupported newPasswordCredential!");
-                } catch (CobaltException e) { 
+                } catch (XenonException e) { 
                     // expected
                 }
             }

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmJobScriptGenerator;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 
@@ -43,7 +43,7 @@ public class SlurmJobScriptGeneratorTest {
     }
 
     @Test
-    public void testEmptyDescription() throws CobaltException {
+    public void testEmptyDescription() throws XenonException {
         JobDescription description = new JobDescription();
 
         String result = SlurmJobScriptGenerator.generate(description, null);
@@ -60,7 +60,7 @@ public class SlurmJobScriptGeneratorTest {
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
      * @throws OctopusException
      */
-    public void testFilledDescription() throws CobaltException {
+    public void testFilledDescription() throws XenonException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");

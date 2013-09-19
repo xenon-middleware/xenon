@@ -26,9 +26,9 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -45,7 +45,7 @@ public class RealFileUtilsTest {
 
     public static String ROOT = "octopus_RealFileUtilsTest_" + System.currentTimeMillis();
 
-    public static Cobalt octopus;
+    public static Xenon octopus;
     public static Files files;
     public static FileSystem fileSystem;
 
@@ -54,7 +54,7 @@ public class RealFileUtilsTest {
     @BeforeClass
     public static void prepare() throws Exception {
 
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
 
         files = octopus.files();
         
@@ -69,7 +69,7 @@ public class RealFileUtilsTest {
     @AfterClass
     public static void cleanup() throws Exception {
         files.delete(testDir);
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     @Test
@@ -370,7 +370,7 @@ public class RealFileUtilsTest {
             this.files = files;
         }
 
-        private void check(Path[] avail, Path path) throws CobaltException {
+        private void check(Path[] avail, Path path) throws XenonException {
 
             for (int i = 0; i < avail.length; i++) {
                 if (path.equals(avail[i])) {
@@ -378,35 +378,35 @@ public class RealFileUtilsTest {
                 }
             }
 
-            throw new CobaltException("", "Unexpected path: " + path);
+            throw new XenonException("", "Unexpected path: " + path);
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files)
-                throws CobaltException {
+        public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)
+                throws XenonException {
             check(dirs, dir);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
-                throws CobaltException {
+                throws XenonException {
 
             check(dirs, dir);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files f) throws CobaltException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files f) throws XenonException {
 
             check(files, file);
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
 
     }
@@ -442,26 +442,26 @@ public class RealFileUtilsTest {
     class MyFileVisitor2 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Unexpected visit of path: " + dir);
+        public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Unexpected visit of path: " + dir);
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
-                throws CobaltException {
+                throws XenonException {
             return FileVisitResult.TERMINATE;
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws CobaltException {
-            throw new CobaltException("", "Unexpected visit of path: " + file);
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
+            throw new XenonException("", "Unexpected visit of path: " + file);
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
     }
 
@@ -496,26 +496,26 @@ public class RealFileUtilsTest {
     class MyFileVisitor3 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files)
-                throws CobaltException {
+        public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)
+                throws XenonException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
-                throws CobaltException {
+                throws XenonException {
             return FileVisitResult.SKIP_SUBTREE;
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws CobaltException {
-            throw new CobaltException("", "Unexpected visit of path: " + file);
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
+            throw new XenonException("", "Unexpected visit of path: " + file);
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
     }
 
@@ -552,34 +552,34 @@ public class RealFileUtilsTest {
         int countFiles = 0;
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files)
-                throws CobaltException {
+        public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)
+                throws XenonException {
             countFiles = 0;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
-                throws CobaltException {
+                throws XenonException {
             countFiles = 0;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws CobaltException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
 
             if (countFiles == 0) {
                 countFiles = 1;
                 return FileVisitResult.SKIP_SIBLINGS;
             }
 
-            throw new CobaltException("", "Unexpected visit of path: " + file);
+            throw new XenonException("", "Unexpected visit of path: " + file);
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
     }
 
@@ -622,26 +622,26 @@ public class RealFileUtilsTest {
     class MyFileVisitor5 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files)
-                throws CobaltException {
+        public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)
+                throws XenonException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
-                throws CobaltException {
+                throws XenonException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws CobaltException {
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
             return FileVisitResult.TERMINATE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
     }
 
@@ -676,26 +676,26 @@ public class RealFileUtilsTest {
     class MyFileVisitor6 implements FileVisitor {
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + dir);
+        public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + dir);
         }
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + dir);
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + dir);
         }
 
         @Override
-        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files)
-                throws CobaltException {
-            throw new CobaltException("", "Visit failed of path: " + file);
+        public FileVisitResult visitFileFailed(Path file, XenonException exception, Files files)
+                throws XenonException {
+            throw new XenonException("", "Visit failed of path: " + file);
         }
     }
 
@@ -710,7 +710,7 @@ public class RealFileUtilsTest {
         try {
             Utils.walkFileTree(files, dir, fv);
             throw new Exception("test_walkFileTree6 did not throw an exception!");
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             // expected
         }
 

@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that an end-of-file was encountered.  
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class EndOfFileException extends CobaltException {
+public class EndOfFileException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

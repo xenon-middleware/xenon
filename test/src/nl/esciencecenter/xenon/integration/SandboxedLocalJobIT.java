@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -56,14 +56,14 @@ public class SandboxedLocalJobIT {
      * 
      * </ol>
      * 
-     * @throws CobaltException
+     * @throws XenonException
      * @throws URISyntaxException
      * @throws InterruptedException
      * @throws IOException
      */
     @Test
-    public void test() throws Exception, CobaltException, URISyntaxException, InterruptedException, IOException {
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+    public void test() throws Exception, XenonException, URISyntaxException, InterruptedException, IOException {
+        Xenon octopus = XenonFactory.newXenon(null);
         Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();

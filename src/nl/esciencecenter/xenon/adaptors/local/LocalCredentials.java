@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.local;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -37,28 +37,28 @@ public class LocalCredentials implements Credentials {
 
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
-            Map<String, String> properties) throws CobaltException {
-        throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "CertificateCredential not supported!");
+            Map<String, String> properties) throws XenonException {
+        throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "CertificateCredential not supported!");
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
-            throws CobaltException {
-        throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "PasswordCredential not supported!");
+            throws XenonException {
+        throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "PasswordCredential not supported!");
     }
     
     @Override
-    public Credential getDefaultCredential(String scheme) throws CobaltException {
+    public Credential getDefaultCredential(String scheme) throws XenonException {
         return credential;
     }
 
     @Override
-    public void close(Credential credential) throws CobaltException {
+    public void close(Credential credential) throws XenonException {
         // ignored
     }
 
     @Override
-    public boolean isOpen(Credential credential) throws CobaltException {
+    public boolean isOpen(Credential credential) throws XenonException {
         return true;
     }
 }

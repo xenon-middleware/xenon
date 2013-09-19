@@ -18,10 +18,10 @@ package nl.esciencecenter.xenon.engine.jobs;
 import java.util.HashSet;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
@@ -32,40 +32,40 @@ import nl.esciencecenter.xenon.jobs.Streams;
 
 public class JobsEngine implements Jobs {
 
-    private final CobaltEngine cobaltEngine;
+    private final XenonEngine cobaltEngine;
 
-    public JobsEngine(CobaltEngine cobaltEngine) {
+    public JobsEngine(XenonEngine cobaltEngine) {
         this.cobaltEngine = cobaltEngine;
     }
 
-    private Adaptor getAdaptor(Scheduler scheduler) throws CobaltException {
+    private Adaptor getAdaptor(Scheduler scheduler) throws XenonException {
         return cobaltEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
 
         Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
     }
 
     @Override
-    public void close(Scheduler scheduler) throws CobaltException {
+    public void close(Scheduler scheduler) throws XenonException {
         getAdaptor(scheduler).jobsAdaptor().close(scheduler);
     }
 
     @Override
-    public boolean isOpen(Scheduler scheduler) throws CobaltException {
+    public boolean isOpen(Scheduler scheduler) throws XenonException {
         return getAdaptor(scheduler).jobsAdaptor().isOpen(scheduler);
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws CobaltException {
+    public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
         return getAdaptor(scheduler).jobsAdaptor().getDefaultQueueName(scheduler);
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
     }
 
@@ -95,11 +95,11 @@ public class JobsEngine implements Jobs {
     private void getJobStatus(String adaptor, Job[] in, JobStatus[] out) {
 
         JobStatus[] result = null;
-        CobaltException exception = null;
+        XenonException exception = null;
 
         try {
             result = cobaltEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in);
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             exception = e;
         }
 
@@ -152,42 +152,42 @@ public class JobsEngine implements Jobs {
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilRunning(job, timeout);
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
         return getAdaptor(scheduler).jobsAdaptor().getJobs(scheduler, queueNames);
     }
 
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws CobaltException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
         return getAdaptor(scheduler).jobsAdaptor().submitJob(scheduler, description);
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatus(scheduler, queueName);
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
         return getAdaptor(scheduler).jobsAdaptor().getQueueStatuses(scheduler, queueNames);
     }
 
     @Override
-    public Streams getStreams(Job job) throws CobaltException {
+    public Streams getStreams(Job job) throws XenonException {
         return getAdaptor(job.getScheduler()).jobsAdaptor().getStreams(job);
     }
 

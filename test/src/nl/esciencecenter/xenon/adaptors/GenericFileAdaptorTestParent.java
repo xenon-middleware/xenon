@@ -27,9 +27,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
@@ -69,7 +69,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     public static FileTestConfig config;
 
-    protected Cobalt octopus;
+    protected Xenon octopus;
     protected Files files;
     protected Credentials credentials;
 
@@ -113,7 +113,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         System.err.println("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
 
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
@@ -125,21 +125,21 @@ public abstract class GenericFileAdaptorTestParent {
             files.delete(root);
         }
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
-    public Path resolve(Path root, String... path) throws CobaltException {
+    public Path resolve(Path root, String... path) throws XenonException {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
  
     protected void prepare() throws Exception {
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
         files = octopus.files();
         credentials = octopus.credentials();
     }
 
     protected void cleanup() throws Exception {
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
         files = null;
         octopus = null;
     }

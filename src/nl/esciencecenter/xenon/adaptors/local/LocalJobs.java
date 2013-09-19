@@ -17,13 +17,13 @@ package nl.esciencecenter.xenon.adaptors.local;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
@@ -52,8 +52,8 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     private final Scheduler localScheduler;
     private final JobQueues jobQueues;
 
-    public LocalJobs(CobaltProperties properties, Path cwd, CobaltEngine engine)
-            throws CobaltException {
+    public LocalJobs(XenonProperties properties, Path cwd, XenonEngine engine)
+            throws XenonException {
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", "local", "/", 
                 new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
@@ -67,13 +67,13 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws CobaltException {
+    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
         return new LocalInteractiveProcess(job);
     }
 
     @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
 
         if (!(location == null || location.isEmpty() || location.equals("/"))) {
             throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with location: " 
@@ -92,27 +92,27 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
         return jobQueues.getJobs(queueNames);
     }
 
     @Override
-    public Job submitJob(Scheduler scheduler, JobDescription description) throws CobaltException {
+    public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
         return jobQueues.submitJob(description);
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
         return jobQueues.getJobStatus(job);
     }
 
     @Override
-    public JobStatus waitUntilDone(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         return jobQueues.waitUntilDone(job, timeout);
     }
 
     @Override
-    public JobStatus waitUntilRunning(Job job, long timeout) throws CobaltException {
+    public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
         return jobQueues.waitUntilRunning(job, timeout);
     }
 
@@ -122,7 +122,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
         return jobQueues.cancelJob(job);
     }
 
@@ -131,32 +131,32 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     }
 
     @Override
-    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
         return jobQueues.getQueueStatus(scheduler, queueName);
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
         return jobQueues.getQueueStatuses(scheduler, queueNames);
     }
 
     @Override
-    public void close(Scheduler scheduler) throws CobaltException {
+    public void close(Scheduler scheduler) throws XenonException {
         // ignored
     }
 
     @Override
-    public boolean isOpen(Scheduler scheduler) throws CobaltException {
+    public boolean isOpen(Scheduler scheduler) throws XenonException {
         return true;
     }
 
     @Override
-    public String getDefaultQueueName(Scheduler scheduler) throws CobaltException {
+    public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
         return jobQueues.getDefaultQueueName(scheduler);
     }
 
     @Override
-    public Streams getStreams(Job job) throws CobaltException {
+    public Streams getStreams(Job job) throws XenonException {
         return jobQueues.getStreams(job);
     }
 

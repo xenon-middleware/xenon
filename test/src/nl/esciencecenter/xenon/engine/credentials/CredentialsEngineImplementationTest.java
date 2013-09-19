@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
@@ -41,7 +41,7 @@ import org.junit.BeforeClass;
  */
 public class CredentialsEngineImplementationTest {
 
-    private static CobaltEngine octopusEngine;
+    private static XenonEngine octopusEngine;
 
     @BeforeClass
     public static void prepare() throws Exception {

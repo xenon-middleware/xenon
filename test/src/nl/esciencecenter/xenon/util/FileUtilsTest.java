@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Iterator;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
@@ -37,7 +37,7 @@ import org.junit.Test;
 public class FileUtilsTest {
 
     @Test
-    public void testRecursiveCopy_SingleFile_CopiedFile() throws CobaltException,
+    public void testRecursiveCopy_SingleFile_CopiedFile() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
@@ -59,7 +59,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws CobaltException,
+    public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcDir = mock(Path.class);
@@ -88,7 +88,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws CobaltException,
+    public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
 // FIXME: 
 //        
@@ -134,7 +134,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws CobaltException,
+    public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
@@ -165,7 +165,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws CobaltException,
+    public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
@@ -204,7 +204,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws CobaltException,
+    public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
 //        Files files = mock(Files.class);
 //        Path srcDir = mock(Path.class); // foo
@@ -254,7 +254,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreDir_DirNotCopied() throws CobaltException,
+    public void recursiveCopy_IgnoreDir_DirNotCopied() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
@@ -289,7 +289,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreFile_FileNotCopied() throws CobaltException,
+    public void recursiveCopy_IgnoreFile_FileNotCopied() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
 // FIXME:        
 //        
@@ -317,7 +317,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_IgnoreAndReplace_UnsupporterOperationException() throws CobaltException {
+    public void recursiveCopy_IgnoreAndReplace_UnsupporterOperationException() throws XenonException {
         Files files = mock(Files.class);
         Path srcDir = mock(Path.class); // foo
         Path dstDir = mock(Path.class); // bar
@@ -331,7 +331,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws CobaltException, InvalidCopyOptionsException {
+    public void recursiveCopy_SingleFileReplace_CopyWithReplace() throws XenonException, InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
         Path dstFile = mock(Path.class);
@@ -352,7 +352,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveDelete_SingleDirectory_DeletedDirectory() throws CobaltException {
+    public void testRecursiveDelete_SingleDirectory_DeletedDirectory() throws XenonException {
         Files files = mock(Files.class);
         Path directory = mock(Path.class);
 
@@ -375,7 +375,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveDelete_DirectoryWithFile_DeletedDirectoryAndFile() throws CobaltException {
+    public void testRecursiveDelete_DirectoryWithFile_DeletedDirectoryAndFile() throws XenonException {
         Files files = mock(Files.class);
 
         Path directory = mock(Path.class);
@@ -406,7 +406,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRecursiveDelete_SingleFile_DeletedFile() throws CobaltException {
+    public void testRecursiveDelete_SingleFile_DeletedFile() throws XenonException {
         Files files = mock(Files.class);
         Path myfile = mock(Path.class);
 

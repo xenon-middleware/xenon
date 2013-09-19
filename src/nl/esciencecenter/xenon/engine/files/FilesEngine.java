@@ -20,11 +20,11 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -54,9 +54,9 @@ public class FilesEngine implements Files {
         }
     };
 
-    private final CobaltEngine cobaltEngine;
+    private final XenonEngine cobaltEngine;
 
-    public FilesEngine(CobaltEngine cobaltEngine) {
+    public FilesEngine(XenonEngine cobaltEngine) {
         this.cobaltEngine = cobaltEngine;
     }
 
@@ -64,83 +64,83 @@ public class FilesEngine implements Files {
         try {
             Adaptor adaptor = cobaltEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new CobaltRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
+            throw new XenonRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
 
-    private Files getFilesAdaptor(Path path) throws CobaltException {
+    private Files getFilesAdaptor(Path path) throws XenonException {
         return getFilesAdaptor(path.getFileSystem());
     }
 
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws CobaltException {
+            throws XenonException {
         
         Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.filesAdaptor().newFileSystem(scheme, location, credential, properties);
     }
 
     @Override
-    public Path newPath(FileSystem filesystem, RelativePath location) throws CobaltException {
+    public Path newPath(FileSystem filesystem, RelativePath location) throws XenonException {
         return getFilesAdaptor(filesystem).newPath(filesystem, location);
     }
 
     @Override
-    public void close(FileSystem filesystem) throws CobaltException {
+    public void close(FileSystem filesystem) throws XenonException {
         getFilesAdaptor(filesystem).close(filesystem);
     }
 
     @Override
-    public boolean isOpen(FileSystem filesystem) throws CobaltException {
+    public boolean isOpen(FileSystem filesystem) throws XenonException {
         return getFilesAdaptor(filesystem).isOpen(filesystem);
     }
 
     @Override
-    public void createDirectories(Path dir) throws CobaltException {
+    public void createDirectories(Path dir) throws XenonException {
         getFilesAdaptor(dir).createDirectories(dir);
     }
 
     @Override
-    public void createDirectory(Path dir) throws CobaltException {
+    public void createDirectory(Path dir) throws XenonException {
         getFilesAdaptor(dir).createDirectory(dir);
     }
 
     @Override
-    public void createFile(Path path) throws CobaltException {
+    public void createFile(Path path) throws XenonException {
         getFilesAdaptor(path).createFile(path);
     }
 
     @Override
-    public void delete(Path path) throws CobaltException {
+    public void delete(Path path) throws XenonException {
         getFilesAdaptor(path).delete(path);
     }
 
     @Override
-    public boolean exists(Path path) throws CobaltException {
+    public boolean exists(Path path) throws XenonException {
         return getFilesAdaptor(path).exists(path);
     }
 
     @Override
-    public Copy copy(Path source, Path target, CopyOption... options) throws CobaltException {
+    public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
             return getFilesAdaptor(source).copy(source, target, options);
-        } else if (sourcefs.getAdaptorName().equals(CobaltEngine.LOCAL_ADAPTOR_NAME)) {
+        } else if (sourcefs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).copy(source, target, options);
-        } else if (targetfs.getAdaptorName().equals(CobaltEngine.LOCAL_ADAPTOR_NAME)) {
+        } else if (targetfs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).copy(source, target, options);
         } else {
-            throw new CobaltException("FilesEngine", "Cannot do inter-scheme third party copy!");
+            throw new XenonException("FilesEngine", "Cannot do inter-scheme third party copy!");
         }
     }
 
     @Override
-    public void move(Path source, Path target) throws CobaltException {
+    public void move(Path source, Path target) throws XenonException {
 
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
@@ -150,62 +150,62 @@ public class FilesEngine implements Files {
             return;
         }
 
-        throw new CobaltException("FilesEngine", "Cannot do inter-scheme third party move!");
+        throw new XenonException("FilesEngine", "Cannot do inter-scheme third party move!");
     }
 
     @Override
-    public CopyStatus getCopyStatus(Copy copy) throws CobaltException {
+    public CopyStatus getCopyStatus(Copy copy) throws XenonException {
         return getFilesAdaptor(copy.getSource()).getCopyStatus(copy);
     }
 
     @Override
-    public CopyStatus cancelCopy(Copy copy) throws CobaltException {
+    public CopyStatus cancelCopy(Copy copy) throws XenonException {
         return getFilesAdaptor(copy.getSource()).cancelCopy(copy);
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws CobaltException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
         return getFilesAdaptor(dir).newDirectoryStream(dir);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws CobaltException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir);
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws CobaltException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
         return getFilesAdaptor(dir).newDirectoryStream(dir, filter);
     }
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, Filter filter)
-            throws CobaltException {
+            throws XenonException {
         return getFilesAdaptor(dir).newAttributesDirectoryStream(dir, filter);
     }
 
     @Override
-    public InputStream newInputStream(Path path) throws CobaltException {
+    public InputStream newInputStream(Path path) throws XenonException {
         return getFilesAdaptor(path).newInputStream(path);
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options) throws CobaltException {
+    public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
         return getFilesAdaptor(path).newOutputStream(path, options);
     }
 
     @Override
-    public FileAttributes getAttributes(Path path) throws CobaltException {
+    public FileAttributes getAttributes(Path path) throws XenonException {
         return getFilesAdaptor(path).getAttributes(path);
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws CobaltException {
+    public Path readSymbolicLink(Path link) throws XenonException {
         return getFilesAdaptor(link).readSymbolicLink(link);
     }
 
     @Override
-    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws CobaltException {
+    public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
         getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
     }
     

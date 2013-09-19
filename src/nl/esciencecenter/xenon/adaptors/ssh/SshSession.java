@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +127,7 @@ class SshSession {
         session.disconnect();
     }
 
-    ChannelExec getExecChannel() throws CobaltException {
+    ChannelExec getExecChannel() throws XenonException {
 
         if (openChannels == MAX_OPEN_CHANNELS) {
             return null;
@@ -140,14 +140,14 @@ class SshSession {
             channel = (ChannelExec) session.openChannel("exec");
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to create EXEC channel {}", sessionID, openChannels, e);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         incOpenChannels("EXEC");
         return channel;
     }
 
-    ChannelSftp getSftpChannel() throws CobaltException {
+    ChannelSftp getSftpChannel() throws XenonException {
 
         ChannelSftp channel = getSftpChannelFromCache();
 
@@ -166,32 +166,32 @@ class SshSession {
             channel.connect();
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to create SFTP channel {}", sessionID, openChannels, e);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
 
         incOpenChannels("SFTP");
         return channel;
     }
 
-    int addTunnel(int localPort, String targetHost, int targetPort) throws CobaltException {
+    int addTunnel(int localPort, String targetHost, int targetPort) throws XenonException {
 
         LOGGER.debug("SSHSESSION-{}: Creating tunnel from localhost:{} via {}:{} to {}:{}", sessionID, localPort,
                 session.getHost(), session.getPort(), targetHost, targetPort);
 
         if (tunnelPort > 0) {
             LOGGER.debug("SSHSESSION-{}: Tunnel already in used for this session!", sessionID);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, "Tunnel already in use!");
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Tunnel already in use!");
         }
 
         try {
             return session.setPortForwardingL(0, targetHost, targetPort);
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to create tunnel to {}:{}", sessionID, targetHost, targetPort, e);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 
-    void removeTunnel(int localPort) throws CobaltException {
+    void removeTunnel(int localPort) throws XenonException {
 
         LOGGER.debug("SSHSESSION-{}: Removing tunnel at localhost:{}", sessionID, localPort);
 
@@ -199,7 +199,7 @@ class SshSession {
             session.delPortForwardingL(localPort);
         } catch (JSchException e) {
             LOGGER.debug("SSHSESSION-{}: Failed to remove tunnel at localhost:{}", sessionID, localPort, e);
-            throw new CobaltException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
     }
 }

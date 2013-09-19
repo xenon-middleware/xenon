@@ -26,9 +26,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.xenon.engine.util.BadParameterException;
@@ -120,11 +120,11 @@ public class JobQueueTest {
         }
 
         @Override
-        public InteractiveProcess createInteractiveProcess(JobImplementation job) throws CobaltException {
+        public InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
 
             if (fail) {
                 setCurrentWrapper(null);
-                throw new CobaltException("JQT", "Failed to create process!");
+                throw new XenonException("JQT", "Failed to create process!");
             }
 
             MyProcessWrapper wrapper = new MyProcessWrapper(job, new byte[0], new byte[0]);
@@ -136,7 +136,7 @@ public class JobQueueTest {
     }
 
     public static Scheduler scheduler;
-    public static Cobalt octopus;
+    public static Xenon octopus;
     public static Path cwd;
     public static Files files;
     public static FileSystem filesystem;
@@ -155,7 +155,7 @@ public class JobQueueTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
         scheduler = octopus.jobs().newScheduler("local", null, null, null);
         files = octopus.files();
         cwd = Utils.getLocalCWD(files);
@@ -296,7 +296,7 @@ public class JobQueueTest {
     //        jobQueue.submitJob(d);
     //    }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_failingInteractiveJob1() throws Exception {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_failingInteractiveJob1");
@@ -313,7 +313,7 @@ public class JobQueueTest {
         }
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_failingInteractiveJob2() throws Exception {
         JobDescription d = new JobDescription();
         d.setExecutable("exec_failingInteractiveJob1");
@@ -332,13 +332,13 @@ public class JobQueueTest {
         }
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_invalidWaitTimeout() throws Exception {
         // throws exception
         jobQueue.waitUntilDone(mock(Job.class), -42);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_invalidScheduler() throws Exception {
         Scheduler s = mock(Scheduler.class);
         Job job = mock(Job.class);
@@ -348,7 +348,7 @@ public class JobQueueTest {
         jobQueue.getJobStatus(job);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_invalidQueueName() throws Exception {
 
         JobDescription d = new JobDescription();
@@ -362,7 +362,7 @@ public class JobQueueTest {
         jobQueue.getJobStatus(job);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test_invalidJob() throws Exception {
 
         JobDescription d = new JobDescription();

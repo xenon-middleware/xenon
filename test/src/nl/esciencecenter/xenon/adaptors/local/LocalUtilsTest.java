@@ -19,9 +19,9 @@ package nl.esciencecenter.xenon.adaptors.local;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.local.LocalUtils;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -42,32 +42,32 @@ public class LocalUtilsTest {
         constructor.newInstance();
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_delete_null() throws Exception {
         LocalUtils.delete(null);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_createFile_null() throws Exception {
         LocalUtils.createFile(null);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_move_null() throws Exception {
         LocalUtils.move(null, null);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_setPosixFilePermissions_null() throws Exception {
         LocalUtils.setPosixFilePermissions(null, null);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_newInputStream_null() throws Exception {
         LocalUtils.newInputStream(null);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_broken_home_null() throws Exception {
         String originalHome = System.getProperty("user.home");
 
@@ -80,7 +80,7 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_broken_cwd_null() throws Exception {
         String originalCWD = System.getProperty("user.dir");
 
@@ -93,7 +93,7 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_broken_home_empty() throws Exception {
         String originalHome = System.getProperty("user.home");
 
@@ -106,7 +106,7 @@ public class LocalUtilsTest {
         }
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_broken_cwd_empty() throws Exception {
         String originalCWD = System.getProperty("user.dir");
 
@@ -137,14 +137,14 @@ public class LocalUtilsTest {
     @org.junit.Test
     public void test_javaPath_home() throws Exception {
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
         Files files = octopus.files();
         
         Path cwd = Utils.getLocalCWD(files);
         
         String tmp = LocalUtils.javaPath(files.newPath(cwd.getFileSystem(), new RelativePath("~"))).toString();
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
 
         assert (tmp.equals(System.getProperty("user.dir")));
     }

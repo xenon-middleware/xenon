@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.adaptors.gridengine;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.ParallelEnvironmentInfo.AllocationRule;
 import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
@@ -60,14 +60,14 @@ public class GridEngineSetup {
         return result;
     }
     
-    private static String[] getQueueNames(SchedulerConnection schedulerConnection) throws CobaltException {
+    private static String[] getQueueNames(SchedulerConnection schedulerConnection) throws XenonException {
         String queueListOutput = schedulerConnection.runCheckedCommand(null, "qconf", "-sql");
 
         return ScriptingParser.parseList(queueListOutput);
     }
 
     private static Map<String, QueueInfo> getQueues(String[] queueNames, SchedulerConnection schedulerConnection)
-            throws CobaltException {
+            throws XenonException {
         String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
@@ -83,7 +83,7 @@ public class GridEngineSetup {
         return result;
     }
 
-    public GridEngineSetup(SchedulerConnection schedulerConnection) throws CobaltException {
+    public GridEngineSetup(SchedulerConnection schedulerConnection) throws XenonException {
             
         this.queueNames = getQueueNames(schedulerConnection);
 
@@ -95,7 +95,7 @@ public class GridEngineSetup {
     }
     
     private static Map<String, ParallelEnvironmentInfo> getParallelEnvironments(SchedulerConnection schedulerConnection)
-            throws CobaltException {
+            throws XenonException {
         //first retrieve a list of parallel environments
         RemoteCommandRunner runner = schedulerConnection.runCommand(null, "qconf", "-spl");
 
@@ -105,7 +105,7 @@ public class GridEngineSetup {
         }
 
         if (!runner.success()) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Could not get parallel environment info from scheduler: "
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Could not get parallel environment info from scheduler: "
                     + runner);
         }
 
@@ -151,17 +151,17 @@ public class GridEngineSetup {
      * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
      * give is dependent on the parallel environment settings.
      */
-    int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws CobaltException {
+    int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
         ParallelEnvironmentInfo pe = parallelEnvironments.get(parallelEnvironmentName);
         QueueInfo queue = queues.get(queueName);
 
         if (pe == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "requested parallel environment \""
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "requested parallel environment \""
                     + parallelEnvironmentName + "\" cannot be found at server");
         }
 
         if (queue == null) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "requested queue \"" + queueName
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "requested queue \"" + queueName
                     + "\" cannot be found at server");
         }
 
@@ -172,7 +172,7 @@ public class GridEngineSetup {
         AllocationRule allocationRule = pe.getAllocationRule();
         if (allocationRule == AllocationRule.PE_SLOTS) {
             if (nodeCount > 1) {
-                throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
+                throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
                         + " only supports single node parallel jobs");
             }
             return 1;
@@ -182,7 +182,7 @@ public class GridEngineSetup {
             return nodeCount * queue.getSlots();
         } else if (allocationRule == AllocationRule.ROUND_ROBIN) {
             if (nodeCount > 1) {
-                throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
+                throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Parallel environment " + parallelEnvironmentName
                         + " only supports single node parallel jobs, as the round robin allocation rule places jobs on a undeterministic number of nodes");
             }
             return 1;
@@ -190,7 +190,7 @@ public class GridEngineSetup {
             //Multiply the number of nodes we require with the number of slots on each host.
             return nodeCount * pe.getPpn();
         } else {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "unknown pe allocation rule: " + pe.getAllocationRule());
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "unknown pe allocation rule: " + pe.getAllocationRule());
         }
     }
 }

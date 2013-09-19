@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 
 /**
@@ -50,11 +50,11 @@ public final class ScriptingParser {
      * @param adaptorName
      *            the adaptor name reported in case an exception occurs.
      * @return a map containing all found key/value pairs.
-     * @throws CobaltException
+     * @throws XenonException
      *             if the input cannot be parsed.
      */
     public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines)
-            throws CobaltException {
+            throws XenonException {
         Map<String, String> result = new HashMap<String, String>();
 
         String[] lines = input.split(NEWLINE_REGEX);
@@ -67,7 +67,7 @@ public final class ScriptingParser {
                     String[] elements = pair.split(EQUALS_REGEX, 2);
 
                     if (elements.length != 2) {
-                        throw new CobaltException(adaptorName, "Got invalid key/value pair in output: \"" + pair + "\"");
+                        throw new XenonException(adaptorName, "Got invalid key/value pair in output: \"" + pair + "\"");
                     }
 
                     result.put(elements[0].trim(), elements[1].trim());
@@ -101,11 +101,11 @@ public final class ScriptingParser {
      * @param ignoredLines
      *            lines containing any of the given strings will be ignored.
      * @return a map containing all found key/value pairs.
-     * @throws CobaltException
+     * @throws XenonException
      *             if the input cannot be parsed
      */
     public static Map<String, String> parseKeyValueLines(String input, String separatorRegEx, String adaptorName,
-            String... ignoredLines) throws CobaltException {
+            String... ignoredLines) throws XenonException {
         Map<String, String> result = new HashMap<String, String>();
 
         String[] lines = input.split(NEWLINE_REGEX);
@@ -115,7 +115,7 @@ public final class ScriptingParser {
                 String[] elements = line.split(separatorRegEx, 2);
 
                 if (elements.length != 2) {
-                    throw new CobaltException(adaptorName, "Got invalid key/value pair in output: " + line);
+                    throw new XenonException(adaptorName, "Got invalid key/value pair in output: " + line);
                 }
 
                 result.put(elements[0].trim(), elements[1].trim());
@@ -135,9 +135,9 @@ public final class ScriptingParser {
      * @param possiblePrefixes
      *            a number of possible prefixes before the job ID.
      * @return the job ID found on the input line.
-     * @throws CobaltException
+     * @throws XenonException
      */
-    public static long parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws CobaltException {
+    public static long parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws XenonException {
         for (String prefix : possiblePrefixes) {
             if (input.startsWith(prefix)) {
                 //cut of prefix
@@ -148,7 +148,7 @@ public final class ScriptingParser {
 
                 //see if anything remains
                 if (jobId.length() == 0) {
-                    throw new CobaltException(adaptorName, "failed to get jobID from line: \"" + input
+                    throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input
                             + "\" Line did not contain job ID.");
                 }
 
@@ -158,12 +158,12 @@ public final class ScriptingParser {
                 try {
                     return Long.parseLong(jobId);
                 } catch (NumberFormatException e) {
-                    throw new CobaltException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
+                    throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
                             + jobId + "\" is not a number", e);
                 }
             }
         }
-        throw new CobaltException(adaptorName, "Failed to get jobID from line: \"" + input
+        throw new XenonException(adaptorName, "Failed to get jobID from line: \"" + input
                 + "\" Line does not match expected prefixes: " + Arrays.toString(possiblePrefixes));
     }
 
@@ -209,11 +209,11 @@ public final class ScriptingParser {
      * @return a map containing key/value maps of all records.
      */
     public static Map<String, Map<String, String>> parseTable(String input, String keyField, String fieldSeparatorRegEx,
-            String adaptorName, String... valueSuffixes) throws CobaltException {
+            String adaptorName, String... valueSuffixes) throws XenonException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         if (input.isEmpty()) {
-            throw new CobaltException(adaptorName, "Cannot parse table, Got no input, expected at least a header");
+            throw new XenonException(adaptorName, "Cannot parse table, Got no input, expected at least a header");
         }
 
         String[] lines = input.split(NEWLINE_REGEX);
@@ -225,7 +225,7 @@ public final class ScriptingParser {
             fields[i] = fields[i].trim();
 
             if (fields[i].isEmpty()) {
-                throw new CobaltException(adaptorName, "Output contains empty field name in line \"" + lines[0] + "\"");
+                throw new XenonException(adaptorName, "Output contains empty field name in line \"" + lines[0] + "\"");
             }
         }
 
@@ -233,7 +233,7 @@ public final class ScriptingParser {
             String[] values = lines[i].split(fieldSeparatorRegEx);
 
             if (fields.length != values.length) {
-                throw new CobaltException(adaptorName, "Expected " + fields.length + " fields in output, got line with "
+                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output, got line with "
                         + values.length + " values: " + lines[i]);
             }
 
@@ -243,7 +243,7 @@ public final class ScriptingParser {
             }
 
             if (!map.containsKey(keyField)) {
-                throw new CobaltException(adaptorName, "Output does not contain required field \"" + keyField + "\"");
+                throw new XenonException(adaptorName, "Output does not contain required field \"" + keyField + "\"");
 
             }
 
@@ -264,16 +264,16 @@ public final class ScriptingParser {
      * @param options
      *            all possible options the input could contain
      * @return the index of the matching option
-     * @throws CobaltException
+     * @throws XenonException
      *             in case the input does not contain any of the options given.
      */
-    public static int checkIfContains(String input, String adaptorName, String... options) throws CobaltException {
+    public static int checkIfContains(String input, String adaptorName, String... options) throws XenonException {
         for (int i = 0; i < options.length; i++) {
             if (input.contains(options[i])) {
                 return i;
             }
         }
-        throw new CobaltException(adaptorName, "Output does not contain expected string: " + Arrays.toString(options));
+        throw new XenonException(adaptorName, "Output does not contain expected string: " + Arrays.toString(options));
     }
 
     /**
@@ -301,10 +301,10 @@ public final class ScriptingParser {
      * @param keyField
      *            the header field which triggers a new record. the first line of the output must contain this key
      * @return a map with all records found. The value of the key field is used as a key.
-     * @throws CobaltException in case the output does not match the expected format
+     * @throws XenonException in case the output does not match the expected format
      */
     public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, String separatorRegEx,
-            String adaptorName, String... ignoredLines) throws CobaltException {
+            String adaptorName, String... ignoredLines) throws XenonException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         String[] lines = input.split(NEWLINE_REGEX);
@@ -316,7 +316,7 @@ public final class ScriptingParser {
                 String[] elements = line.split(separatorRegEx, 2);
 
                 if (elements.length != 2) {
-                    throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in output, got \"" + line
+                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in output, got \"" + line
                             + "\"");
                 }
 
@@ -328,7 +328,7 @@ public final class ScriptingParser {
                     currentMap = new HashMap<String, String>();
                     result.put(value, currentMap);
                 } else if (currentMap == null) {
-                    throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + keyField
+                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + keyField
                             + "\" on first line, got \"" + line + "\"");
                 }
                 currentMap.put(key, value);

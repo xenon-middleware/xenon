@@ -18,9 +18,9 @@ package nl.esciencecenter.xenon.engine.files;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -38,16 +38,16 @@ import org.junit.Test;
  */
 public class PathAttributesPairImplementationTest {
 
-    Cobalt octopus;
+    Xenon octopus;
     Files files;
     FileSystem filesystem;
     Path root;
     FileAttributes att;
 
     @Before
-    public void prepare() throws CobaltException, CobaltException {
+    public void prepare() throws XenonException, XenonException {
 
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
         files = octopus.files();
         root = Utils.getLocalCWD(files);
         filesystem = root.getFileSystem();
@@ -55,13 +55,13 @@ public class PathAttributesPairImplementationTest {
     }
 
     @After
-    public void cleanup() throws CobaltException, CobaltException {
+    public void cleanup() throws XenonException, XenonException {
         files.close(filesystem);
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     @Test
-    public void test_equals() throws CobaltException {
+    public void test_equals() throws XenonException {
 
         PathAttributesPairImplementation tmp = new PathAttributesPairImplementation(root, att);
         PathAttributesPairImplementation tmp2 = new PathAttributesPairImplementation(root, null);
@@ -85,7 +85,7 @@ public class PathAttributesPairImplementationTest {
     }
 
     @Test
-    public void test_hashCode() throws CobaltException {
+    public void test_hashCode() throws XenonException {
 
         final int prime = 31;
         int result = 1;

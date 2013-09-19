@@ -19,18 +19,18 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Type;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
-import nl.esciencecenter.xenon.engine.CobaltPropertyDescriptionImplementation;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
+import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -46,10 +46,10 @@ import nl.esciencecenter.xenon.util.Utils;
 public class LocalAdaptor extends Adaptor {
 
     /** Name of the local adaptor is defined in the engine. */
-    public static final String ADAPTOR_NAME = CobaltEngine.LOCAL_ADAPTOR_NAME;
+    public static final String ADAPTOR_NAME = XenonEngine.LOCAL_ADAPTOR_NAME;
 
     /** Local properties start with this prefix. */
-    public static final String PREFIX = CobaltEngine.ADAPTORS + "local.";
+    public static final String PREFIX = XenonEngine.ADAPTORS + "local.";
 
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
@@ -86,11 +86,11 @@ public class LocalAdaptor extends Adaptor {
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(null)", "(empty string)", "/");
     
     /** The properties supported by this adaptor */
-    private static final ImmutableArray<CobaltPropertyDescription> VALID_PROPERTIES = 
-            new ImmutableArray<CobaltPropertyDescription>(
-                    new CobaltPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Component.COBALT), 
+    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
+            new ImmutableArray<XenonPropertyDescription>(
+                    new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Component.XENON), 
                             "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
-                    new CobaltPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.COBALT), 
+                    new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.XENON), 
                             "4", "The maximum number of concurrent jobs in the multiq.."));
 
     /** Local implementation for Files */
@@ -102,16 +102,16 @@ public class LocalAdaptor extends Adaptor {
     /** Local implementation for Credentials */
     private final LocalCredentials localCredentials;
 
-    public LocalAdaptor(CobaltEngine cobaltEngine, Map<String, String> properties) throws CobaltException {
+    public LocalAdaptor(XenonEngine cobaltEngine, Map<String, String> properties) throws XenonException {
         super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
-                new CobaltProperties(VALID_PROPERTIES, Component.COBALT, properties));
+                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         localFiles = new LocalFiles(this, cobaltEngine.getCopyEngine());
         localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), cobaltEngine);
         localCredentials = new LocalCredentials();
     }
 
-    void checkCredential(Credential credential) throws CobaltException {
+    void checkCredential(Credential credential) throws XenonException {
 
         if (credential == null) {
             return;
@@ -173,7 +173,7 @@ public class LocalAdaptor extends Adaptor {
     }
 
     @Override
-    public Credentials credentialsAdaptor() throws CobaltException {
+    public Credentials credentialsAdaptor() throws XenonException {
         return localCredentials;
     }
 

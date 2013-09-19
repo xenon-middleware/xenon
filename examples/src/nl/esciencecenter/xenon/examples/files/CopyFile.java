@@ -19,9 +19,9 @@ package nl.esciencecenter.xenon.examples.files;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -52,7 +52,7 @@ public class CopyFile {
             URI target = new URI(args[1]);
 
             // Next, we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = cobalt.files();
@@ -73,9 +73,9 @@ public class CopyFile {
             files.close(targetFS);
 
             // Finally, we end Cobalt to release all resources 
-            CobaltFactory.endCobalt(cobalt);
+            XenonFactory.endXenon(cobalt);
 
-        } catch (URISyntaxException | CobaltException e) {
+        } catch (URISyntaxException | XenonException e) {
             System.out.println("CopyFile example failed: " + e.getMessage());
             e.printStackTrace();
         }

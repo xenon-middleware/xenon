@@ -20,9 +20,9 @@ import static org.mockito.Mockito.mock;
 
 import java.util.NoSuchElementException;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.local.LocalDirectoryStream;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
@@ -40,14 +40,14 @@ public class LocalDirectoryStreamTest {
 
     private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
 
-    private static Path resolve(Files files, Path root, String path) throws CobaltException { 
+    private static Path resolve(Files files, Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
     @org.junit.BeforeClass
-    public static void prepareClass() throws CobaltException, CobaltException {
+    public static void prepareClass() throws XenonException, XenonException {
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
 
         Files files = octopus.files();
         Path root = Utils.getLocalCWD(files);
@@ -62,13 +62,13 @@ public class LocalDirectoryStreamTest {
         files.createFile(file1);
         files.createFile(file2);
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     @org.junit.AfterClass
-    public static void cleanupClass() throws CobaltException, CobaltException {
+    public static void cleanupClass() throws XenonException, XenonException {
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
 
         Files files = octopus.files();
         Path root = Utils.getLocalCWD(files);
@@ -85,10 +85,10 @@ public class LocalDirectoryStreamTest {
             files.delete(testDir);
         }
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
-    private Cobalt octopus;
+    private Xenon octopus;
     private Files files;
     private FileSystem fs;
     private Path root;
@@ -109,9 +109,9 @@ public class LocalDirectoryStreamTest {
     }
 
     @org.junit.Before
-    public void prepareTest() throws CobaltException, CobaltException {
+    public void prepareTest() throws XenonException, XenonException {
 
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
 
         files = octopus.files();
         root = Utils.getLocalCWD(files);
@@ -120,11 +120,11 @@ public class LocalDirectoryStreamTest {
     }
 
     @org.junit.After
-    public void cleanupTest() throws CobaltException, CobaltException {
-        CobaltFactory.endCobalt(octopus);
+    public void cleanupTest() throws XenonException, XenonException {
+        XenonFactory.endXenon(octopus);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void test_nonexistant_dir() throws Exception {
         Path path = new PathImplementation(mock(FileSystem.class), new RelativePath("aap"));
         new LocalDirectoryStream(path, new AllTrue());

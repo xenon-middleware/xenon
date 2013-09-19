@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
@@ -43,7 +43,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
 
     private Streams streams;
 
-    LocalInteractiveProcess(JobImplementation job) throws CobaltException {
+    LocalInteractiveProcess(JobImplementation job) throws XenonException {
 
         JobDescription description = job.getJobDescription();
 
@@ -75,7 +75,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
         try { 
             process = builder.start();
         } catch (IOException e) { 
-            throw new CobaltException(LocalAdaptor.ADAPTOR_NAME, "Failed to start local process!", e);
+            throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to start local process!", e);
         }
         streams = new StreamsImplementation(job, process.getInputStream(), process.getOutputStream(), process.getErrorStream());
     }

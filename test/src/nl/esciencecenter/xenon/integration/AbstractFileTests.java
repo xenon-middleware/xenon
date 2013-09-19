@@ -25,9 +25,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -49,16 +49,16 @@ abstract public class AbstractFileTests {
     /**
      * Singleton Engine for all tests
      */
-    protected static Cobalt octopus = null;
+    protected static Xenon octopus = null;
 
-    protected static Files getFiles() throws CobaltException {
+    protected static Files getFiles() throws XenonException {
 
         // class synchronization:
         synchronized (AbstractFileTests.class) {
 
             // init octopus singleton instance: 
             if (octopus == null) {
-                octopus = CobaltFactory.newCobalt(null);
+                octopus = XenonFactory.newXenon(null);
             }
 
             return octopus.files();
@@ -111,9 +111,9 @@ abstract public class AbstractFileTests {
      * Return credentials for this FileSystem if needed for the integration tests.
      * 
      * @return Octopus Credential for the FileSystem to be tested.
-     * @throws CobaltException
+     * @throws XenonException
      */
-    abstract Credential getCredentials() throws CobaltException;
+    abstract Credential getCredentials() throws XenonException;
 
     /**
      * Return test location. Subclasses need to override this.
@@ -135,7 +135,7 @@ abstract public class AbstractFileTests {
         return getFiles().newPath(fs, new RelativePath(testPath));
     }
 
-    protected Path createSubdir(Path parentDirPath, String subDir) throws CobaltException {
+    protected Path createSubdir(Path parentDirPath, String subDir) throws XenonException {
         Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subDir);
         infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
         getFiles().createDirectory(absPath);
@@ -153,8 +153,8 @@ abstract public class AbstractFileTests {
      *            - prefix of the sub-directory. An unique number will be append to this name,
      * @return AbsolutPath of new created directory
      */
-    protected Path createUniqueTestSubdir(Path parentDirPath, String dirPrefix) throws CobaltException,
-            CobaltException {
+    protected Path createUniqueTestSubdir(Path parentDirPath, String dirPrefix) throws XenonException,
+            XenonException {
         do {
             int myid = uniqueIdcounter++;
             Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, dirPrefix + "." + myid);
@@ -178,11 +178,11 @@ abstract public class AbstractFileTests {
      * @param createFile
      *            - actually create (empty) file on (remote) file system.
      * @return new Path, which points to existing file if createFile was true.
-     * @throws CobaltException
-     * @throws CobaltException
+     * @throws XenonException
+     * @throws XenonException
      */
     protected Path createUniqueTestFile(Path parentDirPath, String filePrefix, boolean createFile)
-            throws CobaltException {
+            throws XenonException {
 
         do {
             int myid = uniqueIdcounter++;
@@ -200,13 +200,13 @@ abstract public class AbstractFileTests {
         } while (true);
     }
 
-    protected Path createFile(Path parentDirPath, String subFile) throws CobaltException {
+    protected Path createFile(Path parentDirPath, String subFile) throws XenonException {
         Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subFile);
         getFiles().createFile(absPath);
         return absPath;
     }
 
-    protected void deletePaths(Path[] paths, boolean assertDeletion) throws CobaltException {
+    protected void deletePaths(Path[] paths, boolean assertDeletion) throws XenonException {
 
         for (Path path : paths) {
             getFiles().delete(path);

@@ -21,9 +21,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.attribute.PosixFilePermissions;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.local.LocalFileAttributes;
 import nl.esciencecenter.xenon.adaptors.local.LocalUtils;
 import nl.esciencecenter.xenon.files.FileAttributes;
@@ -37,7 +37,7 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class LocalFileAttributesTest {
 
-    private static Path resolve(Files files, Path root, String path) throws CobaltException { 
+    private static Path resolve(Files files, Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
     
@@ -46,9 +46,9 @@ public class LocalFileAttributesTest {
         new LocalFileAttributes(null);
     }
 
-    @org.junit.Test(expected = CobaltException.class)
+    @org.junit.Test(expected = XenonException.class)
     public void testNonExistingFile() throws Exception {
-        Cobalt o = CobaltFactory.newCobalt(null);
+        Xenon o = XenonFactory.newXenon(null);
         Files files = o.files();
         Path path = resolve(files, Utils.getLocalCWD(files), "noot" + System.currentTimeMillis() + ".txt");
         new LocalFileAttributes(path);
@@ -56,7 +56,7 @@ public class LocalFileAttributesTest {
 
     @org.junit.Test
     public void testCreationTime() throws Exception {
-        Cobalt o = CobaltFactory.newCobalt(null);
+        Xenon o = XenonFactory.newXenon(null);
         Files files = o.files();
         
         long now = System.currentTimeMillis();
@@ -72,7 +72,7 @@ public class LocalFileAttributesTest {
         System.out.println("NOW " + now + " CREATE " + time);
 
         files.delete(path);
-        CobaltFactory.endCobalt(o);
+        XenonFactory.endXenon(o);
 
         assertTrue(time >= now - 5000);
         assertTrue(time <= now + 5000);
@@ -80,7 +80,7 @@ public class LocalFileAttributesTest {
 
     @org.junit.Test
     public void testHashCode() throws Exception {
-        Cobalt o = CobaltFactory.newCobalt(null);
+        Xenon o = XenonFactory.newXenon(null);
         Files files = o.files();
         Path path = resolve(files, Utils.getLocalCWD(files), "aap.txt");
         
@@ -95,7 +95,7 @@ public class LocalFileAttributesTest {
         // TODO: check hashcode ?
 
         files.delete(path);
-        CobaltFactory.endCobalt(o);
+        XenonFactory.endXenon(o);
     }
 
     @org.junit.Test
@@ -105,7 +105,7 @@ public class LocalFileAttributesTest {
             return;
         }
         
-        Cobalt o = CobaltFactory.newCobalt(null);
+        Xenon o = XenonFactory.newXenon(null);
         Files files = o.files();
         Path cwd = Utils.getLocalCWD(files);
         Path path1 = resolve(files, cwd, "aap.txt");
@@ -156,7 +156,7 @@ public class LocalFileAttributesTest {
         files.delete(path1);
         files.delete(path2);
 
-        CobaltFactory.endCobalt(o);
+        XenonFactory.endXenon(o);
     }
 
 }

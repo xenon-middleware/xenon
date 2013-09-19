@@ -25,14 +25,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobStatusImplementation;
 import nl.esciencecenter.xenon.engine.jobs.QueueStatusImplementation;
@@ -72,7 +72,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final String QACCT_HEADER = "==============================================================";
 
-    static void verifyJobDescription(JobDescription description) throws CobaltException {
+    static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, GridEngineAdaptor.ADAPTOR_NAME);
 
         if (description.isInteractive()) {
@@ -101,7 +101,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         }
     }
 
-    static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws CobaltException {
+    static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws XenonException {
         Integer exitcode = null;
         Exception exception = null;
         String state = "done";
@@ -118,7 +118,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         try {
             exitcode = Integer.parseInt(info.get("exit_status"));
         } catch (NumberFormatException e) {
-            throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
+            throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
                     + " from string " + exitcodeString, e);
 
         }
@@ -130,13 +130,13 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             exception = new JobCanceledException(GridEngineAdaptor.ADAPTOR_NAME, "Job killed by signal");
         } else {
             //unknown error code
-            exception = new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
+            exception = new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error: " + failedString);
         }
 
         return new JobStatusImplementation(job, state, exitcode, exception, false, true, info);
     }
 
-    static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws CobaltException {
+    static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
         boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
@@ -151,7 +151,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         Exception exception = null;
         if (stateCode.contains("E")) {
-            exception = new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error state: " + stateCode);
+            exception = new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;
         }
 
@@ -177,7 +177,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     private final GridEngineSetup setupInfo;
 
     GridEngineSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
-            CobaltProperties properties, CobaltEngine engine) throws CobaltException {
+            XenonProperties properties, XenonEngine engine) throws XenonException {
 
         super(adaptor, scheme, location, credential, properties, engine, properties
                 .getLongProperty(GridEngineAdaptor.POLL_DELAY_PROPERTY));
@@ -256,7 +256,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return deletedJobs.remove(Long.parseLong(job.getIdentifier()));
     }
 
-    private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws CobaltException {
+    private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws XenonException {
         Map<String, Map<String, String>> status = parser.parseJobInfos(statusOutput);
 
         updateJobsSeenMap(status.keySet());
@@ -268,7 +268,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job[] getJobs(String... queueNames) throws CobaltException {
+    public Job[] getJobs(String... queueNames) throws XenonException {
         ArrayList<Job> result = new ArrayList<Job>();
 
         if (queueNames == null || queueNames.length == 0) {
@@ -287,7 +287,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
                     throw new NoSuchQueueException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);                    
                 } else {
-                    throw new CobaltException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
+                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);
                 }
             }
@@ -299,7 +299,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus getQueueStatus(String queueName) throws CobaltException {
+    public QueueStatus getQueueStatus(String queueName) throws XenonException {
         String qstatOutput = runCheckedCommand(null, "qstat", "-xml", "-g", "c");
 
         Map<String, Map<String, String>> allMap = parser.parseQueueInfos(qstatOutput);
@@ -315,7 +315,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public QueueStatus[] getQueueStatuses(String... queueNames) throws CobaltException {
+    public QueueStatus[] getQueueStatuses(String... queueNames) throws XenonException {
         if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
@@ -352,7 +352,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public Job submitJob(JobDescription description) throws CobaltException {
+    public Job submitJob(JobDescription description) throws XenonException {
         String output;
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
         
@@ -387,7 +387,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus cancelJob(Job job) throws CobaltException {
+    public JobStatus cancelJob(Job job) throws XenonException {
         String identifier = job.getIdentifier();
         String qdelOutput = runCheckedCommand(null, "qdel", identifier);
 
@@ -407,7 +407,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return getJobStatus(job);
     }
 
-    private Map<String, Map<String, String>> getQstatInfo() throws CobaltException {
+    private Map<String, Map<String, String>> getQstatInfo() throws XenonException {
         RemoteCommandRunner runner = runCommand(null, "qstat", "-xml");
 
         if (!runner.success()) {
@@ -423,7 +423,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    private Map<String, String> getQacctInfo(Job job) throws CobaltException {
+    private Map<String, String> getQacctInfo(Job job) throws XenonException {
         RemoteCommandRunner runner = runCommand(null, "qacct", "-j", job.getIdentifier());
 
         if (!runner.success()) {
@@ -445,12 +445,12 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
      * @param job
      *            the job to get the status for.
      * @return the JobStatus of the job.
-     * @throws CobaltException
+     * @throws XenonException
      *             in case the info is not valid.
-     * @throws CobaltException
+     * @throws XenonException
      *             in case an additional command fails to run.
      */
-    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, Job job) throws CobaltException {
+    private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, Job job) throws XenonException {
 
         if (job == null) {
             return null;
@@ -485,7 +485,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus getJobStatus(Job job) throws CobaltException {
+    public JobStatus getJobStatus(Job job) throws XenonException {
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus result = getJobStatus(info, job);
@@ -499,7 +499,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
-    public JobStatus[] getJobStatuses(Job... jobs) throws CobaltException {
+    public JobStatus[] getJobStatuses(Job... jobs) throws XenonException {
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus[] result = new JobStatus[jobs.length];

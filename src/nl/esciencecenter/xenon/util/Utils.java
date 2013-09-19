@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -75,10 +75,10 @@ public final class Utils {
      * @return
      *          the local <code>Scheduler</code>.
      *          
-     * @throws CobaltException
+     * @throws XenonException
      *          If the creation of the Scheduler failed. 
      */
-    public static Scheduler getLocalScheduler(Jobs jobs) throws CobaltException { 
+    public static Scheduler getLocalScheduler(Jobs jobs) throws XenonException { 
         return jobs.newScheduler("local", null, null, null);
     }
     
@@ -95,10 +95,10 @@ public final class Utils {
      * @return
      *          the local <code>Scheduler</code>.
      *          
-     * @throws CobaltException
+     * @throws XenonException
      *          If the creation of the Scheduler failed. 
      */
-    public static Scheduler newScheduler(Jobs jobs, String scheme) throws CobaltException { 
+    public static Scheduler newScheduler(Jobs jobs, String scheme) throws XenonException { 
         return jobs.newScheduler(scheme, null, null, null);
     }    
     
@@ -305,14 +305,14 @@ public final class Utils {
      * 
      * @return the home directory of the current user.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          If the home directory could not be retrieved. 
      */
-    public static String getHome() throws CobaltException { 
+    public static String getHome() throws XenonException { 
         String home = System.getProperty("user.home");
         
         if (home == null || home.length() == 0) { 
-            throw new CobaltException(NAME, "Home directory property user.home not set!");
+            throw new XenonException(NAME, "Home directory property user.home not set!");
         }
 
         return home;        
@@ -323,14 +323,14 @@ public final class Utils {
      * 
      * @return the current working directory.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          If the current working directory could not be retrieved. 
      */
-    public static String getCWD() throws CobaltException { 
+    public static String getCWD() throws XenonException { 
         String cwd = System.getProperty("user.dir");
         
         if (cwd == null || cwd.length() == 0) { 
-            throw new CobaltException(NAME, "Current working directory property user.dir not set!");
+            throw new XenonException(NAME, "Current working directory property user.dir not set!");
         }
 
         return cwd;        
@@ -347,10 +347,10 @@ public final class Utils {
      *          The absolute path for which to determine the root element.
      * @return 
      *          The locally valid root element.
-     * @throws CobaltException
+     * @throws XenonException
      *          If the provided <code>path</code> is not absolute, or does not contain a locally valid root. 
      */
-    public static String getLocalRoot(String path) throws CobaltException { 
+    public static String getLocalRoot(String path) throws XenonException { 
         
         if (isWindows()) { 
             if (path != null && path.length() >= 2 && (path.charAt(1) == ':') && 
@@ -358,14 +358,14 @@ public final class Utils {
                 return path.substring(0, 2).toUpperCase();
             }
             
-            throw new CobaltException(NAME, "Path is not absolute! " + path);
+            throw new XenonException(NAME, "Path is not absolute! " + path);
         }
         
         if (path != null && path.length() >= 1 && (path.charAt(0) == '/')) { 
             return "/";
         }
             
-        throw new CobaltException(NAME, "Path is not absolute! " + path);
+        throw new XenonException(NAME, "Path is not absolute! " + path);
     }
     
     /**
@@ -537,13 +537,13 @@ public final class Utils {
      *          The root element. 
      * @return
      *          A <code>RelativePath</code> that contains the part of <code>path</code> that is relative to <code>root</code>.
-     * @throws CobaltException
+     * @throws XenonException
      *          If the <code>path</code> does not start with <code>root</code>.
      */
-    public static RelativePath getRelativePath(String path, String root) throws CobaltException {
+    public static RelativePath getRelativePath(String path, String root) throws XenonException {
         
         if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) { 
-            throw new CobaltException(NAME, "Path does not start with root: " + path + " " + root);
+            throw new XenonException(NAME, "Path does not start with root: " + path + " " + root);
         }
 
         if (root.length() == path.length()) { 
@@ -576,10 +576,10 @@ public final class Utils {
      *           
      * @return a <code>Path</code> representing the same location as <code>path</code>. 
      *          
-     * @throws CobaltException 
+     * @throws XenonException 
      *          If the creation of the FileSystem failed.
      */
-    public static Path fromLocalPath(Files files, String path) throws CobaltException { 
+    public static Path fromLocalPath(Files files, String path) throws XenonException { 
         String root = getLocalRoot(path);
         FileSystem fs = files.newFileSystem("file", root, null, null);
         return files.newPath(fs, getRelativePath(path, root));
@@ -596,12 +596,12 @@ public final class Utils {
      * @return
      *          a <code>Path</code> that represents the current working directory.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          If an I/O error occurred
-     * @throws CobaltException
+     * @throws XenonException
      *          If the creation of the FileSystem failed.
      */    
-    public static Path getLocalCWD(Files files) throws CobaltException { 
+    public static Path getLocalCWD(Files files) throws XenonException { 
         return fromLocalPath(files, getCWD());
     }
 
@@ -616,10 +616,10 @@ public final class Utils {
      * @return
      *          a <code>Path</code> that represents the home directory of the current user.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          If the creation of the FileSystem failed.
      */    
-    public static Path getLocalHome(Files files) throws CobaltException { 
+    public static Path getLocalHome(Files files) throws XenonException { 
         return fromLocalPath(files, getHome());
     }
     
@@ -633,10 +633,10 @@ public final class Utils {
      *          the files interface to use to create the <code>FileSystems</code>.
      * @return all local FileSystems.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          If the creation of the FileSystem failed.
      */
-    public static FileSystem [] getLocalFileSystems(Files files) throws CobaltException {
+    public static FileSystem [] getLocalFileSystems(Files files) throws XenonException {
         
         File [] roots = File.listRoots();
         
@@ -672,10 +672,10 @@ public final class Utils {
      *             directory <i>(optional specific exception)</i> *
      * @throws InvalidCopyOptionsException
      *             if {@code options} contains a copy option that is not supported
-     * @throws CobaltException
+     * @throws XenonException
      *             if an I/O error occurs when reading or writing
      */
-    public static long copy(Files files, InputStream in, Path target, boolean truncate) throws CobaltException {
+    public static long copy(Files files, InputStream in, Path target, boolean truncate) throws XenonException {
 
         long bytes = 0;
         OutputStream out = null;
@@ -684,7 +684,7 @@ public final class Utils {
             out = files.newOutputStream(target, openOptionsForWrite(truncate));            
             bytes = copy(in, out, DEFAULT_BUFFER_SIZE);            
         } catch (IOException e) {
-            throw new CobaltException(NAME, "Failed to copy stream to file.", e);
+            throw new XenonException(NAME, "Failed to copy stream to file.", e);
         } finally { 
             close(out);
         }
@@ -704,11 +704,11 @@ public final class Utils {
      * 
      * @return the number of bytes copied.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *             if an I/O error occurs while reading or writing
      * 
      */
-    public static long copy(Files files, Path source, OutputStream out) throws CobaltException {
+    public static long copy(Files files, Path source, OutputStream out) throws XenonException {
         
         long bytes = 0;
         InputStream in = null;
@@ -717,7 +717,7 @@ public final class Utils {
             in = files.newInputStream(source);
             bytes = copy(in, out, DEFAULT_BUFFER_SIZE);
         } catch (IOException e) {
-            throw new CobaltException(NAME, "Failed to copy stream to file.", e);
+            throw new XenonException(NAME, "Failed to copy stream to file.", e);
         } finally { 
             close(in);
         }
@@ -738,10 +738,10 @@ public final class Utils {
      *
      * @return the BufferedReader.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static BufferedReader newBufferedReader(Files files, Path source, Charset cs) throws CobaltException {
+    public static BufferedReader newBufferedReader(Files files, Path source, Charset cs) throws XenonException {
         return new BufferedReader(new InputStreamReader(files.newInputStream(source), cs));
     }
 
@@ -760,11 +760,11 @@ public final class Utils {
      *          
      * @return the BufferedWriter.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or writing the file.
      */
     public static BufferedWriter newBufferedWriter(Files files, Path target, Charset cs, boolean truncate)
-            throws CobaltException {
+            throws XenonException {
 
         OutputStream out = files.newOutputStream(target, openOptionsForWrite(truncate));
         return new BufferedWriter(new OutputStreamWriter(out, cs));
@@ -780,10 +780,10 @@ public final class Utils {
      *          
      * @return a <code>byte[]</code> containing all bytes in the file.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static byte[] readAllBytes(Files files, Path source) throws CobaltException {
+    public static byte[] readAllBytes(Files files, Path source) throws XenonException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         copy(files, source, out);
         return out.toByteArray();
@@ -801,10 +801,10 @@ public final class Utils {
      *          
      * @return a <code>String</code> containing all data from the file as converted using <code>cs</code>.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static String readToString(Files files, Path source, Charset cs) throws CobaltException {
+    public static String readToString(Files files, Path source, Charset cs) throws XenonException {
         
         InputStream in = null;
         
@@ -812,7 +812,7 @@ public final class Utils {
             in = files.newInputStream(source);
             return readToString(in, cs);
         } catch (IOException e) {
-            throw new CobaltException(NAME, "Failed to read data", e);
+            throw new XenonException(NAME, "Failed to read data", e);
         } finally { 
             close(in);
         }
@@ -830,10 +830,10 @@ public final class Utils {
      *           
      * @return a <code>List<String></code> containing all lines in the file.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or reading the file.
      */
-    public static List<String> readAllLines(Files files, Path source, Charset cs) throws CobaltException {
+    public static List<String> readAllLines(Files files, Path source, Charset cs) throws XenonException {
 
         InputStream in = null;
         
@@ -841,7 +841,7 @@ public final class Utils {
             in = files.newInputStream(source);
             return readLines(in, cs);
         } catch (IOException e) {
-            throw new CobaltException(NAME, "Failed to read lines", e);
+            throw new XenonException(NAME, "Failed to read lines", e);
         } finally { 
             close(in);
         }
@@ -859,10 +859,10 @@ public final class Utils {
      * @param truncate
      *          should the file be truncated before writing data into it ?
      *          
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or writing to the file.
      */
-    public static void write(Files files, Path target, byte[] bytes, boolean truncate) throws CobaltException {
+    public static void write(Files files, Path target, byte[] bytes, boolean truncate) throws XenonException {
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         copy(files, in, target, truncate);
         close(in);
@@ -882,11 +882,11 @@ public final class Utils {
      * @param truncate
      *          should the file be truncated before writing data into it ?
      *          
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while opening or writing to the file.
      */
     public static void write(Files files, Path target, Iterable<? extends CharSequence> lines, Charset cs,
-            boolean truncate) throws CobaltException {
+            boolean truncate) throws XenonException {
 
         OutputStream out = null;
         
@@ -894,7 +894,7 @@ public final class Utils {
             out = files.newOutputStream(target, openOptionsForWrite(truncate));
             writeLines(lines, cs, out);
         } catch (IOException e) {
-            throw new CobaltException("FileUtils", "failed to write lines", e);
+            throw new XenonException("FileUtils", "failed to write lines", e);
         } finally { 
             close(out);
         }
@@ -914,10 +914,10 @@ public final class Utils {
      *          the path to start from.
      * @param visitor
      *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs during the walk.
      */
-    public static void walkFileTree(Files files, Path start, FileVisitor visitor) throws CobaltException {
+    public static void walkFileTree(Files files, Path start, FileVisitor visitor) throws XenonException {
         walkFileTree(files, start, false, Integer.MAX_VALUE, visitor);
     }
 
@@ -959,7 +959,7 @@ public final class Utils {
      * </li>
      * <li> 
      * If {@link FileVisitResult#SKIP_SUBTREE} is returned, the elements in the directory will not be visited. Instead 
-     * {@link FileVisitor#postVisitDirectory(Path, CobaltException, Files) visitor.postVisitDirectory} and  
+     * {@link FileVisitor#postVisitDirectory(Path, XenonException, Files) visitor.postVisitDirectory} and  
      * {@link FileVisitResult#CONTINUE} is returned.
      * </li>
      * <li> 
@@ -970,7 +970,7 @@ public final class Utils {
      * If {@link FileVisitResult#CONTINUE} is returned <code>walkFileTree</code> is called on each of the elements 
      * in the directory.
      * If any of these calls returns {@link FileVisitResult#SKIP_SIBLINGS} the remaining elements will be 
-     * skipped, {@link FileVisitor#postVisitDirectory(Path, CobaltException, Files) visitor.postVisitDirectory} will be 
+     * skipped, {@link FileVisitor#postVisitDirectory(Path, XenonException, Files) visitor.postVisitDirectory} will be 
      * called, and its result will be returned.  
      * If any of these calls returns {@link FileVisitResult#TERMINATE} the walk is terminated immediately and 
      * {@link FileVisitResult#TERMINATE} is returned.
@@ -990,20 +990,20 @@ public final class Utils {
      * @param visitor
      *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
      *          
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs during the walk.
      */
     public static void walkFileTree(Files files, Path start, boolean followLinks, int maxDepth,
-            FileVisitor visitor) throws CobaltException {
+            FileVisitor visitor) throws XenonException {
         FileAttributes attributes = files.getAttributes(start);
         walk(files, start, attributes, followLinks, maxDepth, visitor);
     }
 
     // Walk a file tree.
     private static FileVisitResult walk(Files files, Path path, FileAttributes attributes, boolean followLinks,
-            int maxDepth, FileVisitor visitor) throws CobaltException {
+            int maxDepth, FileVisitor visitor) throws XenonException {
         FileVisitResult visitResult;
-        CobaltException exception = null;
+        XenonException exception = null;
 
         try {
             if (attributes.isDirectory() && maxDepth > 0) {
@@ -1022,7 +1022,7 @@ public final class Utils {
                                 return FileVisitResult.TERMINATE;
                             }
                         }
-                    } catch (CobaltException e) {
+                    } catch (XenonException e) {
                         exception = e;
                     }
                     return visitor.postVisitDirectory(path, exception, files);
@@ -1048,7 +1048,7 @@ public final class Utils {
             } else {
                 return visitor.visitFile(path, attributes, files);
             }
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             return visitor.visitFileFailed(path, e, files);
         }
     }
@@ -1067,10 +1067,10 @@ public final class Utils {
      * 
      * @throws InvalidCopyOptionsException
      *           if an invalid combination of options is used.
-     * @throws CobaltException
+     * @throws XenonException
      *           if an I/O error occurs during the copying
      */
-    public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options) throws CobaltException {
+    public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options) throws XenonException {
 
         boolean exist = files.exists(target);
         boolean replace = CopyOption.contains(CopyOption.REPLACE, options);
@@ -1126,10 +1126,10 @@ public final class Utils {
      * @param path
      *          the path to delete.
      *          
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs during the copying
      */
-    public static void recursiveDelete(Files files, Path path) throws CobaltException {
+    public static void recursiveDelete(Files files, Path path) throws XenonException {
 
         FileAttributes att = files.getAttributes(path);
 
@@ -1152,10 +1152,10 @@ public final class Utils {
      *          the relative path to resolve.
      * @return
      *          a new <code>Path</code> that represents the location.
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs during the resolve.
      */
-    public static Path resolveWithRoot(Files files, Path root, String... path) throws CobaltException { 
+    public static Path resolveWithRoot(Files files, Path root, String... path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
 
@@ -1171,10 +1171,10 @@ public final class Utils {
      *          the relative path to resolve.
      * @return
      *          a new <code>Path</code> that represents the location.
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs during the resolve.
      */
-    public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String ... path) throws CobaltException {
+    public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String ... path) throws XenonException {
         return resolveWithRoot(files, fileSystem.getEntryPath(), path);
     }
 }

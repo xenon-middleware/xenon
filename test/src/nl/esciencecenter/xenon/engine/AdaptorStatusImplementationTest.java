@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.engine;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.AdaptorStatusImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
@@ -35,7 +35,7 @@ public class AdaptorStatusImplementationTest {
 
         AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
                 new ImmutableArray<String>("SCHEME1", "SCHEME2"),new ImmutableArray<String>("L1", "L2"), 
-                new ImmutableArray<CobaltPropertyDescription>(), null);
+                new ImmutableArray<XenonPropertyDescription>(), null);
 
         String name = a.getName();
 
@@ -59,7 +59,7 @@ public class AdaptorStatusImplementationTest {
         assert (locations[0].equals("L1"));
         assert (locations[1].equals("L2"));
         
-        CobaltPropertyDescription[] props = a.getSupportedProperties();
+        XenonPropertyDescription[] props = a.getSupportedProperties();
 
         assert (props == null);
 
@@ -72,7 +72,7 @@ public class AdaptorStatusImplementationTest {
     public void testToString() {
 
         String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<String>("SCHEME1", "SCHEME2"), 
-                new ImmutableArray<String>("L1", "L2"), new ImmutableArray<CobaltPropertyDescription>(), null).toString();
+                new ImmutableArray<String>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
 
         assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, " +
         		"SCHEME2], supportedProperties=[], adaptorSpecificInformation=null]"));

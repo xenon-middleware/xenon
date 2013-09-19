@@ -21,15 +21,15 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Component;
-import nl.esciencecenter.xenon.CobaltPropertyDescription.Type;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
-import nl.esciencecenter.xenon.engine.CobaltPropertyDescriptionImplementation;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
+import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -44,9 +44,9 @@ public class AdaptorTest {
 
     class TestAdaptor extends Adaptor {
 
-        public TestAdaptor(CobaltEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-                ImmutableArray<String> supportedLocations, ImmutableArray<CobaltPropertyDescription> validProperties, 
-                CobaltProperties p) throws CobaltException {
+        public TestAdaptor(XenonEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+                ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
+                XenonProperties p) throws XenonException {
 
             super(octopusEngine, name, description, supportedSchemes, supportedLocations, validProperties, p);
         }
@@ -57,17 +57,17 @@ public class AdaptorTest {
         }
 
         @Override
-        public Files filesAdaptor() throws CobaltException {
+        public Files filesAdaptor() throws XenonException {
             return null;
         }
 
         @Override
-        public Jobs jobsAdaptor() throws CobaltException {
+        public Jobs jobsAdaptor() throws XenonException {
             return null;
         }
 
         @Override
-        public Credentials credentialsAdaptor() throws CobaltException {
+        public Credentials credentialsAdaptor() throws XenonException {
             return null;
         }
 
@@ -78,13 +78,13 @@ public class AdaptorTest {
     }
 
     @Test
-    public void test0() throws CobaltException {
+    public void test0() throws XenonException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, 
-                new ImmutableArray<CobaltPropertyDescription>(), new CobaltProperties());
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
 
         String[] tmp = t.getSupportedSchemes();
 
@@ -93,22 +93,22 @@ public class AdaptorTest {
     }
 
     @Test
-    public void test1() throws CobaltException {
+    public void test1() throws XenonException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
-        ImmutableArray<CobaltPropertyDescription> supportedProperties = new ImmutableArray<CobaltPropertyDescription>(
-                new CobaltPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.COBALT),
+        ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
+                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
                         "aap2", "test property p1"),
 
-                new CobaltPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.COBALT),
+                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
                         "noot2", "test property p2"));
 
-        CobaltProperties prop = new CobaltProperties(supportedProperties, new HashMap<String, String>());
+        XenonProperties prop = new XenonProperties(supportedProperties, new HashMap<String, String>());
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
 
-        CobaltPropertyDescription[] p = t.getSupportedProperties();
+        XenonPropertyDescription[] p = t.getSupportedProperties();
 
         assert (p != null);
         assert (p.length == 2);
@@ -119,26 +119,26 @@ public class AdaptorTest {
     }
 
     @Test
-    public void test2() throws CobaltException {
+    public void test2() throws XenonException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
-        ImmutableArray<CobaltPropertyDescription> supportedProperties = new ImmutableArray<CobaltPropertyDescription>(
-                new CobaltPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.COBALT),
+        ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
+                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
                         "aap2", "test property p1"),
 
-                new CobaltPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.COBALT),
+                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
                         "noot2", "test property p2"));
 
         Map<String, String> m = new HashMap<>();
         m.put("octopus.adaptors.test.p1", "mies");
         m.put("octopus.adaptors.test.p2", "zus");
 
-        CobaltProperties prop = new CobaltProperties(supportedProperties, new HashMap<String, String>());
+        XenonProperties prop = new XenonProperties(supportedProperties, new HashMap<String, String>());
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
 
-        CobaltPropertyDescription[] p = t.getSupportedProperties();
+        XenonPropertyDescription[] p = t.getSupportedProperties();
 
         assert (p != null);
         assert (p.length == 2);
@@ -148,23 +148,23 @@ public class AdaptorTest {
         assert (p[1].getDefaultValue().equals("zus"));
     }
 
-    @Test(expected = CobaltException.class)
-    public void test3() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test3() throws XenonException {
 
         ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
-        ImmutableArray<CobaltPropertyDescription> supportedProperties = new ImmutableArray<CobaltPropertyDescription>(
-                new CobaltPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.COBALT),
+        ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
+                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
                         "aap2", "test property p1"),
 
-                new CobaltPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.COBALT),
+                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
                         "noot2", "test property p2"));
 
         Map<String, String> p = new HashMap<>();
         p.put("octopus.adaptors.test.p3", "mies");
 
-        CobaltProperties prop = new CobaltProperties(supportedProperties, p);
+        XenonProperties prop = new XenonProperties(supportedProperties, p);
 
         new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
     }

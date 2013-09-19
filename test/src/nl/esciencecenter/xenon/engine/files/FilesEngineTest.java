@@ -19,10 +19,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.HashMap;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
@@ -36,16 +36,16 @@ public class FilesEngineTest {
     @Test
     public void testFilesEngine() throws Exception {
 
-        CobaltEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
         String tmp = engine.toString();
         assertNotNull(tmp);
     }
 
-    @Test(expected = CobaltRuntimeException.class)
+    @Test(expected = XenonRuntimeException.class)
     public void testUnknownFileSystem() throws Exception {
 
-        CobaltEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
         FileSystemImplementation fsi = new FileSystemImplementation("test", "test1", "test", "/", new RelativePath(),
@@ -55,10 +55,10 @@ public class FilesEngineTest {
         engine.newPath(fsi, new RelativePath("tmp/bla.txt"));
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void testInterSchemeCopy() throws Exception {
 
-        CobaltEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         FilesEngine engine = new FilesEngine(oe);
 
         FileSystemImplementation fs1 = new FileSystemImplementation("aap", "test1", "test", "/", new RelativePath(),

@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.util.JavaJobDescription;
 
@@ -137,7 +137,7 @@ public class JavaJobDescriptionTest {
         j.addJavaClasspathElement("");
     }
 
-    @org.junit.Test(expected = CobaltRuntimeException.class)
+    @org.junit.Test(expected = XenonRuntimeException.class)
     public void test_setArguments_AnyArgument_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.setArguments("some", "arguments");

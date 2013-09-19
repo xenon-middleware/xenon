@@ -17,47 +17,47 @@ package nl.esciencecenter.xenon.engine.credentials;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltRuntimeException;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 
 public class CredentialsEngineImplementation implements Credentials {
-    private final CobaltEngine cobaltEngine;
+    private final XenonEngine cobaltEngine;
 
-    public CredentialsEngineImplementation(CobaltEngine cobaltEngine) {
+    public CredentialsEngineImplementation(XenonEngine cobaltEngine) {
         this.cobaltEngine = cobaltEngine;
     }
 
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
-            Map<String, String> properties) throws CobaltException {
+            Map<String, String> properties) throws XenonException {
         Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, certfile, username, password, properties);
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
-            throws CobaltException {
+            throws XenonException {
         Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, username, password, properties);
     }
 
     @Override
-    public Credential getDefaultCredential(String scheme) throws CobaltException {
+    public Credential getDefaultCredential(String scheme) throws XenonException {
         Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().getDefaultCredential(scheme);
     }
 
     @Override
-    public void close(Credential credential) throws CobaltException {
+    public void close(Credential credential) throws XenonException {
         getCredentialsAdaptor(credential).close(credential);
     }
 
     @Override
-    public boolean isOpen(Credential credential) throws CobaltException {
+    public boolean isOpen(Credential credential) throws XenonException {
         return getCredentialsAdaptor(credential).isOpen(credential);
     }
 
@@ -65,10 +65,10 @@ public class CredentialsEngineImplementation implements Credentials {
         try {
             Adaptor adaptor = cobaltEngine.getAdaptor(credential.getAdaptorName());
             return adaptor.credentialsAdaptor();
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new CobaltRuntimeException("CredentialEngine", "Could not find adaptor named " + credential.getAdaptorName(),
+            throw new XenonRuntimeException("CredentialEngine", "Could not find adaptor named " + credential.getAdaptorName(),
                     e);
         }
     }

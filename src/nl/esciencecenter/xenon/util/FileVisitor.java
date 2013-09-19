@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.util;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -47,10 +47,10 @@ public interface FileVisitor {
      * 
      * @return the desired action. 
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while visiting the directory.
      */
-    FileVisitResult postVisitDirectory(Path dir, CobaltException exception, Files files) throws CobaltException;
+    FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files) throws XenonException;
 
     /**
      * Invoked for a directory before entries in the directory are visited.
@@ -64,10 +64,10 @@ public interface FileVisitor {
      *          
      * @return the desired action.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while visiting the directory. 
      */
-    FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws CobaltException;
+    FileVisitResult preVisitDirectory(Path dir, FileAttributes attributes, Files files) throws XenonException;
 
     /**
      * Invoked for a file in a directory.
@@ -81,10 +81,10 @@ public interface FileVisitor {
      *          
      * @return the desired action.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while visiting the directory. 
      */
-    FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws CobaltException;
+    FileVisitResult visitFile(Path file, FileAttributes attributes, Files files) throws XenonException;
 
     /**
      * Invoked for a file that could not be visited.
@@ -98,8 +98,8 @@ public interface FileVisitor {
      *          
      * @return the desired action.
      * 
-     * @throws CobaltException
+     * @throws XenonException
      *          if an I/O error occurs while visiting the directory. 
      */     
-    FileVisitResult visitFileFailed(Path file, CobaltException exception, Files files) throws CobaltException;
+    FileVisitResult visitFileFailed(Path file, XenonException exception, Files files) throws XenonException;
 }

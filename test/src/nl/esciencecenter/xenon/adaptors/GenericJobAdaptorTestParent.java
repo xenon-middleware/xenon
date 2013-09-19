@@ -29,9 +29,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
@@ -79,7 +79,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     protected static JobTestConfig config;
 
-    protected Cobalt octopus;
+    protected Xenon octopus;
     protected Files files;
     protected Jobs jobs;
     protected Credentials credentials;
@@ -111,7 +111,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     };
     
-    public Path resolve(Path root, String path) throws CobaltException { 
+    public Path resolve(Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
 
@@ -131,7 +131,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         System.err.println("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Cobalt octopus = CobaltFactory.newCobalt(null);
+        Xenon octopus = XenonFactory.newXenon(null);
 
         Files files = octopus.files();
         Credentials credentials = octopus.credentials();
@@ -143,7 +143,7 @@ public abstract class GenericJobAdaptorTestParent {
             files.delete(root);
         }
 
-        CobaltFactory.endCobalt(octopus);
+        XenonFactory.endXenon(octopus);
     }
 
     @Before
@@ -151,16 +151,16 @@ public abstract class GenericJobAdaptorTestParent {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
-        octopus = CobaltFactory.newCobalt(null);
+        octopus = XenonFactory.newXenon(null);
         files = octopus.files();
         jobs = octopus.jobs();
         credentials = octopus.credentials();
     }
 
     @After
-    public void cleanup() throws CobaltException {
+    public void cleanup() throws XenonException {
         // OctopusFactory.endOctopus(octopus);
-        CobaltFactory.endAll();
+        XenonFactory.endAll();
     }
 
     protected String getWorkingDir(String testName) {
@@ -173,7 +173,7 @@ public abstract class GenericJobAdaptorTestParent {
     // credential: null / default / set / wrong
     // properties: null / empty / set / wrong
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test00_newScheduler() throws Exception {
         jobs.newScheduler(null, null, null, null);
     }
@@ -197,7 +197,7 @@ public abstract class GenericJobAdaptorTestParent {
         jobs.close(s);
     }
     
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test02b_newScheduler() throws Exception {
         jobs.newScheduler(config.getScheme(), config.getWrongLocation(), null, null);
     }
@@ -220,7 +220,7 @@ public abstract class GenericJobAdaptorTestParent {
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
             } catch (InvalidCredentialException e) {
                 // expected
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 // allowed
             }
         }
@@ -246,7 +246,7 @@ public abstract class GenericJobAdaptorTestParent {
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw OctopusException");
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 // expected
             }
         }
@@ -320,7 +320,7 @@ public abstract class GenericJobAdaptorTestParent {
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw OctopusException");
-            } catch (CobaltException e) {
+            } catch (XenonException e) {
                 // expected
             }
         }

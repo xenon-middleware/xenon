@@ -15,10 +15,10 @@
  */
 package nl.esciencecenter.xenon.adaptors.scripting;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
-import nl.esciencecenter.xenon.engine.CobaltProperties;
+import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
  * Factory interface for scheduling connections. Implemented by adaptors.
@@ -29,5 +29,5 @@ import nl.esciencecenter.xenon.engine.CobaltProperties;
 public interface SchedulerConnectionFactory {
 
     SchedulerConnection newSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential,
-            CobaltProperties properties, CobaltEngine engine) throws CobaltException;
+            XenonProperties properties, XenonEngine engine) throws XenonException;
 }

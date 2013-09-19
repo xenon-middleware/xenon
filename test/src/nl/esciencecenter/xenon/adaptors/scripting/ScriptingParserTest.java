@@ -25,7 +25,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 
 import org.junit.FixMethodOrder;
@@ -111,7 +111,7 @@ public class ScriptingParserTest {
         assertEquals("parser does not handle empty lines correctly", expected, result);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test01c_parseKeyValuePairs_SpaceInKeyValuePair_ExceptionThrown() throws Exception {
         String input = "key1 = value1";
 
@@ -209,7 +209,7 @@ public class ScriptingParserTest {
         assertEquals("parser does not handle space separated key/value input lines correctly", expected, result);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test03f_parseKeyValueLines_KeyWithoutValue_ExceptionThrown() throws Exception {
         String input = "key1\nkey2 value2\nkey3 value3\nkey4 value4\n";
 
@@ -235,21 +235,21 @@ public class ScriptingParserTest {
         assertEquals("parser failed to get correct job ID from line", 43425, result);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test04c_testParseJobIDFromLine_IncorrectPrefix_ThrowsException() throws Exception {
         String input = "Some dude submitted job 43425";
 
         ScriptingParser.parseJobIDFromLine(input, "fake", "Some user submitted job", "Ow no another job");
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test04d_testParseJobIDFromLine_NoJobID_ThrowsException() throws Exception {
         String input = "Some user submitted job  ";
 
         ScriptingParser.parseJobIDFromLine(input, "fake", "Some user submitted job");
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test04e_testParseJobIDFromLine_JobIDNotANumber_ThrowsException() throws Exception {
         String input = "Some user submitted job thefirstjobever";
 
@@ -390,35 +390,35 @@ public class ScriptingParserTest {
         assertEquals(expected, result);
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test06f_parseTable_EmptyHeaderField_ThrowsException() throws Exception {
         String input = "key1||key2|key3|key4\n";
 
         ScriptingParser.parseTable(input, "key1", ScriptingParser.BAR_REGEX, "fake");
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test06g_parseTable_EmptyInput_ThrowsException() throws Exception {
         String input = "";
 
         ScriptingParser.parseTable(input, "key1", ScriptingParser.WHITESPACE_REGEX, "fake");
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test06h_parseTable_LessFieldsInRecordThanInHeader_ThrowsException() throws Exception {
         String input = "key1 key2 key3 key4\n" + "value1 value2 value3\n";
 
         ScriptingParser.parseTable(input, "key1", ScriptingParser.WHITESPACE_REGEX, "fake");
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test06i_parseTable_MoreFieldsInRecordThanInHeader_ThrowsException() throws Exception {
         String input = "key1 key2 key3 key4\n" + "value1 value2 value3 value4 value5\n";
 
         ScriptingParser.parseTable(input, "key1", ScriptingParser.WHITESPACE_REGEX, "fake");
     }
 
-    @Test(expected = CobaltException.class)
+    @Test(expected = XenonException.class)
     public void test06j_parseTable_GivenKeyFieldNotTable_ThrowsException() throws Exception {
         String input = "key1 key2 key3 key4\n" + "value1 value2 value3 value4\n";
 
@@ -426,7 +426,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test07a_checkIfContains_DoesContain_Index() throws CobaltException {
+    public void test07a_checkIfContains_DoesContain_Index() throws XenonException {
 
         String input = "which one will it contain?";
 
@@ -435,8 +435,8 @@ public class ScriptingParserTest {
         assertEquals(1, result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test07b_checkIfContains_DoesNotContain_ExceptionThrown() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test07b_checkIfContains_DoesNotContain_ExceptionThrown() throws XenonException {
 
         String input = "which one will it contain?";
 
@@ -454,7 +454,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test09a_parseKeyValueRecords_SingleRecord_ResultMap() throws CobaltException {
+    public void test09a_parseKeyValueRecords_SingleRecord_ResultMap() throws XenonException {
         Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
 
         Map<String, String> expectedRecord = new HashMap<String, String>();
@@ -473,7 +473,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test09b_parseKeyValueRecords_MultiRecord_ResultMap() throws CobaltException {
+    public void test09b_parseKeyValueRecords_MultiRecord_ResultMap() throws XenonException {
         Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
 
         Map<String, String> expectedRecord = new HashMap<String, String>();
@@ -500,7 +500,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test09c_parseKeyValueRecords_WhiteSpace_Ignored() throws CobaltException {
+    public void test09c_parseKeyValueRecords_WhiteSpace_Ignored() throws XenonException {
         Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
 
         Map<String, String> expectedRecord = new HashMap<String, String>();
@@ -519,7 +519,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test09d_parseKeyValueRecords_EmptyLines_Ignored() throws CobaltException {
+    public void test09d_parseKeyValueRecords_EmptyLines_Ignored() throws XenonException {
         Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
 
         Map<String, String> expectedRecord = new HashMap<String, String>();
@@ -546,7 +546,7 @@ public class ScriptingParserTest {
     }
 
     @Test
-    public void test09e_parseKeyValueRecords_IgnoreLines_Ignored() throws CobaltException {
+    public void test09e_parseKeyValueRecords_IgnoreLines_Ignored() throws XenonException {
         Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
 
         Map<String, String> expectedRecord = new HashMap<String, String>();
@@ -572,15 +572,15 @@ public class ScriptingParserTest {
         assertEquals(expected, result);
     }
 
-    @Test(expected = CobaltException.class)
-    public void test09f_parseKeyValueRecords_NoValueForKey_ThrowsException() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test09f_parseKeyValueRecords_NoValueForKey_ThrowsException() throws XenonException {
         String input = "key1 = value1\nkey2";
 
         ScriptingParser.parseKeyValueRecords(input, "key1", ScriptingParser.EQUALS_REGEX, "fake");
     }
 
-    @Test(expected = CobaltException.class)
-    public void test09g_parseKeyValueRecords_KeyNotOnFirstLine_ThrowsException() throws CobaltException {
+    @Test(expected = XenonException.class)
+    public void test09g_parseKeyValueRecords_KeyNotOnFirstLine_ThrowsException() throws XenonException {
         String input = "key1 = value1\n";
 
         ScriptingParser.parseKeyValueRecords(input, "key0", ScriptingParser.EQUALS_REGEX, "fake");

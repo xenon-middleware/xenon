@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -49,7 +49,7 @@ public class SubmitInteractiveJobWithOutput {
             URI location = new URI(args[0]);
             
             // We create a new Cobalt using the CobaltFactory (without providing any properties).
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Jobs API
             Jobs jobs = cobalt.jobs();
@@ -82,9 +82,9 @@ public class SubmitInteractiveJobWithOutput {
             jobs.close(scheduler);
 
             // Finally, we end Cobalt to release all resources 
-            CobaltFactory.endCobalt(cobalt);
+            XenonFactory.endXenon(cobalt);
 
-        } catch (URISyntaxException | CobaltException | IOException e)  {
+        } catch (URISyntaxException | XenonException | IOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());
             e.printStackTrace();
         }

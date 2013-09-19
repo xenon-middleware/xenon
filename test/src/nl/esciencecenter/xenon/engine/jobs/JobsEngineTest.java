@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.engine.CobaltEngine;
+import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
 import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
@@ -38,7 +38,7 @@ public class JobsEngineTest {
     @Test
     public void testToString() throws Exception {
 
-        CobaltEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         assertTrue(je.toString().equals("JobsEngine [octopusEngine=" + oe + "]"));
@@ -47,7 +47,7 @@ public class JobsEngineTest {
     @Test
     public void testGetJobStatusesWithException() throws Exception {
 
-        CobaltEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         JobDescription desc = new JobDescription();
@@ -68,7 +68,7 @@ public class JobsEngineTest {
     @Test
     public void testGetJobStatusesWithException2() throws Exception {
 
-        CobaltEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         JobDescription desc = new JobDescription();

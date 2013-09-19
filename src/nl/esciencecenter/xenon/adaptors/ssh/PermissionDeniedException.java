@@ -15,7 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 /**
  * Signals that the user does not have sufficient permissions to perform the operation.
@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.CobaltException;
  * @version 1.0
  * @since 1.0
  */
-public class PermissionDeniedException extends CobaltException {
+public class PermissionDeniedException extends XenonException {
 
     private static final long serialVersionUID = 1L;
 

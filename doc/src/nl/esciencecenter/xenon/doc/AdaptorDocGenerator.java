@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltFactory;
-import nl.esciencecenter.xenon.CobaltPropertyDescription;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -34,7 +34,7 @@ public class AdaptorDocGenerator {
     
     private static PrintWriter out = null;
     
-    private static void printPropertyDescription(CobaltPropertyDescription d) {
+    private static void printPropertyDescription(XenonPropertyDescription d) {
 
         out.println("__`" + d.getName() + "`__\n");
         out.println(d.getDescription() + "\n");
@@ -82,9 +82,9 @@ public class AdaptorDocGenerator {
         
         out.println("#### Supported properties: ####\n\n");
 
-        CobaltPropertyDescription[] properties = a.getSupportedProperties();
+        XenonPropertyDescription[] properties = a.getSupportedProperties();
 
-        for (CobaltPropertyDescription d : properties) {
+        for (XenonPropertyDescription d : properties) {
             printPropertyDescription(d);
         }
 
@@ -107,7 +107,7 @@ public class AdaptorDocGenerator {
         }
 
         try { 
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
             AdaptorStatus[] adaptors = cobalt.getAdaptorStatuses();
 
             out.println("Appendix A: Adaptor Documentation");
@@ -132,7 +132,7 @@ public class AdaptorDocGenerator {
                 printAdaptorDoc(a);
             }
 
-            CobaltFactory.endAll();
+            XenonFactory.endAll();
 
         } catch (Exception e) {
             System.err.println("Failed to generate adaptor documentation: " + e.getMessage());

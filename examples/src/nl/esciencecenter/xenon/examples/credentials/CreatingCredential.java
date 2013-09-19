@@ -16,9 +16,9 @@
 
 package nl.esciencecenter.xenon.examples.credentials;
 
-import nl.esciencecenter.xenon.Cobalt;
-import nl.esciencecenter.xenon.CobaltException;
-import nl.esciencecenter.xenon.CobaltFactory;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -34,7 +34,7 @@ public class CreatingCredential {
     public static void main(String[] args) {
         try {
             // First, we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Cobalt cobalt = CobaltFactory.newCobalt(null);
+            Xenon cobalt = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Credentials API
             Credentials credentials = cobalt.credentials();
@@ -50,9 +50,9 @@ public class CreatingCredential {
             credentials.close(credential2);
 
             // Finally, we end Cobalt to release all resources 
-            CobaltFactory.endCobalt(cobalt);
+            XenonFactory.endXenon(cobalt);
 
-        } catch (CobaltException e) {
+        } catch (XenonException e) {
             System.out.println("CreatingCredential example failed: " + e.getMessage());
             e.printStackTrace();
         }

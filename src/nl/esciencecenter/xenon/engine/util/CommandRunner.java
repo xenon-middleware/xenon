@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class CommandRunner {
         return exe;
     }
 
-    public CommandRunner(String... command) throws CobaltException {
+    public CommandRunner(String... command) throws XenonException {
         this(null, null, command);
     }
 

@@ -16,7 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import nl.esciencecenter.xenon.CobaltException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcessFactory;
@@ -34,7 +34,7 @@ public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
     }
 
     @Override
-    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws CobaltException {
+    public InteractiveProcess createInteractiveProcess(JobImplementation job) throws XenonException {
         return new SshInteractiveProcess(session, job);
     }
 }
