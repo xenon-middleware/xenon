@@ -51,12 +51,12 @@ public class FileExists {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
         
-            // We create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // We create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = cobalt.files();
-            Credentials credentials = cobalt.credentials();
+            Files files = xenon.files();
+            Credentials credentials = xenon.credentials();
 
             // Next we create a FileSystem  
             Credential c = credentials.getDefaultCredential(uri.getScheme());
@@ -76,8 +76,8 @@ public class FileExists {
             files.close(fs);
             credentials.close(c);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (URISyntaxException | XenonException e) {
             System.out.println("FileExists example failed: " + e.getMessage());

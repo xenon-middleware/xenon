@@ -50,11 +50,11 @@ public class ListJobStatus {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
 
-            // Next, create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // Next, create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Jobs and Credentials API
-            Jobs jobs = cobalt.jobs();
+            Jobs jobs = xenon.jobs();
 
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
@@ -76,8 +76,8 @@ public class ListJobStatus {
             // Close the scheduler
             jobs.close(scheduler);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (URISyntaxException | XenonException e) {
             System.out.println("ListJobStatus example failed: " + e.getMessage());

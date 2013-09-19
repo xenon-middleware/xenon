@@ -107,8 +107,8 @@ public class AdaptorDocGenerator {
         }
 
         try { 
-            Xenon cobalt = XenonFactory.newXenon(null);
-            AdaptorStatus[] adaptors = cobalt.getAdaptorStatuses();
+            Xenon xenon = XenonFactory.newXenon(null);
+            AdaptorStatus[] adaptors = xenon.getAdaptorStatuses();
 
             out.println("Appendix A: Adaptor Documentation");
             out.println("---------------------------------");
@@ -116,7 +116,7 @@ public class AdaptorDocGenerator {
             out.println("This section contains the adaptor documentation which is generated "
                     + "from the information provided by the adaptors themselves.");
             out.println("");
-            out.print("Cobalt currently supports " + adaptors.length + " adaptors: ");
+            out.print("Xenon currently supports " + adaptors.length + " adaptors: ");
 
             String comma = "";
 

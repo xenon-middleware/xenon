@@ -51,11 +51,11 @@ public class CopyFile {
             URI source = new URI(args[0]);
             URI target = new URI(args[1]);
 
-            // Next, we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // Next, we create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = cobalt.files();
+            Files files = xenon.files();
 
             // Next we create a FileSystem 
             FileSystem sourceFS = files.newFileSystem(source.getScheme(), source.getAuthority(), null, null);
@@ -72,8 +72,8 @@ public class CopyFile {
             files.close(sourceFS);
             files.close(targetFS);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (URISyntaxException | XenonException e) {
             System.out.println("CopyFile example failed: " + e.getMessage());

@@ -49,12 +49,12 @@ public class CreateFileSystem {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
         
-            // Next, we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // Next, we create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = cobalt.files();
-            Credentials credentials = cobalt.credentials();
+            Files files = xenon.files();
+            Credentials credentials = xenon.credentials();
 
             // We also need a Credential that enable us to access the location. 
             Credential c = credentials.getDefaultCredential(uri.getScheme());
@@ -69,8 +69,8 @@ public class CreateFileSystem {
             credentials.close(c);
             files.close(fs);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (URISyntaxException | XenonException e) {
             System.out.println("CreateFileSystem example failed: " + e.getMessage());

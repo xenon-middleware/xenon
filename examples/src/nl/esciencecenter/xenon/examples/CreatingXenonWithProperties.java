@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 
 /**
- * A simple example of how to configure an Cobalt with properties.
+ * A simple example of how to configure an Xenon with properties.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -35,24 +35,24 @@ public class CreatingXenonWithProperties {
     public static void main(String[] args) {
         try {
 
-            // We create some properties here to configure Cobalt. In this example 
+            // We create some properties here to configure Xenon. In this example 
             // we set the polling delay of the local adaptor to 1000 ms. We also set 
             // the strictHostKeyChecking property of the ssh adaptor to true. 
             Map<String, String> p = new HashMap<>();
-            p.put("cobalt.adaptors.local.queue.pollingDelay", "1000");
-            p.put("cobalt.adaptors.ssh.loadKnownHosts", "true");
+            p.put("xenon.adaptors.local.queue.pollingDelay", "1000");
+            p.put("xenon.adaptors.ssh.loadKnownHosts", "true");
 
-            // We now create a new Cobalt with the properties using the CobaltFactory.
+            // We now create a new Xenon with the properties using the XenonFactory.
             Xenon xenon = XenonFactory.newXenon(p);
 
-            // We can now uses the Cobalt to get some work done!
+            // We can now uses the Xenon to get some work done!
             // ....
 
-            // Finally, we end Cobalt to release all resources 
+            // Finally, we end Xenon to release all resources 
             XenonFactory.endXenon(xenon);
 
         } catch (XenonException e) {
-            System.out.println("CreatingCobaltWithProperties example failed: " + e.getMessage());
+            System.out.println("CreatingXenonWithProperties example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -33,11 +33,11 @@ public class CreatingCredential {
 
     public static void main(String[] args) {
         try {
-            // First, we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // First, we create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Credentials API
-            Credentials credentials = cobalt.credentials();
+            Credentials credentials = xenon.credentials();
 
             // We can now retrieve the default credential for a certain scheme
             Credential credential1 = credentials.getDefaultCredential("ssh");
@@ -49,8 +49,8 @@ public class CreatingCredential {
             credentials.close(credential1);
             credentials.close(credential2);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (XenonException e) {
             System.out.println("CreatingCredential example failed: " + e.getMessage());

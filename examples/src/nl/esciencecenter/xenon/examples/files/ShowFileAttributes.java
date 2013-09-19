@@ -51,11 +51,11 @@ public class ShowFileAttributes {
             // We first turn the user provided argument into a URI.
             URI uri = new URI(args[0]);
 
-            // We create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // We create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = cobalt.files();
+            Files files = xenon.files();
 
             // Next we create a FileSystem 
             FileSystem fs = files.newFileSystem(uri.getScheme(), uri.getAuthority(), null, null);
@@ -86,8 +86,8 @@ public class ShowFileAttributes {
             // If we are done we need to close the FileSystem
             files.close(fs);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch  (URISyntaxException | XenonException e) {
             System.out.println("ShowFileAttributes example failed: " + e.getMessage());

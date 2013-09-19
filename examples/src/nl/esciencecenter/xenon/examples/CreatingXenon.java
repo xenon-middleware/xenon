@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
 /**
- * A simple example of how to create an Cobalt and how to retrieve the various interfaces.
+ * A simple example of how to create an Xenon and how to retrieve the various interfaces.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -35,7 +35,7 @@ public class CreatingXenon {
     @SuppressWarnings("unused")
     public static void main(String[] args) {
         try {
-            // We create a new Cobalt using the CobaltFactory (without providing any properties).
+            // We create a new Xenon using the XenonFactory (without providing any properties).
             Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files, Jobs and Credentials API
@@ -46,11 +46,11 @@ public class CreatingXenon {
             // We can now uses the interfaces to get some work done!
             // ....
 
-            // Finally, we end Cobalt to release all resources 
+            // Finally, we end Xenon to release all resources 
             XenonFactory.endXenon(xenon);
 
         } catch (XenonException e) {
-            System.out.println("CreatingCobalt example failed: " + e.getMessage());
+            System.out.println("CreatingXenon example failed: " + e.getMessage());
             e.printStackTrace();
         }
     }

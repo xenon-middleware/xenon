@@ -48,11 +48,11 @@ public class SubmitInteractiveJobWithOutput {
             // Convert the command line parameter to a URI
             URI location = new URI(args[0]);
             
-            // We create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // We create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Jobs API
-            Jobs jobs = cobalt.jobs();
+            Jobs jobs = xenon.jobs();
 
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
@@ -81,8 +81,8 @@ public class SubmitInteractiveJobWithOutput {
             // Close the scheduler
             jobs.close(scheduler);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (URISyntaxException | XenonException | IOException e)  {
             System.out.println("SubmitBatchJob example failed: " + e.getMessage());

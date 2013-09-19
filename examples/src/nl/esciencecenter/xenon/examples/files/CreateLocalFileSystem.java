@@ -38,12 +38,12 @@ public class CreateLocalFileSystem {
 
     public static void main(String[] args) {
         try {
-            // First , we create a new Cobalt using the CobaltFactory (without providing any properties).
-            Xenon cobalt = XenonFactory.newXenon(null);
+            // First , we create a new Xenon using the XenonFactory (without providing any properties).
+            Xenon xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
-            Files files = cobalt.files();
-            Credentials credentials = cobalt.credentials();
+            Files files = xenon.files();
+            Credentials credentials = xenon.credentials();
 
             // To create a new FileSystem we need a Credential that enable us to access the location. 
             Credential c = credentials.getDefaultCredential("file");
@@ -67,8 +67,8 @@ public class CreateLocalFileSystem {
             credentials.close(c);
             files.close(fs);
 
-            // Finally, we end Cobalt to release all resources 
-            XenonFactory.endXenon(cobalt);
+            // Finally, we end Xenon to release all resources 
+            XenonFactory.endXenon(xenon);
 
         } catch (XenonException e) {
             System.out.println("CreateLocalFileSystem example failed: " + e.getMessage());
