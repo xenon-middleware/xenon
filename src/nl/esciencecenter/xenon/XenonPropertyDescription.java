@@ -19,15 +19,15 @@ package nl.esciencecenter.xenon;
 import java.util.Set;
 
 /**
- * <p>CobaltPropertyDescription contains all necessary information about a property that is recognized by Cobalt or one of its
+ * <p>XenonPropertyDescription contains all necessary information about a property that is recognized by Xenon or one of its
  * components.</p> 
  * 
- * <p>Each CobaltPropertyDescription contains the following information:</p>
+ * <p>Each XenonPropertyDescription contains the following information:</p>
  * 
  * <ul>
  * <li>
  * A name that uniquely identifies the property.
- * This name should be used as a key when passing properties to Cobalt in a {@link java.util.Map}.
+ * This name should be used as a key when passing properties to Xenon in a {@link java.util.Map}.
  * </li> 
  * 
  * <li>
@@ -46,8 +46,8 @@ import java.util.Set;
  * 
  * <li>
  * The components by which this property is accepted (a <code>Set</code> of {@link Component}).
- * Properties are only valid for certain components of Cobalt. For example, some properties may be used when creating an new 
- * <code>Cobalt</code>, while others can be used when creating a new <code>Scheduler</code>, <code>FileSystem</code>, or 
+ * Properties are only valid for certain components of Xenon. For example, some properties may be used when creating an new 
+ * <code>Xenon</code>, while others can be used when creating a new <code>Scheduler</code>, <code>FileSystem</code>, or 
  * <code>Credential</code>. 
  * </li>
  * </ul>
@@ -63,32 +63,32 @@ public interface XenonPropertyDescription {
      */
     public enum Component {
         /** 
-         * Properties for <code>COBALT</code> components can be passed to 
-         * {@link nl.esciencecenter.cobalt.CobaltFactory#newCobalt(Map)}. 
+         * Properties for <code>XENON</code> components can be passed to 
+         * {@link nl.esciencecenter.xenon.XenonFactory#newXenon(Map)}. 
          */        
         XENON, 
         
         /** 
          * Properties for <code>SCHEDULER</code> components can be passed to 
-         * {@link nl.esciencecenter.cobalt.jobs.Jobs#newScheduler(String, String, Credential, Map)}. 
+         * {@link nl.esciencecenter.xenon.jobs.Jobs#newScheduler(String, String, Credential, Map)}. 
          */        
         SCHEDULER, 
         
         /** 
          * Properties for <code>FILESYSTEM</code> components can be passed to 
-         * {@link nl.esciencecenter.cobalt.files.Files#newFileSystem(String, String, Credential, Map)}. 
+         * {@link nl.esciencecenter.xenon.files.Files#newFileSystem(String, String, Credential, Map)}. 
          */        
         FILESYSTEM, 
         
         /** 
          * Properties for <code>CREDENTIAL</code> components can be passed to the various <code>newCredential</code> calls in 
-         * {@link nl.esciencecenter.cobalt.credentials.Credentials}. 
+         * {@link nl.esciencecenter.xenon.credentials.Credentials}. 
          */        
         CREDENTIALS,
     }
 
     /**
-     * This Type enumeration lists all possible types of properties recognized by cobalt.
+     * This Type enumeration lists all possible types of properties recognized by Xenon.
      */
     public enum Type {
         /** 
