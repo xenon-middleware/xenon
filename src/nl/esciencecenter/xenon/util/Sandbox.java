@@ -146,7 +146,7 @@ public class Sandbox {
         }
 
         if (sandboxName == null) {
-            sandboxName = "cobalt_sandbox_" + UUID.randomUUID();
+            sandboxName = "xenon_sandbox_" + UUID.randomUUID();
         }
 
         this.files = files;

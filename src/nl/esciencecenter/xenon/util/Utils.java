@@ -48,7 +48,7 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
 /**
  * Utils contains various utilities for handling files, jobs, streams, and for getting OS specific information.
  * 
- * These utilities are used inside Cobalt, but may also be used by applications. 
+ * These utilities are used inside Xenon, but may also be used by applications. 
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
