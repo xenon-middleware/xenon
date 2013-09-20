@@ -39,7 +39,7 @@ public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
         // use home of user which runs the test which can be different then remote test user: 
         String userHome = System.getProperty("user.home");
 
-        Credentials creds = octopus.credentials();
+        Credentials creds = xenon.credentials();
         String user = getTestUser();
         Credential cred = creds.newCertificateCredential("ssh", userHome + "/.ssh/id_rsa", user, null, null);
         return cred;

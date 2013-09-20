@@ -47,8 +47,8 @@ public class RemoteCommandRunner {
     /**
      * Run a command remotely, and save stdout, stderr, and exit code for later processing.
      * 
-     * @param cobalt
-     *            the Cobalt to use
+     * @param xenon
+     *            the Xenon to use
      * @param scheduler
      *            the scheduler to submit the job to
      * @param adaptorName
@@ -62,7 +62,7 @@ public class RemoteCommandRunner {
      * @throws XenonException
      *             if the job could not be run successfully.
      */
-    public RemoteCommandRunner(Xenon cobalt, Scheduler scheduler, String adaptorName, String stdin, String executable,
+    public RemoteCommandRunner(Xenon xenon, Scheduler scheduler, String adaptorName, String stdin, String executable,
             String... arguments) throws XenonException {
         long start = System.currentTimeMillis();
 
@@ -72,9 +72,9 @@ public class RemoteCommandRunner {
         description.setArguments(arguments);
         description.setQueueName("unlimited");
 
-        Job job = cobalt.jobs().submitJob(scheduler, description);
+        Job job = xenon.jobs().submitJob(scheduler, description);
 
-        Streams streams = cobalt.jobs().getStreams(job);
+        Streams streams = xenon.jobs().getStreams(job);
 
         InputWriter in = new InputWriter(stdin, streams.getStdin());
 
@@ -86,10 +86,10 @@ public class RemoteCommandRunner {
         out.waitUntilFinished();
         err.waitUntilFinished();
 
-        JobStatus status = cobalt.jobs().getJobStatus(job);
+        JobStatus status = xenon.jobs().getJobStatus(job);
 
         if (!status.isDone()) {
-            status = cobalt.jobs().waitUntilDone(job, 0);
+            status = xenon.jobs().waitUntilDone(job, 0);
         }
 
         if (status.hasException()) {

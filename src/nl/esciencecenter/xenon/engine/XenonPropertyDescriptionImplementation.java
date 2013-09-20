@@ -22,7 +22,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
- * CobaltPropertyDescription contains a description of an Cobalt property.
+ * XenonPropertyDescription contains a description of an Xenon property.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -92,7 +92,7 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
 
     @Override
     public String toString() {
-        return "CobaltPropertyDescriptionImplementation [name=" + name + ", type=" + type + ", levels=" + levels
+        return "XenonPropertyDescriptionImplementation [name=" + name + ", type=" + type + ", levels=" + levels
                 + ", defaultValue=" + defaultValue + ", description=" + description + "]";
     }
 }

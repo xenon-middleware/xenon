@@ -21,7 +21,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
 /**
- * The Jobs API of Cobalt.
+ * The Jobs API of Xenon.
  * 
  * This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about
  * schedulers and jobs.

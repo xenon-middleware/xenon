@@ -30,7 +30,7 @@ import org.junit.Test;
 public class SandboxTest {
     
     @Test(expected = XenonException.class)
-    public void testSandbox_WithNullOctopus() throws URISyntaxException, XenonException {
+    public void testSandbox_WithNullXenon() throws URISyntaxException, XenonException {
         // throws exception
         new Sandbox(null, mock(Path.class), "sandbox-1");
     }

@@ -80,50 +80,50 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testOctopusException1() throws Exception {
+    public void testXenonException1() throws Exception {
         testException(new XenonException("name", "message"));
     }
 
     @Test
-    public void testOctopusException2() throws Exception {
+    public void testXenonException2() throws Exception {
         Throwable t = new Throwable();
         testException(new XenonException("name", "message", t), t);
     }
 
     @Test
-    public void testOctopusException3() throws Exception {
+    public void testXenonException3() throws Exception {
         testException(new XenonException(null, "message"), null, "message", null);
     }
 
     @Test
-    public void testOctopusRuntimeException1() throws Exception {
+    public void testXenonRuntimeException1() throws Exception {
         testException(new XenonRuntimeException("name", "message"));
     }
 
     @Test
-    public void testOctopusRuntimeException2() throws Exception {
+    public void testXenonRuntimeException2() throws Exception {
         Throwable t = new Throwable();
         testException(new XenonRuntimeException("name", "message", t), t);
     }
 
     @Test
-    public void testOctopusIOException3() throws Exception {
+    public void testXenonIOException3() throws Exception {
         testException(new XenonException(null, "message"), null, "message", null);
     }
 
     @Test
-    public void testOctopusIOException1() throws Exception {
+    public void testXenonIOException1() throws Exception {
         testException(new XenonException("name", "message"));
     }
 
     @Test
-    public void testOctopusIOException2() throws Exception {
+    public void testXenonIOException2() throws Exception {
         Throwable t = new Throwable();
         testException(new XenonException("name", "message", t), t);
     }
 
     @Test
-    public void testOctopusRuntimeException3() throws Exception {
+    public void testXenonRuntimeException3() throws Exception {
         testException(new XenonRuntimeException(null, "message"), null, "message", null);
     }
 
@@ -359,12 +359,12 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testNoSuchOctopusException1() throws Exception {
+    public void testNoSuchXenonException1() throws Exception {
         testException(new NoSuchXenonException("name", "message"));
     }
 
     @Test
-    public void testNoSuchOctopusException2() throws Exception {
+    public void testNoSuchXenonException2() throws Exception {
         Throwable t = new Throwable();
         testException(new NoSuchXenonException("name", "message", t), t);
     }

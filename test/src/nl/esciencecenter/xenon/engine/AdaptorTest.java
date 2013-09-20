@@ -44,11 +44,11 @@ public class AdaptorTest {
 
     class TestAdaptor extends Adaptor {
 
-        public TestAdaptor(XenonEngine octopusEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+        public TestAdaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
                 ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
                 XenonProperties p) throws XenonException {
 
-            super(octopusEngine, name, description, supportedSchemes, supportedLocations, validProperties, p);
+            super(xenonEngine, name, description, supportedSchemes, supportedLocations, validProperties, p);
         }
 
         @Override
@@ -99,10 +99,10 @@ public class AdaptorTest {
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
+                new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
                         "aap2", "test property p1"),
 
-                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
+                new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
                         "noot2", "test property p2"));
 
         XenonProperties prop = new XenonProperties(supportedProperties, new HashMap<String, String>());
@@ -112,9 +112,9 @@ public class AdaptorTest {
 
         assert (p != null);
         assert (p.length == 2);
-        assert (p[0].getName().equals("octopus.adaptors.test.p1"));
+        assert (p[0].getName().equals("xenon.adaptors.test.p1"));
         assert (p[0].getDefaultValue().equals("aap2"));
-        assert (p[1].getName().equals("octopus.adaptors.test.p2"));
+        assert (p[1].getName().equals("xenon.adaptors.test.p2"));
         assert (p[1].getDefaultValue().equals("noot2"));
     }
 
@@ -125,15 +125,15 @@ public class AdaptorTest {
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
+                new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
                         "aap2", "test property p1"),
 
-                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
+                new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
                         "noot2", "test property p2"));
 
         Map<String, String> m = new HashMap<>();
-        m.put("octopus.adaptors.test.p1", "mies");
-        m.put("octopus.adaptors.test.p2", "zus");
+        m.put("xenon.adaptors.test.p1", "mies");
+        m.put("xenon.adaptors.test.p2", "zus");
 
         XenonProperties prop = new XenonProperties(supportedProperties, new HashMap<String, String>());
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
@@ -142,9 +142,9 @@ public class AdaptorTest {
 
         assert (p != null);
         assert (p.length == 2);
-        assert (p[0].getName().equals("octopus.adaptors.test.p1"));
+        assert (p[0].getName().equals("xenon.adaptors.test.p1"));
         assert (p[0].getDefaultValue().equals("mies"));
-        assert (p[1].getName().equals("octopus.adaptors.test.p2"));
+        assert (p[1].getName().equals("xenon.adaptors.test.p2"));
         assert (p[1].getDefaultValue().equals("zus"));
     }
 
@@ -155,14 +155,14 @@ public class AdaptorTest {
         ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
 
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
-                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
+                new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),
                         "aap2", "test property p1"),
 
-                new XenonPropertyDescriptionImplementation("octopus.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
+                new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p2", Type.STRING, EnumSet.of(Component.XENON),
                         "noot2", "test property p2"));
 
         Map<String, String> p = new HashMap<>();
-        p.put("octopus.adaptors.test.p3", "mies");
+        p.put("xenon.adaptors.test.p3", "mies");
 
         XenonProperties prop = new XenonProperties(supportedProperties, p);
 

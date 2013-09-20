@@ -32,29 +32,29 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
  */
 public class ForwardingCredentials implements Credentials {
 
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
     private final String targetScheme;
 
-    public ForwardingCredentials(XenonEngine cobaltEngine, String targetScheme) {
-        this.cobaltEngine = cobaltEngine;
+    public ForwardingCredentials(XenonEngine xenonEngine, String targetScheme) {
+        this.xenonEngine = xenonEngine;
         this.targetScheme = targetScheme;
     }
 
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws XenonException {
-        return cobaltEngine.credentials().newCertificateCredential(targetScheme, certfile, username, password, properties);
+        return xenonEngine.credentials().newCertificateCredential(targetScheme, certfile, username, password, properties);
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws XenonException {
-        return cobaltEngine.credentials().newPasswordCredential(targetScheme, username, password, properties);
+        return xenonEngine.credentials().newPasswordCredential(targetScheme, username, password, properties);
     }
 
     @Override
     public Credential getDefaultCredential(String scheme) throws XenonException {
-        return cobaltEngine.credentials().getDefaultCredential(targetScheme);
+        return xenonEngine.credentials().getDefaultCredential(targetScheme);
     }
 
     @Override

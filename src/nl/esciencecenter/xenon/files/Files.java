@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
 /**
- * Files represents the Files interface Cobalt.
+ * Files represents the Files interface Xenon.
  * 
  * This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
  * 

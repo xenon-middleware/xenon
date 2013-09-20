@@ -35,29 +35,29 @@ import nl.esciencecenter.xenon.util.Utils;
 public class Util {
 
     /**
-     * Invoke the private constructor of OctopusEngine. Needed in some tests.
+     * Invoke the private constructor of XenonEngine. Needed in some tests.
      * 
      * @param properties
-     *            the properties to pass to the OctopusEngine.
-     * @return a new OctopusEngine.
+     *            the properties to pass to the XenonEngine.
+     * @return a new XenonEngine.
      * @throws Exception
-     *             if the OctopusEngine could not be created or throws an exception.
+     *             if the XenonEngine could not be created or throws an exception.
      */
-    public static XenonEngine createOctopusEngine(HashMap<String, String> properties) throws Exception {
+    public static XenonEngine createXenonEngine(HashMap<String, String> properties) throws Exception {
         Constructor<XenonEngine> constructor = XenonEngine.class.getDeclaredConstructor(Map.class);
         constructor.setAccessible(true);
         return constructor.newInstance(properties);
     }
 
     /**
-     * Invoke the private end method of OctopusEngine. Needed in some tests.
+     * Invoke the private end method of XenonEngine. Needed in some tests.
      * 
      * @param e
-     *            the OctopusEngine to end.
+     *            the XenonEngine to end.
      * @throws Exception
      *             if the method could not be invoked.
      */
-    public static void endOctopusEngine(XenonEngine e) throws Exception {
+    public static void endXenonEngine(XenonEngine e) throws Exception {
         Method method = XenonEngine.class.getDeclaredMethod("end");
         method.setAccessible(true);
         method.invoke(e);

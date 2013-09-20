@@ -36,7 +36,7 @@ public class ITFileTests_SFTP_localhost extends AbstractFileTests {
 
     public Credential getCredentials() throws XenonException {
 
-        Credentials creds = octopus.credentials();
+        Credentials creds = xenon.credentials();
         String user = getTestUser();
         Credential cred = creds.newCertificateCredential("ssh", "/home/" + user + "/.ssh/id_rsa", user, null, null);
         return cred;

@@ -72,7 +72,7 @@ final class LocalUtils {
         return result;
     }
 
-    static Set<PosixFilePermission> cobaltPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
+    static Set<PosixFilePermission> xenonPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
         if (permissions == null) {
             return null;
         }

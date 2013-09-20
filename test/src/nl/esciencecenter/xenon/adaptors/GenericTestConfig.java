@@ -44,7 +44,7 @@ public abstract class GenericTestConfig {
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.dir") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.dir") + File.separator + "xenon.test.properties";
             
             if (!new File(configfile).exists()) { 
                 configfile = null;
@@ -52,7 +52,7 @@ public abstract class GenericTestConfig {
         }
 
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
             
             if (!new File(configfile).exists()) { 
                 configfile = null;

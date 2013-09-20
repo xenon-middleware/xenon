@@ -41,7 +41,7 @@ import org.junit.Test;
 
 public class RealSandboxTest {
 
-    private static Xenon octopus;
+    private static Xenon xenon;
     private static Files files;
     private static FileSystem fileSystem;
 
@@ -54,13 +54,13 @@ public class RealSandboxTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        octopus = XenonFactory.newXenon(null);
-        files = octopus.files();
+        xenon = XenonFactory.newXenon(null);
+        files = xenon.files();
         
         Path cwd = Utils.getLocalCWD(files);
         
         fileSystem = cwd.getFileSystem();
-        testDir = Utils.resolveWithRoot(files, cwd, "octopus_test_" + System.currentTimeMillis());
+        testDir = Utils.resolveWithRoot(files, cwd, "xenon_test_" + System.currentTimeMillis());
         files.createDirectory(testDir);
 
         testInput1 = Utils.resolveWithRoot(files, testDir, "input1");
@@ -73,7 +73,7 @@ public class RealSandboxTest {
     @AfterClass
     public static void cleanup() throws Exception {
         Utils.recursiveDelete(files, testDir);
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     public static synchronized String getNextSandbox() {
@@ -81,7 +81,7 @@ public class RealSandboxTest {
     }
 
     @Test(expected = XenonException.class)
-    public void testSandbox_WithNullOctopus() throws URISyntaxException, XenonException {
+    public void testSandbox_WithNullXenon() throws URISyntaxException, XenonException {
         // throws exception
         new Sandbox(null, testDir, getNextSandbox());
     }
@@ -111,7 +111,7 @@ public class RealSandboxTest {
         String sandboxPath = sandbox.getPath().getRelativePath().getAbsolutePath();
         String tmp = testDir.getRelativePath().getAbsolutePath();
         
-        assertTrue(sandboxPath.startsWith(tmp + testDir.getRelativePath().getSeparator() + "octopus_sandbox_"));
+        assertTrue(sandboxPath.startsWith(tmp + testDir.getRelativePath().getSeparator() + "xenon_sandbox_"));
     }
 
     @Test
@@ -344,24 +344,24 @@ public class RealSandboxTest {
     }
 
     @Test
-    public void testEquals_otherOctopus_notEqual() throws URISyntaxException, XenonException {
+    public void testEquals_otherXenon_notEqual() throws URISyntaxException, XenonException {
 
-        Xenon octopus2 = XenonFactory.newXenon(null);
+        Xenon xenon2 = XenonFactory.newXenon(null);
 
         String name = getNextSandbox();
 
         Sandbox sandbox1 = new Sandbox(files, testDir, name);
-        Sandbox sandbox2 = new Sandbox(octopus2.files(), testDir, name);
+        Sandbox sandbox2 = new Sandbox(xenon2.files(), testDir, name);
 
         assertNotEquals(sandbox1, sandbox2);
 
-        XenonFactory.endXenon(octopus2);
+        XenonFactory.endXenon(xenon2);
     }
 
     @Test
     public void testEquals_otherPath_notEqual() throws URISyntaxException, XenonException {
 
-        Path path = Utils.resolveWithEntryPath(files, fileSystem, "octopus_test_" + System.currentTimeMillis());
+        Path path = Utils.resolveWithEntryPath(files, fileSystem, "xenon_test_" + System.currentTimeMillis());
 
         String name = getNextSandbox();
 

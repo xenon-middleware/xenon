@@ -32,20 +32,20 @@ import nl.esciencecenter.xenon.jobs.Streams;
 
 public class JobsEngine implements Jobs {
 
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
 
-    public JobsEngine(XenonEngine cobaltEngine) {
-        this.cobaltEngine = cobaltEngine;
+    public JobsEngine(XenonEngine xenonEngine) {
+        this.xenonEngine = xenonEngine;
     }
 
     private Adaptor getAdaptor(Scheduler scheduler) throws XenonException {
-        return cobaltEngine.getAdaptor(scheduler.getAdaptorName());
+        return xenonEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
         return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
     }
 
@@ -98,7 +98,7 @@ public class JobsEngine implements Jobs {
         XenonException exception = null;
 
         try {
-            result = cobaltEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in);
+            result = xenonEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in);
         } catch (XenonException e) {
             exception = e;
         }
@@ -193,7 +193,7 @@ public class JobsEngine implements Jobs {
 
     @Override
     public String toString() {
-        return "JobsEngine [cobaltEngine=" + cobaltEngine + "]";
+        return "JobsEngine [xenonEngine=" + xenonEngine + "]";
     }
 
 }

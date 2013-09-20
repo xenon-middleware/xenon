@@ -41,8 +41,8 @@ public class JobTimeoutTest {
         description.setMaxTime(1);
         description.setWorkingDirectory(System.getProperty("java.io.tmpdir"));
 
-        Xenon octopus = XenonFactory.newXenon(null);
-        Jobs jobs = octopus.jobs();
+        Xenon xenon = XenonFactory.newXenon(null);
+        Jobs jobs = xenon.jobs();
 
         Job job = jobs.submitJob(jobs.newScheduler("local", null, null, null), description);
 

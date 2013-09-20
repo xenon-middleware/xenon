@@ -125,16 +125,16 @@ public class SshAdaptor extends Adaptor {
 
     private JSch jsch;
 
-    public SshAdaptor(XenonEngine cobaltEngine, Map<String, String> properties) throws XenonException {
-        this(cobaltEngine, new JSch(), properties);
+    public SshAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
+        this(xenonEngine, new JSch(), properties);
     }
 
-    public SshAdaptor(XenonEngine cobaltEngine, JSch jsch, Map<String, String> properties) throws XenonException {
-        super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+    public SshAdaptor(XenonEngine xenonEngine, JSch jsch, Map<String, String> properties) throws XenonException {
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
-        this.filesAdaptor = new SshFiles(this, cobaltEngine);
-        this.jobsAdaptor = new SshJobs(getProperties(), this, cobaltEngine);
+        this.filesAdaptor = new SshFiles(this, xenonEngine);
+        this.jobsAdaptor = new SshJobs(getProperties(), this, xenonEngine);
         this.credentialsAdaptor = new SshCredentials(getProperties(), this);
         this.jsch = jsch;
 
@@ -229,7 +229,7 @@ public class SshAdaptor extends Adaptor {
        returned by the server if the server does not implement an
        operation).
     */
-    XenonException sftpExceptionToCobaltException(SftpException e) {
+    XenonException sftpExceptionToXenonException(SftpException e) {
         switch (e.id) {
         case ChannelSftp.SSH_FX_OK:
             return new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);

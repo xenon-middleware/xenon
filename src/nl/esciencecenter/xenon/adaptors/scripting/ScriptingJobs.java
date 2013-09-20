@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of Cobalt Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
+ * Implementation of Xenon Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
  * in the adaptors.
  * 
  * @author Niels Drost
@@ -51,15 +51,15 @@ public class ScriptingJobs implements Jobs {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptingJobs.class);
 
     private final ScriptingAdaptor adaptor;
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
     private final String adaptorName;
     private final SchedulerConnectionFactory connectionFactory;
 
     private final Map<String, SchedulerConnection> connections;
 
-    public ScriptingJobs(ScriptingAdaptor adaptor, XenonEngine cobaltEngine, SchedulerConnectionFactory connectionFactory) {
+    public ScriptingJobs(ScriptingAdaptor adaptor, XenonEngine xenonEngine, SchedulerConnectionFactory connectionFactory) {
         this.adaptor = adaptor;
-        this.cobaltEngine = cobaltEngine;
+        this.xenonEngine = xenonEngine;
         this.adaptorName = adaptor.getName();
         this.connectionFactory = connectionFactory;
 
@@ -107,7 +107,7 @@ public class ScriptingJobs implements Jobs {
         XenonProperties p = new XenonProperties(adaptor.getSupportedProperties(Component.SCHEDULER), properties);
 
         SchedulerConnection connection = connectionFactory.newSchedulerConnection(adaptor, scheme, location, credential, p, 
-                cobaltEngine);
+                xenonEngine);
 
         addConnection(connection);
 

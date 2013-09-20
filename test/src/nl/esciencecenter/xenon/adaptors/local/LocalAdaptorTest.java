@@ -32,92 +32,92 @@ public class LocalAdaptorTest {
 
     @org.junit.Test(expected = InvalidLocationException.class)
     public void test_checkLocation_null() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation(null);
+        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation(null);
     }
 
     @org.junit.Test(expected = InvalidLocationException.class)
     public void test_checkLocation_empty() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("");
+        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("");
     }
 
     @org.junit.Test
     public void test_checkLocation_linuxRoot() throws Exception {
         if (Utils.isLinux() || Utils.isOSX()) { 
-            new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("/");
+            new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("/");
         }
     }
 
     @org.junit.Test
     public void test_checkLocation_windowsRoot() throws Exception {
         if (Utils.isWindows()) { 
-            new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:");
+            new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("C:");
         }
     }
 
     @org.junit.Test(expected = InvalidLocationException.class)
     public void test_checkLocation_wrong() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("ABC");
+        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("ABC");
     }
 
     @org.junit.Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withPath() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("/aap");
+        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("/aap");
     }
 
     @org.junit.Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withWindowsPath() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:/aap");
+        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("C:/aap");
     }
     
     @org.junit.Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withWindowsPath2() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).checkLocation("C:\\aap");
+        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("C:\\aap");
     }
 
     @org.junit.Test
     public void test_supports_null() throws Exception {
-        boolean value = new LocalAdaptor(Util.createOctopusEngine(null), null).supports(null);
+        boolean value = new LocalAdaptor(Util.createXenonEngine(null), null).supports(null);
         assert (value);
     }
 
     @org.junit.Test
     public void test_supports_wrong() throws Exception {
-        boolean value = new LocalAdaptor(Util.createOctopusEngine(null), null).supports("ssh");
+        boolean value = new LocalAdaptor(Util.createXenonEngine(null), null).supports("ssh");
         assert (!value);
     }
 
     @org.junit.Test
     public void test_supports_correct_file() throws Exception {
-        boolean value = new LocalAdaptor(Util.createOctopusEngine(null), null).supports("file");
+        boolean value = new LocalAdaptor(Util.createXenonEngine(null), null).supports("file");
         assert (value);
     }
 
     @org.junit.Test
     public void test_supports_correct_local() throws Exception {
-        boolean value = new LocalAdaptor(Util.createOctopusEngine(null), null).supports("local");
+        boolean value = new LocalAdaptor(Util.createXenonEngine(null), null).supports("local");
         assert (value);
     }
 
     @org.junit.Test
     public void test_getSupportedProperties() throws Exception {
-        XenonPropertyDescription[] p = new LocalAdaptor(Util.createOctopusEngine(null), null).getSupportedProperties();
+        XenonPropertyDescription[] p = new LocalAdaptor(Util.createXenonEngine(null), null).getSupportedProperties();
         assert (p != null);
     }
 
     @org.junit.Test
     public void test_credentialsAdaptor() throws Exception {
-        new LocalAdaptor(Util.createOctopusEngine(null), null).credentialsAdaptor();
+        new LocalAdaptor(Util.createXenonEngine(null), null).credentialsAdaptor();
     }
 
     @org.junit.Test
     public void test_filesAdaptor() throws Exception {
-        Files files = new LocalAdaptor(Util.createOctopusEngine(null), null).filesAdaptor();
+        Files files = new LocalAdaptor(Util.createXenonEngine(null), null).filesAdaptor();
         assert (files != null);
     }
 
     @org.junit.Test
     public void test_jobsAdaptor() throws Exception {
-        Jobs jobs = new LocalAdaptor(Util.createOctopusEngine(null), null).jobsAdaptor();
+        Jobs jobs = new LocalAdaptor(Util.createXenonEngine(null), null).jobsAdaptor();
         assert (jobs != null);
     }
 }

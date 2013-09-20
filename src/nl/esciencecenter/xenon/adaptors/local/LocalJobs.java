@@ -39,7 +39,7 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
 
 /**
- * LocalFiles implements an Cobalt <code>Jobs</code> adaptor for local job operations.
+ * LocalFiles implements an Xenon <code>Jobs</code> adaptor for local job operations.
  * 
  * @see nl.esciencecenter.xenon.jobs.Jobs
  * 

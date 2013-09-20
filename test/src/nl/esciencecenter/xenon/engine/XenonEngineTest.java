@@ -57,30 +57,30 @@ public class XenonEngineTest {
     @Test
     public void newEngine_CorrectProperties_Success() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
+        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
         XenonEngine.newXenon(properties);
     }
 
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectPropertiesAtWrongLevel_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        // This property is valid at scheduler level, not at octopus level 
-        properties.put("octopus.adaptors.ssh.queue.pollingDelay", "1500");
+        // This property is valid at scheduler level, not at xenon level 
+        properties.put("xenon.adaptors.ssh.queue.pollingDelay", "1500");
         XenonEngine.newXenon(properties);
     }
 
     @Test
     public void newEngine_MultipleCorrectProperties_Success() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
-        properties.put("octopus.adaptors.local.queue.pollingDelay", "1500");
+        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
+        properties.put("xenon.adaptors.local.queue.pollingDelay", "1500");
         XenonEngine.newXenon(properties);
     }
 
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectAndIncorrectProperties_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
+        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
         properties.put("key", "value");
         XenonEngine.newXenon(properties);
     }
@@ -88,11 +88,11 @@ public class XenonEngineTest {
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_PropertiesAtCorrectAndWrongLevel_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        // These are octopus level properties
-        properties.put("octopus.adaptors.ssh.loadKnownHosts", "false");
-        properties.put("octopus.adaptors.local.queue.pollingDelay", "1500");
-        // This property is valid at scheduler level, not at octopus level 
-        properties.put("octopus.adaptors.ssh.queue.pollingDelay", "1500");
+        // These are xenon level properties
+        properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
+        properties.put("xenon.adaptors.local.queue.pollingDelay", "1500");
+        // This property is valid at scheduler level, not at xenon level 
+        properties.put("xenon.adaptors.ssh.queue.pollingDelay", "1500");
         XenonEngine.newXenon(properties);
     }
 
@@ -152,9 +152,9 @@ public class XenonEngineTest {
 
     //    @Test
     //    public void testGetAdaptors() throws Exception {
-    //        OctopusEngine octopus = (OctopusEngine) OctopusEngine.newOctopus(null);
+    //        XenonEngine xenon = (XenonEngine) XenonEngine.newXenon(null);
     //
-    //        Adaptor[] tmp = octopus.getAdaptors();
+    //        Adaptor[] tmp = xenon.getAdaptors();
     //
     //        assert (tmp != null);
     //        assert (tmp.length == 3);
@@ -175,13 +175,13 @@ public class XenonEngineTest {
     }
 
     @Test
-    public void close_SingleOctopus_Succeeds() throws Exception {
+    public void close_SingleXenon_Succeeds() throws Exception {
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
         XenonEngine.closeXenon(x);
     }
 
     @Test
-    public void close_MultipleOctopus_Succeeds() throws Exception {
+    public void close_MultipleXenon_Succeeds() throws Exception {
         XenonEngine x1 = (XenonEngine) XenonEngine.newXenon(null);
         XenonEngine x2 = (XenonEngine) XenonEngine.newXenon(null);
 
@@ -190,7 +190,7 @@ public class XenonEngineTest {
     }
 
     @Test
-    public void endAll_MultipleOctopus_Succeeds() throws Exception {
+    public void endAll_MultipleXenon_Succeeds() throws Exception {
         XenonEngine.newXenon(null);
         XenonEngine.newXenon(null);
 
@@ -198,14 +198,14 @@ public class XenonEngineTest {
     }
 
     @Test(expected = XenonException.class)
-    public void closenIvokedTwice_SingleOctopus_ThrowsException() throws Exception {
+    public void closenIvokedTwice_SingleXenon_ThrowsException() throws Exception {
         XenonEngine x1 = (XenonEngine) XenonEngine.newXenon(null);
         XenonEngine.closeXenon(x1);
         XenonEngine.closeXenon(x1);
     }
 
     @Test
-    public void toString_OctopusNoProperties_Succeeds() throws Exception {
+    public void toString_XenonNoProperties_Succeeds() throws Exception {
         XenonEngine x1 = (XenonEngine) XenonEngine.newXenon(null);
         String tmp = x1.toString();
 

@@ -16,9 +16,9 @@
 package nl.esciencecenter.xenon;
 
 /**
- * CobaltRuntimeException is the parent for all runtime exceptions raised in Cobalt. 
+ * XenonRuntimeException is the parent for all runtime exceptions raised in Xenon. 
  * 
- * Next to the regular exception message and cause, CobaltRuntimeException add a source adaptor name to all runtime exceptions.  
+ * Next to the regular exception message and cause, XenonRuntimeException add a source adaptor name to all runtime exceptions.  
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0

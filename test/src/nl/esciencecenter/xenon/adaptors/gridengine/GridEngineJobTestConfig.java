@@ -190,13 +190,13 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     @Override
     public Map<String, String> getDefaultProperties() throws Exception {
         Map<String, String> result = new HashMap<String, String>();
-        result.put("octopus.adaptors.gridengine.poll.delay", "100");
+        result.put("xenon.adaptors.gridengine.poll.delay", "100");
         return result;
     }
 
     public Map<String, String> getUnknownProperties() throws Exception {
         Map<String, String> result = new HashMap<String, String>();
-        result.put("octopus.adaptors.gridengine.unknown.property", "some.value");
+        result.put("xenon.adaptors.gridengine.unknown.property", "some.value");
         return result;
     }
 
@@ -206,13 +206,13 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
         result[0] = new HashMap<String, String>();
 
-        result[0].put("octopus.adaptors.gridengine.poll.delay", "AAP");
+        result[0].put("xenon.adaptors.gridengine.poll.delay", "AAP");
         return result;
     }
 
     public Map<String, String> getCorrectProperties() throws Exception {
         Map<String, String> result = new HashMap<String, String>();
-        result.put("octopus.adaptors.gridengine.poll.delay", "100");
+        result.put("xenon.adaptors.gridengine.poll.delay", "100");
         return result;
     }
 

@@ -43,9 +43,9 @@ import org.junit.Test;
 
 public class RealFileUtilsTest {
 
-    public static String ROOT = "octopus_RealFileUtilsTest_" + System.currentTimeMillis();
+    public static String ROOT = "xenon_RealFileUtilsTest_" + System.currentTimeMillis();
 
-    public static Xenon octopus;
+    public static Xenon xenon;
     public static Files files;
     public static FileSystem fileSystem;
 
@@ -54,9 +54,9 @@ public class RealFileUtilsTest {
     @BeforeClass
     public static void prepare() throws Exception {
 
-        octopus = XenonFactory.newXenon(null);
+        xenon = XenonFactory.newXenon(null);
 
-        files = octopus.files();
+        files = xenon.files();
         
         Path cwd = Utils.getLocalCWD(files);
         
@@ -69,7 +69,7 @@ public class RealFileUtilsTest {
     @AfterClass
     public static void cleanup() throws Exception {
         files.delete(testDir);
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @Test

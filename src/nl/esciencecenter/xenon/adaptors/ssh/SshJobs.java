@@ -79,7 +79,7 @@ public class SshJobs implements Jobs {
         }
     }
 
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
 
     private final SshAdaptor adaptor;
 
@@ -89,8 +89,8 @@ public class SshJobs implements Jobs {
 
     private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
 
-    public SshJobs(XenonProperties properties, SshAdaptor sshAdaptor, XenonEngine cobaltEngine) throws XenonException {
-        this.cobaltEngine = cobaltEngine;
+    public SshJobs(XenonProperties properties, SshAdaptor sshAdaptor, XenonEngine xenonEngine) throws XenonException {
+        this.xenonEngine = xenonEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
     }
@@ -121,7 +121,7 @@ public class SshJobs implements Jobs {
         long pollingDelay = p.getLongProperty(SshAdaptor.POLLING_DELAY);
         int multiQThreads = p.getIntegerProperty(SshAdaptor.MULTIQ_MAX_CONCURRENT);
 
-        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, cobaltEngine.files(), scheduler, fs.getEntryPath(), factory,
+        JobQueues jobQueues = new JobQueues(SshAdaptor.ADAPTOR_NAME, xenonEngine.files(), scheduler, fs.getEntryPath(), factory,
                 multiQThreads, pollingDelay);
 
         synchronized (this) {

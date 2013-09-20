@@ -53,7 +53,7 @@ public class InterSchemeMoveTest {
         String configfile = System.getProperty("test.config");
         
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
         }
         
         Properties p = new Properties();
@@ -62,9 +62,9 @@ public class InterSchemeMoveTest {
         String user = getPropertyOrFail(p, "test.ssh.user");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
-        Xenon octopus = XenonEngine.newXenon(null);
+        Xenon xenon = XenonEngine.newXenon(null);
 
-        Files files = octopus.files();
+        Files files = xenon.files();
 
         FileSystem fs1 = Utils.getLocalCWD(files).getFileSystem();
         FileSystem fs2 = files.newFileSystem("ssh", user + "@" + location, null, null);

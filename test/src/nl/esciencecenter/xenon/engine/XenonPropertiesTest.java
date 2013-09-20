@@ -38,7 +38,7 @@ import org.junit.Test;
 public class XenonPropertiesTest {
 
     @Test
-    public void testOctopusProperties_supportsProperty_propertySet_true() throws Exception {
+    public void testXenonProperties_supportsProperty_propertySet_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -53,7 +53,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_supportsProperty_useDefault_true() throws Exception {
+    public void testXenonProperties_supportsProperty_useDefault_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -67,7 +67,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_supportsProperty_propertySet_false() throws Exception {
+    public void testXenonProperties_supportsProperty_propertySet_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -82,7 +82,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_supportsProperty_useDefault_false() throws Exception {
+    public void testXenonProperties_supportsProperty_useDefault_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -96,7 +96,7 @@ public class XenonPropertiesTest {
     }
     
     @Test
-    public void testOctopusProperties_propertySet_true() throws Exception {
+    public void testXenonProperties_propertySet_true() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -111,7 +111,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_propertySet_false() throws Exception {
+    public void testXenonProperties_propertySet_false() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -125,7 +125,7 @@ public class XenonPropertiesTest {
     }
     
     @Test(expected = UnknownPropertyException.class)
-    public void testOctopusProperties_propertySet_fails() throws Exception {
+    public void testXenonProperties_propertySet_fails() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -139,7 +139,7 @@ public class XenonPropertiesTest {
  
 
     @Test
-    public void testOctopusProperties_getProperty_propertySet() throws Exception {
+    public void testXenonProperties_getProperty_propertySet() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -154,7 +154,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_getProperty_default() throws Exception {
+    public void testXenonProperties_getProperty_default() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -168,7 +168,7 @@ public class XenonPropertiesTest {
     }
 
     @Test(expected = UnknownPropertyException.class)
-    public void testOctopusProperties_getProperty_fails() throws Exception {
+    public void testXenonProperties_getProperty_fails() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -182,7 +182,7 @@ public class XenonPropertiesTest {
     }
     
     @Test
-    public void testOctopusProperties_fromProperties() throws Exception {
+    public void testXenonProperties_fromProperties() throws Exception {
 
         ImmutableArray<XenonPropertyDescription> valid = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
@@ -197,7 +197,7 @@ public class XenonPropertiesTest {
     }
 
     @Test(expected = UnknownPropertyException.class)
-    public void testOctopusProperties_fromDefaultsAndProperties_noOverlap() throws Exception {
+    public void testXenonProperties_fromDefaultsAndProperties_noOverlap() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "value", 
@@ -210,7 +210,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_fromDefaultsAndProperties_withOverlap() throws Exception {
+    public void testXenonProperties_fromDefaultsAndProperties_withOverlap() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "value",
@@ -227,7 +227,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_fromDefaultsAndProperties_Filter() throws Exception {
+    public void testXenonProperties_fromDefaultsAndProperties_Filter() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "value",
@@ -518,7 +518,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_filter_withPropertiesSet() throws Exception {
+    public void testXenonProperties_filter_withPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
@@ -536,7 +536,7 @@ public class XenonPropertiesTest {
     }
     
     @Test
-    public void testOctopusProperties_filter_noPropertiesSet() throws Exception {
+    public void testXenonProperties_filter_noPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
@@ -552,7 +552,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_filter_wrongPrefix() throws Exception {
+    public void testXenonProperties_filter_wrongPrefix() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
@@ -568,7 +568,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_exclude_withPropertiesSet() throws Exception {
+    public void testXenonProperties_exclude_withPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
@@ -586,7 +586,7 @@ public class XenonPropertiesTest {
     }
     
     @Test
-    public void testOctopusProperties_exclude_noPropertiesSet() throws Exception {
+    public void testXenonProperties_exclude_noPropertiesSet() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
@@ -602,7 +602,7 @@ public class XenonPropertiesTest {
     }
 
     @Test
-    public void testOctopusProperties_exclude_wrongPrefix() throws Exception {
+    public void testXenonProperties_exclude_wrongPrefix() throws Exception {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
@@ -630,25 +630,25 @@ public class XenonPropertiesTest {
         @Test(expected = InvalidPropertyException.class) 
         public void testGetIntegerProperty_emptyString_False() throws Exception {
 
-            OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
-                 new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.OCTOPUS), "42", "test property")
+            XenonPropertyDescription [] valid = new XenonPropertyDescription [] { 
+                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
             };
 
             Map<String,String> props = new HashMap<>();
             props.put("key", "bla");
-            new OctopusProperties(valid, props);
+            new XenonProperties(valid, props);
         }
 
         @Test(expected = PropertyTypeException.class) 
         public void testGetIntegerProperty_emptyString_False() throws Exception {
 
-            OctopusPropertyDescription [] valid = new OctopusPropertyDescription [] { 
-                 new OctopusPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.OCTOPUS), "42", "test property")
+            XenonPropertyDescription [] valid = new XenonPropertyDescription [] { 
+                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Level.XENON), "42", "test property")
             };
 
             Map<String,String> props = new HashMap<>();
             props.put("key", "bla");
-            new OctopusProperties(valid, props);
+            new XenonProperties(valid, props);
         }
 
         
@@ -662,7 +662,7 @@ public class XenonPropertiesTest {
         public void testGetIntProperty_int_int() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "42");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             int result = xprop.getIntProperty("key");
 
@@ -672,7 +672,7 @@ public class XenonPropertiesTest {
         @Test
         public void testGetIntProperty_null_UndefinedException() throws Exception {
             Map<String,String> props = new HashMap<>();
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             try {
                 xprop.getIntProperty("key");
@@ -686,7 +686,7 @@ public class XenonPropertiesTest {
         public void testGetIntProperty_null_IntParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getIntProperty("key");
         }
 
@@ -694,7 +694,7 @@ public class XenonPropertiesTest {
         public void testGetIntProperty_null_IntParseException2() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getIntProperty("key", 42);
         }
 
@@ -702,7 +702,7 @@ public class XenonPropertiesTest {
         public void testGetIntProperty_withDefault2() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "33");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             int result = xprop.getIntProperty("key", 42);
 
@@ -711,7 +711,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testGetIntProperty_withDefault() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
 
             int result = xprop.getIntProperty("key", 42);
 
@@ -722,7 +722,7 @@ public class XenonPropertiesTest {
         public void testGetIntProperty_SetAndDefault_returnsSet() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "13");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             int result = xprop.getIntProperty("key", 42);
 
@@ -733,7 +733,7 @@ public class XenonPropertiesTest {
         public void testGetLongProperty_long_long() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "42");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             long result = xprop.getLongProperty("key");
 
@@ -743,7 +743,7 @@ public class XenonPropertiesTest {
         @Test
         public void testGetLongProperty_null_UndefinedException() throws Exception {
             Map<String,String> props = new HashMap<>();
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             try {
                 xprop.getLongProperty("key");
@@ -757,7 +757,7 @@ public class XenonPropertiesTest {
         public void testGetLongProperty_null_LongParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getLongProperty("key");
         }
 
@@ -765,13 +765,13 @@ public class XenonPropertiesTest {
         public void testGetLongProperty_null_LongParseException2() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getLongProperty("key", 42L);
         }
 
         @Test
         public void testGetLongProperty_withDefault() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
 
             long result = xprop.getLongProperty("key", 42);
 
@@ -782,7 +782,7 @@ public class XenonPropertiesTest {
         public void testGetLongProperty_SetAndDefault_returnsSet() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "13");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             long result = xprop.getLongProperty("key", 42);
 
@@ -793,7 +793,7 @@ public class XenonPropertiesTest {
         public void testGetShortProperty_short_short() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "42");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             short result = xprop.getShortProperty("key");
 
@@ -804,7 +804,7 @@ public class XenonPropertiesTest {
         @Test
         public void testGetShortProperty_null_UndefinedException() throws Exception {
             Map<String,String> props = new HashMap<>();
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             try {
                 xprop.getShortProperty("key");
@@ -818,7 +818,7 @@ public class XenonPropertiesTest {
         public void testGetShortProperty_null_ShortParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getShortProperty("key");
         }
 
@@ -826,13 +826,13 @@ public class XenonPropertiesTest {
         public void testGetShortProperty_null_ShortParseException2() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getShortProperty("key", (short) 42);
         }
 
         @Test
         public void testGetShortProperty_withDefault() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             short default_value = 42;
 
             short result = xprop.getShortProperty("key", default_value);
@@ -844,7 +844,7 @@ public class XenonPropertiesTest {
         public void testGetShortProperty_SetAndDefault_returnsSet() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "13");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             short default_value = 42;
             short result = xprop.getShortProperty("key", default_value);
@@ -856,7 +856,7 @@ public class XenonPropertiesTest {
         public void testGetDoubleProperty_double_double() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "42.123");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             double result = xprop.getDoubleProperty("key");
 
@@ -866,7 +866,7 @@ public class XenonPropertiesTest {
         @Test
         public void testGetDoubleProperty_null_UndefinedException() throws Exception {
             Map<String,String> props = new HashMap<>();
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             try {
                 xprop.getDoubleProperty("key");
@@ -880,13 +880,13 @@ public class XenonPropertiesTest {
         public void testGetDoubleProperty_null_DoubleParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getDoubleProperty("key");
         }
 
         @Test
         public void testGetDoubleProperty_withDefault() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             double default_value = 42.123;
 
             double result = xprop.getDoubleProperty("key", default_value);
@@ -898,7 +898,7 @@ public class XenonPropertiesTest {
         public void testGetDoubleProperty_withDefault_DoubleParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             xprop.getDoubleProperty("key", 42.0);
         }
 
@@ -906,7 +906,7 @@ public class XenonPropertiesTest {
         public void testGetDoubleProperty_SetAndDefault_returnsSet() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "13.456");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             double default_value = 42.123;
             double result = xprop.getDoubleProperty("key", default_value);
@@ -918,7 +918,7 @@ public class XenonPropertiesTest {
         public void testGetFloatProperty_float_float() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "42.123f");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             float result = xprop.getFloatProperty("key");
 
@@ -928,20 +928,20 @@ public class XenonPropertiesTest {
         @Test(expected = NumberFormatException.class)
         public void testGetFloatProperty_null_UndefinedException() throws Exception {
             Map<String,String> props = new HashMap<>();
-            new OctopusProperties(props).getFloatProperty("key");
+            new XenonProperties(props).getFloatProperty("key");
         }
 
         @Test(expected = NumberFormatException.class)
         public void testGetFloatProperty_null_FloatParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            new OctopusProperties(props).getFloatProperty("key");
+            new XenonProperties(props).getFloatProperty("key");
 
         }
 
         @Test
         public void testGetFloatProperty_withDefault() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             float default_value = 42.123f;
 
             float result = xprop.getFloatProperty("key", default_value);
@@ -953,14 +953,14 @@ public class XenonPropertiesTest {
         public void testGetFloatProperty_withDefault_FloatParseException() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "foo");
-            new OctopusProperties(props).getFloatProperty("key", 42.0f);
+            new XenonProperties(props).getFloatProperty("key", 42.0f);
         }
 
         @Test
         public void testGetFloatProperty_SetAndDefault_returnsSet() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "13.456f");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             float default_value = 42.123f;
             float result = xprop.getFloatProperty("key", default_value);
@@ -977,7 +977,7 @@ public class XenonPropertiesTest {
             props.put("M", "100M");
             props.put("G", "100G");
 
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             long result = xprop.getSizeProperty("B");
 
@@ -1005,7 +1005,7 @@ public class XenonPropertiesTest {
             props.put("M", "100m");
             props.put("G", "100g");
 
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             long result = xprop.getSizeProperty("B");
 
@@ -1030,7 +1030,7 @@ public class XenonPropertiesTest {
             Map<String,String> props = new HashMap<>();
             props.put("K", "100Q");
 
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             xprop.getSizeProperty("K");
         }
@@ -1039,7 +1039,7 @@ public class XenonPropertiesTest {
         public void testGetSizeProperty3() throws Exception {
 
             Map<String,String> props = new HashMap<>();
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             xprop.getSizeProperty("K");
         }
@@ -1050,7 +1050,7 @@ public class XenonPropertiesTest {
             Map<String,String> props = new HashMap<>();
             props.put("B", "100");
 
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             long result = xprop.getSizeProperty("B", 999);
 
@@ -1063,7 +1063,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testGetStringList_emptyValue_emptyList() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
 
             String[] result = xprop.getStringList("key");
             String[] expected = new String[] {};
@@ -1072,7 +1072,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testGetStringList_emptyValue_Defaults() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             String[] defaults = new String[] { "value1", "value2", "value3" };
             String[] result = xprop.getStringList("key", ", ", defaults);
 
@@ -1084,7 +1084,7 @@ public class XenonPropertiesTest {
         public void testGetString_withDefaultDelimiter() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "value1, value2, value3");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             String[] result = xprop.getStringList("key");
 
@@ -1096,7 +1096,7 @@ public class XenonPropertiesTest {
         public void testGetString_withDelimiter() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "value1, value2, value3");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             String[] result = xprop.getStringList("key", ", ");
 
@@ -1106,25 +1106,25 @@ public class XenonPropertiesTest {
 
         @Test
         public void testFilter_filledWithKeyAndItem_returnsKey() throws Exception {
-            OctopusProperties xprop = getSample();
+            XenonProperties xprop = getSample();
 
-            OctopusProperties nxprop = xprop.filter("k");
+            XenonProperties nxprop = xprop.filter("k");
 
-            assertEquals(nxprop.toString(), "OctopusProperties [properties={key=value}]");
+            assertEquals(nxprop.toString(), "XenonProperties [properties={key=value}]");
         }
 
         @Test
         public void testFilter_null() throws Exception {
-            OctopusProperties xprop = getSample();
-            OctopusProperties nxprop = xprop.filter(null);
-            assertEquals(nxprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
+            XenonProperties xprop = getSample();
+            XenonProperties nxprop = xprop.filter(null);
+            assertEquals(nxprop.toString(), "XenonProperties [properties={key=value, item=value2}]");
         }
 
         @Test
         public void testFilter_emptyPrefix_returnsSame() throws Exception {
-            OctopusProperties xprop = getSample();
+            XenonProperties xprop = getSample();
 
-            OctopusProperties nxprop = xprop.filter("");
+            XenonProperties nxprop = xprop.filter("");
 
             assertEquals(nxprop, xprop);
         }
@@ -1135,7 +1135,7 @@ public class XenonPropertiesTest {
             Map<String,String> props = new HashMap<>();
             props.put("key", "value");
             props.put("item", "value2");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             xprop.printProperties(new PrintStream(out), "");
@@ -1168,22 +1168,22 @@ public class XenonPropertiesTest {
 
         @Test
         public void testToString() throws Exception {
-            OctopusProperties xprop = getSample();
+            XenonProperties xprop = getSample();
 
-            assertEquals(xprop.toString(), "OctopusProperties [properties={key=value, item=value2}]");
+            assertEquals(xprop.toString(), "XenonProperties [properties={key=value, item=value2}]");
         }
 
-        public OctopusProperties getSample() throws Exception {
+        public XenonProperties getSample() throws Exception {
             Map<String,String> props = new HashMap<>();
             props.put("key", "value");
             props.put("item", "value2");
-            OctopusProperties xprop = new OctopusProperties(props);
+            XenonProperties xprop = new XenonProperties(props);
             return xprop;
         }
 
         @Test
         public void testGetPropertyNames() throws Exception {
-            OctopusProperties xprop = getSample();
+            XenonProperties xprop = getSample();
             String[] names = xprop.getPropertyNames();
             String[] expected_names = new String[] { "item", "key" };
             assertTrue(Arrays.equals(names, expected_names));
@@ -1192,13 +1192,13 @@ public class XenonPropertiesTest {
         @Test
         public void testEqualsObject() throws Exception {
 
-            OctopusProperties xprop1 = getSample();
+            XenonProperties xprop1 = getSample();
 
             boolean b = xprop1.equals(xprop1);
 
             assertTrue(b);
 
-            OctopusProperties xprop2 = getSample();
+            XenonProperties xprop2 = getSample();
 
             b = xprop1.equals(xprop2);
 
@@ -1207,7 +1207,7 @@ public class XenonPropertiesTest {
             Map<String,String> props = new HashMap<>();
             props.put("key", "value");
 
-            OctopusProperties xprop3 = new OctopusProperties(props);
+            XenonProperties xprop3 = new XenonProperties(props);
             b = xprop1.equals(xprop3);
 
             assertFalse(b);
@@ -1215,7 +1215,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testSetProperty_Unsupported() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             try {
                 xprop.setProperty("key", "value");
             } catch (UnsupportedOperationException e) {
@@ -1225,7 +1225,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testPutObject_Unsupported() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             try {
                 xprop.put("key", "value");
             } catch (UnsupportedOperationException e) {
@@ -1235,7 +1235,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testRemove_Unsupported() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             try {
                 xprop.remove("key");
             } catch (UnsupportedOperationException e) {
@@ -1246,7 +1246,7 @@ public class XenonPropertiesTest {
         @Test
         public void testPutAllMapOfQextendsObjectQextendsObject() throws Exception {
 
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
 
             Map<String, String> tmp = new HashMap<String, String>();
             tmp.put("key", "value");
@@ -1260,7 +1260,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testLoad_Reader_Unsupported() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             try {
                 xprop.load(mock(Reader.class));
             } catch (UnsupportedOperationException e) {
@@ -1270,7 +1270,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testLoad_InputStream_Unsupported() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             try {
                 xprop.load(mock(InputStream.class));
             } catch (UnsupportedOperationException e) {
@@ -1280,7 +1280,7 @@ public class XenonPropertiesTest {
 
         @Test
         public void testLoadFromXML_Unsupported() throws Exception {
-            OctopusProperties xprop = new OctopusProperties();
+            XenonProperties xprop = new XenonProperties();
             try {
                 xprop.loadFromXML(mock(InputStream.class));
             } catch (UnsupportedOperationException e) {

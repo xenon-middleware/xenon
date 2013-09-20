@@ -20,7 +20,7 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * Credentials represents the credentials interface of Cobalt.
+ * Credentials represents the credentials interface of Xenon.
  * 
  * This interface contains various methods for creating and closing credentials.
  * 

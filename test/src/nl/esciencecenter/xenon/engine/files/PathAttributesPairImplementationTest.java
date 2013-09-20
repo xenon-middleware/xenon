@@ -38,7 +38,7 @@ import org.junit.Test;
  */
 public class PathAttributesPairImplementationTest {
 
-    Xenon octopus;
+    Xenon xenon;
     Files files;
     FileSystem filesystem;
     Path root;
@@ -47,8 +47,8 @@ public class PathAttributesPairImplementationTest {
     @Before
     public void prepare() throws XenonException, XenonException {
 
-        octopus = XenonFactory.newXenon(null);
-        files = octopus.files();
+        xenon = XenonFactory.newXenon(null);
+        files = xenon.files();
         root = Utils.getLocalCWD(files);
         filesystem = root.getFileSystem();
         att = files.getAttributes(root);
@@ -57,7 +57,7 @@ public class PathAttributesPairImplementationTest {
     @After
     public void cleanup() throws XenonException, XenonException {
         files.close(filesystem);
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @Test

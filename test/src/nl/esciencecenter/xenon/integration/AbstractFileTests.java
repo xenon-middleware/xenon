@@ -49,19 +49,19 @@ abstract public class AbstractFileTests {
     /**
      * Singleton Engine for all tests
      */
-    protected static Xenon octopus = null;
+    protected static Xenon xenon = null;
 
     protected static Files getFiles() throws XenonException {
 
         // class synchronization:
         synchronized (AbstractFileTests.class) {
 
-            // init octopus singleton instance: 
-            if (octopus == null) {
-                octopus = XenonFactory.newXenon(null);
+            // init xenon singleton instance: 
+            if (xenon == null) {
+                xenon = XenonFactory.newXenon(null);
             }
 
-            return octopus.files();
+            return xenon.files();
         }
     }
 
@@ -110,7 +110,7 @@ abstract public class AbstractFileTests {
     /**
      * Return credentials for this FileSystem if needed for the integration tests.
      * 
-     * @return Octopus Credential for the FileSystem to be tested.
+     * @return Xenon Credential for the FileSystem to be tested.
      * @throws XenonException
      */
     abstract Credential getCredentials() throws XenonException;
@@ -136,7 +136,7 @@ abstract public class AbstractFileTests {
     }
 
     protected Path createSubdir(Path parentDirPath, String subDir) throws XenonException {
-        Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subDir);
+        Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, subDir);
         infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
         getFiles().createDirectory(absPath);
         return absPath;
@@ -157,7 +157,7 @@ abstract public class AbstractFileTests {
             XenonException {
         do {
             int myid = uniqueIdcounter++;
-            Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, dirPrefix + "." + myid);
+            Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, dirPrefix + "." + myid);
 
             if (getFiles().exists(absPath) == false) {
                 infoPrintf("createUniqueTestSubdir: '%s'+%d => '%s'\n", dirPrefix, myid, absPath);
@@ -186,7 +186,7 @@ abstract public class AbstractFileTests {
 
         do {
             int myid = uniqueIdcounter++;
-            Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, filePrefix + "." + myid);
+            Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, filePrefix + "." + myid);
 
             if (getFiles().exists(absPath) == false) {
 
@@ -201,7 +201,7 @@ abstract public class AbstractFileTests {
     }
 
     protected Path createFile(Path parentDirPath, String subFile) throws XenonException {
-        Path absPath = Utils.resolveWithRoot(octopus.files(), parentDirPath, subFile);
+        Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, subFile);
         getFiles().createFile(absPath);
         return absPath;
     }
@@ -253,7 +253,7 @@ abstract public class AbstractFileTests {
      */
     @org.junit.Test
     public void testCreateDeleteEmptyFile() throws Exception {
-        Path filePath = Utils.resolveWithRoot(octopus.files(), getTestDir(), "testFile01");
+        Path filePath = Utils.resolveWithRoot(xenon.files(), getTestDir(), "testFile01");
 
         Files files = getFiles();
 
@@ -288,7 +288,7 @@ abstract public class AbstractFileTests {
 
         Files files = getFiles();
 
-        Path dirPath = Utils.resolveWithRoot(octopus.files(), getTestDir(), "testSubdir01");
+        Path dirPath = Utils.resolveWithRoot(xenon.files(), getTestDir(), "testSubdir01");
         assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath,
                 files.exists(dirPath));
 

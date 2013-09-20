@@ -121,8 +121,8 @@ public class LocalUtilsTest {
 
     
     @org.junit.Test
-    public void test_octopusPermissions_null() throws Exception {
-        Set<PosixFilePermission> tmp = LocalUtils.cobaltPermissions(null);
+    public void test_xenonPermissions_null() throws Exception {
+        Set<PosixFilePermission> tmp = LocalUtils.xenonPermissions(null);
         assert (tmp == null);
     }
 
@@ -137,14 +137,14 @@ public class LocalUtilsTest {
     @org.junit.Test
     public void test_javaPath_home() throws Exception {
 
-        Xenon octopus = XenonFactory.newXenon(null);
-        Files files = octopus.files();
+        Xenon xenon = XenonFactory.newXenon(null);
+        Files files = xenon.files();
         
         Path cwd = Utils.getLocalCWD(files);
         
         String tmp = LocalUtils.javaPath(files.newPath(cwd.getFileSystem(), new RelativePath("~"))).toString();
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
 
         assert (tmp.equals(System.getProperty("user.dir")));
     }

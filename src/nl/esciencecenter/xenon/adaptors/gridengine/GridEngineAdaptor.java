@@ -82,13 +82,13 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
      * 
      * @param properties
      *            the properties to use when creating the adaptor.
-     * @param cobaltEngine
+     * @param xenonEngine
      *            the engine to which this adaptor belongs.
      * @throws XenonException
      *             if the adaptor creation fails.
      */
-    public GridEngineAdaptor(XenonEngine cobaltEngine, Map<String, String> properties) throws XenonException {
-        super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+    public GridEngineAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties), new GridEngineSchedulerConnectionFactory());
     }
 

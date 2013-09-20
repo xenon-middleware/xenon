@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * CobaltEngine implements the Cobalt Interface class by redirecting all calls to {@link Adaptor}s.
+ * XenonEngine implements the Xenon Interface class by redirecting all calls to {@link Adaptor}s.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
@@ -66,22 +66,22 @@ public final class XenonEngine implements Xenon {
     /** All our own queue properties start with this prefix. */
     public static final String ADAPTORS = PREFIX + "adaptors.";
 
-    /** All CobaltEngines created so far */
+    /** All XenonEngines created so far */
     private static final List<XenonEngine> XENON_ENGINES = new ArrayList<XenonEngine>();
 
     /**
-     * Create a new Cobalt using the given properties.
+     * Create a new Xenon using the given properties.
      * 
      * @param properties
-     *            the properties used to create the Cobalt.
-     * @return the newly created Cobalt created.
+     *            the properties used to create the Xenon.
+     * @return the newly created Xenon created.
      * 
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
      * @throws InvalidPropertyException
      *             If a known property was passed with an illegal value.
      * @throws XenonException
-     *             If the Cobalt failed initialize.
+     *             If the Xenon failed initialize.
      */
     public static synchronized Xenon newXenon(Map<String, String> properties) throws XenonException {
         XenonEngine result = new XenonEngine(properties);
@@ -101,7 +101,7 @@ public final class XenonEngine implements Xenon {
         }
 
         if (result == null) {
-            throw new NoSuchXenonException("engine", "No such CobaltEngine");
+            throw new NoSuchXenonException("engine", "No such XenonEngine");
         }
 
         result.end();
@@ -134,7 +134,7 @@ public final class XenonEngine implements Xenon {
     private final CopyEngine copyEngine;
 
     /**
-     * Constructs a CobaltEngine.
+     * Constructs a XenonEngine.
      * 
      * @param properties
      *            the properties to use. Will NOT be copied.
@@ -144,7 +144,7 @@ public final class XenonEngine implements Xenon {
      * @throws IllegalPropertyException
      *             If a known property was passed with an illegal value.
      * @throws XenonException
-     *             If the Cobalt failed initialize.
+     *             If the Xenon failed initialize.
      */
     private XenonEngine(Map<String, String> properties) throws XenonException {
 
@@ -163,7 +163,7 @@ public final class XenonEngine implements Xenon {
 
         adaptors = loadAdaptors(this.properties);
 
-        LOGGER.info("Cobalt engine initialized with adaptors: " + Arrays.toString(adaptors));
+        LOGGER.info("Xenon engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
     private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
@@ -180,7 +180,7 @@ public final class XenonEngine implements Xenon {
 
         // Check if there are any properties left. If so, this is a problem. 
         if (tmp.size() != 0) {
-            throw new UnknownPropertyException("CobaltEngine", "Unknown properties: " + tmp);
+            throw new UnknownPropertyException("XenonEngine", "Unknown properties: " + tmp);
         }
 
         return result.toArray(new Adaptor[result.size()]);
@@ -205,7 +205,7 @@ public final class XenonEngine implements Xenon {
         return tmp;
     }
 
-    // ************** Cobalt Interface Implementation ***************\\
+    // ************** Xenon Interface Implementation ***************\\
 
     @Override
     public AdaptorStatus[] getAdaptorStatuses() {
@@ -302,6 +302,6 @@ public final class XenonEngine implements Xenon {
 
     @Override
     public String toString() {
-        return "CobaltEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
+        return "XenonEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
     }
 }

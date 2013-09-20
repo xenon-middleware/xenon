@@ -46,9 +46,9 @@ public class ITJobLocal {
      */
     @Test
     public void WorkingDirectoryRelativlyToCwd() throws Exception {
-        Xenon octopus = XenonFactory.newXenon(null);
-        Path testdir = testFolder.newFolder("octopustest").toPath();
-        // testdir == /tmp/junit<random>/octopustest/
+        Xenon xenon = XenonFactory.newXenon(null);
+        Path testdir = testFolder.newFolder("xenontest").toPath();
+        // testdir == /tmp/junit<random>/xenontest/
         logger.info("Absolute tmp dir {}", testdir);
 
         JobDescription description = new JobDescription();
@@ -57,18 +57,18 @@ public class ITJobLocal {
         description.setQueueName("single");
         description.setWorkingDirectory(testdir.toString());
 
-        Scheduler scheduler = octopus.jobs().newScheduler("local", null, null, null);
-        Job job = octopus.jobs().submitJob(scheduler, description);
+        Scheduler scheduler = xenon.jobs().newScheduler("local", null, null, null);
+        Job job = xenon.jobs().submitJob(scheduler, description);
 
-        octopus.jobs().waitUntilDone(job, 5000);
+        xenon.jobs().waitUntilDone(job, 5000);
 
-        // Expect files in /tmp/junit<random>/octopustest/
+        // Expect files in /tmp/junit<random>/xenontest/
         assertTrue(Files.exists(testdir.resolve("bla")));
 
         logger.info("stdout written to {}", testdir.resolve("stdout.txt"));
         assertTrue(Files.exists(testdir.resolve("stdout.txt")));
         assertTrue(Files.exists(testdir.resolve("stderr.txt")));
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 }

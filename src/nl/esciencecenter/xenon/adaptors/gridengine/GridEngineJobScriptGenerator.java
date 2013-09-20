@@ -109,8 +109,8 @@ final class GridEngineJobScriptGenerator {
         //set shell to sh
         script.format("#$ -S /bin/sh\n");
 
-        //set name of job to cobalt
-        script.format("#$ -N cobalt\n");
+        //set name of job to xenon 
+        script.format("#$ -N xenon\n");
 
         //set working directory
         if (description.getWorkingDirectory() != null) {

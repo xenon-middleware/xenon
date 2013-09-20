@@ -268,7 +268,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         Path[] out = new Path[5];
         Path[] err = new Path[5];
 
-        Jobs jobs = octopus.jobs();
+        Jobs jobs = xenon.jobs();
 
         Job[] j = new Job[5];
 

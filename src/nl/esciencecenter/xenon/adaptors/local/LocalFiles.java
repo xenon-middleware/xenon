@@ -50,7 +50,7 @@ import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
- * LocalFiles implements an Cobalt <code>Files</code> adaptor for local file operations.
+ * LocalFiles implements an Xenon <code>Files</code> adaptor for local file operations.
  * 
  * @see nl.esciencecenter.xenon.files.Files
  * 

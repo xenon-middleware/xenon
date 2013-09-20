@@ -40,7 +40,7 @@ import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 
 /**
- * Engine for File operations. Implements functionality using File operations, Cobalt create functions, and Adaptors' Files
+ * Engine for File operations. Implements functionality using File operations, Xenon create functions, and Adaptors' Files
  * object.
  * 
  * @author Niels Drost <N.Drost@esciencecenter.nl>
@@ -54,15 +54,15 @@ public class FilesEngine implements Files {
         }
     };
 
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
 
-    public FilesEngine(XenonEngine cobaltEngine) {
-        this.cobaltEngine = cobaltEngine;
+    public FilesEngine(XenonEngine xenonEngine) {
+        this.xenonEngine = xenonEngine;
     }
 
     private Files getFilesAdaptor(FileSystem filesystem) {
         try {
-            Adaptor adaptor = cobaltEngine.getAdaptor(filesystem.getAdaptorName());
+            Adaptor adaptor = xenonEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
         } catch (XenonException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
@@ -79,7 +79,7 @@ public class FilesEngine implements Files {
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
         
-        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
         return adaptor.filesAdaptor().newFileSystem(scheme, location, credential, properties);
     }
 
@@ -211,6 +211,6 @@ public class FilesEngine implements Files {
     
     @Override
     public String toString() {
-        return "FilesEngine [cobaltEngine=" + cobaltEngine + "]";
+        return "FilesEngine [XenonEngine=" + xenonEngine + "]";
     }
 }

@@ -69,7 +69,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     public static FileTestConfig config;
 
-    protected Xenon octopus;
+    protected Xenon xenon;
     protected Files files;
     protected Credentials credentials;
 
@@ -105,7 +105,7 @@ public abstract class GenericFileAdaptorTestParent {
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(FileTestConfig testConfig) throws Exception {
         config = testConfig;
-        TEST_ROOT = "octopus_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
+        TEST_ROOT = "xenon_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
     }
 
     // MUST be invoked by a @AfterClass method of the subclass! 
@@ -113,10 +113,10 @@ public abstract class GenericFileAdaptorTestParent {
 
         System.err.println("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = octopus.files();
-        Credentials credentials = octopus.credentials();
+        Files files = xenon.files();
+        Credentials credentials = xenon.credentials();
 
         Path p = config.getWorkingDir(files, credentials);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
@@ -125,7 +125,7 @@ public abstract class GenericFileAdaptorTestParent {
             files.delete(root);
         }
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     public Path resolve(Path root, String... path) throws XenonException {
@@ -133,15 +133,15 @@ public abstract class GenericFileAdaptorTestParent {
     }
  
     protected void prepare() throws Exception {
-        octopus = XenonFactory.newXenon(null);
-        files = octopus.files();
-        credentials = octopus.credentials();
+        xenon = XenonFactory.newXenon(null);
+        files = xenon.files();
+        credentials = xenon.credentials();
     }
 
     protected void cleanup() throws Exception {
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
         files = null;
-        octopus = null;
+        xenon = null;
     }
 
     // Various util functions ------------------------------------------------------------
@@ -2851,8 +2851,8 @@ public abstract class GenericFileAdaptorTestParent {
 
         Path cwd = config.getWorkingDir(files, credentials);
 
-        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = resolve(cwd, "octopus_test/links");
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
+        Path root = resolve(cwd, "xenon_test/links");
 
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root);
@@ -2903,8 +2903,8 @@ public abstract class GenericFileAdaptorTestParent {
     //
     //        FileSystem fs = config.getTestFileSystem(files, credentials);
     //
-    //        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-    //        Path root = fs.getEntryPath().resolve(new RelativePath("octopus_test/links"));
+    //        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
+    //        Path root = fs.getEntryPath().resolve(new RelativePath("xenon_test/links"));
     //
     //        if (!files.exists(root)) {
     //            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
@@ -2934,8 +2934,8 @@ public abstract class GenericFileAdaptorTestParent {
         
         Path cwd = config.getWorkingDir(files, credentials);
 
-        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = resolve(cwd, "octopus_test/links");
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
+        Path root = resolve(cwd, "xenon_test/links");
         
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root);
@@ -2981,8 +2981,8 @@ public abstract class GenericFileAdaptorTestParent {
         
         Path cwd = config.getWorkingDir(files, credentials);
 
-        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("octopus_test/links");
-        Path root = resolve(cwd, "octopus_test/links");
+        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
+        Path root = resolve(cwd, "xenon_test/links");
         
         if (!files.exists(root)) {
             throw new Exception("Cannot find symbolic link test dir at " + root);
@@ -3018,9 +3018,9 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     /*        
-    public Path readSymbolicLink(Path link) throws OctopusException;
+    public Path readSymbolicLink(Path link) throws XenonException;
 
-    public boolean isSymbolicLink(Path path) throws OctopusException;
+    public boolean isSymbolicLink(Path path) throws XenonException;
     
      
     */

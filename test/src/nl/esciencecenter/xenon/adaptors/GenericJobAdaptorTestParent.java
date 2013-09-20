@@ -79,7 +79,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     protected static JobTestConfig config;
 
-    protected Xenon octopus;
+    protected Xenon xenon;
     protected Files files;
     protected Jobs jobs;
     protected Credentials credentials;
@@ -115,7 +115,7 @@ public abstract class GenericJobAdaptorTestParent {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
 
-//    public Path resolve(FileSystem fs, String path) throws OctopusException {
+//    public Path resolve(FileSystem fs, String path) throws XenonException {
 //        return resolve(fs.getEntryPath(), path);
 //    }
 
@@ -123,7 +123,7 @@ public abstract class GenericJobAdaptorTestParent {
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(JobTestConfig testConfig) {
         config = testConfig;
-        TEST_ROOT = "octopus_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
+        TEST_ROOT = "xenon_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
     }
 
     // MUST be invoked by a @AfterClass method of the subclass! 
@@ -131,10 +131,10 @@ public abstract class GenericJobAdaptorTestParent {
 
         System.err.println("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = octopus.files();
-        Credentials credentials = octopus.credentials();
+        Files files = xenon.files();
+        Credentials credentials = xenon.credentials();
 
         Path cwd = config.getWorkingDir(files, credentials);
         Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
@@ -143,7 +143,7 @@ public abstract class GenericJobAdaptorTestParent {
             files.delete(root);
         }
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @Before
@@ -151,15 +151,15 @@ public abstract class GenericJobAdaptorTestParent {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
-        octopus = XenonFactory.newXenon(null);
-        files = octopus.files();
-        jobs = octopus.jobs();
-        credentials = octopus.credentials();
+        xenon = XenonFactory.newXenon(null);
+        files = xenon.files();
+        jobs = xenon.jobs();
+        credentials = xenon.credentials();
     }
 
     @After
     public void cleanup() throws XenonException {
-        // OctopusFactory.endOctopus(octopus);
+        // XenonFactory.endXenon(xenon);
         XenonFactory.endAll();
     }
 
@@ -245,7 +245,7 @@ public abstract class GenericJobAdaptorTestParent {
                 Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), c, null);
                 jobs.close(s);
 
-                throw new Exception("newScheduler did NOT throw OctopusException");
+                throw new Exception("newScheduler did NOT throw XenonException");
             } catch (XenonException e) {
                 // expected
             }
@@ -319,7 +319,7 @@ public abstract class GenericJobAdaptorTestParent {
                         config.getDefaultCredential(credentials), p);
                 jobs.close(s);
 
-                throw new Exception("newScheduler did NOT throw OctopusException");
+                throw new Exception("newScheduler did NOT throw XenonException");
             } catch (XenonException e) {
                 // expected
             }
@@ -839,7 +839,7 @@ public abstract class GenericJobAdaptorTestParent {
         Path[] out = new Path[jobCount];
         Path[] err = new Path[jobCount];
 
-        Jobs jobs = octopus.jobs();
+        Jobs jobs = xenon.jobs();
 
         Job[] j = new Job[jobCount];
 

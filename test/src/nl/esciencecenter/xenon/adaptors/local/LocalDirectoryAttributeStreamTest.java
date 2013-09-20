@@ -43,7 +43,7 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class LocalDirectoryAttributeStreamTest {
 
-    private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
+    private static final String TEST_DIR = "xenon_test_" + System.currentTimeMillis();
 
     private static Path resolve(Files files, Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
@@ -52,9 +52,9 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.BeforeClass
     public static void prepareClass() throws XenonException, XenonException {
 
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = octopus.files();
+        Files files = xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
@@ -67,15 +67,15 @@ public class LocalDirectoryAttributeStreamTest {
         files.createFile(file1);
         files.createFile(file2);
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @org.junit.AfterClass
     public static void cleanupClass() throws XenonException, XenonException {
 
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = octopus.files();
+        Files files = xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         Path file0 = resolve(files, testDir, "file0");
@@ -101,10 +101,10 @@ public class LocalDirectoryAttributeStreamTest {
             files.delete(testDir);
         }
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
-    private XenonEngine octopus;
+    private XenonEngine xenon;
     private FileSystem fs;
     private Path root;
     private Path testDir;
@@ -128,9 +128,9 @@ public class LocalDirectoryAttributeStreamTest {
 
     @org.junit.Before
     public void prepareTest() throws Exception {
-        octopus = Util.createOctopusEngine(null);
-        localAdaptor = new LocalAdaptor(octopus, new HashMap<String, String>());
-        localFiles = new LocalFiles(localAdaptor, octopus.getCopyEngine());
+        xenon = Util.createXenonEngine(null);
+        localAdaptor = new LocalAdaptor(xenon, new HashMap<String, String>());
+        localFiles = new LocalFiles(localAdaptor, xenon.getCopyEngine());
         root = Utils.getLocalCWD(localFiles);
         fs = root.getFileSystem();
         testDir = resolve(localFiles, root, TEST_DIR);
@@ -138,7 +138,7 @@ public class LocalDirectoryAttributeStreamTest {
 
     @org.junit.After
     public void cleanupTest() throws Exception {
-        Util.endOctopusEngine(octopus);
+        Util.endXenonEngine(xenon);
     }
 
     @org.junit.Test(expected = XenonException.class)

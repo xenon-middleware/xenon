@@ -51,7 +51,7 @@ public class GridEngineJobScriptGeneratorTest {
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N octopus\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n"
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n"
                 + "#$ -e /dev/null\n" + "\n" + "null\n";
 
         assertEquals(expected, result);
@@ -60,7 +60,7 @@ public class GridEngineJobScriptGeneratorTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
-     * @throws OctopusException
+     * @throws XenonException
      */
     public void test01b_generate__FilledDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
@@ -80,7 +80,7 @@ public class GridEngineJobScriptGeneratorTest {
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N octopus\n" + "#$ -wd '/some/working/directory'\n"
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n"
                 + "#$ -q the.queue\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n"
                 + "#$ -e 'stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n" + "\n" + "/bin/executable 'some' 'arguments'\n";
@@ -93,7 +93,7 @@ public class GridEngineJobScriptGeneratorTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
-     * @throws OctopusException
+     * @throws XenonException
      */
     public void test01c_generate__ParallelDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
@@ -114,7 +114,7 @@ public class GridEngineJobScriptGeneratorTest {
 
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N octopus\n" + "#$ -wd '/some/working/directory'\n"
+        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n"
                 + "#$ -q the.queue\n" + "#$ -pe some.pe 5\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n"
                 + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
                 + "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"

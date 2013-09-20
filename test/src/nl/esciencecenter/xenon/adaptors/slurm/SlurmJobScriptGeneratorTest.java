@@ -48,7 +48,7 @@ public class SlurmJobScriptGeneratorTest {
 
         String result = SlurmJobScriptGenerator.generate(description, null);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --nodes=1\n"
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --nodes=1\n"
                 + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n"
                 + "#SBATCH --error=/dev/null\n\n" + "srun null\n";
 
@@ -58,7 +58,7 @@ public class SlurmJobScriptGeneratorTest {
     @Test
     /**
      * Check to see if the output is _exactly_ what we expect, and not a single char different.
-     * @throws OctopusException
+     * @throws XenonException
      */
     public void testFilledDescription() throws XenonException {
         JobDescription description = new JobDescription();
@@ -78,7 +78,7 @@ public class SlurmJobScriptGeneratorTest {
 
         String result = SlurmJobScriptGenerator.generate(description, null);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name octopus\n" + "#SBATCH --workdir='/some/working/directory'\n"
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --workdir='/some/working/directory'\n"
                 + "#SBATCH --partition=the.queue\n" + "#SBATCH --nodes=5\n" + "#SBATCH --ntasks-per-node=55\n"
                 + "#SBATCH --time=100\n" + "#SBATCH --input='stdin.file'\n" + "#SBATCH --output='stdout.file'\n"
                 + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"

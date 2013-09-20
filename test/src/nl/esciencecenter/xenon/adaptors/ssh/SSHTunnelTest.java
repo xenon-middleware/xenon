@@ -50,7 +50,7 @@ public class SSHTunnelTest {
         String configfile = System.getProperty("test.config");
         
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
         }
         
         Properties p = new Properties();
@@ -59,18 +59,18 @@ public class SSHTunnelTest {
         String gateway = getPropertyOrFail(p, "test.ssh.gateway");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
-        Xenon octopus = XenonFactory.newXenon(null);
-        Files files = octopus.files();
-        Credentials credentials = octopus.credentials();
+        Xenon xenon = XenonFactory.newXenon(null);
+        Files files = xenon.files();
+        Credentials credentials = xenon.credentials();
 
         HashMap<String, String> properties = new HashMap<String, String>();
-        properties.put("octopus.adaptors.ssh.gateway", gateway);
+        properties.put("xenon.adaptors.ssh.gateway", gateway);
 
         // Will thrown an exception if the tunnel fails ?
         FileSystem filesystem = files.newFileSystem("ssh", location, credentials.getDefaultCredential("sftp"), properties);
 
         files.close(filesystem);
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
 }

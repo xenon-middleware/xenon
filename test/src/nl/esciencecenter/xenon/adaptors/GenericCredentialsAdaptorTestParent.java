@@ -80,8 +80,8 @@ public class GenericCredentialsAdaptorTestParent {
         // This is not an adaptor option, so it will throw an exception!
         //Map<String, String> properties = new HashMap<>();
         //properties.put(SshAdaptor.POLLING_DELAY, "100");
-        octopus = XenonFactory.newXenon(null);
-        credentials = octopus.credentials();
+        xenon = XenonFactory.newXenon(null);
+        credentials = xenon.credentials();
     }
 
     @After
@@ -89,7 +89,7 @@ public class GenericCredentialsAdaptorTestParent {
         XenonFactory.endAll();
     }
    
-    protected Xenon octopus;
+    protected Xenon xenon;
     protected Credentials credentials;
     
     @Test

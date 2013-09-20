@@ -38,16 +38,16 @@ public class JobsEngineTest {
     @Test
     public void testToString() throws Exception {
 
-        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
-        assertTrue(je.toString().equals("JobsEngine [octopusEngine=" + oe + "]"));
+        assertTrue(je.toString().equals("JobsEngine [xenonEngine=" + oe + "]"));
     }
 
     @Test
     public void testGetJobStatusesWithException() throws Exception {
 
-        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         JobDescription desc = new JobDescription();
@@ -68,7 +68,7 @@ public class JobsEngineTest {
     @Test
     public void testGetJobStatusesWithException2() throws Exception {
 
-        XenonEngine oe = Util.createOctopusEngine(new HashMap<String, String>());
+        XenonEngine oe = Util.createXenonEngine(new HashMap<String, String>());
         JobsEngine je = new JobsEngine(oe);
 
         JobDescription desc = new JobDescription();
@@ -138,23 +138,23 @@ public class JobsEngineTest {
     //    }
 
     //    @Test
-    //    public void testSubmitJob_StubbedLocalAdaptor_LocalJob() throws OctopusIOException, OctopusException, URISyntaxException {
+    //    public void testSubmitJob_StubbedLocalAdaptor_LocalJob() throws XenonIOException, XenonException, URISyntaxException {
     //        URI sheduler_location = new URI("local:///");
     //        JobDescription job_description = new JobDescription();
     //        SchedulerImplementation scheduler = new SchedulerImplementation("local", "1", sheduler_location, 
     //                new String[] { "single" }, null, null, true, true, true);
     //        
     //        // stub adaptor
-    //        OctopusEngine octopus = mock(OctopusEngine.class);
+    //        XenonEngine xenon = mock(XenonEngine.class);
     //        Adaptor adaptor = mock(Adaptor.class);
     //        Jobs job_adaptor = mock(Jobs.class);
     //        Job expected_job = new JobImplementation(job_description, scheduler, UUID.randomUUID(), "1", false, true);
-    //        when(octopus.getAdaptorFor("local")).thenReturn(adaptor);
-    //        when(octopus.getAdaptor("local")).thenReturn(adaptor);
+    //        when(xenon.getAdaptorFor("local")).thenReturn(adaptor);
+    //        when(xenon.getAdaptor("local")).thenReturn(adaptor);
     //        when(adaptor.jobsAdaptor()).thenReturn(job_adaptor);
     //        when(job_adaptor.newScheduler(sheduler_location, null, null)).thenReturn(scheduler);
     //        when(job_adaptor.submitJob(scheduler, job_description)).thenReturn(expected_job);
-    //        JobsEngine engine = new JobsEngine(octopus);
+    //        JobsEngine engine = new JobsEngine(xenon);
     //
     //        Job job = engine.submitJob(scheduler, job_description);
     //

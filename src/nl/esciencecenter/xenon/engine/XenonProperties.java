@@ -36,7 +36,7 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
  */
 public class XenonProperties {
 
-    private static final String NAME = "CobaltProperties";
+    private static final String NAME = "XenonProperties";
 
     /** One kilo is 1024 */
     private static final int KILO = 1024;
@@ -47,14 +47,14 @@ public class XenonProperties {
     /** One giga is a kilo*kilo*kilo */
     private static final int GIGA = KILO * MEGA;
 
-    /** Contains a description of all properties this CobaltProperties should accept, including their type, default, etc. */
+    /** Contains a description of all properties this XenonProperties should accept, including their type, default, etc. */
     private final Map<String, XenonPropertyDescription> supportedProperties;
 
     /** The properties that are actually set. */
     private final Map<String, String> properties;
 
     /**
-     * Private constructor for CobaltProperties using in copying and filtering. The <code>properties</code> parameter is assumed
+     * Private constructor for XenonProperties using in copying and filtering. The <code>properties</code> parameter is assumed
      * to only contain valid supported properties and have values of the correct type.
      * 
      * @param supportedProperties
@@ -68,7 +68,7 @@ public class XenonProperties {
     }
 
     /**
-     * Creates an empty CobaltProperties.
+     * Creates an empty XenonProperties.
      */
     public XenonProperties() {
         supportedProperties = new HashMap<>();
@@ -76,7 +76,7 @@ public class XenonProperties {
     }
 
     /**
-     * Create a new CobaltProperties that will support the properties in <code>supportedProperties</code>. All properties in
+     * Create a new XenonProperties that will support the properties in <code>supportedProperties</code>. All properties in
      * <code>properties</code> will be added.
      * 
      * @param supportedProperties
@@ -105,7 +105,7 @@ public class XenonProperties {
     }
 
     /**
-     * Create a new CobaltProperties that will support the properties in <code>supportedProperties</code> that are valid at level
+     * Create a new XenonProperties that will support the properties in <code>supportedProperties</code> that are valid at level
      * <code>level</code>. All properties in <code>properties</code> will be added.
      * 
      * @param supportedProperties
@@ -202,11 +202,11 @@ public class XenonProperties {
     }
 
     /**
-     * Check if this CobaltProperties supports a property with the given name.
+     * Check if this XenonProperties supports a property with the given name.
      * 
      * @param name
      *            the name of the property.
-     * @return <code>true</code> if this CobaltProperties supports a property with the given name, <code>false</code> otherwise.
+     * @return <code>true</code> if this XenonProperties supports a property with the given name, <code>false</code> otherwise.
      */
     public boolean supportsProperty(String name) {
         return supportedProperties.containsKey(name);
@@ -475,9 +475,9 @@ public class XenonProperties {
     }
 
     /**
-     * Returns a new CobaltProperties that contains only the properties whose key start with a certain prefix.
+     * Returns a new XenonProperties that contains only the properties whose key start with a certain prefix.
      * 
-     * @return an CobaltProperties containing only the matching properties.
+     * @return an XenonProperties containing only the matching properties.
      * @param tmp
      *            the desired prefix
      */
@@ -506,9 +506,9 @@ public class XenonProperties {
     }
 
     /**
-     * Returns a new CobaltProperties that contains only the properties with a given level.
+     * Returns a new XenonProperties that contains only the properties with a given level.
      * 
-     * @return an CobaltProperties containing only the properties with the matching level.
+     * @return an XenonProperties containing only the properties with the matching level.
      * @param tmp
      *            the desired prefix
      */
@@ -534,12 +534,12 @@ public class XenonProperties {
     }
 
     /**
-     * Returns a copy of this CobaltProperties that contains all properties except the properties that start with the given
+     * Returns a copy of this XenonProperties that contains all properties except the properties that start with the given
      * prefix. Note that these properties are also removed from the supported properties set.
      * 
      * @param prefix
      *            the prefix of the properties to exclude
-     * @return an CobaltProperties containing all properties except the properties with the given prefix.
+     * @return an XenonProperties containing all properties except the properties with the given prefix.
      */
     public XenonProperties exclude(String prefix) {
 
@@ -566,12 +566,12 @@ public class XenonProperties {
     }
 
     /**
-     * Returns a copy of this CobaltProperties that contains all properties but clears the properties that start with the given
+     * Returns a copy of this XenonProperties that contains all properties but clears the properties that start with the given
      * prefix. Note that these properties are not removed from the supported properties set.
      * 
      * @param prefix
      *            the prefix of the properties to exclude
-     * @return an CobaltProperties containing all properties except the properties with the given prefix.
+     * @return an XenonProperties containing all properties except the properties with the given prefix.
      */
     public XenonProperties clear(String prefix) {
 

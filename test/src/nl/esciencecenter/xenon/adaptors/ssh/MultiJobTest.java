@@ -87,7 +87,7 @@ public class MultiJobTest {
         String configfile = System.getProperty("test.config");
         
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
         }
         
         Properties p = new Properties();
@@ -96,12 +96,12 @@ public class MultiJobTest {
         String user = getPropertyOrFail(p, "test.ssh.user");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
-        String TEST_ROOT = "octopus_test_SSH_" + System.currentTimeMillis();
+        String TEST_ROOT = "xenon_test_SSH_" + System.currentTimeMillis();
 
-        Xenon octopus = XenonFactory.newXenon(null);
-        Files files = octopus.files();
-        Jobs jobs = octopus.jobs();
-        Credentials credentials = octopus.credentials();
+        Xenon xenon = XenonFactory.newXenon(null);
+        Files files = xenon.files();
+        Jobs jobs = xenon.jobs();
+        Credentials credentials = xenon.credentials();
 
         FileSystem filesystem = files.newFileSystem("sftp", user + "@" + location, credentials.getDefaultCredential("sftp"),
                 new HashMap<String, String>());
@@ -196,7 +196,7 @@ public class MultiJobTest {
         files.delete(root);
         files.close(filesystem);
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @org.junit.Test

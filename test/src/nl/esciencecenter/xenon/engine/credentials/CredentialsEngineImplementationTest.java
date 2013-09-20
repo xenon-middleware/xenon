@@ -41,22 +41,22 @@ import org.junit.BeforeClass;
  */
 public class CredentialsEngineImplementationTest {
 
-    private static XenonEngine octopusEngine;
+    private static XenonEngine xenonEngine;
 
     @BeforeClass
     public static void prepare() throws Exception {
-        octopusEngine = Util.createOctopusEngine(null);
+        xenonEngine = Util.createXenonEngine(null);
     }
 
     @AfterClass
     public static void cleanup() throws Exception {
-        Util.endOctopusEngine(octopusEngine);
+        Util.endXenonEngine(xenonEngine);
     }
 
     @org.junit.Test
     public void testDefault() throws Exception {
 
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
         Credential c = ce.getDefaultCredential("ssh");
 
         assertEquals("ssh", c.getAdaptorName());
@@ -65,7 +65,7 @@ public class CredentialsEngineImplementationTest {
     @org.junit.Test
     public void testCertificate() throws Exception {
 
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
         
         String certfile = Utils.getHome() + Utils.getLocalSeparator() + ".ssh" + Utils.getLocalSeparator() + "id_rsa";  
         
@@ -94,7 +94,7 @@ public class CredentialsEngineImplementationTest {
     @org.junit.Test
     public void testPassword() throws Exception {
 
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(octopusEngine);
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
         Credential c = ce.newPasswordCredential("ssh", "username", "password".toCharArray(), null);
 
         assertTrue(c instanceof PasswordCredentialImplementation);

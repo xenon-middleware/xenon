@@ -52,12 +52,12 @@ public class InterSchemeCopyTest {
     @Test
     public void test_copy_local_ssh() throws Exception {
 
-        Xenon octopus = XenonEngine.newXenon(null);
+        Xenon xenon = XenonEngine.newXenon(null);
 
         String configfile = System.getProperty("test.config");
         
         if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "octopus.test.properties";
+            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
         }
         
         Properties p = new Properties();
@@ -66,12 +66,12 @@ public class InterSchemeCopyTest {
         String user = getPropertyOrFail(p, "test.ssh.user");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
-        Files files = octopus.files();
+        Files files = xenon.files();
 
         Path localCWD = Utils.getLocalCWD(files);
         Path sshCWD = files.newFileSystem("ssh", user + "@" + location, null, null).getEntryPath();
 
-        String dirname = "octopus_test_" + System.currentTimeMillis();
+        String dirname = "xenon_test_" + System.currentTimeMillis();
 
         Path localDir = Utils.resolveWithRoot(files, localCWD, dirname);
         files.createDirectory(localDir);
@@ -107,6 +107,6 @@ public class InterSchemeCopyTest {
         files.delete(localDir);
         files.delete(sshDir);
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 }

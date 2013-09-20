@@ -43,7 +43,7 @@ import org.junit.Test;
 public class SandboxedLocalJobIT {
 
     /**
-     * Octopus usage example:
+     * Xenon usage example:
      * <ol>
      * <li>Create temporary work directory</li>
      * <li>Copy `test/fixtures/lorem_ipsum.txt` input file to work directory</li>
@@ -63,32 +63,32 @@ public class SandboxedLocalJobIT {
      */
     @Test
     public void test() throws Exception, XenonException, URISyntaxException, InterruptedException, IOException {
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
         Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
-        FileSystem localrootfs = Utils.getLocalCWD(octopus.files()).getFileSystem();
+        FileSystem localrootfs = Utils.getLocalCWD(xenon.files()).getFileSystem();
 
         // create workdir
         String workFn = tmpdir + "/AAP" + work_id;
-        Path workdir = octopus.files().newPath(localrootfs, new RelativePath(workFn));
-        octopus.files().createDirectory(workdir);
+        Path workdir = xenon.files().newPath(localrootfs, new RelativePath(workFn));
+        xenon.files().createDirectory(workdir);
 
         // fill workdir
         String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
-        octopus.files().copy(octopus.files().newPath(localrootfs, new RelativePath(input_file)),
-                octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
+        xenon.files().copy(xenon.files().newPath(localrootfs, new RelativePath(input_file)),
+                xenon.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
         // create sandbox
         String sandbox_id = "MIES" + UUID.randomUUID().toString();
-        Path sandboxPath = octopus.files().newPath(localrootfs, new RelativePath(tmpdir));
-        Sandbox sandbox = new Sandbox(octopus.files(), sandboxPath, sandbox_id);
+        Path sandboxPath = xenon.files().newPath(localrootfs, new RelativePath(tmpdir));
+        Sandbox sandbox = new Sandbox(xenon.files(), sandboxPath, sandbox_id);
 
-        sandbox.addUploadFile(octopus.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
+        sandbox.addUploadFile(xenon.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
                 "lorem_ipsum.txt");
 
-        sandbox.addDownloadFile("stdout.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
-        sandbox.addDownloadFile("stderr.txt", octopus.files().newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
+        sandbox.addDownloadFile("stdout.txt", xenon.files().newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
+        sandbox.addDownloadFile("stderr.txt", xenon.files().newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
 
         // upload lorem_ipsum.txt to sandbox
         sandbox.upload();
@@ -101,19 +101,19 @@ public class SandboxedLocalJobIT {
         description.setStderr("stderr.txt");
         description.setWorkingDirectory(sandbox.getPath().getRelativePath().getAbsolutePath());
 
-        Scheduler scheduler = octopus.jobs().newScheduler("local", "", null, null);
+        Scheduler scheduler = xenon.jobs().newScheduler("local", "", null, null);
 
-        Job job = octopus.jobs().submitJob(scheduler, description);
+        Job job = xenon.jobs().submitJob(scheduler, description);
 
         // TODO add timeout
-        while (!octopus.jobs().getJobStatus(job).isDone()) {
+        while (!xenon.jobs().getJobStatus(job).isDone()) {
             Thread.sleep(500);
         }
 
         sandbox.download();
         sandbox.delete();
 
-        JobStatus status = octopus.jobs().getJobStatus(job);
+        JobStatus status = xenon.jobs().getJobStatus(job);
         if (status.hasException()) {
             throw status.getException();
         }
@@ -122,6 +122,6 @@ public class SandboxedLocalJobIT {
         
         assertThat(Util.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
 
-        Utils.recursiveDelete(octopus.files(), workdir);
+        Utils.recursiveDelete(xenon.files(), workdir);
     }
 }

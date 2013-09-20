@@ -37,7 +37,7 @@ import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
- * LocalAdaptor implements an Cobalt adaptor for local operations.
+ * LocalAdaptor implements an Xenon adaptor for local operations.
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -102,12 +102,12 @@ public class LocalAdaptor extends Adaptor {
     /** Local implementation for Credentials */
     private final LocalCredentials localCredentials;
 
-    public LocalAdaptor(XenonEngine cobaltEngine, Map<String, String> properties) throws XenonException {
-        super(cobaltEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+    public LocalAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
-        localFiles = new LocalFiles(this, cobaltEngine.getCopyEngine());
-        localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), cobaltEngine);
+        localFiles = new LocalFiles(this, xenonEngine.getCopyEngine());
+        localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), xenonEngine);
         localCredentials = new LocalCredentials();
     }
 

@@ -123,8 +123,8 @@ public class LocalFileAttributesTest {
 
         files.createFile(path2);
 
-        files.setPosixFilePermissions(path1, LocalUtils.cobaltPermissions(PosixFilePermissions.fromString("rwxr--r--")));
-        files.setPosixFilePermissions(path2, LocalUtils.cobaltPermissions(PosixFilePermissions.fromString("---r--r--")));
+        files.setPosixFilePermissions(path1, LocalUtils.xenonPermissions(PosixFilePermissions.fromString("rwxr--r--")));
+        files.setPosixFilePermissions(path2, LocalUtils.xenonPermissions(PosixFilePermissions.fromString("---r--r--")));
 
         FileAttributes att1 = new LocalFileAttributes(path1);
         FileAttributes att2 = new LocalFileAttributes(path2);
@@ -134,17 +134,17 @@ public class LocalFileAttributesTest {
         assertFalse(att1.equals("aap"));
         assertFalse(att1.equals(att2));
 
-        files.setPosixFilePermissions(path2, LocalUtils.cobaltPermissions(PosixFilePermissions.fromString("--xr--r--")));
+        files.setPosixFilePermissions(path2, LocalUtils.xenonPermissions(PosixFilePermissions.fromString("--xr--r--")));
         att2 = new LocalFileAttributes(path2);
 
         assertFalse(att1.equals(att2));
 
-        files.setPosixFilePermissions(path2, LocalUtils.cobaltPermissions(PosixFilePermissions.fromString("r-xr--r--")));
+        files.setPosixFilePermissions(path2, LocalUtils.xenonPermissions(PosixFilePermissions.fromString("r-xr--r--")));
         att2 = new LocalFileAttributes(path2);
 
         assertFalse(att1.equals(att2));
 
-        files.setPosixFilePermissions(path2, LocalUtils.cobaltPermissions(PosixFilePermissions.fromString("rwxr--r--")));
+        files.setPosixFilePermissions(path2, LocalUtils.xenonPermissions(PosixFilePermissions.fromString("rwxr--r--")));
                 
         att2 = new LocalFileAttributes(path2);
 

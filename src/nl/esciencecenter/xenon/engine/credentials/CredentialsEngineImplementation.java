@@ -25,29 +25,29 @@ import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 
 public class CredentialsEngineImplementation implements Credentials {
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
 
-    public CredentialsEngineImplementation(XenonEngine cobaltEngine) {
-        this.cobaltEngine = cobaltEngine;
+    public CredentialsEngineImplementation(XenonEngine xenonEngine) {
+        this.xenonEngine = xenonEngine;
     }
 
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws XenonException {
-        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newCertificateCredential(scheme, certfile, username, password, properties);
     }
 
     @Override
     public Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws XenonException {
-        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().newPasswordCredential(scheme, username, password, properties);
     }
 
     @Override
     public Credential getDefaultCredential(String scheme) throws XenonException {
-        Adaptor adaptor = cobaltEngine.getAdaptorFor(scheme);
+        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
         return adaptor.credentialsAdaptor().getDefaultCredential(scheme);
     }
 
@@ -63,7 +63,7 @@ public class CredentialsEngineImplementation implements Credentials {
 
     private Credentials getCredentialsAdaptor(Credential credential) {
         try {
-            Adaptor adaptor = cobaltEngine.getAdaptor(credential.getAdaptorName());
+            Adaptor adaptor = xenonEngine.getAdaptor(credential.getAdaptorName());
             return adaptor.credentialsAdaptor();
         } catch (XenonException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.

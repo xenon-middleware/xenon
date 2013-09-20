@@ -45,13 +45,13 @@ public class XenonFactoryTest {
     }
 
     @Test
-    public void testEndOctopus() throws XenonException {
+    public void testEndXenon() throws XenonException {
         Xenon x = XenonFactory.newXenon(null);
         XenonFactory.endXenon(x);
     }
 
     @Test(expected = NoSuchXenonException.class)
-    public void testEndOctopus2() throws XenonException {
+    public void testEndXenon2() throws XenonException {
         Xenon x = XenonFactory.newXenon(null);
         XenonFactory.endXenon(x);
         XenonFactory.endXenon(x);

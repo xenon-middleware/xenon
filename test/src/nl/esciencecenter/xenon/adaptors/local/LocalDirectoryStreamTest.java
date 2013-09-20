@@ -38,7 +38,7 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class LocalDirectoryStreamTest {
 
-    private static final String TEST_DIR = "octopus_test_" + System.currentTimeMillis();
+    private static final String TEST_DIR = "xenon_test_" + System.currentTimeMillis();
 
     private static Path resolve(Files files, Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
@@ -47,9 +47,9 @@ public class LocalDirectoryStreamTest {
     @org.junit.BeforeClass
     public static void prepareClass() throws XenonException, XenonException {
 
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = octopus.files();
+        Files files = xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         files.createDirectory(testDir);
@@ -62,15 +62,15 @@ public class LocalDirectoryStreamTest {
         files.createFile(file1);
         files.createFile(file2);
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @org.junit.AfterClass
     public static void cleanupClass() throws XenonException, XenonException {
 
-        Xenon octopus = XenonFactory.newXenon(null);
+        Xenon xenon = XenonFactory.newXenon(null);
 
-        Files files = octopus.files();
+        Files files = xenon.files();
         Path root = Utils.getLocalCWD(files);
         Path testDir = resolve(files, root, TEST_DIR);
         
@@ -85,10 +85,10 @@ public class LocalDirectoryStreamTest {
             files.delete(testDir);
         }
 
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
-    private Xenon octopus;
+    private Xenon xenon;
     private Files files;
     private FileSystem fs;
     private Path root;
@@ -111,9 +111,9 @@ public class LocalDirectoryStreamTest {
     @org.junit.Before
     public void prepareTest() throws XenonException, XenonException {
 
-        octopus = XenonFactory.newXenon(null);
+        xenon = XenonFactory.newXenon(null);
 
-        files = octopus.files();
+        files = xenon.files();
         root = Utils.getLocalCWD(files);
         fs = root.getFileSystem();
         testDir = resolve(files, root, TEST_DIR);
@@ -121,7 +121,7 @@ public class LocalDirectoryStreamTest {
 
     @org.junit.After
     public void cleanupTest() throws XenonException, XenonException {
-        XenonFactory.endXenon(octopus);
+        XenonFactory.endXenon(xenon);
     }
 
     @org.junit.Test(expected = XenonException.class)

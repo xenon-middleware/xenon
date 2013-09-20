@@ -98,13 +98,13 @@ public class SshFiles implements Files {
         }
     }
 
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
     private final SshAdaptor adaptor;
 
     private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
-    public SshFiles(SshAdaptor sshAdaptor, XenonEngine cobaltEngine) {
-        this.cobaltEngine = cobaltEngine;
+    public SshFiles(SshAdaptor sshAdaptor, XenonEngine xenonEngine) {
+        this.xenonEngine = xenonEngine;
         this.adaptor = sshAdaptor;
     }
 
@@ -138,7 +138,7 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             session.disconnect();
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -161,12 +161,12 @@ public class SshFiles implements Files {
 
         SshLocation sshLocation = SshLocation.parse(location);
         
-        XenonProperties cobaltProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
+        XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
                 properties);
 
-        SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, cobaltProperties);
+        SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, xenonProperties);
 
-        return newFileSystem(session, scheme, location, credential, cobaltProperties);
+        return newFileSystem(session, scheme, location, credential, xenonProperties);
     }
 
     private SshMultiplexedSession getSession(Path path) throws XenonException {
@@ -221,7 +221,7 @@ public class SshFiles implements Files {
             channel.mkdir(dir.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -294,7 +294,7 @@ public class SshFiles implements Files {
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -358,7 +358,7 @@ public class SshFiles implements Files {
             channel.rename(source.getRelativePath().getAbsolutePath(), target.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -386,7 +386,7 @@ public class SshFiles implements Files {
             result = channel.ls(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -435,7 +435,7 @@ public class SshFiles implements Files {
             return new SshInputStream(in, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
     }
 
@@ -480,7 +480,7 @@ public class SshFiles implements Files {
             return new SshOutputStream(out, session, channel);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
     }
 
@@ -503,7 +503,7 @@ public class SshFiles implements Files {
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -535,7 +535,7 @@ public class SshFiles implements Files {
             channel.chmod(SshUtil.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -552,7 +552,7 @@ public class SshFiles implements Files {
             result = channel.lstat(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw adaptor.sftpExceptionToCobaltException(e);
+            throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -577,7 +577,7 @@ public class SshFiles implements Files {
     @Override
     public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
 
-        CopyEngine ce = cobaltEngine.getCopyEngine();
+        CopyEngine ce = xenonEngine.getCopyEngine();
         
         CopyInfo info = CopyInfo.createCopyInfo(SshAdaptor.ADAPTOR_NAME, ce.getNextID("SSH_COPY_"), source, target, options);
          
@@ -599,11 +599,11 @@ public class SshFiles implements Files {
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws XenonException {
-        return cobaltEngine.getCopyEngine().getStatus(copy);
+        return xenonEngine.getCopyEngine().getStatus(copy);
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws XenonException {
-        return cobaltEngine.getCopyEngine().cancel(copy);
+        return xenonEngine.getCopyEngine().cancel(copy);
     }
 }

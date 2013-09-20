@@ -136,7 +136,7 @@ public class JobQueueTest {
     }
 
     public static Scheduler scheduler;
-    public static Xenon octopus;
+    public static Xenon xenon;
     public static Path cwd;
     public static Files files;
     public static FileSystem filesystem;
@@ -155,9 +155,9 @@ public class JobQueueTest {
 
     @BeforeClass
     public static void prepare() throws Exception {
-        octopus = XenonFactory.newXenon(null);
-        scheduler = octopus.jobs().newScheduler("local", null, null, null);
-        files = octopus.files();
+        xenon = XenonFactory.newXenon(null);
+        scheduler = xenon.jobs().newScheduler("local", null, null, null);
+        files = xenon.files();
         cwd = Utils.getLocalCWD(files);
         filesystem = cwd.getFileSystem();
         myFactory = new MyFactory();

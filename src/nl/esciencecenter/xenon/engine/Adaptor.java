@@ -28,7 +28,7 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
 /**
- * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Cobalt interface,
+ * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Xenon interface,
  * depending on which functionality they provide.
  * 
  * @author Jason Maassen
@@ -42,15 +42,15 @@ public abstract class Adaptor {
     private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<XenonPropertyDescription> validProperties;
     private final XenonProperties properties;
-    private final XenonEngine cobaltEngine;
+    private final XenonEngine xenonEngine;
 
-    protected Adaptor(XenonEngine cobaltEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+    protected Adaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
             ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
             XenonProperties properties) throws XenonException {
 
         super();
 
-        this.cobaltEngine = cobaltEngine;
+        this.xenonEngine = xenonEngine;
         this.name = name;
         this.description = description;
         this.supportedSchemes = supportedSchemes;
@@ -65,8 +65,8 @@ public abstract class Adaptor {
         this.properties = properties;
     }
 
-    protected XenonEngine getCobaltEngine() {
-        return cobaltEngine;
+    protected XenonEngine getXenonEngine() {
+        return xenonEngine;
     }
 
     public XenonProperties getProperties() {
