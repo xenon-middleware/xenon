@@ -1,6 +1,6 @@
-<project name="Octopus" default="build" basedir=".">
-	<description>
-	Build file for Octopus
+<project name="Xenon" default="build" basedir=".">
+    <description>
+	Build file for Xenon
     </description>
 
 	<property name="build.sysclasspath" value="ignore" />
@@ -42,7 +42,7 @@
 		</javac>
 
 		<!-- Put everything in classes into the jar file -->
-		<jar jarfile="dist/octopus-${version}.jar" basedir="build/classes" />
+		<jar jarfile="dist/xenon-${version}.jar" basedir="build/classes" />
 
 		<!-- Copy external dependancies to dist directory -->
 		<copy todir="dist">
@@ -55,11 +55,11 @@
 
 	<target name="javadoc" description="generate javadoc for users">
 		<delete dir="doc/javadoc" />
-		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" excludepackagenames="nl.esciencecenter.octopus.engine.*,nl.esciencecenter.octopus.adaptors.*">
+		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" excludepackagenames="nl.esciencecenter.xenon.engine.*,nl.esciencecenter.xenon.adaptors.*">
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 			<classpath refid="lib.jars" />
 		</javadoc>
-		<zip destfile="dist/octopus-javadoc-${version}.zip" basedir="doc/javadoc"/>
+		<zip destfile="dist/xenon-javadoc-${version}.zip" basedir="doc/javadoc"/>
 	</target>
 
 	<target name="javadoc-devel" description="generate javadoc for developers">

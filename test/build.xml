@@ -4,9 +4,9 @@
     	</description>
  
 	<!-- NOTE: this operation is ignored if the property is already set on the command line! -->
-	<property name="test.config" location="${user.home}/octopus.test.properties"/>
+	<property name="test.config" location="${user.home}/xenon.test.properties"/>
 
-	<property name="octopus.dist" location="../dist" />
+	<property name="xenon.dist" location="../dist" />
 
 	<property name="build.sysclasspath" value="ignore" />
 
@@ -23,11 +23,11 @@
 		<fileset dir="dist">
 			<include name="*.jar" />
 		</fileset>
-		<fileset dir="${octopus.dist}">
+		<fileset dir="${xenon.dist}">
 			<include name="*.jar" />
 		</fileset>
 		<pathelement location="." />
-		<pathelement location="${octopus.dist}" />
+		<pathelement location="${xenon.dist}" />
 	</path>
 
 	<target name="compile" description="compile the source ">
@@ -40,7 +40,7 @@
 		</javac>
 
 		<!-- Put everything in ${classes} into the jar file -->
-		<jar jarfile="dist/octopus-tests.jar" basedir="build/classes" />
+		<jar jarfile="dist/xenon-tests.jar" basedir="build/classes" />
 	</target>
 
 	<target name="build" description="build everything" depends="clean,compile" />
@@ -103,7 +103,7 @@
                 <file file="reports/jacoco/jacoco.exec" />
             </executiondata>
 
-            <structure name="octopus">
+            <structure name="xenon">
                 <sourcefiles>
                     <fileset dir="../src" />
                 </sourcefiles>

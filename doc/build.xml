@@ -4,25 +4,25 @@
       		Build file for documentation generation
     	</description>
 
-	<property name="octopus.dist" location="../dist" />
+	<property name="xenon.dist" location="../dist" />
 
 	<property name="build.sysclasspath" value="ignore" />
 
 	<path id="compile.classpath">
-		<fileset dir="${octopus.dist}">
+		<fileset dir="${xenon.dist}">
 			<include name="*.jar" />
 		</fileset>
 		<pathelement location="." />
-		<pathelement location="${octopus.dist}" />		
+		<pathelement location="${xenon.dist}" />		
 	</path>
 
 	<path id="doc.classpath">
-		<fileset dir="${octopus.dist}">
+		<fileset dir="${xenon.dist}">
 			<include name="*.jar" />
 		</fileset>
 		<pathelement location="." />
-		<pathelement location="${octopus.dist}" />		
-		<pathelement location="dist/octopus-doc.jar" />		
+		<pathelement location="${xenon.dist}" />		
+		<pathelement location="dist/xenon-doc.jar" />		
 	</path>
 
 	<target name="compile" description="compile the source ">
@@ -35,11 +35,11 @@
 		</javac>
 
 		<!-- Put everything in ${classes} into the jar file -->
-		<jar jarfile="dist/octopus-doc.jar" basedir="build/classes" />
+		<jar jarfile="dist/xenon-doc.jar" basedir="build/classes" />
 	</target>
 
         <target name="adaptordoc" description="generate documentation for the adaptors." depends="compile">
-		<java classname="nl.esciencecenter.octopus.doc.AdaptorDocGenerator">
+		<java classname="nl.esciencecenter.xenon.doc.AdaptorDocGenerator">
 	        	<arg value="adaptors_generated.md"/>
          		<classpath refid="doc.classpath"/>
        		</java>

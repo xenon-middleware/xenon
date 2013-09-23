@@ -1,12 +1,12 @@
 <project name="Examples" default="build" basedir=".">
 	<description>Build file for the examples</description>
 
-	<property name="octopus.dist" location="../dist" />
+	<property name="xenon.dist" location="../dist" />
 
 	<property name="build.sysclasspath" value="ignore" />
 
 	<path id="default.classpath">
-		<fileset dir="${octopus.dist}">
+		<fileset dir="${xenon.dist}">
 			<include name="*.jar" />
 		</fileset>
 	</path>
@@ -21,7 +21,7 @@
 			<classpath refid="default.classpath" />
 		</javac>
 
-		<jar jarfile="dist/octopus-examples-${version}.jar" basedir="build/classes" includes="**" />
+		<jar jarfile="dist/xenon-examples-${version}.jar" basedir="build/classes" includes="**" />
 	</target>
 
 	<target name="clean" description="clean up">

@@ -3,7 +3,7 @@ Appendix A: Adaptor Documentation
 
 This section contains the adaptor documentation which is generated from the information provided by the adaptors themselves.
 
-Octopus currently supports 4 adaptors: local, ssh, gridengine, slurm.
+Xenon currently supports 4 adaptors: local, ssh, gridengine, slurm.
 
 Adaptor: local
 --------
@@ -19,7 +19,7 @@ local, file
 #### Supported properties: ####
 
 
-__`octopus.adaptors.local.queue.pollingDelay`__
+__`xenon.adaptors.local.queue.pollingDelay`__
 
 The polling delay for monitoring running jobs (in milliseconds).
 
@@ -27,10 +27,10 @@ The polling delay for monitoring running jobs (in milliseconds).
 
 - Default value: 1000
 
-- Valid for: [OCTOPUS]
+- Valid for: [XENON]
 
 
-__`octopus.adaptors.local.queue.multi.maxConcurrentJobs`__
+__`xenon.adaptors.local.queue.multi.maxConcurrentJobs`__
 
 The maximum number of concurrent jobs in the multiq..
 
@@ -38,7 +38,7 @@ The maximum number of concurrent jobs in the multiq..
 
 - Default value: 4
 
-- Valid for: [OCTOPUS]
+- Valid for: [XENON]
 
 
 
@@ -56,7 +56,7 @@ ssh, sftp
 #### Supported properties: ####
 
 
-__`octopus.adaptors.ssh.autoAddHostKey`__
+__`xenon.adaptors.ssh.autoAddHostKey`__
 
 Automatically add unknown host keys to known_hosts.
 
@@ -64,10 +64,10 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
-__`octopus.adaptors.ssh.strictHostKeyChecking`__
+__`xenon.adaptors.ssh.strictHostKeyChecking`__
 
 Enable strict host key checking.
 
@@ -75,10 +75,10 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
-__`octopus.adaptors.ssh.loadKnownHosts`__
+__`xenon.adaptors.ssh.loadKnownHosts`__
 
 Load the standard known_hosts file.
 
@@ -86,10 +86,10 @@ Load the standard known_hosts file.
 
 - Default value: true
 
-- Valid for: [OCTOPUS]
+- Valid for: [XENON]
 
 
-__`octopus.adaptors.ssh.queue.pollingDelay`__
+__`xenon.adaptors.ssh.queue.pollingDelay`__
 
 The polling delay for monitoring running jobs (in milliseconds).
 
@@ -100,7 +100,7 @@ The polling delay for monitoring running jobs (in milliseconds).
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.ssh.queue.multi.maxConcurrentJobs`__
+__`xenon.adaptors.ssh.queue.multi.maxConcurrentJobs`__
 
 The maximum number of concurrent jobs in the multiq..
 
@@ -111,7 +111,7 @@ The maximum number of concurrent jobs in the multiq..
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.ssh.gateway`__
+__`xenon.adaptors.ssh.gateway`__
 
 The gateway machine used to create an SSH tunnel to the target.
 
@@ -119,7 +119,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
@@ -137,7 +137,7 @@ ge, sge
 #### Supported properties: ####
 
 
-__`octopus.adaptors.gridengine.ignore.version`__
+__`xenon.adaptors.gridengine.ignore.version`__
 
 Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
 
@@ -148,7 +148,7 @@ Skip version check is skipped when connecting to remote machines. WARNING: it is
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.gridengine.accounting.grace.time`__
+__`xenon.adaptors.gridengine.accounting.grace.time`__
 
 Number of milliseconds a job is allowed to take going from the queue to the qacct output.
 
@@ -159,7 +159,7 @@ Number of milliseconds a job is allowed to take going from the queue to the qacc
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.gridengine.poll.delay`__
+__`xenon.adaptors.gridengine.poll.delay`__
 
 Number of milliseconds between polling the status of a job.
 
@@ -185,7 +185,7 @@ slurm
 #### Supported properties: ####
 
 
-__`octopus.adaptors.slurm.ignore.version`__
+__`xenon.adaptors.slurm.ignore.version`__
 
 Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
 
@@ -196,7 +196,7 @@ Skip version check is skipped when connecting to remote machines. WARNING: it is
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.slurm.disable.accounting.usage`__
+__`xenon.adaptors.slurm.disable.accounting.usage`__
 
 Do not used accounting info of slurm, even when available. Mostly for testing purposes
 
@@ -207,7 +207,7 @@ Do not used accounting info of slurm, even when available. Mostly for testing pu
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.slurm.poll.delay`__
+__`xenon.adaptors.slurm.poll.delay`__
 
 Number of milliseconds between polling the status of a job.
 

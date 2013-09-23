@@ -1,13 +1,13 @@
-![logo](images/NLeSC_Octopus_logo.png "Octopus Logo")
+![logo](images/NLeSC_Xenon_logo.png "Xenon Logo")
 
-Octopus
-=======
+Xenon
+=====
 
 Copyright 2013 The Netherlands eScience Center
 
 Author: Jason Maassen (<J.Maassen@esciencecenter.nl>)
 
-Version: Userguide v1.0, Octopus v1.0
+Version: Userguide v1.0, Xenon v1.0
 
 Last modified: 11 September 2013
 
@@ -15,19 +15,19 @@ Last modified: 11 September 2013
 Copyrights & Disclaimers
 ------------------------
 
-Octopus is copyrighted by the Netherlands eScience Center and 
+Xenon is copyrighted by the Netherlands eScience Center and 
 releases under the Apache License, Version 2.0.
 
-See the "LICENSE" and "NOTICE" files in the octopus distribution for
+See the "LICENSE" and "NOTICE" files in the Xenon distribution for
 more information. 
 
 For more information on the Netherlands eScience Center see:
 
 <http://www.esciencecenter.nl> 
 
-The octopus project web site can be found at:
+The Xenon project web site can be found at:
 
-<https://github.com/NLeSC/octopus>.
+<https://github.com/NLeSC/Xenon>.
 
 
 Third party libraries
@@ -63,45 +63,45 @@ the licence information of the Mockito library.
 What is it?
 -----------
 
-Octopus is a middleware abstraction library. It provides a simple 
+Xenon is a middleware abstraction library. It provides a simple 
 Java programming interface to various pieces of software that can be
 used to access distributed compute and storage resources. 
 
 
-Why Octopus?
+Why Xenon?
 ------------
 
-Octopus is developed by the Netherlands eScience Center as a support
+Xenon is developed by the Netherlands eScience Center as a support
 library for our projects. Several projects develop end-user
 applications that require access to distributed compute and storage
-resources. Octopus provides a simple API to access those resources,
+resources. Xenon provides a simple API to access those resources,
 allowing those applications to be developed more rapidly. The
 experience gained during the development of these end-user 
-applications is used to improve the Octopus API and implementation. 
+applications is used to improve the Xenon API and implementation. 
 
 
 Installation
 ------------
 
-The installation procedure and dependencies of the octopus library
-can be found in the file "INSTALL.md" in the octopus distribution. 
+The installation procedure and dependencies of the Xenon library
+can be found in the file "INSTALL.md" in the Xenon distribution. 
 
 
 Design
 ------
 
-Octopus is designed with extensibility in mind. It uses a modular
+Xenon is designed with extensibility in mind. It uses a modular
 and layered design as shown in the figure below:
 
-![Octopus design](images/octopus-design.png "Octopus design.")
+![Xenon design](images/xenon-design.png "Xenon design.")
 	
-Octopus consists of three layers, an *interface layer*, an 
+Xenon consists of three layers, an *interface layer*, an 
 *engine layer* and an *adaptor layer*. 
 
-The *interface layer* is used by the application using octopus. It
+The *interface layer* is used by the application using Xenon. It
 contains several specialized interfaces:
 
-- Octopus: this is the main entry point used to retrieve the other
+- Xenon: this is the main entry point used to retrieve the other
   interfaces. 
 - Files: contains functionality related to files, e.g., creation,
   deletion, copying, reading, writing, obtaining directory listings,
@@ -112,28 +112,28 @@ contains several specialized interfaces:
   Credentials (such as a username password combination) are often
   needed to gain access to files or to submit jobs. 
 
-The modular design of octopus allows us to add additional interfaces
+The modular design of Xenon allows us to add additional interfaces
 in later versions, e.g., a Clouds interface to manage virtual
 machines, or a Networks interface to manage bandwidth-on-demand
 networks. 
 
 The *adaptor layer* contains the adaptors for the each of the
-middlewares that octopus supports. An *adaptor* offers a middleware
+middlewares that Xenon supports. An *adaptor* offers a middleware
 specific implementation for the functionality offered by one of the
-interfaces in octopus.
+interfaces in Xenon.
  
 For example, an adaptor may provide an *sftp* specific implementation
-of the functions in the octopus *file interface* (such as *copy* or
+of the functions in the Xenon *file interface* (such as *copy* or
 *delete*) by translating each of these functions to *sftp* specific
 code and commands.
 
-For each interface in octopus there may be multiple adaptors
+For each interface in Xenon there may be multiple adaptors
 translating its functionality to different middlewares. To
-distinguises between these adaptors octopus uses the *scheme* they
+distinguises between these adaptors Xenon uses the *scheme* they
 support, such as "sftp", "http" or "ssh". There can be only one
 adaptor for each scheme. 
 
-The *engine layer* of octopus contains the "glue" that connects each
+The *engine layer* of Xenon contains the "glue" that connects each
 interface to the adaptors that implement its functionality. When a
 function of the interface layer is invoked, the call will be
 forwarded to the engine layer. It is then the responsibility of the
@@ -149,57 +149,57 @@ Interfaces and datatypes
 ------------------------
 
 This section will briefly explain each of the interfaces and related
-datatypes. Detailed information about Octopus can be found in the
+datatypes. Detailed information about Xenon can be found in the
 online Javadoc at: 
 
-<http://nlesc.github.io/octopus/javadoc/>
+<http://nlesc.github.io/xenon/javadoc/>
 
 ### Package Structure ##
 
-The octopus API uses the following package structure:
+The Xenon API uses the following package structure:
 
-- `nl.esciencecenter.octopus` Entry point into octopus.
-- `nl.esciencecenter.octopus.credentials` Credential interface.
-- `nl.esciencecenter.octopus.files`  Files interface.
-- `nl.esciencecenter.octopus.jobs`  Jobs interface.
-- `nl.esciencecenter.octopus.util`  Various utilty classes.
+- `nl.esciencecenter.xenon` Entry point into Xenon.
+- `nl.esciencecenter.xenon.credentials` Credential interface.
+- `nl.esciencecenter.xenon.files`  Files interface.
+- `nl.esciencecenter.xenon.jobs`  Jobs interface.
+- `nl.esciencecenter.xenon.util`  Various utilty classes.
 
 We will now briefly describe the most important classes and
 interfaces of these packages.
 
 ### Getting started ###
 
-The [`nl.esciencecenter.octopus`][1] package contains the entry
-point into the octopus library: [__OctopusFactory__][2]
+The [`nl.esciencecenter.xenon`][1] package contains the entry
+point into the Xenon library: [__XenonFactory__][2]
 
-    public class OctopusFactory {
-       public static Octopus newOctopus(Map<String,String> properties) 
-       public static void endOctopus(Octopus octopus) 
+    public class XenonFactory {
+       public static Xenon newXenon(Map<String,String> properties) 
+       public static void endXenon(Xenon xenon) 
        public static void endAll()
     }
 
-The __newOctopus__ method can be used to create a new __Octopus__
-instance, while the __endOctopus__ method can be used to release the
-octopus instance once it is no longer needed. It is important to end
-the octopus when it is no longer needed, as this allows it to release 
+The __newXenon__ method can be used to create a new __Xenon__
+instance, while the __endXenon__ method can be used to release the
+Xenon instance once it is no longer needed. It is important to end
+the Xenon when it is no longer needed, as this allows it to release 
 any resources it has obtained. 
 
-When creating an octopus using __newOctopus__, the _properties_
-parameter can be used to configure the octopus instance. If no
+When creating an Xenon using __newXenon__, the _properties_
+parameter can be used to configure the Xenon instance. If no
 configuration is necessary, `null` can be used. 
 
-Properties consist of a set of key-value pairs. In octopus all keys
-__must__ start with "octopus.". To configure the adaptors,
-properties of the form "octopus.adaptors.(name).(property)" can be
+Properties consist of a set of key-value pairs. In Xenon all keys
+__must__ start with "xenon.". To configure the adaptors,
+properties of the form "xenon.adaptors.(name).(property)" can be
 used, where "(name)" is the name of the adaptor (for example "local"
 or "ssh") and "(property)" is the name of the property to be 
 configured. Note that this name can be futher qualified, for example 
-"octopus.adaptors.local.a.b.c". The available properties can be found
+"xenon.adaptors.local.a.b.c". The available properties can be found
 in the documentation of the individual adaptors (see Appendix A). 
 
-A call to __newOctopus__ will return an [__Octopus__][3]:
+A call to __newXenon__ will return an [__Xenon__][3]:
 
-    public interface Octopus {
+    public interface Xenon {
         Files files()
         Jobs jobs()
         Credentials credentials()
@@ -210,10 +210,10 @@ A call to __newOctopus__ will return an [__Octopus__][3]:
 
 The __files__, __jobs__ and __credentials__ methods in this
 interface can be used to retrieve various interfaces that the
-octopus library offers. They will be described in more detail below. 
+Xenon library offers. They will be described in more detail below. 
 
 The __getProperties__ method can be used to retrieve the properties
-used when the octopus was created. Most objects created by octopus
+used when the Xenon was created. Most objects created by Xenon
 contain such a __getProperties__ method. For brevity, we will not
 explain these further.
 
@@ -225,7 +225,7 @@ about the adaptors. This information is returned in an
         String getName()
         String getDescription()
         String[] getSupportedSchemes()
-        OctopusPropertyDescription[] getSupportedProperties()
+        XenonPropertyDescription[] getSupportedProperties()
         Map<String, String> getAdaptorSpecificInformation()
     }
     
@@ -236,9 +236,9 @@ retrieve a list of the schemes it supports.
 
 The __getSupportedProperties__ method can be used to retrieve a list
 of configuration options the adaptor supports. Each returned
-[__OctopusPropertyDescription__][5] gives a full description of a
+[__XenonPropertyDescription__][5] gives a full description of a
 single property, including its name (of the form 
-"octopus.adaptors.(name).(property)"), the expected type of its 
+"xenon.adaptors.(name).(property)"), the expected type of its 
 value, a human readable description of its purpose, etc. More
 information on the supported properties can be found in Appendix A.
 
@@ -248,8 +248,8 @@ the form described above.
 
 ### Credentials interface ###
 
-The [`nl.esciencecenter.octopus.credentials`][6] package contains the
-[__Credentials__][7] interface of octopus:
+The [`nl.esciencecenter.xenon.credentials`][6] package contains the
+[__Credentials__][7] interface of Xenon:
 
     public interface Credentials {
         Credential newCertificateCredential(String scheme, String keyfile, String certfile, String username, 
@@ -263,14 +263,14 @@ The [`nl.esciencecenter.octopus.credentials`][6] package contains the
 The __Credentials__ interface contains various methods for creating
 credentials, based on certificates or passwords. For each method,
 the desired _scheme_ needs to be provided as a parameter (for example,
-"ssh" or "sftp"). This allows octopus to forward the call to the
+"ssh" or "sftp"). This allows Xenon to forward the call to the
 correct adaptor. Note that some types of credentials may not be
 supported by all adaptors. An exception will be thrown when an
 unsupported __new**Credential__ methods is invoked. 
 
 Additional configuration can also be provides using the _properties_
 parameter, which use the same form as described in the
-_Octopus factory and interface_ section above. If no additional
+_Xenon factory and interface_ section above. If no additional
 configuration is needed, `null` can be used. The 
 __getDefaultCredential__ method returns the default credential for
  the given scheme. All adaptors are guarenteed to support this
@@ -286,7 +286,7 @@ methods:
 
 The __getAdaptorName__ method can be used to retrieve the name of
 the adaptor that created the credential. Many adaptor specific
-objects returned by octopus contain this method. For brevity we will
+objects returned by Xenon contain this method. For brevity we will
 not explain this further.
 
 When a __Credential__ is no longer used, it __must__ be closed using
@@ -296,8 +296,8 @@ open or closed.
 
 ### Files interface ###
 
-The [`nl.esciencecenter.octopus.files`][8] package contains the
-[__Files__][9] interface of octopus. For readability we will split
+The [`nl.esciencecenter.xenon.files`][8] package contains the
+[__Files__][9] interface of Xenon. For readability we will split
 the explanation of __Files__ into several parts:
 
     public interface Files {
@@ -382,7 +382,7 @@ many utility methods for manipulating these string sequences. The
 details can be found in the Javadoc of [__RelativePath__][12].
 
 __Files__ contains several methods to create and delete files and
-directories. When creating files and directories octopus checks if
+directories. When creating files and directories Xenon checks if
 the target already exists. If so, an exception will be thrown.
 Similary, an exception is thrown when attempting to delete
 non-existing file or a directory that is not empty. The __exists__
@@ -443,8 +443,8 @@ operations can be found in the Javadoc of [__CopyOption__][17].
 
 ### Jobs interface ###
 
-The [`nl.esciencecenter.octopus.job`][18] package contains the
-[__Jobs__][19] interface of octopus. For readability we will split
+The [`nl.esciencecenter.xenon.job`][18] package contains the
+[__Jobs__][19] interface of Xenon. For readability we will split
 the explanation of __Jobs__ into several parts:
 
     public interface Jobs {
@@ -579,12 +579,12 @@ exist. Some adaptors may return a result however.
 
 ### Utilities classes ###
 
-The [`nl.esciencecenter.octopus.util`][25] package contains various
+The [`nl.esciencecenter.xenon.util`][25] package contains various
 utility classes. The main entry points are __Utils__, __Sandbox__
 and __JavaJobDescription__.
 
 In [__Utils__][42] various utility methods can be found that make it
-easier to use Octopus. Many methods provide simple shortcuts to
+easier to use Xenon. Many methods provide simple shortcuts to
 often used code constructs. Some examples are shown below:
 
     public class Utils {
@@ -636,7 +636,7 @@ contains the following methods:
        void delete()
     }
 
-Creating a Sandbox requires an octopus __Files__ interface and a
+Creating a Sandbox requires an Xenon __Files__ interface and a
 __root__ directory. The Sandbox will then create a temporary
 directory __sandboxName__ in __root__. If __sandboxName__ is `null`,
 a random name will be generated. Using __addUploadFile__ files can
@@ -656,7 +656,7 @@ _class path_, _system properties_, and _JVM options_.
 
 The JavaJobDescription class extends the regular JobDescription with
 support for these additional arguments. When a Job a submitted to an
-octopus Scheduler that uses a JavaJobDescription, the various types
+Xenon Scheduler that uses a JavaJobDescription, the various types
 of command line arguments will be merged automatically into a single
 arguments list. See the Javadoc of [__JavaJobDescription__][44] for
 details.
@@ -664,17 +664,17 @@ details.
 Examples
 --------
 
-Examples of how to use octopus can be found in the [examples][26]
+Examples of how to use Xenon can be found in the [examples][26]
 directory. We will list the examples here in order of increasing
 complexity, and with a short description of each example.
 
-### Initializing Octopus ###
+### Initializing Xenon ###
 
-Creating an __Octopus__: 
-[CreatingOctopus.java][27]
+Creating an __Xenon__: 
+[CreatingXenon.java][27]
 
-Creating an __Octopus__ with configuration properties: 
-[CreatingOctopusWithProperties.java][28]
+Creating an __Xenon__ with configuration properties: 
+[CreatingXenonWithProperties.java][28]
 
 ### Creating Credentials ###
 
@@ -724,57 +724,57 @@ Submitting a batch job with output:
 Submitting an interactive job with output: 
 [SubmitInteractiveJobWithOutput.java][41]
 
-[1]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/package-summary.html
-[2]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusFactory.html
-[3]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/Octopus.html
-[4]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/AdaptorStatus.html
-[5]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/OctopusPropertyDescription.html
-[6]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/package-summary.html 
-[7]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credentials.html
-[8]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/package-summary.html
-[9]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Files.html 
-[10]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileSystem.html
-[11]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Path.html
-[12]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/RelativePath.html
-[13]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/credentials/Credential.html
-[14]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/FileAttributes.html
-[15]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/DirectoryStream.html
-[16]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/Copy.html
-[17]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/files/CopyOption.html
-[18]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/package-summary.html
-[19]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Jobs.html
-[20]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Scheduler.html
-[21]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobDescription.html
-[22]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/Job.html
-[23]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/jobs/JobStatus.html
-[25]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/package-summary.html
-[26]: https://github.com/NLeSC/octopus/tree/develop/examples/src/nl/esciencecenter/octopus/examples
-[27]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/CreatingOctopus.java
-[28]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/CreatingOctopusWithProperties.java
-[29]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/credentials/CreatingCredential.java
-[30]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/CreateLocalFileSystem.java
-[31]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/CreateFileSystem.java
-[32]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/LocalFileExists.java  
-[33]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/FileExists.java
-[34]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/DirectoryListing.java
-[35]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/CopyFile.java 
-[36]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/ListQueueStatus.java
-[37]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/ListJobs.java
-[38]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/ListJobStatus.java
-[39]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/SubmitSimpleBatchJob.java
-[40]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/SubmitBatchJobWithOutput.java
-[41]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/jobs/SubmitInteractiveJobWithOutput.java
-[42]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/Utils.html
-[43]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/Sandbox.html
-[44]: http://nlesc.github.io/octopus/javadoc/nl/esciencecenter/octopus/utils/JavaJobDescription.html
-[45]: https://github.com/NLeSC/octopus/blob/develop/examples/src/nl/esciencecenter/octopus/examples/files/ShowFileAttributes.java
+[1]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/package-summary.html
+[2]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/XenonFactory.html
+[3]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/Xenon.html
+[4]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/AdaptorStatus.html
+[5]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/XenonPropertyDescription.html
+[6]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/credentials/package-summary.html 
+[7]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/credentials/Credentials.html
+[8]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/package-summary.html
+[9]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/Files.html 
+[10]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/FileSystem.html
+[11]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/Path.html
+[12]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/RelativePath.html
+[13]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/credentials/Credential.html
+[14]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/FileAttributes.html
+[15]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/DirectoryStream.html
+[16]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/Copy.html
+[17]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/CopyOption.html
+[18]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/package-summary.html
+[19]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/Jobs.html
+[20]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/Scheduler.html
+[21]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/JobDescription.html
+[22]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/Job.html
+[23]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/JobStatus.html
+[25]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/package-summary.html
+[26]: https://github.com/NLeSC/xenon/tree/develop/examples/src/nl/esciencecenter/xenon/examples
+[27]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/CreatingXenon.java
+[28]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/CreatingXenonWithProperties.java
+[29]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/credentials/CreatingCredential.java
+[30]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CreateLocalFileSystem.java
+[31]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CreateFileSystem.java
+[32]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/LocalFileExists.java  
+[33]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/FileExists.java
+[34]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/DirectoryListing.java
+[35]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CopyFile.java 
+[36]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListQueueStatus.java
+[37]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListJobs.java
+[38]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListJobStatus.java
+[39]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitSimpleBatchJob.java
+[40]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitBatchJobWithOutput.java
+[41]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitInteractiveJobWithOutput.java
+[42]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/Utils.html
+[43]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/Sandbox.html
+[44]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/JavaJobDescription.html
+[45]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/ShowFileAttributes.java
 
 Appendix A: Adaptor Documentation
 ---------------------------------
 
 This section contains the adaptor documentation which is generated from the information provided by the adaptors themselves.
 
-Octopus currently supports 4 adaptors: local, ssh, gridengine, slurm.
+Xenon currently supports 4 adaptors: local, ssh, gridengine, slurm.
 
 Adaptor: local
 --------
@@ -790,7 +790,7 @@ local, file
 #### Supported properties: ####
 
 
-__`octopus.adaptors.local.queue.pollingDelay`__
+__`xenon.adaptors.local.queue.pollingDelay`__
 
 The polling delay for monitoring running jobs (in milliseconds).
 
@@ -798,10 +798,10 @@ The polling delay for monitoring running jobs (in milliseconds).
 
 - Default value: 1000
 
-- Valid for: [OCTOPUS]
+- Valid for: [XENON]
 
 
-__`octopus.adaptors.local.queue.multi.maxConcurrentJobs`__
+__`xenon.adaptors.local.queue.multi.maxConcurrentJobs`__
 
 The maximum number of concurrent jobs in the multiq..
 
@@ -809,7 +809,7 @@ The maximum number of concurrent jobs in the multiq..
 
 - Default value: 4
 
-- Valid for: [OCTOPUS]
+- Valid for: [XENON]
 
 
 
@@ -827,7 +827,7 @@ ssh, sftp
 #### Supported properties: ####
 
 
-__`octopus.adaptors.ssh.autoAddHostKey`__
+__`xenon.adaptors.ssh.autoAddHostKey`__
 
 Automatically add unknown host keys to known_hosts.
 
@@ -835,10 +835,10 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
-__`octopus.adaptors.ssh.strictHostKeyChecking`__
+__`xenon.adaptors.ssh.strictHostKeyChecking`__
 
 Enable strict host key checking.
 
@@ -846,10 +846,10 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
-__`octopus.adaptors.ssh.loadKnownHosts`__
+__`xenon.adaptors.ssh.loadKnownHosts`__
 
 Load the standard known_hosts file.
 
@@ -857,10 +857,10 @@ Load the standard known_hosts file.
 
 - Default value: true
 
-- Valid for: [OCTOPUS]
+- Valid for: [XENON]
 
 
-__`octopus.adaptors.ssh.queue.pollingDelay`__
+__`xenon.adaptors.ssh.queue.pollingDelay`__
 
 The polling delay for monitoring running jobs (in milliseconds).
 
@@ -871,7 +871,7 @@ The polling delay for monitoring running jobs (in milliseconds).
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.ssh.queue.multi.maxConcurrentJobs`__
+__`xenon.adaptors.ssh.queue.multi.maxConcurrentJobs`__
 
 The maximum number of concurrent jobs in the multiq..
 
@@ -882,7 +882,7 @@ The maximum number of concurrent jobs in the multiq..
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.ssh.gateway`__
+__`xenon.adaptors.ssh.gateway`__
 
 The gateway machine used to create an SSH tunnel to the target.
 
@@ -890,7 +890,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
@@ -908,7 +908,7 @@ ge, sge
 #### Supported properties: ####
 
 
-__`octopus.adaptors.gridengine.ignore.version`__
+__`xenon.adaptors.gridengine.ignore.version`__
 
 Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
 
@@ -919,7 +919,7 @@ Skip version check is skipped when connecting to remote machines. WARNING: it is
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.gridengine.accounting.grace.time`__
+__`xenon.adaptors.gridengine.accounting.grace.time`__
 
 Number of milliseconds a job is allowed to take going from the queue to the qacct output.
 
@@ -930,7 +930,7 @@ Number of milliseconds a job is allowed to take going from the queue to the qacc
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.gridengine.poll.delay`__
+__`xenon.adaptors.gridengine.poll.delay`__
 
 Number of milliseconds between polling the status of a job.
 
@@ -956,7 +956,7 @@ slurm
 #### Supported properties: ####
 
 
-__`octopus.adaptors.slurm.ignore.version`__
+__`xenon.adaptors.slurm.ignore.version`__
 
 Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
 
@@ -967,7 +967,7 @@ Skip version check is skipped when connecting to remote machines. WARNING: it is
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.slurm.disable.accounting.usage`__
+__`xenon.adaptors.slurm.disable.accounting.usage`__
 
 Do not used accounting info of slurm, even when available. Mostly for testing purposes
 
@@ -978,7 +978,7 @@ Do not used accounting info of slurm, even when available. Mostly for testing pu
 - Valid for: [SCHEDULER]
 
 
-__`octopus.adaptors.slurm.poll.delay`__
+__`xenon.adaptors.slurm.poll.delay`__
 
 Number of milliseconds between polling the status of a job.
 

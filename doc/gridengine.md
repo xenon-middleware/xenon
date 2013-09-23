@@ -1,4 +1,4 @@
-##GridEngine adaptor for Octopus
+##GridEngine adaptor for Xenon
 
 ###XML Parsing
 

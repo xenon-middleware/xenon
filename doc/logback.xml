@@ -10,7 +10,7 @@
     <appender-ref ref="STDERR" />
   </root>
 
-  <logger name="nl.esciencecenter.octopus" level="WARN" />
+  <logger name="nl.esciencecenter.xenon" level="WARN" />
 
   <!-- sends logs to logback-beagle -->
   <!--
