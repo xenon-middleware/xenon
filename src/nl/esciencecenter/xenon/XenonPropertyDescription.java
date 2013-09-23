@@ -33,8 +33,8 @@ import java.util.Set;
  * <li>
  * A (human-readable) description that explains the use of the property.  
  * </li>
- * 
  * <li>
+ * 
  * The type of values that are accepted for the property (one of the {@link Type} enum).
  * Even though it is customary to pass the values of properties as <code>String</code>s, the user should ensure the values can be
  * converted into the expected type. 
