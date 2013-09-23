@@ -59,7 +59,7 @@ import java.util.Set;
 public interface XenonPropertyDescription {
 
     /**
-     * The Component enumeration lists all possible parts of Cctopus for which a property can be provided. 
+     * The Component enumeration lists all possible parts of Xenon for which a property can be provided. 
      */
     public enum Component {
         /** 
