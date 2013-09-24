@@ -12,6 +12,35 @@ Version: Userguide v1.0, Xenon v1.0
 Last modified: 24 September 2013
 
 
+What is it?
+-----------
+
+Xenon is a middleware abstraction library. It provides a simple 
+Java programming interface to various pieces of software that can be
+used to access distributed compute and storage resources. 
+
+
+Why Xenon?
+------------
+
+Xenon is developed by the Netherlands eScience Center as a support
+library for our projects. Several projects develop end-user
+applications that require access to distributed compute and storage
+resources. Xenon provides a simple API to access those resources,
+allowing those applications to be developed more rapidly. The
+experience gained during the development of these end-user 
+applications is used to improve the Xenon API and implementation. 
+
+
+Installation
+------------
+
+The installation procedure and dependencies of the Xenon library
+can be found in the file "INSTALL.md" in the Xenon distribution. 
+In Addition, the "EXAMPLES.md" file explains how to compile and 
+run the Xenon examples.
+
+
 Copyrights & Disclaimers
 ------------------------
 
@@ -60,51 +89,16 @@ This project includes the Mockito library, which is Copyright
 the licence information of the Mockito library.
 
 
-What is it?
------------
-
-Xenon is a middleware abstraction library. It provides a simple 
-Java programming interface to various pieces of software that can be
-used to access distributed compute and storage resources. 
-
-
-Why Xenon?
-------------
-
-Xenon is developed by the Netherlands eScience Center as a support
-library for our projects. Several projects develop end-user
-applications that require access to distributed compute and storage
-resources. Xenon provides a simple API to access those resources,
-allowing those applications to be developed more rapidly. The
-experience gained during the development of these end-user 
-applications is used to improve the Xenon API and implementation. 
-
-
-Installation
-------------
-
-The installation procedure and dependencies of the Xenon library
-can be found in the file "INSTALL.md" in the Xenon distribution. 
-
-
-Examples
---------
-
-The _binary distribution_ of Xenon contains several examples on 
-how to use Xenon. See the "EXAMPLES.md" file in the distribution
-for more information.
-
-
 Design
 ------
 
 Xenon is designed with extensibility in mind. It uses a modular
-and layered design as shown in the figure below:
+and layered design as shown in the figure below. Xenon consists 
+of three layers, an *interface layer*, an *engine layer* and an 
+*adaptor layer*. 
 
 ![Xenon design](images/xenon-design.png "Xenon design.")
 	
-Xenon consists of three layers, an *interface layer*, an 
-*engine layer* and an *adaptor layer*. 
 
 The *interface layer* is used by the application using Xenon. It
 contains several specialized interfaces:
@@ -844,7 +838,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 __`xenon.adaptors.ssh.strictHostKeyChecking`__
@@ -855,7 +849,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 __`xenon.adaptors.ssh.loadKnownHosts`__
@@ -899,7 +893,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [SCHEDULER, FILESYSTEM]
+- Valid for: [FILESYSTEM, SCHEDULER]
 
 
 
