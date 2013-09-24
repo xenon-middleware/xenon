@@ -52,6 +52,7 @@ The Xenon userguide can be found in "doc/userguide.md" or
 "doc/userguide.pdf". It is also available online at:
 
 <https://github.com/NLeSC/Xenon/blob/develop/doc/userguide.md>
+
 <http://nlesc.github.io/Xenon/userguide.pdf>
 
 The javadoc of Xenon library can be found in "doc/javadoc". It is 
