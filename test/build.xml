@@ -141,6 +141,7 @@
 	<target name="clean" description="clean up">
 		<delete dir="build" />
 		<delete dir="dist" />
+		<delete dir="xenon_test" />
 		<delete dir="reports" />
 		<delete dir="it-reports" />
 	</target>
