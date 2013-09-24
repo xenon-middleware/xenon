@@ -5,7 +5,7 @@
 
 	<property name="build.sysclasspath" value="ignore" />
 
-	<property name="version" value="1.0" />
+	<property name="version" value="1.0.0" />
 
 	<path id="lib.jars">
 		<fileset dir="lib">
@@ -13,56 +13,92 @@
 		</fileset>
 	</path>
 
-	<target name="build" depends="clean, compile, examples, javadoc" description="build everything" />
+	<target name="build" depends="clean, create-dist" description="Main build target" />
 
-	<target name="test" description="run the unit tests with coverage" depends="build">
+	<target name="test" depends="build" description="run the unit tests with coverage">
 		<ant dir="${basedir}/test" target="test" />
 	</target>
 
-	<target name="test-integration" description="run the integration tests" depends="build">
+	<target name="test-integration" depends="build" description="run the integration tests">
 		<ant dir="${basedir}/test" target="test-integration" />
 	</target>
 
-	<target name="examples" description="compile the examples" depends="compile">
-		<ant dir="${basedir}/examples" target="build" />
+	<target name="xenon-dist" depends="compile" description="create xenon jars">
+		<!-- Put all compiled classes into a jar file in the lib dir -->
+		<jar jarfile="dist/nlesc-xenon-${version}/lib/xenon-${version}.jar" basedir="build/classes" />
 
-		<!-- Copy examples jar to dist directory -->
-		<copy todir="dist">
-			<fileset dir="examples/dist" />
+		<!-- Copy external dependancies to dist directory -->
+		<copy todir="dist/nlesc-xenon-${version}/lib">
+			<fileset dir="lib" />
+		</copy>
+        </target>
+
+	<target name="create-dist" depends="xenon-dist, javadoc" description="build a binary distribution">
+
+		<!-- Copy the users guide to doc -->
+		<copy file="doc/userguide.md" todir="dist/nlesc-xenon-${version}/doc"/>
+		<copy file="doc/userguide.pdf" todir="dist/nlesc-xenon-${version}/doc"/>
+
+		<!-- Zip the source and put it in doc -->
+		<zip destfile="dist/nlesc-xenon-${version}/doc/xenon-src-${version}.zip" basedir="src"/>
+
+		<!-- Copy the javadoc to doc -->
+		<copy todir="dist/nlesc-xenon-${version}/doc/javadoc">
+			<fileset dir="doc/javadoc"/>
+		</copy>
+
+		<!-- Copy the examples to examples -->
+		<copy todir="dist/nlesc-xenon-${version}/examples">
+			<fileset dir="examples_src"/>
+		</copy>
+
+		<!-- Copy logging config to dist/etc -->
+		<copy todir="dist/nlesc-xenon-${version}/etc">
+			<fileset file="logback.xml" />
+		</copy>
+
+		<!-- Copy various readme and licence files to root of dist -->
+		<copy file="INSTALL.md" todir="dist/nlesc-xenon-${version}"/>
+		<copy file="LICENSE" todir="dist/nlesc-xenon-${version}"/>
+		<copy file="NOTICE" todir="dist/nlesc-xenon-${version}"/>
+		<copy file="README.md" todir="dist/nlesc-xenon-${version}"/>
+		<copy file="EXAMPLES.md" todir="dist/nlesc-xenon-${version}"/>
+
+		<copy todir="dist/nlesc-xenon-${version}/notices">
+			<fileset dir="notices"/>
 		</copy>
 	</target>
 
-	<target name="compile" description="compile the source ">
-		<mkdir dir="build/classes" />
+	<target name="create-dirs" description="create the necessary target dirs">
 		<mkdir dir="dist" />
+		<mkdir dir="dist/nlesc-xenon-${version}" />
+		<mkdir dir="dist/nlesc-xenon-${version}/lib" />
+		<mkdir dir="dist/nlesc-xenon-${version}/bin" />
+		<mkdir dir="dist/nlesc-xenon-${version}/etc" />
+		<mkdir dir="dist/nlesc-xenon-${version}/doc" />
+		<mkdir dir="dist/nlesc-xenon-${version}/doc/javadoc" />
+		<mkdir dir="dist/nlesc-xenon-${version}/examples" />
+		<mkdir dir="dist/nlesc-xenon-${version}/notices" />
+	</target>
+
+	<target name="compile" description="compile the source" depends="create-dirs">
+		<mkdir dir="build/classes" />
 
 		<!-- Compile the java code from src into classes -->
 		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="lib.jars" />
 		</javac>
-
-		<!-- Put everything in classes into the jar file -->
-		<jar jarfile="dist/xenon-${version}.jar" basedir="build/classes" />
-
-		<!-- Copy external dependancies to dist directory -->
-		<copy todir="dist">
-			<fileset dir="lib" />
-		</copy>
-		<copy todir="dist">
-			<fileset file="logback.xml" />
-		</copy>
 	</target>
 
-	<target name="javadoc" description="generate javadoc for users">
+	<target name="javadoc" description="generate javadoc for users" depends="create-dirs">
 		<delete dir="doc/javadoc" />
 		<javadoc destdir="doc/javadoc" access="public" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false" excludepackagenames="nl.esciencecenter.xenon.engine.*,nl.esciencecenter.xenon.adaptors.*">
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />
 			<classpath refid="lib.jars" />
 		</javadoc>
-		<zip destfile="dist/xenon-javadoc-${version}.zip" basedir="doc/javadoc"/>
 	</target>
 
-	<target name="javadoc-devel" description="generate javadoc for developers">
+	<target name="javadoc-devel" description="generate javadoc for developers" depends="create-dirs">
 		<delete dir="doc/javadoc-devel" />
 		<javadoc destdir="doc/javadoc-devel" access="private" use="true" notree="false" nonavbar="false" sourcepath="src" noindex="false" splitindex="true" version="true" nodeprecatedlist="false" nodeprecated="false" verbose="false">
 			<link href="http://docs.oracle.com/javase/7/docs/api/" />

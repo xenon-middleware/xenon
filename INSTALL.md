@@ -22,8 +22,9 @@ Obtaining Xenon
 Xenon releases can be obtained from the Netherlands eScience Center
 GitHub page at https://github.com/NLeSC/Xenon/releases. You can 
 download it there as a zip archive, and unpack to the desired 
-location. Alternatively, you can checkout the latest development 
-version using Git.
+location. Both source and binary distributions of Xenon are avalable.
+Alternatively, you can checkout the latest development version using 
+Git.
 
 
 Obtaining Java
@@ -50,33 +51,32 @@ In Linux, Ant can also be installed using various package managers,
 such as "apt-get" or "yum".
 
 
-Compiling
----------
+Compiling Xenon from source
+---------------------------
 
-To compile Xenon, run `ant` in the main Xenon directory. This 
-will: 
+To compile Xenon, download a source distribution and unpack it in 
+a suitable location. Also ensure you have both Java and Ant 
+correctly installed (as described above).
 
-- Compile Xenon and create an `Xenon-<version>.jar` in the `dist`
-  directory. 
-- Compile the examples, and create an 
-  `Xenon-examples-<version>.jar` to the `dist` directory. 
-- Generate the Javadoc for the public Xenon API and create an 
-  `Xenon-javadoc-<version>.jar` in the `dist` directory.
-- Copy all dependencies of Xenon from `lib` to `dist`.
-- Copy the `logback.xml` from the root directory to `dist`.
-
-After compiling, the `dist` directory contains a complete binary 
-distribution of Xenon without any external depencencies. If needed, 
-you can copy the contents of `dist` into your own software project.
+Next, run `ant` in the main directory of Xenon. This will compile 
+the Xenon library and generate the javadoc. After compilation, the 
+`dist` subdirectory will contain a complete binary distribution of 
+Xenon.
 
 
 Examples
 --------
 
-Xenon comes with a set of examples, located in the `examples` 
-directory. The examples are build as part of the compile process 
-described above. A list of the available examples can be found 
-in the user documentation.
+Xenon comes with a set of examples. These are located in the 
+`examples` directory of the _binary_ distribution (which you 
+download or create from source, as described above). A list 
+of the available examples can be found in the user 
+documentation.
+
+To compile the examples, go to the `examples` directory and 
+run `ant`.  
+
+
 
 To run the examples, ensure that all jar files in the `dist` 
 directory are in the classpath. In addition, the directory 

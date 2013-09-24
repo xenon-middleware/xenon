@@ -9,7 +9,7 @@ Author: Jason Maassen (<J.Maassen@esciencecenter.nl>)
 
 Version: Userguide v1.0, Xenon v1.0
 
-Last modified: 23 September 2013
+Last modified: 24 September 2013
 
 
 Copyrights & Disclaimers
@@ -27,7 +27,7 @@ For more information on the Netherlands eScience Center see:
 
 The Xenon project web site can be found at:
 
-<https://github.com/NLeSC/Xenon>.
+<http://nlesc.github.io/Xenon>.
 
 
 Third party libraries
@@ -85,6 +85,14 @@ Installation
 
 The installation procedure and dependencies of the Xenon library
 can be found in the file "INSTALL.md" in the Xenon distribution. 
+
+
+Examples
+--------
+
+The _binary distribution_ of Xenon contains several examples on 
+how to use Xenon. See the "EXAMPLES.md" file in the distribution
+for more information.
 
 
 Design
@@ -665,8 +673,9 @@ Examples
 --------
 
 Examples of how to use Xenon can be found in the [examples][26]
-directory. We will list the examples here in order of increasing
-complexity, and with a short description of each example.
+directory of the __binary distribution__ of Xenon. The "EXAMPLES.md" 
+file in the distribution explains how to compile and run these 
+examples. We will list them here in order of increasing complexity: 
 
 ### Initializing Xenon ###
 

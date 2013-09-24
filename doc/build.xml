@@ -4,7 +4,7 @@
       		Build file for documentation generation
     	</description>
 
-	<property name="xenon.dist" location="../dist" />
+	<property name="xenon.dist" location="../dist/nlesc-xenon-1.0.0/lib" />
 
 	<property name="build.sysclasspath" value="ignore" />
 

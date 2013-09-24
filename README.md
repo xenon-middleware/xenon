@@ -1,11 +1,11 @@
 ![logo](doc/images/NLeSC_Xenon_logo.png "Xenon Logo")
 
 Xenon
-======
+=====
 
 Copyright 2013 The Netherlands eScience Center
 
-Last modified: 23 September 2013
+Last modified: 24 September 2013
 
 What is it?
 -----------
@@ -43,24 +43,21 @@ found at:
 Documentation
 -------------
 
-For an overview of Xenon please consult the __online users guide__:
+See the file "INSTALL.md" for a description of how to install Xenon. 
+
+See the file "EXAMPLES.md" for information on how to compile and 
+run Xenon examples.
+
+The Xenon userguide can be found in "doc/userguide.md" or 
+"doc/userguide.pdf". It is also available online at:
 
 <https://github.com/NLeSC/Xenon/blob/develop/doc/userguide.md>
-
-A pdf version of the user guide is also available in the docs 
-directory "docs/usersguide.pdf" or online at:
-
 <http://nlesc.github.io/Xenon/userguide.pdf>
 
-See the file "INSTALL.md" for a description of how to install 
-Xenon. 
-
-The javadoc of Xenon library is available online at: 
+The javadoc of Xenon library can be found in "doc/javadoc". It is 
+also available online at: 
 
 <http://nlesc.github.io/Xenon/javadoc>
-
-The source of Xenon can be found in "src/". Example applications
-can be found in "examples/src/".
 
 
 Copyrights & Disclaimers

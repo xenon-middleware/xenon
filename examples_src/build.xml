@@ -1,27 +1,25 @@
-<project name="Examples" default="build" basedir=".">
-	<description>Build file for the examples</description>
-
-	<property name="xenon.dist" location="../dist" />
+<project name="Xenon examples" default="build" basedir=".">
+	<description>Build file for the Xenon examples.</description>
 
 	<property name="build.sysclasspath" value="ignore" />
 
 	<path id="default.classpath">
-		<fileset dir="${xenon.dist}">
+		<fileset dir="../lib">
 			<include name="*.jar" />
 		</fileset>
 	</path>
 
 	<target name="build" depends="clean" description="build the JARs and documentation">
 		<!-- Create the distribution end classes directory -->
-		<mkdir dir="dist" />
 		<mkdir dir="build/classes" />
+		<mkdir dir="dist" />
 
 		<!-- Compile the java code from ${src} into ${classes} -->
 		<javac srcdir="src" destdir="build/classes" debug="on">
 			<classpath refid="default.classpath" />
 		</javac>
 
-		<jar jarfile="dist/xenon-examples-${version}.jar" basedir="build/classes" includes="**" />
+		<jar jarfile="dist/xenon-examples.jar" basedir="build/classes" />
 	</target>
 
 	<target name="clean" description="clean up">

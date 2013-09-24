@@ -4,9 +4,11 @@
     	</description>
  
 	<!-- NOTE: this operation is ignored if the property is already set on the command line! -->
-	<property name="test.config" location="${user.home}/xenon.test.properties"/>
+	<property name="version" value="1.0.0" />
 
-	<property name="xenon.dist" location="../dist" />
+	<property name="test.config" location="xenon.test.properties"/>
+
+	<property name="xenon.dist" location="../dist/nlesc-xenon-${version}/lib" />
 
 	<property name="build.sysclasspath" value="ignore" />
 
