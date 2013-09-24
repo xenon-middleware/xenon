@@ -154,7 +154,7 @@ This section will briefly explain each of the interfaces and related
 datatypes. Detailed information about Xenon can be found in the
 online Javadoc at: 
 
-<http://nlesc.github.io/xenon/javadoc/>
+<http://nlesc.github.io/Xenon/javadoc/>
 
 ### Package Structure ##
 
@@ -727,48 +727,48 @@ Submitting a batch job with output:
 Submitting an interactive job with output: 
 [SubmitInteractiveJobWithOutput.java][41]
 
-[1]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/package-summary.html
-[2]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/XenonFactory.html
-[3]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/Xenon.html
-[4]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/AdaptorStatus.html
-[5]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/XenonPropertyDescription.html
-[6]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/credentials/package-summary.html 
-[7]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/credentials/Credentials.html
-[8]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/package-summary.html
-[9]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/Files.html 
-[10]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/FileSystem.html
-[11]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/Path.html
-[12]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/RelativePath.html
-[13]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/credentials/Credential.html
-[14]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/FileAttributes.html
-[15]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/DirectoryStream.html
-[16]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/Copy.html
-[17]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/files/CopyOption.html
-[18]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/package-summary.html
-[19]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/Jobs.html
-[20]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/Scheduler.html
-[21]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/JobDescription.html
-[22]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/Job.html
-[23]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/jobs/JobStatus.html
-[25]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/package-summary.html
-[26]: https://github.com/NLeSC/xenon/tree/develop/examples/src/nl/esciencecenter/xenon/examples
-[27]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/CreatingXenon.java
-[28]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/CreatingXenonWithProperties.java
-[29]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/credentials/CreatingCredential.java
-[30]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CreateLocalFileSystem.java
-[31]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CreateFileSystem.java
-[32]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/LocalFileExists.java  
-[33]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/FileExists.java
-[34]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/DirectoryListing.java
-[35]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CopyFile.java 
-[36]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListQueueStatus.java
-[37]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListJobs.java
-[38]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListJobStatus.java
-[39]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitSimpleBatchJob.java
-[40]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitBatchJobWithOutput.java
-[41]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitInteractiveJobWithOutput.java
-[42]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/Utils.html
-[43]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/Sandbox.html
-[44]: http://nlesc.github.io/xenon/javadoc/nl/esciencecenter/xenon/utils/JavaJobDescription.html
-[45]: https://github.com/NLeSC/xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/ShowFileAttributes.java
+[1]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/package-summary.html
+[2]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/XenonFactory.html
+[3]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/Xenon.html
+[4]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/AdaptorStatus.html
+[5]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/XenonPropertyDescription.html
+[6]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/credentials/package-summary.html 
+[7]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/credentials/Credentials.html
+[8]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/package-summary.html
+[9]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/Files.html 
+[10]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/FileSystem.html
+[11]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/Path.html
+[12]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/RelativePath.html
+[13]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/credentials/Credential.html
+[14]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/FileAttributes.html
+[15]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/DirectoryStream.html
+[16]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/Copy.html
+[17]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/files/CopyOption.html
+[18]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/jobs/package-summary.html
+[19]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/jobs/Jobs.html
+[20]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/jobs/Scheduler.html
+[21]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/jobs/JobDescription.html
+[22]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/jobs/Job.html
+[23]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/jobs/JobStatus.html
+[25]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/utils/package-summary.html
+[26]: https://github.com/NLeSC/Xenon/tree/develop/examples/src/nl/esciencecenter/xenon/examples
+[27]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/CreatingXenon.java
+[28]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/CreatingXenonWithProperties.java
+[29]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/credentials/CreatingCredential.java
+[30]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CreateLocalFileSystem.java
+[31]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CreateFileSystem.java
+[32]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/LocalFileExists.java  
+[33]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/FileExists.java
+[34]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/DirectoryListing.java
+[35]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/CopyFile.java 
+[36]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListQueueStatus.java
+[37]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListJobs.java
+[38]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/ListJobStatus.java
+[39]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitSimpleBatchJob.java
+[40]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitBatchJobWithOutput.java
+[41]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/jobs/SubmitInteractiveJobWithOutput.java
+[42]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/utils/Utils.html
+[43]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/utils/Sandbox.html
+[44]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/utils/JavaJobDescription.html
+[45]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/ShowFileAttributes.java
 
