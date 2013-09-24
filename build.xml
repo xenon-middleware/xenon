@@ -73,7 +73,6 @@
 		<mkdir dir="dist" />
 		<mkdir dir="dist/nlesc-xenon-${version}" />
 		<mkdir dir="dist/nlesc-xenon-${version}/lib" />
-		<mkdir dir="dist/nlesc-xenon-${version}/bin" />
 		<mkdir dir="dist/nlesc-xenon-${version}/etc" />
 		<mkdir dir="dist/nlesc-xenon-${version}/doc" />
 		<mkdir dir="dist/nlesc-xenon-${version}/doc/javadoc" />
