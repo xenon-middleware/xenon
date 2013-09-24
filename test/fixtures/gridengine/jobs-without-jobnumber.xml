@@ -1,0 +1,14 @@
+<?xml version='1.0'?>
+<job_info  xmlns:xsd="http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11">
+  <queue_info>
+    <job_list state="running">
+      <JAT_prio>0.45754</JAT_prio>
+      <JB_name>prun-job</JB_name>
+      <JB_owner>ceriel</JB_owner>
+      <state>r</state>
+      <JAT_start_time>2013-04-08T15:28:15</JAT_start_time>
+      <queue_name>all.q@node042.cm.cluster</queue_name>
+      <slots>8</slots>
+    </job_list>
+  </queue_info>
+</job_info>

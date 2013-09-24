@@ -1,0 +1,4 @@
+#!/bin/sh
+
+#sge sge6.2u5p2 schema's (revision = 1.11)
+/usr/lib/jvm/java-7-oracle/bin/xjc -d src -b doc/schemas/sge6.2u5p2/qstat/qstat.xjb doc/schemas/sge6.2u5p2/qstat/qstat.xsd
