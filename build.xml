@@ -67,6 +67,9 @@
 		<copy todir="dist/nlesc-xenon-${version}/notices">
 			<fileset dir="notices"/>
 		</copy>
+
+		<!-- Finally, create a binary distribution zip -->
+		<zip destfile="dist/nlesc-xenon-${version}-bin.zip" basedir="dist"/>
 	</target>
 
 	<target name="create-dirs" description="create the necessary target dirs">
