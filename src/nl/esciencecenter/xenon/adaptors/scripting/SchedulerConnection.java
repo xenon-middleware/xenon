@@ -260,7 +260,8 @@ public abstract class SchedulerConnection {
                 arguments);
 
         if (!runner.success()) {
-            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with arguments \""
+            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin + \"" + stdin 
+                    + "\" arguments \""
                     + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = " + runner.getExitCode()
                     + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
