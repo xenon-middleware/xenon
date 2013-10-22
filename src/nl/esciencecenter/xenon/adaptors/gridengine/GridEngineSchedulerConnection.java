@@ -66,9 +66,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
     public static final String JOB_OPTION_PARALLEL_ENVIRONMENT = "parallel.environment";
 
     public static final String JOB_OPTION_PARALLEL_SLOTS = "parallel.slots";
+    
+    public static final String JOB_OPTION_RESOURCES = "resources";
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_PARALLEL_ENVIRONMENT,
-            JOB_OPTION_PARALLEL_SLOTS };
+            JOB_OPTION_PARALLEL_SLOTS, JOB_OPTION_RESOURCES };
 
     private static final String QACCT_HEADER = "==============================================================";
 

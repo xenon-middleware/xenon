@@ -67,7 +67,7 @@ public class GridEngineJobScriptGeneratorTest {
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
         description.addEnvironment("some.more", "environment value with spaces");
-        description.addJobOption("job", "option");
+        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxTime(100);
         description.setNodeCount(1);
@@ -81,7 +81,7 @@ public class GridEngineJobScriptGeneratorTest {
         String result = GridEngineJobScriptGenerator.generate(description, null, null);
 
         String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n"
-                + "#$ -q the.queue\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n"
+                + "#$ -q the.queue\n" + "#$ -l h_rt=01:40:00\n" + "#$ -l list-of-resources\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n"
                 + "#$ -e 'stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n" + "\n" + "/bin/executable 'some' 'arguments'\n";
 
