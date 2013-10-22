@@ -135,7 +135,13 @@ final class GridEngineJobScriptGenerator {
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#$ -l h_rt=%02d:%02d:00\n", description.getMaxTime() / MINUTES_PER_HOUR, description.getMaxTime()
                 % MINUTES_PER_HOUR);
-
+        
+        String resources = description.getJobOptions().get(GridEngineSchedulerConnection.JOB_OPTION_RESOURCES);
+        
+        if (resources != null) {
+            script.format("#$ -l %s\n", resources);
+        }
+        
         if (description.getStdin() != null) {
             script.format("#$ -i '%s'\n", description.getStdin());
         }
