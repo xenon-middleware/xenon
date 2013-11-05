@@ -99,7 +99,10 @@ public final class CopyEngine {
 
     public CopyEngine(Files owner) {
         this.owner = owner;
-        new CopyThread().start();
+        
+        Thread copyThread = new CopyThread();
+        copyThread.setDaemon(true);
+        copyThread.start();
     }
 
     private void close(Closeable c) {
