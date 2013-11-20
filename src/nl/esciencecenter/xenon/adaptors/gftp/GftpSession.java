@@ -802,7 +802,6 @@ public class GftpSession {
                 this.closeGFTPClient(myclient);
             }
 
-
             if (listV.size() < -0) {
                 return new Vector<MlsxEntry>(0);
             } else if (listV.size() > 0) {
@@ -826,7 +825,7 @@ public class GftpSession {
             }
 
             return mlsxs;
-            
+
         } catch (Exception e) {
             throw new XenonException(GftpAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }

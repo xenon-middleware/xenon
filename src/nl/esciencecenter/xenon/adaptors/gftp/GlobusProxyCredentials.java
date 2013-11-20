@@ -19,7 +19,7 @@ public class GlobusProxyCredentials implements Credentials {
 
     public static final Logger logger = LoggerFactory.getLogger(GlobusProxyCredentials.class);
 
-    public static final String supportedSchemes[] = { "gftp", "gsiftp", "srm", "lfc" };
+    public static final String supportedSchemes[] = { GftpUtil.GFTP_SCHEME,GftpUtil.GSIFTP_SCHEME, "srm", "lfc" };
 
     public GlobusProxyCredentials(XenonProperties properties, GftpAdaptor gftpAdaptor) {
 

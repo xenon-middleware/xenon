@@ -29,10 +29,10 @@ public class GftpUtil {
 
     public static final Logger logger = LoggerFactory.getLogger(GftpUtil.class);
 
-    public static final String GSIFTP_SCHEME = "gsiftp"; 
+    public static final String GSIFTP_SCHEME = "gsiftp";
 
-    public static final String GFTP_SCHEME = "gftp"; 
-    
+    public static final String GFTP_SCHEME = "gftp";
+
     /**
      * In cog-jglobus 1.4 this string isn't defined. Define it here to stay 1.4 compatible. This property is defined in CoG
      * jGlobus 1.7 and higher.
@@ -148,7 +148,7 @@ public class GftpUtil {
     }
 
     public static boolean isXDir(String dirName) {
-        
+
         if (dirName.compareTo(".") == 0) // Current Dir
         {
             return true;
@@ -202,7 +202,7 @@ public class GftpUtil {
     }
 
     public static String toString(FeatureList features) {
-        
+
         String str = "FeatureList:[";
         boolean first = true;
 

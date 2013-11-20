@@ -43,11 +43,11 @@ public class GftpFileAttributes implements FileAttributes {
     public static final String UNIX_UID = "unix.uid";
 
     public static final String UNIX_MODE = "unix.mode";
-    
+
     // ---
     // Instance
     // --- 
-    
+
     private final Path path;
 
     private final MlsxEntry mlsxEntry;
@@ -114,17 +114,14 @@ public class GftpFileAttributes implements FileAttributes {
 
     @Override
     public Set<PosixFilePermission> permissions() {
-        
+
         // unix mode supported ? 
-        int mode=getUnixMode();
-            
-        if (mode>=0)
-        {
-            return GftpUtil.unixModeToPosixFilePermissions(mode); 
-        }
-        else
-        {
-            return getPosixPermissionFromPERMString(); 
+        int mode = getUnixMode();
+
+        if (mode >= 0) {
+            return GftpUtil.unixModeToPosixFilePermissions(mode);
+        } else {
+            return getPosixPermissionFromPERMString();
         }
     }
 
@@ -191,8 +188,6 @@ public class GftpFileAttributes implements FileAttributes {
 
         return perm.isPosixWritable();
     }
-
-    
 
     public String getUnixUID() {
         // gftp v1 dummy MslxEntry:
