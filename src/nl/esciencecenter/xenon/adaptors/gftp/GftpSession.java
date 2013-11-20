@@ -432,6 +432,11 @@ public class GftpSession {
         GridFTPInputStream inps;
 
         try {
+            
+            if (useActiveMode()) {
+                logger.error("FIXME: createInputStream(): Active Mode not tested!");
+            }
+            
             inps = new GridFTPInputStream(getValidGSSCredential(), getAuthorization(), this.getHostname(), this.getPort(),
                     filepath, usePassiveMode(), // always passive ?
                     Session.TYPE_IMAGE, useDataChannelAuthentication());
@@ -453,6 +458,10 @@ public class GftpSession {
         try {
             // Create custom GridFTPOutputStream. 
 
+            if (useActiveMode()) {
+                logger.error("FIXME: createOutputStream(): Active Mode not tested!");
+            }
+            
             outps = new GridFTPOutputStream(getValidGSSCredential(), getAuthorization(), getHostname(), getPort(), filePath,
                     append,
                     usePassiveMode(), // always passive ?
@@ -733,8 +742,12 @@ public class GftpSession {
     }
 
     /**
-     * Update and check status of Passive Mode connection. Some GridFTP command settting up a Data Channel either Passive Mode or
-     * Active Mode <strong>has</strong> to be choosen. DataChannel methods are: msld, get, put and variants of the methods.
+     * Update and check status of Passive/Active Mode connection.
+     * <p>
+     * Some GridFTP commands setup a Data Channel. Before setting up this channel either Passive or Active 
+     * mode has to be specified. 
+     * <p>
+     * DataChannel methods are: msld, get, put and variants of the methods.
      * 
      * @param dataChannelCommand
      *            - if true then update Active/Passive mode for a DataChannel Command.
