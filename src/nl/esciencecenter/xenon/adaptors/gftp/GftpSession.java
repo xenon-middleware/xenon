@@ -802,7 +802,7 @@ public class GftpSession {
                 this.closeGFTPClient(myclient);
             }
 
-            if (listV.size() < -0) {
+            if (listV.size() <= 0) {
                 return new Vector<MlsxEntry>(0);
             } else if (listV.size() > 0) {
 
