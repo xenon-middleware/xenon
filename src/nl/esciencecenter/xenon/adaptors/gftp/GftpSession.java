@@ -34,8 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Managed GFTP Client Session to a single host+port. This class is thread safe as the Globus GridFTPClient can not be used
- * multi-threaded. This because the GridGTP client hold a state.
+ * Managed GridFTP Client Session to a single server (host:port).
+ * <p>
+ * This class is thread-safe as opposed to the Globus GridFTPClient which can not be used multi-threaded. This because the
+ * GridFTPClient client holds a state. For multi-threaded access to the same (GFTP) server it is recommended to use multiple
+ * GftpSession objects as Grid FTP Servers are optimized for parallel access.
+ * <p>
+ * Multiple (Gftp)FileSystems can share the same GftpSession, but a Single (Gftp)FileSystem might also use multiple GftpSessions
+ * for Parallel access.
  * 
  * @author Piter T. de Boer
  */
@@ -210,7 +216,7 @@ public class GftpSession {
     }
 
     /**
-     * Idempotent Close GridFTPClient. Does not throw exception
+     * Idempotent Close GridFTPClient. Does not throw exceptions. 
      */
     public void closeGFTPClient(GridFTPClient client) {
         try {
@@ -308,14 +314,14 @@ public class GftpSession {
     }
 
     /**
-     * Delete single file or empty subdirectory from parent directory
+     * Delete single file or empty sub-directory from parent directory.
      * 
      * @param parentdir
-     *            - accessable parent directory
+     *            - Accessible parent directory
      * @param basename
-     *            - file or sub directory name
+     *            - File or sub-directory name
      * @param isDirectory
-     *            - whether to delte a file or sub directory.
+     *            - whether to delete a file or sub-directory.
      * @throws XenonException
      */
     public void rmpath(String parentdir, String basename, boolean isDirectory) throws XenonException {
@@ -448,7 +454,7 @@ public class GftpSession {
             // Create custom GridFTPOutputStream. 
 
             outps = new GridFTPOutputStream(getValidGSSCredential(), getAuthorization(), getHostname(), getPort(), filePath,
-                    append,// do not append !
+                    append,
                     usePassiveMode(), // always passive ?
                     Session.TYPE_IMAGE, false);
 
@@ -462,7 +468,7 @@ public class GftpSession {
     }
 
     // ========================================================================
-    // MLST/MSLD commands 
+    // MLST/MLSD commands 
     // ========================================================================
 
     public boolean exists(String path) throws XenonException {
