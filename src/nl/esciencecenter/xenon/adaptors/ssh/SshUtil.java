@@ -29,31 +29,31 @@ import com.jcraft.jsch.SftpATTRS;
 public class SshUtil {
 
     /** read by owner */
-    static final int READ_OWNER = 00400;
+    public static final int READ_OWNER = 00400;
 
     /** write by owner */
-    static final int WRITE_OWNER = 00200;
+    public static final int WRITE_OWNER = 00200;
 
     /** execute/search by owner */
-    static final int EXEC_OWNER = 00100;
+    public static final int EXEC_OWNER = 00100;
 
     /** read by group */
-    static final int READ_GROUP = 00040;
+    public  static final int READ_GROUP = 00040;
 
     /** write by group */
-    static final int WRITE_GROUP = 00020;
+    public static final int WRITE_GROUP = 00020;
 
     /** execute/search by group */
-    static final int EXEC_GROUP = 00010;
+    public static final int EXEC_GROUP = 00010;
 
     /** read by others */
-    static final int READ_OTHERS = 00004;
+    public static final int READ_OTHERS = 00004;
 
     /** write by others */
-    static final int WRITE_OTHERS = 00002;
+    public static final int WRITE_OTHERS = 00002;
 
     /** execute/search by others */
-    static final int EXEC_OTHERS = 00001;
+    public static final int EXEC_OTHERS = 00001;
 
     protected SshUtil() {
         // do not use
@@ -103,7 +103,7 @@ public class SshUtil {
         return true;
     }
 
-    static Set<PosixFilePermission> bitsToPermissions(int bit) {
+    public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
         HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();
 
@@ -140,7 +140,7 @@ public class SshUtil {
         return result;
     }
 
-    static int permissionsToBits(Set<PosixFilePermission> permissions) {
+    public static int permissionsToBits(Set<PosixFilePermission> permissions) {
 
         int bits = 0;
 
@@ -180,15 +180,15 @@ public class SshUtil {
         return bits;
     }
 
-    static boolean isExecutable(int permissions) {
+    public static boolean isExecutable(int permissions) {
         return (permissions & EXEC_OWNER) != 0;
     }
 
-    static boolean isReadable(int permissions) {
+    public static boolean isReadable(int permissions) {
         return (permissions & READ_OWNER) != 0;
     }
 
-    static boolean isWritable(int permissions) {
+    public static boolean isWritable(int permissions) {
         return (permissions & WRITE_OWNER) != 0;
     }
 
