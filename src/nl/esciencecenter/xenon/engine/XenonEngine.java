@@ -64,7 +64,7 @@ public final class XenonEngine implements Xenon {
     /** All our own properties start with this prefix. */
     public static final String PREFIX = "xenon.";
 
-    /** All our own queue properties start with this prefix. */
+    /** All our own adaptor properties start with this prefix. */
     public static final String ADAPTORS = PREFIX + "adaptors.";
 
     /** All XenonEngines created so far */

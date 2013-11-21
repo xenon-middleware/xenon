@@ -38,6 +38,7 @@ import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
+import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -598,7 +599,7 @@ public class SshFiles implements Files {
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            channel.chmod(SshUtil.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
+            channel.chmod(PosixFileUtils.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToXenonException(e);
