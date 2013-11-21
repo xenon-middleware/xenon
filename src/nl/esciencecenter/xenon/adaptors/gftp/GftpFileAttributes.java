@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -25,10 +26,12 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
 import org.globus.ftp.MlsxEntry;
 
 /**
- * GridFTP File Attributes wrap around an MslxEntry containing the file system specific attributes. Various FileSystems support
- * various file attributes.
+ * GridFTP File Attributes wrap around an MslxEntry containing the file system specific attributes.
+ * <p>
+ * Various GridFTP FileSystems support various file attributes.
  * 
- * Note that some (POSIX) attributes like 'group' and 'user' are not applicable in some Grid environments.
+ * Note that some (POSIX) attributes like 'group' and 'user' are not applicable in most Grid environments. Also permission
+ * attributes are given relative for the authenticated user.
  * 
  * @author Piter T. de Boer
  */
@@ -63,11 +66,6 @@ public class GftpFileAttributes implements FileAttributes {
     }
 
     @Override
-    public boolean isDirectory() {
-        return isDir();
-    }
-
-    @Override
     public boolean isOther() {
         return ((!isRegularFile()) && (!isDirectory()) & (!isSymbolicLink()));
     }
@@ -99,16 +97,18 @@ public class GftpFileAttributes implements FileAttributes {
 
     @Override
     public long size() {
-        return getLength();
+        return getSize();
     }
 
     @Override
     public String group() {
+        // default to unix.group could be "VO" as well. 
         return getUnixGroup();
     }
 
     @Override
     public String owner() {
+        // default to unix.user, could also be "VO" or Proxy Subject DN 
         return getUnixOwner();
     }
 
@@ -119,9 +119,9 @@ public class GftpFileAttributes implements FileAttributes {
         int mode = getUnixMode();
 
         if (mode >= 0) {
-            return GftpUtil.unixModeToPosixFilePermissions(mode);
+            return PosixFileUtils.bitsToPermissions(mode);
         } else {
-            return getPosixPermissionFromPERMString();
+            return createPosixPermissionsFromPERMString();
         }
     }
 
@@ -131,12 +131,14 @@ public class GftpFileAttributes implements FileAttributes {
         if (isDirectory()) {
             return isAccessable();
         } else {
-            return isExecutable();
+            // default to --x--x--x 
+            return ((getUnixMode() & PosixFileUtils.EXEC_OWNER) > 0) ; 
         }
     }
 
     @Override
     public boolean isHidden() {
+        // assume unix style hidden files on the grid: 
         return path.getRelativePath().getFileName().startsWith(".");
     }
 
@@ -145,12 +147,14 @@ public class GftpFileAttributes implements FileAttributes {
         if (mlsxEntry == null) {
             return "mlsxEntry:NULL";
         } else {
-            return "mlsxEntry:" + mlsxEntry.toString();
+            return "mlsxEntry:[" + mlsxEntry.toString() + "]";
         }
     }
 
     @Override
     public boolean isReadable() {
+        
+        // use generic FTP permissions:
         FtpPermissions perm = FtpPermissions.fromString(mlsxEntry.get(MlsxEntry.PERM));
 
         if (perm == null) {
@@ -160,17 +164,20 @@ public class GftpFileAttributes implements FileAttributes {
     }
 
     public boolean isAccessable() {
+
+        // use generic FTP permissions: 
         FtpPermissions perm = FtpPermissions.fromString(mlsxEntry.get(MlsxEntry.PERM));
 
         if (perm == null) {
             return false;
         }
 
-        // files must be 'readable' and directories must be 'listable':
+        // Files must be 'readable' and directories must be 'listable':
         return (perm.readable || perm.listable);
     }
 
-    public boolean isDir() {
+    @Override
+    public boolean isDirectory() {
         String val = mlsxEntry.get(MlsxEntry.TYPE);
 
         if (val == null)
@@ -181,6 +188,7 @@ public class GftpFileAttributes implements FileAttributes {
 
     @Override
     public boolean isWritable() {
+        // use generic FTP permissions:
         FtpPermissions perm = FtpPermissions.fromString(mlsxEntry.get(MlsxEntry.PERM));
 
         if (perm == null)
@@ -189,6 +197,9 @@ public class GftpFileAttributes implements FileAttributes {
         return perm.isPosixWritable();
     }
 
+    /**
+     * @return unix User ID, which typically is a number, not the name.
+     */
     public String getUnixUID() {
         // gftp v1 dummy MslxEntry:
         if (mlsxEntry == null) {
@@ -208,9 +219,7 @@ public class GftpFileAttributes implements FileAttributes {
     }
 
     /**
-     * Returns Octagonal Unix mode as integer !
-     * 
-     * @return
+     * @return (Octal) Unix mode as integer !
      */
     public int getUnixMode() {
 
@@ -229,22 +238,14 @@ public class GftpFileAttributes implements FileAttributes {
     }
 
     /**
-     * Return Unix Group ID, which typically is a file system depended group id number.
-     * 
-     * @param mlsxEntry
-     *            - MslxEnty
-     * @return
+     * @return Unix Group ID, which typically is a file system depended group id number, or null otherwise.
      */
     public String getGID() {
         return mlsxEntry.get(UNIX_GID);
     }
 
     /**
-     * Return logical Unix Group name.
-     * 
-     * @param mlsxEntry
-     *            - MslxEnty
-     * @return
+     * @return logical Unix Group name, if supported, null otherwise.
      */
     public String getUnixGroup() {
         return mlsxEntry.get(UNIX_GROUP);
@@ -268,7 +269,7 @@ public class GftpFileAttributes implements FileAttributes {
         String val = mlsxEntry.get(MlsxEntry.MODIFY);
 
         if (val == null) {
-            return 0;
+            return -1;
         }
 
         return GftpUtil.timeStringToMillis(val);
@@ -278,7 +279,7 @@ public class GftpFileAttributes implements FileAttributes {
         return mlsxEntry.get(MlsxEntry.UNIQUE);
     }
 
-    public long getLength() {
+    public long getSize() {
 
         String val = mlsxEntry.get(MlsxEntry.SIZE);
 
@@ -326,14 +327,20 @@ public class GftpFileAttributes implements FileAttributes {
         return false;
     }
 
-    public Set<PosixFilePermission> getPosixPermissionFromPERMString() {
+    /**
+     * Create PosixFilePermissions from FTP Permissions String (PERM). These permissions are only given for the current
+     * authenticated user.
+     * 
+     * @return
+     */
+    public Set<PosixFilePermission> createPosixPermissionsFromPERMString() {
 
         FtpPermissions perm = FtpPermissions.fromString(mlsxEntry.get(MlsxEntry.PERM));
         Set<PosixFilePermission> set = new HashSet<PosixFilePermission>();
 
         // Gftp Permissions are only given for the current users credentials so 
         // all permissions are "OWNER". 
-        // Groups do not exists. VOs are used for this, but can't be checked here.  
+        // Groups may not exist. VOs are used for this, but can't be checked here.  
         if (perm.isPosixReadable()) {
             set.add(PosixFilePermission.OWNER_READ);
         }
@@ -341,8 +348,8 @@ public class GftpFileAttributes implements FileAttributes {
             set.add(PosixFilePermission.OWNER_WRITE);
         }
 
-        // Posix "x" bit for directories means 'listable'. 
-        if (isDir() && perm.listable) {
+        // Posix "x" bit for directories means 'accessable'. 
+        if (isDirectory() && perm.enterable) {
             set.add(PosixFilePermission.OWNER_EXECUTE);
         }
 

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import nl.esciencecenter.xenon.adaptors.ssh.SshUtil;
 import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -150,13 +149,12 @@ public class GftpUtil {
 
     public static boolean isXDir(String dirName) {
 
-        if (dirName.compareTo(".") == 0) // Current Dir
-        {
+        // Current Dir
+        if (dirName.compareTo(".") == 0) {
             return true;
         }
-
-        if (dirName.compareTo("..") == 0) // Parent Dir
-        {
+        // Parent Dir
+        if (dirName.compareTo("..") == 0) {
             return true;
         }
 
@@ -208,6 +206,7 @@ public class GftpUtil {
         // Use reflection to check String Constants as FeatureList doesn't support them:
         Field[] fields = FeatureList.class.getFields();
         for (Field field : fields) {
+            
             // skip private parts 
             if (field.isAccessible() == false) {
                 //continue; 

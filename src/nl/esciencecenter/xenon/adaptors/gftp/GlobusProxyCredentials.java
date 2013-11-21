@@ -60,7 +60,7 @@ public class GlobusProxyCredentials implements Credentials {
 
     public String getProxyFileLocation() {
         logger.error("FIXME:getProxyFileLocation()");
-        return null;
+        return "/tmp/testproxy"; // copy of user proxy, for example /tmp/x509_u666
     }
 
     public GlobusProxyCredential getDefaultProxyCredential() throws XenonException {
@@ -70,10 +70,18 @@ public class GlobusProxyCredentials implements Credentials {
     public GlobusProxyCredential loadProxy(String proxyFile) throws XenonException {
         return new GlobusProxyCredential(this, proxyFile);
     }
+    
+    /**
+     * 
+     * @param certfile - user certificate key file, for example ~/.globus/userkey.pem 
+     * @param userVOinfo - optional User and VO information, may be null. Only needed for VOMS enabled proxies. 
+     * @param passprhase - grid Certificate Passphrase. 
+     * @return new created Grid Proxy Credential 
+     * @throws XenonException
+     */
+    public GlobusProxyCredential createProxy(String certfile, String userVOinfo, char[] password) throws XenonException {
 
-    public GlobusProxyCredential createProxy(String certfile, String userinfo, char[] password) throws XenonException {
-
-        throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "createProxy(): Not supported yet.");
+        throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "FIXME: createProxy(): Not supported yet.");
     }
 
 }

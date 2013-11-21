@@ -45,7 +45,6 @@ public class GlobusProxyCredential implements Credential {
         } catch (GlobusCredentialException e) {
             throw new XenonException(GftpAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
-
     }
 
     @Override

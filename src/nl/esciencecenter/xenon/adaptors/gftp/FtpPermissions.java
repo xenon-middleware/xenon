@@ -189,15 +189,15 @@ public class FtpPermissions {
     }
 
     /**
-     * Return Posix compatible "writable" or "w" bit for these permissions. This means files must be writable or directories must
-     * be able to add/create new entries.
+     * Return Posix compatible "writable" or "w" bit for these permissions. This means files must be writable,deletable and appendable, and directories must
+     * be able to add/create/delete new entries.
      */
     public boolean isPosixWritable() {
-        return (writable || (cancreatedirs && cancreatefiles));
+        return ((writable && appendable && deletable) || (cancreatedirs && cancreatefiles && canbepurged));
     }
 
     /**
-     * Return Posix compatible "readable" or "r" bit for these permissions. This means files must be 'readable' or directories
+     * Return Posix compatible "readable" or "r" bit for these permissions. This means files must be 'readable' and directories
      * must be 'listable':
      */
     public boolean isPosixReadable() {
@@ -206,7 +206,7 @@ public class FtpPermissions {
 
     /**
      * Return Posix compatible "accessible" or directory "executable" or "x" bit. This means directories must be 'enterable' but
-     * not listable. File executionable does not apply to distributed (grid) file systems.
+     * not perse listable. 
      */
     public boolean isPosixAccessible() {
         return (enterable);

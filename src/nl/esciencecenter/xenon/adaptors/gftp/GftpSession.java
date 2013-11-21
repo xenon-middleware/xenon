@@ -19,6 +19,7 @@ import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.RelativePath;
 
+import org.globus.ftp.ChecksumAlgorithm;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
@@ -34,14 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Managed GridFTP Client Session to a single server (host:port).
+ * GftpSession manages a (multi-threaded) Grid FTP Session a single server (host:port).
  * <p>
  * This class is thread-safe as opposed to the Globus GridFTPClient which can not be used multi-threaded. This because the
- * GridFTPClient client holds a state. For multi-threaded access to the same (GFTP) server it is recommended to use multiple
+ * GridFTPClient client holds a state. For multi-threaded access to the same (Grid FTP) server it is recommended to use multiple
  * GftpSession objects as Grid FTP Servers are optimized for parallel access.
  * <p>
- * Multiple (Gftp)FileSystems can share the same GftpSession, but a Single (Gftp)FileSystem might also use multiple GftpSessions
- * for Parallel access.
+ * This class can be used multi-threaded.
  * 
  * @author Piter T. de Boer
  */
@@ -53,23 +53,28 @@ public class GftpSession {
 
         public boolean protocol_v1 = false;
 
+        /** Use Passive Gftp Mode. Default is true. */
         public boolean usePassiveMode = true;
 
+        /** Either GFTP V1 or SRM Grid FTP Server. */
         public boolean useBlindMode = false;
 
-        public boolean explicitListHiddenFiles = true;
+        /** Explicit list hidden files on Grid FTP V1 servers. */
+        public boolean gftp1ListHiddenFiles = true;
 
+        /** Always use DataChannel Authentication or throw exceptions. */
         public boolean enforceDCAU = false;
 
+        /** Perform extra client state test to ensure valid connections. */
         public boolean optCheckClientState = true;
 
+        /** Reconnect client after exceptions to ensure continues access. */
         public boolean autoConnectAfterException = true;
 
         @Override
         public String toString() {
             return "GftpSessionOptions:[protocol_v1=" + protocol_v1 + ", usePassiveMode=" + usePassiveMode + ", useBlindMode="
-                    + useBlindMode + ", explicitListHiddenFiles=" + explicitListHiddenFiles + ", enforceDCAU=" + enforceDCAU
-                    + "]";
+                    + useBlindMode + ", gfpt1ListHiddenFiles=" + gftp1ListHiddenFiles + ", enforceDCAU=" + enforceDCAU + "]";
         }
 
     }
@@ -84,10 +89,13 @@ public class GftpSession {
 
     private GridFTPClient client = null;
 
+    private Object clientMutex = new Object();
+
     private GftpSessionOptions options = new GftpSessionOptions();
 
     /**
-     * Default to true, server will update actual use of DCAU when checking features after connecting.
+     * Default to true, server will update actual use of DCAU when checking features after connecting. If
+     * GftpSessionOptions.enforceDCAU==true, Exceptions will be thrown when this is not supported.
      */
     private boolean useDataChannelAuthentication = true;
 
@@ -120,7 +128,6 @@ public class GftpSession {
         } catch (UnknownPropertyException | PropertyTypeException | InvalidPropertyException e) {
             throw e; //new XenonException(GftpAdaptor.ADAPTOR_NAME,e.getMessage(),e);
         }
-
     }
 
     public void connect(boolean closePreviousClient) throws XenonException {
@@ -134,7 +141,6 @@ public class GftpSession {
         }
 
         this.client = this.createGFTPClient();
-
         this.entryPath = pwd();
 
         logger.info("connect(): connected to remote path (user home=) {}", entryPath);
@@ -143,8 +149,9 @@ public class GftpSession {
     }
 
     protected void updateFeatureList() throws XenonException {
-        // Check Grid FTP feature list: 
+
         try {
+            // Check Grid FTP feature list:
             this.features = client.getFeatureList();
             this.useDataChannelAuthentication = features.contains(FeatureList.DCAU);
 
@@ -216,7 +223,7 @@ public class GftpSession {
     }
 
     /**
-     * Idempotent Close GridFTPClient. Does not throw exceptions. 
+     * Idempotent Close GridFTPClient. Does not throw exceptions.
      */
     public void closeGFTPClient(GridFTPClient client) {
         try {
@@ -248,7 +255,7 @@ public class GftpSession {
      * Support for (OLD) SRM Grid FTP server which basically do not allow listing of remote filepaths at all. If useBlindMode() is
      * true it is assumed that all filepaths exists and dummy mslx entries will be created.
      * 
-     * @return Wether to use Blind Mode GridFTP.
+     * @return Whether to use Blind Mode GridFTP.
      */
     public boolean useBlindMode() {
         return options.useBlindMode;
@@ -261,111 +268,15 @@ public class GftpSession {
      * @return - whether to explicit list hidden files.
      */
     public boolean getExplicitListHidden() {
-        return options.explicitListHiddenFiles;
+        return options.gftp1ListHiddenFiles;
     }
 
     // ========================================================================
     // Actual GridFTP methods  
     // ========================================================================
 
-    public String pwd() throws XenonException {
-        assertConnected();
-        try {
-            synchronized (client) {
-                this.updatePassiveMode(false);
-                return client.getCurrentDir();
-            }
-        } catch (ServerException | IOException e) {
-            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "pwd() of server:" + this + "failed\n." + e.getMessage(), e);
-        }
-    }
-
-    public void mkdir(String dirpath, boolean ignoreExisting) throws XenonException {
-        logger.debug("mkdir(): {}", dirpath);
-
-        if (exists(dirpath)) {
-            if (ignoreExisting) {
-                return;
-            } else {
-                throw new PathAlreadyExistsException(GftpAdaptor.ADAPTOR_NAME, "Path already exists:" + dirpath);
-            }
-        }
-
-        assertConnected();
-        synchronized (client) {
-            // mkdir doesn't need data channel
-            this.updatePassiveMode(false);
-
-            try {
-                client.makeDir(dirpath);
-            } catch (ServerException | IOException e) {
-                throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "mkdir() failed for path:" + dirpath + "\n" + e.getMessage(),
-                        e);
-            }
-        }
-    }
-
-    public void rmfile(RelativePath path) throws XenonException {
-        rmpath(path.getParent().getAbsolutePath(), path.getFileNameAsString(), false);
-    }
-
-    public void rmdir(RelativePath path) throws XenonException {
-        rmpath(path.getParent().getAbsolutePath(), path.getFileNameAsString(), true);
-    }
-
     /**
-     * Delete single file or empty sub-directory from parent directory.
-     * 
-     * @param parentdir
-     *            - Accessible parent directory
-     * @param basename
-     *            - File or sub-directory name
-     * @param isDirectory
-     *            - whether to delete a file or sub-directory.
-     * @throws XenonException
-     */
-    public void rmpath(String parentdir, String basename, boolean isDirectory) throws XenonException {
-        assertConnected();
-
-        synchronized (client) {
-            // changedir/delete doesn't need data channel:
-            updatePassiveMode(false);
-
-            // cd to directory. This also acts as an extra permissions check.
-            try {
-                client.changeDir(parentdir);
-
-                if (isDirectory) {
-                    client.deleteDir(basename);
-                } else {
-                    client.deleteFile(basename);
-                }
-
-            } catch (ServerException | IOException e) {
-                throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "rmpath() failed for:" + parentdir + "/" + basename + "\n"
-                        + e.getMessage(), e);
-            }
-        }
-    }
-
-    public void rename(String absolutePath, String otherPath) throws XenonException {
-        logger.error("FIXME: rename(): {} -> {} ", absolutePath, otherPath);
-    }
-
-    public List<MlsxEntry> list(RelativePath dirpath) throws XenonException {
-        return mlsd(dirpath);
-    }
-
-    protected GSSCredential getValidGSSCredential() throws XenonException {
-        return this.credential.createGSSCredential();
-    }
-
-    protected Authorization getAuthorization() {
-        return client.getAuthorization();
-    }
-
-    /**
-     * Create New Globus GridFTPClient using this Sessions default configuration. Multiple Grid FTP Clients maybe created for a
+     * Create New Globus GridFTPClient using this Sessions default configuration. Multiple Grid FTP Clients may be created for a
      * single GftpSession, but a single GridFTPCLient may never be shared by multiple Threads !
      */
     protected GridFTPClient createGFTPClient() throws XenonException {
@@ -376,6 +287,10 @@ public class GftpSession {
 
         if (port <= 0) {
             port = GftpAdaptor.DEFAULT_PORT;
+        }
+
+        if (credential == null) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "No (Globus Proxy) Credentials supplied, please supply them");
         }
 
         // --- todo: 
@@ -418,10 +333,175 @@ public class GftpSession {
         return newClient;
     }
 
+    /**
+     * @return current working directory.
+     * @throws XenonException
+     */
+    public String pwd() throws XenonException {
+
+        try {
+            synchronized (clientMutex) {
+
+                assertConnected();
+                updatePassiveMode(false);
+                String pwd = client.getCurrentDir();
+                logger.error("pwd() of {} = {}", this, pwd);
+                return pwd;
+
+            }
+        } catch (ServerException | IOException e) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "pwd() of server:" + this + "failed\n." + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create directory.
+     * 
+     * @param dirpath
+     *            - directory to create on the remote server
+     * @param ignoreExisting
+     *            - if true an existing directory will be ignored, else an Exception will be thrown if the (remote) directory
+     *            already exists.
+     * @throws XenonException
+     */
+    public void mkdir(String dirpath, boolean ignoreExisting) throws XenonException {
+        logger.debug("mkdir(): {}", dirpath);
+
+        if (exists(dirpath)) {
+            if (ignoreExisting) {
+                return; // already exists: ok. 
+            } else {
+                throw new PathAlreadyExistsException(GftpAdaptor.ADAPTOR_NAME, "Path already exists:" + dirpath);
+            }
+        }
+        try {
+            synchronized (clientMutex) {
+
+                assertConnected();
+                // mkdir doesn't need data channel
+                this.updatePassiveMode(false);
+
+                client.makeDir(dirpath);
+            }
+        } catch (ServerException | IOException e) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "mkdir() failed for path:" + dirpath + "\n" + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Remove remote file.
+     * 
+     * @param filepath
+     *            - path of the file to be removed.
+     * @throws XenonException
+     */
+    public void rmfile(RelativePath filepath) throws XenonException {
+        rmpath(filepath.getParent().getAbsolutePath(), filepath.getFileNameAsString(), false);
+    }
+
+    /**
+     * Remove remote directory. Directory must be empty.
+     * 
+     * @param dirpath
+     * @throws XenonException
+     */
+    public void rmdir(RelativePath dirpath) throws XenonException {
+        rmpath(dirpath.getParent().getAbsolutePath(), dirpath.getFileNameAsString(), true);
+    }
+
+    /**
+     * Delete single file or empty sub-directory from parent directory.
+     * 
+     * @param parentdir
+     *            - Accessible parent directory.
+     * @param basename
+     *            - File or sub-directory name.
+     * @param isDirectory
+     *            - whether to delete a file or sub-directory.
+     * @throws XenonException
+     */
+    public void rmpath(String parentdir, String basename, boolean isDirectory) throws XenonException {
+
+        try {
+            synchronized (clientMutex) {
+
+                assertConnected();
+                // changedir/delete doesn't need data channel:
+                updatePassiveMode(false);
+                // first CD into directory, this also serves as extra permission check. (dir must be 'accessible').
+                client.changeDir(parentdir);
+
+                if (isDirectory) {
+                    client.deleteDir(basename);
+                } else {
+                    client.deleteFile(basename);
+                }
+            }
+
+        } catch (ServerException | IOException e) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "rmpath() failed for:" + parentdir + "/" + basename + "\n"
+                    + e.getMessage(), e);
+        }
+    }
+
+    public void rename(String absolutePath, String otherPath) throws XenonException {
+
+        try {
+            synchronized (clientMutex) {
+                assertConnected();
+                updatePassiveMode(false); // no data channel needed. 
+                client.rename(absolutePath, otherPath);
+            }
+
+        } catch (ServerException | IOException e) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "rename() failed for:" + absolutePath + " -> " + otherPath + "\n"
+                    + e.getMessage(), e);
+        }
+    }
+
+    public List<MlsxEntry> list(RelativePath dirpath) throws XenonException {
+        return mlsd(dirpath);
+    }
+
+    protected GSSCredential getValidGSSCredential() throws XenonException {
+        return this.credential.createGSSCredential();
+    }
+
+    protected Authorization getAuthorization() {
+        return client.getAuthorization();
+    }
+
+    public String getChecksum(String algorithm, long offset, long length, String filePath) throws XenonException {
+
+        if (algorithm == null || algorithm.equalsIgnoreCase("")) {
+            return null;
+        }
+
+        ChecksumAlgorithm checksumAlgorithm = new ChecksumAlgorithm(algorithm);
+
+        try {
+            synchronized (this.clientMutex) {
+                return client.checksum(checksumAlgorithm, offset, length, filePath);
+            }
+        } catch (Exception e) {
+            throw new XenonException(adaptor.getName(), e.getMessage(), e);
+        }
+    }
+
     // ========================================================================
     // InputStream//OutputStream 
     // ========================================================================
 
+    /**
+     * Create new InputStream.
+     * <p>
+     * This method doesn't not block the current GridFTPClient so multiple InputStreams may be created.
+     * 
+     * @param filePath
+     * @param append
+     * @return
+     * @throws XenonException
+     */
     protected GridFTPInputStream createInputStream(String filepath) throws IOException, XenonException {
 
         logger.debug("createInputStream(): {}", filepath);
@@ -432,11 +512,11 @@ public class GftpSession {
         GridFTPInputStream inps;
 
         try {
-            
+
             if (useActiveMode()) {
                 logger.error("FIXME: createInputStream(): Active Mode not tested!");
             }
-            
+
             inps = new GridFTPInputStream(getValidGSSCredential(), getAuthorization(), this.getHostname(), this.getPort(),
                     filepath, usePassiveMode(), // always passive ?
                     Session.TYPE_IMAGE, useDataChannelAuthentication());
@@ -447,9 +527,22 @@ public class GftpSession {
             logger.error("createInputStream(): {} => Exception={}", filepath, e);
             throw new XenonException(GftpAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
-
     }
 
+    /**
+     * Create new OutputStream.
+     * <p>
+     * This method doesn't not block the current GridFTPClient so multiple OutputStreams to the same client may be created
+     * simultaneously.
+     * 
+     * @param filePath
+     *            - File path to open for writing.
+     * @param append
+     *            - whether to start writing at the end of the file. If false the stream will start writing at the beginning of
+     *            the file.
+     * @return Outputstream to the remote file.  
+     * @throws XenonException
+     */
     protected OutputStream createOutputStream(String filePath, boolean append) throws XenonException {
         logger.info("createOutputStream(): (append={}):{} ", append, filePath);
 
@@ -461,10 +554,9 @@ public class GftpSession {
             if (useActiveMode()) {
                 logger.error("FIXME: createOutputStream(): Active Mode not tested!");
             }
-            
+
             outps = new GridFTPOutputStream(getValidGSSCredential(), getAuthorization(), getHostname(), getPort(), filePath,
-                    append,
-                    usePassiveMode(), // always passive ?
+                    append, usePassiveMode(), // always passive ?
                     Session.TYPE_IMAGE, false);
 
             // Wrap ? 
@@ -495,14 +587,14 @@ public class GftpSession {
             return fakeMlst(filepath);
         }
 
-        assertConnected();
-
         try {
-            String pathStr = filepath.getAbsolutePath();
 
-            MlsxEntry entry = null;
+            synchronized (clientMutex) {
 
-            synchronized (client) {
+                String pathStr = filepath.getAbsolutePath();
+                MlsxEntry entry = null;
+
+                assertConnected();
                 // Assert correct GridFTP modus: 
                 updatePassiveMode(false);
                 if (this.client.exists(pathStr) == false) {
@@ -513,7 +605,6 @@ public class GftpSession {
                 // Update to passive for DATA channel mslt
                 updatePassiveMode(true);
                 entry = client.mlst(pathStr);
-
                 return entry;
             }
         } catch (Exception e) {
@@ -523,24 +614,30 @@ public class GftpSession {
     }
 
     private void assertConnected() throws XenonException {
+
         if (client == null) {
             throw new XenonException(adaptor.getName(), "assertConnected(): Grid FTP Client is not connected!");
         }
 
-        // check connection state here (debugging and keep-alive option).  
+        // Check connection state here (for debugging and keep-alive option).  
         if (options.optCheckClientState) {
-            synchronized (client) {
-                try {
+
+            //  
+            try {
+
+                synchronized (clientMutex) {
+
                     String pwd = client.getCurrentDir();
                     logger.debug("assertConnected():pwd= {} ", pwd);
-                } catch (ServerException | IOException e) {
-                    if (options.autoConnectAfterException) {
-                        logger.info("assertConnected(): reconnecting to remote server after exception: {} ", this);
-                        resetConnection();
-                    } else {
-                        throw new XenonException(adaptor.getName(), "assertConnected(): Client in error state:" + e.getMessage(),
-                                e);
-                    }
+
+                }
+            } catch (ServerException | IOException e) {
+
+                if (options.autoConnectAfterException) {
+                    logger.info("assertConnected(): reconnecting to remote server after exception: {} ", this);
+                    resetConnection();
+                } else {
+                    throw new XenonException(adaptor.getName(), "assertConnected(): Client in error state:" + e.getMessage(), e);
                 }
             }
         }
@@ -574,9 +671,18 @@ public class GftpSession {
         }
 
         try {
-            // update mode for exists(). 
-            updatePassiveMode(false);
-            if (client.exists(pathStr) == false) {
+
+            boolean exists = false;
+
+            // update mode for exists().
+            synchronized (clientMutex) {
+                assertConnected();
+                updatePassiveMode(false);
+                exists = client.exists(pathStr);
+            }
+
+            if (exists == false) {
+
                 logger.debug("fakeMlst(): path doet not exist: {}", filepath);
 
                 // Old Grid FTP server do not support statting "/", since the client is connected, return 'dummy' entry. 
@@ -664,8 +770,7 @@ public class GftpSession {
     }
 
     /**
-     * Create simple directory or file Mslx without any other file attributes. Used for Grid FTP V1.
-     * 
+     * Create simple directory or file MslxEntry without any other file attributes. Used for Grid FTP V1.
      * @throws XenonException
      */
     private MlsxEntry createDummyMslx(String filepath, boolean isDir) throws XenonException {
@@ -691,7 +796,15 @@ public class GftpSession {
         }
 
     }
-
+    /** 
+     * Convert FTP FileInfo object to MslxEntry. 
+     * 
+     * @param path - file or directory path
+     * @param basename - lastpart of the filename 
+     * @param finfo - actual FileInfo Object 
+     * @return MslxEntry 
+     * @throws XenonException
+     */
     private static MlsxEntry createMslx(String dirpath, String basename, FileInfo finfo) throws XenonException {
         // Example Mslx. Note space before filepath:
         // mslx=unix.owner=dexter;unix.mode=0755;size=4096;perm=cfmpel;type=dir;unix.group=admin;
@@ -744,19 +857,18 @@ public class GftpSession {
     /**
      * Update and check status of Passive/Active Mode connection.
      * <p>
-     * Some GridFTP commands setup a Data Channel. Before setting up this channel either Passive or Active 
-     * mode has to be specified. 
+     * Some GridFTP commands setup a Data Channel. Before setting up this channel either Passive or Active mode has to be
+     * specified.
      * <p>
      * DataChannel methods are: msld, get, put and variants of the methods.
      * 
      * @param dataChannelCommand
      *            - if true then update Active/Passive mode for a DataChannel Command.
-     * 
      * @throws XenonException
      */
     private void updatePassiveMode(boolean dataChannelCommand) throws XenonException {
         try {
-            synchronized (client) {
+            synchronized (clientMutex) {
 
                 if (usePassiveMode() == false) {
                     // Always update active mode.  
@@ -781,7 +893,13 @@ public class GftpSession {
     public List<MlsxEntry> mlsd(String pathStr) throws XenonException {
         return mlsd(new RelativePath(pathStr));
     }
-
+    /**
+     * Performs directory list command ('msld') on remote Grid FTP Server.  
+     * 
+     * @param dirpath - directory path to list 
+     * @return Contents of remote directory.    
+     * @throws XenonException
+     */
     public List<MlsxEntry> mlsd(RelativePath dirpath) throws XenonException {
         logger.debug("msld(): {}", dirpath);
 
@@ -852,7 +970,7 @@ public class GftpSession {
     }
 
     /**
-     * GridFTP V1.0 compatible list command which mimics mlsd. Performs different backward compatible methods to list the remote
+     * GridFTP V1.0 compatible list command which mimics 'mlsd'. Performs different backward compatible methods to list the remote
      * contents.
      */
     private List<MlsxEntry> fakeMlsd(RelativePath dirpath) throws XenonException {

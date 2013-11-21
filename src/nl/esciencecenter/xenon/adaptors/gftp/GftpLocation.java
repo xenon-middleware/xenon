@@ -2,6 +2,12 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
 
+/** 
+ * Grid FTP server:port location. 
+ * 
+ * @author Piter T. de Boer 
+ *
+ */
 public class GftpLocation {
 
     private final String hostname;
