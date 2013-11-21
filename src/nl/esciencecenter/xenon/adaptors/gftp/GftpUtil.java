@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import nl.esciencecenter.xenon.adaptors.ssh.SshUtil;
+import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 
@@ -196,9 +197,7 @@ public class GftpUtil {
     }
 
     public static Set<PosixFilePermission> unixModeToPosixFilePermissions(int mode) {
-
-        // use SshUtil. 
-        return SshUtil.bitsToPermissions(mode);
+        return PosixFileUtils.bitsToPermissions(mode);
     }
 
     public static String toString(FeatureList features) {
