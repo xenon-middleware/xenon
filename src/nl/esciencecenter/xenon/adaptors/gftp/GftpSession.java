@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.io.IOException;
@@ -35,12 +51,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GftpSession manages a (multi-threaded) Grid FTP Session a single server (host:port).
+ * GftpSession manages a (thread-safe) Grid FTP Session for a single server (host:port).
  * <p>
  * This class is thread-safe as opposed to the Globus GridFTPClient which can not be used multi-threaded. This because the
- * GridFTPClient client holds a state. For multi-threaded access to the same (Grid FTP) server it is recommended to use multiple
- * GftpSession objects as Grid FTP Servers are optimized for parallel access.
- * <p>
+ * GridFTPClient client holds a state. For multi-threaded access to the same GFTP server it is recommended to use multiple
+ * GftpSession objects as GFTP Servers are optimized for parallel access.<br>
  * This class can be used multi-threaded.
  * 
  * @author Piter T. de Boer
@@ -53,7 +68,7 @@ public class GftpSession {
 
         public boolean protocol_v1 = false;
 
-        /** Use Passive Gftp Mode. Default is true. */
+        /** Use Passive GFTP Mode. Default is true. */
         public boolean usePassiveMode = true;
 
         /** Either GFTP V1 or SRM Grid FTP Server. */
@@ -76,8 +91,11 @@ public class GftpSession {
             return "GftpSessionOptions:[protocol_v1=" + protocol_v1 + ", usePassiveMode=" + usePassiveMode + ", useBlindMode="
                     + useBlindMode + ", gfpt1ListHiddenFiles=" + gftp1ListHiddenFiles + ", enforceDCAU=" + enforceDCAU + "]";
         }
-
     }
+
+    // ---
+    // Instance 
+    // --- 
 
     private GftpAdaptor adaptor = null;
 
@@ -140,8 +158,10 @@ public class GftpSession {
             }
         }
 
-        this.client = this.createGFTPClient();
-        this.entryPath = pwd();
+        synchronized (clientMutex) {
+            this.client = this.createGFTPClient();
+            this.entryPath = pwd();
+        }
 
         logger.info("connect(): connected to remote path (user home=) {}", entryPath);
 
@@ -151,9 +171,15 @@ public class GftpSession {
     protected void updateFeatureList() throws XenonException {
 
         try {
-            // Check Grid FTP feature list:
-            this.features = client.getFeatureList();
-            this.useDataChannelAuthentication = features.contains(FeatureList.DCAU);
+
+            synchronized (clientMutex) {
+                // Check Grid FTP feature list:
+                this.features = client.getFeatureList();
+                this.useDataChannelAuthentication = features.contains(FeatureList.DCAU);
+            }
+
+            //this.useMLST = features.contains("mslt");
+            //this.useMLSD = features.contains("msld");
 
             if (logger.isInfoEnabled()) {
                 logger.info(" - Server Feature list:{}         = {}.", this, GftpUtil.toString(features));
@@ -181,32 +207,34 @@ public class GftpSession {
     }
 
     /**
-     * Idempotent close() method, Can be called multiple times.
+     * Idempotent close() method, can be called multiple times.
      * 
      * @param silent
-     *            - if an exception is thrown during the close, this exception will be ignored.
+     *            - if an Exception is thrown during the close, the Exception will be ignored.
      * @throws XenonException
      *             only if (silent==false) and an exception occurred during the close.
      */
     public void autoClose(boolean silent) throws XenonException {
-        if (client != null) {
-            try {
-                client.close();
-            } catch (ServerException | IOException e) {
 
-                client = null;
-
-                if (silent) {
-                    // log exception, continue execution. 
-                    logger.warn("Exception when closing previous Grid FTP Client:" + e.getMessage(), e);
-                } else {
-                    // not silent
-                    throw new XenonException(adaptor.getName(), "Exception during close:" + e.getMessage(), e);
+        synchronized (clientMutex) {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (ServerException | IOException e) {
+                    client = null;
+                    if (silent) {
+                        // silent mode: log exception, continue execution. 
+                        logger.warn("Exception when closing previous Grid FTP Client:" + e.getMessage(), e);
+                    } else {
+                        // not silent
+                        throw new XenonException(adaptor.getName(), "Exception during close:" + e.getMessage(), e);
+                    }
                 }
             }
+
+            client = null;
         }
 
-        client = null;
     }
 
     public void resetConnection() throws XenonException {
@@ -225,13 +253,48 @@ public class GftpSession {
     /**
      * Idempotent Close GridFTPClient. Does not throw exceptions.
      */
-    public void closeGFTPClient(GridFTPClient client) {
+    public void closeGFTPClient(GridFTPClient gftpClient) {
         try {
-            client.close();
+            gftpClient.close();
         } catch (Exception e) {
-            logger.warn("Exception when closing GridFTPClient:" + client);
+            logger.warn("Exception when closing GridFTPClient:" + gftpClient);
         }
 
+    }
+
+    /**
+     * Check whether connection is still valid and (optionally) reconnect to ensure valid Grid FTP connection.<br>
+     * If the connection is already closed by one of the close() methods this method will always result in an Exception.
+     * 
+     * @throws XenonException
+     *             if connection is not valid anymore and option autoConnectAfterException==false.
+     */
+    private void assertConnected() throws XenonException {
+
+        if (client == null) {
+            throw new XenonException(adaptor.getName(), "assertConnected(): Grid FTP Client is not connected!");
+        }
+
+        // Check connection state here (for debugging and keep-alive option).  
+        if (options.optCheckClientState) {
+
+            //  
+            try {
+
+                synchronized (clientMutex) {
+                    String pwd = client.getCurrentDir();
+                    logger.debug("assertConnected():pwd= {} ", pwd);
+                }
+            } catch (ServerException | IOException e) {
+
+                if (options.autoConnectAfterException) {
+                    logger.info("assertConnected(): reconnecting to remote server after exception: {} ", this);
+                    resetConnection();
+                } else {
+                    throw new XenonException(adaptor.getName(), "assertConnected(): Client in error state:" + e.getMessage(), e);
+                }
+            }
+        }
     }
 
     // ========================================================================
@@ -276,8 +339,9 @@ public class GftpSession {
     // ========================================================================
 
     /**
-     * Create New Globus GridFTPClient using this Sessions default configuration. Multiple Grid FTP Clients may be created for a
-     * single GftpSession, but a single GridFTPCLient may never be shared by multiple Threads !
+     * Create New Globus GridFTPClient using this Sessions configuration. Multiple GridFTPClients may be created for a single
+     * GftpSession, but a single GridFTPCLient may never be shared by multiple threads !<br>
+     * Create Multiple <code>GftpSession</code> instances to ensure save parallel access to a remote Grid FTP server. 
      */
     protected GridFTPClient createGFTPClient() throws XenonException {
         // actual Grid FTP Client; 
@@ -345,7 +409,7 @@ public class GftpSession {
                 assertConnected();
                 updatePassiveMode(false);
                 String pwd = client.getCurrentDir();
-                logger.error("pwd() of {} = {}", this, pwd);
+                logger.debug("pwd() of {} = {}", this, pwd);
                 return pwd;
 
             }
@@ -380,7 +444,6 @@ public class GftpSession {
                 assertConnected();
                 // mkdir doesn't need data channel
                 this.updatePassiveMode(false);
-
                 client.makeDir(dirpath);
             }
         } catch (ServerException | IOException e) {
@@ -495,7 +558,7 @@ public class GftpSession {
     /**
      * Create new InputStream.
      * <p>
-     * This method doesn't not block the current GridFTPClient so multiple InputStreams may be created.
+     * This method doesn't not block the current GridFTPClient so multiple InputStreams may be created to the same server. 
      * 
      * @param filePath
      * @param append
@@ -512,6 +575,11 @@ public class GftpSession {
         GridFTPInputStream inps;
 
         try {
+
+            // ---
+            // Create Custom GFTP Stream for multi-threaded access to remote files. 
+            // This way this method will not block the GftpSession while the file is read. 
+            // ---
 
             if (useActiveMode()) {
                 logger.error("FIXME: createInputStream(): Active Mode not tested!");
@@ -532,7 +600,7 @@ public class GftpSession {
     /**
      * Create new OutputStream.
      * <p>
-     * This method doesn't not block the current GridFTPClient so multiple OutputStreams to the same client may be created
+     * This method doesn't not block the current GridFTPClient so multiple OutputStreams to the same server may be created
      * simultaneously.
      * 
      * @param filePath
@@ -540,7 +608,7 @@ public class GftpSession {
      * @param append
      *            - whether to start writing at the end of the file. If false the stream will start writing at the beginning of
      *            the file.
-     * @return Outputstream to the remote file.  
+     * @return Outputstream to the remote file.
      * @throws XenonException
      */
     protected OutputStream createOutputStream(String filePath, boolean append) throws XenonException {
@@ -549,7 +617,11 @@ public class GftpSession {
         GridFTPOutputStream outps;
 
         try {
-            // Create custom GridFTPOutputStream. 
+
+            // ---
+            // Create Custom GFTP Stream for multi-threaded access to remote files. 
+            // This way this method will not block the GftpSession while the file is written to. 
+            // ---
 
             if (useActiveMode()) {
                 logger.error("FIXME: createOutputStream(): Active Mode not tested!");
@@ -613,40 +685,9 @@ public class GftpSession {
         }
     }
 
-    private void assertConnected() throws XenonException {
-
-        if (client == null) {
-            throw new XenonException(adaptor.getName(), "assertConnected(): Grid FTP Client is not connected!");
-        }
-
-        // Check connection state here (for debugging and keep-alive option).  
-        if (options.optCheckClientState) {
-
-            //  
-            try {
-
-                synchronized (clientMutex) {
-
-                    String pwd = client.getCurrentDir();
-                    logger.debug("assertConnected():pwd= {} ", pwd);
-
-                }
-            } catch (ServerException | IOException e) {
-
-                if (options.autoConnectAfterException) {
-                    logger.info("assertConnected(): reconnecting to remote server after exception: {} ", this);
-                    resetConnection();
-                } else {
-                    throw new XenonException(adaptor.getName(), "assertConnected(): Client in error state:" + e.getMessage(), e);
-                }
-            }
-        }
-
-    }
-
     /**
-     * V1.0 compatible 'mlst' method. Tries to get the FileInfo and converts it to a MlsxEntry object. Method is also needed for
-     * some old SRM Servers.
+     * Grid FTP V1.0 compatible 'mlst' method. Tries to get the FileInfo and converts it to a MlsxEntry object. Method is also
+     * needed for some old SRM Servers.
      */
     private MlsxEntry fakeMlst(RelativePath filepath) throws XenonException {
         logger.debug("fakeMlst():{}", filepath);
@@ -771,6 +812,7 @@ public class GftpSession {
 
     /**
      * Create simple directory or file MslxEntry without any other file attributes. Used for Grid FTP V1.
+     * 
      * @throws XenonException
      */
     private MlsxEntry createDummyMslx(String filepath, boolean isDir) throws XenonException {
@@ -796,13 +838,17 @@ public class GftpSession {
         }
 
     }
-    /** 
-     * Convert FTP FileInfo object to MslxEntry. 
+
+    /**
+     * Convert FTP FileInfo object to MslxEntry.
      * 
-     * @param path - file or directory path
-     * @param basename - lastpart of the filename 
-     * @param finfo - actual FileInfo Object 
-     * @return MslxEntry 
+     * @param path
+     *            - file or directory path
+     * @param basename
+     *            - lastpart of the filename
+     * @param finfo
+     *            - actual FileInfo Object
+     * @return MslxEntry
      * @throws XenonException
      */
     private static MlsxEntry createMslx(String dirpath, String basename, FileInfo finfo) throws XenonException {
@@ -868,6 +914,7 @@ public class GftpSession {
      */
     private void updatePassiveMode(boolean dataChannelCommand) throws XenonException {
         try {
+            // do no use assertConnected() here...
             synchronized (clientMutex) {
 
                 if (usePassiveMode() == false) {
@@ -893,11 +940,15 @@ public class GftpSession {
     public List<MlsxEntry> mlsd(String pathStr) throws XenonException {
         return mlsd(new RelativePath(pathStr));
     }
+
     /**
-     * Performs directory list command ('msld') on remote Grid FTP Server.  
+     * Performs list directory command ('mlsd') on remote Grid FTP Server.<br>
+     * This method creates a custom GftpClient and does not block the curent <code>GftpSession</code>. <br>
+     * This way multiple directories can be listed in parallel on the same server.
      * 
-     * @param dirpath - directory path to list 
-     * @return Contents of remote directory.    
+     * @param dirpath
+     *            - directory path to list
+     * @return Contents of remote directory.
      * @throws XenonException
      */
     public List<MlsxEntry> mlsd(RelativePath dirpath) throws XenonException {
@@ -923,8 +974,8 @@ public class GftpSession {
             Vector<?> listV = null;
 
             // ---
-            // multi-threaded directory listing: 
-            // Create custom client and no not block (synchronized) this session. 
+            // Create Custom GFTP client for multi-threaded listing of remote directories. 
+            // This way this method will not block the GftpSession. 
             // ---
 
             if (useActiveMode()) {
@@ -970,8 +1021,8 @@ public class GftpSession {
     }
 
     /**
-     * GridFTP V1.0 compatible list command which mimics 'mlsd'. Performs different backward compatible methods to list the remote
-     * contents.
+     * GridFTP V1.0 compatible list command which mimics 'mlsd'. <br>
+     * Performs different backward compatible methods to list the remote contents.
      */
     private List<MlsxEntry> fakeMlsd(RelativePath dirpath) throws XenonException {
         logger.debug("fakeMlsd(): {}", dirpath);
@@ -1074,7 +1125,7 @@ public class GftpSession {
     // ---
 
     public String toString() {
-        return "GftpSession:[location:" + this.location + ",connected:" + this.isConnected() + "]";
+        return "GftpSession:[location=" + this.location + ",connected=" + this.isConnected() + "]";
     }
 
 }

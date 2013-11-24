@@ -1,3 +1,19 @@
+/*
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.io.File;
@@ -21,7 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Various Globus and Other GridFTP util methods.
+ * Various Globus and Other Grid FTP util methods.<br>
+ * Also contains static initialization methods needed to configure Globus.
  * 
  * @author Piter T. de Boer
  */
@@ -34,13 +51,13 @@ public class GftpUtil {
     public static final String GFTP_SCHEME = "gftp";
 
     /**
-     * In cog-jglobus 1.4 this string isn't defined. Define it here to stay 1.4 compatible. This property is defined in CoG
-     * jGlobus 1.7 and higher.
+     * In cog-jglobus 1.4 this String isn't defined. Define it here to stay 1.4 compatible.<br>
+     * This property is defined in CoG jGlobus 1.7 and higher.
      */
     public static final String COG_ENFORCE_SIGNING_POLICY = "java.security.gsi.signing.policy";
 
     /**
-     * PKCS11 Model property (not used).
+     * PKCS11 Model property (not yet used).
      */
     public static final String PKCS11_MODEL = "org.globus.tools.proxy.PKCS11GridProxyModel";
 
@@ -50,9 +67,19 @@ public class GftpUtil {
     public static final String DEFAULT_SYSTEM_CERTIFICATES_DIR = "/etc/grid-security/certificates";
 
     /**
-     * User subdirectory '~/.globus' for globus configurations.
+     * User sub-directory '~/.globus' for globus configurations.
      */
     public static final String GLOBUSRC = ".globus";
+
+    /**
+     * Default user (grid) public certificate file for example in the "~/.globusrc" directory.
+     */
+    public static final String USERCERTPEM = "usercert.pem";
+
+    /**
+     * Default user (grid) private certificate key file, for example in the "~/.globusrc/" directory.
+     */
+    public static final String USERKEYPEM = "userkey.pem";
 
     public static void staticInit() {
         initCogProperties();
@@ -60,7 +87,7 @@ public class GftpUtil {
 
     public static void initCogProperties() {
         CoGProperties props = CoGProperties.getDefault();
-
+        // If not set explicitly, this value must be set to avoid exceptions thrown by globus. 
         String val = props.getProperty(COG_ENFORCE_SIGNING_POLICY);
 
         if ((val == null) || (val.equals(""))) {
@@ -69,7 +96,7 @@ public class GftpUtil {
     }
 
     public synchronized static List<X509Certificate> loadX509Certificates() {
-        String dirs[] = new String[] { "/etc/grid-security/certificates" };
+        String dirs[] = new String[] { DEFAULT_SYSTEM_CERTIFICATES_DIR };
         return loadCertificates(dirs);
     }
 
@@ -85,7 +112,9 @@ public class GftpUtil {
             TrustedCertificates defCerts = null;
             X509Certificate[] defXCerts = null;
             defCerts = TrustedCertificates.getDefault();
-            defXCerts = defCerts.getCertificates();
+            if (defCerts != null) {
+                defXCerts = defCerts.getCertificates();
+            }
 
             if (defXCerts != null) {
                 for (X509Certificate cert : defXCerts) {
@@ -94,7 +123,7 @@ public class GftpUtil {
                 }
             }
         } catch (NullPointerException e) {
-            // Bug in Globus!
+            // (old) Bug in Globus!
             logger.warn("Globus NullPointer bug: TrustedCertificates.getDefault(): NullPointerException:");
         }
 
@@ -127,6 +156,12 @@ public class GftpUtil {
         return allCerts;
     }
 
+    /**
+     * Update static loaded Trusted Certificates used by Globus.
+     * 
+     * @param certs
+     *            - Trusted certificates needed by Globus.
+     */
     public static void staticUpdateTrustedCertificates(List<X509Certificate> certs) {
         X509Certificate[] newXCerts = new X509Certificate[certs.size()];
         newXCerts = certs.toArray(newXCerts);
@@ -141,7 +176,7 @@ public class GftpUtil {
             X509Certificate[] xcerts = tcerts.getCertificates();
 
             for (X509Certificate xcert : xcerts) {
-                logger.info(" > updating trusted certificate: {}", xcert.getSubjectX500Principal());
+                logger.info(" > updating Trusted Certificate: {}", xcert.getSubjectX500Principal());
             }
         }
 
@@ -162,9 +197,23 @@ public class GftpUtil {
     }
 
     /**
-     * Convert GridFTP Time String "YYYYMMDDhhmmss" to millis since Epoch.
+     * Convert (Grid) FTP Time String "YYYYMMDDhhmmss[.zzz]" to millis since Epoch.
      */
     public static long timeStringToMillis(String val) {
+        return timeStringtoCalender(val).getTimeInMillis();
+    }
+
+    /**
+     * Convert (Grid) FTP Time String "YYYYMMDDhhmmss[.zzz]" to Java Date.
+     */
+    public static java.util.Date timeStringToDate(String val) {
+        return timeStringtoCalender(val).getTime();
+    }
+
+    /**
+     * Convert (Grid) FTP Time String "YYYYMMDDhhmmss[.zzz]" to java Calendar.
+     */
+    public static java.util.Calendar timeStringtoCalender(String val) {
         // FTP date value is in YYYYMMDDhhmmss
         int YYYY = Integer.valueOf(val.substring(0, 4));
         int MM = Integer.valueOf(val.substring(4, 6));
@@ -173,17 +222,16 @@ public class GftpUtil {
         int mm = Integer.valueOf(val.substring(10, 12));
         int ss = Integer.valueOf(val.substring(12, 14));
 
+        // todo: optional milli seconds after seconds.  
+
         // GMT TIMEZONE:
         TimeZone gmtTZ = TimeZone.getTimeZone("GMT-0:00");
         Calendar cal = new GregorianCalendar(gmtTZ);
 
-        // O-be-1-kenobi: month nr in GregorianCalendar is zero-based
+        // O-be-1-kenobi: month number in GregorianCalendar is zero-based
         cal.set(YYYY, MM - 1, DD, hh, mm, ss);
 
-        // TimeZone localTZ=Calendar.getInstance().getTimeZone();
-        // cal.setTimeZone(localTZ);
-
-        return cal.getTimeInMillis();
+        return cal;
     }
 
     public static String basename(String filepath) {
@@ -206,7 +254,7 @@ public class GftpUtil {
         // Use reflection to check String Constants as FeatureList doesn't support them:
         Field[] fields = FeatureList.class.getFields();
         for (Field field : fields) {
-            
+
             // skip private parts 
             if (field.isAccessible() == false) {
                 //continue; 

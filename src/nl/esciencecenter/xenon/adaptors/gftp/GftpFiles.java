@@ -60,6 +60,11 @@ import org.globus.io.streams.GridFTPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** 
+ * Files implementation for Grid FTP. 
+ * 
+ * @author Piter T. de Boer. 
+ */
 public class GftpFiles implements Files {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GftpFiles.class);
@@ -129,7 +134,7 @@ public class GftpFiles implements Files {
         LOGGER.debug("* newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
-        // (re)connect, session migh be shared and/or re-used.
+        // (re)connect, keep possible already connected session. Session might be shared and/or re-used.
         session.connect(false);
 
         String wd = session.pwd();
@@ -157,6 +162,7 @@ public class GftpFiles implements Files {
 
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
+        // Create New private owned Session for each Grid FTP FileSystem Implementation. 
         GftpSession session = adaptor.createNewSession(sshLocation, (GlobusProxyCredential) credential, xenonProperties);
 
         return newFileSystem(session, scheme, location, credential, xenonProperties);
@@ -233,9 +239,7 @@ public class GftpFiles implements Files {
         }
 
         checkParent(dir);
-
         GftpSession session = getSession(dir);
-
         session.mkdir(dir.getRelativePath().getAbsolutePath(), false);
 
         LOGGER.debug("createDirectory OK");

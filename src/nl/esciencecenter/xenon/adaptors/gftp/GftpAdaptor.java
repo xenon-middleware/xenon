@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the Grid FTP Adaptor. Uses cog-jglobus 1.8 API.
+ * Implementation of the Grid FTP Adaptor. Uses cog-jglobus-1.7/1.8 API.
  * 
  * @author Piter T. de Boer
  */
@@ -49,43 +49,46 @@ public class GftpAdaptor extends Adaptor {
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "gftp";
 
-    /** The default SSH port */
+    /** The default Grid FTP port */
     protected static final int DEFAULT_PORT = 2811;
 
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "Grid FTP adaptor based on Globus Grid FTP";
 
-    /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>(GftpUtil.GSIFTP_SCHEME,GftpUtil.GFTP_SCHEME); 
-    
+    /** The schemes supported by this adaptor. both "gftp" and "gsiftp" are supported. */
+    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>(GftpUtil.GSIFTP_SCHEME,
+            GftpUtil.GFTP_SCHEME);
+
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("host[:port]");
 
-    /** All our own properties start with this prefix. */
+    /** All Grid FTP properties start with this prefix. */
     public static final String PREFIX = XenonEngine.ADAPTORS + ADAPTOR_NAME + ".";
 
-    /** Some data channels must use channel authentication when setting up a GFTP connection. */
+    /** Some data channels must use channel authentication when setting up a Grid FTP connection. */
     public static final String USE_PASSIVE_MODE = PREFIX + "usePassiveMode";
 
     /**
-     * Do not 'stat' the remote file and assume remote file exists. This is needed to access SRM Grid FTP Servers. Also listing of
-     * remote directories is not possible. list() method should returns empty directories.
+     * Do not 'stat' the remote file and assume remote files exists when statted. <br>
+     * This is needed to access SRM Grid FTP Servers. Also listing of remote directories is not possible. The msld() method(s)
+     * will return no entries.
      */
     public static final String USE_BLIND_GFTP = PREFIX + "useBlindMode";
 
     /**
-     * Explicitly set to Gftp V1. Needed for old Grid FTP and SRM backend grid servers.
+     * Explicitly set to gftp version 1.x. Needed for old Grid FTP servers and some SRM back-end gftp servers.
      */
     public static final String USE_GFTP_V1 = PREFIX + "useGftpV1";
 
     /**
-     * Enforce the use of Data Channel Authentication. Some Grid FTP server do not support this. If this is not supported but
-     * enforceDCAUE==true, an exception will be thrown. If set to false DCAU will be disabled if not supported by the GFTP Server.
+     * Enforce the use of Data Channel Authentication. Some Grid FTP servers do not support this.<br>
+     * If this is not supported but enforceDCAUE==true, an exception will be thrown. If set to false DCAU will be disabled if not
+     * supported by the GFTP Server.
      */
     public static final String ENFORCE_DATA_CHANNEL_AUTHENTICATION = PREFIX + "enforceDCAU";
 
-    /** 
-     * List of properties supported by this GfridFTP adaptor 
+    /**
+     * List of properties supported by this GfridFTP adaptor
      */
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
 

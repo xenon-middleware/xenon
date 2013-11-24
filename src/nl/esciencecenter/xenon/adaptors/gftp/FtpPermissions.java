@@ -2,10 +2,8 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 
 /**
  * Generic (G)FTP Permissions.
- * 
- * <br>
- * 
- * From: http://www.nextgen6.net/docs/proftpd/rfc/draft-ietf-ftpext-mlst-12.txt
+ * <p>
+ * From: http://www.ietf.org/rfc/rfc3659.txt Section 7.5.5: 
  * 
  * <pre>
  * 7.5.5. The perm Fact
@@ -181,6 +179,10 @@ public class FtpPermissions {
         return new FtpPermissions(str);
     }
 
+    /**
+     * Returns PERM String equivalent but not exact euqal with PERM string givin as constructor argument. 
+     * @Return PERM compatible Permissions String. 
+     */
     public String toString() {
         return "" + ((appendable) ? "a" : "-") + ((cancreatefiles) ? "c" : "-") + ((deletable) ? "d" : "-")
                 + ((enterable) ? "e" : "-") + ((renamable) ? "f" : "-") + ((listable) ? "l" : "-") + ((canbepurged) ? "p" : "-")
@@ -189,8 +191,8 @@ public class FtpPermissions {
     }
 
     /**
-     * Return Posix compatible "writable" or "w" bit for these permissions. This means files must be writable,deletable and appendable, and directories must
-     * be able to add/create/delete new entries.
+     * Return Posix compatible "writable" or "w" bit for these permissions. This means files must be writable,deletable and
+     * appendable, and directories must be able to add/create/delete new entries.
      */
     public boolean isPosixWritable() {
         return ((writable && appendable && deletable) || (cancreatedirs && cancreatefiles && canbepurged));
@@ -206,10 +208,31 @@ public class FtpPermissions {
 
     /**
      * Return Posix compatible "accessible" or directory "executable" or "x" bit. This means directories must be 'enterable' but
-     * not perse listable. 
+     * not perse listable.
      */
     public boolean isPosixAccessible() {
         return (enterable);
     }
+
+    @Override
+    public int hashCode() {
+        // return String hashcode. 
+        return toString().hashCode(); 
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        // Compare using (PERM) String representation: 
+        FtpPermissions other = (FtpPermissions) obj;
+        return toString().equals(other.toString()); 
+    }
+
 
 }
