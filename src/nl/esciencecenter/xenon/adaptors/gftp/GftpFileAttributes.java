@@ -24,6 +24,8 @@ import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 
 import org.globus.ftp.MlsxEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The GftpFileAttributes class wraps around an MslxEntry containing default and file system specific attributes.
@@ -36,6 +38,8 @@ import org.globus.ftp.MlsxEntry;
  */
 public class GftpFileAttributes implements FileAttributes {
 
+    private static final Logger logger = LoggerFactory.getLogger(GftpFileAttributes.class);
+    
     public static final String UNIX_GROUP = "unix.group";
 
     public static final String UNIX_GID = "unix.gid";
@@ -217,7 +221,7 @@ public class GftpFileAttributes implements FileAttributes {
      * @return (Octal) Unix File Mode as integer, or -1 if not supported.
      */
     public int getUnixMode() {
-        
+
         String val = mlsxEntry.get(UNIX_MODE);
 
         if ((val == null) || (val == "")) {
@@ -377,6 +381,47 @@ public class GftpFileAttributes implements FileAttributes {
         }
 
         return set;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((mlsxEntry == null) ? 0 : mlsxEntry.toString().hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+         
+        logger.error("equals: {} == {} ",this,obj);
+        
+        GftpFileAttributes other = (GftpFileAttributes) obj;
+
+        if (path == null) {
+            if (other.path != null)
+                return false;
+        } else if (!path.equals(other.path)) {
+            return false;
+        }
+        // Compare String representations of mslxEntry !  
+        // note that the order of mlsxEntries is not defined. 
+        if (mlsxEntry == null) {
+            if (other.mlsxEntry != null) {
+                return false;
+            }
+        } else if (!mlsxEntry.toString().equals(other.mlsxEntry.toString()))
+            return false;
+        return true;
     }
 
 }

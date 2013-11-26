@@ -43,7 +43,7 @@ public class GftpAdaptor extends Adaptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(GftpAdaptor.class);
 
     static {
-        GftpUtil.staticInit();
+        GlobusUtil.staticInit();
     }
 
     /** The name of this adaptor */
@@ -114,6 +114,7 @@ public class GftpAdaptor extends Adaptor {
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         this.filesAdaptor = new GftpFiles(this, xenonEngine);
+        // Custom Globus Properties factory for this FileSystem, which should be linked to one user credential configuration. 
         this.credentialsAdaptor = new GlobusProxyCredentials(getProperties(), this);
     }
 

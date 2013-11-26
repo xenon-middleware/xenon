@@ -30,7 +30,6 @@ import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 
-import org.globus.common.CoGProperties;
 import org.globus.ftp.FeatureList;
 import org.globus.gsi.TrustedCertificates;
 import org.slf4j.Logger;
@@ -51,52 +50,27 @@ public class GftpUtil {
     public static final String GFTP_SCHEME = "gftp";
 
     /**
-     * In cog-jglobus 1.4 this String isn't defined. Define it here to stay 1.4 compatible.<br>
-     * This property is defined in CoG jGlobus 1.7 and higher.
-     */
-    public static final String COG_ENFORCE_SIGNING_POLICY = "java.security.gsi.signing.policy";
-
-    /**
-     * PKCS11 Model property (not yet used).
-     */
-    public static final String PKCS11_MODEL = "org.globus.tools.proxy.PKCS11GridProxyModel";
-
-    /**
      * Default system wide grid certificates directory.
      */
     public static final String DEFAULT_SYSTEM_CERTIFICATES_DIR = "/etc/grid-security/certificates";
 
-    /**
-     * User sub-directory '~/.globus' for globus configurations.
-     */
-    public static final String GLOBUSRC = ".globus";
+    public synchronized static List<X509Certificate> loadX509Certificates(String[] customDirs) {
 
-    /**
-     * Default user (grid) public certificate file for example in the "~/.globusrc" directory.
-     */
-    public static final String USERCERTPEM = "usercert.pem";
-
-    /**
-     * Default user (grid) private certificate key file, for example in the "~/.globusrc/" directory.
-     */
-    public static final String USERKEYPEM = "userkey.pem";
-
-    public static void staticInit() {
-        initCogProperties();
-    }
-
-    public static void initCogProperties() {
-        CoGProperties props = CoGProperties.getDefault();
-        // If not set explicitly, this value must be set to avoid exceptions thrown by globus. 
-        String val = props.getProperty(COG_ENFORCE_SIGNING_POLICY);
-
-        if ((val == null) || (val.equals(""))) {
-            props.setProperty(COG_ENFORCE_SIGNING_POLICY, "false");
+        int n = 0;
+        if (customDirs != null) {
+            n = customDirs.length;
         }
-    }
 
-    public synchronized static List<X509Certificate> loadX509Certificates() {
-        String dirs[] = new String[] { DEFAULT_SYSTEM_CERTIFICATES_DIR };
+        // default dir: 
+        String dirs[] = new String[1 + n];
+        // add custom dirs (if specified):
+        dirs[0] = DEFAULT_SYSTEM_CERTIFICATES_DIR;
+        int index=1;
+        for (int i = 0; i < n; i++) {
+            if (customDirs[i]!=null) {
+                dirs[index++] = customDirs[i]; // filter existing here ? 
+            }
+        }
         return loadCertificates(dirs);
     }
 
@@ -130,9 +104,12 @@ public class GftpUtil {
         logger.info(" + Got {} default certificates", allCerts.size());
 
         for (String certPath : caCertificateDirs) {
-            //Global.infoPrintf(this," + Checking extra certificates from:%s\n",certPath);
-
-            // check path: avoid errors in eclipse: 
+             
+            if ((certPath==null) || certPath=="") 
+            {
+                continue; 
+            }
+            
             File file = new File(certPath);
             if (file.exists()) {
                 logger.debug(" +++ Loading Extra Certificates from: {} +++", certPath);
