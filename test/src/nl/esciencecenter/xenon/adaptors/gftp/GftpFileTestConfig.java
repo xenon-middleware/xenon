@@ -39,7 +39,7 @@ public class GftpFileTestConfig extends FileTestConfig {
 
         super(GftpUtil.GFTP_SCHEME, configfile);
 
-        String location="localhost:2811"; 
+        String location="eslt007:2811"; 
         
         //String location = getPropertyOrFail(p, "test.gftp.location");
         
