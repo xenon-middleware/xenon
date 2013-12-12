@@ -36,11 +36,13 @@ import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.RelativePath;
 
 import org.globus.ftp.ChecksumAlgorithm;
+import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.MlsxEntry;
 import org.globus.ftp.Session;
+import org.globus.ftp.exception.ClientException;
 import org.globus.ftp.exception.FTPException;
 import org.globus.ftp.exception.ServerException;
 import org.globus.gsi.gssapi.auth.Authorization;
@@ -341,7 +343,7 @@ public class GftpSession {
     /**
      * Create New Globus GridFTPClient using this Sessions configuration. Multiple GridFTPClients may be created for a single
      * GftpSession, but a single GridFTPCLient may never be shared by multiple threads !<br>
-     * Create Multiple <code>GftpSession</code> instances to ensure save parallel access to a remote Grid FTP server. 
+     * Create Multiple <code>GftpSession</code> instances to ensure save parallel access to a remote Grid FTP server.
      */
     protected GridFTPClient createGFTPClient() throws XenonException {
         // actual Grid FTP Client; 
@@ -551,6 +553,32 @@ public class GftpSession {
         }
     }
 
+    /**
+     * Grid FTP 1.0 compatible method. Fetches file size using FTP (1.0) method 'getSize' and does not stat remote file entry
+     * using mlst method.
+     * 
+     * @param filePath
+     * @return file size or -1 if unknown or not applicable.
+     * @throws XenonException
+     */
+    public long getSize(String path) throws XenonException {
+        long size = 0;
+
+        try {
+            synchronized (clientMutex) {
+                assertConnected();
+                updatePassiveMode(false); // no data channel needed. 
+                size = this.client.getSize(path);
+                if (size < -1)
+                    size = -1; // 
+                return size;
+            }
+        } catch (Exception e) {
+            throw new XenonException(adaptor.getName(), "Couldn't get size of file (" + this.getHostname() + "):" + path
+                    + "\nError:" + e.getMessage(), e);
+        }
+    }
+
     // ========================================================================
     // InputStream//OutputStream 
     // ========================================================================
@@ -558,7 +586,7 @@ public class GftpSession {
     /**
      * Create new InputStream.
      * <p>
-     * This method doesn't not block the current GridFTPClient so multiple InputStreams may be created to the same server. 
+     * This method doesn't not block the current GridFTPClient so multiple InputStreams may be created to the same server.
      * 
      * @param filePath
      * @param append
@@ -1118,6 +1146,184 @@ public class GftpSession {
         String basename = finf.getName();
         // check ? 
         entrys.put(basename, createMslx(dirpath, basename, finf));
+    }
+
+    // =================================
+    // Third party transfer/copy methods  
+    // =================================
+
+    /**
+     * Copy remote file but on same server. This can be done with 3rd party copying to the same server. 
+     * 
+     * @param sourcePath - source file to copy
+     * @param targetFilepath - target file path to copy to on the same server 
+     * @throws XenonException
+     */
+    public void activeRemoteCopy(RelativePath sourcePath, RelativePath targetFilepath) throws XenonException {
+        active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), this, targetFilepath.getAbsolutePath());
+    }
+    
+    /**
+     * Perform active third party transfer and initiate active file transfer from this (source) server. This server will be the
+     * active party. If this is not possible use the reverse method
+     * 
+     * @param sourcePath
+     *            - file path on this GridFTP server
+     * @param remoteServer
+     *            - remote GridFTP server.
+     * @param targetFilepath
+     *            - remote File path to copy to
+     * @throws XenonException
+     */
+    public void active3rdPartyTransfer(RelativePath sourcePath, GftpSession remoteServer, RelativePath targetFilepath)
+            throws XenonException {
+        active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), remoteServer, targetFilepath.getAbsolutePath());
+    }
+
+    /**
+     * Perform active third party transfer but the direction is reversed.<br>
+     * The (Remote) source server will be the active party. This is necessary when the source server is behind a firewall or it
+     * can't be the active server for some other reason.
+     * 
+     * @param destinationPathHere
+     *            - destination path on this GridFTP Server.
+     * @param remoteSourceServer
+     *            - remote GridFTP Server to copy from, this server will be the active party.
+     * @param remoteSourceFilepath
+     *            - File path on remote (other) GridFTP Server.
+     * @throws XenonException
+     *             -
+     */
+    public void active3rdPartyTransferReverse(RelativePath destinationPathHere, GftpSession remoteSourceServer,
+            RelativePath remoteSourceFilepath) throws XenonException {
+        active3rdPartyTransfer(remoteSourceServer, remoteSourceFilepath.getAbsolutePath(), this,
+                destinationPathHere.getAbsolutePath());
+    }
+
+    /**
+     * Initiate 3rd party transfer from sourceServer to targetServer. This is a static method as transfers must be done between
+     * two authenticated GridFTP Sessions.
+     * 
+     * @param sourceServer
+     *            - source GFTP FileSystem: this server is the Active Party during transfer.
+     * @param sourceFilepath
+     *            - source path of file
+     * @param targetServer
+     *            - target GFTP FileSystem: this server is the Passive Party during transfer. 
+     * @param targetFilepath
+     *            - target path of file
+     * @return new Target VFile object
+     * @throws VrsException
+     */
+    protected static void active3rdPartyTransfer(GftpSession sourceServer, String sourceFilepath, GftpSession targetServer,
+            String targetFilepath) throws XenonException {
+        String transferInfoStr = "third party copy from " + sourceServer.getHostname() + ":" + sourceFilepath + " to "
+                + targetServer.getHostname() + ":" + targetFilepath;
+        logger.info("> Performing:{}", transferInfoStr);
+
+        //monitor.logPrintf("Performing: %s\n",transferInfoStr); 
+
+        // Multi threaded support: Create private GridFTP clients for each location:  
+        GridFTPClient privateSourceClient = sourceServer.createGFTPClient();
+        GridFTPClient privateTargetClient = targetServer.createGFTPClient();
+
+        // Grid FTP 1.0 compatibility
+        // Both must support DCAU. If one of them doesn't: disable at the other ! 
+
+        boolean sourceDCAU = sourceServer.useDataChannelAuthentication();
+        boolean destDCAU = targetServer.useDataChannelAuthentication();
+
+        long sourceSize = -1;
+        try {
+            sourceSize = sourceServer.getSize(sourceFilepath);
+        } catch (Exception e) {
+            // SRM Patch: not always possible to fetch file size from transport URLs !
+            logger.warn("Couldn't determine file size of source file {}:", e);
+        }
+
+        logger.debug(" - GridFTP 3rd party transfer source Server DCAU = {}", sourceDCAU);
+        logger.debug(" - GridFTP 3rd party transfer dest   Server DCAU = {}", destDCAU);
+
+        // both must be true or false. 
+        if (sourceDCAU != destDCAU) {
+            logger.warn("Warning: Grid FTP Data Channel Authentication mismatch between source: " + sourceServer.getHostname()
+                    + " and destination:" + targetServer.getHostname());
+
+            privateSourceClient.setLocalNoDataChannelAuthentication();
+            privateTargetClient.setLocalNoDataChannelAuthentication();
+
+            if ((sourceDCAU == false) && (destDCAU == true)) {
+                try {
+                    privateTargetClient.setDataChannelAuthentication(DataChannelAuthentication.NONE);
+                } catch (Exception e) {
+                    // API might not be supported, continue anyway. 
+                    logger.error("Exception disabling DataChannel Authentication for server:{} => {}", sourceServer, e);
+                }
+            }
+
+            if ((destDCAU == false) && (sourceDCAU == true)) {
+                try {
+                    privateSourceClient.setDataChannelAuthentication(DataChannelAuthentication.NONE);
+                } catch (Exception e) {
+                    // API might not be supported, continue anyway. 
+                    logger.error("Exception disabling DataChannel Authentication for server:{} => {}", sourceServer, e);
+                }
+            }
+        }
+
+//        TBD:
+//        try {
+//            // explicit set active/passsive mode !  
+//
+//            privateSourceClient.setPassiveMode(false);
+//            privateTargetClient.setPassiveMode(true); 
+//            
+//        } catch (Exception e) {
+//
+//            throw new XenonException(GftpAdaptor.ADAPTOR_NAME,"active3rdPartyTransfer: Couldn't set Active/Passive modes:"+e.getMessage(),e); 
+//        } 
+         
+        
+        Throwable transferEx = null;
+
+        GftpTransferMonitor listener = new GftpTransferMonitor(targetServer, targetFilepath, sourceSize);
+
+        try {
+
+            boolean append = false;
+            // ===
+            // Passive/Active mode:   
+            // Transfers are initiated from the source and the destination MUST support active mode or else the 3rd party
+            // transfer doesn't work and the direction must be reversed.
+            // In that case the other server must allow active mode because if
+            // neither of the two servers allow active mode no transfer can happen at all.  
+            // ===
+
+            // Create monitor for destination  
+
+            privateSourceClient.transfer(sourceFilepath, privateTargetClient, targetFilepath, append, listener);
+           
+        } catch (Throwable e) {
+            listener.setException(e);
+            logger.error("Exception during 3rd party transfer:{}",e);
+            // retry ? 
+            transferEx = e;
+        }
+
+        // finally: 
+
+        // CLEANUP !
+        sourceServer.closeGFTPClient(privateSourceClient);
+        targetServer.closeGFTPClient(privateTargetClient);
+
+        if (transferEx != null) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "Couldn't perform " + transferInfoStr + ". Error="
+                    + transferEx.getMessage(), transferEx);
+        }
+
+        logger.info("GridFTP: Finished 3rd party transfer.\n");
+
+        return; // ok 
     }
 
     // ---

@@ -198,7 +198,7 @@ public class GlobusProxyCredentials implements Credentials {
      * @return GlobusCredentials from proxy certificate.
      * @throws XenonException
      */
-    public GlobusCredential loadProxyFile(String proxyFilepath) throws XenonException {
+    public GlobusCredential loadGlobusProxyFile(String proxyFilepath) throws XenonException {
 
         // Refresh Trusted Certificates before creating new credential, more could have been added manually 
         // by user. 

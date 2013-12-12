@@ -46,7 +46,7 @@ public class GlobusProxyCredential implements Credential {
     public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, String proxyFilepath) throws XenonException {
         this.credentialFactory = globusProxyCredentials;
         this.proxyFilepath = proxyFilepath;
-        this.globusCredential = credentialFactory.loadProxyFile(proxyFilepath);
+        this.globusCredential = credentialFactory.loadGlobusProxyFile(proxyFilepath);
     }
 
     @Override

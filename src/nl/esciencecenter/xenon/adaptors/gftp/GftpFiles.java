@@ -592,7 +592,7 @@ public class GftpFiles implements Files {
 
         CopyEngine ce = xenonEngine.getCopyEngine();
 
-        CopyInfo info = CopyInfo.createCopyInfo(GftpAdaptor.ADAPTOR_NAME, ce.getNextID("SSH_COPY_"), source, target, options);
+        CopyInfo info = CopyInfo.createCopyInfo(GftpAdaptor.ADAPTOR_NAME, ce.getNextID("GFTP_COPY_"), source, target, options);
 
         ce.copy(info);
 

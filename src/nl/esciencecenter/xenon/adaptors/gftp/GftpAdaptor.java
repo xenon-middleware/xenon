@@ -30,6 +30,7 @@ import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
+import org.globus.gsi.GlobusCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,10 +138,27 @@ public class GftpAdaptor extends Adaptor {
     public void end() {
         filesAdaptor.end();
     }
-
+    
     protected GftpSession createNewSession(GftpLocation location, GlobusProxyCredential credential, XenonProperties properties)
             throws XenonException {
         return new GftpSession(this, location, credential, properties);
+    }
+
+    /** 
+     * Helper method to create new Session. 
+     * @param hostname - hostname of Grid FTP Server. 
+     * @param port - port of Grid FTP server. 
+     * @param proxyFilepath - location of (globus) proxy file 
+     * @param props - map of properties 
+     * @return
+     * @throws XenonException
+     */
+    public GftpSession createNewSession(String host, int port, String proxyFilepath, Map<String,String> props) throws XenonException {
+
+        GftpLocation gftpLocation=new GftpLocation(host,port); 
+        GlobusProxyCredential cred = credentialsAdaptor.loadProxy(proxyFilepath);
+        XenonProperties xenonProperties = new XenonProperties(this.getSupportedProperties(Component.FILESYSTEM), props);
+        return createNewSession(gftpLocation,cred,xenonProperties); 
     }
 
     @Override
@@ -157,4 +175,7 @@ public class GftpAdaptor extends Adaptor {
     public GlobusProxyCredentials getGlobusProxyCredentials() {
         return this.credentialsAdaptor;
     }
+
+
+
 }
