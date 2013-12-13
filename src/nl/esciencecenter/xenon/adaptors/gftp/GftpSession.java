@@ -1238,7 +1238,7 @@ public class GftpSession {
             sourceSize = sourceServer.getSize(sourceFilepath);
         } catch (Exception e) {
             // SRM Patch: not always possible to fetch file size from transport URLs !
-            logger.warn("Couldn't determine file size of source file {}:", e);
+            logger.warn("Couldn't determine file size of source file {}:{}", sourceFilepath,e);
         }
 
         logger.debug(" - GridFTP 3rd party transfer source Server DCAU = {}", sourceDCAU);
@@ -1271,36 +1271,23 @@ public class GftpSession {
             }
         }
 
-//        TBD:
+//        //TBD:
 //        try {
-//            // explicit set active/passsive mode !  
-//
-//            privateSourceClient.setPassiveMode(false);
-//            privateTargetClient.setPassiveMode(true); 
+//            // Reverse active/passsive mode !  
+//            privateSourceClient.setPassiveMode(true);
+//            privateTargetClient.setPassiveMode(false); 
 //            
 //        } catch (Exception e) {
-//
 //            throw new XenonException(GftpAdaptor.ADAPTOR_NAME,"active3rdPartyTransfer: Couldn't set Active/Passive modes:"+e.getMessage(),e); 
 //        } 
-         
         
         Throwable transferEx = null;
-
         GftpTransferMonitor listener = new GftpTransferMonitor(targetServer, targetFilepath, sourceSize);
 
         try {
 
             boolean append = false;
-            // ===
-            // Passive/Active mode:   
-            // Transfers are initiated from the source and the destination MUST support active mode or else the 3rd party
-            // transfer doesn't work and the direction must be reversed.
-            // In that case the other server must allow active mode because if
-            // neither of the two servers allow active mode no transfer can happen at all.  
-            // ===
-
-            // Create monitor for destination  
-
+            // initiate transfer from active source to passive destination  
             privateSourceClient.transfer(sourceFilepath, privateTargetClient, targetFilepath, append, listener);
            
         } catch (Throwable e) {
@@ -1308,17 +1295,15 @@ public class GftpSession {
             logger.error("Exception during 3rd party transfer:{}",e);
             // retry ? 
             transferEx = e;
-        }
-
-        // finally: 
-
-        // CLEANUP !
-        sourceServer.closeGFTPClient(privateSourceClient);
-        targetServer.closeGFTPClient(privateTargetClient);
-
-        if (transferEx != null) {
+            
             throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "Couldn't perform " + transferInfoStr + ". Error="
                     + transferEx.getMessage(), transferEx);
+        }
+        finally
+        {
+            // CLEANUP !
+            sourceServer.closeGFTPClient(privateSourceClient);
+            targetServer.closeGFTPClient(privateTargetClient);
         }
 
         logger.info("GridFTP: Finished 3rd party transfer.\n");
