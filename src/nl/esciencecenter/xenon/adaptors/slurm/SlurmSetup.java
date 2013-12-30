@@ -32,7 +32,7 @@ public class SlurmSetup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSetup.class);
 
-    private static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5." };
+    private static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6."};
 
     private final boolean accountingAvailable;
     private final String version;
@@ -68,7 +68,7 @@ public class SlurmSetup {
                     SlurmAdaptor.IGNORE_VERSION_PROPERTY);
         } else {
             throw new IncompatibleVersionException(SlurmAdaptor.ADAPTOR_NAME, "Slurm version " + version
-                    + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + "to ignore");
+                    + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + " to ignore");
         }
     }
 
