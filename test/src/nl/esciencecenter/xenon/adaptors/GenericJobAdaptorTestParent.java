@@ -1033,7 +1033,7 @@ public abstract class GenericJobAdaptorTestParent {
             description.setArguments("-n", "61", "127.0.0.1");
         } else { 
             description.setExecutable("/bin/sleep");
-            description.setArguments("60");
+            description.setArguments("600");
         }
 
         description.setInteractive(false);

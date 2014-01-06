@@ -84,7 +84,15 @@ class SshSession {
     }
 
     boolean putSftpChannelInCache(ChannelSftp channel) {
+        
         if (sftpChannelCache != null) {
+
+            if (sftpChannelCache == channel) {
+                // If the given channel is the one that is currently cached, we should return true to 
+                // prevent the channel from being closed. 
+                return true;
+            }
+            
             return false;
         }
 
