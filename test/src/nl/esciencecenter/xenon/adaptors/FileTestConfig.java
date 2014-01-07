@@ -42,6 +42,10 @@ public abstract class FileTestConfig extends GenericTestConfig {
 
     public abstract boolean supportsSymboliclinks();
     
+    public boolean readOnlyPosixPermissions() { 
+        return false;
+    }
+    
     public boolean supportsClose() {
         return false;
     }
