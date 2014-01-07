@@ -2117,6 +2117,9 @@ public abstract class GenericFileAdaptorTestParent {
             throwUnexpected("test20b_newInputStreamDoubleClose", e);
         }
         
+        deleteTestFile(file);
+        deleteTestDir(testDir);
+
         cleanup();
     } 
         
