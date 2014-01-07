@@ -2076,7 +2076,9 @@ public abstract class GenericFileAdaptorTestParent {
         byte[] data = "Hello World".getBytes();
 
         prepare();
-
+        
+        prepareTestDir("test20b_newInputStreamDoubleClose");
+        
         Path file = createTestFile(testDir, data);
         
         InputStream in = null;
