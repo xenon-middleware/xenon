@@ -32,7 +32,10 @@
 
 		<!-- Copy external dependancies to dist directory -->
 		<copy todir="dist/nlesc-xenon-${version}/lib">
-			<fileset dir="lib" />
+			<fileset dir="lib" includes="*.jar"/>
+		</copy>
+		<copy todir="dist/nlesc-xenon-${version}/lib">
+			<fileset dir="lib/cog-jglobus" includes="*.jar"/>
 		</copy>
         </target>
 
