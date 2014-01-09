@@ -16,18 +16,15 @@
 
 package nl.esciencecenter.xenon.adaptors.gftp;
 
-import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Map;
-
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.GlobusCredentialException;
-import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.ietf.jgss.GSSCredential;
-import org.ietf.jgss.GSSException;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
+
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSException;
 
 /**
  * Grid Proxy Credential.
@@ -37,16 +34,20 @@ import nl.esciencecenter.xenon.credentials.Credential;
  * @author Piter T. de Boer
  */
 public class GlobusProxyCredential implements Credential {
-    private String proxyFilepath = null;
 
     private GlobusCredential globusCredential = null;
 
-     private GlobusProxyCredentials credentialFactory = null;
+    private GlobusProxyCredentials credentialFactory = null;
 
     public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, String proxyFilepath) throws XenonException {
         this.credentialFactory = globusProxyCredentials;
-        this.proxyFilepath = proxyFilepath;
         this.globusCredential = credentialFactory.loadGlobusProxyFile(proxyFilepath);
+    }
+
+    public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, GlobusCredential globusCredential)
+            throws XenonException {
+        this.credentialFactory = globusProxyCredentials;
+        this.globusCredential = globusCredential;
     }
 
     @Override
@@ -56,9 +57,16 @@ public class GlobusProxyCredential implements Credential {
 
     @Override
     public Map<String, String> getProperties() {
+        // todo: return proxy properties like timeleft, user subject, etc. 
         return null;
     }
 
+    /**
+     * Convert Globus Credential to GSS Credential.
+     * 
+     * @return new GSS Credential created from this GlobusCredential.
+     * @throws XenonException
+     */
     public GSSCredential createGSSCredential() throws XenonException {
         try {
             return new GlobusGSSCredentialImpl(globusCredential, GSSCredential.DEFAULT_LIFETIME);
@@ -67,6 +75,36 @@ public class GlobusProxyCredential implements Credential {
         }
     }
 
+    /**
+     * @return User Subject String of the proxy.
+     */
+    public String getUserSubject() {
+        return this.globusCredential.getSubject();
+    }
 
+    /**
+     * Return Issuer of the proxy credential. The "issuer" of a <strong>proxy</strong> credential is the owner of the certificate itself, not the
+     * CA.
+     * 
+     * @return Issuer Principle
+     */
+    public String getIssuer() {
+        return this.globusCredential.getIssuer();
+    }
+
+    /**
+     * @return proxy lifetime left in seconds.
+     */
+    public long getTimeLeftInSeconds() {
+        return this.globusCredential.getTimeLeft();
+    }
+
+    /**
+     * Return actual GlobusCredential object. 
+     * @return actual GlobusCredential object.
+     */
+    public GlobusCredential getGlobusCredential() {
+        return this.globusCredential;
+    }
 
 }

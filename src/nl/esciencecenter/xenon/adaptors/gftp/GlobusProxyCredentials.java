@@ -21,12 +21,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.GlobusCredentialException;
-import org.omg.PortableInterceptor.USER_EXCEPTION;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -39,9 +33,14 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.GlobusCredentialException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Grid Proxy Credential Factory based on Globus (Proxy) Credentials.
- * 
+ * Typically a GlobusProxyCrentials object is linked to one user account and credential. 
  * @author Piter T. de Boer
  */
 public class GlobusProxyCredentials implements Credentials {
@@ -96,13 +95,14 @@ public class GlobusProxyCredentials implements Credentials {
 
     public GlobusProxyCredentials(XenonProperties properties, GftpAdaptor gftpAdaptor) {
 
-        updateProperties(properties);
-        // static init Globus ! 
+        // Preload cerficicates, must be update per Proxy Creation call!    
         reloadCACertificates();
-
+        // Optional properties, if none defined Globus defaults will be used. 
+        updateProperties(properties);
     }
 
     protected void updateProperties(XenonProperties properties) {
+        // Defaults: 
         userKeyfile = getPropertyOrNull(properties, PROPERTY_USER_KEY_FILE);
         userCertfile = getPropertyOrNull(properties, PROPERTY_USER_CERT_FILE);
         userProxyfile = getPropertyOrNull(properties, PROPERTY_USER_X509_PROXY);
@@ -127,7 +127,7 @@ public class GlobusProxyCredentials implements Credentials {
             Map<String, String> properties) throws XenonException {
 
         if (password != null) {
-            return createProxy(certfile, userinfo, password);
+            return createProxy(certfile, userinfo, password, null);
         } else {
             return loadProxy(certfile);
         }
@@ -152,6 +152,7 @@ public class GlobusProxyCredentials implements Credentials {
 
     @Override
     public boolean isOpen(Credential credential) throws XenonException {
+        // not applicable 
         return false;
     }
 
@@ -179,15 +180,43 @@ public class GlobusProxyCredentials implements Credentials {
      * @param certfile
      *            - directory containing user certificate files: 'usercert.key' and 'userkey.pem', for example: ~/.globus/.
      * @param userVOinfo
-     *            - optional User and VO (+role) information, may be null. Only needed for VOMS enabled proxies.
+     *            - optional User and VO (+role) information, may be null. Only needed for VO enabled proxy credentials.
      * @param passphrase
      *            - User Grid Certificate Passphrase.
-     * @return new created Grid Proxy Credential as Globus Credential.
+     * @param userProxyLocation
+     *            - optional location of the proxy file, if null the default location will be used.
+     * @return new created Grid Proxy Credential as GlobusProxyCredential.
      * @throws XenonException
      */
-    public GlobusProxyCredential createProxy(String certdirectory, String userVOinfo, char[] passphrase) throws XenonException {
-        logger.error("FIXME:createProxy()");
-        throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "FIXME: createProxy(): Not supported yet.");
+    public GlobusProxyCredential
+            createProxy(String certDirectory, String userVOinfo, char[] passphrase, String userProxyLocation)
+                    throws XenonException {
+
+        this.userCertificatesDir = certDirectory+"/certificates"; 
+        this.userCertfile = certDirectory + "/usercert.pem";
+        this.userKeyfile = certDirectory + "/userkey.pem";
+
+        if (userProxyLocation != null) {
+            this.userProxyfile = userProxyLocation;
+        }
+
+        return createProxy(passphrase);
+    }
+
+    protected GlobusProxyCredential createProxy(char[] passphrase) throws XenonException {
+
+        try {
+
+            // Must reload static configured certificates before calling globus !   
+            reloadCACertificates();
+
+            GlobusCredential cred = GlobusUtil.createCredential(userCertfile, userKeyfile, passphrase, userProxyfile);
+            return new GlobusProxyCredential(this, cred);
+
+        } catch (Exception e) {
+            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+        }
+
     }
 
     /**

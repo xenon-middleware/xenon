@@ -108,8 +108,22 @@ public class GlobusUtil {
         return staticModel;
     }
     
-    
     public static GlobusCredential createCredential(String userCert,String userKey,char passphrase[]) throws Exception
+    {
+        return createCredential(userCert,userKey,passphrase,null);
+    }
+    
+    /** 
+     * Static method to create a Globus Proxy Credential. 
+     * 
+     * @param userCert - usercert.pem file 
+     * @param userKey - location of userkey.pem file 
+     * @param passphrase - actual passphrase
+     * @param userProxyLocation - optional location to save proxy file to 
+     * @return actual globus proxy credential if proxy creation is successful. 
+     * @throws Exception
+     */
+    public static GlobusCredential createCredential(String userCert,String userKey,char passphrase[], String userProxyLocation) throws Exception
     {
         GridProxyModel staticModel = staticGetModel();
         GlobusCredential credential;
@@ -124,7 +138,11 @@ public class GlobusUtil {
         props.setUserCertFile(userCert);
         props.setUserKeyFile(userKey);
         props.setProxyLifeTime(defaultLifetime);
-
+        
+        if (userProxyLocation!=null) {
+            props.setProxyFile(userProxyLocation);
+        }
+        
         credential = staticModel.createProxy(new String(passphrase)); 
         
         return credential; 
