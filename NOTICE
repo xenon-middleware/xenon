@@ -25,3 +25,27 @@ This project includes the Mockito library, which is Copyright (c) 2007
 Mockito contributors. See "notices/LICENSE.mockito.txt" for the licence
 information of the Mockito library.
 
+This project includes the Java CoG Kit, which is Copyright (c) 1999-2006 
+University of Chicago. See "notices/LICENSE.cog-jglobus.txt" for the 
+licence information of the Java CoG Kit.
+
+This project includes the Commons-logging library, which is Copyright (c)
+Apache Software Foundation. See "notices/LICENSE.commons-logging.txt"
+for the licence information of the Commons-logging library.
+
+This project includes the log4j library, which is Copyright (c) Apache 
+Software Foundation. See "notices/LICENSE.log4j.txt" for the licence 
+information of the log4j library.
+
+This project includes the Legion of the Bouncy Castle Java cryptography 
+APIs, which are Copyright (c) 2000-2013 The Legion Of The Bouncy Castle. 
+See "notices/LICENSE.bouncycastle.txt" for the licence information of this 
+library.
+
+This project includes the pureTLS library, which is Copyright (c) Claymore 
+Systems, Inc. See "notices/LICENSE.puretls.txt" for the licence information 
+of the pureTLS library.
+
+This project includes libraries produced by the Cryptix Project. See 
+"notices/LICENSE.cryptix.txt" for the licence information of these libraries.
+
