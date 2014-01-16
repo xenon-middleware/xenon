@@ -65,7 +65,12 @@ public class SSHTunnelTest {
 
         HashMap<String, String> properties = new HashMap<String, String>();
         properties.put("xenon.adaptors.ssh.gateway", gateway);
-
+        properties.put("xenon.adaptors.ssh.strictHostKeyChecking", "false");
+        
+//        System.out.println("gateway = " + gateway);
+//        System.out.println("location = " + location);
+//        System.out.println("credential = " + credentials.getDefaultCredential("sftp"));
+//        
         // Will thrown an exception if the tunnel fails ?
         FileSystem filesystem = files.newFileSystem("ssh", location, credentials.getDefaultCredential("sftp"), properties);
 
@@ -73,4 +78,9 @@ public class SSHTunnelTest {
         XenonFactory.endXenon(xenon);
     }
 
+    public static void main(String [] args) throws Exception { 
+        new SSHTunnelTest().test_sshViaTunnel();
+    }
+    
+    
 }

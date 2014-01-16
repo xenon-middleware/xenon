@@ -113,7 +113,11 @@ class SshMultiplexedSession {
                 gatewayLocation = new SshLocation(location.getUser(), gatewayLocation.getHost(), gatewayLocation.getPort());
             }
 
+            LOGGER.debug("Creating gateway via {}", gatewayLocation);
+
             gatewaySession = createSession(jsch, -1, gatewayLocation, credential, null, null, properties);
+            
+            LOGGER.debug("Gateway session via {} created!", gatewayLocation);
         }
 
         createSession();
@@ -153,7 +157,7 @@ class SshMultiplexedSession {
         int sessionPort = location.getPort();
         int tunnelPort = -1;
 
-        LOGGER.debug("SSHSESSION: Creating new session to " + location);
+        LOGGER.info("SSHSESSION: XXXX Creating new session to {} via gateway {} (session {})", location, gatewayLocation, gateway);
 
         if (gateway != null) {
             LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayLocation);
