@@ -47,15 +47,19 @@ public class SSHTunnelTest {
     @org.junit.Test
     public void test_sshViaTunnel() throws Exception {
 
+        Properties p = System.getProperties();
+        
         String configfile = System.getProperty("test.config");
         
         if (configfile == null) {
             configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
         }
         
-        Properties p = new Properties();
-        p.load(new FileInputStream(configfile));
-
+        if (new File(configfile).exists()) {
+            p = new Properties();
+            p.load(new FileInputStream(configfile));    
+        }
+        
         String gateway = getPropertyOrFail(p, "test.ssh.gateway");
         String location = getPropertyOrFail(p, "test.ssh.location");
         
