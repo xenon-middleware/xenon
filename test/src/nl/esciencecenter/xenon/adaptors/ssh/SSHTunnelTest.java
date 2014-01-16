@@ -62,6 +62,11 @@ public class SSHTunnelTest {
         
         String gateway = getPropertyOrFail(p, "test.ssh.gateway");
         String location = getPropertyOrFail(p, "test.ssh.location");
+        String username = getPropertyOrFail(p, "test.ssh.user");
+        
+        if (username != null) { 
+            location = username + "@" + location;
+        }
         
         Xenon xenon = XenonFactory.newXenon(null);
         Files files = xenon.files();

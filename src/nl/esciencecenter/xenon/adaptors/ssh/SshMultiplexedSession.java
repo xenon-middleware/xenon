@@ -157,7 +157,7 @@ class SshMultiplexedSession {
         int sessionPort = location.getPort();
         int tunnelPort = -1;
 
-        LOGGER.info("SSHSESSION: XXXX Creating new session to {} via gateway {} (session {})", location, gatewayLocation, gateway);
+        LOGGER.info("SSHSESSION: XXXX Creating new session to {} using credential {} via gateway {} (session {})", location, credential, gatewayLocation, gateway);
 
         if (gateway != null) {
             LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayLocation);
