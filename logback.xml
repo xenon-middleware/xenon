@@ -10,7 +10,8 @@
     <appender-ref ref="STDERR" />
   </root>
 
-  <logger name="nl.esciencecenter.xenon" level="WARN" />
+  <logger name="nl.esciencecenter.xenon" level="INFO" />
+  <logger name="nl.esciencecenter.xenon.adaptors.ssh" level="DEBUG" />
 
   <!-- sends logs to logback-beagle -->
   <!--
