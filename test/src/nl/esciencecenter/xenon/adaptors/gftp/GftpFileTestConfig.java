@@ -17,7 +17,7 @@
 package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.util.HashMap;
-
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
@@ -29,23 +29,41 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
 public class GftpFileTestConfig extends FileTestConfig {
-    
-    private String scheme=GftpUtil.GFTP_SCHEME; 
-    
+
+    private String scheme = GftpUtil.GFTP_SCHEME;
+
     private String correctLocation;
     private String wrongLocation;
-    
+    private String userCertFile;
+    private String userKeyFile;
+    private String proxyFile;
+    private char[] passphrase = null;
+
+    private GlobusProxyCredential tempProxy = null;
+
     public GftpFileTestConfig(String configfile) throws Exception {
 
         super(GftpUtil.GFTP_SCHEME, configfile);
 
-        String location="eslt007:2811"; 
-        
-        //String location = getPropertyOrFail(p, "test.gftp.location");
-        
-        correctLocation=location;
+        correctLocation = getPropertyOrFail(p, "test.gftp.location");
+
+        // Either test proxy file must be defined or userkey file + passphrase !  
+        userCertFile = p.getProperty("test.gftp.usercert");
+        userKeyFile = p.getProperty("test.gftp.userkey");
+        proxyFile = p.getProperty("test.gftp.proxyfile");
+
+        String str = p.getProperty("test.gftp.passphrase");
+        if (str != null) {
+            passphrase = str.toCharArray();
+        }
         wrongLocation = "doesnotexist.nodomain";
-        
+
+        debugPrintf(" - correctLocation  =%s\n", correctLocation);
+        debugPrintf(" - usercert file    =%s\n", userCertFile);
+        debugPrintf(" - userKeyFile file =%s\n", userKeyFile);
+        debugPrintf(" - proxyFile file   =%s\n", proxyFile);
+        debugPrintf(" - passphrase file  =%s\n", (passphrase != null) ? "<Not Null" : "<NULL>");
+
     }
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
@@ -76,17 +94,56 @@ public class GftpFileTestConfig extends FileTestConfig {
 
     @Override
     public Credential getDefaultCredential(Credentials credentials) throws Exception {
-        return credentials.getDefaultCredential(scheme);
+
+        debugPrintf("creds=" + credentials);
+
+        if (tempProxy == null) {
+            initTempProxy(credentials);
+        }
+
+        return tempProxy;
+    }
+
+    private void initTempProxy(Credentials credentials) throws Exception {
+
+        if (proxyFile != null) {
+            //            try {
+            //                // check proxy file:
+            //                GlobusProxyCredential proxy = credentials.loadProxy(proxyFile);
+            //                if (proxy.isValid()) {
+            //                    tempProxy = proxy;
+            //                }
+            //            } catch (Exception e) {
+            //                e.printStackTrace();
+            //            }
+        }
+
+        // Create new Proxy using test account: 
+ 
+        Map<String, String> props = new Hashtable<String, String>();
+        
+        props.put(GlobusProxyCredentials.PROPERTY_USER_CERT_FILE, userCertFile); 
+        props.put(GlobusProxyCredentials.PROPERTY_USER_KEY_FILE, userKeyFile);
+        
+        Credential cred = credentials.newCertificateCredential(scheme, null, null, passphrase, props);
+
+        if (cred instanceof GlobusProxyCredential) {
+            tempProxy = (GlobusProxyCredential) cred;
+            debugPrintf("Created new proxy:%s\n", tempProxy);
+        } else {
+            throw new Exception("Couldn't create/get default Credential. Created Credential is not a GlobusProxyCredential!");
+        }
+
     }
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, null,null, new HashMap<String, String>());
+        return credentials.newPasswordCredential(scheme, null, null, new HashMap<String, String>());
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, null,null, new HashMap<String, String>());
+        return credentials.newPasswordCredential(scheme, null, null, new HashMap<String, String>());
     }
 
     @Override
@@ -146,8 +203,9 @@ public class GftpFileTestConfig extends FileTestConfig {
 
     @Override
     public boolean supportsPosixPermissions() {
-        // Depends on actual GridFTP FileSystem but API supports it. 
-        return true;
+        // Depends on actual GridFTP FileSystem but API supports it.
+        // Disable testing for now: 
+        return false;
     }
 
     @Override
@@ -159,4 +217,9 @@ public class GftpFileTestConfig extends FileTestConfig {
     public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
         return files.newFileSystem("gftp", correctLocation, getDefaultCredential(credentials), null).getEntryPath();
     }
+
+    public static void debugPrintf(String format, Object... args) {
+        System.out.printf("GftpFileTextConfig:" + format, args);
+    }
+
 }

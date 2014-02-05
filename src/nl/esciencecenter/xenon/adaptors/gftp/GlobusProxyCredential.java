@@ -16,6 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.gftp;
 
+import java.util.Hashtable;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -27,9 +28,8 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 
 /**
- * Grid Proxy Credential.
- * 
- * Wrap around a proxy credential for example in "/tmp/x509up_u1000"
+ * Grid Proxy Credential. Wraps around a proxy credential for example loaded from "/tmp/x509up_u1000" or a created
+ * GlobusCredential.
  * 
  * @author Piter T. de Boer
  */
@@ -39,13 +39,19 @@ public class GlobusProxyCredential implements Credential {
 
     private GlobusProxyCredentials credentialFactory = null;
 
-    public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, String proxyFilepath) throws XenonException {
+    private Map<String, String> properties = new Hashtable<String, String>();
+
+    public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, String proxyFilepath, Map<String, String> props)
+            throws XenonException {
+        this.updateProperties(props, true);
         this.credentialFactory = globusProxyCredentials;
         this.globusCredential = credentialFactory.loadGlobusProxyFile(proxyFilepath);
+        setProxyFilePath(proxyFilepath);
     }
 
-    public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, GlobusCredential globusCredential)
-            throws XenonException {
+    public GlobusProxyCredential(GlobusProxyCredentials globusProxyCredentials, GlobusCredential globusCredential,
+            Map<String, String> props) throws XenonException {
+        this.updateProperties(props, true);
         this.credentialFactory = globusProxyCredentials;
         this.globusCredential = globusCredential;
     }
@@ -55,10 +61,42 @@ public class GlobusProxyCredential implements Credential {
         return GftpAdaptor.ADAPTOR_NAME;
     }
 
+    /**
+     * Update Credential Properties.
+     * 
+     * @param newProps
+     *            - new properties to add to this one.
+     * @param clearPrevious
+     *            - clear previous stored properties.
+     */
+    protected void updateProperties(Map<String, String> newProps, boolean clearPrevious) {
+        if (clearPrevious) {
+            properties.clear();
+        }
+        properties.putAll(newProps);
+    }
+
+    protected void setProxyFilePath(String path) {
+        if (path == null) {
+            // clear property. 
+            this.properties.remove(GlobusProxyCredentials.PROPERTY_USER_KEY_FILE);
+        } else {
+            properties.put(GlobusProxyCredentials.PROPERTY_USER_KEY_FILE, path);
+        }
+    }
+
+    /**
+     * If the proxy has been saved to a file, or loaded from a file, this method will return that path.
+     * 
+     * @return path to actual proxy file, if loaded from or save to a file. Null otherwise.
+     */
+    public String getProxyFilePath() {
+        return properties.get(GlobusProxyCredentials.PROPERTY_USER_KEY_FILE);
+    }
+
     @Override
     public Map<String, String> getProperties() {
-        // todo: return proxy properties like timeleft, user subject, etc. 
-        return null;
+        return properties;
     }
 
     /**
@@ -83,8 +121,8 @@ public class GlobusProxyCredential implements Credential {
     }
 
     /**
-     * Return Issuer of the proxy credential. The "issuer" of a <strong>proxy</strong> credential is the owner of the certificate itself, not the
-     * CA.
+     * Return Issuer of the proxy credential. The "issuer" of a <strong>proxy</strong> credential is the owner of the certificate
+     * itself, not the CA.
      * 
      * @return Issuer Principle
      */
@@ -100,11 +138,37 @@ public class GlobusProxyCredential implements Credential {
     }
 
     /**
-     * Return actual GlobusCredential object. 
+     * Return actual GlobusCredential object.
+     * 
      * @return actual GlobusCredential object.
      */
     public GlobusCredential getGlobusCredential() {
         return this.globusCredential;
+    }
+
+    public GlobusProxyCredentials getGlobusProxyCredentials() {
+        return this.credentialFactory;
+    }
+
+    public void invalidate(boolean deleteProxy) {
+
+        if (deleteProxy) {
+            credentialFactory.delete(this);
+        }
+
+        this.globusCredential = null;
+    }
+
+    public boolean isValid() {
+        if (globusCredential == null) {
+            return false;
+        }
+
+        if (this.getTimeLeftInSeconds() > 0) {
+            return true;
+        }
+
+        return false;
     }
 
 }
