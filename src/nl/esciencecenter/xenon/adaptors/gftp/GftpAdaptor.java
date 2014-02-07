@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -55,7 +56,10 @@ public class GftpAdaptor extends Adaptor {
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "Grid FTP adaptor based on Globus Grid FTP";
 
-    /** The schemes supported by this adaptor. both "gftp" and "gsiftp" are supported. */
+    /**
+     * The schemes supported by this adaptor. both "gftp" and "gsiftp" are supported. 
+     * "gsiftp "is the default scheme for Grid FTP 
+     */
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>(GftpUtil.GSIFTP_SCHEME,
             GftpUtil.GFTP_SCHEME);
 
@@ -76,7 +80,7 @@ public class GftpAdaptor extends Adaptor {
     public static final String USE_BLIND_GFTP = PREFIX + "useBlindMode";
 
     /**
-     * Explicitly set to gftp version 1.x. Needed for old Grid FTP servers and some SRM back-end gftp servers.
+     * Explicitly set to gftp version 1.x. Needed for old Grid FTP servers and some SRM back-end Grid FTP servers.
      */
     public static final String USE_GFTP_V1 = PREFIX + "useGftpV1";
 
@@ -106,19 +110,45 @@ public class GftpAdaptor extends Adaptor {
                     .of(Component.FILESYSTEM), "false",
                     "Enforce the use of Data Channel Authentication (DCAU) and throw exceptions if not supported by the Grid FTP Server."));
 
+    
+    // ===
+    
+    // === 
     private final GftpFiles filesAdaptor;
 
     private final GlobusProxyCredentials credentialsAdaptor;
 
     public GftpAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
         super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+                new XenonProperties(VALID_PROPERTIES, Component.FILESYSTEM , filterProps(VALID_PROPERTIES,properties)));
 
         this.filesAdaptor = new GftpFiles(this, xenonEngine);
 
-        XenonProperties xenonProps = new XenonProperties(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES, properties);
+        // filter out credentials properties: 
+        Map<String, String> credProps = filterProps(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES,properties);  
+        
+        XenonProperties xenonCredProps = new XenonProperties(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES, Component.CREDENTIALS , filterProps(VALID_PROPERTIES,credProps));
+        
         // Custom Globus Properties factory for this FileSystem, which should be linked to one user credential configuration. 
-        this.credentialsAdaptor = new GlobusProxyCredentials(xenonProps, this);
+        this.credentialsAdaptor = new GlobusProxyCredentials(xenonCredProps, this);
+    }
+
+    private static Map<String, String> filterProps(ImmutableArray<XenonPropertyDescription> validProperties,
+            Map<String, String> properties) {
+
+        Map<String, String> props=new Hashtable<String,String>(); 
+        
+        for (XenonPropertyDescription entry:GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES)
+        {       
+            String name = entry.getName(); entry.getType(); 
+            String val=properties.get(name); 
+            
+            if (val!=null){
+                props.put(name,val);
+            }
+        }            
+
+        return props; 
     }
 
     @Override
