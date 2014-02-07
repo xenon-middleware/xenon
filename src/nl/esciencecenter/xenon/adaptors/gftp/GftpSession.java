@@ -1306,7 +1306,7 @@ public class GftpSession {
                 // Create passive port at source server: 
                 HostPort port = privateSourceClient.setPassive(); 
                 // privateSourceClient.setLocalActive(); // skip ? 
-                privateTargetClient.setLocalPassive();
+                // privateTargetClient.setLocalPassive();
                 // Let target server connect back to passive port on source server(!) 
                 privateTargetClient.setActive(port); 
             }
