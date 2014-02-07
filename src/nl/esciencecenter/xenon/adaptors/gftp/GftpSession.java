@@ -1293,6 +1293,7 @@ public class GftpSession {
             }
             else // if (reverseActiveMode)
             {
+                logger.info("Switching active/passive mode between servers. Target Server is active party");
                 // reverse polarity of transfer, this means target server should connect back to source server. 
                 privateSourceClient.setPassive(); 
                 privateSourceClient.setLocalActive();
