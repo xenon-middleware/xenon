@@ -40,6 +40,7 @@ import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
+import org.globus.ftp.HostPort;
 import org.globus.ftp.MlsxEntry;
 import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;
@@ -1219,6 +1220,8 @@ public class GftpSession {
      *            - target GFTP FileSystem: this server is the Passive Party during transfer.
      * @param targetFilepath
      *            - target path of file
+     * @param reverseActiveMOde - reverse active passive mode of servers. Target Server will become active party. 
+     *        This needed when for example the target server is behind a firewall! 
      * @return new Target VFile object
      * @throws VrsException
      */
@@ -1284,21 +1287,28 @@ public class GftpSession {
         GftpTransferMonitor listener = new GftpTransferMonitor(targetServer, targetFilepath, sourceSize);
 
         try {
-            // to be tested: 
+ 
             if (reverseActiveMode==false)
             {
                 // The source server is active party, should be default mode for 3rd party transfers. 
-                //privateSourceClient.setLocalPassive();
-                //privateSourceClient.setActive(); 
+                // privateSourceClient.setLocalPassive();
+                // privateSourceClient.setActive(); 
             }
             else // if (reverseActiveMode)
             {
+                // ===
+                // Reverse polarity of transfer, this means target server should connect back to source server
+                // and perform a get() of the file. 
+                // === 
+                
                 logger.info("Switching active/passive mode between servers. Target Server is active party");
-                // reverse polarity of transfer, this means target server should connect back to source server. 
-                privateSourceClient.setPassive(); 
-                privateSourceClient.setLocalActive();
-                privateTargetClient.setLocalPassive(); 
-                privateTargetClient.setActive(); 
+
+                // Create passive port at source server: 
+                HostPort port = privateSourceClient.setPassive(); 
+                // privateSourceClient.setLocalActive(); // skip ? 
+                privateTargetClient.setLocalPassive();
+                // Let target server connect back to passive port on source server(!) 
+                privateTargetClient.setActive(port); 
             }
             
             boolean append = false;
