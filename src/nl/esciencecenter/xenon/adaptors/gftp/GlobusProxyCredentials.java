@@ -210,8 +210,16 @@ public class GlobusProxyCredentials implements Credentials {
             keyfile = userCredentialsDir + "/" + GlobusProxyCredentials.USERKEY_PEM;
             certfile = userCredentialsDir + "/" + GlobusProxyCredentials.USERCERT_PEM;
         }
-
-        return createProxy(certfile, keyfile, userinfo, password, proxyFile, lifeTime);
+        
+        // Feature: load already created proxy: 
+        if ((keyfile==null) && (certfile==null) && (proxyFile!=null))
+        {
+            return this.loadProxy(proxyFile); 
+        }
+        else
+        {
+            return createProxy(certfile, keyfile, userinfo, password, proxyFile, lifeTime);
+        }
     }
 
     @Override
