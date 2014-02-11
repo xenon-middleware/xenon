@@ -125,6 +125,11 @@ public class GlobusUtil {
 
         CoGProperties props = getStaticCoGProperties();
 
+        if (passphrase==null)
+        {
+            throw new NullPointerException("Can't create proxy without passphrase. passphrase==null!"); 
+        }
+        
         // --- 
         // Must update static properties *before* using static create proxy methods from Globus! 
         // ---

@@ -134,7 +134,7 @@ public class GftpSession {
         updateProperties(properties);
     }
 
-    private void updateProperties(XenonProperties properties) throws XenonException {
+    protected void updateProperties(XenonProperties properties) throws XenonException {
 
         if (properties == null) {
             return;
@@ -153,7 +153,7 @@ public class GftpSession {
             throw e; //new XenonException(GftpAdaptor.ADAPTOR_NAME,e.getMessage(),e);
         }
     }
-
+    
     public void connect(boolean closePreviousClient) throws XenonException {
 
         if (client != null) {

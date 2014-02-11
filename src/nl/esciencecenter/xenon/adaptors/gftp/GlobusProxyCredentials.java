@@ -78,10 +78,10 @@ public class GlobusProxyCredentials implements Credentials {
     public static final ImmutableArray<XenonPropertyDescription> GLOBUS_CREDENTIAL_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
 
     new XenonPropertyDescriptionImplementation(PROPERTY_USER_KEY_FILE, Type.STRING, EnumSet.of(Component.CREDENTIALS), null,
-            "Location of User Key file or userkey.pem. Default location is: ~/.globus/userkey.pem"),
+            "Location of User Key file or 'userkey.pem' file. Default location is: ~/.globus/userkey.pem"),
 
     new XenonPropertyDescriptionImplementation(PROPERTY_USER_CERT_FILE, Type.STRING, EnumSet.of(Component.CREDENTIALS), null,
-            "Location of user Certificate file or 'usercert.pem'. Default location is: ~/.globus/usercert.pem"),
+            "Location of user Certificate file or 'usercert.pem' file. Default location is: ~/.globus/usercert.pem"),
 
     new XenonPropertyDescriptionImplementation(PROPERTY_USER_X509_PROXY, Type.STRING, EnumSet.of(Component.CREDENTIALS), null,
             "Location of user X509 proxy file. Default location is: /tmp/x509_<userid>"),
@@ -122,8 +122,7 @@ public class GlobusProxyCredentials implements Credentials {
 
     /**
      * Create Properties object containing current configured properties.
-     * 
-     * @return
+     * @return Properties Map of current credential Properties.  
      */
     protected Map<String, String> createDefaultCredentialProperties() {
 
