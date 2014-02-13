@@ -101,14 +101,14 @@ public class GlobusUtil {
     }
 
     public static GlobusCredential createCredential(String userCert, String userKey, char passphrase[]) throws Exception {
-        return createCredential(userCert, userKey, passphrase, null,-1);
+        return createCredential(userCert, userKey, passphrase, null, -1);
     }
 
     /**
      * Static method to create a Globus Proxy Credential.
      * 
      * @param userCert
-     *            - location of usercert.pem file, default is 'usercert.pem' from ~/.globus 
+     *            - location of usercert.pem file, default is 'usercert.pem' from ~/.globus
      * @param userKey
      *            - location of userkey.pem file, default is 'userkey.pem' from ~/.globus
      * @param passphrase
@@ -118,34 +118,33 @@ public class GlobusUtil {
      * @return actual globus proxy credential if proxy creation is successful.
      * @throws Exception
      */
-    public static GlobusCredential createCredential(String userCert, String userKey, char passphrase[],
-            String userProxyLocation,int lifeTime) throws Exception {
+    public static GlobusCredential createCredential(String userCert, String userKey, char passphrase[], String userProxyLocation,
+            int lifeTime) throws Exception {
         GridProxyModel staticModel = staticGetModel();
         GlobusCredential credential;
 
         CoGProperties props = getStaticCoGProperties();
 
-        if (passphrase==null)
-        {
-            throw new NullPointerException("Can't create proxy without passphrase. passphrase==null!"); 
+        if (passphrase == null) {
+            throw new NullPointerException("Can't create proxy without passphrase. passphrase==null!");
         }
-        
+
         // --- 
         // Must update static properties *before* using static create proxy methods from Globus! 
         // ---
-        
+
         if (userCert != null) {
             props.setUserCertFile(userCert);
         } // else use default 'usercert.pem' location 
-        
-        if (userKey!=null) {
+
+        if (userKey != null) {
             props.setUserKeyFile(userKey);
         } // else use default 'userkey.pem' location. 
-        
+
         if (userProxyLocation != null) {
             props.setProxyFile(userProxyLocation);
         } //else use /tmp/x509_<userid>  
-        
+
         if (lifeTime > 0) {
             props.setProxyLifeTime(lifeTime);
         } // default is 24 hours. 

@@ -65,9 +65,9 @@ public class GftpUtil {
         String dirs[] = new String[1 + n];
         // add custom dirs (if specified):
         dirs[0] = DEFAULT_SYSTEM_CERTIFICATES_DIR;
-        int index=1;
+        int index = 1;
         for (int i = 0; i < n; i++) {
-            if (customDirs[i]!=null) {
+            if (customDirs[i] != null) {
                 dirs[index++] = customDirs[i]; // filter existing here ? 
             }
         }
@@ -104,12 +104,11 @@ public class GftpUtil {
         logger.info(" + Got {} default certificates", allCerts.size());
 
         for (String certPath : caCertificateDirs) {
-             
-            if ((certPath==null) || certPath=="") 
-            {
-                continue; 
+
+            if ((certPath == null) || certPath == "") {
+                continue;
             }
-            
+
             File file = new File(certPath);
             if (file.exists()) {
                 logger.debug(" +++ Loading Extra Certificates from: {} +++", certPath);

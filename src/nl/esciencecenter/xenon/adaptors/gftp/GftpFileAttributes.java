@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class GftpFileAttributes implements FileAttributes {
 
     private static final Logger logger = LoggerFactory.getLogger(GftpFileAttributes.class);
-    
+
     public static final String UNIX_GROUP = "unix.group";
 
     public static final String UNIX_GID = "unix.gid";
@@ -402,9 +402,8 @@ public class GftpFileAttributes implements FileAttributes {
         if (getClass() != obj.getClass())
             return false;
 
-         
-        logger.error("equals: {} == {} ",this,obj);
-        
+        logger.error("equals: {} == {} ", this, obj);
+
         GftpFileAttributes other = (GftpFileAttributes) obj;
 
         if (path == null) {

@@ -117,11 +117,10 @@ public class GftpAdaptor extends Adaptor {
     public static Map<String, String> filterProps(ImmutableArray<XenonPropertyDescription> validProperties,
             Map<String, String> properties) {
 
-        if (properties==null)
-        {
-            return null; 
+        if (properties == null) {
+            return null;
         }
-        
+
         Map<String, String> props = new Hashtable<String, String>();
 
         for (XenonPropertyDescription entry : validProperties) {
@@ -165,7 +164,6 @@ public class GftpAdaptor extends Adaptor {
     public XenonPropertyDescription[] getSupportedProperties() {
         return VALID_GFTP_PROPERTIES.asArray();
     }
-    
 
     public ImmutableArray<XenonPropertyDescription> getSupportedFileSystemProperties() {
         return VALID_GFTP_PROPERTIES;
