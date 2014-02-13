@@ -227,9 +227,9 @@ public class GftpFiles implements Files {
     /**
      * 
      * @param dir
-     *            - directory path to create, may only contian one subdirectory which may be created.
+     *            - directory path to create, may only contain one sub-directory which may be created.
      * @param ignoreExisting
-     *            - equavalent with -f flag: create or keep existing (sub) directory.
+     *            - Equivalent with -f flag: create or keep existing (sub) directory.
      * @throws XenonException
      */
     public void createDirectory(Path dir, boolean ignoreExisting) throws XenonException {
