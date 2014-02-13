@@ -275,9 +275,9 @@ public class GftpThirdPartyTransfer implements Closeable {
                 // Set to Extended mode or MODE-E. 
                 updateGftpMode(GridFTPSession.MODE_EBLOCK);
 
-                logger.info(
-                        "Performing partial transger using Extend Block Mode (MODE E): sourceFile bytes:[{},{}] ==> targetFile bytes:[{},{}] \n",
-                        sourceOffset, sourceOffset + numBytes, destOffset, destOffset + numBytes);
+                logger.info("Performing partial transfer using Extend Block Mode (MODE E): sourceFile bytes:[{},{}] ==>"
+                        + " targetFile bytes:[{},{}] \n", sourceOffset, sourceOffset + numBytes, destOffset, destOffset
+                        + numBytes);
 
                 // perform partial transfer. This mode uses Extended Block Mode (Mode E) ! 
                 privateSourceClient.extendedTransfer(sourcePath, sourceOffset, numBytes, privateTargetClient, targetPath,
