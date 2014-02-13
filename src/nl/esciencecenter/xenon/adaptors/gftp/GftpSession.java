@@ -153,7 +153,7 @@ public class GftpSession {
             throw e; //new XenonException(GftpAdaptor.ADAPTOR_NAME,e.getMessage(),e);
         }
     }
-    
+
     public void connect(boolean closePreviousClient) throws XenonException {
 
         if (client != null) {
@@ -1186,7 +1186,7 @@ public class GftpSession {
     // =================================
 
     /**
-     * Copy remote file but on same server. This can be done with 3rd party copying from and to the same server.
+     * Copy remote file but on same server. This can be done with 3rd party copying from and to the <strong>same</strong> server.
      * 
      * @param sourcePath
      *            - source file to copy
@@ -1194,13 +1194,13 @@ public class GftpSession {
      *            - target file path to copy to on the same server
      * @throws XenonException
      */
-    public void activeRemoteCopy(RelativePath sourcePath, RelativePath targetFilepath) throws XenonException {
+    public void remoteCopy(RelativePath sourcePath, RelativePath targetFilepath) throws XenonException {
         active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), this, targetFilepath.getAbsolutePath(), false);
     }
 
     /**
      * Perform active third party transfer and initiate active file transfer from this (source) server.<br>
-     * This server will be the active party. If this is not possible use the reverse method.
+     * This server will be the active party. If this is not possible use the reverse method setting targetServerIsActive==true.
      * 
      * @param sourcePath
      *            - file path on this GridFTP server
@@ -1208,10 +1208,13 @@ public class GftpSession {
      *            - remote GridFTP server.
      * @param targetFilepath
      *            - remote File path to copy to
+     * @param targetServerIsActive
+     *            - Reverse Active/Passive roles, remote Target Server must be active party.
      * @throws XenonException
      */
     public void active3rdPartyTransfer(RelativePath sourcePath, GftpSession remoteServer, RelativePath targetFilepath,
             boolean targetServerIsActive) throws XenonException {
+        
         active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), remoteServer, targetFilepath.getAbsolutePath(),
                 targetServerIsActive);
     }
@@ -1237,112 +1240,12 @@ public class GftpSession {
     protected static void active3rdPartyTransfer(GftpSession sourceServer, String sourceFilepath, GftpSession targetServer,
             String targetFilepath, boolean reverseActiveMode) throws XenonException {
 
-        String transferInfoStr = "third party copy from " + sourceServer.getHostname() + ":" + sourceFilepath + " to "
-                + targetServer.getHostname() + ":" + targetFilepath;
-        logger.info("> Performing:{}", transferInfoStr);
-        //monitor.logPrintf("Performing: %s\n",transferInfoStr); 
-
-        // Multi threaded support: Create private GridFTP clients for each location:  
-        GridFTPClient privateSourceClient = sourceServer.createGFTPClient();
-        GridFTPClient privateTargetClient = targetServer.createGFTPClient();
-
-        // Grid FTP 1.0 compatibility
-        // Both must support DCAU. If one of them doesn't: disable at the other ! 
-        boolean sourceDCAU = sourceServer.useDataChannelAuthentication();
-        boolean destDCAU = targetServer.useDataChannelAuthentication();
-
-        logger.debug(" - GridFTP 3rd party transfer source Server DCAU = {}", sourceDCAU);
-        logger.debug(" - GridFTP 3rd party transfer dest   Server DCAU = {}", destDCAU);
-
-        long sourceSize = -1;
-        try {
-            sourceSize = sourceServer.getSize(sourceFilepath);
-        } catch (Exception e) {
-            // SRM 'BlindMode' Patch: not always possible to fetch file size from transport URLs !
-            logger.warn("Couldn't determine size of source file {}:{}", sourceFilepath, e);
-        }
-
-        // Both must be true or false. 
-        if (sourceDCAU != destDCAU) {
-            logger.warn("Warning: Grid FTP Data Channel Authentication mismatch between source: {}  and destination: {} ",
-                    targetServer.getHostname(), sourceServer.getHostname());
-        }
-
-        // Disable DCAU from source to target. 
-        if (destDCAU == false) {
-            try {
-                privateSourceClient.setLocalNoDataChannelAuthentication();
-                privateTargetClient.setDataChannelAuthentication(DataChannelAuthentication.NONE);
-                logger.warn("Disabled DataChannel Authentication for target server:{} => {}", targetServer);
-            } catch (Exception e) {
-                // API might not be supported, continue anyway. 
-                logger.error("Exception disabling DataChannel Authentication for target server:{} => {}", targetServer, e);
-            }
-        }
-
-        // Disable DCAU from target to source (if needed).  
-        if (sourceDCAU == false) {
-            try {
-                privateTargetClient.setLocalNoDataChannelAuthentication();
-                privateSourceClient.setDataChannelAuthentication(DataChannelAuthentication.NONE);
-                logger.warn("Disabled DataChannel Authentication for source server:{} => {}", sourceServer);
-            } catch (Exception e) {
-                // API might not be supported, continue anyway. 
-                logger.error("Exception disabling DataChannel Authentication for source server:{} => {}", sourceServer, e);
-            }
-        }
-
-        Throwable transferEx = null;
-        GftpTransferMonitor listener = new GftpTransferMonitor(targetServer, targetFilepath, sourceSize);
-
-        try {
-
-            if (reverseActiveMode)
-            {
-                // ===
-                // Reverse polarity of transfer, this means target server should connect back to source server
-                // and perform a get() of the file. 
-                // === 
-
-                logger.info("Switching active/passive mode between servers. Target Server is active party.");
-
-                // Create passive port at source server: 
-                HostPort port = privateSourceClient.setPassive();
-                // Skip: (?) 
-                // privateSourceClient.setLocalActive();  
-                // privateTargetClient.setLocalPassive();
-                // Let target server connect back to passive port on source server(!) 
-                privateTargetClient.setActive(port);
-            }
-            else
-            {
-                logger.info("Source server will be active party in this party tranfer.");
-                // The source server is active party, should be default mode for 3rd party transfers.
-                // Following configuration should be default for source client:
-                // privateSourceClient.setLocalPassive();
-                // privateSourceClient.setActive(); 
-            }
-
-            boolean append = false;
-            // initiate transfer from active source to passive destination  
-            privateSourceClient.transfer(sourceFilepath, privateTargetClient, targetFilepath, append, listener);
-
-        } catch (Throwable e) {
-            listener.setException(e);
-            logger.error("Exception during 3rd party transfer:{}", e);
-            // retry ? 
-            transferEx = e;
-
-            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "Couldn't perform " + transferInfoStr + ". Error="
-                    + transferEx.getMessage(), transferEx);
-        } finally {
-            // CLEANUP !
-            sourceServer.closeGFTPClient(privateSourceClient);
-            targetServer.closeGFTPClient(privateTargetClient);
-        }
-
-        logger.info("GridFTP: Finished 3rd party transfer.\n");
-        return; // ok 
+        
+        GftpThirdPartyTransfer transfer=new GftpThirdPartyTransfer(sourceServer,sourceFilepath,targetServer,targetFilepath,reverseActiveMode); 
+        
+        transfer.transfer(false); 
+       
+        transfer.dispose(); 
     }
 
     /**
