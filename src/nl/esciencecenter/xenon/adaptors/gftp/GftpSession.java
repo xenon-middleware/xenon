@@ -1214,7 +1214,7 @@ public class GftpSession {
      */
     public void active3rdPartyTransfer(RelativePath sourcePath, GftpSession remoteServer, RelativePath targetFilepath,
             boolean targetServerIsActive) throws XenonException {
-        
+
         active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), remoteServer, targetFilepath.getAbsolutePath(),
                 targetServerIsActive);
     }
@@ -1240,12 +1240,12 @@ public class GftpSession {
     protected static void active3rdPartyTransfer(GftpSession sourceServer, String sourceFilepath, GftpSession targetServer,
             String targetFilepath, boolean reverseActiveMode) throws XenonException {
 
-        
-        GftpThirdPartyTransfer transfer=new GftpThirdPartyTransfer(sourceServer,sourceFilepath,targetServer,targetFilepath,reverseActiveMode); 
-        
-        transfer.transfer(false); 
-       
-        transfer.close(); 
+        GftpThirdPartyTransfer transfer = new GftpThirdPartyTransfer(sourceServer, sourceFilepath, targetServer, targetFilepath,
+                reverseActiveMode);
+
+        transfer.transfer(false);
+
+        transfer.close();
     }
 
     /**
