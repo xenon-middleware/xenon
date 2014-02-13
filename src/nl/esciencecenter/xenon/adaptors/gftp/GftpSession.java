@@ -1245,7 +1245,7 @@ public class GftpSession {
         
         transfer.transfer(false); 
        
-        transfer.dispose(); 
+        transfer.close(); 
     }
 
     /**
