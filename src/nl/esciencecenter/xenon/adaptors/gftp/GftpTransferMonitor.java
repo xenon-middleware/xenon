@@ -12,12 +12,12 @@ import org.globus.ftp.MarkerListener;
  */
 public class GftpTransferMonitor implements MarkerListener {
 
-    private GftpSession targetSession;
-    private String targetFilePath;
-    private Throwable exception;
-    private long sourceFileSize = -1;
-    private boolean isDone=false;
-    private boolean hasStarted=false;
+    protected GftpSession targetSession;
+    protected String targetFilePath;
+    protected Throwable exception;
+    protected long sourceFileSize = -1;
+    protected boolean isDone=false;
+    protected boolean hasStarted=false;
 
     public GftpTransferMonitor(GftpSession targetSession, String targetPath, long fileSize) {
         this.targetSession = targetSession;

@@ -36,11 +36,9 @@ import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.RelativePath;
 
 import org.globus.ftp.ChecksumAlgorithm;
-import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
-import org.globus.ftp.HostPort;
 import org.globus.ftp.MlsxEntry;
 import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;

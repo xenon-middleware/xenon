@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GftpAdaptor extends Adaptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GftpAdaptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(GftpAdaptor.class);
 
     static {
         GlobusUtil.staticInit();
@@ -148,6 +148,8 @@ public class GftpAdaptor extends Adaptor {
         super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_GFTP_PROPERTIES,
                 new XenonProperties(VALID_GFTP_PROPERTIES, Component.FILESYSTEM, filterProps(VALID_GFTP_PROPERTIES, properties)));
 
+        logger.debug("New GftpAadaptor()"); 
+        
         this.filesAdaptor = new GftpFiles(this, xenonEngine);
 
         // filter out credentials properties: 

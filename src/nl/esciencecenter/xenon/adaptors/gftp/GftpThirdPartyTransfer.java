@@ -200,20 +200,22 @@ public class GftpThirdPartyTransfer implements Closeable {
      * <Strong>Concurrency note</strong>: This method is NOT thread safe. Use multiple GridThirdPartyTansfer objects for parallel
      * copying of the same file.
      * 
-     * @param offset
+     * @param sourceOffset
      *            - starting offset in source file.
      * @param numBytes
      *            - number of bytes to transfer.
+     * @param destinationOffset
+     *            - offset into destination file.
      * @param autoClose
      *            - whether to (auto) close the clients after the transfer.
      * 
      * @throws XenonException
      */
-    public void transferPart(long offset, long numBytes, boolean autoClose) throws XenonException {
+    public void transferPart(long sourceOffset, long numBytes, long destinationOffset, boolean autoClose) throws XenonException {
 
         try {
 
-            doTransfer(false, false, offset, numBytes, offset);
+            doTransfer(false, false, sourceOffset, numBytes, destinationOffset);
 
         } finally {
             // last partial transfer: close
@@ -325,7 +327,7 @@ public class GftpThirdPartyTransfer implements Closeable {
      * 
      * @throws XenonException
      *             If busy state is wrong, for example a transfer() method is called again when the previous hasn't finished yet
-     *             or an exception has occured.
+     *             or an exception has occurred.
      */
     protected void setIsBusy() throws XenonException {
 
@@ -347,7 +349,7 @@ public class GftpThirdPartyTransfer implements Closeable {
      * Update current state to finished: no two transfer() methods may be called at the same time.
      * 
      * @throws XenonException
-     *             If busy state is wrong, for example a transfer() method already finished or an exception occured.
+     *             If busy state is wrong, for example a transfer() method already finished or an exception occurred.
      */
     protected void setIsDone() throws XenonException {
 
