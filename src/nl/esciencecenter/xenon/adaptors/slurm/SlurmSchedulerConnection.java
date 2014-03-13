@@ -58,8 +58,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
+    
+    public static final String JOB_OPTION_SINGLE_PROCESS = "single.process";
 
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_SINGLE_PROCESS };
 
     private static final String[] FAILED_STATES = new String[] { "FAILED", "CANCELLED", "NODE_FAIL", "TIMEOUT", "PREEMPTED" };
 
