@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GftpAdaptor extends Adaptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GftpAdaptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(GftpAdaptor.class);
 
     static {
         GlobusUtil.staticInit();
@@ -55,7 +56,9 @@ public class GftpAdaptor extends Adaptor {
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "Grid FTP adaptor based on Globus Grid FTP";
 
-    /** The schemes supported by this adaptor. both "gftp" and "gsiftp" are supported. */
+    /**
+     * The schemes supported by this adaptor. Both "gftp" and "gsiftp" are supported. "gsiftp "is the default scheme for Grid FTP.
+     */
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>(GftpUtil.GSIFTP_SCHEME,
             GftpUtil.GFTP_SCHEME);
 
@@ -65,18 +68,22 @@ public class GftpAdaptor extends Adaptor {
     /** All Grid FTP properties start with this prefix. */
     public static final String PREFIX = XenonEngine.ADAPTORS + ADAPTOR_NAME + ".";
 
-    /** Some data channels must use channel authentication when setting up a Grid FTP connection. */
-    public static final String USE_PASSIVE_MODE = PREFIX + "usePassiveMode";
+    /**
+     * Whether Active mode Grid FTP must be used by the remote server. <br>
+     * This means the remote Grid FTP Server will the active party when connecting back to the (local) client. This mode has a
+     * better performance, but is only possible when the local client is not behind a firewall.
+     */
+    public static final String USE_ACTIVE_MODE = PREFIX + "useActiveMode";
 
     /**
-     * Do not 'stat' the remote file and assume remote files exists when statted. <br>
-     * This is needed to access SRM Grid FTP Servers. Also listing of remote directories is not possible. The msld() method(s)
-     * will return no entries.
+     * SRM compatible GridFTP mode. Grid FTP URLs are only used as transport URLs to copy files. This means all URLs are assumed
+     * to be files and assumed to exist on the remote server. File won't be 'stat'-ed (mlst will return default values). <br>
+     * Also listing of remote directories is not possible. The list()/mlsd() methods will return no entries.
      */
     public static final String USE_BLIND_GFTP = PREFIX + "useBlindMode";
 
     /**
-     * Explicitly set to gftp version 1.x. Needed for old Grid FTP servers and some SRM back-end gftp servers.
+     * Explicitly set to Grid FTP version 1.x. Needed for old Grid FTP servers and some SRM back-end Grid FTP servers.
      */
     public static final String USE_GFTP_V1 = PREFIX + "useGftpV1";
 
@@ -90,40 +97,82 @@ public class GftpAdaptor extends Adaptor {
     /**
      * List of properties supported by this GfridFTP adaptor
      */
-    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
+    protected static final ImmutableArray<XenonPropertyDescription> VALID_GFTP_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
 
-            new XenonPropertyDescriptionImplementation(USE_PASSIVE_MODE, Type.BOOLEAN, EnumSet.of(Component.FILESYSTEM), "true",
-                    "Whether to use Active Mode or Passive Mode Grid FTP. Default is Passive mode. When the client is set to Passive mode, "
-                            + "the remote server MUST support Active mode."),
+    new XenonPropertyDescriptionImplementation(USE_ACTIVE_MODE, Type.BOOLEAN, EnumSet.of(Component.FILESYSTEM), "false",
+            "Whether the remote server should use active mode. This means the remote server connects back to the local client"
+                    + "Default is false (= passive mode). "),
 
-            new XenonPropertyDescriptionImplementation(USE_BLIND_GFTP, Type.BOOLEAN, EnumSet.of(Component.FILESYSTEM), "false",
-                    "Whether to use Blind mode GFTP: stat and list methods are not supported, only get and put."),
+    new XenonPropertyDescriptionImplementation(USE_BLIND_GFTP, Type.BOOLEAN, EnumSet.of(Component.FILESYSTEM), "false",
+            "Whether to use Blind mode GFTP: stat and list methods are not supported, only get and put."),
 
-            new XenonPropertyDescriptionImplementation(USE_GFTP_V1, Type.BOOLEAN, EnumSet.of(Component.FILESYSTEM), "false",
-                    "Enforce the use of old Grid FTP V1.0 methods: Mlst and Mlsd methods are not supported in V1."),
+    new XenonPropertyDescriptionImplementation(USE_GFTP_V1, Type.BOOLEAN, EnumSet.of(Component.FILESYSTEM), "false",
+            "Enforce the use of old Grid FTP V1.0 methods: Mlst and Mlsd methods are not supported in V1."),
 
-            new XenonPropertyDescriptionImplementation(ENFORCE_DATA_CHANNEL_AUTHENTICATION, Type.BOOLEAN, EnumSet
-                    .of(Component.FILESYSTEM), "false",
-                    "Enforce the use of Data Channel Authentication (DCAU) and throw exceptions if not supported by the Grid FTP Server."));
+    new XenonPropertyDescriptionImplementation(ENFORCE_DATA_CHANNEL_AUTHENTICATION, Type.BOOLEAN,
+            EnumSet.of(Component.FILESYSTEM), "false",
+            "Enforce the use of Data Channel Authentication (DCAU) and throw exceptions if not supported by the Grid FTP Server."
+                    + "Default behaviour is to switch off DCAU if not support by remote server."));
+
+    public static Map<String, String> filterProps(ImmutableArray<XenonPropertyDescription> validProperties,
+            Map<String, String> properties) {
+
+        if (properties == null) {
+            return null;
+        }
+
+        Map<String, String> props = new Hashtable<String, String>();
+
+        for (XenonPropertyDescription entry : validProperties) {
+            String name = entry.getName();
+            entry.getType();
+            String val = properties.get(name);
+
+            if (val != null) {
+                props.put(name, val);
+            }
+        }
+
+        return props;
+    }
+
+    // ========
+    // Instance 
+    // ========
 
     private final GftpFiles filesAdaptor;
 
     private final GlobusProxyCredentials credentialsAdaptor;
 
     public GftpAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_GFTP_PROPERTIES,
+                new XenonProperties(VALID_GFTP_PROPERTIES, Component.FILESYSTEM, filterProps(VALID_GFTP_PROPERTIES, properties)));
 
+        logger.debug("New GftpAadaptor()"); 
+        
         this.filesAdaptor = new GftpFiles(this, xenonEngine);
 
-        XenonProperties xenonProps = new XenonProperties(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES, properties);
+        // filter out credentials properties: 
+        Map<String, String> credProps = filterProps(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES, properties);
+
+        XenonProperties xenonCredProps = new XenonProperties(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES,
+                Component.CREDENTIALS, filterProps(GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES, credProps));
+
         // Custom Globus Properties factory for this FileSystem, which should be linked to one user credential configuration. 
-        this.credentialsAdaptor = new GlobusProxyCredentials(xenonProps, this);
+        this.credentialsAdaptor = new GlobusProxyCredentials(xenonCredProps, this);
     }
 
     @Override
     public XenonPropertyDescription[] getSupportedProperties() {
-        return VALID_PROPERTIES.asArray();
+        return VALID_GFTP_PROPERTIES.asArray();
+    }
+
+    public ImmutableArray<XenonPropertyDescription> getSupportedFileSystemProperties() {
+        return VALID_GFTP_PROPERTIES;
+    }
+
+    public ImmutableArray<XenonPropertyDescription> getSupportedCredentialProperties() {
+        return GlobusProxyCredentials.GLOBUS_CREDENTIAL_PROPERTIES;
     }
 
     @Override
@@ -157,7 +206,7 @@ public class GftpAdaptor extends Adaptor {
      *            - location of (globus) proxy file
      * @param props
      *            - map of properties
-     * @return
+     * @return New connected GftpSession
      * @throws XenonException
      */
     public GftpSession createNewSession(String host, int port, String proxyFilepath, Map<String, String> props)

@@ -36,7 +36,6 @@ import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.RelativePath;
 
 import org.globus.ftp.ChecksumAlgorithm;
-import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPClient;
@@ -58,6 +57,10 @@ import org.slf4j.LoggerFactory;
  * GridFTPClient client holds a state. For multi-threaded access to the same GFTP server it is recommended to use multiple
  * GftpSession objects as GFTP Servers are optimized for parallel access.<br>
  * This class can be used multi-threaded.
+ * <p>
+ * Active Passive Mode: Set transfer mode to Passive when the client is behind a (NAT) firewall.
+ * <p>
+ * For more reading about FTP on which Grid FTP is base, see RFC 959 (http://www.faqs.org/rfcs/rfc959.html)
  * 
  * @author Piter T. de Boer
  */
@@ -69,8 +72,8 @@ public class GftpSession {
 
         public boolean protocol_v1 = false;
 
-        /** Use Passive GFTP Mode. Default is true. */
-        public boolean usePassiveMode = true;
+        /** Use Active Mode Grid FTP. Default is false (client is active party). */
+        public boolean useActiveMode = false;
 
         /** Either GFTP V1 or SRM Grid FTP Server. */
         public boolean useBlindMode = false;
@@ -78,7 +81,7 @@ public class GftpSession {
         /** Explicit list hidden files on Grid FTP V1 servers. */
         public boolean gftp1ListHiddenFiles = true;
 
-        /** Always use DataChannel Authentication or throw exceptions. */
+        /** Always use DataChannel Authentication or throw an exception if not supported by the remote GridFTP server. */
         public boolean enforceDCAU = false;
 
         /** Perform extra client state test to ensure valid connections. */
@@ -89,7 +92,7 @@ public class GftpSession {
 
         @Override
         public String toString() {
-            return "GftpSessionOptions:[protocol_v1=" + protocol_v1 + ", usePassiveMode=" + usePassiveMode + ", useBlindMode="
+            return "GftpSessionOptions:[protocol_v1=" + protocol_v1 + ", useActiveMode=" + useActiveMode + ", useBlindMode="
                     + useBlindMode + ", gfpt1ListHiddenFiles=" + gftp1ListHiddenFiles + ", enforceDCAU=" + enforceDCAU + "]";
         }
     }
@@ -129,8 +132,8 @@ public class GftpSession {
         updateProperties(properties);
     }
 
-    private void updateProperties(XenonProperties properties) throws XenonException {
-        
+    protected void updateProperties(XenonProperties properties) throws XenonException {
+
         if (properties == null) {
             return;
         }
@@ -138,7 +141,7 @@ public class GftpSession {
         try {
 
             options.useBlindMode = properties.getBooleanProperty(GftpAdaptor.USE_BLIND_GFTP);
-            options.usePassiveMode = properties.getBooleanProperty(GftpAdaptor.USE_PASSIVE_MODE);
+            options.useActiveMode = properties.getBooleanProperty(GftpAdaptor.USE_ACTIVE_MODE);
             options.enforceDCAU = properties.getBooleanProperty(GftpAdaptor.ENFORCE_DATA_CHANNEL_AUTHENTICATION);
             options.protocol_v1 = properties.getBooleanProperty(GftpAdaptor.USE_GFTP_V1);
 
@@ -306,17 +309,38 @@ public class GftpSession {
     }
 
     /**
-     * @return whether this client should use Passive mode. This means the remote server has to be set to Active Mode.
+     * @return whether this client should use Passive Mode transfers, which means the remote server has to be set to Passive Mode
+     *         for each data channel transfer.
      */
     public boolean usePassiveMode() {
-        return options.usePassiveMode;
+        return (options.useActiveMode == false);
     }
 
     /**
-     * @return whether this client should use Active mode. This means the remote server has to be set to Passive mode.
+     * @return whether this client should use Active transfer, which means the remote server has to be set to Active mode for each
+     *         data channel
      */
     public boolean useActiveMode() {
-        return (options.usePassiveMode == false);
+        return options.useActiveMode;
+    }
+
+    /**
+     * Set transfer mode of Server to Passive.<br>
+     * This is the default behavior of the GridFTP Client. This means that per data transfer the remote server will create a
+     * data-channel port and the local client will connect to that data channel. The remote data-channel port must be accessible
+     * by the client.
+     */
+    public void setPassiveMode() {
+        options.useActiveMode = false;
+    }
+
+    /**
+     * Set transfer mode of the Server to Active. <br>
+     * This means the remote server will be the active party and connect back to the local client. The local (client) port must be
+     * accessible by the remote server.
+     */
+    public void setActiveMode() {
+        options.useActiveMode = true;
     }
 
     /**
@@ -331,8 +355,10 @@ public class GftpSession {
     }
 
     /**
-     * Whether to perform an extra list command to get hidden files. Some GridFTP servers don't list hidden files. Set this to
-     * true to explicit list hidden files. This will result in some extra overhead since this might involve an extra list command.
+     * Whether to perform an extra list command to get hidden files.
+     * <p>
+     * Some GridFTP servers don't list hidden files. Set this to true to explicit list hidden files. This will result in some
+     * extra overhead since this might involve an extra list command.
      * 
      * @return whether to explicit list hidden files.
      */
@@ -385,10 +411,11 @@ public class GftpSession {
             boolean ldca = useDataChannelAuthentication();
 
             if (ldca == false) {
+                logger.warn("GftpSession(): Explicitly disabling dataChannelAuthentication for: {}", this);
                 newClient.setLocalNoDataChannelAuthentication();
             }
 
-            logger.debug("GftpSession(): new gftp session:{}:{}.", hostname, port);
+            logger.debug("GftpSession(): new gftp session for host:{}:{}.", hostname, port);
 
         } catch (UnknownHostException e) {
             throw new XenonException(adaptor.getName(), "Unknown hostname or server:" + e.getMessage(), e);
@@ -938,7 +965,7 @@ public class GftpSession {
      * Some GridFTP commands setup a Data Channel. Before setting up this channel either Passive or Active mode has to be
      * specified.
      * <p>
-     * DataChannel methods are: msld, get, put and variants of the methods.
+     * DataChannel methods are: msld, get, put and variants of these methods.
      * 
      * @param dataChannelCommand
      *            - if true then update Active/Passive mode for a DataChannel Command.
@@ -954,7 +981,7 @@ public class GftpSession {
                     client.setPassiveMode(false);
                 } else {
                     // Explicit setting passive mode must be done before opening a Data Channel and may never
-                    // be performed twice. 
+                    // be performed twice before starting a data tranfers. 
                     if (dataChannelCommand) {
                         client.setPassiveMode(true);
                     }
@@ -1157,7 +1184,7 @@ public class GftpSession {
     // =================================
 
     /**
-     * Copy remote file but on same server. This can be done with 3rd party copying to the same server.
+     * Copy remote file but on same server. This can be done with 3rd party copying from and to the <strong>same</strong> server.
      * 
      * @param sourcePath
      *            - source file to copy
@@ -1165,13 +1192,13 @@ public class GftpSession {
      *            - target file path to copy to on the same server
      * @throws XenonException
      */
-    public void activeRemoteCopy(RelativePath sourcePath, RelativePath targetFilepath) throws XenonException {
-        active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), this, targetFilepath.getAbsolutePath());
+    public void remoteCopy(RelativePath sourcePath, RelativePath targetFilepath) throws XenonException {
+        active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), this, targetFilepath.getAbsolutePath(), false);
     }
 
     /**
-     * Perform active third party transfer and initiate active file transfer from this (source) server. This server will be the
-     * active party. If this is not possible use the reverse method
+     * Perform active third party transfer and initiate active file transfer from this (source) server.<br>
+     * This server will be the active party. If this is not possible use the reverse method setting targetServerIsActive==true.
      * 
      * @param sourcePath
      *            - file path on this GridFTP server
@@ -1179,31 +1206,15 @@ public class GftpSession {
      *            - remote GridFTP server.
      * @param targetFilepath
      *            - remote File path to copy to
+     * @param targetServerIsActive
+     *            - Reverse Active/Passive roles, remote Target Server must be active party.
      * @throws XenonException
      */
-    public void active3rdPartyTransfer(RelativePath sourcePath, GftpSession remoteServer, RelativePath targetFilepath)
-            throws XenonException {
-        active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), remoteServer, targetFilepath.getAbsolutePath());
-    }
+    public void active3rdPartyTransfer(RelativePath sourcePath, GftpSession remoteServer, RelativePath targetFilepath,
+            boolean targetServerIsActive) throws XenonException {
 
-    /**
-     * Perform active third party transfer but the direction is reversed.<br>
-     * The (Remote) source server will be the active party. This is necessary when the source server is behind a firewall or it
-     * can't be the active server for some other reason.
-     * 
-     * @param destinationPathHere
-     *            - destination path on this GridFTP Server.
-     * @param remoteSourceServer
-     *            - remote GridFTP Server to copy from, this server will be the active party.
-     * @param remoteSourceFilepath
-     *            - File path on remote (other) GridFTP Server.
-     * @throws XenonException
-     *             -
-     */
-    public void active3rdPartyTransferReverse(RelativePath destinationPathHere, GftpSession remoteSourceServer,
-            RelativePath remoteSourceFilepath) throws XenonException {
-        active3rdPartyTransfer(remoteSourceServer, remoteSourceFilepath.getAbsolutePath(), this,
-                destinationPathHere.getAbsolutePath());
+        active3rdPartyTransfer(this, sourcePath.getAbsolutePath(), remoteServer, targetFilepath.getAbsolutePath(),
+                targetServerIsActive);
     }
 
     /**
@@ -1218,109 +1229,47 @@ public class GftpSession {
      *            - target GFTP FileSystem: this server is the Passive Party during transfer.
      * @param targetFilepath
      *            - target path of file
+     * @param reverseActiveMOde
+     *            - reverse active passive mode of servers. Target Server will become active party. This needed when for example
+     *            the target server is behind a firewall!
      * @return new Target VFile object
      * @throws VrsException
      */
     protected static void active3rdPartyTransfer(GftpSession sourceServer, String sourceFilepath, GftpSession targetServer,
-            String targetFilepath) throws XenonException {
-        String transferInfoStr = "third party copy from " + sourceServer.getHostname() + ":" + sourceFilepath + " to "
-                + targetServer.getHostname() + ":" + targetFilepath;
-        logger.info("> Performing:{}", transferInfoStr);
+            String targetFilepath, boolean reverseActiveMode) throws XenonException {
 
-        //monitor.logPrintf("Performing: %s\n",transferInfoStr); 
+        GftpThirdPartyTransfer transfer = new GftpThirdPartyTransfer(sourceServer, sourceFilepath, targetServer, targetFilepath,
+                reverseActiveMode);
 
-        // Multi threaded support: Create private GridFTP clients for each location:  
-        GridFTPClient privateSourceClient = sourceServer.createGFTPClient();
-        GridFTPClient privateTargetClient = targetServer.createGFTPClient();
+        transfer.transfer(false);
 
-        // Grid FTP 1.0 compatibility
-        // Both must support DCAU. If one of them doesn't: disable at the other ! 
+        transfer.close();
+    }
 
-        boolean sourceDCAU = sourceServer.useDataChannelAuthentication();
-        boolean destDCAU = targetServer.useDataChannelAuthentication();
+    /**
+     * Set whether DataChannelAuthentication must be used. This value is automatically set after connecting to a remote server.
+     * Change this value only after connecting to override the default settings.
+     */
+    public void setUseDataChannelAuthentication(boolean value) {
+        this.useDataChannelAuthentication = value;
+    }
 
-        long sourceSize = -1;
-        try {
-            sourceSize = sourceServer.getSize(sourceFilepath);
-        } catch (Exception e) {
-            // SRM Patch: not always possible to fetch file size from transport URLs !
-            logger.warn("Couldn't determine size of source file {}:{}", sourceFilepath, e);
-        }
-
-        logger.debug(" - GridFTP 3rd party transfer source Server DCAU = {}", sourceDCAU);
-        logger.debug(" - GridFTP 3rd party transfer dest   Server DCAU = {}", destDCAU);
-
-        // both must be true or false. 
-        if (sourceDCAU != destDCAU) {
-            logger.warn("Warning: Grid FTP Data Channel Authentication mismatch between source: " + sourceServer.getHostname()
-                    + " and destination:" + targetServer.getHostname());
-
-            privateSourceClient.setLocalNoDataChannelAuthentication();
-            privateTargetClient.setLocalNoDataChannelAuthentication();
-
-            if ((sourceDCAU == false) && (destDCAU == true)) {
-                try {
-                    privateTargetClient.setDataChannelAuthentication(DataChannelAuthentication.NONE);
-                } catch (Exception e) {
-                    // API might not be supported, continue anyway. 
-                    logger.error("Exception disabling DataChannel Authentication for server:{} => {}", sourceServer, e);
-                }
-            }
-
-            if ((destDCAU == false) && (sourceDCAU == true)) {
-                try {
-                    privateSourceClient.setDataChannelAuthentication(DataChannelAuthentication.NONE);
-                } catch (Exception e) {
-                    // API might not be supported, continue anyway. 
-                    logger.error("Exception disabling DataChannel Authentication for server:{} => {}", sourceServer, e);
-                }
-            }
-        }
-
-        //        //TBD:
-        //        try {
-        //            // Reverse active/passsive mode !  
-        //            privateSourceClient.setPassiveMode(true);
-        //            privateTargetClient.setPassiveMode(false); 
-        //            
-        //        } catch (Exception e) {
-        //            throw new XenonException(GftpAdaptor.ADAPTOR_NAME,"active3rdPartyTransfer: Couldn't set Active/Passive modes:"+e.getMessage(),e); 
-        //        } 
-
-        Throwable transferEx = null;
-        GftpTransferMonitor listener = new GftpTransferMonitor(targetServer, targetFilepath, sourceSize);
-
-        try {
-
-            boolean append = false;
-            // initiate transfer from active source to passive destination  
-            privateSourceClient.transfer(sourceFilepath, privateTargetClient, targetFilepath, append, listener);
-
-        } catch (Throwable e) {
-            listener.setException(e);
-            logger.error("Exception during 3rd party transfer:{}", e);
-            // retry ? 
-            transferEx = e;
-
-            throw new XenonException(GftpAdaptor.ADAPTOR_NAME, "Couldn't perform " + transferInfoStr + ". Error="
-                    + transferEx.getMessage(), transferEx);
-        } finally {
-            // CLEANUP !
-            sourceServer.closeGFTPClient(privateSourceClient);
-            targetServer.closeGFTPClient(privateTargetClient);
-        }
-
-        logger.info("GridFTP: Finished 3rd party transfer.\n");
-
-        return; // ok 
+    /**
+     * Returns whether DataChannelAuthentication will be used. This value is automatically set after connecting to a remote
+     * server. First connect to a remote server then check this value whether DCAU is supported.
+     */
+    public boolean getUseDataChannelAuthentication() {
+        return useDataChannelAuthentication;
     }
 
     // ---
     // Miscellaneous methods 
     // ---
 
+    @Override
     public String toString() {
-        return "GftpSession:[location=" + this.location + ",connected=" + this.isConnected() + "]";
+        return "GftpSession [location=" + location + ",features=" + features + ", useDCAU=" + useDataChannelAuthentication
+                + ", entryPath=" + entryPath + ", options=" + options + "]";
     }
 
 }
