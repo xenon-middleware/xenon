@@ -106,7 +106,6 @@ public class GlobusProxyCredentials implements Credentials {
 
     public GlobusProxyCredentials(XenonProperties properties, GftpAdaptor gftpAdaptor) {
 
-        reloadCACertificates();
         // Optional properties, if none defined Globus defaults will be used. 
         updateDefaultProperties(properties);
     }
