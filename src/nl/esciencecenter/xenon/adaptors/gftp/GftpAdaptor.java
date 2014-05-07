@@ -213,7 +213,7 @@ public class GftpAdaptor extends Adaptor {
             throws XenonException {
 
         GftpLocation gftpLocation = new GftpLocation(host, port);
-        GlobusProxyCredential cred = credentialsAdaptor.loadProxy(proxyFilepath);
+        GlobusProxyCredential cred = getGlobusProxyCredentials().loadProxy(proxyFilepath);
         XenonProperties xenonProperties = new XenonProperties(this.getSupportedProperties(Component.FILESYSTEM), props);
         return createNewSession(gftpLocation, cred, xenonProperties);
     }

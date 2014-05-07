@@ -106,8 +106,6 @@ public class GlobusProxyCredentials implements Credentials {
 
     public GlobusProxyCredentials(XenonProperties properties, GftpAdaptor gftpAdaptor) {
 
-        // Preload cerficicates, must be update per Proxy Creation call!    
-        reloadCACertificates();
         // Optional properties, if none defined Globus defaults will be used. 
         updateDefaultProperties(properties);
     }
@@ -329,15 +327,11 @@ public class GlobusProxyCredentials implements Credentials {
      */
     public GlobusCredential loadGlobusProxyFile(String proxyFilepath) throws XenonException {
 
-        // Refresh Trusted Certificates before creating new credential, more could have been added manually 
-        // by user. 
-        reloadCACertificates();
-
         try {
-
-            // Update static loaded certificates: 
-            GftpUtil.staticUpdateTrustedCertificates(certificates);
-            // 
+            
+            // Update static loaded trusted certificates.
+            reloadCACertificates();
+            GlobusUtil.staticUpdateTrustedCertificates(certificates);
             return new GlobusCredential(proxyFilepath);
 
         } catch (GlobusCredentialException e) {
@@ -350,7 +344,7 @@ public class GlobusProxyCredentials implements Credentials {
      */
     protected void reloadCACertificates() {
 
-        this.certificates = GftpUtil.loadX509Certificates(new String[] { userCertificatesDir });
+        this.certificates = GlobusUtil.loadX509Certificates(new String[] { userCertificatesDir });
     }
 
     /**
