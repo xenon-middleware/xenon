@@ -47,6 +47,7 @@ import nl.esciencecenter.xenon.jobs.NoSuchJobException;
 import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -521,6 +522,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             }
         }
         return result;
+    }
+
+    @Override
+    public Streams getStreams(Job job) throws XenonException {
+        throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "does not support interactive jobs");
     }
 
 }

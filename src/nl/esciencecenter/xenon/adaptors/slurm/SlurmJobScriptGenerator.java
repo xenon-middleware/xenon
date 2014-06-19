@@ -1,8 +1,10 @@
 package nl.esciencecenter.xenon.adaptors.slurm;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
@@ -23,6 +25,36 @@ public final class SlurmJobScriptGenerator {
         //DO NOT USE
     }
 
+    private static String getWorkingDirPath(JobDescription description, RelativePath fsEntryPath) {
+        String path;
+        if (description.getWorkingDirectory().startsWith("/")) {
+            path = description.getWorkingDirectory();
+        } else {
+            //make relative path absolute
+            RelativePath workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
+            path = workingDirectory.getAbsolutePath();
+        }
+
+        return path;
+    }
+    
+    static String[] generateInteractiveArguments(JobDescription description, RelativePath fsEntryPath, UUID tag) throws XenonException {
+        ArrayList<String> arguments = new ArrayList<String>();
+
+        //suppress printing of status messages
+        arguments.add("--quiet");
+
+        //add a tag so we can find the job back in the queue later
+        arguments.add("--comment=" + tag.toString());
+
+        arguments.add(description.getExecutable());
+        arguments.addAll(description.getArguments());
+        
+        //TODO: IMPLEMENT OTHER OPTIONS!
+        
+        return arguments.toArray(new String[arguments.size()]);
+    }
+
     static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
@@ -34,16 +66,8 @@ public final class SlurmJobScriptGenerator {
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
-            String path;
-            if (description.getWorkingDirectory().startsWith("/")) {
-                path = description.getWorkingDirectory();
-            } else {
-                //make relative path absolute
-                RelativePath workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                path = workingDirectory.getAbsolutePath();
-            }
+            String path = getWorkingDirPath(description, fsEntryPath);
             script.format("#SBATCH --workdir='%s'\n", path);
-
         }
 
         if (description.getQueueName() != null) {

@@ -234,7 +234,7 @@ public final class ScriptingParser {
 
             if (fields.length != values.length) {
                 throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output, got line with "
-                        + values.length + " values: " + lines[i]);
+                        + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values));
             }
 
             Map<String, String> map = new HashMap<String, String>();

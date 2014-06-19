@@ -38,6 +38,7 @@ import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public abstract class SchedulerConnection {
 
     private final ScriptingAdaptor adaptor;
     private final String id;
-    private final XenonEngine engine;
+    protected final XenonEngine engine;
     private final Scheduler subScheduler;
     private final FileSystem subFileSystem;
 
@@ -114,11 +115,6 @@ public abstract class SchedulerConnection {
         if (maxTime <= 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
-
-        if (description.isInteractive()) {
-            throw new InvalidJobDescriptionException(adaptorName, "Adaptor does not support interactive jobs");
-        }
-
     }
 
     protected static void verifyJobOptions(Map<String, String> options, String[] validOptions, String adaptorName)
@@ -172,8 +168,7 @@ public abstract class SchedulerConnection {
 
         for (String field : additionalFields) {
             if (!jobInfo.containsKey(field)) {
-                throw new XenonException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field
-                        + "\"");
+                throw new XenonException(adaptorName, "Invalid job info. Info does not contain mandatory field \"" + field + "\"");
             }
         }
     }
@@ -192,7 +187,7 @@ public abstract class SchedulerConnection {
         return result;
     }
 
-    protected SchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
+    protected SchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential,
             XenonProperties properties, XenonEngine engine, long pollDelay) throws XenonException {
 
         this.adaptor = adaptor;
@@ -203,23 +198,23 @@ public abstract class SchedulerConnection {
         if (!supportsScheme(scheme, adaptor.getSupportedSchemes())) {
             throw new InvalidLocationException(adaptor.getName(), "Adaptor does not support scheme \"" + scheme + "\"");
         }
-        
+
         id = adaptor.getName() + "-" + getNextSchedulerID();
 
         String subJobScheme = null;
         String subFileScheme = null;
         String subLocation = null;
-        
-        if (location == null|| location.length() == 0 || location.equals("/")) {
+
+        if (location == null || location.length() == 0 || location.equals("/")) {
             subJobScheme = "local";
             subFileScheme = "file";
             subLocation = "/";
-        } else { 
+        } else {
             subJobScheme = "ssh";
             subFileScheme = "sftp";
             subLocation = location;
         }
- 
+
         LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), (subJobScheme + "://" + subLocation));
         Map<String, String> subSchedulerProperties = new HashMap<String, String>();
 
@@ -255,18 +250,30 @@ public abstract class SchedulerConnection {
     /**
      * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
      */
-    public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException { 
+    public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException {
         RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable,
                 arguments);
 
         if (!runner.success()) {
-            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin + \"" + stdin 
-                    + "\" arguments \""
-                    + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = " + runner.getExitCode()
-                    + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
+            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin + \"" + stdin
+                    + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
+                    + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
         return runner.getStdout();
+    }
+
+    /**
+     * Start an interactive command on the remote machine (usually via ssh).
+     */
+    public Job startCommand(String executable, String... arguments) throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setInteractive(true);
+        description.setExecutable(executable);
+        description.setArguments(arguments);
+        description.setQueueName("unlimited");
+
+        return engine.jobs().submitJob(subScheduler, description);
     }
 
     /**
@@ -393,5 +400,7 @@ public abstract class SchedulerConnection {
     public abstract JobStatus getJobStatus(Job job) throws XenonException;
 
     public abstract JobStatus[] getJobStatuses(Job... jobs) throws XenonException;
+
+    public abstract Streams getStreams(Job job) throws XenonException;
 
 }
