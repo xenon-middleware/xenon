@@ -1,13 +1,17 @@
 package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.io.File;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.globus.common.CoGProperties;
 import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.OpenSSLKey;
 import org.globus.gsi.TrustedCertificates;
+import org.globus.gsi.bc.BouncyCastleOpenSSLKey;
 import org.globus.tools.proxy.DefaultGridProxyModel;
 import org.globus.tools.proxy.GridProxyModel;
 import org.slf4j.Logger;
@@ -49,11 +53,21 @@ public class GlobusUtil {
      */
     public static final String USERKEYPEM = "userkey.pem";
 
+    /**
+     * Default system wide grid certificates directory.
+     */
+    public static final String DEFAULT_SYSTEM_CERTIFICATES_DIR = "/etc/grid-security/certificates";
+    
+    
     public static void staticInit() {
         // Some Globus properties must be defined Globally 
         initCogProperties();
     }
 
+    /**
+     * Returns global defined Cog Properties. Will be used as defaults. 
+     * @deprecated 
+     */
     public static CoGProperties getStaticCoGProperties() {
         // initialize defaults from Globus Proxy Model 
         GridProxyModel staticModel = staticGetModel(false);
@@ -72,6 +86,9 @@ public class GlobusUtil {
         return props;
     }
 
+    /**
+     * Initializes static Cog Properties. 
+     */
     public static void initCogProperties() {
         // update static properties: 
         CoGProperties props = CoGProperties.getDefault();
@@ -82,12 +99,9 @@ public class GlobusUtil {
             props.setProperty(COG_ENFORCE_SIGNING_POLICY, "false");
         }
     }
-
-    protected static GridProxyModel staticGetModel() {
-        return staticGetModel(false);
-    }
-
+    
     /**
+     * 
      * Todo: support for external PKCS11 device.
      */
     protected static GridProxyModel staticGetModel(boolean usePKCS11Device) {
@@ -107,8 +121,10 @@ public class GlobusUtil {
         return staticModel;
     }
 
-    public static GlobusCredential createCredential(String userCert, String userKey, char passphrase[]) throws Exception {
-        return createCredential(userCert, userKey, passphrase, null, -1);
+    public static GlobusCredential createCredential(String userCert, String userKey, char passphrase[], boolean legacyProxy)
+            throws Exception {
+
+        return createCredential(userCert, userKey, passphrase, null, -1, true);
     }
 
     /**
@@ -121,55 +137,43 @@ public class GlobusUtil {
      * @param passphrase
      *            - actual passphrase
      * @param userProxyLocation
-     *            - optional location to save proxy file to
+     *            - optional location to save proxy file to. I null the proxy won't be saved. 
+     * @param lifeTimeInSeconds - proxy life time in seconds. Set to -1 for default lifeTime. 
      * @return actual globus proxy credential if proxy creation is successful.
      * @throws Exception
      */
     public static GlobusCredential createCredential(String userCert, String userKey, char passphrase[], String userProxyLocation,
-            int lifeTime) throws Exception {
-        GridProxyModel staticModel = staticGetModel();
-        GlobusCredential credential;
+            int lifeTime, boolean legacyProxy) throws Exception {
 
-        CoGProperties props = getStaticCoGProperties();
+        ProxyInit proxyInit = new ProxyInit();
 
         if (passphrase == null) {
             throw new NullPointerException("Can't create proxy without passphrase. passphrase==null!");
         }
 
-        // --- 
-        // Must update static properties *before* using static create proxy methods from Globus! 
-        // ---
-
-        if (userCert != null) {
-            props.setUserCertFile(userCert);
-        } // else use default 'usercert.pem' location 
-
-        if (userKey != null) {
-            props.setUserKeyFile(userKey);
-        } // else use default 'userkey.pem' location. 
-
-        if (userProxyLocation != null) {
-            props.setProxyFile(userProxyLocation);
-        } //else use /tmp/x509_<userid>  
+        // update default settings. 
+        
+        if (legacyProxy) {
+            proxyInit.setProxyTypeToGSI2Legacy();
+        }
 
         if (lifeTime > 0) {
-            props.setProxyLifeTime(lifeTime);
-        } // default is 24 hours. 
+            proxyInit.setLifetime(lifeTime);
+        }
 
-        credential = staticModel.createProxy(new String(passphrase));
+        GlobusCredential cred = proxyInit.createProxy(userCert, userKey, passphrase, true, userProxyLocation);
 
-        return credential;
+        return cred;
     }
 
-    /**
-     * Default system wide grid certificates directory.
-     */
-    public static final String DEFAULT_SYSTEM_CERTIFICATES_DIR = "/etc/grid-security/certificates";
+   
 
-    /** 
-     * Load certificates from list of locations. If directory doesn't exist, the location will be skipped. 
-     * @param customDirs - List of directories to look for X509 Certificates.   
-     * @return loaded X509 Certificates from specified directories. 
+    /**
+     * Load certificates from list of locations. If directory doesn't exist, the location will be skipped.
+     * 
+     * @param customDirs
+     *            - List of directories to look for X509 Certificates.
+     * @return loaded X509 Certificates from specified directories.
      */
     public static List<X509Certificate> loadX509Certificates(String[] customDirs) {
 
@@ -256,7 +260,7 @@ public class GlobusUtil {
      *            - Trusted certificates needed by Globus.
      */
     public static void staticUpdateTrustedCertificates(List<X509Certificate> certs) {
-        
+
         X509Certificate[] newXCerts = new X509Certificate[certs.size()];
         newXCerts = certs.toArray(newXCerts);
         TrustedCertificates trustedCertificates = new TrustedCertificates(newXCerts);
@@ -272,5 +276,43 @@ public class GlobusUtil {
             }
         }
 
+    }
+
+    /**
+     * Decode user private key (userkey.pem) and return it.<br>
+     * <strong>warning</strong> this method return the <emph>decoded</emph> prive key. Handle with care.
+     * 
+     * @return decode users private key.
+     * @throws Exception
+     */
+    public static PrivateKey getPrivateKey(String filename, char passphrase[]) throws Exception {
+        // X509Certificate userCert =
+        // CertUtil.loadCertificate(this.getDefaultUserCertLocation());
+        OpenSSLKey key = new BouncyCastleOpenSSLKey(filename);
+        // String charSet="UTF-8";
+
+        byte bytes[] = new byte[passphrase.length];
+
+        if (key.isEncrypted()) {
+            try {
+
+                for (int i = 0; i < passphrase.length; i++) {
+                    bytes[i] = (byte) passphrase[i];
+                }
+                key.decrypt(bytes);
+
+            } catch (GeneralSecurityException e) {
+                throw new Exception("Wrong password or other security error");
+            } finally {
+
+                for (int i = 0; i < bytes.length; i++) {
+                    bytes[i] = 0;
+                }
+            }
+
+        }
+
+        java.security.PrivateKey userKey = key.getPrivateKey();
+        return userKey;
     }
 }
