@@ -65,8 +65,7 @@ public class GlobusUtil {
     }
 
     /**
-     * Returns global defined Cog Properties. Will be used as defaults. 
-     * @deprecated 
+     * Returns global defined CoG Properties. Will be used as defaults. 
      */
     public static CoGProperties getStaticCoGProperties() {
         // initialize defaults from Globus Proxy Model 
@@ -135,7 +134,7 @@ public class GlobusUtil {
      * @param userKey
      *            - location of userkey.pem file, default is 'userkey.pem' from ~/.globus
      * @param passphrase
-     *            - actual passphrase
+     *            - actual passphrase neede to decode user private key. 
      * @param userProxyLocation
      *            - optional location to save proxy file to. I null the proxy won't be saved. 
      * @param lifeTimeInSeconds - proxy life time in seconds. Set to -1 for default lifeTime. 
@@ -189,12 +188,18 @@ public class GlobusUtil {
         int index = 1;
         for (int i = 0; i < n; i++) {
             if (customDirs[i] != null) {
-                dirs[index++] = customDirs[i]; // filter existing here ? 
+                dirs[index++] = customDirs[i];
             }
         }
         return loadCertificates(dirs);
     }
 
+    /** 
+     * Scan specified directories and load X509 certificates if found. 
+     * @param caCertificateDirs array of directories which may contain CA certificates. 
+     * 
+     * @return list of X509Certificate found. 
+     */
     public static List<X509Certificate> loadCertificates(String caCertificateDirs[]) {
         if (caCertificateDirs == null) {
             return null; // null in null out
@@ -280,9 +285,9 @@ public class GlobusUtil {
 
     /**
      * Decode user private key (userkey.pem) and return it.<br>
-     * <strong>warning</strong> this method return the <emph>decoded</emph> prive key. Handle with care.
+     * <strong>warning</strong> this method returns the <emph>decoded</emph> prive key. Handle with care.
      * 
-     * @return decode users private key.
+     * @return decoded user's private key.
      * @throws Exception
      */
     public static PrivateKey getPrivateKey(String filename, char passphrase[]) throws Exception {

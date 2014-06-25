@@ -36,6 +36,7 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GlobusCredentialException;
+import org.globus.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -306,8 +307,8 @@ public class GlobusProxyCredentials implements Credentials {
             // Must reload static configured certificates before calling globus !   
             reloadCACertificates();
             // Static create Globus Proxy: 
-            GlobusCredential cred = GlobusUtil.createCredential(certFile, keyFile, passphrase, proxyFile, lifeTime);
-            // keep properties used to creat this proxy :
+            GlobusCredential cred = GlobusUtil.createCredential(certFile, keyFile, passphrase, proxyFile, lifeTime,true);
+            // keep properties used to create this proxy :
             Map<String, String> props = createCredentialProperties(certFile, keyFile, proxyFile);
             return new GlobusProxyCredential(this, cred, props);
 
@@ -353,13 +354,18 @@ public class GlobusProxyCredentials implements Credentials {
      * @param globusProxyCredential
      *            proxy credential to remove.
      */
-    public void delete(GlobusProxyCredential globusProxyCredential) {
+    public boolean delete(GlobusProxyCredential globusProxyCredential) {
 
         String proxyPath = globusProxyCredential.getProxyFilePath();
         if (proxyPath != null) {
 
+            return Util.destroy(proxyPath);
         }
-
+        else
+        {
+            logger.warn("No proxy file to delete.");
+        }
+        return false; 
     }
 
 }
