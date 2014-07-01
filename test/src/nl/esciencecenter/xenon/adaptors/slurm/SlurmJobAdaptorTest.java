@@ -32,6 +32,7 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -357,6 +358,62 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         String reportedDefaultQueueName = jobs.getDefaultQueueName(scheduler);
 
         assertEquals(config.getDefaultQueueName(), reportedDefaultQueueName);
+    }
+    
+    @Test
+    public void slurm_test07_interactiveJob() throws Exception {
+        String message = "Hello World! Test Slurm 07";
+
+        String workingDir = getWorkingDir("slurm_test07");
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        files.createDirectories(root);
+
+        JobDescription description = new JobDescription();
+        description.setInteractive(true);
+        description.setWorkingDirectory(workingDir);
+        description.setExecutable("/bin/echo");
+        description.setArguments(message);
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+
+        Job job = jobs.submitJob(scheduler, description);
+
+
+        Streams streams = jobs.getStreams(job);
+        streams.getStdin().close();
+
+        String out = readFully(streams.getStdout());
+        String err = readFully(streams.getStderr());
+        
+        logger.debug("got back stdout : {}", out);
+        logger.debug("got back stderr : {}", err);
+
+        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+
+        if (!status.isDone()) {
+            throw new Exception("Job not finished");
+        }
+
+        if (status.hasException()) {
+            throw new Exception("Job did not finish properly", status.getException());
+        }
+        
+        files.delete(root);
+
+        jobs.close(scheduler);
+        files.close(cwd.getFileSystem());
+
+        
+
+        String[] lines = out.split("\\r?\\n");
+
+        assertTrue(lines.length == 4);
+        for (String line : lines) {
+            assertTrue(line.equals(message));
+        }
     }
 
 }

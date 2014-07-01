@@ -266,12 +266,14 @@ public abstract class SchedulerConnection {
     /**
      * Start an interactive command on the remote machine (usually via ssh).
      */
-    public Job startCommand(String executable, String... arguments) throws XenonException {
+    public Job startInteractiveCommand(Map<String, String> environment, String executable, String... arguments) throws XenonException {
         JobDescription description = new JobDescription();
         description.setInteractive(true);
+        description.setQueueName("unlimited");
+        
+        description.setEnvironment(environment);
         description.setExecutable(executable);
         description.setArguments(arguments);
-        description.setQueueName("unlimited");
 
         return engine.jobs().submitJob(subScheduler, description);
     }

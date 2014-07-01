@@ -546,7 +546,6 @@ public class SlurmSchedulerConnectionTest {
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
         description.setMaxTime(0);
-        //slurm specific info
 
         SlurmSchedulerConnection.verifyJobDescription(description);
     }

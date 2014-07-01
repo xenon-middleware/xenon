@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.slurm;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -48,8 +47,6 @@ import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xml.internal.ws.api.pipe.Engine;
 
 /**
  * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
@@ -351,7 +348,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         String[] arguments = SlurmJobScriptGenerator.generateInteractiveArguments(description, fsEntryPath, tag);
 
         //start actual job
-        Job interactiveJob = startCommand("srun", arguments);
+        Job interactiveJob = startInteractiveCommand(description.getEnvironment(), "srun", arguments);
 
         //get contents of queue (should include job)
         Map<String, Map<String, String>> queueInfo = getSqueueInfo();
@@ -360,13 +357,18 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
             if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag.toString())) {
                 String jobID = entry.getKey();
+                
+                LOGGER.debug("Found interactivde job ID: " + jobID);
 
+                Job result = new JobImplementation(getScheduler(), jobID, description, true, true);
+                
                 synchronized (this) {
                     //add to set of interactive jobs so we can find it
-                    interactiveJobs.put(jobID, interactiveJob);
+                    interactiveJobs.put(result.getIdentifier(), interactiveJob);
                 }
+                
+                return result;
 
-                return new JobImplementation(getScheduler(), jobID, description, true, true);
             }
         }
 

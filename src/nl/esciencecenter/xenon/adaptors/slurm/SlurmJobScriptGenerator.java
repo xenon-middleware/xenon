@@ -46,11 +46,28 @@ public final class SlurmJobScriptGenerator {
 
         //add a tag so we can find the job back in the queue later
         arguments.add("--comment=" + tag.toString());
+        
+        //set working directory
+        if (description.getWorkingDirectory() != null) {
+            String path = getWorkingDirPath(description, fsEntryPath);
+            arguments.add("--chdir=" + path);
+        }
+
+        if (description.getQueueName() != null) {
+            arguments.add("--partition=" + description.getQueueName());
+        }
+
+        //number of nodes
+        arguments.add("--nodes=" + description.getNodeCount());
+
+        //number of processer per node
+        arguments.add("--ntasks-per-node=" +description.getProcessesPerNode());
+
+        //add maximum runtime
+        arguments.add("--time=" +description.getMaxTime());
 
         arguments.add(description.getExecutable());
         arguments.addAll(description.getArguments());
-        
-        //TODO: IMPLEMENT OTHER OPTIONS!
         
         return arguments.toArray(new String[arguments.size()]);
     }

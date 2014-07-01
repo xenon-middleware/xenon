@@ -16,10 +16,13 @@
 package nl.esciencecenter.xenon.adaptors.slurm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmJobScriptGenerator;
@@ -48,9 +51,8 @@ public class SlurmJobScriptGeneratorTest {
 
         String result = SlurmJobScriptGenerator.generate(description, null);
 
-        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --nodes=1\n"
-                + "#SBATCH --ntasks-per-node=1\n" + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n"
-                + "#SBATCH --error=/dev/null\n\n" + "srun null\n";
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n"
+                + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n\n" + "srun null\n";
 
         assertEquals(expected, result);
     }
@@ -87,5 +89,39 @@ public class SlurmJobScriptGeneratorTest {
         System.out.println(result);
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    /**
+     * Check to see if the output is _exactly_ what we expect, and not a single char different.
+     * @throws XenonException
+     */
+    public void testFilledInteractiveDescription() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setArguments("some", "arguments");
+        description.addEnvironment("some", "environment.value");
+        description.addEnvironment("some.more", "environment value with spaces");
+        description.addJobOption("job", "option");
+        description.setExecutable("/bin/executable");
+        description.setMaxTime(100);
+        description.setNodeCount(5);
+        description.setProcessesPerNode(55);
+        description.setQueueName("the.queue");
+        description.setStderr("stderr.file");
+        description.setStdin("stdin.file");
+        description.setStdout("stdout.file");
+        description.setWorkingDirectory("/some/working/directory");
+
+        String[] expected = { "--quiet", "--comment=e74ef5ee-ff73-48a0-9219-3c4d34f960d2", "--chdir=/some/working/directory",
+                "--partition=the.queue", "--nodes=5", "--ntasks-per-node=55", "--time=100", "/bin/executable", "some",
+                "arguments" };
+
+        UUID id = UUID.fromString("e74ef5ee-ff73-48a0-9219-3c4d34f960d2");
+
+        String[] result = SlurmJobScriptGenerator.generateInteractiveArguments(description, null, id);
+
+        System.out.println(Arrays.toString(result));
+
+        assertArrayEquals(expected, result);
     }
 }
