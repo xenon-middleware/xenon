@@ -56,6 +56,19 @@ public class SlurmJobScriptGeneratorTest {
 
         assertEquals(expected, result);
     }
+    
+    @Test
+    public void testSingleProcessDescription() throws XenonException {
+        JobDescription description = new JobDescription();
+        description.setStartSingleProcess(true);
+
+        String result = SlurmJobScriptGenerator.generate(description, null);
+
+        String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --nodes=1\n" + "#SBATCH --ntasks-per-node=1\n"
+                + "#SBATCH --time=15\n" + "#SBATCH --output=/dev/null\n" + "#SBATCH --error=/dev/null\n\n" + "null\n";
+
+        assertEquals(expected, result);
+    }
 
     @Test
     /**

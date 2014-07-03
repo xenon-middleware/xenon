@@ -154,15 +154,6 @@ public class SchedulerConnectionTest {
         SchedulerConnection.verifyJobDescription(description, "testing");
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test02i_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        description.setExecutable("/bin/nothing");
-        description.setInteractive(true);
-
-        SchedulerConnection.verifyJobDescription(description, "testing");
-    }
 
 //    @Test
 //    public void test03a_getSubSchedulerLocation_NoHost_LocalLocation() throws Exception {

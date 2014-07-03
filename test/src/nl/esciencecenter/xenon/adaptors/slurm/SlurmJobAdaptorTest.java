@@ -179,11 +179,12 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         String[] lines = outputContent.split("\\r?\\n");
 
-        assertTrue(lines.length == 4);
+        assertEquals(4, lines.length);
         for (String line : lines) {
             assertTrue(line.equals(message));
         }
     }
+    
 
     @org.junit.Test
     public void slurm_test05_jobStatusWithAccountingDisabled() throws Exception {
@@ -415,5 +416,63 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
             assertTrue(line.equals(message));
         }
     }
+    
+    @Test
+    public void slurm_test08_parallel_batchJob_singleProcess() throws Exception {
+        String message = "Hello World! Test Slurm 04";
+
+        String workingDir = getWorkingDir("slurm_test04");
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        files.createDirectories(root);
+
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
+
+        JobDescription description = new JobDescription();
+        description.setWorkingDirectory(workingDir);
+        description.setExecutable("/bin/echo");
+        description.setArguments(message);
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
+        description.setStartSingleProcess(true);
+
+        Job job = jobs.submitJob(scheduler, description);
+
+        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+
+        if (!status.isDone()) {
+            throw new Exception("Job not finished");
+        }
+
+        if (status.hasException()) {
+            throw new Exception("Job did not finish properly", status.getException());
+        }
+
+        String outputContent = readFully(files.newInputStream(stdout));
+
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
+
+        jobs.close(scheduler);
+        files.close(cwd.getFileSystem());
+
+        logger.debug("got back result: {}", outputContent);
+
+        String[] lines = outputContent.split("\\r?\\n");
+
+        //make sure we only have a single line of output, not 4
+        assertEquals(1, lines.length);
+        for (String line : lines) {
+            assertTrue(line.equals(message));
+        }
+    }
+
 
 }

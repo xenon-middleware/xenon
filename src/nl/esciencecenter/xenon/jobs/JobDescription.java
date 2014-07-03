@@ -65,8 +65,11 @@ public class JobDescription {
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
 
-    /** The number of processes to start per node. */
+    /** The number of processes to start/reserve per node. */
     private int processesPerNode = 1;
+
+    /** If true, only a single process is started on the first node aquired, instead of nodeCount * processesPerNode. */
+    private boolean startSingleProcess = false;
 
     /** The maximum run time in minutes. */
     private int maxTime = DEFAULT_MAX_RUN_TIME;
@@ -96,6 +99,7 @@ public class JobDescription {
         jobOptions.putAll(original.getJobOptions());
         nodeCount = original.getNodeCount();
         processesPerNode = original.getProcessesPerNode();
+        startSingleProcess = original.isStartSingleProcess();
         maxTime = original.getMaxTime();
         interactive = original.isInteractive();
     }
@@ -136,6 +140,26 @@ public class JobDescription {
      */
     public void setProcessesPerNode(int processesPerNode) {
         this.processesPerNode = processesPerNode;
+    }
+
+    /**
+     * Is only a single process started?
+     * 
+     * @return if only a single process is started.
+     */
+    public boolean isStartSingleProcess() {
+        return startSingleProcess;
+    }
+
+    /**
+     * Set if only a single process is started, instead of nodeCount * processesPerNode. Resources are still reserved, but it is
+     * up to the user to start all the processes. Mainly useful for MPI.
+     * 
+     * @param startSingleProcess
+     *            if only a single process is started.
+     */
+    public void setStartSingleProcess(boolean startSingleProcess) {
+        this.startSingleProcess = startSingleProcess;
     }
 
     /**
@@ -276,9 +300,9 @@ public class JobDescription {
      * The key of an environment variable may not be <code>null</code> or empty.
      * 
      * @param key
-     *          the unique key under which to store the value.
+     *            the unique key under which to store the value.
      * @param value
-     *          the value to store the value.
+     *            the value to store the value.
      */
     public void addEnvironment(String key, String value) {
 
@@ -326,9 +350,9 @@ public class JobDescription {
      * 
      * Neither the key or value of a job option may be <code>null</code> or empty.
      * 
-     * @param key 
+     * @param key
      *            the unique key under which to store the job option.
-     * @param value 
+     * @param value
      *            the value of the option to store.
      */
     public void addJobOption(String key, String value) {
@@ -442,10 +466,11 @@ public class JobDescription {
     /* Generated */
     @Override
     public String toString() {
-        return "JobDescription [queueName=" + queueName + ", " + "executable=" + executable + ", arguments=" + arguments
-                + ", nodeCount=" + nodeCount + ", processesPerNode=" + processesPerNode + ", maxTime=" + maxTime
-                + ", interactive=" + interactive + ", stdin=" + stdin + ", stdout=" + stdout + ", stderr=" + stderr
-                + ", workingDirectory=" + workingDirectory + ", environment=" + environment + ", jobOptions=" + jobOptions + "]";
+        return "JobDescription [queueName=" + queueName + ", executable=" + executable + ", arguments=" + arguments + ", stdin="
+                + stdin + ", stdout=" + stdout + ", stderr=" + stderr + ", workingDirectory=" + workingDirectory
+                + ", environment=" + environment + ", jobOptions=" + jobOptions + ", nodeCount=" + nodeCount
+                + ", processesPerNode=" + processesPerNode + ", startSingleProcess=" + startSingleProcess + ", maxTime="
+                + maxTime + ", interactive=" + interactive + "]";
     }
 
     private boolean compare(Object a, Object b) {
@@ -466,15 +491,16 @@ public class JobDescription {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + arguments.hashCode();
-        result = prime * result + environment.hashCode();
-        result = prime * result + jobOptions.hashCode();
+        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
+        result = prime * result + ((environment == null) ? 0 : environment.hashCode());
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
+        result = prime * result + ((jobOptions == null) ? 0 : jobOptions.hashCode());
         result = prime * result + (interactive ? 1231 : 1237);
         result = prime * result + maxTime;
         result = prime * result + nodeCount;
         result = prime * result + processesPerNode;
         result = prime * result + ((queueName == null) ? 0 : queueName.hashCode());
+        result = prime * result + (startSingleProcess ? 1231 : 1237);
         result = prime * result + ((stderr == null) ? 0 : stderr.hashCode());
         result = prime * result + ((stdin == null) ? 0 : stdin.hashCode());
         result = prime * result + ((stdout == null) ? 0 : stdout.hashCode());
@@ -499,7 +525,7 @@ public class JobDescription {
         JobDescription other = (JobDescription) obj;
 
         if (interactive != other.interactive || maxTime != other.maxTime || nodeCount != other.nodeCount
-                || processesPerNode != other.processesPerNode) {
+                || startSingleProcess != other.startSingleProcess || processesPerNode != other.processesPerNode) {
             return false;
         }
 

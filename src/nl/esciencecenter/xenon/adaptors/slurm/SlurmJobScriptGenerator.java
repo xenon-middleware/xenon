@@ -122,14 +122,7 @@ public final class SlurmJobScriptGenerator {
 
         script.format("\n");
 
-        //figure out if we use srun to run multiple processes, or just one (on the first node allocated)
-        Boolean singleProcess = false;
-        if (description.getJobOptions().get(SlurmSchedulerConnection.JOB_OPTION_SINGLE_PROCESS) != null) {
-            singleProcess = Boolean.parseBoolean(description.getJobOptions().get(
-                    SlurmSchedulerConnection.JOB_OPTION_SINGLE_PROCESS));
-        }
-
-        if (!singleProcess) {
+        if (!description.isStartSingleProcess()) {
             //run commands through srun
             script.format("srun ");
         }
@@ -143,7 +136,7 @@ public final class SlurmJobScriptGenerator {
 
         script.close();
 
-        LOGGER.debug("Created job script:\n{}", stringBuilder);
+        LOGGER.debug("Created job script:\n{} from description {}", stringBuilder, description);
 
         return stringBuilder.toString();
     }

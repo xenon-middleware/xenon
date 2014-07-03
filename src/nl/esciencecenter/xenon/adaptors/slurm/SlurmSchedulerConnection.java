@@ -61,9 +61,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
-    public static final String JOB_OPTION_SINGLE_PROCESS = "single.process";
-
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_SINGLE_PROCESS };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
     private static final String[] FAILED_STATES = new String[] { "FAILED", "CANCELLED", "NODE_FAIL", "TIMEOUT", "PREEMPTED" };
 
@@ -201,14 +199,27 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, SlurmAdaptor.ADAPTOR_NAME);
 
-        //        if (description.isInteractive()) {
-        //            throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
-        //        }
-
         if (description.isInteractive()) {
             if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
                 throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME,
                         "Custom job script not supported in interactive mode");
+            }
+            
+            if (description.isStartSingleProcess()) {
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME,
+                        "StartSingleProcess option not supported in interactive mode");
+            }
+            
+            if (description.getStdin() != null) {
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Illegal stdin redirect for interactive job!");
+            }
+
+            if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) {
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Illegal stdout redirect for interactive job!");
+            }
+
+            if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Illegal stderr redirect for interactive job!");
             }
         }
 
