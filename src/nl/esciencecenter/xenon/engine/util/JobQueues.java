@@ -344,7 +344,7 @@ public class JobQueues {
 
         int maxTime = description.getMaxTime();
 
-        if (maxTime <= 0) {
+        if (maxTime < 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 

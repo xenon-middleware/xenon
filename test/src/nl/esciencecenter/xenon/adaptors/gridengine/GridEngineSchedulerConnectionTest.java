@@ -26,6 +26,7 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.FakeScriptingJob;
+import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobCanceledException;
@@ -188,6 +189,27 @@ public class GridEngineSchedulerConnectionTest {
 
         GridEngineSchedulerConnection.verifyJobDescription(description);
     }
+    
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test01k_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
+        JobDescription description = new JobDescription();
+
+        description.setExecutable("/bin/nothing");
+        description.setInteractive(true);
+
+        GridEngineSchedulerConnection.verifyJobDescription(description);
+    }
+    
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test01l_verifyJobDescription_StringProcessOption_ExceptionThrown() throws Exception {
+        JobDescription description = new JobDescription();
+
+        description.setExecutable("/bin/nothing");
+        description.setStartSingleProcess(true);
+
+        GridEngineSchedulerConnection.verifyJobDescription(description);
+    }
+
 
     @Test
     public void test03a_getJobStatusFromQacctInfo_doneJob_JobStatus() throws XenonException {

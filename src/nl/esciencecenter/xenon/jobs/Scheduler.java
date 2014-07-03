@@ -92,7 +92,8 @@ public interface Scheduler {
      * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs
      * (where the standard streams are redirected to/from files).
      * 
-     * Offline schedulers only support batch jobs.
+     * Since it is impossible to continue an interactive jobs when a scheduler ends, interactive jobs will always be killed,
+     * even in an offline scheduler.
      * 
      * @return if this scheduler is online.
      */

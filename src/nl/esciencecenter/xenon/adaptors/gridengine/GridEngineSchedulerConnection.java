@@ -30,6 +30,7 @@ import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingAdaptor;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
+import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
@@ -47,6 +48,7 @@ import nl.esciencecenter.xenon.jobs.NoSuchJobException;
 import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         if (description.isInteractive()) {
             throw new InvalidJobDescriptionException(GridEngineAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
+        }
+        
+        if (description.isStartSingleProcess()) {
+            throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME,
+                    "StartSingleProcess option not supported");
         }
 
         //check for option that overrides job script completely.
@@ -521,6 +528,11 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             }
         }
         return result;
+    }
+
+    @Override
+    public Streams getStreams(Job job) throws XenonException {
+        throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "does not support interactive jobs");
     }
 
 }

@@ -23,8 +23,10 @@ import static org.junit.Assume.assumeTrue;
 import java.io.OutputStream;
 
 import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
+import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
@@ -191,5 +193,6 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
             assertTrue(line.equals(message));
         }
     }
+    
 
 }
