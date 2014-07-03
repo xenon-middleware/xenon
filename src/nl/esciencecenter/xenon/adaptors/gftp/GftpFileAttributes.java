@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class GftpFileAttributes implements FileAttributes {
 
     private static final Logger logger = LoggerFactory.getLogger(GftpFileAttributes.class);
-    
+
     public static final String UNIX_GROUP = "unix.group";
 
     public static final String UNIX_GID = "unix.gid";
@@ -70,7 +70,7 @@ public class GftpFileAttributes implements FileAttributes {
 
     @Override
     public boolean isOther() {
-        return ((!isRegularFile()) && (!isDirectory()) & (!isSymbolicLink()));
+        return ((!isRegularFile()) && (!isDirectory()) && (!isSymbolicLink()));
     }
 
     @Override
@@ -132,7 +132,7 @@ public class GftpFileAttributes implements FileAttributes {
     public boolean isExecutable() {
 
         if (isDirectory()) {
-            //'x' bit for directories means 'accessable'.
+            //'x' bit for directories means 'accessible'.
             return isAccessable();
         } else {
             // default to --x--x--x 
@@ -150,10 +150,11 @@ public class GftpFileAttributes implements FileAttributes {
     public String toString() {
         String str = "GftpFileAttributes:[path=" + path + ",";
         if (mlsxEntry == null) {
-            return "mlsxEntry=NULL]";
+            str+="mlsxEntry=NULL]";
         } else {
-            return "mlsxEntry=" + mlsxEntry.toString() + "]";
+            str+="mlsxEntry=" + mlsxEntry.toString() + "]";
         }
+        return str; 
     }
 
     @Override
@@ -330,7 +331,7 @@ public class GftpFileAttributes implements FileAttributes {
     }
 
     /**
-     * Check Whether "TYPE" is either parent dir "PDIR" or current dir "CDIR".
+     * Check whether "TYPE" is either parent dir "PDIR" or current dir "CDIR".
      * 
      * @return true if mlsxEntry is for "." or for ".." (current dir or parent dir respectively).
      */
@@ -402,9 +403,8 @@ public class GftpFileAttributes implements FileAttributes {
         if (getClass() != obj.getClass())
             return false;
 
-         
-        logger.error("equals: {} == {} ",this,obj);
-        
+        logger.error("equals: {} == {} ", this, obj);
+
         GftpFileAttributes other = (GftpFileAttributes) obj;
 
         if (path == null) {

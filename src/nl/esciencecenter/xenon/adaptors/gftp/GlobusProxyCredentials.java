@@ -78,10 +78,10 @@ public class GlobusProxyCredentials implements Credentials {
     public static final ImmutableArray<XenonPropertyDescription> GLOBUS_CREDENTIAL_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
 
     new XenonPropertyDescriptionImplementation(PROPERTY_USER_KEY_FILE, Type.STRING, EnumSet.of(Component.CREDENTIALS), null,
-            "Location of User Key file or userkey.pem. Default location is: ~/.globus/userkey.pem"),
+            "Location of User Key file or 'userkey.pem' file. Default location is: ~/.globus/userkey.pem"),
 
     new XenonPropertyDescriptionImplementation(PROPERTY_USER_CERT_FILE, Type.STRING, EnumSet.of(Component.CREDENTIALS), null,
-            "Location of user Certificate file or 'usercert.pem'. Default location is: ~/.globus/usercert.pem"),
+            "Location of user Certificate file or 'usercert.pem' file. Default location is: ~/.globus/usercert.pem"),
 
     new XenonPropertyDescriptionImplementation(PROPERTY_USER_X509_PROXY, Type.STRING, EnumSet.of(Component.CREDENTIALS), null,
             "Location of user X509 proxy file. Default location is: /tmp/x509_<userid>"),
@@ -102,12 +102,10 @@ public class GlobusProxyCredentials implements Credentials {
     protected String userCertfile;
     protected String userProxyfile;
     protected String userCertificatesDir;
-    int proxyLifeTimeInHours=24; 
-    
+    int proxyLifeTimeInHours = 24;
+
     public GlobusProxyCredentials(XenonProperties properties, GftpAdaptor gftpAdaptor) {
 
-        // Preload cerficicates, must be update per Proxy Creation call!    
-        reloadCACertificates();
         // Optional properties, if none defined Globus defaults will be used. 
         updateDefaultProperties(properties);
     }
@@ -117,13 +115,13 @@ public class GlobusProxyCredentials implements Credentials {
         userKeyfile = getPropertyOrDefault(properties, PROPERTY_USER_KEY_FILE, null);
         userCertfile = getPropertyOrDefault(properties, PROPERTY_USER_CERT_FILE, null);
         userProxyfile = getPropertyOrDefault(properties, PROPERTY_USER_X509_PROXY, null);
-        proxyLifeTimeInHours=parseInt(getPropertyOrDefault(properties, PROPERTY_USER_PROXY_LIFETIME_HOURS, "24"),24); 
+        proxyLifeTimeInHours = parseInt(getPropertyOrDefault(properties, PROPERTY_USER_PROXY_LIFETIME_HOURS, "24"), 24);
     }
 
     /**
      * Create Properties object containing current configured properties.
      * 
-     * @return
+     * @return Properties Map of current credential Properties.
      */
     protected Map<String, String> createDefaultCredentialProperties() {
 
@@ -174,20 +172,20 @@ public class GlobusProxyCredentials implements Credentials {
             return defaultValue;
         }
     }
- 
-   protected int parseInt(String strVal, int defaultValue) {
 
-        if (strVal==null) {
-            return defaultValue;  
+    protected int parseInt(String strVal, int defaultValue) {
+
+        if (strVal == null) {
+            return defaultValue;
         }
-        
+
         try {
             return Integer.parseInt(strVal);
         } catch (Exception e) {
             logger.warn("Couldn't parse integer value:'{}'", strVal);
         }
 
-        return defaultValue; 
+        return defaultValue;
     }
 
     @Override
@@ -202,7 +200,9 @@ public class GlobusProxyCredentials implements Credentials {
         keyfile = getPropertyOrDefault(properties, GlobusProxyCredentials.PROPERTY_USER_KEY_FILE, userKeyfile);
         certfile = getPropertyOrDefault(properties, GlobusProxyCredentials.PROPERTY_USER_CERT_FILE, userCertfile);
         proxyFile = getPropertyOrDefault(properties, GlobusProxyCredentials.PROPERTY_USER_X509_PROXY, userProxyfile);
-        int lifeTime = parseInt(getPropertyOrDefault(properties, GlobusProxyCredentials.PROPERTY_USER_PROXY_LIFETIME_HOURS, null),proxyLifeTimeInHours);
+        int lifeTime = parseInt(
+                getPropertyOrDefault(properties, GlobusProxyCredentials.PROPERTY_USER_PROXY_LIFETIME_HOURS, null),
+                proxyLifeTimeInHours);
 
         // Parent '.globus' directory contains 'userkey.pem' and 'usercert.pem' directory: 
         if (userCredentialsDir != null) {
@@ -211,7 +211,12 @@ public class GlobusProxyCredentials implements Credentials {
             certfile = userCredentialsDir + "/" + GlobusProxyCredentials.USERCERT_PEM;
         }
 
-        return createProxy(certfile, keyfile, userinfo, password, proxyFile, lifeTime);
+        // Feature: load already created proxy: 
+        if ((keyfile == null) && (certfile == null) && (proxyFile != null)) {
+            return this.loadProxy(proxyFile);
+        } else {
+            return createProxy(certfile, keyfile, userinfo, password, proxyFile, lifeTime);
+        }
     }
 
     @Override
@@ -322,15 +327,11 @@ public class GlobusProxyCredentials implements Credentials {
      */
     public GlobusCredential loadGlobusProxyFile(String proxyFilepath) throws XenonException {
 
-        // Refresh Trusted Certificates before creating new credential, more could have been added manually 
-        // by user. 
-        reloadCACertificates();
-
         try {
-
-            // Update static loaded certificates: 
-            GftpUtil.staticUpdateTrustedCertificates(certificates);
-            // 
+            
+            // Update static loaded trusted certificates.
+            reloadCACertificates();
+            GlobusUtil.staticUpdateTrustedCertificates(certificates);
             return new GlobusCredential(proxyFilepath);
 
         } catch (GlobusCredentialException e) {
@@ -343,7 +344,7 @@ public class GlobusProxyCredentials implements Credentials {
      */
     protected void reloadCACertificates() {
 
-        this.certificates = GftpUtil.loadX509Certificates(new String[] { userCertificatesDir });
+        this.certificates = GlobusUtil.loadX509Certificates(new String[] { userCertificatesDir });
     }
 
     /**

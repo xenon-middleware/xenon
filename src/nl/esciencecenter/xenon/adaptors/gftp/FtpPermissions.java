@@ -3,7 +3,7 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 /**
  * Generic (G)FTP Permissions.
  * <p>
- * From: http://www.ietf.org/rfc/rfc3659.txt Section 7.5.5: 
+ * From: http://www.ietf.org/rfc/rfc3659.txt Section 7.5.5:
  * 
  * <pre>
  * 7.5.5. The perm Fact
@@ -166,7 +166,6 @@ public class FtpPermissions {
             default:
                 break; // ignore
             }
-
         }
     }
 
@@ -180,8 +179,9 @@ public class FtpPermissions {
     }
 
     /**
-     * Returns PERM String equivalent but not exact euqal with PERM string givin as constructor argument. 
-     * @Return PERM compatible Permissions String. 
+     * Returns PERM String equivalent but not exact euqal with PERM string givin as constructor argument.
+     * 
+     * @Return PERM compatible Permissions String.
      */
     public String toString() {
         return "" + ((appendable) ? "a" : "-") + ((cancreatefiles) ? "c" : "-") + ((deletable) ? "d" : "-")
@@ -217,7 +217,7 @@ public class FtpPermissions {
     @Override
     public int hashCode() {
         // return String hashcode. 
-        return toString().hashCode(); 
+        return toString().hashCode();
     }
 
     @Override
@@ -231,8 +231,7 @@ public class FtpPermissions {
 
         // Compare using (PERM) String representation: 
         FtpPermissions other = (FtpPermissions) obj;
-        return toString().equals(other.toString()); 
+        return toString().equals(other.toString());
     }
-
 
 }

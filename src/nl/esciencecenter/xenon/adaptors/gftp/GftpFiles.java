@@ -60,10 +60,10 @@ import org.globus.io.streams.GridFTPInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
- * Files implementation for Grid FTP. 
+/**
+ * Files implementation for Grid FTP.
  * 
- * @author Piter T. de Boer. 
+ * @author Piter T. de Boer.
  */
 public class GftpFiles implements Files {
 
@@ -158,12 +158,14 @@ public class GftpFiles implements Files {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
-        GftpLocation sshLocation = GftpLocation.parse(location);
+        GftpLocation gftpLocation = GftpLocation.parse(location);
 
-        XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
+        XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM),
+                GftpAdaptor.filterProps(GftpAdaptor.VALID_GFTP_PROPERTIES, properties));
 
         // Create New private owned Session for each Grid FTP FileSystem Implementation. 
-        GftpSession session = adaptor.createNewSession(sshLocation, (GlobusProxyCredential) credential, xenonProperties);
+        // GftpSession could be shared between FileSystems, but this would impact performance. 
+        GftpSession session = adaptor.createNewSession(gftpLocation, (GlobusProxyCredential) credential, xenonProperties);
 
         return newFileSystem(session, scheme, location, credential, xenonProperties);
     }
@@ -225,9 +227,9 @@ public class GftpFiles implements Files {
     /**
      * 
      * @param dir
-     *            - directory path to create, may only contian one subdirectory which may be created.
+     *            - directory path to create, may only contain one sub-directory which may be created.
      * @param ignoreExisting
-     *            - equavalent with -f flag: create or keep existing (sub) directory.
+     *            - Equivalent with -f flag: create or keep existing (sub) directory.
      * @throws XenonException
      */
     public void createDirectory(Path dir, boolean ignoreExisting) throws XenonException {
