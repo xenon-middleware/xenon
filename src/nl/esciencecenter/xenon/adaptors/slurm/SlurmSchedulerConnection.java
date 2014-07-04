@@ -211,15 +211,19 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             }
             
             if (description.getStdin() != null) {
-                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Illegal stdin redirect for interactive job!");
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Stdin redirect not supported in interactive mode");
             }
 
             if (description.getStdout() != null && !description.getStdout().equals("stdout.txt")) {
-                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Illegal stdout redirect for interactive job!");
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Stdout redirect not supported in interactive mode");
             }
 
             if (description.getStderr() != null && !description.getStderr().equals("stderr.txt")) {
-                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Illegal stderr redirect for interactive job!");
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Stderr redirect not supported in interactive mode");
+            }
+            
+            if (description.getEnvironment().size() != 0) {
+                throw new InvalidJobDescriptionException(SlurmAdaptor.ADAPTOR_NAME, "Environment variables not supported in interactive mode");
             }
         }
 
@@ -358,8 +362,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         String[] arguments = SlurmJobScriptGenerator.generateInteractiveArguments(description, fsEntryPath, tag);
 
-        //start actual job
-        Job interactiveJob = startInteractiveCommand(description.getEnvironment(), "srun", arguments);
+        Job interactiveJob = startInteractiveCommand("salloc", arguments);
 
         //get contents of queue (should include job)
         Map<String, Map<String, String>> queueInfo = getSqueueInfo();
@@ -384,14 +387,20 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
 
         //job not found. Fetch status of interactive job to return as an error.
+        JobStatus status;
         try {
-            JobStatus status = engine.jobs().getJobStatus(interactiveJob);
-
-            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job. Interactive job status is "
-                    + status.getState(), status.getException());
+            status = engine.jobs().getJobStatus(interactiveJob);
         } catch (XenonException e) {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job");
         }
+
+        if (status.getExitCode() != null && status.getExitCode().equals(1)) {
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job, perhaps some job options are invalid? (e.g. too many nodes, or invalid partition name)");
+        }
+        
+        throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job. Interactive job status is "
+                + status.getState() + " exit code = " + status.getExitCode(), status.getException());
+
     }
 
     @Override
