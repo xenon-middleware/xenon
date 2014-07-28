@@ -407,11 +407,9 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         jobs.close(scheduler);
         files.close(cwd.getFileSystem());
 
-        
-
         String[] lines = out.split("\\r?\\n");
 
-        assertTrue(lines.length == 4);
+        assertTrue(lines.length == 1);
         for (String line : lines) {
             assertTrue(line.equals(message));
         }
