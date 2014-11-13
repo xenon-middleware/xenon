@@ -2067,6 +2067,62 @@ public abstract class GenericFileAdaptorTestParent {
         cleanup();
     }
 
+    @org.junit.Test
+    public void test20b_newInputStreamDoubleClose() throws Exception {
+
+        // See what happens when we close an in input stream twice and then reopen the stream. This failed 
+        // on the SSH adaptor due to a bug in the sftp channel cache. 
+       
+        byte[] data = "Hello World".getBytes();
+
+        prepare();
+        
+        prepareTestDir("test20b_newInputStreamDoubleClose");
+        
+        Path file = createTestFile(testDir, data);
+        
+        InputStream in = null;
+
+        try {
+            in = files.newInputStream(file);
+        } catch (Exception e) {
+            // should not fail
+            throwUnexpected("test20b_newInputStreamDoubleClose", e);
+        }
+
+        try {
+            // should not fail
+            in.close();
+        } catch (Exception e) {
+            throwUnexpected("test20b_newInputStreamDoubleClose", e);
+        }
+
+        try {   
+            in.close();
+        } catch (Exception e) {
+            // should fail
+        } 
+        
+        try {            
+            in = files.newInputStream(file);
+        } catch (Exception e) {
+            // should not fail
+            throwUnexpected("test20b_newInputStreamDoubleClose", e);
+        }
+
+        try {
+            in.close();
+        } catch (Exception e) {
+            // should not fail
+            throwUnexpected("test20b_newInputStreamDoubleClose", e);
+        }
+        
+        deleteTestFile(file);
+        deleteTestDir(testDir);
+
+        cleanup();
+    } 
+        
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: newOuputStream 
     // 

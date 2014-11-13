@@ -643,7 +643,7 @@ public final class Utils {
         FileSystem [] result = new FileSystem[roots.length]; 
         
         for (int i=0;i<result.length;i++) { 
-            result[i] = files.newFileSystem("file", roots[i].getPath(), null, null);
+            result[i] = files.newFileSystem("file", getLocalRoot(roots[i].getPath()), null, null);
         }
         
         return result;

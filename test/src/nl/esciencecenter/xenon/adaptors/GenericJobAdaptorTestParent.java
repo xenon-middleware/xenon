@@ -622,7 +622,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
-        if (scheduler.isOnline()) {
+        if (scheduler.supportsInteractive()) {
 
             String message = "Hello World! test30";
 
@@ -1033,7 +1033,7 @@ public abstract class GenericJobAdaptorTestParent {
             description.setArguments("-n", "61", "127.0.0.1");
         } else { 
             description.setExecutable("/bin/sleep");
-            description.setArguments("60");
+            description.setArguments("600");
         }
 
         description.setInteractive(false);

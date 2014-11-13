@@ -546,7 +546,6 @@ public class SlurmSchedulerConnectionTest {
         description.setNodeCount(0);
         description.setProcessesPerNode(0);
         description.setMaxTime(0);
-        //slurm specific info
 
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
@@ -562,14 +561,14 @@ public class SlurmSchedulerConnectionTest {
         SlurmSchedulerConnection.verifyJobDescription(description);
     }
 
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test08e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
-        JobDescription description = new JobDescription();
-
-        description.setInteractive(true);
-
-        SlurmSchedulerConnection.verifyJobDescription(description);
-    }
+//    @Test(expected = InvalidJobDescriptionException.class)
+//    public void test08e_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
+//        JobDescription description = new JobDescription();
+//
+//        description.setInteractive(true);
+//
+//        SlurmSchedulerConnection.verifyJobDescription(description);
+//    }
 
     @Test(expected = InvalidJobDescriptionException.class)
     public void test08f_verifyJobDescription_InvalidStandardSetting_ExceptionThrown() throws Exception {

@@ -59,4 +59,10 @@ public class CopyImplementation implements Copy {
     public boolean hasID(String copyID) { 
         return uniqueID.equals(copyID);
     }
+
+    @Override
+    public String toString() {
+        return "CopyImplementation [adaptorName=" + adaptorName + ", uniqueID=" + uniqueID + ", source=" + source + ", target="
+                + target + "]";
+    }
 }

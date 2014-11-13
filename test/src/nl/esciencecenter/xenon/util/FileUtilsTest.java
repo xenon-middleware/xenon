@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -23,10 +24,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.Iterator;
 
+import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
+import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
 import nl.esciencecenter.xenon.files.Path;
@@ -35,7 +39,28 @@ import nl.esciencecenter.xenon.util.Utils;
 import org.junit.Test;
 
 public class FileUtilsTest {
+    
+    @Test
+    public void testGetLocalFileSystems() throws XenonException { 
+    
+        Xenon xenon = XenonFactory.newXenon(null);
+        Files files = xenon.files();
 
+        FileSystem [] result = Utils.getLocalFileSystems(files);
+        
+        assertNotNull(result);
+        
+        for (FileSystem f : result) { 
+            assertNotNull(f);
+            files.close(f);
+        }
+        
+        XenonFactory.endXenon(xenon);
+    }
+    
+    // Replace these!
+    
+    
     @Test
     public void testRecursiveCopy_SingleFile_CopiedFile() throws XenonException,
             nl.esciencecenter.xenon.files.InvalidCopyOptionsException {

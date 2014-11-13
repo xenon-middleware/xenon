@@ -31,6 +31,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.NoSuchXenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
+import nl.esciencecenter.xenon.adaptors.gftp.GftpAdaptor;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
@@ -63,7 +64,7 @@ public final class XenonEngine implements Xenon {
     /** All our own properties start with this prefix. */
     public static final String PREFIX = "xenon.";
 
-    /** All our own queue properties start with this prefix. */
+    /** All our own adaptor properties start with this prefix. */
     public static final String ADAPTORS = PREFIX + "adaptors.";
 
     /** All XenonEngines created so far */
@@ -177,6 +178,8 @@ public final class XenonEngine implements Xenon {
         result.add(new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX)));
         result.add(new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX)));
         result.add(new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX)));
+        result.add(new GftpAdaptor(this, extract(tmp, GftpAdaptor.PREFIX)));
+        
 
         // Check if there are any properties left. If so, this is a problem. 
         if (tmp.size() != 0) {

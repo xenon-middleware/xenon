@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ThreadFactory;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
@@ -47,6 +48,18 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class JobQueues {
+
+    /**
+     * Simple thread factory which returns daemon threads instead of normal threads
+     *
+     */
+    class DaemonThreadFactory implements ThreadFactory {
+        public Thread newThread(Runnable runnable) {
+            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+            thread.setDaemon(true);
+            return thread;
+        }
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobQueues.class);
 
@@ -94,6 +107,7 @@ public class JobQueues {
         this.workingDirectory = workingDirectory;
         this.factory = factory;
         this.pollingDelay = pollingDelay;
+        
 
         singleQ = new LinkedList<JobExecutor>();
         multiQ = new LinkedList<JobExecutor>();
@@ -108,9 +122,11 @@ public class JobQueues {
                     + MAX_POLLING_DELAY + "!");
         }
 
-        unlimitedExecutor = Executors.newCachedThreadPool();
-        singleExecutor = Executors.newSingleThreadExecutor();
-        multiExecutor = Executors.newFixedThreadPool(multiQThreads);
+        ThreadFactory threadFactory = new DaemonThreadFactory();
+
+        unlimitedExecutor = Executors.newCachedThreadPool(threadFactory);
+        singleExecutor = Executors.newSingleThreadExecutor(threadFactory);
+        multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
     }
 
 	public long getCurrentJobID() {
@@ -325,7 +341,7 @@ public class JobQueues {
 
         int maxTime = description.getMaxTime();
 
-        if (maxTime <= 0) {
+        if (maxTime < 0) {
             throw new InvalidJobDescriptionException(adaptorName, "Illegal maximum runtime: " + maxTime);
         }
 

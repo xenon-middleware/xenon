@@ -32,6 +32,7 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
+import nl.esciencecenter.xenon.jobs.Streams;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -178,11 +179,12 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         String[] lines = outputContent.split("\\r?\\n");
 
-        assertTrue(lines.length == 4);
+        assertEquals(4, lines.length);
         for (String line : lines) {
             assertTrue(line.equals(message));
         }
     }
+    
 
     @org.junit.Test
     public void slurm_test05_jobStatusWithAccountingDisabled() throws Exception {
@@ -358,5 +360,117 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         assertEquals(config.getDefaultQueueName(), reportedDefaultQueueName);
     }
+    
+    @Test
+    public void slurm_test07_interactiveJob() throws Exception {
+        String message = "Hello World! Test Slurm 07";
+
+        String workingDir = getWorkingDir("slurm_test07");
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        files.createDirectories(root);
+
+        JobDescription description = new JobDescription();
+        description.setInteractive(true);
+        description.setWorkingDirectory(workingDir);
+        description.setExecutable("/bin/echo");
+        description.setArguments(message);
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+
+        Job job = jobs.submitJob(scheduler, description);
+
+
+        Streams streams = jobs.getStreams(job);
+        streams.getStdin().close();
+
+        String out = readFully(streams.getStdout());
+        String err = readFully(streams.getStderr());
+        
+        logger.debug("got back stdout : {}", out);
+        logger.debug("got back stderr : {}", err);
+
+        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+
+        if (!status.isDone()) {
+            throw new Exception("Job not finished");
+        }
+
+        if (status.hasException()) {
+            throw new Exception("Job did not finish properly", status.getException());
+        }
+        
+        files.delete(root);
+
+        jobs.close(scheduler);
+        files.close(cwd.getFileSystem());
+
+        String[] lines = out.split("\\r?\\n");
+
+        assertTrue(lines.length == 1);
+        for (String line : lines) {
+            assertTrue(line.equals(message));
+        }
+    }
+    
+    @Test
+    public void slurm_test08_parallel_batchJob_singleProcess() throws Exception {
+        String message = "Hello World! Test Slurm 04";
+
+        String workingDir = getWorkingDir("slurm_test04");
+
+        Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, workingDir);
+        files.createDirectories(root);
+
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
+
+        JobDescription description = new JobDescription();
+        description.setWorkingDirectory(workingDir);
+        description.setExecutable("/bin/echo");
+        description.setArguments(message);
+        description.setNodeCount(2);
+        description.setProcessesPerNode(2);
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
+        
+        description.setStartSingleProcess(true);
+
+        Job job = jobs.submitJob(scheduler, description);
+
+        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+
+        if (!status.isDone()) {
+            throw new Exception("Job not finished");
+        }
+
+        if (status.hasException()) {
+            throw new Exception("Job did not finish properly", status.getException());
+        }
+
+        String outputContent = readFully(files.newInputStream(stdout));
+
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
+
+        jobs.close(scheduler);
+        files.close(cwd.getFileSystem());
+
+        logger.debug("got back result: {}", outputContent);
+
+        String[] lines = outputContent.split("\\r?\\n");
+
+        //make sure we only have a single line of output, not 4
+        assertEquals(1, lines.length);
+        for (String line : lines) {
+            assertTrue(line.equals(message));
+        }
+    }
+
 
 }

@@ -56,13 +56,21 @@ public class SshInteractiveProcess implements InteractiveProcess {
 
         JobDescription description = job.getJobDescription();
 
-        StringBuilder command = new StringBuilder(description.getExecutable());
+        StringBuilder command = new StringBuilder();
+        
+        String workdir = description.getWorkingDirectory();
 
+        if (workdir != null) { 
+            command.append("cd " + workdir + " && ");
+        }
+        
+        command.append(description.getExecutable());
+        
         for (String s : description.getArguments()) {
             command.append(" ");
             command.append(CommandLineUtils.protectAgainstShellMetas(s));
         }
-
+        
         channel.setCommand(command.toString());
 
         Map<String, String> environment = description.getEnvironment();

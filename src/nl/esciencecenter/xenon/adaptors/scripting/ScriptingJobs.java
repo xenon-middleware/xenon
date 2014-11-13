@@ -280,7 +280,9 @@ public class ScriptingJobs implements Jobs {
 
     @Override
     public Streams getStreams(Job job) throws XenonException {
-        throw new XenonException(adaptorName, "Interactive jobs not supported");
+        SchedulerConnection connection = getConnection(job.getScheduler());
+
+        return connection.getStreams(job);
     }
 
     @Override

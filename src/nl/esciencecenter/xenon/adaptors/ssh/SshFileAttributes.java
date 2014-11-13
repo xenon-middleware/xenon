@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.util.Set;
 
+import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -101,12 +102,12 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public Set<PosixFilePermission> permissions() {
-        return SshUtil.bitsToPermissions(attributes.getPermissions());
+        return PosixFileUtils.bitsToPermissions(attributes.getPermissions());
     }
 
     @Override
     public boolean isExecutable() {
-        return SshUtil.isExecutable(attributes.getPermissions());
+        return PosixFileUtils.isExecutable(attributes.getPermissions());
     }
 
     @Override
@@ -116,12 +117,12 @@ public class SshFileAttributes implements FileAttributes {
 
     @Override
     public boolean isReadable() {
-        return SshUtil.isReadable(attributes.getPermissions());
+        return PosixFileUtils.isReadable(attributes.getPermissions());
     }
 
     @Override
     public boolean isWritable() {
-        return SshUtil.isWritable(attributes.getPermissions());
+        return PosixFileUtils.isWritable(attributes.getPermissions());
     }
 
     @Override

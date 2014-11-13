@@ -86,4 +86,10 @@ public class CopyStatusImplementation implements CopyStatus {
     public long bytesCopied() {
         return bytesCopied;
     }
+
+    @Override
+    public String toString() {
+        return "CopyStatusImplementation [copy=" + copy + ", state=" + state + ", exception=" + exception + ", isRunning="
+                + isRunning + ", isDone=" + isDone + ", bytesToCopy=" + bytesToCopy + ", bytesCopied=" + bytesCopied + "]";
+    }
 }

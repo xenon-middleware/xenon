@@ -38,6 +38,7 @@ import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
+import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -125,10 +126,13 @@ public class SshFiles implements Files {
     
     
     protected FileSystem newFileSystem(SshMultiplexedSession session, String scheme, String location, Credential credential,
-            XenonProperties properties) throws XenonException {
-
+            XenonProperties properties) throws XenonException {       
+        
         String uniqueID = getNewUniqueID();
 
+        LOGGER.debug("* newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential, 
+                properties);
+        
         ChannelSftp channel = session.getSftpChannel();
 
         String wd = null;
@@ -144,14 +148,14 @@ public class SshFiles implements Files {
         session.releaseSftpChannel(channel);
 
         RelativePath entryPath = new RelativePath(wd);
-
-        LOGGER.debug("remote cwd = " + wd + ", entryPath = " + entryPath);
-
+        
         FileSystemImplementation result = new FileSystemImplementation(SshAdaptor.ADAPTOR_NAME, uniqueID, scheme, location, 
                 entryPath, credential, properties);
 
         fileSystems.put(uniqueID, new FileSystemInfo(result, session));
 
+        LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", wd, entryPath, uniqueID);
+        
         return result;
     }
 
@@ -159,11 +163,14 @@ public class SshFiles implements Files {
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
+        LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential, 
+                properties);
+        
         SshLocation sshLocation = SshLocation.parse(location);
         
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
                 properties);
-
+        
         SshMultiplexedSession session = adaptor.createNewSession(sshLocation, credential, xenonProperties);
 
         return newFileSystem(session, scheme, location, credential, xenonProperties);
@@ -188,6 +195,9 @@ public class SshFiles implements Files {
 
     @Override
     public void close(FileSystem filesystem) throws XenonException {
+        
+        LOGGER.debug("close fileSystem = {}", filesystem);
+        
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
 
         FileSystemInfo info = fileSystems.remove(fs.getUniqueID());
@@ -197,17 +207,28 @@ public class SshFiles implements Files {
         }
 
         info.getSession().disconnect();
+        
+        LOGGER.debug("close OK");        
     }
 
     @Override
     public boolean isOpen(FileSystem filesystem) throws XenonException {
+        
+        LOGGER.debug("isOpen fileSystem = {}", filesystem);
+        
         FileSystemImplementation fs = (FileSystemImplementation) filesystem;
-        return (fileSystems.get(fs.getUniqueID()) != null);
+        boolean result = (fileSystems.get(fs.getUniqueID()) != null);
+        
+        LOGGER.debug("isOpen OK result = {}", result);
+        
+        return result;        
     }
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
 
+        LOGGER.debug("createDirectory dir = {}", dir);
+        
         if (exists(dir)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
@@ -225,15 +246,19 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
+        
+        LOGGER.debug("createDirectory OK");        
     }
 
     @Override
     public void createDirectories(Path dir) throws XenonException {
-
+        
+        LOGGER.debug("createDirectories dir = {}", dir);
+        
         if (exists(dir)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
-
+        
         Iterator<RelativePath> itt = dir.getRelativePath().iterator();
 
         while (itt.hasNext()) {
@@ -243,11 +268,15 @@ public class SshFiles implements Files {
                 createDirectory(tmp);
             }
         }
+        
+        LOGGER.debug("createDirectories OK");
     }
 
     @Override
     public void createFile(Path path) throws XenonException {
 
+        LOGGER.debug("createFile path = {}", path);
+        
         if (exists(path)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File " + path + " already exists!");
         }
@@ -267,11 +296,15 @@ public class SshFiles implements Files {
                 // ignore
             }
         }
+        
+        LOGGER.debug("createFile OK");
     }
 
     @Override
     public void delete(Path path) throws XenonException {
 
+        LOGGER.debug("delete path = {}", path);
+        
         if (!exists(path)) {
             throw new NoSuchPathException(getClass().getName(), "Cannot delete file, as it does not exist");
         }
@@ -298,6 +331,8 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
+        
+        LOGGER.debug("delete OK");
     }
 
     /**
@@ -324,6 +359,8 @@ public class SshFiles implements Files {
     @Override
     public void move(Path source, Path target) throws XenonException {
 
+        LOGGER.debug("move source = {} target = {}", source, target);
+        
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
@@ -362,6 +399,8 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
+        
+        LOGGER.debug("move OK");
     }
 
     @SuppressWarnings("unchecked")
@@ -394,29 +433,34 @@ public class SshFiles implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter)
-            throws XenonException {
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter) throws XenonException {
+        LOGGER.debug("newAttributesDirectoryStream path = {} filter = <?>", path);
         return new SshDirectoryAttributeStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws XenonException {
+        LOGGER.debug("newDirectoryStream path = {} filter = <?>", path);
         return new SshDirectoryStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
+        LOGGER.debug("newDirectoryStream path = {}", dir);
         return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
+        LOGGER.debug("newAttributesDirectoryStream path = {}", dir);
         return newAttributesDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
     public InputStream newInputStream(Path path) throws XenonException {
 
+        LOGGER.debug("newInputStream path = {}", path);
+        
         if (!exists(path)) {
             throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!");
         }
@@ -430,18 +474,25 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
+        InputStream in = null;
+        
         try {
-            InputStream in = channel.get(path.getRelativePath().getAbsolutePath());
-            return new SshInputStream(in, session, channel);
+            in = channel.get(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToXenonException(e);
         }
+        
+        LOGGER.debug("newInputStream OK");
+
+        return new SshInputStream(in, session, channel);
     }
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
-
+        
+        LOGGER.debug("newOutputStream path = {} option = {}", path, options);
+        
         OpenOptions tmp = OpenOptions.processOptions(SshAdaptor.ADAPTOR_NAME, options);
 
         if (tmp.getReadMode() != null) {
@@ -475,18 +526,25 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
+        OutputStream out = null;
+        
         try {
-            OutputStream out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
-            return new SshOutputStream(out, session, channel);
+            out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToXenonException(e);
         }
+        
+        LOGGER.debug("newOutputStream OK");
+        
+        return new SshOutputStream(out, session, channel);
     }
 
     @Override
     public Path readSymbolicLink(Path path) throws XenonException {
 
+        LOGGER.debug("readSymbolicLink path = {}", path);
+       
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
@@ -507,11 +565,16 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
+        
+        LOGGER.debug("readSymbolicLink OK result = {}", result);
+
         return result;
     }
 
     public void end() {
+        
         LOGGER.debug("end called, closing all file systems");
+        
         while (fileSystems.size() > 0) {
             Set<String> keys = fileSystems.keySet();
             String first = keys.iterator().next();
@@ -523,26 +586,34 @@ public class SshFiles implements Files {
                 // ignore for now
             }
         }
+        
+        LOGGER.debug("end OK");
     }
     
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
 
+        LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
+        
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
         try {
-            channel.chmod(SshUtil.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
+            channel.chmod(PosixFileUtils.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             throw adaptor.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
+
+        LOGGER.debug("setPosixFilePermissions OK");
     }
 
     private SftpATTRS stat(Path path) throws XenonException {
 
+        LOGGER.debug("* stat path = {}", path);
+        
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
@@ -556,35 +627,58 @@ public class SshFiles implements Files {
         }
 
         session.releaseSftpChannel(channel);
+        
+        LOGGER.debug("* stat OK result = {}", result);
+        
         return result;
     }
 
     @Override
     public FileAttributes getAttributes(Path path) throws XenonException {
-        return new SshFileAttributes(stat(path), path);
+        
+        LOGGER.debug("getAttributes path = {}", path);
+
+        FileAttributes att = new SshFileAttributes(stat(path), path);
+        
+        LOGGER.debug("getAttributes OK result = {}", att);
+
+        return att;
     }
 
     @Override
     public boolean exists(Path path) throws XenonException {
+        
+        LOGGER.debug("exists path = {}", path);
+
+        boolean result;
+        
         try {
             stat(path);
-            return true;
+            result = true;
         } catch (NoSuchPathException e) {
-            return false;
+            result = false;
         }
+        
+        LOGGER.debug("exists OK result = {}", result);
+
+        return result;
     }
     
     @Override
     public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
 
+        LOGGER.debug("copy source = {} target = {} options = {}", source, target, options);
+        
         CopyEngine ce = xenonEngine.getCopyEngine();
         
         CopyInfo info = CopyInfo.createCopyInfo(SshAdaptor.ADAPTOR_NAME, ce.getNextID("SSH_COPY_"), source, target, options);
          
         ce.copy(info);
 
+        Copy result;
+        
         if (info.isAsync()) {
-            return info.getCopy();
+            result = info.getCopy();
         } else {
 
             Exception e = info.getException();
@@ -593,17 +687,35 @@ public class SshFiles implements Files {
                 throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Copy failed!", e);
             }
 
-            return null;
+            result = null;
         }
+        
+        LOGGER.debug("copy OK result = {}", result);
+
+        return result;
     }
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws XenonException {
-        return xenonEngine.getCopyEngine().getStatus(copy);
+
+        LOGGER.debug("getCopyStatus copy = {}", copy);
+
+        CopyStatus result = xenonEngine.getCopyEngine().getStatus(copy);
+        
+        LOGGER.debug("getCopyStatus OK result = {}", result);
+        
+        return result;
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws XenonException {
-        return xenonEngine.getCopyEngine().cancel(copy);
+
+        LOGGER.debug("cancelCopy copy = {}", copy);
+        
+        CopyStatus result = xenonEngine.getCopyEngine().cancel(copy);
+        
+        LOGGER.debug("cancelCopy OK result = {}", result);
+        
+        return result;
     }
 }

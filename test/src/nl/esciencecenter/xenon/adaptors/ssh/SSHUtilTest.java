@@ -16,16 +16,6 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.EnumSet;
-import java.util.Set;
-
-import nl.esciencecenter.xenon.adaptors.ssh.SshUtil;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
@@ -36,37 +26,5 @@ public class SSHUtilTest {
     public void testConstructor() throws Exception {
         // Dummy test for coverage
         new SshUtil();
-    }
-
-    @org.junit.Test
-    public void testAllBits() throws Exception {
-
-        Set<PosixFilePermission> tmp = EnumSet.allOf(PosixFilePermission.class);
-
-        int bits = SshUtil.permissionsToBits(tmp);
-
-        Set<PosixFilePermission> tmp2 = SshUtil.bitsToPermissions(bits);
-
-        assertEquals(tmp, tmp2);
-
-        assertTrue(SshUtil.isExecutable(bits));
-        assertTrue(SshUtil.isReadable(bits));
-        assertTrue(SshUtil.isWritable(bits));
-    }
-
-    @org.junit.Test
-    public void testNoBits() throws Exception {
-
-        Set<PosixFilePermission> tmp = EnumSet.noneOf(PosixFilePermission.class);
-
-        int bits = SshUtil.permissionsToBits(tmp);
-
-        Set<PosixFilePermission> tmp2 = SshUtil.bitsToPermissions(bits);
-
-        assertEquals(tmp, tmp2);
-
-        assertFalse(SshUtil.isExecutable(bits));
-        assertFalse(SshUtil.isReadable(bits));
-        assertFalse(SshUtil.isWritable(bits));
     }
 }
