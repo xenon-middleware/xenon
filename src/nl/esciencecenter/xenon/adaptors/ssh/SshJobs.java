@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
@@ -44,12 +45,10 @@ public class SshJobs implements Jobs {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SshJobs.class);
 
-    private static int currentID = 1;
+    private static final AtomicInteger currentID = new AtomicInteger(1);
 
-    private static synchronized String getNewUniqueID() {
-        String res = "ssh" + currentID;
-        currentID++;
-        return res;
+    private static String getNewUniqueID() {
+        return "ssh" + currentID.getAndIncrement();
     }
 
     /**
