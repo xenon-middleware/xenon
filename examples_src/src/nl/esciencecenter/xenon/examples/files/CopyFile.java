@@ -46,13 +46,14 @@ public class CopyFile {
             System.exit(1);
         }
 
+		Xenon xenon = null;
         try {
             // We first turn the user provided arguments into a URI.
             URI source = new URI(args[0]);
             URI target = new URI(args[1]);
 
             // Next, we create a new Xenon using the XenonFactory (without providing any properties).
-            Xenon xenon = XenonFactory.newXenon(null);
+            xenon = XenonFactory.newXenon(null);
 
             // Next, we retrieve the Files and Credentials interfaces
             Files files = xenon.files();
@@ -71,13 +72,18 @@ public class CopyFile {
             // If we are done we need to close the FileSystems
             files.close(sourceFS);
             files.close(targetFS);
-
-            // Finally, we end Xenon to release all resources 
-            XenonFactory.endXenon(xenon);
-
         } catch (URISyntaxException | XenonException e) {
             System.out.println("CopyFile example failed: " + e.getMessage());
             e.printStackTrace();
-        }
+        } finally {
+			if (xenon != null) {
+				try {
+					// Finally, we end Xenon to release all resources
+					XenonFactory.endXenon(xenon);
+				} catch (XenonException ex) {
+					System.exit(1);
+				}
+			}
+		}
     }
 }
