@@ -75,7 +75,7 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public boolean supportUser() {
+    public boolean supportUserInUri() {
         return true;
     }
 

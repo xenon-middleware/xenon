@@ -72,7 +72,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public boolean supportUser() {
+    public boolean supportUserInUri() {
         return true;
     }
 

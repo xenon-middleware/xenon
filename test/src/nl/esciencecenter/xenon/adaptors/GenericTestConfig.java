@@ -80,7 +80,7 @@ public abstract class GenericTestConfig {
     
     public abstract String getCorrectLocationWithWrongUser() throws Exception;
     
-    public boolean supportUser() {
+    public boolean supportUserInUri() {
         return false;
     }
 

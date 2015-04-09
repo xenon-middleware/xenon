@@ -119,7 +119,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public boolean supportUser() {
+    public boolean supportUserInUri() {
         return true;
     }
 
