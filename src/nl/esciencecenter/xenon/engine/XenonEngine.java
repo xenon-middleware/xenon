@@ -26,11 +26,13 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.Xenon;
-import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.NoSuchXenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
+import nl.esciencecenter.xenon.Xenon;
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.ftp.FtpAdaptor;
 import nl.esciencecenter.xenon.adaptors.gftp.GftpAdaptor;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
@@ -49,7 +51,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * XenonEngine implements the Xenon Interface class by redirecting all calls to {@link Adaptor}s.
- * 
+ *
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
@@ -72,11 +74,11 @@ public final class XenonEngine implements Xenon {
 
     /**
      * Create a new Xenon using the given properties.
-     * 
+     *
      * @param properties
      *            the properties used to create the Xenon.
      * @return the newly created Xenon created.
-     * 
+     *
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
      * @throws InvalidPropertyException
@@ -136,10 +138,10 @@ public final class XenonEngine implements Xenon {
 
     /**
      * Constructs a XenonEngine.
-     * 
+     *
      * @param properties
      *            the properties to use. Will NOT be copied.
-     * 
+     *
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
      * @throws IllegalPropertyException
@@ -169,19 +171,19 @@ public final class XenonEngine implements Xenon {
 
     private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
 
-        // Copy the map so we can manipulate it. 
+        // Copy the map so we can manipulate it.
         Map<String, String> tmp = new HashMap<>(properties);
 
         List<Adaptor> result = new ArrayList<>();
 
         result.add(new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX)));
         result.add(new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX)));
+        result.add(new FtpAdaptor(this, extract(tmp, FtpAdaptor.PREFIX)));
         result.add(new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX)));
         result.add(new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX)));
         result.add(new GftpAdaptor(this, extract(tmp, GftpAdaptor.PREFIX)));
-        
 
-        // Check if there are any properties left. If so, this is a problem. 
+        // Check if there are any properties left. If so, this is a problem.
         if (tmp.size() != 0) {
             throw new UnknownPropertyException("XenonEngine", "Unknown properties: " + tmp);
         }
@@ -197,8 +199,8 @@ public final class XenonEngine implements Xenon {
 
         while (itt.hasNext()) {
 
-            Entry<String,String> e = itt.next();
-            
+            Entry<String, String> e = itt.next();
+
             if (e.getKey().startsWith(prefix)) {
                 tmp.put(e.getKey(), e.getValue());
                 itt.remove();
@@ -229,17 +231,17 @@ public final class XenonEngine implements Xenon {
 
     /**
      * Return the adaptor that provides functionality for the given scheme.
-     * 
+     *
      * @param scheme
      *            the scheme for which to get the adaptor
      * @return the adaptor
      */
     public Adaptor getAdaptorFor(String scheme) throws InvalidSchemeException {
 
-        if (scheme == null || scheme.isEmpty()) { 
+        if (scheme == null || scheme.isEmpty()) {
             throw new InvalidSchemeException("engine", "Invalid scheme " + scheme);
         }
-        
+
         for (Adaptor adaptor : adaptors) {
             if (adaptor.supports(scheme)) {
                 return adaptor;
