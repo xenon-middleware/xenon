@@ -275,6 +275,11 @@ public class FtpFiles implements Files {
 
     @Override
     public void createFile(Path path) throws XenonException {
+        if (exists(path)) {
+            String message = MessageFormat.format("Cannot create file because path {0} already exist!", path);
+            throw new XenonException(adaptor.getName(), message);
+        }
+
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
             public boolean execute(FTPClient ftpClient, String absolutePath) throws IOException {
