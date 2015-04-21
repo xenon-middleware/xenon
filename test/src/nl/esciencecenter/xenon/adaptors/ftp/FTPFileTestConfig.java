@@ -73,7 +73,7 @@ public class FTPFileTestConfig extends FileTestConfig {
 
     @Override
     public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
-        return files.newFileSystem(scheme, correctLocation, getDefaultCredential(credentials), null).getEntryPath();
+        return files.newFileSystem(scheme, correctLocation, getNonDefaultCredential(credentials), null).getEntryPath();
     }
 
     @Override

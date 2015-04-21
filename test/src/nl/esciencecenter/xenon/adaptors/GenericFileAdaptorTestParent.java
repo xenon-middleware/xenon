@@ -506,9 +506,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             result = files.isOpen(fs);
-            result = files.isOpen(fs);
-            result = files.isOpen(fs);
-            result = files.isOpen(fs);
         } catch (Exception e) {
             if (mustFail) {
                 // expected
