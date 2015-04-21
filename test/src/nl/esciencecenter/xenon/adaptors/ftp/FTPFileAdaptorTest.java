@@ -18,6 +18,9 @@ package nl.esciencecenter.xenon.adaptors.ftp;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.nio.file.Paths;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
 import nl.esciencecenter.xenon.files.FileAttributes;
@@ -151,5 +154,29 @@ public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
         boolean exists = files.exists(path);
         cleanup();
         assertFalse(exists);
+    }
+
+    @Test
+    public void createDirs_1dir() throws Exception {
+        // Arrange
+        prepare();
+        String nestedDir = "nesteddir";
+        String parentDir = "parentdir";
+        String relativePath = Paths.get(parentDir).resolve(nestedDir).toString();
+        Path root = config.getWorkingDir(files, credentials);
+        Path nestedPath = resolve(root, relativePath);
+
+        // Act
+        files.createDirectories(nestedPath);
+        boolean exists = files.exists(nestedPath);
+
+        // Cleanup
+        Path parentPath = resolve(root, parentDir);
+        files.delete(nestedPath);
+        files.delete(parentPath);
+        cleanup();
+
+        // Assert
+        assertTrue(exists);
     }
 }

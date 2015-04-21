@@ -231,6 +231,15 @@ public class FtpFiles implements Files {
 
     @Override
     public void createDirectories(Path path) throws XenonException {
+        RelativePath relativeParent = path.getRelativePath().getParent();
+
+        if (relativeParent != null) {
+            PathImplementation parentPath = new PathImplementation(path.getFileSystem(), relativeParent);
+            if (exists(parentPath) == false) {
+                createDirectories(parentPath);
+            }
+        }
+        createDirectory(path);
     }
 
     @Override
