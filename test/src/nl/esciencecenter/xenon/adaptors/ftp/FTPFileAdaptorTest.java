@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
+import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
 
@@ -178,5 +179,14 @@ public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
 
         // Assert
         assertTrue(exists);
+    }
+
+    @Test
+    public void newDirectoryStream_root_returnList() throws Exception {
+        prepare();
+        Path dir = config.getWorkingDir(files, credentials);
+        DirectoryStream<Path> newDirectoryStream = files.newDirectoryStream(dir);
+        assertTrue(newDirectoryStream != null);
+        cleanup();
     }
 }

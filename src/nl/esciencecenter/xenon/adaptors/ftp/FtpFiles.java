@@ -33,6 +33,7 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
+import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -345,11 +346,17 @@ public class FtpFiles implements Files {
         }
     }
 
-    private boolean directoryExists(FTPClient ftpClient, Path path) throws IOException {
+    private boolean directoryExists(FTPClient ftpClient, Path path) throws XenonException {
         String absolutePath = path.getRelativePath().getAbsolutePath();
-        String originalWorkingDirectory = ftpClient.printWorkingDirectory();
-        boolean pathExists = ftpClient.changeWorkingDirectory(absolutePath);
-        ftpClient.changeWorkingDirectory(originalWorkingDirectory);
+        String originalWorkingDirectory;
+        boolean pathExists = false;
+        try {
+            originalWorkingDirectory = ftpClient.printWorkingDirectory();
+            pathExists = ftpClient.changeWorkingDirectory(absolutePath);
+            ftpClient.changeWorkingDirectory(originalWorkingDirectory);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), MessageFormat.format("Could not inspect directory {0}", absolutePath), e);
+        }
         return pathExists;
     }
 
@@ -360,12 +367,42 @@ public class FtpFiles implements Files {
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
-        return null;
+        return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
-        return null;
+        return new FtpDirectoryStream(dir, filter, listDirectory(dir, filter));
+    }
+
+    private FTPFile[] listDirectory(Path path, Filter filter) throws XenonException {
+        String absolutePath = path.getRelativePath().getAbsolutePath();
+        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
+        FTPClient ftpClient = fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
+
+        FTPFile[] listFiles = null;
+        try {
+            if (filter == null) {
+                throw new XenonException(adaptor.getName(), "Filter is null.");
+            }
+            throwIfDirectoryNotExists(path, ftpClient);
+            listFiles = ftpClient.listFiles(absolutePath);
+        } catch (IOException e) {
+            String message = MessageFormat.format("Failed to retrieve directory listing of {0}", absolutePath);
+            throw new XenonException(adaptor.getName(), message);
+        }
+
+        return listFiles;
+    }
+
+    private void throwIfDirectoryNotExists(Path path, FTPClient ftpClient) throws XenonException {
+        boolean directoryExists = false;
+        directoryExists = directoryExists(ftpClient, path);
+        if (directoryExists == false) {
+            String absolutePath = path.getRelativePath().getAbsolutePath();
+            String message = MessageFormat.format("Directory does not exist at path ", absolutePath);
+            throw new XenonException(adaptor.getName(), message);
+        }
     }
 
     @Override
