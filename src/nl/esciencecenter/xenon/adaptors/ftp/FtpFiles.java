@@ -28,6 +28,7 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
@@ -35,6 +36,7 @@ import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementati
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
+import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -43,8 +45,11 @@ import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
+import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
+import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -113,16 +118,20 @@ public class FtpFiles implements Files {
 
         FtpLocation ftpLocation = FtpLocation.parse(location);
         FTPClient ftpClient = new FTPClient();
+        ftpClient.setListHiddenFiles(true);
         connectToServer(ftpLocation, ftpClient);
         login(credential, ftpClient);
-        String cwd = getCurrentWorkingDirectory(ftpClient);
+        return createAndRegisterFileSystem(scheme, location, credential, xenonProperties, ftpClient);
+    }
 
+    private FileSystemImplementation createAndRegisterFileSystem(String scheme, String location, Credential credential,
+            XenonProperties xenonProperties, FTPClient ftpClient) throws XenonException {
+        String cwd = getCurrentWorkingDirectory(ftpClient);
         RelativePath entryPath = new RelativePath(cwd);
         String uniqueID = getNewUniqueID();
         FileSystemImplementation fileSystem = new FileSystemImplementation(FtpAdaptor.ADAPTOR_NAME, uniqueID, scheme, location,
                 entryPath, credential, xenonProperties);
         fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, ftpClient));
-
         LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", cwd, entryPath, uniqueID);
         return fileSystem;
     }
@@ -181,9 +190,8 @@ public class FtpFiles implements Files {
     @Override
     public void close(FileSystem fileSystem) throws XenonException {
         LOGGER.debug("close fileSystem = {}", fileSystem);
-
         if (isOpen(fileSystem) == false) {
-            throw new XenonException(adaptor.getName(), "file system is already closed");
+            throw new XenonException(adaptor.getName(), "File system is already closed");
         }
 
         FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
@@ -194,20 +202,16 @@ public class FtpFiles implements Files {
         } catch (IOException e) {
             throw new XenonException(adaptor.getName(), "Exception while disconnecting ftp file system.");
         }
-
         LOGGER.debug("close OK");
     }
 
     @Override
     public boolean isOpen(FileSystem fileSystem) throws XenonException {
         LOGGER.debug("isOpen fileSystem = {}", fileSystem);
-
         FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
         FileSystemInfo fileSystemInfo = fileSystems.get(fs.getUniqueID());
         boolean result = (fileSystemInfo != null) && fileSystemInfo.getFtpClient().isConnected();
-
         LOGGER.debug("isOpen OK result = {}", result);
-
         return result;
     }
 
@@ -237,6 +241,7 @@ public class FtpFiles implements Files {
         if (relativeParent != null) {
             PathImplementation parentPath = new PathImplementation(path.getFileSystem(), relativeParent);
             if (exists(parentPath) == false) {
+                // Recursive call
                 createDirectories(parentPath);
             }
         }
@@ -260,8 +265,7 @@ public class FtpFiles implements Files {
     }
 
     private void executeFtpCommand(Path path, FtpCommand ftpCommand, String messageInCaseOfError) throws XenonException {
-        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
-        FTPClient ftpClient = fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
+        FTPClient ftpClient = getFtpClientByPath(path);
         String absolutePath = path.getRelativePath().getAbsolutePath();
 
         try {
@@ -276,10 +280,7 @@ public class FtpFiles implements Files {
 
     @Override
     public void createFile(Path path) throws XenonException {
-        if (exists(path)) {
-            String message = MessageFormat.format("Cannot create file because path {0} already exist!", path);
-            throw new XenonException(adaptor.getName(), message);
-        }
+        assertPathNotExists(path);
 
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
@@ -335,8 +336,7 @@ public class FtpFiles implements Files {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
-        FTPClient ftpClient = fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
+        FTPClient ftpClient = getFtpClientByPath(path);
         try {
             return fileExists(ftpClient, path) || directoryExists(ftpClient, path);
         } catch (IOException e) {
@@ -377,15 +377,14 @@ public class FtpFiles implements Files {
 
     private FTPFile[] listDirectory(Path path, Filter filter) throws XenonException {
         String absolutePath = path.getRelativePath().getAbsolutePath();
-        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
-        FTPClient ftpClient = fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
+        FTPClient ftpClient = getFtpClientByPath(path);
 
         FTPFile[] listFiles = null;
         try {
             if (filter == null) {
                 throw new XenonException(adaptor.getName(), "Filter is null.");
             }
-            throwIfDirectoryNotExists(path, ftpClient);
+            assertDirectoryExists(path, ftpClient);
             listFiles = ftpClient.listFiles(absolutePath);
         } catch (IOException e) {
             String message = MessageFormat.format("Failed to retrieve directory listing of {0}", absolutePath);
@@ -395,7 +394,7 @@ public class FtpFiles implements Files {
         return listFiles;
     }
 
-    private void throwIfDirectoryNotExists(Path path, FTPClient ftpClient) throws XenonException {
+    private void assertDirectoryExists(Path path, FTPClient ftpClient) throws XenonException {
         boolean directoryExists = false;
         directoryExists = directoryExists(ftpClient, path);
         if (directoryExists == false) {
@@ -417,25 +416,83 @@ public class FtpFiles implements Files {
 
     @Override
     public InputStream newInputStream(Path path) throws XenonException {
-        return null;
+        LOGGER.debug("newInputStream path = {}", path);
+        assertValidArgumentsForNewInputStream(path);
+        FTPClient ftpClient = getFtpClientByPath(path);
+        InputStream inputStream = getInputStreamFromFtpClient(ftpClient, path);
+        LOGGER.debug("newInputStream OK");
+        return inputStream;
+    }
+
+    private InputStream getInputStreamFromFtpClient(FTPClient ftpClient, Path path) throws XenonException {
+        String absolutePath = path.getRelativePath().getAbsolutePath();
+        InputStream inputStream = null;
+        try {
+            inputStream = ftpClient.retrieveFileStream(absolutePath);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Failed to open input stream", e);
+        }
+        return inputStream;
+    }
+
+    private void assertValidArgumentsForNewInputStream(Path path) throws XenonException, NoSuchPathException {
+        assertPathExists(path);
+
+        FileAttributes att = getAttributes(path);
+        if (att.isDirectory()) {
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
+        }
     }
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
-        return null;
+        LOGGER.debug("newOutputStream path = {} option = {}", path, options);
+        assertValidArgumentsForNewOutputStream(path, options);
+        FTPClient ftpClient = getFtpClientByPath(path);
+        OutputStream outputStream = getOutputStreamFromFtpClient(ftpClient, path);
+        LOGGER.debug("newOutputStream OK");
+        return outputStream;
+    }
+
+    private OutputStream getOutputStreamFromFtpClient(FTPClient ftpClient, Path path) throws XenonException {
+        String absolutePath = path.getRelativePath().getAbsolutePath();
+        OutputStream outputStream = null;
+        try {
+            outputStream = ftpClient.storeFileStream(absolutePath);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Failed to open outputstream", e);
+        }
+        return outputStream;
+    }
+
+    private void assertValidArgumentsForNewOutputStream(Path path, OpenOption... options) throws InvalidOpenOptionsException,
+            XenonException, PathAlreadyExistsException, NoSuchPathException {
+        OpenOptions processedOptions = OpenOptions.processOptions(adaptor.getName(), options);
+
+        if (processedOptions.getReadMode() != null) {
+            throw new InvalidOpenOptionsException(adaptor.getName(), "Disallowed open option: READ");
+        }
+
+        if (processedOptions.getAppendMode() == null) {
+            throw new InvalidOpenOptionsException(adaptor.getName(), "No append mode provided!");
+        }
+
+        if (processedOptions.getWriteMode() == null) {
+            processedOptions.setWriteMode(OpenOption.WRITE);
+        }
+
+        if (processedOptions.getOpenMode() == OpenOption.CREATE) {
+            assertPathNotExists(path);
+        } else if (processedOptions.getOpenMode() == OpenOption.OPEN) {
+            assertPathExists(path);
+        }
     }
 
     @Override
     public FileAttributes getAttributes(Path path) throws XenonException {
-        if (exists(path) == false) {
-            throw new XenonException(adaptor.getName(), MessageFormat.format("Path {0} does not exist!", path));
-        }
-
-        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
-        FTPClient ftpClient = fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
-
+        assertPathExists(path);
+        FTPClient ftpClient = getFtpClientByPath(path);
         FTPFile listFile = getFtpFile(ftpClient, path);
-
         return new FtpFileAttributes(listFile);
     }
 
@@ -461,16 +518,10 @@ public class FtpFiles implements Files {
     }
 
     private FTPFile getDirectoryFtpFile(FTPClient ftpClient, Path path) throws IOException, XenonException {
-        RelativePath parent = path.getRelativePath().getParent();
+        String targetName = ".";
+        String absolutePath = path.getRelativePath().getAbsolutePath();
 
-        if (parent == null) {
-            String absolutePath = path.getRelativePath().getAbsolutePath();
-            String message = MessageFormat.format("Cannot get attributes of root path {0}", absolutePath);
-            throw new XenonException(adaptor.getName(), message);
-        }
-
-        String targetName = path.getRelativePath().getFileNameAsString();
-        FTPFile[] listFiles = ftpClient.listDirectories(parent.getAbsolutePath());
+        FTPFile[] listFiles = ftpClient.listDirectories(absolutePath);
 
         for (FTPFile listFile : listFiles) {
             if (listFile.getName().equals(targetName)) {
@@ -506,5 +557,22 @@ public class FtpFiles implements Files {
         //        }
 
         LOGGER.debug("end OK");
+    }
+
+    private FTPClient getFtpClientByPath(Path path) {
+        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
+        return fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
+    }
+
+    private void assertPathNotExists(Path path) throws XenonException, PathAlreadyExistsException {
+        if (exists(path)) {
+            throw new PathAlreadyExistsException(adaptor.getName(), "File already exists: " + path);
+        }
+    }
+
+    private void assertPathExists(Path path) throws XenonException, NoSuchPathException {
+        if (exists(path) == false) {
+            throw new NoSuchPathException(adaptor.getName(), "File does not exist: " + path);
+        }
     }
 }

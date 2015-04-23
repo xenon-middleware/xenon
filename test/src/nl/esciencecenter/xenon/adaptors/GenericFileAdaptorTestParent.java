@@ -244,7 +244,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: [createTestDir]
-    private void prepareTestDir(String testName) throws Exception {
+    protected void prepareTestDir(String testName) throws Exception {
 
         Path p = config.getWorkingDir(files, credentials);
 
@@ -294,7 +294,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: [createNewTestFileName], createFile, [writeData]
-    private Path createTestFile(Path root, byte[] data) throws Exception {
+    protected Path createTestFile(Path root, byte[] data) throws Exception {
 
         Path file = createNewTestFileName(root);
 
@@ -324,7 +324,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // Depends on: exists, isDirectory, delete
-    private void deleteTestDir(Path dir) throws Exception {
+    protected void deleteTestDir(Path dir) throws Exception {
 
         if (!files.exists(dir)) {
             throw new Exception("Cannot delete non-existing dir: " + dir);

@@ -38,7 +38,7 @@ import org.junit.Test;
 public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     private String testDirectoryPath = "test123";
-    private String testFilePath = "somefile";
+    private String testFilePath = "somefile2";
     private String testLinkPath = "somelink";
 
     @BeforeClass
@@ -111,7 +111,7 @@ public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
         assertFalse(attributes.isSymbolicLink());
     }
 
-    @Test(expected = XenonException.class)
+    @Test
     public void getAttributes_ofRoot_isDirectory() throws Exception {
         FileAttributes attributes = ftpClientGetAttributes("/");
         assertTrue(attributes.isDirectory());
@@ -189,4 +189,5 @@ public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
         assertTrue(newDirectoryStream != null);
         cleanup();
     }
+
 }
