@@ -26,6 +26,7 @@ import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.RelativePath;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,6 +41,7 @@ public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
     private String testDirectoryPath = "test123";
     private String testFilePath = "somefile2";
     private String testLinkPath = "somelink";
+    private String executableTestFile = "execfile";
 
     @BeforeClass
     public static void prepareFTPFileAdaptorTest() throws Exception {
@@ -186,8 +188,26 @@ public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {
         prepare();
         Path dir = config.getWorkingDir(files, credentials);
         DirectoryStream<Path> newDirectoryStream = files.newDirectoryStream(dir);
-        assertTrue(newDirectoryStream != null);
+        boolean notNull = newDirectoryStream != null;
         cleanup();
+        assertTrue(notNull);
     }
 
+    @Test
+    public void getAttributes_executableFile_isExecutable() throws Exception {
+        // Arrange
+        prepare();
+        Path root = config.getWorkingDir(files, credentials);
+        RelativePath relativePath = root.getRelativePath().resolve(executableTestFile);
+        Path testFilePath = files.newPath(root.getFileSystem(), relativePath);
+
+        // Act
+        FileAttributes attributes = files.getAttributes(testFilePath);
+
+        // Cleanup
+        cleanup();
+
+        // Assert
+        assertTrue(attributes.isExecutable());
+    }
 }

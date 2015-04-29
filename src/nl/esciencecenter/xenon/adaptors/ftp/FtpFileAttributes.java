@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.adaptors.ftp;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
@@ -9,17 +10,30 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
 import org.apache.commons.net.ftp.FTPFile;
 
 public class FtpFileAttributes implements FileAttributes {
+    private static final int[] permissionTypes = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION, FTPFile.EXECUTE_PERMISSION };
+    private static final int[] userTypes = { FTPFile.USER_ACCESS, FTPFile.GROUP_ACCESS, FTPFile.WORLD_ACCESS };
 
     private boolean isDirectory;
     private boolean isSymbolicLink;
     private boolean isRegularFile;
     private boolean isOther;
+    private long size;
+    private long lastModifiedTime;
+    private String group;
+    private String user;
+    private Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
 
     public FtpFileAttributes(FTPFile listFile) {
         isDirectory = listFile.isDirectory();
         isSymbolicLink = listFile.isSymbolicLink();
         isOther = listFile.isUnknown();
         isRegularFile = listFile.isFile();
+        size = listFile.getSize();
+        lastModifiedTime = listFile.getTimestamp().getTimeInMillis();
+        storePermissions(listFile);
+        user = listFile.getUser();
+        group = listFile.getGroup();
+
     }
 
     @Override
@@ -44,27 +58,27 @@ public class FtpFileAttributes implements FileAttributes {
 
     @Override
     public long creationTime() {
-        return 0;
+        return lastModifiedTime();
     }
 
     @Override
     public long lastAccessTime() {
-        return 0;
+        return lastModifiedTime();
     }
 
     @Override
     public long lastModifiedTime() {
-        return 0;
+        return lastModifiedTime;
     }
 
     @Override
     public long size() {
-        return 0;
+        return size;
     }
 
     @Override
     public boolean isExecutable() {
-        return false;
+        return permissions.contains(PosixFilePermission.OWNER_EXECUTE);
     }
 
     @Override
@@ -74,27 +88,74 @@ public class FtpFileAttributes implements FileAttributes {
 
     @Override
     public boolean isReadable() {
-        return false;
+        return permissions.contains(PosixFilePermission.OWNER_READ);
     }
 
     @Override
     public boolean isWritable() {
-        return false;
+        return permissions.contains(PosixFilePermission.OWNER_WRITE);
     }
 
     @Override
     public String group() throws AttributeNotSupportedException {
-        return null;
+        return group;
     }
 
     @Override
     public String owner() throws AttributeNotSupportedException {
-        return null;
+        return user;
     }
 
     @Override
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
-        return null;
+        return permissions;
     }
 
+    private void storePermissions(FTPFile listFile) {
+        for (int userType : userTypes) {
+            for (int permissionType : permissionTypes) {
+                if (listFile.hasPermission(userType, permissionType)) {
+                    permissions.add(getPosixFilePermission(userType, permissionType));
+                }
+            }
+        }
+    }
+
+    static private PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
+        PosixFilePermission permission = null;
+        if (userType == FTPFile.USER_ACCESS) {
+            if (permissionType == FTPFile.EXECUTE_PERMISSION) {
+                permission = PosixFilePermission.OWNER_EXECUTE;
+            }
+            if (permissionType == FTPFile.WRITE_PERMISSION) {
+                permission = PosixFilePermission.OWNER_WRITE;
+            }
+            if (permissionType == FTPFile.READ_PERMISSION) {
+                permission = PosixFilePermission.OWNER_READ;
+            }
+        }
+        if (userType == FTPFile.GROUP_ACCESS) {
+            if (permissionType == FTPFile.EXECUTE_PERMISSION) {
+                permission = PosixFilePermission.GROUP_EXECUTE;
+            }
+            if (permissionType == FTPFile.WRITE_PERMISSION) {
+                permission = PosixFilePermission.GROUP_WRITE;
+            }
+            if (permissionType == FTPFile.READ_PERMISSION) {
+                permission = PosixFilePermission.GROUP_READ;
+            }
+        }
+        if (userType == FTPFile.WORLD_ACCESS) {
+            if (permissionType == FTPFile.EXECUTE_PERMISSION) {
+                permission = PosixFilePermission.OTHERS_EXECUTE;
+            }
+            if (permissionType == FTPFile.WRITE_PERMISSION) {
+                permission = PosixFilePermission.OTHERS_WRITE;
+            }
+            if (permissionType == FTPFile.READ_PERMISSION) {
+                permission = PosixFilePermission.OTHERS_READ;
+            }
+        }
+        return permission;
+    }
 }

@@ -252,30 +252,13 @@ public class FtpFiles implements Files {
     public void createDirectory(Path path) throws XenonException {
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
-            public boolean execute(FTPClient ftpClient, String absolutePath) throws IOException {
-                boolean result = ftpClient.makeDirectory(absolutePath);
-                replyString = ftpClient.getReplyString();
-                return result;
-
+            public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
+                hasSucceeded = ftpClient.makeDirectory(absolutePath);
             }
         };
         String messageInCaseOfError = "Failed to create directory";
 
-        executeFtpCommand(path, ftpCommand, messageInCaseOfError);
-    }
-
-    private void executeFtpCommand(Path path, FtpCommand ftpCommand, String messageInCaseOfError) throws XenonException {
-        FTPClient ftpClient = getFtpClientByPath(path);
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-
-        try {
-            boolean hasSucceeded = ftpCommand.execute(ftpClient, absolutePath);
-            if (hasSucceeded == false) {
-                throw new IOException(ftpCommand.getReplyString());
-            }
-        } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), messageInCaseOfError + " " + absolutePath, e);
-        }
+        ftpCommand.execute(getFtpClientByPath(path), path, messageInCaseOfError);
     }
 
     @Override
@@ -284,16 +267,14 @@ public class FtpFiles implements Files {
 
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
-            public boolean execute(FTPClient ftpClient, String absolutePath) throws IOException {
+            public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
                 InputStream dummyContent = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-                boolean result = ftpClient.storeFile(absolutePath, dummyContent);
-                replyString = ftpClient.getReplyString();
-                return result;
+                hasSucceeded = ftpClient.storeFile(absolutePath, dummyContent);
             }
         };
         String messageInCaseOfError = "Failed to create file";
 
-        executeFtpCommand(path, ftpCommand, messageInCaseOfError);
+        ftpCommand.execute(getFtpClientByPath(path), path, messageInCaseOfError);
     }
 
     @Override
@@ -303,66 +284,67 @@ public class FtpFiles implements Files {
         } else {
             deleteFile(path);
         }
-        ;
     }
 
     private void deleteDirectory(Path path) throws XenonException {
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
-            public boolean execute(FTPClient ftpClient, String absolutePath) throws IOException {
-                boolean result = ftpClient.removeDirectory(absolutePath);
-                replyString = ftpClient.getReplyString();
-                return result;
+            public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
+                hasSucceeded = ftpClient.removeDirectory(absolutePath);
             }
         };
         String messageInCaseOfError = "Failed to delete file or directory";
 
-        executeFtpCommand(path, ftpCommand, messageInCaseOfError);
+        ftpCommand.execute(getFtpClientByPath(path), path, messageInCaseOfError);
     }
 
     private void deleteFile(Path path) throws XenonException {
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
-            public boolean execute(FTPClient ftpClient, String absolutePath) throws IOException {
-                boolean result = ftpClient.deleteFile(absolutePath);
-                replyString = ftpClient.getReplyString();
-                return result;
+            public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
+                hasSucceeded = ftpClient.deleteFile(absolutePath);
             }
         };
         String messageInCaseOfError = "Failed to delete file or directory";
 
-        executeFtpCommand(path, ftpCommand, messageInCaseOfError);
+        ftpCommand.execute(getFtpClientByPath(path), path, messageInCaseOfError);
     }
 
     @Override
     public boolean exists(Path path) throws XenonException {
+        return fileExists(path) || directoryExists(path);
+    }
+
+    private boolean directoryExists(Path path) throws XenonException {
         FTPClient ftpClient = getFtpClientByPath(path);
-        try {
-            return fileExists(ftpClient, path) || directoryExists(ftpClient, path);
-        } catch (IOException e) {
-            String absolutePath = path.getRelativePath().getAbsolutePath();
-            String message = MessageFormat.format("Failed to check whether path {0} exists.", absolutePath);
-            throw new XenonException(adaptor.getName(), message, e);
-        }
+        FtpQuery<Boolean> ftpQuery = new FtpQuery<Boolean>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                String originalWorkingDirectory = ftpClient.printWorkingDirectory();
+                boolean pathExists = ftpClient.changeWorkingDirectory(path);
+                String[] replyStrings1 = ftpClient.getReplyStrings();
+                ftpClient.changeWorkingDirectory(originalWorkingDirectory);
+                String[] replyStrings2 = ftpClient.getReplyStrings();
+                result = pathExists;
+            }
+        };
+        ftpQuery.execute(ftpClient, path, "Could not inspect directory");
+        return ftpQuery.getResult();
     }
 
-    private boolean directoryExists(FTPClient ftpClient, Path path) throws XenonException {
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-        String originalWorkingDirectory;
-        boolean pathExists = false;
-        try {
-            originalWorkingDirectory = ftpClient.printWorkingDirectory();
-            pathExists = ftpClient.changeWorkingDirectory(absolutePath);
-            ftpClient.changeWorkingDirectory(originalWorkingDirectory);
-        } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), MessageFormat.format("Could not inspect directory {0}", absolutePath), e);
-        }
-        return pathExists;
-    }
-
-    private boolean fileExists(FTPClient ftpClient, Path path) throws IOException {
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-        return ftpClient.listFiles(absolutePath).length == 1;
+    private boolean fileExists(Path path) throws XenonException {
+        FTPClient ftpClient = getFtpClientByPath(path);
+        FtpQuery<Boolean> ftpQuery = new FtpQuery<Boolean>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                FTPFile[] listFiles = ftpClient.listFiles(path);
+                String[] replyStrings3 = ftpClient.getReplyStrings();
+                int length = listFiles.length;
+                result = length == 1;
+            }
+        };
+        ftpQuery.execute(ftpClient, path, "Could not inspect file");
+        return ftpQuery.getResult();
     }
 
     @Override
@@ -384,7 +366,7 @@ public class FtpFiles implements Files {
             if (filter == null) {
                 throw new XenonException(adaptor.getName(), "Filter is null.");
             }
-            assertDirectoryExists(path, ftpClient);
+            assertDirectoryExists(path);
             listFiles = ftpClient.listFiles(absolutePath);
         } catch (IOException e) {
             String message = MessageFormat.format("Failed to retrieve directory listing of {0}", absolutePath);
@@ -394,9 +376,9 @@ public class FtpFiles implements Files {
         return listFiles;
     }
 
-    private void assertDirectoryExists(Path path, FTPClient ftpClient) throws XenonException {
+    private void assertDirectoryExists(Path path) throws XenonException {
         boolean directoryExists = false;
-        directoryExists = directoryExists(ftpClient, path);
+        directoryExists = directoryExists(path);
         if (directoryExists == false) {
             String absolutePath = path.getRelativePath().getAbsolutePath();
             String message = MessageFormat.format("Directory does not exist at path ", absolutePath);
@@ -425,19 +407,18 @@ public class FtpFiles implements Files {
     }
 
     private InputStream getInputStreamFromFtpClient(FTPClient ftpClient, Path path) throws XenonException {
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-        InputStream inputStream = null;
-        try {
-            inputStream = ftpClient.retrieveFileStream(absolutePath);
-        } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), "Failed to open input stream", e);
-        }
-        return inputStream;
+        FtpQuery<InputStream> ftpQuery = new FtpQuery<InputStream>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                result = ftpClient.retrieveFileStream(path);
+            }
+        };
+        ftpQuery.execute(ftpClient, path, "Failed to open input stream");
+        return ftpQuery.getResult();
     }
 
     private void assertValidArgumentsForNewInputStream(Path path) throws XenonException, NoSuchPathException {
         assertPathExists(path);
-
         FileAttributes att = getAttributes(path);
         if (att.isDirectory()) {
             throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Path " + path + " is a directory!");
@@ -446,23 +427,31 @@ public class FtpFiles implements Files {
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
+        // TODO work here:
+        /* You are not using any of the options. You are not setting any of the modes like "OpenOption.CREATE" etc.
+         * This might be the reason that the file is not written in one go.
+         *
+         * Also, read the OpenOption class and the Files interface about newoutputstream.
+         *
+         */
         LOGGER.debug("newOutputStream path = {} option = {}", path, options);
         assertValidArgumentsForNewOutputStream(path, options);
         FTPClient ftpClient = getFtpClientByPath(path);
         OutputStream outputStream = getOutputStreamFromFtpClient(ftpClient, path);
+        FtpOutputStream ftpOutputStream = new FtpOutputStream(outputStream, ftpClient);
         LOGGER.debug("newOutputStream OK");
-        return outputStream;
+        return ftpOutputStream;
     }
 
     private OutputStream getOutputStreamFromFtpClient(FTPClient ftpClient, Path path) throws XenonException {
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-        OutputStream outputStream = null;
-        try {
-            outputStream = ftpClient.storeFileStream(absolutePath);
-        } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), "Failed to open outputstream", e);
-        }
-        return outputStream;
+        FtpQuery<OutputStream> ftpQuery = new FtpQuery<OutputStream>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                result = ftpClient.storeFileStream(path);
+            }
+        };
+        ftpQuery.execute(ftpClient, path, "Failed to open outputstream");
+        return ftpQuery.getResult();
     }
 
     private void assertValidArgumentsForNewOutputStream(Path path, OpenOption... options) throws InvalidOpenOptionsException,
@@ -497,38 +486,39 @@ public class FtpFiles implements Files {
     }
 
     private FTPFile getFtpFile(FTPClient ftpClient, Path path) throws XenonException {
-        FTPFile listFile;
-        try {
-            if (directoryExists(ftpClient, path)) {
-                listFile = getDirectoryFtpFile(ftpClient, path);
-            } else {
-                listFile = getRegularFtpFile(ftpClient, path);
-            }
-        } catch (IOException e) {
-            String absolutePath = path.getRelativePath().getAbsolutePath();
-            String message = MessageFormat.format("Failed to retrieve attributes of path {0}", absolutePath);
-            throw new XenonException(adaptor.getName(), message, e);
+        FTPFile ftpFile = getRegularFtpFile(path);
+        if (ftpFile == null) {
+            ftpFile = getDirectoryFtpFile(path);
         }
-        return listFile;
+        return ftpFile;
     }
 
-    private FTPFile getRegularFtpFile(FTPClient ftpClient, Path pathToRegularFile) throws IOException {
-        String absolutePath = pathToRegularFile.getRelativePath().getAbsolutePath();
-        return ftpClient.listFiles(absolutePath)[0];
+    private FTPFile getRegularFtpFile(Path pathToRegularFile) throws XenonException {
+        FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                result = ftpClient.listFiles(path)[0];
+            }
+        };
+        ftpQuery.execute(getFtpClientByPath(pathToRegularFile), pathToRegularFile, "Failed to retrieve attributes of path");
+        return ftpQuery.getResult();
     }
 
-    private FTPFile getDirectoryFtpFile(FTPClient ftpClient, Path path) throws IOException, XenonException {
-        String targetName = ".";
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-
-        FTPFile[] listFiles = ftpClient.listDirectories(absolutePath);
-
-        for (FTPFile listFile : listFiles) {
-            if (listFile.getName().equals(targetName)) {
-                return listFile;
+    private FTPFile getDirectoryFtpFile(Path path) throws XenonException {
+        FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                String targetName = ".";
+                FTPFile[] listFiles = ftpClient.listDirectories(path);
+                for (FTPFile listFile : listFiles) {
+                    if (listFile.getName().equals(targetName)) {
+                        result = listFile;
+                    }
+                }
             }
-        }
-        return null;
+        };
+        ftpQuery.execute(getFtpClientByPath(path), path, "Failed to retrieve attributes of directory");
+        return ftpQuery.getResult();
     }
 
     @Override

@@ -299,11 +299,9 @@ public abstract class GenericFileAdaptorTestParent {
         Path file = createNewTestFileName(root);
 
         files.createFile(file);
-
         if (data != null && data.length > 0) {
             writeData(file, data);
         }
-
         return file;
     }
 
@@ -1470,7 +1468,8 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories,
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    private void test13_getAttributes(Path path, boolean isDirectory, long size, boolean mustFail) throws Exception {
+    private void test13_getAttributes(Path path, boolean isDirectory, long size, long currentTime, boolean mustFail)
+            throws Exception {
 
         FileAttributes result = null;
 
@@ -1498,37 +1497,66 @@ public abstract class GenericFileAdaptorTestParent {
             throwWrong("test13_getfileAttributes", "size=" + size, "size=" + result.size());
         }
 
+        if (isWithinMargin(currentTime, result.lastModifiedTime()) == false) {
+            throwWrong("test13_getfileAttributes", "lastModifiedTime=" + currentTime,
+                    "lastModifiedTime=" + result.lastModifiedTime());
+        }
+
+        if (isWithinMargin(currentTime, result.creationTime()) == false) {
+            throwWrong("test13_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.creationTime());
+        }
+
+        if (isWithinMargin(currentTime, result.lastAccessTime()) == false) {
+            throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.lastAccessTime());
+        }
+
         System.err.println("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
                 + result.isExecutable() + " " + result.isSymbolicLink() + " " + result.isDirectory() + " "
                 + result.isRegularFile() + " " + result.isHidden() + " " + result.isOther() + " " + result.lastAccessTime() + " "
                 + result.lastModifiedTime());
     }
 
+    /**
+     * Tests whether two times (in milliseconds) are within a mild margin of one another. The margin is large enough to be able to
+     * cope with servers in other timezones and similar, expected, sources of discrepancy between times.
+     *
+     * @param time1
+     * @param time2
+     * @return
+     */
+    private boolean isWithinMargin(long time1, long time2) {
+        final int millisecondsPerSecond = 1000;
+        final int secondsPerHour = 3600;
+        final long margin = 30 * secondsPerHour * millisecondsPerSecond;
+        return Math.abs(time1 - time2) < margin;
+    }
+
     @org.junit.Test
     public void test13_getAttributes() throws Exception {
 
         prepare();
+        long currentTime = System.currentTimeMillis();
 
         // test with null
-        test13_getAttributes(null, false, -1, true);
+        test13_getAttributes(null, false, -1, currentTime, true);
 
         prepareTestDir("test13_getAttributes");
 
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
-        test13_getAttributes(file0, false, -1, true);
+        test13_getAttributes(file0, false, -1, currentTime, true);
 
         // test with existing empty file
         Path file1 = createTestFile(testDir, null);
-        test13_getAttributes(file1, false, 0, false);
+        test13_getAttributes(file1, false, 0, currentTime, false);
 
         // test with existing non-empty file
         Path file2 = createTestFile(testDir, new byte[] { 1, 2, 3 });
-        test13_getAttributes(file2, false, 3, false);
+        test13_getAttributes(file2, false, 3, currentTime, false);
 
         // test with existing dir
         Path dir0 = createTestDir(testDir);
-        test13_getAttributes(dir0, true, -1, false);
+        test13_getAttributes(dir0, true, -1, currentTime, false);
 
         // TODO: test with link!
 
@@ -1542,7 +1570,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         if (config.supportsClose()) {
             // test with closed fs
-            test13_getAttributes(testDir, false, -1, true);
+            test13_getAttributes(testDir, false, -1, currentTime, true);
         }
     }
 
