@@ -21,8 +21,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -357,7 +359,7 @@ public class FtpFiles implements Files {
         return new FtpDirectoryStream(dir, filter, listDirectory(dir, filter));
     }
 
-    private FTPFile[] listDirectory(Path path, Filter filter) throws XenonException {
+    private LinkedList<FTPFile> listDirectory(Path path, Filter filter) throws XenonException {
         String absolutePath = path.getRelativePath().getAbsolutePath();
         FTPClient ftpClient = getFtpClientByPath(path);
 
@@ -373,7 +375,7 @@ public class FtpFiles implements Files {
             throw new XenonException(adaptor.getName(), message);
         }
 
-        return listFiles;
+        return new LinkedList<FTPFile>(Arrays.asList(listFiles));
     }
 
     private void assertDirectoryExists(Path path) throws XenonException {
@@ -387,13 +389,16 @@ public class FtpFiles implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
-        return null;
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path) throws XenonException {
+        return newAttributesDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, Filter filter) throws XenonException {
-        return null;
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter) throws XenonException {
+        if (path == null) {
+            throw new XenonException(adaptor.getName(), "Cannot open attribute directory stream of null path");
+        }
+        return new FtpDirectoryAttributeStream(path, filter, listDirectory(path, filter));
     }
 
     @Override
@@ -455,7 +460,7 @@ public class FtpFiles implements Files {
     }
 
     private void assertValidArgumentsForNewOutputStream(Path path, OpenOption... options) throws InvalidOpenOptionsException,
-            XenonException, PathAlreadyExistsException, NoSuchPathException {
+    XenonException, PathAlreadyExistsException, NoSuchPathException {
         OpenOptions processedOptions = OpenOptions.processOptions(adaptor.getName(), options);
 
         if (processedOptions.getReadMode() != null) {

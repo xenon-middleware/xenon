@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.adaptors.ftp;
 import java.util.HashSet;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -13,47 +14,33 @@ public class FtpFileAttributes implements FileAttributes {
     private static final int[] permissionTypes = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION, FTPFile.EXECUTE_PERMISSION };
     private static final int[] userTypes = { FTPFile.USER_ACCESS, FTPFile.GROUP_ACCESS, FTPFile.WORLD_ACCESS };
 
-    private boolean isDirectory;
-    private boolean isSymbolicLink;
-    private boolean isRegularFile;
-    private boolean isOther;
-    private long size;
-    private long lastModifiedTime;
-    private String group;
-    private String user;
-    private Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
+    private FTPFile attributes;
 
-    public FtpFileAttributes(FTPFile listFile) {
-        isDirectory = listFile.isDirectory();
-        isSymbolicLink = listFile.isSymbolicLink();
-        isOther = listFile.isUnknown();
-        isRegularFile = listFile.isFile();
-        size = listFile.getSize();
-        lastModifiedTime = listFile.getTimestamp().getTimeInMillis();
-        storePermissions(listFile);
-        user = listFile.getUser();
-        group = listFile.getGroup();
-
+    public FtpFileAttributes(FTPFile ftpFile) throws XenonException {
+        if (ftpFile == null) {
+            throw new XenonException(FtpAdaptor.ADAPTOR_NAME, "Cannot create ftp file attributes based on null");
+        }
+        attributes = ftpFile;
     }
 
     @Override
     public boolean isDirectory() {
-        return isDirectory;
+        return attributes.isDirectory();
     }
 
     @Override
     public boolean isOther() {
-        return isOther;
+        return attributes.isUnknown();
     }
 
     @Override
     public boolean isRegularFile() {
-        return isRegularFile;
+        return attributes.isFile();
     }
 
     @Override
     public boolean isSymbolicLink() {
-        return isSymbolicLink;
+        return attributes.isSymbolicLink();
     }
 
     @Override
@@ -68,17 +55,17 @@ public class FtpFileAttributes implements FileAttributes {
 
     @Override
     public long lastModifiedTime() {
-        return lastModifiedTime;
+        return attributes.getTimestamp().getTimeInMillis();
     }
 
     @Override
     public long size() {
-        return size;
+        return attributes.getSize();
     }
 
     @Override
     public boolean isExecutable() {
-        return permissions.contains(PosixFilePermission.OWNER_EXECUTE);
+        return getPermissions().contains(PosixFilePermission.OWNER_EXECUTE);
     }
 
     @Override
@@ -88,37 +75,39 @@ public class FtpFileAttributes implements FileAttributes {
 
     @Override
     public boolean isReadable() {
-        return permissions.contains(PosixFilePermission.OWNER_READ);
+        return getPermissions().contains(PosixFilePermission.OWNER_READ);
     }
 
     @Override
     public boolean isWritable() {
-        return permissions.contains(PosixFilePermission.OWNER_WRITE);
+        return getPermissions().contains(PosixFilePermission.OWNER_WRITE);
     }
 
     @Override
     public String group() throws AttributeNotSupportedException {
-        return group;
+        return attributes.getGroup();
     }
 
     @Override
     public String owner() throws AttributeNotSupportedException {
-        return user;
+        return attributes.getUser();
     }
 
     @Override
     public Set<PosixFilePermission> permissions() throws AttributeNotSupportedException {
-        return permissions;
+        return getPermissions();
     }
 
-    private void storePermissions(FTPFile listFile) {
+    private HashSet<PosixFilePermission> getPermissions() {
+        HashSet<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
         for (int userType : userTypes) {
             for (int permissionType : permissionTypes) {
-                if (listFile.hasPermission(userType, permissionType)) {
+                if (attributes.hasPermission(userType, permissionType)) {
                     permissions.add(getPosixFilePermission(userType, permissionType));
                 }
             }
         }
+        return permissions;
     }
 
     static private PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
@@ -157,5 +146,50 @@ public class FtpFileAttributes implements FileAttributes {
             }
         }
         return permission;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof FtpFileAttributes) {
+            FtpFileAttributes other = (FtpFileAttributes) obj;
+
+            if (areFtpFilesIdentical(attributes, other.attributes)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean areFtpFilesIdentical(FTPFile a, FTPFile b) {
+        if (a.getTimestamp().equals(b.getTimestamp()) == false) {
+            return false;
+        }
+
+        if (a.getGroup().equals(b.getGroup()) == false) {
+            return false;
+        }
+
+        if (a.getUser().equals(b.getUser()) == false) {
+            return false;
+        }
+
+        if (a.getSize() != b.getSize()) {
+            return false;
+        }
+
+        for (int userType : userTypes) {
+            for (int permissionType : permissionTypes) {
+                if (a.hasPermission(userType, permissionType) != b.hasPermission(userType, permissionType)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

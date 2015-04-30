@@ -1,10 +1,12 @@
 package nl.esciencecenter.xenon.adaptors.ftp;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
 
-import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 
 import org.apache.commons.net.ftp.FTPFile;
@@ -14,10 +16,19 @@ import org.junit.Test;
 public class FtpFileAttributesTest {
     private final int[] permissionTypes = { FTPFile.READ_PERMISSION, FTPFile.WRITE_PERMISSION, FTPFile.EXECUTE_PERMISSION };
     private final int[] userTypes = { FTPFile.USER_ACCESS, FTPFile.GROUP_ACCESS, FTPFile.WORLD_ACCESS };
-    private FTPFile testFtpFile;
+    private FtpFileAttributes defaultTestFtpFileAttributes;
+    private final GregorianCalendar defaultCalendar = new GregorianCalendar(2010, 4, 1);
+
+    @Test(expected = XenonException.class)
+    public void construct_null_throwException() throws XenonException {
+        new FtpFileAttributes(null);
+    }
 
     @Test
-    public void permissions_none_containsZeroPermissions() throws AttributeNotSupportedException {
+    public void permissions_none_containsZeroPermissions() throws XenonException {
+        // Arrange
+        FTPFile testFtpFile = getNewDefaultFTPFile();
+
         // Act
         FtpFileAttributes ftpFileAttributes = new FtpFileAttributes(testFtpFile);
 
@@ -26,8 +37,9 @@ public class FtpFileAttributesTest {
     }
 
     @Test
-    public void permissions_all_contains9Permissions() throws AttributeNotSupportedException {
+    public void permissions_all_contains9Permissions() throws XenonException {
         // Arrange
+        FTPFile testFtpFile = getNewDefaultFTPFile();
         for (int permissionType : permissionTypes) {
             for (int userType : userTypes) {
                 testFtpFile.setPermission(userType, permissionType, true);
@@ -42,8 +54,9 @@ public class FtpFileAttributesTest {
     }
 
     @Test
-    public void permissions_worldRead_containsOthersRead() throws AttributeNotSupportedException {
+    public void permissions_worldRead_containsOthersRead() throws XenonException {
         // Arrange
+        FTPFile testFtpFile = getNewDefaultFTPFile();
         testFtpFile.setPermission(FTPFile.WORLD_ACCESS, FTPFile.READ_PERMISSION, true);
 
         // Act
@@ -53,9 +66,99 @@ public class FtpFileAttributesTest {
         assertEquals(PosixFilePermission.OTHERS_READ, ftpFileAttributes.permissions().toArray()[0]);
     }
 
+    @Test
+    public void equals_itself_true() {
+        assertTrue(defaultTestFtpFileAttributes.equals(defaultTestFtpFileAttributes));
+    }
+
+    @Test
+    public void equals_null_false() {
+        assertFalse(defaultTestFtpFileAttributes.equals(null));
+    }
+
+    @Test
+    public void equals_string_false() {
+        assertFalse(defaultTestFtpFileAttributes.equals("test"));
+    }
+
+    @Test
+    public void equals_otherDate_false() throws XenonException {
+        // Arrange
+        FTPFile otherFtpFile = getNewDefaultFTPFile();
+        GregorianCalendar otherDate = (GregorianCalendar) defaultCalendar.clone();
+        otherDate.add(GregorianCalendar.MONTH, 2);
+        otherFtpFile.setTimestamp(otherDate);
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(otherFtpFile);
+
+        // Act & Assert
+        assertFalse(defaultTestFtpFileAttributes.equals(otherAttributes));
+    }
+
+    @Test
+    public void equals_otherWithSameData_true() throws XenonException {
+        // Arrange
+        FTPFile otherFtpFile = getNewDefaultFTPFile();
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(otherFtpFile);
+
+        // Act & Assert
+        assertTrue(defaultTestFtpFileAttributes.equals(otherAttributes));
+    }
+
+    @Test
+    public void equals_otherOwner_false() throws XenonException {
+        // Arrange
+        FTPFile otherFtpFile = getNewDefaultFTPFile();
+        otherFtpFile.setUser("otheruser");
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(otherFtpFile);
+
+        // Act & Assert
+        assertFalse(defaultTestFtpFileAttributes.equals(otherAttributes));
+    }
+
+    @Test
+    public void equals_otherGroup_false() throws XenonException {
+        // Arrange
+        FTPFile otherFtpFile = getNewDefaultFTPFile();
+        otherFtpFile.setGroup("othergroup");
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(otherFtpFile);
+
+        // Act & Assert
+        assertFalse(defaultTestFtpFileAttributes.equals(otherAttributes));
+    }
+
+    @Test
+    public void equals_otherSize_false() throws XenonException {
+        // Arrange
+        FTPFile otherFtpFile = getNewDefaultFTPFile();
+        otherFtpFile.setSize(1);
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(otherFtpFile);
+
+        // Act & Assert
+        assertFalse(defaultTestFtpFileAttributes.equals(otherAttributes));
+    }
+
+    @Test
+    public void equals_otherPermissions_false() throws XenonException {
+        // Arrange
+        FTPFile otherFtpFile = getNewDefaultFTPFile();
+        otherFtpFile.setPermission(FTPFile.GROUP_ACCESS, FTPFile.EXECUTE_PERMISSION, true);
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(otherFtpFile);
+
+        // Act & Assert
+        assertFalse(defaultTestFtpFileAttributes.equals(otherAttributes));
+    }
+
     @Before
-    public void setUp() {
-        testFtpFile = new FTPFile();
-        testFtpFile.setTimestamp(new GregorianCalendar(2010, 4, 1));
+    public void setUp() throws XenonException {
+        defaultTestFtpFileAttributes = new FtpFileAttributes(getNewDefaultFTPFile());
+    }
+
+    private FTPFile getNewDefaultFTPFile() {
+        FTPFile defaultFTPFile = new FTPFile();
+        defaultFTPFile.setUser("defaultuser");
+        defaultFTPFile.setGroup("defaultgroup");
+        defaultFTPFile.setTimestamp(defaultCalendar);
+        defaultFTPFile.setSize(0);
+        return defaultFTPFile;
     }
 }
