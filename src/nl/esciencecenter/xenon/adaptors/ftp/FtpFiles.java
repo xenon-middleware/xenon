@@ -325,7 +325,9 @@ public class FtpFiles implements Files {
                 String originalWorkingDirectory = ftpClient.printWorkingDirectory();
                 boolean pathExists = ftpClient.changeWorkingDirectory(path);
                 String[] replyStrings1 = ftpClient.getReplyStrings();
+                //                if (originalWorkingDirectory != null) {
                 ftpClient.changeWorkingDirectory(originalWorkingDirectory);
+                //                }
                 String[] replyStrings2 = ftpClient.getReplyStrings();
                 result = pathExists;
             }
@@ -407,8 +409,9 @@ public class FtpFiles implements Files {
         assertValidArgumentsForNewInputStream(path);
         FTPClient ftpClient = getFtpClientByPath(path);
         InputStream inputStream = getInputStreamFromFtpClient(ftpClient, path);
+        FtpInputStream ftpInputStream = new FtpInputStream(inputStream, ftpClient);
         LOGGER.debug("newInputStream OK");
-        return inputStream;
+        return ftpInputStream;
     }
 
     private InputStream getInputStreamFromFtpClient(FTPClient ftpClient, Path path) throws XenonException {

@@ -6,8 +6,8 @@ import java.io.OutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
- * Wraps an OutputStream instance following the decorator pattern. Functionality added is sending a pending command completed
- * signal after closing the output stream.
+ * Wraps an OutputStream instance. Only functionality added is sending a pending command completed signal after closing the output
+ * stream.
  *
  * @author Christiaan Meijer
  *
@@ -16,6 +16,7 @@ public class FtpOutputStream extends OutputStream {
 
     private OutputStream outputStream;
     private FTPClient ftpClient;
+    private boolean completedPendingFtpCommand = false;
 
     public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient) {
         this.outputStream = outputStream;
@@ -45,7 +46,12 @@ public class FtpOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         outputStream.close();
-        ftpClient.completePendingCommand();
+
+        // Added functionality:
+        if (completedPendingFtpCommand == false) {
+            ftpClient.completePendingCommand();
+            completedPendingFtpCommand = true;
+        }
     }
 
     @Override
