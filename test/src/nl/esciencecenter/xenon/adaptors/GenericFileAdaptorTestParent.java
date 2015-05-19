@@ -2576,7 +2576,7 @@ public abstract class GenericFileAdaptorTestParent {
         // test copy with dir source
         test23_copy(dir0, file1, new CopyOption[] { CopyOption.CREATE }, null, true);
 
-        // test copy with non-existing target
+        // test copy using conflicting options should fail
         test23_copy(file0, file1, new CopyOption[] { CopyOption.IGNORE, CopyOption.CREATE }, null, true);
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.IGNORE }, null, true);
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.REPLACE }, null, true);
