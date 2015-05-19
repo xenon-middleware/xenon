@@ -254,8 +254,65 @@ public class FtpFiles implements Files {
         return result;
     }
 
+    /**
+     * Move or rename an existing source path to a non-existing target path.
+     *
+     * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
+     *
+     * If the source is a link, the link itself will be moved, not the path to which it refers. If the source is a directory, it
+     * will be renamed to the target. This implies that a moving a directory between physical locations may fail.
+     *
+     * @param source
+     *            the existing source path.
+     * @param target
+     *            the non existing target path.
+     * @return the target path.
+     *
+     * @throws NoSuchPathException
+     *             If the source file does not exist or the target parent directory does not exist.
+     * @throws PathAlreadyExistsException
+     *             If the target file already exists.
+     * @throws XenonException
+     *             If the move failed.
+     */
     @Override
     public void move(Path source, Path target) throws XenonException {
+        LOGGER.debug("move source = {} target = {}", source, target);
+
+        assertSameFileSystemsForMove(source, target);
+        assertPathExists(source);
+        if (areSamePaths(source, target)) {
+            return;
+        }
+        assertPathNotExists(target);
+        assertParentDirectoryExists(target);
+
+        String absoluteSourcePath = source.getRelativePath().getAbsolutePath();
+        FTPClient ftpClient = getFtpClientByPath(target);
+        FtpCommand ftpCommand = new FtpCommand() {
+            @Override
+            public void doWork(FTPClient ftpClient, String absoluteTargetPath) throws IOException {
+                ftpClient.rename(absoluteSourcePath, absoluteTargetPath);
+            }
+        };
+        ftpCommand.execute(ftpClient, target, "Failed to move to path");
+        LOGGER.debug("move OK");
+    }
+
+    private void assertSameFileSystemsForMove(Path source, Path target) throws XenonException {
+        FileSystem sourcefs = source.getFileSystem();
+        FileSystem targetfs = target.getFileSystem();
+
+        if (!sourcefs.getLocation().equals(targetfs.getLocation())) {
+            throw new XenonException(adaptor.getName(), "Cannot move between different FileSystems: " + sourcefs.getLocation()
+                    + " and " + targetfs.getLocation());
+        }
+    }
+
+    private boolean areSamePaths(Path source, Path target) {
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
+        return sourceName.equals(targetName);
     }
 
     @Override
@@ -276,6 +333,7 @@ public class FtpFiles implements Files {
 
     @Override
     public void createDirectories(Path path) throws XenonException {
+        LOGGER.debug("createDirectories dir = {}", path);
         RelativePath relativeParent = path.getRelativePath().getParent();
 
         if (relativeParent != null) {
@@ -286,6 +344,7 @@ public class FtpFiles implements Files {
             }
         }
         createDirectory(path);
+        LOGGER.debug("createDirectories OK");
     }
 
     @Override
@@ -362,11 +421,7 @@ public class FtpFiles implements Files {
             public void doWork(FTPClient ftpClient, String path) throws IOException {
                 String originalWorkingDirectory = ftpClient.printWorkingDirectory();
                 boolean pathExists = ftpClient.changeWorkingDirectory(path);
-                String[] replyStrings1 = ftpClient.getReplyStrings();
-                //                if (originalWorkingDirectory != null) {
                 ftpClient.changeWorkingDirectory(originalWorkingDirectory);
-                //                }
-                String[] replyStrings2 = ftpClient.getReplyStrings();
                 result = pathExists;
             }
         };
@@ -380,7 +435,6 @@ public class FtpFiles implements Files {
             @Override
             public void doWork(FTPClient ftpClient, String path) throws IOException {
                 FTPFile[] listFiles = ftpClient.listFiles(path);
-                String[] replyStrings3 = ftpClient.getReplyStrings();
                 int length = listFiles.length;
                 result = length == 1;
             }
@@ -636,6 +690,13 @@ public class FtpFiles implements Files {
     private void assertPathExists(Path path) throws XenonException, NoSuchPathException {
         if (exists(path) == false) {
             throw new NoSuchPathException(adaptor.getName(), "File does not exist: " + path);
+        }
+    }
+
+    private void assertParentDirectoryExists(Path target) throws XenonException {
+        Path parentDirectory = newPath(target.getFileSystem(), target.getRelativePath().getParent());
+        if (parentDirectory != null) {
+            assertDirectoryExists(parentDirectory);
         }
     }
 }

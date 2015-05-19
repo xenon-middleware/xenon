@@ -40,7 +40,7 @@ public abstract class FtpCommand {
      * @param replyCode
      * @return if code implies successful completion
      */
-    private boolean isCodeSuccessfulCompletion(int replyCode) {
+    public static boolean isCodeSuccessfulCompletion(int replyCode) {
         return replyCode < 300 && replyCode >= 100;
     }
 }
