@@ -349,6 +349,7 @@ public class FtpFiles implements Files {
 
     @Override
     public void createDirectory(Path path) throws XenonException {
+        LOGGER.debug("createDirectory dir = {}", path);
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
             public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
@@ -356,14 +357,14 @@ public class FtpFiles implements Files {
             }
         };
         String messageInCaseOfError = "Failed to create directory";
-
         ftpCommand.execute(getFtpClientByPath(path), path, messageInCaseOfError);
+        LOGGER.debug("createDirectory OK");
     }
 
     @Override
     public void createFile(Path path) throws XenonException {
+        LOGGER.debug("createFile path = {}", path);
         assertPathNotExists(path);
-
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
             public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
@@ -372,17 +373,19 @@ public class FtpFiles implements Files {
             }
         };
         String messageInCaseOfError = "Failed to create file";
-
         ftpCommand.execute(getFtpClientByPath(path), path, messageInCaseOfError);
+        LOGGER.debug("createFile OK");
     }
 
     @Override
     public void delete(Path path) throws XenonException {
+        LOGGER.debug("delete path = {}", path);
         if (getAttributes(path).isDirectory()) {
             deleteDirectory(path);
         } else {
             deleteFile(path);
         }
+        LOGGER.debug("delete OK");
     }
 
     private void deleteDirectory(Path path) throws XenonException {
@@ -411,7 +414,10 @@ public class FtpFiles implements Files {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        return fileExists(path) || directoryExists(path);
+        LOGGER.debug("exists path = {}", path);
+        boolean result = fileExists(path) || directoryExists(path);
+        LOGGER.debug("exists OK result = {}", result);
+        return result;
     }
 
     private boolean directoryExists(Path path) throws XenonException {
@@ -445,12 +451,14 @@ public class FtpFiles implements Files {
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
+        LOGGER.debug("newDirectoryStream path = {}", dir);
         return newDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
-        return new FtpDirectoryStream(dir, filter, listDirectory(dir, filter));
+    public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws XenonException {
+        LOGGER.debug("newDirectoryStream path = {} filter = <?>", path);
+        return new FtpDirectoryStream(path, filter, listDirectory(path, filter));
     }
 
     private LinkedList<FTPFile> listDirectory(Path path, Filter filter) throws XenonException {
@@ -484,11 +492,13 @@ public class FtpFiles implements Files {
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path) throws XenonException {
+        LOGGER.debug("newAttributesDirectoryStream path = {}", path);
         return newAttributesDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter) throws XenonException {
+        LOGGER.debug("newAttributesDirectoryStream path = {} filter = <?>", path);
         if (path == null) {
             throw new XenonException(adaptor.getName(), "Cannot open attribute directory stream of null path");
         }
@@ -499,12 +509,10 @@ public class FtpFiles implements Files {
     public InputStream newInputStream(Path path) throws XenonException {
         LOGGER.debug("newInputStream path = {}", path);
         assertValidArgumentsForNewInputStream(path);
-
-        Path newPath = getPathOnNewFileSystem(path);
-
-        FTPClient ftpClient = getFtpClientByPath(newPath);
-        InputStream inputStream = getInputStreamFromFtpClient(ftpClient, newPath);
-        FtpInputStream ftpInputStream = new FtpInputStream(inputStream, ftpClient, newPath, this);
+        Path pathOnNewFileSystem = getPathOnNewFileSystem(path);
+        FTPClient ftpClient = getFtpClientByPath(pathOnNewFileSystem);
+        InputStream inputStream = getInputStreamFromFtpClient(ftpClient, pathOnNewFileSystem);
+        FtpInputStream ftpInputStream = new FtpInputStream(inputStream, ftpClient, pathOnNewFileSystem, this);
         LOGGER.debug("newInputStream OK");
         return ftpInputStream;
     }
@@ -533,16 +541,23 @@ public class FtpFiles implements Files {
         LOGGER.debug("newOutputStream path = {} option = {}", path, options);
         OpenOptions processedOptions = OpenOptions.processOptions(adaptor.getName(), options);
         assertValidArgumentsForNewOutputStream(path, processedOptions);
-
-        Path newPath = getPathOnNewFileSystem(path);
-
-        FTPClient ftpClient = getFtpClientByPath(newPath);
-        OutputStream outputStream = getOutputStreamFromFtpClient(ftpClient, newPath, processedOptions);
-        FtpOutputStream ftpOutputStream = new FtpOutputStream(outputStream, ftpClient, newPath, this);
+        Path pathOnNewFileSystem = getPathOnNewFileSystem(path);
+        FTPClient ftpClient = getFtpClientByPath(pathOnNewFileSystem);
+        OutputStream outputStream = getOutputStreamFromFtpClient(ftpClient, pathOnNewFileSystem, processedOptions);
+        FtpOutputStream ftpOutputStream = new FtpOutputStream(outputStream, ftpClient, pathOnNewFileSystem, this);
         LOGGER.debug("newOutputStream OK");
         return ftpOutputStream;
     }
 
+    /**
+     * Creates a copy of the file system of the path and returns a copy of the path that refers to the new file system. This way
+     * structures like streams can have their own dedicated ftp client. This is necessary because ftp can't do two things over the
+     * same connection like uploading to a stream and reading from another stream for example.
+     *
+     * @param path
+     * @return copy of the path referring to a new file system
+     * @throws XenonException
+     */
     private Path getPathOnNewFileSystem(Path path) throws XenonException {
         FileSystem fileSystem = path.getFileSystem();
         FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
@@ -606,10 +621,13 @@ public class FtpFiles implements Files {
 
     @Override
     public FileAttributes getAttributes(Path path) throws XenonException {
+        LOGGER.debug("getAttributes path = {}", path);
         assertPathExists(path);
         FTPClient ftpClient = getFtpClientByPath(path);
         FTPFile listFile = getFtpFile(ftpClient, path);
-        return new FtpFileAttributes(listFile);
+        FileAttributes fileAttributes = new FtpFileAttributes(listFile);
+        LOGGER.debug("getAttributes OK result = {}", fileAttributes);
+        return fileAttributes;
     }
 
     private FTPFile getFtpFile(FTPClient ftpClient, Path path) throws XenonException {
@@ -649,18 +667,21 @@ public class FtpFiles implements Files {
     }
 
     @Override
-    public Path readSymbolicLink(Path link) throws XenonException {
-        return null;
+    public Path readSymbolicLink(Path path) throws XenonException {
+        LOGGER.debug("readSymbolicLink path = {}", path);
+        Path result = null;
+        LOGGER.debug("readSymbolicLink OK result = {}", result);
+        return result;
     }
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
+        LOGGER.debug("setPosixFilePermissions path = {} permissions = {}", path, permissions);
+        LOGGER.debug("setPosixFilePermissions OK");
     }
 
     public void end() {
-
         LOGGER.debug("end called, closing all file systems");
-
         while (fileSystems.size() > 0) {
             Set<String> keys = fileSystems.keySet();
             String first = keys.iterator().next();
@@ -672,7 +693,6 @@ public class FtpFiles implements Files {
                 // ignore for now
             }
         }
-
         LOGGER.debug("end OK");
     }
 
