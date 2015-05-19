@@ -38,6 +38,8 @@ import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementati
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
+import nl.esciencecenter.xenon.engine.util.CopyEngine;
+import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -80,11 +82,13 @@ public class FtpFiles implements Files {
 
         private final FileSystemImplementation impl;
         private final FTPClient ftpClient;
+        private final Credential credential;
 
-        public FileSystemInfo(FileSystemImplementation impl, FTPClient ftpClient) {
+        public FileSystemInfo(FileSystemImplementation impl, FTPClient ftpClient, Credential credential) {
             super();
             this.impl = impl;
             this.ftpClient = ftpClient;
+            this.credential = credential;
         }
 
         public FileSystemImplementation getImpl() {
@@ -93,6 +97,10 @@ public class FtpFiles implements Files {
 
         public FTPClient getFtpClient() {
             return ftpClient;
+        }
+
+        public Credential getCredential() {
+            return credential;
         }
     }
 
@@ -133,7 +141,7 @@ public class FtpFiles implements Files {
         String uniqueID = getNewUniqueID();
         FileSystemImplementation fileSystem = new FileSystemImplementation(FtpAdaptor.ADAPTOR_NAME, uniqueID, scheme, location,
                 entryPath, credential, xenonProperties);
-        fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, ftpClient));
+        fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, ftpClient, credential));
         LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", cwd, entryPath, uniqueID);
         return fileSystem;
     }
@@ -219,7 +227,31 @@ public class FtpFiles implements Files {
 
     @Override
     public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
-        return null;
+        LOGGER.debug("copy source = {} target = {} options = {}", source, target, options);
+        CopyEngine ce = xenonEngine.getCopyEngine();
+
+        CopyInfo info = CopyInfo.createCopyInfo(adaptor.getName(), ce.getNextID("FTP_COPY_"), source, target, options);
+
+        ce.copy(info);
+
+        Copy result;
+
+        if (info.isAsync()) {
+            result = info.getCopy();
+        } else {
+
+            Exception e = info.getException();
+
+            if (e != null) {
+                throw new XenonException(adaptor.getName(), "Copy failed!", e);
+            }
+
+            result = null;
+        }
+
+        LOGGER.debug("copy OK result = {}", result);
+
+        return result;
     }
 
     @Override
@@ -228,12 +260,18 @@ public class FtpFiles implements Files {
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws XenonException {
-        return null;
+        LOGGER.debug("getCopyStatus copy = {}", copy);
+        CopyStatus result = xenonEngine.getCopyEngine().getStatus(copy);
+        LOGGER.debug("getCopyStatus OK result = {}", result);
+        return result;
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws XenonException {
-        return null;
+        LOGGER.debug("cancelCopy copy = {}", copy);
+        CopyStatus result = xenonEngine.getCopyEngine().cancel(copy);
+        LOGGER.debug("cancelCopy OK result = {}", result);
+        return result;
     }
 
     @Override
@@ -407,9 +445,12 @@ public class FtpFiles implements Files {
     public InputStream newInputStream(Path path) throws XenonException {
         LOGGER.debug("newInputStream path = {}", path);
         assertValidArgumentsForNewInputStream(path);
-        FTPClient ftpClient = getFtpClientByPath(path);
-        InputStream inputStream = getInputStreamFromFtpClient(ftpClient, path);
-        FtpInputStream ftpInputStream = new FtpInputStream(inputStream, ftpClient);
+
+        Path newPath = getPathOnNewFileSystem(path);
+
+        FTPClient ftpClient = getFtpClientByPath(newPath);
+        InputStream inputStream = getInputStreamFromFtpClient(ftpClient, newPath);
+        FtpInputStream ftpInputStream = new FtpInputStream(inputStream, ftpClient, newPath, this);
         LOGGER.debug("newInputStream OK");
         return ftpInputStream;
     }
@@ -435,37 +476,61 @@ public class FtpFiles implements Files {
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
-        // TODO work here:
-        /* You are not using any of the options. You are not setting any of the modes like "OpenOption.CREATE" etc.
-         * This might be the reason that the file is not written in one go.
-         *
-         * Also, read the OpenOption class and the Files interface about newoutputstream.
-         *
-         */
         LOGGER.debug("newOutputStream path = {} option = {}", path, options);
-        assertValidArgumentsForNewOutputStream(path, options);
-        FTPClient ftpClient = getFtpClientByPath(path);
-        OutputStream outputStream = getOutputStreamFromFtpClient(ftpClient, path);
-        FtpOutputStream ftpOutputStream = new FtpOutputStream(outputStream, ftpClient);
+        OpenOptions processedOptions = OpenOptions.processOptions(adaptor.getName(), options);
+        assertValidArgumentsForNewOutputStream(path, processedOptions);
+
+        Path newPath = getPathOnNewFileSystem(path);
+
+        FTPClient ftpClient = getFtpClientByPath(newPath);
+        OutputStream outputStream = getOutputStreamFromFtpClient(ftpClient, newPath, processedOptions);
+        FtpOutputStream ftpOutputStream = new FtpOutputStream(outputStream, ftpClient, newPath, this);
         LOGGER.debug("newOutputStream OK");
         return ftpOutputStream;
     }
 
-    private OutputStream getOutputStreamFromFtpClient(FTPClient ftpClient, Path path) throws XenonException {
-        FtpQuery<OutputStream> ftpQuery = new FtpQuery<OutputStream>() {
+    private Path getPathOnNewFileSystem(Path path) throws XenonException {
+        FileSystem fileSystem = path.getFileSystem();
+        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
+        FileSystemInfo fileSystemInfo = fileSystems.get(fs.getUniqueID());
+        Credential credential = fileSystemInfo.getCredential();
+        FileSystem newFileSystem = newFileSystem(fileSystem.getScheme(), fileSystem.getLocation(), credential,
+                fileSystem.getProperties());
+        Path newPath = newPath(newFileSystem, path.getRelativePath());
+        return newPath;
+    }
+
+    private OutputStream getOutputStreamFromFtpClient(FTPClient ftpClient, Path path, OpenOptions options) throws XenonException {
+        FtpQuery<OutputStream> ftpQuery = options.getAppendMode() == OpenOption.APPEND ? getAppendingOutputStreamQuery()
+                : getTruncatingOrNewFileOutputStreamQuery();
+        ftpQuery.execute(ftpClient, path, "Failed to open outputstream");
+        return ftpQuery.getResult();
+    }
+
+    private FtpQuery<OutputStream> getTruncatingOrNewFileOutputStreamQuery() {
+        FtpQuery<OutputStream> ftpQuery;
+        ftpQuery = new FtpQuery<OutputStream>() {
             @Override
             public void doWork(FTPClient ftpClient, String path) throws IOException {
                 result = ftpClient.storeFileStream(path);
             }
         };
-        ftpQuery.execute(ftpClient, path, "Failed to open outputstream");
-        return ftpQuery.getResult();
+        return ftpQuery;
     }
 
-    private void assertValidArgumentsForNewOutputStream(Path path, OpenOption... options) throws InvalidOpenOptionsException,
-    XenonException, PathAlreadyExistsException, NoSuchPathException {
-        OpenOptions processedOptions = OpenOptions.processOptions(adaptor.getName(), options);
+    private FtpQuery<OutputStream> getAppendingOutputStreamQuery() {
+        FtpQuery<OutputStream> ftpQuery;
+        ftpQuery = new FtpQuery<OutputStream>() {
+            @Override
+            public void doWork(FTPClient ftpClient, String path) throws IOException {
+                result = ftpClient.appendFileStream(path);
+            }
+        };
+        return ftpQuery;
+    }
 
+    private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions)
+            throws InvalidOpenOptionsException, XenonException, PathAlreadyExistsException, NoSuchPathException {
         if (processedOptions.getReadMode() != null) {
             throw new InvalidOpenOptionsException(adaptor.getName(), "Disallowed open option: READ");
         }
@@ -542,17 +607,17 @@ public class FtpFiles implements Files {
 
         LOGGER.debug("end called, closing all file systems");
 
-        //        while (fileSystems.size() > 0) {
-        //            Set<String> keys = fileSystems.keySet();
-        //            String first = keys.iterator().next();
-        //            FileSystem fs = fileSystems.get(first).getImpl();
-        //
-        //            try {
-        //                close(fs);
-        //            } catch (XenonException e) {
-        //                // ignore for now
-        //            }
-        //        }
+        while (fileSystems.size() > 0) {
+            Set<String> keys = fileSystems.keySet();
+            String first = keys.iterator().next();
+            FileSystem fs = fileSystems.get(first).getImpl();
+
+            try {
+                close(fs);
+            } catch (XenonException e) {
+                // ignore for now
+            }
+        }
 
         LOGGER.debug("end OK");
     }

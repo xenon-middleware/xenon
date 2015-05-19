@@ -3,6 +3,9 @@ package nl.esciencecenter.xenon.adaptors.ftp;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.files.Path;
+
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
@@ -17,10 +20,14 @@ public class FtpOutputStream extends OutputStream {
     private OutputStream outputStream;
     private FTPClient ftpClient;
     private boolean completedPendingFtpCommand = false;
+    private Path path;
+    private FtpFiles ftpFiles;
 
-    public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient) {
+    public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient, Path path, FtpFiles ftpFiles) {
         this.outputStream = outputStream;
+        this.path = path;
         this.ftpClient = ftpClient;
+        this.ftpFiles = ftpFiles;
     }
 
     @Override
@@ -40,7 +47,7 @@ public class FtpOutputStream extends OutputStream {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        return new FtpOutputStream(outputStream, ftpClient);
+        return new FtpOutputStream(outputStream, ftpClient, path, ftpFiles);
     }
 
     @Override
@@ -51,6 +58,11 @@ public class FtpOutputStream extends OutputStream {
         if (completedPendingFtpCommand == false) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
+            try {
+                ftpFiles.close(path.getFileSystem());
+            } catch (XenonException e) {
+                throw new IOException("Could not close file system for ftp output stream", e);
+            }
         }
     }
 
