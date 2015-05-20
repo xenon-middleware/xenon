@@ -669,9 +669,7 @@ public class FtpFiles implements Files {
     @Override
     public Path readSymbolicLink(Path path) throws XenonException {
         LOGGER.debug("readSymbolicLink path = {}", path);
-        Path result = null;
-        LOGGER.debug("readSymbolicLink OK result = {}", result);
-        return result;
+        throw new XenonException(adaptor.getName(), "Ftp file system does not support symbolic links");
     }
 
     @Override

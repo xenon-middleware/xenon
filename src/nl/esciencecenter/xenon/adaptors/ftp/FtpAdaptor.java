@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.SftpException;
 
 public class FtpAdaptor extends Adaptor {
 
@@ -49,7 +48,7 @@ public class FtpAdaptor extends Adaptor {
     protected static final int DEFAULT_PORT = 21;
 
     /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
+    private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remove ftp servers.";
 
     /** The schemes supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ftp");
@@ -100,25 +99,18 @@ public class FtpAdaptor extends Adaptor {
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
             new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
                     Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-                    new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                            Component.FILESYSTEM), "true", "Enable strict host key checking."),
-            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
-                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
-                    Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                                            "The polling delay for monitoring running jobs (in milliseconds)."),
-                                            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
-                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
-                    Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
-                    "The gateway machine used to create an SSH tunnel to the target."));
+            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
+                            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
+                                            Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
+                                                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
+                                                            Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
+                                                            "The gateway machine used to create an SSH tunnel to the target."));
 
     private final FtpFiles filesAdaptor;
-
-    //    private final SshJobs jobsAdaptor;
-
-    //    private final SshCredentials credentialsAdaptor;
-
-    private JSch jsch;
-
     private FtpCredentials credentialsAdaptor;
 
     public FtpAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
@@ -130,39 +122,8 @@ public class FtpAdaptor extends Adaptor {
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         filesAdaptor = new FtpFiles(this, xenonEngine);
-        //        this.jobsAdaptor = new SshJobs(getProperties(), this, xenonEngine);
         credentialsAdaptor = new FtpCredentials(getProperties(), this);
-
-        //        this.jsch = jsch;
-
-        //        if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
-        //            String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
-        //            LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
-        //            setKnownHostsFile(knownHosts);
-        //        }
     }
-
-    //    private void setKnownHostsFile(String knownHostsFile) throws XenonException {
-    //        try {
-    //            jsch.setKnownHosts(knownHostsFile);
-    //        } catch (JSchException e) {
-    //            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Could not set known_hosts file", e);
-    //        }
-    //
-    //        if (LOGGER.isDebugEnabled()) {
-    //            HostKeyRepository hkr = jsch.getHostKeyRepository();
-    //            HostKey[] hks = hkr.getHostKey();
-    //            if (hks != null) {
-    //                LOGGER.debug("Host keys in " + hkr.getKnownHostsRepositoryID());
-    //                for (HostKey hk : hks) {
-    //                    LOGGER.debug(hk.getHost() + " " + hk.getType() + " " + hk.getFingerPrint(jsch));
-    //                }
-    //                LOGGER.debug("");
-    //            } else {
-    //                LOGGER.debug("No keys in " + knownHostsFile);
-    //            }
-    //        }
-    //    }
 
     @Override
     public XenonPropertyDescription[] getSupportedProperties() {
@@ -186,75 +147,8 @@ public class FtpAdaptor extends Adaptor {
 
     @Override
     public void end() {
-        //jobsAdaptor.end();
         filesAdaptor.end();
     }
-
-    /*
-    SSH_FX_OK
-       Indicates successful completion of the operation.
-    SSH_FX_EOF
-      indicates end-of-file condition; for SSH_FX_READ it means that no
-        more data is available in the file, and for SSH_FX_READDIR it
-       indicates that no more files are contained in the directory.
-    SSH_FX_NO_SUCH_FILE
-       is returned when a reference is made to a file which should exist
-       but doesn't.
-    SSH_FX_PERMISSION_DENIED
-       is returned when the authenticated user does not have sufficient
-       permissions to perform the operation.
-    SSH_FX_FAILURE
-       is a generic catch-all error message; it should be returned if an
-       error occurs for which there is no more specific error code
-       defined.
-    SSH_FX_BAD_MESSAGE
-       may be returned if a badly formatted packet or protocol
-       incompatibility is detected.
-    SSH_FX_NO_CONNECTION
-       is a pseudo-error which indicates that the client has no
-       connection to the server (it can only be generated locally by the
-       client, and MUST NOT be returned by servers).
-    SSH_FX_CONNECTION_LOST
-       is a pseudo-error which indicates that the connection to the
-       server has been lost (it can only be generated locally by the
-       client, and MUST NOT be returned by servers).
-    SSH_FX_OP_UNSUPPORTED
-       indicates that an attempt was made to perform an operation which
-       is not supported for the server (it may be generated locally by
-       the client if e.g.  the version number exchange indicates that a
-       required feature is not supported by the server, or it may be
-       returned by the server if the server does not implement an
-       operation).
-     */
-    XenonException sftpExceptionToXenonException(SftpException e) {
-        switch (e.id) {
-        //        case ChannelSftp.SSH_FX_OK:
-        //            return new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        //        case ChannelSftp.SSH_FX_EOF:
-        //            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, "Unexpected EOF", e);
-        //        case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-        //            return new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "No such file", e);
-        //        case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-        //            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, "Permission denied", e);
-        //        case ChannelSftp.SSH_FX_FAILURE:
-        //            return new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
-        //        case ChannelSftp.SSH_FX_BAD_MESSAGE:
-        //            return new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
-        //        case ChannelSftp.SSH_FX_NO_CONNECTION:
-        //            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, "SSH does not have a connection!", e);
-        //        case ChannelSftp.SSH_FX_CONNECTION_LOST:
-        //            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, "SSH lost connection!", e);
-        //        case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
-        //            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, "Unsupported operation", e);
-        default:
-            return new XenonException(FtpAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
-        }
-    }
-
-    //    protected SshMultiplexedSession createNewSession(SshLocation location, Credential credential, XenonProperties properties)
-    //            throws XenonException {
-    //        return new SshMultiplexedSession(this, jsch, location, credential, properties);
-    //    }
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
