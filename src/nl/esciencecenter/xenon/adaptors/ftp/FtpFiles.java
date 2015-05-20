@@ -278,13 +278,11 @@ public class FtpFiles implements Files {
     public void move(Path source, Path target) throws XenonException {
         LOGGER.debug("move source = {} target = {}", source, target);
 
-        assertSameFileSystemsForMove(source, target);
-        assertPathExists(source);
         if (areSamePaths(source, target)) {
             return;
         }
-        assertPathNotExists(target);
-        assertParentDirectoryExists(target);
+
+        assertValidArgumentsForMove(source, target);
 
         final String absoluteSourcePath = source.getRelativePath().getAbsolutePath();
         FTPClient ftpClient = getFtpClientByPath(target);
@@ -296,6 +294,14 @@ public class FtpFiles implements Files {
         };
         ftpCommand.execute(ftpClient, target, "Failed to move to path");
         LOGGER.debug("move OK");
+    }
+
+    private void assertValidArgumentsForMove(Path source, Path target) throws XenonException, NoSuchPathException,
+    PathAlreadyExistsException {
+        assertSameFileSystemsForMove(source, target);
+        assertPathExists(source);
+        assertPathNotExists(target);
+        assertParentDirectoryExists(target);
     }
 
     private void assertSameFileSystemsForMove(Path source, Path target) throws XenonException {
