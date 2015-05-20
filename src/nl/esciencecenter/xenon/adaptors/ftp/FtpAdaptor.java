@@ -95,20 +95,20 @@ public class FtpAdaptor extends Adaptor {
     /** How many jobs have been submitted using this adaptor. */
     public static final String SUBMITTED = JOBS + "submitted";
 
-    /** List of properties supported by this SSH adaptor */
+    /** List of properties supported by this FTP adaptor */
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
-            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                    Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
-                            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
-                                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
-                                            Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                    "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
-                                                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
-                                                            Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
-                                                            "The gateway machine used to create an SSH tunnel to the target."));
+            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
+                    EnumSet.of(Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
+                    new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+                            Component.FILESYSTEM), "true", "Enable strict host key checking."),
+            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
+                    Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
+                                            "The polling delay for monitoring running jobs (in milliseconds)."),
+                                            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
+                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
+                    Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
+                    "The gateway machine used to create an SSH tunnel to the target."));
 
     private final FtpFiles filesAdaptor;
     private FtpCredentials credentialsAdaptor;
@@ -136,8 +136,8 @@ public class FtpAdaptor extends Adaptor {
     }
 
     @Override
-    public Jobs jobsAdaptor() {
-        return null;
+    public Jobs jobsAdaptor() throws XenonException {
+        throw new XenonException(getName(), "jobsAdaptor(): Not implemented");
     }
 
     @Override
@@ -153,7 +153,6 @@ public class FtpAdaptor extends Adaptor {
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         Map<String, String> result = new HashMap<String, String>();
-        //        jobsAdaptor.getAdaptorSpecificInformation(result);
         return result;
     }
 }
