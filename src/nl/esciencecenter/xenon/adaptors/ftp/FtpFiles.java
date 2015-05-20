@@ -188,7 +188,6 @@ public class FtpFiles implements Files {
             password = new String(passwordCredential.getPassword());
             user = passwordCredential.getUsername();
         }
-        System.out.println("Logging in as '" + user + "' : '" + password + "'."); // TODO remove this debugging line
         ftp.login(user, password);
     }
 
