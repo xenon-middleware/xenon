@@ -82,6 +82,11 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsLocalCWD() {
+        return true;
+    }
+
+    @Override
     public boolean supportsSymboliclinks() {
         return false;
     }
