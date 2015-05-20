@@ -286,7 +286,7 @@ public class FtpFiles implements Files {
         assertPathNotExists(target);
         assertParentDirectoryExists(target);
 
-        String absoluteSourcePath = source.getRelativePath().getAbsolutePath();
+        final String absoluteSourcePath = source.getRelativePath().getAbsolutePath();
         FTPClient ftpClient = getFtpClientByPath(target);
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
