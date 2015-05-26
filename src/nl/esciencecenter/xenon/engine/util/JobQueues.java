@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ThreadFactory;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -92,7 +93,7 @@ public class JobQueues {
 
     private final InteractiveProcessFactory factory;
 
-    private int jobID = 0;
+    private final AtomicLong jobID = new AtomicLong(0l);
 
     public JobQueues(String adaptorName, Files myFiles, Scheduler myScheduler, Path workingDirectory,
             InteractiveProcessFactory factory, int multiQThreads, long pollingDelay) throws BadParameterException {
@@ -128,14 +129,10 @@ public class JobQueues {
         multiExecutor = Executors.newFixedThreadPool(multiQThreads, threadFactory);
     }
 
-    private synchronized int getNextJobID() {
-        return jobID++;
-    }
-
-    public synchronized int getCurrentJobID() {
-        return jobID;
-    }
-
+	public long getCurrentJobID() {
+		return jobID.get();
+	}
+	
     private void checkScheduler(Scheduler scheduler) throws XenonException {
 
         if (scheduler == null) {
@@ -375,7 +372,7 @@ public class JobQueues {
 
         LOGGER.debug("{}: JobDescription verified OK", adaptorName);
 
-        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + getNextJobID(), copyOfDescription,
+        JobImplementation result = new JobImplementation(myScheduler, adaptorName + "-" + jobID.getAndIncrement(), copyOfDescription,
                 copyOfDescription.isInteractive(), true);
 
         LOGGER.debug("{}: Created Job {}", adaptorName, result.getIdentifier());
