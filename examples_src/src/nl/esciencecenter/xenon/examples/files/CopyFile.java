@@ -46,7 +46,7 @@ public class CopyFile {
             System.exit(1);
         }
 
-		Xenon xenon = null;
+        Xenon xenon = null;
         try {
             // We first turn the user provided arguments into a URI.
             URI source = new URI(args[0]);
@@ -76,14 +76,14 @@ public class CopyFile {
             System.out.println("CopyFile example failed: " + e.getMessage());
             e.printStackTrace();
         } finally {
-			if (xenon != null) {
-				try {
-					// Finally, we end Xenon to release all resources
-					XenonFactory.endXenon(xenon);
-				} catch (XenonException ex) {
-					System.exit(1);
-				}
-			}
-		}
+            if (xenon != null) {
+                try {
+                    // Finally, we end Xenon to release all resources
+                    XenonFactory.endXenon(xenon);
+                } catch (XenonException ex) {
+                    System.exit(1);
+                }
+            }
+        }
     }
 }
