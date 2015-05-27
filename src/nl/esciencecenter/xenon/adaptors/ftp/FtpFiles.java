@@ -297,8 +297,7 @@ public class FtpFiles implements Files {
         LOGGER.debug("move OK");
     }
 
-    private void assertValidArgumentsForMove(Path source, Path target) throws XenonException, NoSuchPathException,
-            PathAlreadyExistsException {
+    private void assertValidArgumentsForMove(Path source, Path target) throws XenonException {
         assertSameFileSystemsForMove(source, target);
         assertPathExists(source);
         assertPathNotExists(target);
@@ -534,7 +533,7 @@ public class FtpFiles implements Files {
         return ftpQuery.getResult();
     }
 
-    private void assertValidArgumentsForNewInputStream(Path path) throws XenonException, NoSuchPathException {
+    private void assertValidArgumentsForNewInputStream(Path path) throws XenonException {
         assertPathExists(path);
         FileAttributes att = getAttributes(path);
         if (att.isDirectory()) {
@@ -603,8 +602,7 @@ public class FtpFiles implements Files {
         return ftpQuery;
     }
 
-    private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions)
-            throws InvalidOpenOptionsException, XenonException, PathAlreadyExistsException, NoSuchPathException {
+    private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions) throws XenonException {
         if (processedOptions.getReadMode() != null) {
             throw new InvalidOpenOptionsException(adaptor.getName(), "Disallowed open option: READ");
         }
@@ -705,13 +703,13 @@ public class FtpFiles implements Files {
         return fileSystems.get(fileSystem.getUniqueID()).getFtpClient();
     }
 
-    private void assertPathNotExists(Path path) throws XenonException, PathAlreadyExistsException {
+    private void assertPathNotExists(Path path) throws XenonException {
         if (exists(path)) {
             throw new PathAlreadyExistsException(adaptor.getName(), "File already exists: " + path);
         }
     }
 
-    private void assertPathExists(Path path) throws XenonException, NoSuchPathException {
+    private void assertPathExists(Path path) throws XenonException {
         if (!exists(path)) {
             throw new NoSuchPathException(adaptor.getName(), "File does not exist: " + path);
         }
