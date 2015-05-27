@@ -149,20 +149,16 @@ public class FtpFileAttributes implements FileAttributes {
     }
 
     /**
-     * It was necessary to overwrite hashCode() because equals() is overridden also. It might never be used though. Returns a very
-     * simple hash code that is sure to get rid of at least some collisions.
+     * It was necessary to overwrite hashCode() because equals() is overridden also.
      */
     @Override
     public int hashCode() {
-        return (int) creationTime();
+        // Hash code is not designed because it is not planned to be used.
+        return 0;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
         if (obj instanceof FtpFileAttributes) {
             FtpFileAttributes other = (FtpFileAttributes) obj;
 
