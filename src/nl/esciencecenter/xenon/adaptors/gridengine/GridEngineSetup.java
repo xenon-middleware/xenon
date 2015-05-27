@@ -72,8 +72,7 @@ public class GridEngineSetup {
         String output = schedulerConnection.runCheckedCommand(null, "qconf", "-sq", CommandLineUtils.asCSList(queueNames));
 
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
-
-        ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
+                ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
 
         Map<String, QueueInfo> result = Utils.emptyMap(maps.size());
 
