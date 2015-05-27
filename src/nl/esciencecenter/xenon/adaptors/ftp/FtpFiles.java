@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -209,7 +210,7 @@ public class FtpFiles implements Files {
         try {
             info.getFtpClient().disconnect();
         } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), "Exception while disconnecting ftp file system.");
+            throw new XenonException(adaptor.getName(), "Exception while disconnecting ftp file system.", e);
         }
         LOGGER.debug("close OK");
     }
@@ -466,7 +467,7 @@ public class FtpFiles implements Files {
         return new FtpDirectoryStream(path, filter, listDirectory(path, filter));
     }
 
-    private LinkedList<FTPFile> listDirectory(Path path, Filter filter) throws XenonException {
+    private List<FTPFile> listDirectory(Path path, Filter filter) throws XenonException {
         String absolutePath = path.getRelativePath().getAbsolutePath();
         FTPClient ftpClient = getFtpClientByPath(path);
 
@@ -570,8 +571,7 @@ public class FtpFiles implements Files {
         Credential credential = fileSystemInfo.getCredential();
         FileSystem newFileSystem = newFileSystem(fileSystem.getScheme(), fileSystem.getLocation(), credential,
                 fileSystem.getProperties());
-        Path newPath = newPath(newFileSystem, path.getRelativePath());
-        return newPath;
+        return newPath(newFileSystem, path.getRelativePath());
     }
 
     private OutputStream getOutputStreamFromFtpClient(FTPClient ftpClient, Path path, OpenOptions options) throws XenonException {
@@ -629,13 +629,13 @@ public class FtpFiles implements Files {
         LOGGER.debug("getAttributes path = {}", path);
         assertPathExists(path);
         FTPClient ftpClient = getFtpClientByPath(path);
-        FTPFile listFile = getFtpFile(ftpClient, path);
+        FTPFile listFile = getFtpFile(path);
         FileAttributes fileAttributes = new FtpFileAttributes(listFile);
         LOGGER.debug("getAttributes OK result = {}", fileAttributes);
         return fileAttributes;
     }
 
-    private FTPFile getFtpFile(FTPClient ftpClient, Path path) throws XenonException {
+    private FTPFile getFtpFile(Path path) throws XenonException {
         FTPFile ftpFile = getRegularFtpFile(path);
         if (ftpFile == null) {
             ftpFile = getDirectoryFtpFile(path);

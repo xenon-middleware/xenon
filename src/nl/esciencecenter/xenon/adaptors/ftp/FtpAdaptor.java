@@ -32,14 +32,7 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.jcraft.jsch.JSch;
-
 public class FtpAdaptor extends Adaptor {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FtpAdaptor.class);
 
     /** The name of this adaptor */
     public static final String ADAPTOR_NAME = "ftp";
@@ -99,25 +92,21 @@ public class FtpAdaptor extends Adaptor {
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
             new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
                     EnumSet.of(Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-                    new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                            Component.FILESYSTEM), "true", "Enable strict host key checking."),
-            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
-                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
-                    Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                                            "The polling delay for monitoring running jobs (in milliseconds)."),
-                                            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
-                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
-                    Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
-                    "The gateway machine used to create an SSH tunnel to the target."));
+            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
+                            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
+                                            Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
+                                                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
+                                                            Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
+                                                            "The gateway machine used to create an SSH tunnel to the target."));
 
     private final FtpFiles filesAdaptor;
     private FtpCredentials credentialsAdaptor;
 
     public FtpAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        this(xenonEngine, new JSch(), properties);
-    }
-
-    public FtpAdaptor(XenonEngine xenonEngine, JSch jsch, Map<String, String> properties) throws XenonException {
         super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
@@ -152,7 +141,6 @@ public class FtpAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        Map<String, String> result = new HashMap<String, String>();
-        return result;
+        return new HashMap<String, String>();
     }
 }
