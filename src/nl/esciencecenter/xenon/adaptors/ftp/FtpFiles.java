@@ -297,7 +297,7 @@ public class FtpFiles implements Files {
     }
 
     private void assertValidArgumentsForMove(Path source, Path target) throws XenonException, NoSuchPathException,
-            PathAlreadyExistsException {
+    PathAlreadyExistsException {
         assertSameFileSystemsForMove(source, target);
         assertPathExists(source);
         assertPathNotExists(target);
@@ -358,7 +358,7 @@ public class FtpFiles implements Files {
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
             public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
-                hasSucceeded = ftpClient.makeDirectory(absolutePath);
+                setHasSucceeded(ftpClient.makeDirectory(absolutePath));
             }
         };
         String messageInCaseOfError = "Failed to create directory";
@@ -374,7 +374,7 @@ public class FtpFiles implements Files {
             @Override
             public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
                 InputStream dummyContent = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-                hasSucceeded = ftpClient.storeFile(absolutePath, dummyContent);
+                setHasSucceeded(ftpClient.storeFile(absolutePath, dummyContent));
             }
         };
         String messageInCaseOfError = "Failed to create file";
@@ -397,7 +397,7 @@ public class FtpFiles implements Files {
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
             public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
-                hasSucceeded = ftpClient.removeDirectory(absolutePath);
+                setHasSucceeded(ftpClient.removeDirectory(absolutePath));
             }
         };
         String messageInCaseOfError = "Failed to delete file or directory";
@@ -409,7 +409,7 @@ public class FtpFiles implements Files {
         FtpCommand ftpCommand = new FtpCommand() {
             @Override
             public void doWork(FTPClient ftpClient, String absolutePath) throws IOException {
-                hasSucceeded = ftpClient.deleteFile(absolutePath);
+                setHasSucceeded(ftpClient.deleteFile(absolutePath));
             }
         };
         String messageInCaseOfError = "Failed to delete file or directory";
