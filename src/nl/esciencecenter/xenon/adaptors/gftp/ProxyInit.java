@@ -31,10 +31,6 @@ public class ProxyInit {
 
     private static final Logger logger = LoggerFactory.getLogger(ProxyInit.class);
 
-    // ================
-    // instance fields 
-    // ================
-
     private PrivateKey userKey = null;
 
     protected X509Certificate[] userCertificates;
@@ -166,8 +162,14 @@ public class ProxyInit {
 
         create();
 
-        logger.info("Your proxy is valid until: {}.", proxy.getCertificateChain()[0].getNotAfter());
 
+        logger.info("Proxychain length is " + proxy.getCertificateChain().length);
+        
+        for (int i=0;i<proxy.getCertificateChain().length;i++) {
+            logger.info("Proxy {} is valid from {} until {}.", i, proxy.getCertificateChain()[0].getNotBefore(), 
+                proxy.getCertificateChain()[0].getNotAfter());        
+        }
+            
         if (proxyFile == null) {
             logger.info("No proxy file specified. Not saving proxy file.\n");
         } else {

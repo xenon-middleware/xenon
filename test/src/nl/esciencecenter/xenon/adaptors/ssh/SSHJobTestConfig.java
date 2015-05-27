@@ -16,7 +16,6 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
