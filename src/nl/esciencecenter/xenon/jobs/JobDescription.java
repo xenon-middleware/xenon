@@ -42,7 +42,7 @@ public class JobDescription {
     private String executable = null;
 
     /** The arguments to pass to the executable. */
-    private final List<String> arguments = new ArrayList<String>();
+    private final List<String> arguments = new ArrayList<>(10);
 
     /** The location file from which to redirect stdin. (optional) */
     private String stdin = null;
@@ -57,10 +57,10 @@ public class JobDescription {
     private String workingDirectory = null;
 
     /** The environment variables and their values */
-    private final Map<String, String> environment = new HashMap<String, String>();
+    private final Map<String, String> environment = new HashMap<>(5);
 
     /** The job options of this job */
-    private final Map<String, String> jobOptions = new HashMap<String, String>();
+    private final Map<String, String> jobOptions = new HashMap<>(5);
 
     /** The number of nodes to run the job on. */
     private int nodeCount = 1;
