@@ -148,6 +148,15 @@ public class FtpFileAttributes implements FileAttributes {
         return permission;
     }
 
+    /**
+     * It was necessary to overwrite hashCode() because equals() is overridden also. It might never be used though. Returns a very
+     * simple hash code that is sure to get rid of at least some collisions.
+     */
+    @Override
+    public int hashCode() {
+        return (int) creationTime();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -192,4 +201,5 @@ public class FtpFileAttributes implements FileAttributes {
 
         return true;
     }
+
 }
