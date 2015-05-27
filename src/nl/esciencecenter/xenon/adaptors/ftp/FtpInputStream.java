@@ -56,11 +56,6 @@ public class FtpInputStream extends InputStream {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return new FtpInputStream(inputStream, ftpClient, path, ftpFiles);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return inputStream.equals(obj);
     }

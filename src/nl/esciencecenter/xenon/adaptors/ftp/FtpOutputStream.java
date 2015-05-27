@@ -46,11 +46,6 @@ public class FtpOutputStream extends OutputStream {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return new FtpOutputStream(outputStream, ftpClient, path, ftpFiles);
-    }
-
-    @Override
     public void close() throws IOException {
         outputStream.close();
 
