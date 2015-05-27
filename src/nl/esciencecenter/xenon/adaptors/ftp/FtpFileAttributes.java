@@ -110,7 +110,7 @@ public class FtpFileAttributes implements FileAttributes {
         return permissions;
     }
 
-    static private PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
+    private static PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
         PosixFilePermission permission = null;
         if (userType == FTPFile.USER_ACCESS) {
             if (permissionType == FTPFile.EXECUTE_PERMISSION) {

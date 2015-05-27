@@ -169,15 +169,22 @@ public class FtpFiles implements Files {
         try {
             loginWithCredentialOrDefault(ftp, credential);
             int replyCode = ftp.getReplyCode();
-            verifySuccessByServerCode(replyCode);
+            verifyLoginSuccess(replyCode);
         } catch (XenonException | IOException e) {
             throw new XenonException(adaptor.getName(), "Failed to login", e);
         }
     }
 
-    private void verifySuccessByServerCode(int replyCode) throws XenonException {
-        if (!(replyCode >= 200 && replyCode < 300)) {
-            throw new XenonException(adaptor.getName(), "Server status not succesfull (status code " + replyCode + ").");
+    /**
+     * Returns true if code is in interval [200,300). See http://en.wikipedia.org/wiki/List_of_FTP_server_return_codes.
+     *
+     * @param replyCode
+     * @return if code implies successful login
+     */
+    private void verifyLoginSuccess(int replyCode) throws XenonException {
+        if (replyCode < 200 || replyCode >= 300) {
+            String message = MessageFormat.format("Server status not succesfull after login (status code {0}).", replyCode);
+            throw new XenonException(adaptor.getName(), message);
         }
     }
 
