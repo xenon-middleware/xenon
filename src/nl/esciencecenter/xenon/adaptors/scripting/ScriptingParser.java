@@ -38,7 +38,7 @@ public final class ScriptingParser {
 
     public static final Pattern EQUALS_REGEX = Pattern.compile("\\s*=\\s*");
 
-    public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=-]{2,}\\s*)+$");
+    public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
 
     private ScriptingParser() {
         //DO NOT USE
@@ -221,13 +221,17 @@ public final class ScriptingParser {
         String[] lines = NEWLINE_REGEX.split(input);
         Map<String, Map<String, String>> result = Utils.emptyMap(lines.length);
 
+        int headerLine = 0;
         String[] fields;
         //the first line will contain the fields (unless it is a separator)
-        if (!HORIZONTAL_LINE_REGEX.matcher(lines[0]).find()) {
-            fields = fieldSeparatorRegEx.split(lines[0]);
-        } else {
-            fields = fieldSeparatorRegEx.split(lines[1]);
+        while (headerLine < lines.length && HORIZONTAL_LINE_REGEX.matcher(lines[headerLine]).find()) {
+            headerLine++;
         }
+        if (headerLine == lines.length) {
+            throw new XenonException(adaptorName, "No table header encountered");
+        }
+
+        fields = fieldSeparatorRegEx.split(lines[headerLine]);
 
         for (int i = 0; i < fields.length; i++) {
             fields[i] = fields[i].trim();
@@ -237,7 +241,7 @@ public final class ScriptingParser {
             }
         }
 
-        for (int i = 1; i < lines.length; i++) {
+        for (int i = headerLine + 1; i < lines.length; i++) {
             if (HORIZONTAL_LINE_REGEX.matcher(lines[i]).find()) {
                 // do not parse separators
                 continue;

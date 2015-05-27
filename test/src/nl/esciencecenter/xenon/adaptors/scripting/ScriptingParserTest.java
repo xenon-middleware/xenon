@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -423,6 +423,52 @@ public class ScriptingParserTest {
         String input = "key1 key2 key3 key4\n" + "value1 value2 value3 value4\n";
 
         ScriptingParser.parseTable(input, "key0", ScriptingParser.WHITESPACE_REGEX, "fake");
+    }
+
+    @Test
+    public void test06k_parseTable_HorizontalSeparator_NormalResult() throws Exception {
+        Map<String, Map<String, String>> expected = Utils.emptyMap(1);
+
+        Map<String, String> expectedRecord = Utils.emptyMap(4);
+        expectedRecord.put("key1", "value1");
+        expectedRecord.put("key2", "value2");
+        expectedRecord.put("key3", "value3");
+        expectedRecord.put("key4", "value4");
+        expected.put("value1", expectedRecord);
+
+        String input =
+                  "key1    key2    key3    key4     \n"
+                + "------  ------  ------  ----------\n"
+                + "value1  value2  value3  value4    \n";
+
+        Map<String, Map<String, String>> result = ScriptingParser.parseTable(input, "key1", ScriptingParser.WHITESPACE_REGEX, "fake",
+                "$");
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test06l_parseTable_DoubleHorizontalSeparator_NormalResult() throws Exception {
+        Map<String, Map<String, String>> expected = Utils.emptyMap(1);
+
+        Map<String, String> expectedRecord = Utils.emptyMap(4);
+        expectedRecord.put("key1", "value1");
+        expectedRecord.put("key2", "value2");
+        expectedRecord.put("key3", "value3");
+        expectedRecord.put("key4", "value4");
+        expected.put("value1", expectedRecord);
+
+        String input =
+                  "==================================\n"
+                + "key1    key2    key3    key4      \n"
+                + "----------------------------------\n"
+                + "value1  value2  value3  value4    \n"
+                + "==================================\n";
+
+        Map<String, Map<String, String>> result = ScriptingParser.parseTable(input, "key1", ScriptingParser.WHITESPACE_REGEX, "fake",
+                "$");
+
+        assertEquals(expected, result);
     }
 
     @Test
