@@ -55,7 +55,7 @@ public class FtpOutputStream extends OutputStream {
         outputStream.close();
 
         // Added functionality:
-        if (completedPendingFtpCommand == false) {
+        if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
             try {

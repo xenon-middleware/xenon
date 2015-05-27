@@ -39,7 +39,7 @@ public class FtpInputStream extends InputStream {
         inputStream.close();
 
         // Added functionality:
-        if (completedPendingFtpCommand == false) {
+        if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
             try {

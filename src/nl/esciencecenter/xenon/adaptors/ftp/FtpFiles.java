@@ -175,7 +175,7 @@ public class FtpFiles implements Files {
     }
 
     private void verifySuccessByServerCode(int replyCode) throws XenonException {
-        if ((replyCode >= 200 && replyCode < 300) == false) {
+        if (!(replyCode >= 200 && replyCode < 300)) {
             throw new XenonException(adaptor.getName(), "Server status not succesfull (status code " + replyCode + ").");
         }
     }
@@ -199,7 +199,7 @@ public class FtpFiles implements Files {
     @Override
     public void close(FileSystem fileSystem) throws XenonException {
         LOGGER.debug("close fileSystem = {}", fileSystem);
-        if (isOpen(fileSystem) == false) {
+        if (!isOpen(fileSystem)) {
             throw new XenonException(adaptor.getName(), "File system is already closed");
         }
 
@@ -297,7 +297,7 @@ public class FtpFiles implements Files {
     }
 
     private void assertValidArgumentsForMove(Path source, Path target) throws XenonException, NoSuchPathException,
-    PathAlreadyExistsException {
+            PathAlreadyExistsException {
         assertSameFileSystemsForMove(source, target);
         assertPathExists(source);
         assertPathNotExists(target);
@@ -343,7 +343,7 @@ public class FtpFiles implements Files {
 
         if (relativeParent != null) {
             PathImplementation parentPath = new PathImplementation(path.getFileSystem(), relativeParent);
-            if (exists(parentPath) == false) {
+            if (!exists(parentPath)) {
                 // Recursive call
                 createDirectories(parentPath);
             }
@@ -488,7 +488,7 @@ public class FtpFiles implements Files {
     private void assertDirectoryExists(Path path) throws XenonException {
         boolean directoryExists = false;
         directoryExists = directoryExists(path);
-        if (directoryExists == false) {
+        if (!directoryExists) {
             String absolutePath = path.getRelativePath().getAbsolutePath();
             String message = MessageFormat.format("Directory does not exist at path ", absolutePath);
             throw new XenonException(adaptor.getName(), message);
@@ -711,7 +711,7 @@ public class FtpFiles implements Files {
     }
 
     private void assertPathExists(Path path) throws XenonException, NoSuchPathException {
-        if (exists(path) == false) {
+        if (!exists(path)) {
             throw new NoSuchPathException(adaptor.getName(), "File does not exist: " + path);
         }
     }

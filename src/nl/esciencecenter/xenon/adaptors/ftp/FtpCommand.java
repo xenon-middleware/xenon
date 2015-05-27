@@ -26,7 +26,7 @@ public abstract class FtpCommand {
             doWork(ftpClient, absolutePath);
             replyString = ftpClient.getReplyString();
             hasSucceeded = isCodeSuccessfulCompletion(ftpClient.getReplyCode());
-            if (hasSucceeded == false) {
+            if (!hasSucceeded) {
                 throw new IOException(replyString);
             }
         } catch (IOException e) {

@@ -171,15 +171,15 @@ public class FtpFileAttributes implements FileAttributes {
     }
 
     private boolean areFtpFilesIdentical(FTPFile a, FTPFile b) {
-        if (a.getTimestamp().equals(b.getTimestamp()) == false) {
+        if (!a.getTimestamp().equals(b.getTimestamp())) {
             return false;
         }
 
-        if (a.getGroup().equals(b.getGroup()) == false) {
+        if (!a.getGroup().equals(b.getGroup())) {
             return false;
         }
 
-        if (a.getUser().equals(b.getUser()) == false) {
+        if (!a.getUser().equals(b.getUser())) {
             return false;
         }
 
