@@ -15,8 +15,16 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  */
 public abstract class FtpCommand {
-    protected String replyString;
-    protected boolean hasSucceeded;
+    private String replyString;
+    private boolean hasSucceeded;
+
+    public void setReplyString(String replyString) {
+        this.replyString = replyString;
+    }
+
+    public void setHasSucceeded(boolean hasSucceeded) {
+        this.hasSucceeded = hasSucceeded;
+    }
 
     public abstract void doWork(FTPClient ftpClient, String path) throws IOException;
 
@@ -26,7 +34,7 @@ public abstract class FtpCommand {
             doWork(ftpClient, absolutePath);
             replyString = ftpClient.getReplyString();
             hasSucceeded = isCodeSuccessfulCompletion(ftpClient.getReplyCode());
-            if (hasSucceeded == false) {
+            if (!hasSucceeded) {
                 throw new IOException(replyString);
             }
         } catch (IOException e) {

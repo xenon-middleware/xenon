@@ -39,7 +39,7 @@ public class FtpInputStream extends InputStream {
         inputStream.close();
 
         // Added functionality:
-        if (completedPendingFtpCommand == false) {
+        if (!completedPendingFtpCommand) {
             ftpClient.completePendingCommand();
             completedPendingFtpCommand = true;
             try {
@@ -53,11 +53,6 @@ public class FtpInputStream extends InputStream {
     @Override
     public int available() throws IOException {
         return inputStream.available();
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return new FtpInputStream(inputStream, ftpClient, path, ftpFiles);
     }
 
     @Override
