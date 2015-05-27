@@ -24,6 +24,7 @@ import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class GridEngineSetup {
 
         ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
 
-        Map<String, QueueInfo> result = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> result = Utils.emptyMap(maps.size());
 
         for (Map.Entry<String, Map<String, String>> entry : maps.entrySet()) {
             result.put(entry.getKey(), new QueueInfo(entry.getValue()));
