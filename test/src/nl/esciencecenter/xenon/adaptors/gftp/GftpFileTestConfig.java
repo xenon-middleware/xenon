@@ -83,7 +83,7 @@ public class GftpFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public boolean supportUser() {
+    public boolean supportUserInUri() {
         return false;
     }
 

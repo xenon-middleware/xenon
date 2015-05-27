@@ -29,7 +29,7 @@ import nl.esciencecenter.xenon.files.Path;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * 
+ *
  */
 public class SSHFileTestConfig extends FileTestConfig {
 
@@ -40,7 +40,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     private String correctLocation;
     private String wrongLocation;
     private String correctLocationWrongUser;
-    
+
     public SSHFileTestConfig(String configfile) throws Exception {
 
         super("ssh", configfile);
@@ -49,7 +49,7 @@ public class SSHFileTestConfig extends FileTestConfig {
 
         username = getPropertyOrFail(p, "test.ssh.user");
         passwd = getPropertyOrFail(p, "test.ssh.password").toCharArray();
-        
+
         correctLocation = username + "@" + location;
         wrongLocation = username + "@doesnotexist.com";
         correctLocationWrongUser = "incorrect@" + location;
@@ -60,7 +60,7 @@ public class SSHFileTestConfig extends FileTestConfig {
         String tmp = p.getProperty(property);
 
         if (tmp == null) {
-            throw new Exception("Failed to retireve property " + property);
+            throw new Exception("Failed to retrieve property " + property);
         }
 
         return tmp;
@@ -72,7 +72,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public boolean supportUser() {
+    public boolean supportUserInUri() {
         return true;
     }
 

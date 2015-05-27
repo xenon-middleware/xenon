@@ -15,74 +15,32 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import java.io.IOException;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.generic.DirectoryStreamBase;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
-import nl.esciencecenter.xenon.engine.files.PathImplementation;
-import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
-class SshDirectoryAttributeStream implements DirectoryStream<PathAttributesPair>, Iterator<PathAttributesPair> {
+class SshDirectoryAttributeStream extends DirectoryStreamBase<LsEntry, PathAttributesPair> {
 
-    private final Deque<PathAttributesPair> stream;
-
-    SshDirectoryAttributeStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws XenonException {
-
-        stream = new LinkedList<PathAttributesPair>();
-
-        for (LsEntry e : listing) {
-
-            String filename = e.getFilename();
-
-            if (filename.equals(".") || filename.equals("..")) {
-                // filter out the "." and ".."
-            } else {
-                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(filename));
-
-                if (filter.accept(tmp)) {
-                    SshFileAttributes attributes = new SshFileAttributes(e.getAttrs(), tmp);
-                    stream.add(new PathAttributesPairImplementation(tmp, attributes));
-                }
-            }
-        }
+    public SshDirectoryAttributeStream(Path dir, nl.esciencecenter.xenon.files.DirectoryStream.Filter filter,
+            List<LsEntry> listing) throws XenonException {
+        super(dir, filter, listing);
     }
 
     @Override
-    public Iterator<PathAttributesPair> iterator() {
-        return this;
+    protected PathAttributesPair getStreamElementFromEntry(LsEntry entry, Path entryPath) {
+        SshFileAttributes attributes = new SshFileAttributes(entry.getAttrs(), entryPath);
+        return new PathAttributesPairImplementation(entryPath, attributes);
     }
 
     @Override
-    public synchronized void close() throws IOException {
-        stream.clear();
+    protected String getFileNameFromEntry(LsEntry entry) {
+        return entry.getFilename();
     }
 
-    @Override
-    public synchronized boolean hasNext() {
-        return (stream.size() > 0);
-    }
-
-    @Override
-    public synchronized PathAttributesPair next() {
-
-        if (stream.size() > 0) {
-            return stream.removeFirst();
-        }
-
-        throw new NoSuchElementException("No more files in directory");
-    }
-
-    @Override
-    public synchronized void remove() {
-        throw new UnsupportedOperationException("DirectoryStream iterator does not support remove");
-    }
 }

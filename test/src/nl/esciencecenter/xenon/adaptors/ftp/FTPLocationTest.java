@@ -1,4 +1,4 @@
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.adaptors.ftp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -7,13 +7,13 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 
 import org.junit.Test;
 
-public class SSHLocationTest {
+public class FTPLocationTest {
 
-    public static final int DEFAULT_PORT = 22;
+    public static final int DEFAULT_PORT = 21;
 
     @Test
     public void test_parse_hostOnly() throws Exception {
-        SshLocation tmp = SshLocation.parse("host");
+        FtpLocation tmp = FtpLocation.parse("host");
         assertNull(tmp.getUser());
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == DEFAULT_PORT);
@@ -21,7 +21,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_userHost() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host");
+        FtpLocation tmp = FtpLocation.parse("user@host");
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == DEFAULT_PORT);
@@ -29,7 +29,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_hostPort() throws Exception {
-        SshLocation tmp = SshLocation.parse("host:33");
+        FtpLocation tmp = FtpLocation.parse("host:33");
         assertNull(tmp.getUser());
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == 33);
@@ -37,7 +37,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_userHostPort() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host:33");
+        FtpLocation tmp = FtpLocation.parse("user@host:33");
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == 33);
@@ -45,7 +45,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_userHostDefaultPort1() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host:-42");
+        FtpLocation tmp = FtpLocation.parse("user@host:-42");
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == DEFAULT_PORT);
@@ -53,7 +53,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_userHostDefaultPort2() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host:0");
+        FtpLocation tmp = FtpLocation.parse("user@host:0");
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == DEFAULT_PORT);
@@ -61,37 +61,37 @@ public class SSHLocationTest {
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingUser() throws Exception {
-        SshLocation.parse("@host:33");
+        FtpLocation.parse("@host:33");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingPort() throws Exception {
-        SshLocation.parse("host:");
+        FtpLocation.parse("host:");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingPort2() throws Exception {
-        SshLocation.parse("host:  ");
+        FtpLocation.parse("host:  ");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_invalidPort() throws Exception {
-        SshLocation.parse("host:aap");
+        FtpLocation.parse("host:aap");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingHost1() throws Exception {
-        SshLocation.parse(":33");
+        FtpLocation.parse(":33");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingHost2() throws Exception {
-        SshLocation.parse("user@");
+        FtpLocation.parse("user@");
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingHost3() throws Exception {
-        SshLocation.parse("user@:33");
+        FtpLocation.parse("user@:33");
     }
 
 }

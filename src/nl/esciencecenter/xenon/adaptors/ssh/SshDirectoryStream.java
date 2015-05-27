@@ -15,71 +15,28 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import java.io.IOException;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.files.PathImplementation;
-import nl.esciencecenter.xenon.files.DirectoryStream;
+import nl.esciencecenter.xenon.adaptors.generic.DirectoryStreamBase;
 import nl.esciencecenter.xenon.files.Path;
 
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
-public class SshDirectoryStream implements DirectoryStream<Path>, Iterator<Path> {
+public class SshDirectoryStream extends DirectoryStreamBase<LsEntry, Path> {
 
-    private final Deque<Path> stream;
-
-    SshDirectoryStream(Path dir, DirectoryStream.Filter filter, List<LsEntry> listing) throws XenonException {
-
-        stream = new LinkedList<Path>();
-
-        for (LsEntry e : listing) {
-
-            String filename = e.getFilename();
-
-            if (filename.equals(".") || filename.equals("..")) {
-                // filter out the "." and ".."
-            } else {
-                Path tmp = new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(filename));
-                
-                if (filter.accept(tmp)) {
-                    stream.add(tmp);
-                }
-            }
-        }
+    public SshDirectoryStream(Path dir, nl.esciencecenter.xenon.files.DirectoryStream.Filter filter, List<LsEntry> listing)
+            throws XenonException {
+        super(dir, filter, listing);
     }
 
     @Override
-    public Iterator<Path> iterator() {
-        return this;
+    protected Path getStreamElementFromEntry(LsEntry entry, Path entryPath) {
+        return entryPath;
     }
 
     @Override
-    public synchronized void close() throws IOException {
-        stream.clear();
-    }
-
-    @Override
-    public synchronized boolean hasNext() {
-        return (stream.size() > 0);
-    }
-
-    @Override
-    public synchronized Path next() {
-
-        if (stream.size() > 0) {
-            return stream.removeFirst();
-        }
-
-        throw new NoSuchElementException("No more files in directory");
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("DirectoryStream iterator does not support remove");
+    protected String getFileNameFromEntry(LsEntry entry) {
+        return entry.getFilename();
     }
 }
