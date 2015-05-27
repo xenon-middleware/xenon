@@ -297,7 +297,7 @@ public class FtpFiles implements Files {
     }
 
     private void assertValidArgumentsForMove(Path source, Path target) throws XenonException, NoSuchPathException,
-    PathAlreadyExistsException {
+            PathAlreadyExistsException {
         assertSameFileSystemsForMove(source, target);
         assertPathExists(source);
         assertPathNotExists(target);
@@ -433,7 +433,7 @@ public class FtpFiles implements Files {
                 String originalWorkingDirectory = ftpClient.printWorkingDirectory();
                 boolean pathExists = ftpClient.changeWorkingDirectory(path);
                 ftpClient.changeWorkingDirectory(originalWorkingDirectory);
-                result = pathExists;
+                setResult(pathExists);
             }
         };
         ftpQuery.execute(ftpClient, path, "Could not inspect directory");
@@ -447,7 +447,7 @@ public class FtpFiles implements Files {
             public void doWork(FTPClient ftpClient, String path) throws IOException {
                 FTPFile[] listFiles = ftpClient.listFiles(path);
                 int length = listFiles.length;
-                result = length == 1;
+                setResult(length == 1);
             }
         };
         ftpQuery.execute(ftpClient, path, "Could not inspect file");
@@ -526,7 +526,7 @@ public class FtpFiles implements Files {
         FtpQuery<InputStream> ftpQuery = new FtpQuery<InputStream>() {
             @Override
             public void doWork(FTPClient ftpClient, String path) throws IOException {
-                result = ftpClient.retrieveFileStream(path);
+                setResult(ftpClient.retrieveFileStream(path));
             }
         };
         ftpQuery.execute(ftpClient, path, "Failed to open input stream");
@@ -586,7 +586,7 @@ public class FtpFiles implements Files {
         ftpQuery = new FtpQuery<OutputStream>() {
             @Override
             public void doWork(FTPClient ftpClient, String path) throws IOException {
-                result = ftpClient.storeFileStream(path);
+                setResult(ftpClient.storeFileStream(path));
             }
         };
         return ftpQuery;
@@ -597,7 +597,7 @@ public class FtpFiles implements Files {
         ftpQuery = new FtpQuery<OutputStream>() {
             @Override
             public void doWork(FTPClient ftpClient, String path) throws IOException {
-                result = ftpClient.appendFileStream(path);
+                setResult(ftpClient.appendFileStream(path));
             }
         };
         return ftpQuery;
@@ -647,7 +647,7 @@ public class FtpFiles implements Files {
         FtpQuery<FTPFile> ftpQuery = new FtpQuery<FTPFile>() {
             @Override
             public void doWork(FTPClient ftpClient, String path) throws IOException {
-                result = ftpClient.listFiles(path)[0];
+                setResult(ftpClient.listFiles(path)[0]);
             }
         };
         ftpQuery.execute(getFtpClientByPath(pathToRegularFile), pathToRegularFile, "Failed to retrieve attributes of path");
@@ -662,7 +662,8 @@ public class FtpFiles implements Files {
                 FTPFile[] listFiles = ftpClient.listDirectories(path);
                 for (FTPFile listFile : listFiles) {
                     if (listFile.getName().equals(targetName)) {
-                        result = listFile;
+                        setResult(listFile);
+                        break;
                     }
                 }
             }
