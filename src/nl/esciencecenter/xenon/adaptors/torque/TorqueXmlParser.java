@@ -43,7 +43,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Joris Borgdorff
  * 
  */
-public class TorqueXmlParser extends DefaultHandler {
+class TorqueXmlParser extends DefaultHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueXmlParser.class);
 
@@ -71,29 +71,31 @@ public class TorqueXmlParser extends DefaultHandler {
         }
     }
 
-    private Map<String, String> recursiveMapFromElement(Element root) {
-        Map<String, String> result = new HashMap<>();
-
+    /**
+     * Create a Map from the tag names and text values of child nodes.
+     * If a child node also has tags, those tags and their text values will also
+     * be added. If multiple of the same tag names occur, the value of the last
+     * occurrence will be stored.
+     * 
+     * @param root XML element of which the children will be added to the map
+     * @param result a mutable map that will have added to it tag names as keys and text values as values
+     * @throws IllegalArgumentException if root is not an XML element
+     */
+    private void recursiveMapFromElement(Node root, Map<String, String> result) {
+        if (root.getNodeType() != Node.ELEMENT_NODE) {
+            throw new IllegalArgumentException("Node " + root + " is not an XML element.");
+        }
         NodeList tagNodes = root.getChildNodes();
 
         //fetch tags from the list of tag nodes. Ignores empty values
         for (int j = 0; j < tagNodes.getLength(); j++) {
             Node tagNode = tagNodes.item(j);
             if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
-                String key = tagNode.getNodeName();
-                if (key != null && key.length() > 0) {
-                    NodeList children = tagNode.getChildNodes();
-                    if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
-                        String value = children.item(0).getNodeValue();
-                        result.put(key, value);
-                    } else if (children.getLength() > 0) {
-                        Map<String, String> childResult = recursiveMapFromElement((Element) tagNode);
-                        result.putAll(childResult);
-                    }
-                }
+                recursiveMapFromElement(tagNode, result);
+            } else if (tagNode.getNodeType() == Node.TEXT_NODE) {
+                result.put(root.getNodeName(), tagNode.getNodeValue());
             }
         }
-        return result;
     }
 
     /**
@@ -119,9 +121,8 @@ public class TorqueXmlParser extends DefaultHandler {
             Node node = nodes.item(i);
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) node;
-
-                Map<String, String> jobInfo = recursiveMapFromElement(element);
+                Map<String, String> jobInfo = Utils.emptyMap(20);
+                recursiveMapFromElement(node, jobInfo);
 
                 String jobID = jobInfo.get("Job_Name");
 

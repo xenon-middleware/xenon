@@ -56,7 +56,7 @@ final class TorqueJobScriptGenerator {
     }
 
     static void generateParallelScriptContent(JobDescription description, Formatter script) {
-        script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
+        script.format("for host in `cat $PBS_HOSTFILE | cut -d \" \" -f 1` ; do\n");
 
         for (int i = 0; i < description.getProcessesPerNode(); i++) {
             script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
@@ -73,7 +73,7 @@ final class TorqueJobScriptGenerator {
         script.format("\n");
     }
 
-    static String generate(JobDescription description, RelativePath fsEntryPath, TorqueSetup setup)
+    static String generate(JobDescription description, RelativePath fsEntryPath)
             throws XenonException {
         
         StringBuilder stringBuilder = new StringBuilder(500);

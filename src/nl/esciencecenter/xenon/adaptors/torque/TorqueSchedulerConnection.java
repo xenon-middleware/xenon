@@ -57,8 +57,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
+ * Interface to the TORQUE command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
  * 
+ * @author Joris Borgdorff
  * @author Niels Drost
  * 
  */
@@ -124,7 +125,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     private final TorqueXmlParser parser;
 
-    private final TorqueSetup setupInfo;
+    private final String[] queueNames;
 
     TorqueSchedulerConnection(ScriptingAdaptor adaptor, String scheme, String location, Credential credential, 
             XenonProperties properties, XenonEngine engine) throws XenonException {
@@ -136,14 +137,19 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
         parser = new TorqueXmlParser();
 
-        lastSeenMap = new HashMap<String, Long>();
-        deletedJobs = new HashSet<Long>();
+        lastSeenMap = new HashMap<>(30);
+        deletedJobs = new HashSet<>(10);
 
-        //will run a few commands to fetch info
-        setupInfo = new TorqueSetup(this);
+        queueNames = queryQueueNames();
 
         scheduler = new SchedulerImplementation(TorqueAdaptor.ADAPTOR_NAME, getID(), scheme, location, 
-                setupInfo.getQueueNames(), credential, getProperties(), false, false, true);
+                queueNames, credential, getProperties(), false, false, true);
+    }
+
+    /** Query the queue names of the TORQUE batch system. */
+    private String[] queryQueueNames() throws XenonException {
+        Set<String> queueNameSet = queryQueues().keySet();
+        return queueNameSet.toArray(new String[queueNameSet.size()]);
     }
 
     @Override
@@ -153,7 +159,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     @Override
     public String[] getQueueNames() {
-        return setupInfo.getQueueNames();
+        return queueNames;
     }
 
     @Override
@@ -248,7 +254,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     @Override
     public QueueStatus getQueueStatus(String queueName) throws XenonException {
-        Map<String, Map<String,String>> allMap = queryQueues(null);
+        Map<String, Map<String,String>> allMap = queryQueues(queueName);
 
         Map<String, String> map = allMap.get(queueName);
 
@@ -266,13 +272,9 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
 
-        if (queueNames.length == 0) {
-            queueNames = getQueueNames();
-        }
-
         QueueStatus[] result = new QueueStatus[queueNames.length];
 
-        Map<String, Map<String, String>> allMap = queryQueues(null);
+        Map<String, Map<String, String>> allMap = queryQueues(queueNames);
 
         for (int i = 0; i < queueNames.length; i++) {
             if (queueNames[i] == null) {
@@ -296,10 +298,14 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     private final static Pattern queueInfoName = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
     
-    Map<String, Map<String,String>> queryQueues(String[] queueNames)
+    Map<String, Map<String,String>> queryQueues(String... queueNames)
             throws XenonException {
+        if (queueNames == null) {
+            throw new IllegalArgumentException("Queue names cannot be null");
+        }
+
         String output;
-        if (queueNames == null || queueNames.length == 0) {
+        if (queueNames.length == 0) {
             output = runCheckedCommand(null, "qstat", "-Qf");
         } else {
             String[] args = new String[1 + queueNames.length];
@@ -327,7 +333,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
                         throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "qstat does not follow syntax.");
                     }
                     currentQueueMap.put(keyVal[0], keyVal[1]);
-                }
+                } // else: empty line
             }
         }
 
@@ -345,7 +351,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
-            String jobScript = TorqueJobScriptGenerator.generate(description, fsEntryPath, setupInfo);
+            String jobScript = TorqueJobScriptGenerator.generate(description, fsEntryPath);
 
             output = runCheckedCommand(jobScript, "qsub");
         } else {
@@ -420,7 +426,6 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
      *             in case an additional command fails to run.
      */
     private JobStatus getJobStatus(Map<String, Map<String, String>> qstatInfo, Job job) throws XenonException {
-
         if (job == null) {
             return null;
         }

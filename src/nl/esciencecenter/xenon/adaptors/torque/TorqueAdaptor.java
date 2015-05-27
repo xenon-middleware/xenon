@@ -30,8 +30,9 @@ import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 /**
- * Adaptor for (Sun/Ocacle/Univa) Grid Engine scheduler.
+ * Adaptor for TORQUE batch system.
  * 
+ * @author Joris Borgdorff <J.Borgdorff@esciencecenter.nl>
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
@@ -78,7 +79,7 @@ public class TorqueAdaptor extends ScriptingAdaptor {
                 "Number of milliseconds between polling the status of a job."));
 
     /**
-     * Create a new GridEngineAdaptor.
+     * Create a new TorqueAdaptor.
      * 
      * @param properties
      *            the properties to use when creating the adaptor.
