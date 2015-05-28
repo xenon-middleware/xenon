@@ -68,8 +68,10 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueSchedulerConnection.class);
 
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
+    public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
+    public static final String JOB_OPTION_RESOURCES = "job.resources";
 
-    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
+    private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
 
     static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, TorqueAdaptor.ADAPTOR_NAME);
@@ -79,7 +81,11 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         }
 
         //check for option that overrides job script completely.
-        if (description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT) != null) {
+        if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
+            if (description.getJobOptions().containsKey(JOB_OPTION_JOB_CONTENTS)) {
+                throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Adaptor cannot process job script and job contents simultaneously.");
+            }
+
             //no remaining settings checked.
             return;
         }

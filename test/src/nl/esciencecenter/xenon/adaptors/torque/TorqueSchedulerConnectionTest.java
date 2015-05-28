@@ -133,6 +133,18 @@ public class TorqueSchedulerConnectionTest {
         TorqueSchedulerConnection.verifyJobDescription(description);
     }
 
+    @Test(expected = InvalidJobDescriptionException.class)
+    public void test01l_verifyJobDescription_InteractiveJob_ExceptionThrown() throws Exception {
+        JobDescription description = new JobDescription();
+
+        description.setExecutable("/bin/nothing");
+        description.setInteractive(true);
+        description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_JOB_CONTENTS, "some");
+        description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_JOB_SCRIPT, "other");
+
+        TorqueSchedulerConnection.verifyJobDescription(description);
+    }
+
     @Test
     public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";

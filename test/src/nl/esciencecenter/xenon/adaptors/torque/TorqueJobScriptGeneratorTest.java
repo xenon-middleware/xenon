@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.gridengine;
+package nl.esciencecenter.xenon.adaptors.torque;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Formatter;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineJobScriptGenerator;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSchedulerConnection;
-import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 
 import org.junit.FixMethodOrder;
@@ -34,11 +30,11 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GridEngineJobScriptGeneratorTest {
+public class TorqueJobScriptGeneratorTest {
 
     @Test
     public void test00_constructorIsPrivate() throws Throwable {
-        Constructor<GridEngineJobScriptGenerator> constructor = GridEngineJobScriptGenerator.class.getDeclaredConstructor();
+        Constructor<TorqueJobScriptGenerator> constructor = TorqueJobScriptGenerator.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance();
@@ -49,10 +45,16 @@ public class GridEngineJobScriptGeneratorTest {
     public void test01a_generate_EmptyDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
 
-        String result = GridEngineJobScriptGenerator.generate(description, null, null);
+        String result = TorqueJobScriptGenerator.generate(description, null);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -l h_rt=00:15:00\n" + "#$ -o /dev/null\n"
-                + "#$ -e /dev/null\n" + "\n" + "null\n";
+        String expected =
+                  "#!/bin/sh\n"
+                + "#PBS -S /bin/sh\n"
+                + "#PBS -N xenon\n"
+                + "#PBS -l walltime=00:15:00\n"
+                + "#PBS -o /dev/null\n"
+                + "#PBS -e /dev/null\n\n"
+                + "null\n";
 
         assertEquals(expected, result);
     }
@@ -67,7 +69,7 @@ public class GridEngineJobScriptGeneratorTest {
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
         description.addEnvironment("some.more", "environment value with spaces");
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_RESOURCES, "list-of-resources");
+        description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxTime(100);
         description.setNodeCount(1);
@@ -78,14 +80,23 @@ public class GridEngineJobScriptGeneratorTest {
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
-        String result = GridEngineJobScriptGenerator.generate(description, null, null);
+        String result = TorqueJobScriptGenerator.generate(description, null);
 
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n"
-                + "#$ -q the.queue\n" + "#$ -l h_rt=01:40:00\n" + "#$ -l list-of-resources\n" + "#$ -i 'stdin.file'\n" + "#$ -o 'stdout.file'\n"
-                + "#$ -e 'stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
-                + "export some=\"environment.value\"\n" + "\n" + "/bin/executable 'some' 'arguments'\n";
-
-        System.out.println(result);
+        String expected =
+                  "#!/bin/sh\n"
+                + "#PBS -S /bin/sh\n"
+                + "#PBS -N xenon\n"
+                + "#PBS -w '/some/working/directory'"
+                + "#PBS -q the.queue\n"
+                + "#PBS -l list-of-resources\n"
+                + "#PBS -l nodes=1,ppn=1\n"
+                + "#PBS -l walltime=01:40:00\n"
+                + "#PBS -i 'stdin.file'\n"
+                + "#PBS -o 'stdout.file'\n"
+                + "#PBS -e 'stderr.file'\n"
+                + "export some.more=\"environment value with spaces\"\n"
+                + "export some=\"environment.value\"\n\n"
+                + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
     }
@@ -97,8 +108,11 @@ public class GridEngineJobScriptGeneratorTest {
      */
     public void test01c_generate__ParallelDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
-        description.setExecutable("/bin/executable");
         description.setArguments("some", "arguments");
+        description.addEnvironment("some", "environment.value");
+        description.addEnvironment("some.more", "environment value with spaces");
+        description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_RESOURCES, "list-of-resources");
+        description.setExecutable("/bin/executable");
         description.setMaxTime(100);
         description.setNodeCount(4);
         description.setProcessesPerNode(10);
@@ -108,71 +122,44 @@ public class GridEngineJobScriptGeneratorTest {
         description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
-        //set pe and slots explicitly. We test the setup class used to automatically get these values separately.
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "5");
+        String result = TorqueJobScriptGenerator.generate(description, null);
 
-        String result = GridEngineJobScriptGenerator.generate(description, null, null);
-
-        String expected = "#!/bin/sh\n" + "#$ -S /bin/sh\n" + "#$ -N xenon\n" + "#$ -wd '/some/working/directory'\n"
-                + "#$ -q the.queue\n" + "#$ -pe some.pe 5\n" + "#$ -l h_rt=01:40:00\n" + "#$ -i 'stdin.file'\n"
-                + "#$ -o 'stdout.file'\n" + "#$ -e 'stderr.file'\n" + "\n"
-                + "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n" + "done\n"
-                + "\n" + "wait\n" + "exit 0\n\n";
-
-        System.out.println(result);
+        String expected =
+                  "#!/bin/sh\n"
+                + "#PBS -S /bin/sh\n"
+                + "#PBS -N xenon\n"
+                + "#PBS -w '/some/working/directory'"
+                + "#PBS -q the.queue\n"
+                + "#PBS -l list-of-resources\n"
+                + "#PBS -l nodes=4,ppn=4\n"
+                + "#PBS -l walltime=01:40:00\n"
+                + "#PBS -i 'stdin.file'\n"
+                + "#PBS -o 'stdout.file'\n"
+                + "#PBS -e 'stderr.file'\n"
+                + "export some.more=\"environment value with spaces\"\n"
+                + "export some=\"environment.value\"\n\n"
+                + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
     }
 
-    public void test02a__generateParallelEnvironmentSpecification_SlotsProvided_Result() throws XenonException {
+    @Test
+    public void test01d_generate_CustomContents() throws XenonException {
         JobDescription description = new JobDescription();
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "5");
+        description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_JOB_CONTENTS, "/myscript/or_other");
 
-        Formatter output = new Formatter();
+        String result = TorqueJobScriptGenerator.generate(description, null);
 
-        String expected = "#$ -pe some.pe 5\n";
+        String expected =
+                  "#!/bin/sh\n"
+                + "#PBS -S /bin/sh\n"
+                + "#PBS -N xenon\n"
+                + "#PBS -l walltime=00:15:00\n"
+                + "#PBS -o /dev/null\n"
+                + "#PBS -e /dev/null\n\n"
+                + "/myscript/or_other\n";
 
-        GridEngineJobScriptGenerator.generateParallelEnvironmentSpecification(description, null, output);
-
-        assertEquals("parallel environment specification incorrect", expected, output.out().toString());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void test02b__generateParallelEnvironmentSpecification_ParallelSlotsNotProvided_SetupUsed() throws XenonException {
-        //this should trigger the usage of the GridEngineSetup to calculate the slots 
-        JobDescription description = new JobDescription();
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-
-        Formatter output = new Formatter();
-
-        //setup not provided, leads to NullpointerException
-        GridEngineJobScriptGenerator.generateParallelEnvironmentSpecification(description, null, output);
-
-        fail("calling generator should lead to null pointer exception");
-    }
-
-    @Test(expected = InvalidJobDescriptionException.class)
-    public void test02c__generateParallelEnvironmentSpecification_InvalidParallelSlotsOption_ExceptionThrown()
-            throws XenonException {
-        JobDescription description = new JobDescription();
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_ENVIRONMENT, "some.pe");
-        description.addJobOption(GridEngineSchedulerConnection.JOB_OPTION_PARALLEL_SLOTS, "five");
-
-        Formatter output = new Formatter();
-
-        GridEngineJobScriptGenerator.generateParallelEnvironmentSpecification(description, null, output);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -185,28 +172,8 @@ public class GridEngineJobScriptGeneratorTest {
 
         String expected = "/bin/executable 'some' 'arguments'\n";
 
-        GridEngineJobScriptGenerator.generateSerialScriptContent(description, output);
+        TorqueJobScriptGenerator.generateScriptContent(description, output);
 
         assertEquals("serial script content incorrect", expected, output.out().toString());
     }
-
-    @Test
-    public void test04a_generateParallelScriptContent() {
-        JobDescription description = new JobDescription();
-        description.setProcessesPerNode(2);
-        description.setExecutable("/bin/executable");
-        description.setArguments("some", "arguments");
-
-        Formatter output = new Formatter();
-
-        String expected = "for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n"
-                + "  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && /bin/executable 'some' 'arguments'\"&\n" + "done\n"
-                + "\n" + "wait\n" + "exit 0\n\n";
-
-        GridEngineJobScriptGenerator.generateParallelScriptContent(description, output);
-
-        assertEquals("parallel script content incorrect", expected, output.out().toString());
-    }
-
 }

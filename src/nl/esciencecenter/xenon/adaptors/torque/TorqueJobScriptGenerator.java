@@ -46,30 +46,12 @@ final class TorqueJobScriptGenerator {
 
     private static final int MINUTES_PER_HOUR = 60;
 
-    static void generateSerialScriptContent(JobDescription description, Formatter script) {
+    static void generateScriptContent(JobDescription description, Formatter script) {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
             script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
         }
-        script.format("\n");
-    }
-
-    static void generateParallelScriptContent(JobDescription description, Formatter script) {
-        script.format("for host in `cat $PBS_HOSTFILE | cut -d \" \" -f 1` ; do\n");
-
-        for (int i = 0; i < description.getProcessesPerNode(); i++) {
-            script.format("  ssh -o StrictHostKeyChecking=false $host \"cd `pwd` && ");
-            script.format("%s", description.getExecutable());
-            for (String argument : description.getArguments()) {
-                script.format(" %s", CommandLineUtils.protectAgainstShellMetas(argument));
-            }
-            script.format("\"&\n");
-        }
-        //wait for all ssh connections to finish
-        script.format("done\n\n");
-        script.format("wait\n");
-        script.format("exit 0\n");
         script.format("\n");
     }
 
@@ -102,11 +84,16 @@ final class TorqueJobScriptGenerator {
             script.format("#PBS -q %s\n", description.getQueueName());
         }
 
+        String resources = description.getJobOptions().get(TorqueSchedulerConnection.JOB_OPTION_RESOURCES);
+        if (resources != null) {
+            script.format("#PBS -l %s\n", resources);
+        }
+
         //number of nodes and processes per node
-        script.format("#PBS -lnodes=%d,ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
+        script.format("#PBS -l nodes=%d,ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
         
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
-        script.format("#PBS -lwalltime=%02d:%02d:00\n",
+        script.format("#PBS -l walltime=%02d:%02d:00\n",
                 description.getMaxTime() / MINUTES_PER_HOUR,
                 description.getMaxTime() % MINUTES_PER_HOUR);
 
@@ -132,10 +119,11 @@ final class TorqueJobScriptGenerator {
 
         script.format("\n");
 
-        if (description.getNodeCount() == 1 && description.getProcessesPerNode() == 1) {
-            generateSerialScriptContent(description, script);
+        String customContents = description.getJobOptions().get(TorqueSchedulerConnection.JOB_OPTION_JOB_CONTENTS);
+        if (customContents == null) {
+            generateScriptContent(description, script);
         } else {
-            generateParallelScriptContent(description, script);
+            script.format("%s\n", customContents);
         }
 
         script.close();
