@@ -57,7 +57,7 @@ class QueueInfo {
         if (peValue == null) {
             throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Cannot find parallel environments for queue \"" + name + "\"");
         }
-        parallelEnvironments = peValue.split(ScriptingParser.WHITESPACE_REGEX);
+        parallelEnvironments = ScriptingParser.WHITESPACE_REGEX.split(peValue);
     }
 
     /**
