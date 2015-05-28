@@ -86,9 +86,9 @@ public abstract class SchedulerConnection {
      *            the job description to check
      * @param adaptorName
      *            the name of the adaptor. Used when an exception is thrown
-     * @throws IncompleteJobDescription
+     * @throws IncompleteJobDescriptionException
      *             if the description is missing a mandatory value.
-     * @throws InvalidJobDescription
+     * @throws InvalidJobDescriptionException
      *             if the description contains illegal values.
      */
     protected static void verifyJobDescription(JobDescription description, String adaptorName) throws XenonException {
