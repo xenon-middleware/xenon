@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.torque;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -31,11 +30,9 @@ import nl.esciencecenter.xenon.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * Parses xml output from TORQUE batch system.
@@ -43,7 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Joris Borgdorff
  * 
  */
-class TorqueXmlParser extends DefaultHandler {
+final class TorqueXmlParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueXmlParser.class);
 
@@ -81,19 +78,23 @@ class TorqueXmlParser extends DefaultHandler {
      * @param result a mutable map that will have added to it tag names as keys and text values as values
      * @throws IllegalArgumentException if root is not an XML element
      */
-    private void recursiveMapFromElement(Node root, Map<String, String> result) {
+    // not private for testing purposes
+    void recursiveMapFromElement(Node root, Map<String, String> result) {
         if (root.getNodeType() != Node.ELEMENT_NODE) {
             throw new IllegalArgumentException("Node " + root + " is not an XML element.");
         }
         NodeList tagNodes = root.getChildNodes();
 
         //fetch tags from the list of tag nodes. Ignores empty values
-        for (int j = 0; j < tagNodes.getLength(); j++) {
-            Node tagNode = tagNodes.item(j);
+        for (int i = 0; i < tagNodes.getLength(); i++) {
+            Node tagNode = tagNodes.item(i);
             if (tagNode.getNodeType() == Node.ELEMENT_NODE) {
                 recursiveMapFromElement(tagNode, result);
             } else if (tagNode.getNodeType() == Node.TEXT_NODE) {
-                result.put(root.getNodeName(), tagNode.getNodeValue());
+                String value = tagNode.getNodeValue().trim();
+                if (!value.isEmpty()) {
+                    result.put(root.getNodeName(), value);
+                }
             }
         }
     }
@@ -114,19 +115,20 @@ class TorqueXmlParser extends DefaultHandler {
         Document document = parseDocument(data);
 
         LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
-        NodeList nodes = document.getElementsByTagName("Data");
-        Map<String, Map<String, String>> result = Utils.emptyMap(nodes.getLength());
+        NodeList nodes = document.getDocumentElement().getChildNodes();
+        int numNodes = nodes.getLength();
+        Map<String, Map<String, String>> result = Utils.emptyMap(numNodes);
 
-        for (int i = 0; i < nodes.getLength(); i++) {
+        for (int i = 0; i < numNodes; i++) {
             Node node = nodes.item(i);
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Map<String, String> jobInfo = Utils.emptyMap(20);
                 recursiveMapFromElement(node, jobInfo);
 
-                String jobID = jobInfo.get("Job_Name");
+                String jobID = jobInfo.get("Job_Id");
 
-                if (jobID == null || jobID.length() == 0) {
+                if (jobID == null || jobID.isEmpty()) {
                     throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
@@ -136,5 +138,4 @@ class TorqueXmlParser extends DefaultHandler {
 
         return result;
     }
-
 }
