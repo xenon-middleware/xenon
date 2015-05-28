@@ -148,6 +148,15 @@ public class FtpFileAttributesTest {
         assertFalse(defaultTestFtpFileAttributes.equals(otherAttributes));
     }
 
+    @Test
+    public void getHash_sameAttributes_sameHashes() throws XenonException {
+        // Arrange
+        FtpFileAttributes otherAttributes = new FtpFileAttributes(getNewDefaultFTPFile());
+
+        // Act & Assert
+        assertEquals(defaultTestFtpFileAttributes.hashCode(), otherAttributes.hashCode());
+    }
+
     @Before
     public void setUp() throws XenonException {
         defaultTestFtpFileAttributes = new FtpFileAttributes(getNewDefaultFTPFile());

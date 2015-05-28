@@ -110,7 +110,7 @@ public class FtpFileAttributes implements FileAttributes {
         return permissions;
     }
 
-    static private PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
+    private static PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
         PosixFilePermission permission = null;
         if (userType == FTPFile.USER_ACCESS) {
             if (permissionType == FTPFile.EXECUTE_PERMISSION) {
@@ -148,12 +148,17 @@ public class FtpFileAttributes implements FileAttributes {
         return permission;
     }
 
+    /**
+     * It was necessary to overwrite hashCode() because equals() is overridden also.
+     */
+    @Override
+    public int hashCode() {
+        // Hash code is not designed because it is not planned to be used.
+        return 0;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-
         if (obj instanceof FtpFileAttributes) {
             FtpFileAttributes other = (FtpFileAttributes) obj;
 
@@ -166,15 +171,15 @@ public class FtpFileAttributes implements FileAttributes {
     }
 
     private boolean areFtpFilesIdentical(FTPFile a, FTPFile b) {
-        if (a.getTimestamp().equals(b.getTimestamp()) == false) {
+        if (haveDifferentTimestamps(a, b)) {
             return false;
         }
 
-        if (a.getGroup().equals(b.getGroup()) == false) {
+        if (haveDifferentGroups(a, b)) {
             return false;
         }
 
-        if (a.getUser().equals(b.getUser()) == false) {
+        if (haveDifferentUsers(a, b)) {
             return false;
         }
 
@@ -192,4 +197,17 @@ public class FtpFileAttributes implements FileAttributes {
 
         return true;
     }
+
+    private boolean haveDifferentTimestamps(FTPFile a, FTPFile b) {
+        return !a.getTimestamp().equals(b.getTimestamp());
+    }
+
+    private boolean haveDifferentGroups(FTPFile a, FTPFile b) {
+        return !a.getGroup().equals(b.getGroup());
+    }
+
+    private boolean haveDifferentUsers(FTPFile a, FTPFile b) {
+        return !a.getUser().equals(b.getUser());
+    }
+
 }
