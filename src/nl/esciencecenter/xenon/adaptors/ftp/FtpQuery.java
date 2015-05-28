@@ -8,7 +8,7 @@ package nl.esciencecenter.xenon.adaptors.ftp;
  *
  */
 public abstract class FtpQuery<T> extends FtpCommand {
-    protected T result;
+    private T result;
 
     /**
      * Gets the result of the query execution when called after calling execute.
@@ -17,5 +17,9 @@ public abstract class FtpQuery<T> extends FtpCommand {
      */
     public T getResult() {
         return result;
+    }
+
+    protected void setResult(T result) {
+        this.result = result;
     }
 }

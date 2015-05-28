@@ -53,12 +53,12 @@ public class GlobusProxyCredentials implements Credentials {
     public static final String PROPERTY_PREFIX = "xenon.globus.";
 
     /**
-     * Location of 'userkey.pem' file. Ussualy it is ~/.globus/userkey.pem.
+     * Location of 'userkey.pem' file. Usually it is ~/.globus/userkey.pem.
      */
     public static final String PROPERTY_USER_KEY_FILE = PROPERTY_PREFIX + "user.userkey";
 
     /**
-     * Location of 'usercert.pem' file. Ussualy it is ~/.globus/usercert.pem.
+     * Location of 'usercert.pem' file. Usually it is ~/.globus/usercert.pem.
      */
     public static final String PROPERTY_USER_CERT_FILE = PROPERTY_PREFIX + "user.usercert";
 
@@ -303,15 +303,16 @@ public class GlobusProxyCredentials implements Credentials {
         logger.info("proxy lifetime  = {}H", lifeTime);
 
         try {
-
             // Must reload static configured certificates before calling globus !   
             reloadCACertificates();
-            // Static create Globus Proxy: 
-            GlobusCredential cred = GlobusUtil.createCredential(certFile, keyFile, passphrase, proxyFile, lifeTime,true);
-            // keep properties used to create this proxy :
-            Map<String, String> props = createCredentialProperties(certFile, keyFile, proxyFile);
-            return new GlobusProxyCredential(this, cred, props);
+            // Create Globus proxy certificate using the given user certificate, key and passphrase (if needed). Note that this 
+            // method expects a proxy lifetime in seconds, not hours!
+            GlobusCredential cred = GlobusUtil.createCredential(certFile, keyFile, passphrase, proxyFile, lifeTime * 3600, true);
 
+            // Remember the properties used to create this credential.  
+            Map<String, String> props = createCredentialProperties(certFile, keyFile, proxyFile);
+            
+            return new GlobusProxyCredential(this, cred, props);
         } catch (Exception e) {
             throw new XenonException(GftpAdaptor.ADAPTOR_NAME, e.getMessage(), e);
         }
