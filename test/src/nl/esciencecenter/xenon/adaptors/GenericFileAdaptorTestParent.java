@@ -47,6 +47,8 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Utils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.internal.AssumptionViolatedException;
@@ -132,13 +134,15 @@ public abstract class GenericFileAdaptorTestParent {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
 
-    protected void prepare() throws Exception {
+    @Before
+    public void prepare() throws Exception {
         xenon = XenonFactory.newXenon(null);
         files = xenon.files();
         credentials = xenon.credentials();
     }
 
-    protected void cleanup() throws Exception {
+    @After
+    public void cleanup() throws Exception {
         XenonFactory.endXenon(xenon);
         files = null;
         xenon = null;
@@ -175,32 +179,32 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     private void throwUnexpected(String name, Exception e) throws Exception {
-        cleanup();
+
         throw new Exception(name + " throws unexpected Exception!", e);
     }
 
     private void throwExpected(String name) throws Exception {
-        cleanup();
+
         throw new Exception(name + " did NOT throw Exception which was expected!");
     }
 
     private void throwWrong(String name, Object expected, Object result) throws Exception {
-        cleanup();
+
         throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);
     }
 
     private void throwUnexpectedElement(String name, Object element) throws Exception {
-        cleanup();
+
         throw new Exception(name + " produced unexpected element: " + element);
     }
 
     //    private void throwMissingElement(String name, String element) throws Exception {
-    //        cleanup();
+    //
     //        throw new Exception(name + " did NOT produce element: " + element);
     //    }
 
     private void throwMissingElements(String name, Collection elements) throws Exception {
-        cleanup();
+
         throw new Exception(name + " did NOT produce elements: " + elements);
     }
 
@@ -430,8 +434,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test00_newFileSystem() throws Exception {
 
-        prepare();
-
         // test with null URI and null credentials
         test00_newFileSystem(null, null, null, null, true);
 
@@ -484,7 +486,6 @@ public abstract class GenericFileAdaptorTestParent {
             // true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -525,8 +526,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test01_isOpen() throws Exception {
 
-        prepare();
-
         // test with null filesystem
         test01_isOpen(null, false, true);
 
@@ -542,7 +541,6 @@ public abstract class GenericFileAdaptorTestParent {
             test01_isOpen(fs, false, false);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -576,8 +574,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test02_close() throws Exception {
 
-        prepare();
-
         // test with null filesystem
         test02_close(null, true);
 
@@ -592,7 +588,6 @@ public abstract class GenericFileAdaptorTestParent {
             test02_close(fs, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -634,8 +629,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test03_newPath() throws Exception {
 
-        prepare();
-
         FileSystem fs = config.getTestFileSystem(files, credentials);
         String root = "/";
 
@@ -653,7 +646,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         files.close(fs);
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -690,8 +682,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test04_createDirectory() throws Exception {
 
-        prepare();
-
         // test with null
         test04_createDirectory(null, true);
 
@@ -725,7 +715,6 @@ public abstract class GenericFileAdaptorTestParent {
             test04_createDirectory(root, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -770,8 +759,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test05_createDirectories() throws Exception {
 
-        prepare();
-
         // test with null
         test05_createDirectories(null, true);
 
@@ -813,7 +800,6 @@ public abstract class GenericFileAdaptorTestParent {
             test05_createDirectories(root, true);
         }
 
-        cleanup();
     }
 
     // From this point on we can use prepareTestDir
@@ -858,7 +844,7 @@ public abstract class GenericFileAdaptorTestParent {
     //    @org.junit.Test
     //    public void test06_isDirectory() throws Exception {
     //
-    //        prepare();
+    //
     //
     //        // prepare
     //        FileSystem fs = config.getTestFileSystem(files, credentials);
@@ -888,7 +874,7 @@ public abstract class GenericFileAdaptorTestParent {
     //            test06_isDirectory(testDir, true, true);
     //        }
     //
-    //        cleanup();
+    //
     //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -925,8 +911,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test07_createFile() throws Exception {
 
-        prepare();
-
         // prepare
         prepareTestDir("test07_createFile");
 
@@ -961,7 +945,6 @@ public abstract class GenericFileAdaptorTestParent {
             test07_createFile(file0, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1004,8 +987,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test08_exists() throws Exception {
 
-        prepare();
-
         // prepare
         prepareTestDir("test08_exists");
 
@@ -1027,7 +1008,6 @@ public abstract class GenericFileAdaptorTestParent {
         // close test FS
         closeTestFS();
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1068,8 +1048,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test09_delete() throws Exception {
-
-        prepare();
 
         // test with null
         test09_delete(null, true);
@@ -1114,7 +1092,6 @@ public abstract class GenericFileAdaptorTestParent {
             test09_delete(testDir, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1157,7 +1134,7 @@ public abstract class GenericFileAdaptorTestParent {
     //    @org.junit.Test
     //    public void test10_size() throws Exception {
     //
-    //        prepare();
+    //
     //
     //        // test with null parameter
     //        test10_size(null, -1, true);
@@ -1191,7 +1168,7 @@ public abstract class GenericFileAdaptorTestParent {
     //            test10_size(file1, 0, true);
     //        }
     //
-    //        cleanup();
+    //
     //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1254,8 +1231,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test11_newDirectoryStream() throws Exception {
 
-        prepare();
-
         // test with null
         test11_newDirectoryStream(null, null, true);
 
@@ -1309,7 +1284,6 @@ public abstract class GenericFileAdaptorTestParent {
             test11_newDirectoryStream(testDir, null, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1385,8 +1359,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test12_newDirectoryStream_with_filter() throws Exception {
 
-        prepare();
-
         // test with null
         test12_newDirectoryStream(null, null, null, true);
 
@@ -1452,7 +1424,6 @@ public abstract class GenericFileAdaptorTestParent {
             test12_newDirectoryStream(testDir, new AllTrue(), null, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1534,7 +1505,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test13_getAttributes() throws Exception {
 
-        prepare();
         long currentTime = System.currentTimeMillis();
 
         // test with null
@@ -1620,8 +1590,6 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsPosixPermissions()) {
             return;
         }
-
-        prepare();
 
         // test with null, null
         test14_setPosixFilePermissions(null, null, true);
@@ -1771,8 +1739,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test15_newAttrributesDirectoryStream() throws Exception {
 
-        prepare();
-
         // test with null
         test15_newAttributesDirectoryStream(null, null, true);
 
@@ -1826,7 +1792,6 @@ public abstract class GenericFileAdaptorTestParent {
             test15_newAttributesDirectoryStream(testDir, null, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1844,7 +1809,7 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], createDirectories,
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
-    public void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter, Set<PathAttributesPair> expected,
+    private void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter, Set<PathAttributesPair> expected,
             boolean mustFail) throws Exception {
 
         Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
@@ -1921,8 +1886,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test15_newAttributesDirectoryStream_with_filter() throws Exception {
 
-        prepare();
-
         // test with null
         test16_newAttributesDirectoryStream(null, null, null, true);
 
@@ -1997,7 +1960,6 @@ public abstract class GenericFileAdaptorTestParent {
             test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2011,7 +1973,7 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on:
 
-    public void test20_newInputStream(Path file, byte[] expected, boolean mustFail) throws Exception {
+    private void test20_newInputStream(Path file, byte[] expected, boolean mustFail) throws Exception {
 
         InputStream in = null;
 
@@ -2055,8 +2017,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         byte[] data = "Hello World".getBytes();
 
-        prepare();
-
         // test with null
         test20_newInputStream(null, null, true);
 
@@ -2092,7 +2052,6 @@ public abstract class GenericFileAdaptorTestParent {
             test20_newInputStream(file2, data, true);
         }
 
-        cleanup();
     }
 
     @org.junit.Test
@@ -2102,8 +2061,6 @@ public abstract class GenericFileAdaptorTestParent {
         // on the SSH adaptor due to a bug in the sftp channel cache.
 
         byte[] data = "Hello World".getBytes();
-
-        prepare();
 
         prepareTestDir("test20b_newInputStreamDoubleClose");
 
@@ -2148,7 +2105,6 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file);
         deleteTestDir(testDir);
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2163,7 +2119,7 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on:
 
-    public void test21_newOutputStream(Path path, OpenOption[] options, byte[] data, byte[] expected, boolean mustFail)
+    private void test21_newOutputStream(Path path, OpenOption[] options, byte[] data, byte[] expected, boolean mustFail)
             throws Exception {
 
         OutputStream out = null;
@@ -2213,8 +2169,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         byte[] data = "Hello World".getBytes();
         byte[] data2 = "Hello WorldHello World".getBytes();
-
-        prepare();
 
         // test with null
         test21_newOutputStream(null, null, null, null, true);
@@ -2326,7 +2280,6 @@ public abstract class GenericFileAdaptorTestParent {
             test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, null, null, true);
         }
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2399,7 +2352,7 @@ public abstract class GenericFileAdaptorTestParent {
     //        byte [] data = "Hello World".getBytes();
     //        byte [] data2 = "Hello WorldHello World".getBytes();
     //
-    //        prepare();
+    //
     //
     //        // test with null
     //        test22_newByteChannel(null, null, null, null, true);
@@ -2490,7 +2443,7 @@ public abstract class GenericFileAdaptorTestParent {
     //                    null, null, true);
     //        }
     //
-    //        cleanup();
+    //
     //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2542,8 +2495,6 @@ public abstract class GenericFileAdaptorTestParent {
         byte[] data3 = "Hello World!Goodbye World!".getBytes();
         byte[] data4 = "Hello World!Hello World!".getBytes();
         byte[] data5 = "Hello World!Hello World!Hello World!".getBytes();
-
-        prepare();
 
         // test with null
         test23_copy(null, null, null, null, true);
@@ -2661,7 +2612,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         closeTestFS();
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2680,8 +2630,6 @@ public abstract class GenericFileAdaptorTestParent {
     public void test24_copy_async() throws Exception {
 
         byte[] data = "Hello World!".getBytes();
-
-        prepare();
 
         prepareTestDir("test24_copy_async");
         Path file0 = createTestFile(testDir, data);
@@ -2709,7 +2657,6 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file0);
         deleteTestDir(testDir);
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2729,15 +2676,12 @@ public abstract class GenericFileAdaptorTestParent {
 
         if (config.supportsLocalCWD()) {
 
-            prepare();
-
             try {
                 Utils.getLocalCWD(files);
             } catch (Exception e) {
                 throwUnexpected("test25_getLocalCWD", e);
             }
 
-            cleanup();
         }
     }
 
@@ -2745,7 +2689,6 @@ public abstract class GenericFileAdaptorTestParent {
     public void test26_getLocalHomeFileSystem() throws Exception {
 
         if (config.supportsLocalHome()) {
-            prepare();
 
             try {
                 Utils.getLocalHome(files);
@@ -2753,7 +2696,6 @@ public abstract class GenericFileAdaptorTestParent {
                 throwUnexpected("test26_getLocalHomeFileSystem", e);
             }
 
-            cleanup();
         }
     }
 
@@ -2809,8 +2751,6 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test27_move() throws Exception {
 
-        prepare();
-
         test27_move(null, null, true);
 
         prepareTestDir("test27_move");
@@ -2849,7 +2789,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         closeTestFS();
 
-        cleanup();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2896,8 +2835,6 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        prepare();
-
         // test with null
         test28_readSymbolicLink(null, null, true);
 
@@ -2921,7 +2858,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         closeTestFS();
 
-        cleanup();
     }
 
     @org.junit.Test
@@ -2930,8 +2866,6 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsSymboliclinks()) {
             return;
         }
-
-        prepare();
 
         Path cwd = config.getWorkingDir(files, credentials);
 
@@ -2977,13 +2911,12 @@ public abstract class GenericFileAdaptorTestParent {
         // link6 should point to link5 which points to link6
         test28_readSymbolicLink(link6, link5, false);
 
-        cleanup();
     }
 
     //    @org.junit.Test
     //    public void test30_isSymbolicLink() throws Exception {
     //
-    //        prepare();
+    //
     //
     //        FileSystem fs = config.getTestFileSystem(files, credentials);
     //
@@ -3004,7 +2937,7 @@ public abstract class GenericFileAdaptorTestParent {
     //        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
     //        assertFalse(v);
     //
-    //        cleanup();
+    //
     //    }
 
     @org.junit.Test
@@ -3013,8 +2946,6 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsSymboliclinks()) {
             return;
         }
-
-        prepare();
 
         Path cwd = config.getWorkingDir(files, credentials);
 
@@ -3051,7 +2982,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         test11_newDirectoryStream(root, tmp, false);
 
-        cleanup();
     }
 
     @org.junit.Test
@@ -3060,8 +2990,6 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsSymboliclinks()) {
             return;
         }
-
-        prepare();
 
         Path cwd = config.getWorkingDir(files, credentials);
 
@@ -3098,7 +3026,6 @@ public abstract class GenericFileAdaptorTestParent {
 
         test15_newAttributesDirectoryStream(root, tmp, false);
 
-        cleanup();
     }
 
     /*
@@ -3111,7 +3038,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test33_multipleFileSystemsOpenSimultaneously() throws Exception {
-        prepare();
 
         // Open two file systems. They should both be open afterwards.
         FileSystem fs0 = files.newFileSystem(config.getScheme(), config.getCorrectLocation(),
@@ -3125,7 +3051,6 @@ public abstract class GenericFileAdaptorTestParent {
         files.close(fs0);
         files.close(fs1);
 
-        cleanup();
     }
 
 }
