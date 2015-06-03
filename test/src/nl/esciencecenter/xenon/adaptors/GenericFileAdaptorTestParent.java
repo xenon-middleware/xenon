@@ -432,60 +432,73 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test00_newFileSystem() throws Exception {
-
-        // test with null URI and null credentials
+    public void test00_newFileSystem_nullUriAndCredentials_shouldThrow() throws Exception {
         test00_newFileSystem(null, null, null, null, true);
+    }
 
-        // test with correct scheme with but null location
+    @org.junit.Test
+    public void test00_newFileSystem_nullCredentials_shouldThrow() throws Exception {
         test00_newFileSystem(config.getScheme(), null, null, null, true);
+    }
 
+    @org.junit.Test
+    public void test00_newFileSystem_nullProperties_throwConditionally() throws Exception {
         // test with correct URI without credential and without properties
         boolean allowNull = config.supportNullCredential();
-
-        // test with correct scheme with, correct location, location
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null, !allowNull);
+    }
 
+    @org.junit.Test
+    public void test00_newFileSystem_correctArguments_noThrow() throws Exception {
         // test with correct scheme with, correct location, location
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null,
                 false);
+    }
 
+    @org.junit.Test
+    public void test00_newFileSystem_wrongLocation_throw() throws Exception {
         // test with correct scheme with, wrong location
         test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null, true);
+    }
 
-        // test with correct scheme with default credential and without properties
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null,
-                false);
-
-        // test with user name in location
-        if (config.supportUserInUri()) {
-            // location with correct user name
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocationWithUser(), null, null, false);
-
-            // location with wrong user name
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocationWithWrongUser(), null, null, true);
+    @org.junit.Test
+    public void test00_newFileSystem_userInUriIfSupported_noThrow() throws Exception {
+        if (!config.supportUserInUri()) {
+            return;
         }
+        String uriWithUsername = config.getCorrectLocationWithUser();
+        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null, false);
+    }
 
-        // test with correct URI with non-default credential and without properties
+    @org.junit.Test
+    public void test00_newFileSystem_wrongUserInUriIfSupported_noThrow() throws Exception {
+        if (!config.supportUserInUri()) {
+            return;
+        }
+        String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
+        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null, true);
+    }
+
+    @org.junit.Test
+    public void test00_newFileSystem_nonDefaultCredentialIfSupported_noThrow() throws Exception {
+        Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
         if (config.supportNonDefaultCredential()) {
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getNonDefaultCredential(credentials),
-                    null, false);
+            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), nonDefaultCredential, null, false);
         }
+    }
 
-        // test with correct URI with default credential and with empty properties
+    @org.junit.Test
+    public void test00_newFileSystem_emptyProperties_noThrow() throws Exception {
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
                 new HashMap<String, String>(), false);
+    }
 
-        // test with correct URI with default credential and with correct properties
+    @org.junit.Test
+    public void test00_newFileSystem_correctProperties_noThrow() throws Exception {
         if (config.supportsProperties()) {
             test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
                     config.getCorrectProperties(), false);
-
-            // test with correct URI with default credential and with wrong properties
-            // test00_newFileSystem(config.getCorrectURI(), config.getDefaultCredential(credentials), getIncorrectProperties(),
-            // true);
         }
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
