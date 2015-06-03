@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Properties;
 
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -26,7 +27,7 @@ import nl.esciencecenter.xenon.files.Path;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * 
+ *
  */
 public abstract class FileTestConfig extends GenericTestConfig {
 
@@ -37,15 +38,15 @@ public abstract class FileTestConfig extends GenericTestConfig {
     public abstract FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception;
 
     public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
-    
+
     public abstract boolean supportsPosixPermissions();
 
     public abstract boolean supportsSymboliclinks();
-    
-    public boolean readOnlyPosixPermissions() { 
+
+    public boolean readOnlyPosixPermissions() {
         return false;
     }
-    
+
     public boolean supportsClose() {
         return false;
     }
@@ -58,6 +59,15 @@ public abstract class FileTestConfig extends GenericTestConfig {
         return false;
     }
 
+    protected String getPropertyOrFail(Properties p, String property) throws Exception {
 
+        String tmp = p.getProperty(property);
+
+        if (tmp == null) {
+            throw new Exception("Failed to retrieve property " + property);
+        }
+
+        return tmp;
+    }
 
 }
