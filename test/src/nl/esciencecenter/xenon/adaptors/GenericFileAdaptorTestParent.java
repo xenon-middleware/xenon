@@ -442,7 +442,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test00_newFileSystem_nullProperties_throwConditionally() throws Exception {
+    public void test00_newFileSystem_nullProperties_throwIfApplicable() throws Exception {
         // test with correct URI without credential and without properties
         boolean allowNull = config.supportNullCredential();
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null, !allowNull);
@@ -466,6 +466,7 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportUserInUri()) {
             return;
         }
+
         String uriWithUsername = config.getCorrectLocationWithUser();
         test00_newFileSystem(config.getScheme(), uriWithUsername, null, null, false);
     }
@@ -475,16 +476,19 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportUserInUri()) {
             return;
         }
+
         String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
         test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null, true);
     }
 
     @org.junit.Test
     public void test00_newFileSystem_nonDefaultCredentialIfSupported_noThrow() throws Exception {
-        Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
-        if (config.supportNonDefaultCredential()) {
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), nonDefaultCredential, null, false);
+        if (!config.supportNonDefaultCredential()) {
+            return;
         }
+
+        Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), nonDefaultCredential, null, false);
     }
 
     @org.junit.Test
@@ -495,10 +499,12 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test00_newFileSystem_correctProperties_noThrow() throws Exception {
-        if (config.supportsProperties()) {
-            test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
-                    config.getCorrectProperties(), false);
+        if (!config.supportsProperties()) {
+            return;
         }
+
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
+                config.getCorrectProperties(), false);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -537,23 +543,24 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test01_isOpen() throws Exception {
-
-        // test with null filesystem
+    public void test01_isOpen_fsIsNull_throw() throws Exception {
         test01_isOpen(null, false, true);
+    }
 
+    @org.junit.Test
+    public void test01_isOpen_openFs_true() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
-
-        // test with correct open filesystem
         test01_isOpen(fs, true, false);
+    }
 
-        if (config.supportsClose()) {
-            files.close(fs);
-
-            // test with correct closed filesystem
-            test01_isOpen(fs, false, false);
+    @org.junit.Test
+    public void test01_isOpen_closedFsIfSupported_false() throws Exception {
+        if (!config.supportsClose()) {
+            return;
         }
-
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        files.close(fs);
+        test01_isOpen(fs, false, false);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
