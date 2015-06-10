@@ -472,7 +472,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test00_newFileSystem_wrongUserInUriIfSupported_noThrow() throws Exception {
+    public void test00_newFileSystem_wrongUserInUriIfSupported_throw() throws Exception {
         if (!config.supportUserInUri()) {
             return;
         }
