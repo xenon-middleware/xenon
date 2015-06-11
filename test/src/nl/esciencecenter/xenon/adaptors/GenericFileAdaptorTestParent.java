@@ -563,51 +563,25 @@ public abstract class GenericFileAdaptorTestParent {
         test01_isOpen(fs, false, false);
     }
 
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST close
-    //
-    // Possible parameters:
-    //
-    // FileSystem - null / open FS / closed FS
-    //
-    // Total combinations : 3
-    //
-    // Depends on: [getTestFileSystem], close
-
-    private void test02_close(FileSystem fs, boolean mustFail) throws Exception {
-
-        try {
-            files.close(fs);
-        } catch (Exception e) {
-            if (mustFail) {
-                // expected
-                return;
-            }
-            throwUnexpected("test02_close", e);
+    @org.junit.Test
+    public void test02_close_openFileSystemIfSupported_noThrow() throws Exception {
+        if (!config.supportsClose()) {
+            return;
         }
 
-        if (mustFail) {
-            throwExpected("test02_close");
-        }
+        FileSystem openFileSystem = config.getTestFileSystem(files, credentials);
+        files.close(openFileSystem);
     }
 
-    @org.junit.Test
-    public void test02_close() throws Exception {
-
-        // test with null filesystem
-        test02_close(null, true);
-
-        if (config.supportsClose()) {
-
-            FileSystem fs = config.getTestFileSystem(files, credentials);
-
-            // test with correct open filesystem
-            test02_close(fs, false);
-
-            // test with correct closed filesystem
-            test02_close(fs, true);
+    @org.junit.Test(expected = XenonException.class)
+    public void test02_close_closedFileSystemIfSupported_throw() throws Exception {
+        if (!config.supportsClose()) {
+            return;
         }
 
+        FileSystem fileSystem = config.getTestFileSystem(files, credentials);
+        files.close(fileSystem);
+        files.close(fileSystem);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
