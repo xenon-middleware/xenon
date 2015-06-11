@@ -621,25 +621,31 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test03_newPath() throws Exception {
+    public void test03_newPath_nullFileSystemAndNullRelativePath_throw() throws Exception {
+        test03_newPath(null, null, null, true);
+    }
 
+    @org.junit.Test
+    public void test03_newPath_correctFileSystemAndNullRelativePath_throw() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        test03_newPath(fs, null, null, true);
+        files.close(fs);
+    }
+
+    @org.junit.Test
+    public void test03_newPath_emptyRelativePath_noThrow() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         String root = "/";
-
-        // test with null filesystem and null relative path
-        test03_newPath(null, null, null, true);
-
-        // test with correct filesystem and null relative path
-        test03_newPath(fs, null, null, true);
-
-        // test with correct filesystem and empty relative path
         test03_newPath(fs, new RelativePath(), root, false);
-
-        // test with correct filesystem and relativepath with value
-        test03_newPath(fs, new RelativePath("test"), root + "test", false);
-
         files.close(fs);
+    }
 
+    @org.junit.Test
+    public void test03_newPath_nonEmptyRelativePath_noThrow() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        String root = "/";
+        test03_newPath(fs, new RelativePath("test"), root + "test", false);
+        files.close(fs);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
