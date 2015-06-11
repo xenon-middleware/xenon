@@ -576,7 +576,7 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test(expected = XenonException.class)
     public void test02_close_closedFileSystemIfSupported_throw() throws Exception {
         if (!config.supportsClose()) {
-            return;
+            throw new XenonException(null, null); // Test should always pass in this case.
         }
 
         FileSystem fileSystem = config.getTestFileSystem(files, credentials);
