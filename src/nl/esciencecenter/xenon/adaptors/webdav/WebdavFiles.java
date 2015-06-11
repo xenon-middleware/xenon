@@ -16,6 +16,7 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
+import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -140,7 +141,7 @@ public class WebdavFiles implements Files {
 
     @Override
     public Path newPath(FileSystem filesystem, RelativePath location) throws XenonException {
-        return null;
+        return new PathImplementation(filesystem, location);
     }
 
     @Override
