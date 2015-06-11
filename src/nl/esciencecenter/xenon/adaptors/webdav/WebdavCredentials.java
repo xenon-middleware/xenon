@@ -45,7 +45,7 @@ public class WebdavCredentials implements Credentials {
 
     @Override
     public Credential getDefaultCredential(String scheme) throws XenonException {
-        return null; // TODO
+        return null;
     }
 
     @Override

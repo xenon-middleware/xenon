@@ -44,29 +44,35 @@ public class SSHLocationTest {
     }
 
     @Test
-    public void test_parse_userHostDefaultPort1() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host:-42");
-        assertEquals(tmp.getUser(), "user");
-        assertEquals(tmp.getHost(), "host");
-        assertTrue(tmp.getPort() == DEFAULT_PORT);
+    public void test_parse_withScheme_correctScheme() throws InvalidLocationException {
+        SshLocation tmp = SshLocation.parse("ssh://host");
+        assertEquals("ssh", tmp.getSCheme());
     }
 
     @Test
-    public void test_parse_userHostDefaultPort2() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host:0");
-        assertEquals(tmp.getUser(), "user");
-        assertEquals(tmp.getHost(), "host");
-        assertTrue(tmp.getPort() == DEFAULT_PORT);
+    public void test_parse_withScheme_correctHost() throws InvalidLocationException {
+        SshLocation tmp = SshLocation.parse("ssh://host");
+        assertEquals("host", tmp.getHost());
     }
 
-    @Test(expected = InvalidLocationException.class)
-    public void test_parse_missingUser() throws Exception {
-        SshLocation.parse("@host:33");
+    @Test
+    public void test_parse_withScheme_correctPort() throws InvalidLocationException {
+        SshLocation tmp = SshLocation.parse("ssh://host:777");
+        assertEquals(777, tmp.getPort());
     }
 
-    @Test(expected = InvalidLocationException.class)
-    public void test_parse_missingPort() throws Exception {
-        SshLocation.parse("host:");
+    @Test
+    public void test_parseToString_withOutScheme() throws InvalidLocationException {
+        String url = "user@host:777";
+        SshLocation tmp = SshLocation.parse(url);
+        assertEquals(url, tmp.toString());
+    }
+
+    @Test
+    public void test_parseToString_withScheme() throws InvalidLocationException {
+        String url = "ssh://user@host:777";
+        SshLocation tmp = SshLocation.parse(url);
+        assertEquals(url, tmp.toString());
     }
 
     @Test(expected = InvalidLocationException.class)

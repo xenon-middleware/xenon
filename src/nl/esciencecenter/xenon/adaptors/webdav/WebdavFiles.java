@@ -1,8 +1,10 @@
 package nl.esciencecenter.xenon.adaptors.webdav;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import nl.esciencecenter.xenon.adaptors.ftp.FtpFiles;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
+import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -27,24 +30,58 @@ import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileSystemOptions;
+import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.auth.StaticUserAuthenticator;
+import org.apache.commons.vfs2.impl.DefaultFileSystemConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.sardine.Sardine;
-import com.github.sardine.SardineFactory;
-
 public class WebdavFiles implements Files {
     private static final Logger LOGGER = LoggerFactory.getLogger(FtpFiles.class);
+    private WebdavAdaptor adaptor;
+
+    private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     private static int currentID = 1;
 
     private static synchronized String getNewUniqueID() {
-        String res = "ftp" + currentID;
+        String res = "webdav" + currentID;
         currentID++;
         return res;
     }
 
-    private WebdavAdaptor adaptor;
+    /**
+     * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
+     */
+    static class FileSystemInfo {
+
+        private final FileSystemImplementation impl;
+        private final Credential credential;
+        private final FileObject fileObject;
+
+        public FileSystemInfo(FileSystemImplementation impl, FileObject fileObject, Credential credential) {
+            super();
+            this.impl = impl;
+            this.credential = credential;
+            this.fileObject = fileObject;
+        }
+
+        public FileObject getFileObject() {
+            return fileObject;
+        }
+
+        public FileSystemImplementation getImpl() {
+            return impl;
+        }
+
+        public Credential getCredential() {
+            return credential;
+        }
+    }
 
     public WebdavFiles(WebdavAdaptor webdavAdaptor, XenonEngine xenonEngine) {
         adaptor = webdavAdaptor;
@@ -56,12 +93,8 @@ public class WebdavFiles implements Files {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
-        Sardine sardine = SardineFactory.begin("xenon", "xenon1");
-        try {
-            sardine.exists(location);
-        } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), "Failed to open filesystem", e);
-        }
+        WebdavLocation webdavLocation = new WebdavLocation(location);
+        FileObject fileObject = openWithVfs(webdavLocation, credential);
 
         String cwd = null;
         RelativePath entryPath = new RelativePath(cwd);
@@ -69,8 +102,40 @@ public class WebdavFiles implements Files {
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
         FileSystemImplementation fileSystem = new FileSystemImplementation(adaptor.getName(), uniqueID, scheme, location,
                 entryPath, credential, xenonProperties);
+        fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, fileObject, credential));
         LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", cwd, entryPath, uniqueID);
         return fileSystem;
+    }
+
+    private FileObject openWithVfs(WebdavLocation webdavLocation, Credential credential) throws XenonException {
+        FileObject file = null;
+        try {
+            FileSystemManager manager = VFS.getManager();
+            StaticUserAuthenticator auth = getAuthenticator(webdavLocation, credential);
+            FileSystemOptions opts = new FileSystemOptions();
+            DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(opts, auth);
+            file = manager.resolveFile(webdavLocation.toString(), opts);
+            boolean exists = file.exists();
+            if (!exists) {
+                throw new XenonException(adaptor.getName(), MessageFormat.format("Location {0} does not exist", webdavLocation));
+            }
+
+        } catch (FileSystemException e) {
+            throw new XenonException(adaptor.getName(), "Failed to start file system manager", e);
+        }
+        return file;
+    }
+
+    private StaticUserAuthenticator getAuthenticator(WebdavLocation webdavLocation, Credential credential) {
+        String password = "";
+        String user = "";
+        if (credential instanceof PasswordCredentialImplementation) {
+            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
+            password = new String(passwordCredential.getPassword());
+            user = passwordCredential.getUsername();
+        }
+        StaticUserAuthenticator auth = new StaticUserAuthenticator(webdavLocation.toString(), user, password);
+        return auth;
     }
 
     @Override
@@ -79,12 +144,17 @@ public class WebdavFiles implements Files {
     }
 
     @Override
-    public void close(FileSystem filesystem) throws XenonException {
+    public void close(FileSystem fileSystem) throws XenonException {
     }
 
     @Override
-    public boolean isOpen(FileSystem filesystem) throws XenonException {
-        return false;
+    public boolean isOpen(FileSystem fileSystem) throws XenonException {
+        LOGGER.debug("isOpen fileSystem = {}", fileSystem);
+        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
+        FileSystemInfo fileSystemInfo = fileSystems.get(fs.getUniqueID());
+        boolean result = (fileSystemInfo != null) && fileSystemInfo.getFileObject().isAttached();
+        LOGGER.debug("isOpen OK result = {}", result);
+        return result;
     }
 
     @Override

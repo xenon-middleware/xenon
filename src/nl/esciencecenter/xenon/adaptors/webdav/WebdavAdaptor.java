@@ -38,7 +38,7 @@ public class WebdavAdaptor extends Adaptor {
     public static final String ADAPTOR_NAME = "webdav";
 
     /** The default SSH port */
-    protected static final int DEFAULT_PORT = 21;
+    protected static final int DEFAULT_PORT = 80;
 
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remove ftp servers.";

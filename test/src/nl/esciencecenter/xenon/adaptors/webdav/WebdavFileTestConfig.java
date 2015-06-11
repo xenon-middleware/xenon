@@ -15,7 +15,7 @@ import nl.esciencecenter.xenon.files.Path;
 public class WebdavFileTestConfig extends FileTestConfig {
 
     private String username;
-    private char[] passwd;
+    private char[] password;
 
     private static String scheme = "webdav";
     private String correctLocation;
@@ -30,20 +30,22 @@ public class WebdavFileTestConfig extends FileTestConfig {
     public WebdavFileTestConfig(String configfile) throws Exception {
         super(scheme, configfile);
 
-        String location = getPropertyOrFail(p, "test.webdav.location");
+        String publicLocation = getPropertyOrFail(p, "test.webdav.publiclocation");
+        String privateLocation = getPropertyOrFail(p, "test.webdav.privatelocation");
 
         username = getPropertyOrFail(p, "test.webdav.user");
-        passwd = getPropertyOrFail(p, "test.webdav.password").toCharArray();
+        password = getPropertyOrFail(p, "test.webdav.password").toCharArray();
 
         String uriScheme = "http://";
-        correctLocation = uriScheme + location;
+        correctLocation = uriScheme + publicLocation;
         wrongLocation = uriScheme + username + "@doesnotexist71093880.com";
-        correctLocationWrongUser = uriScheme + "incorrect@" + location;
+        correctLocationWrongUser = uriScheme + "incorrect@" + publicLocation;
+        correctLocationWithUser = uriScheme + username + "@" + publicLocation;
     }
 
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
-        return null;
+        return files.newFileSystem(scheme, correctLocation, getDefaultCredential(credentials), null);
     }
 
     @Override
@@ -87,8 +89,8 @@ public class WebdavFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getDefaultCredential(Credentials credential) throws Exception {
-        return credential.getDefaultCredential(scheme);
+    public Credential getDefaultCredential(Credentials credentials) throws Exception {
+        return credentials.getDefaultCredential(scheme);
     }
 
     @Override
@@ -103,7 +105,7 @@ public class WebdavFileTestConfig extends FileTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, username, passwd, new HashMap<String, String>());
+        return credentials.newPasswordCredential(scheme, username, password, new HashMap<String, String>());
     }
 
     @Override
