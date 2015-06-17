@@ -22,10 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSetup;
-import nl.esciencecenter.xenon.adaptors.gridengine.ParallelEnvironmentInfo;
-import nl.esciencecenter.xenon.adaptors.gridengine.QueueInfo;
 import nl.esciencecenter.xenon.adaptors.gridengine.ParallelEnvironmentInfo.AllocationRule;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -110,10 +108,10 @@ public class GridEngineSetupTest {
     public void test02d_calculateSlots_roundRobinPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = Utils.emptyMap(1);
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = Utils.emptyMap(1);
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);

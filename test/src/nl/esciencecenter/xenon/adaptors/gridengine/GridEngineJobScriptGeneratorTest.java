@@ -24,8 +24,6 @@ import java.lang.reflect.Modifier;
 import java.util.Formatter;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineJobScriptGenerator;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineSchedulerConnection;
 import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 
