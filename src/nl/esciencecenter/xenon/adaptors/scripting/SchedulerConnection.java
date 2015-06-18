@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -257,7 +257,7 @@ public abstract class SchedulerConnection {
                 arguments);
 
         if (!runner.success()) {
-            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin + \"" + stdin
+            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
                     + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
                     + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }

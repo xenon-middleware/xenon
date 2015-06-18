@@ -32,6 +32,8 @@ public final class ScriptingParser {
 
     public static final Pattern WHITESPACE_REGEX = Pattern.compile("\\s+");
 
+    public static final Pattern DOT_REGEX = Pattern.compile("\\.");
+
     public static final Pattern BAR_REGEX = Pattern.compile("\\s*\\|\\s*");
 
     public static final Pattern NEWLINE_REGEX = Pattern.compile("\\r?\\n");
@@ -156,13 +158,16 @@ public final class ScriptingParser {
 
                 //cut of anything after the job id
                 jobId = WHITESPACE_REGEX.split(jobId)[0];
-
-                try {
-                    return Long.parseLong(jobId);
-                } catch (NumberFormatException e) {
-                    throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
-                            + jobId + "\" is not a number", e);
+                // parse job ID's of the form 929292.host or host.29131
+                for (String jobIdPart : DOT_REGEX.split(jobId)) {
+                    try {
+                        return Long.parseLong(jobIdPart);
+                    } catch (NumberFormatException e) {
+                        //continue
+                    }
                 }
+                throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
+                                    + jobId + "\" is not a number");
             }
         }
         throw new XenonException(adaptorName, "Failed to get jobID from line: \"" + input

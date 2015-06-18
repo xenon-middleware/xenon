@@ -16,12 +16,11 @@
 package nl.esciencecenter.xenon.adaptors.scripting;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
@@ -35,6 +34,7 @@ import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class ScriptingJobs implements Jobs {
         this.adaptorName = adaptor.getName();
         this.connectionFactory = connectionFactory;
 
-        connections = new HashMap<String, SchedulerConnection>();
+        connections = Utils.emptyMap(1);
     }
 
     private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws NoSuchSchedulerException {
@@ -173,7 +173,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     private SchedulerConnection[] getConnections(Job[] jobs) {
-        Map<String, SchedulerConnection> result = new HashMap<String, SchedulerConnection>();
+        Map<String, SchedulerConnection> result = Utils.emptyMap(jobs.length);
 
         for (Job job : jobs) {
             if (job != null) {
