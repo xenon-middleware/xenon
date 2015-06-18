@@ -75,9 +75,6 @@ public class TorqueJobScriptGeneratorTest {
         description.setNodeCount(1);
         description.setProcessesPerNode(1);
         description.setQueueName("the.queue");
-        description.setStderr("stderr.file");
-        description.setStdin("stdin.file");
-        description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
         String result = TorqueJobScriptGenerator.generate(description, null);
@@ -91,9 +88,6 @@ public class TorqueJobScriptGeneratorTest {
                 + "#PBS -l list-of-resources\n"
                 + "#PBS -l nodes=1,ppn=1\n"
                 + "#PBS -l walltime=01:40:00\n"
-                + "#PBS -i 'stdin.file'\n"
-                + "#PBS -o 'stdout.file'\n"
-                + "#PBS -e 'stderr.file'\n"
                 + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n\n"
                 + "/bin/executable 'some' 'arguments'\n";
@@ -117,9 +111,6 @@ public class TorqueJobScriptGeneratorTest {
         description.setNodeCount(4);
         description.setProcessesPerNode(10);
         description.setQueueName("the.queue");
-        description.setStderr("stderr.file");
-        description.setStdin("stdin.file");
-        description.setStdout("stdout.file");
         description.setWorkingDirectory("/some/working/directory");
 
         String result = TorqueJobScriptGenerator.generate(description, null);
@@ -133,9 +124,6 @@ public class TorqueJobScriptGeneratorTest {
                 + "#PBS -l list-of-resources\n"
                 + "#PBS -l nodes=4,ppn=4\n"
                 + "#PBS -l walltime=01:40:00\n"
-                + "#PBS -i 'stdin.file'\n"
-                + "#PBS -o 'stdout.file'\n"
-                + "#PBS -e 'stderr.file'\n"
                 + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n\n"
                 + "/bin/executable 'some' 'arguments'\n";
