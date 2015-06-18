@@ -51,10 +51,9 @@ public class TorqueJobScriptGeneratorTest {
                   "#!/bin/sh\n"
                 + "#PBS -S /bin/sh\n"
                 + "#PBS -N xenon\n"
+                + "#PBS -l nodes=1:ppn=1\n"
                 + "#PBS -l walltime=00:15:00\n"
-                + "#PBS -o /dev/null\n"
-                + "#PBS -e /dev/null\n\n"
-                + "null\n";
+                + "\nnull\n";
 
         assertEquals(expected, result);
     }
@@ -83,10 +82,10 @@ public class TorqueJobScriptGeneratorTest {
                   "#!/bin/sh\n"
                 + "#PBS -S /bin/sh\n"
                 + "#PBS -N xenon\n"
-                + "#PBS -w '/some/working/directory'"
+                + "#PBS -w '/some/working/directory'\n"
                 + "#PBS -q the.queue\n"
                 + "#PBS -l list-of-resources\n"
-                + "#PBS -l nodes=1,ppn=1\n"
+                + "#PBS -l nodes=1:ppn=1\n"
                 + "#PBS -l walltime=01:40:00\n"
                 + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n\n"
@@ -119,10 +118,10 @@ public class TorqueJobScriptGeneratorTest {
                   "#!/bin/sh\n"
                 + "#PBS -S /bin/sh\n"
                 + "#PBS -N xenon\n"
-                + "#PBS -w '/some/working/directory'"
+                + "#PBS -w '/some/working/directory'\n"
                 + "#PBS -q the.queue\n"
                 + "#PBS -l list-of-resources\n"
-                + "#PBS -l nodes=4,ppn=4\n"
+                + "#PBS -l nodes=4:ppn=10\n"
                 + "#PBS -l walltime=01:40:00\n"
                 + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n\n"
@@ -142,10 +141,9 @@ public class TorqueJobScriptGeneratorTest {
                   "#!/bin/sh\n"
                 + "#PBS -S /bin/sh\n"
                 + "#PBS -N xenon\n"
+                + "#PBS -l nodes=1:ppn=1\n"
                 + "#PBS -l walltime=00:15:00\n"
-                + "#PBS -o /dev/null\n"
-                + "#PBS -e /dev/null\n\n"
-                + "/myscript/or_other\n";
+                + "\n/myscript/or_other\n";
 
         assertEquals(expected, result);
     }
