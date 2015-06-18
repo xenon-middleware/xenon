@@ -148,8 +148,10 @@ public class TorqueSchedulerConnectionTest {
     @Test
     public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";
+        String jobIDfull = "555.localhost";
         Map<String, String> jobInfo = Utils.emptyMap(2);
-        jobInfo.put("Job_Id", jobID);
+        jobInfo.put("Job_Id", jobIDfull);
+        jobInfo.put("Job_Id_Number", jobID);
         jobInfo.put("job_state", "Q");
         
         Map<String, Map<String, String>> input = Utils.emptyMap(1);
@@ -169,8 +171,10 @@ public class TorqueSchedulerConnectionTest {
     @Test
     public void test04b_getJobStatusFromQstatInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
+        String jobIDfull = "555.localhost";
         Map<String, String> jobInfo = Utils.emptyMap(2);
-        jobInfo.put("Job_Id", jobID);
+        jobInfo.put("Job_Id", jobIDfull);
+        jobInfo.put("Job_Id_Number", jobID);
         jobInfo.put("job_state", "R");
         
         Map<String, Map<String, String>> input = Utils.emptyMap(1);
@@ -190,8 +194,10 @@ public class TorqueSchedulerConnectionTest {
     @Test
     public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws XenonException {
         String jobID = "555";
+        String jobIDfull = "555.localhost";
         Map<String, String> jobInfo = Utils.emptyMap(2);
-        jobInfo.put("Job_Id", jobID);
+        jobInfo.put("Job_Id", jobIDfull);
+        jobInfo.put("Job_Id_Number", jobID);
         jobInfo.put("job_state", "E");
         
         Map<String, Map<String, String>> input = Utils.emptyMap(1);
