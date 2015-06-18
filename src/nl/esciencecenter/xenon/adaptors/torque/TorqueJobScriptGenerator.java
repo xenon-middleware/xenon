@@ -71,13 +71,12 @@ final class TorqueJobScriptGenerator {
 
         //set working directory
         if (description.getWorkingDirectory() != null) {
-            if (description.getWorkingDirectory().startsWith("/")) {
-                script.format("#PBS -w '%s'\n", description.getWorkingDirectory());
-            } else {
+            String workingDirectory = description.getWorkingDirectory();
+            if (!workingDirectory.startsWith("/")) {
                 //make relative path absolute
-                RelativePath workingDirectory = fsEntryPath.resolve(description.getWorkingDirectory());
-                script.format("#PBS -w '%s'\n", workingDirectory.getAbsolutePath());
+                workingDirectory = fsEntryPath.resolve(workingDirectory).getAbsolutePath();
             }
+            script.format("#PBS -w '%s'\n", workingDirectory);
         }
 
         if (description.getQueueName() != null) {
@@ -90,28 +89,12 @@ final class TorqueJobScriptGenerator {
         }
 
         //number of nodes and processes per node
-        script.format("#PBS -l nodes=%d,ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
+        script.format("#PBS -l nodes=%d:ppn=%d\n", description.getNodeCount(), description.getProcessesPerNode());
         
         //add maximum runtime in hour:minute:second format (converted from minutes in description)
         script.format("#PBS -l walltime=%02d:%02d:00\n",
                 description.getMaxTime() / MINUTES_PER_HOUR,
                 description.getMaxTime() % MINUTES_PER_HOUR);
-
-        if (description.getStdin() != null) {
-            script.format("#PBS -i '%s'\n", description.getStdin());
-        }
-
-        if (description.getStdout() == null) {
-            script.format("#PBS -o /dev/null\n");
-        } else {
-            script.format("#PBS -o '%s'\n", description.getStdout());
-        }
-
-        if (description.getStderr() == null) {
-            script.format("#PBS -e /dev/null\n");
-        } else {
-            script.format("#PBS -e '%s'\n", description.getStderr());
-        }
 
         for (Map.Entry<String, String> entry : description.getEnvironment().entrySet()) {
             script.format("export %s=\"%s\"\n", entry.getKey(), entry.getValue());

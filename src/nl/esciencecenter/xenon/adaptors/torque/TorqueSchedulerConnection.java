@@ -80,6 +80,10 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
         }
 
+        if (description.getStdin() != null) {
+            throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Torque cannot process STDIN");
+        }
+
         //check for option that overrides job script completely.
         if (description.getJobOptions().containsKey(JOB_OPTION_JOB_SCRIPT)) {
             if (description.getJobOptions().containsKey(JOB_OPTION_JOB_CONTENTS)) {
@@ -102,7 +106,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        SchedulerConnection.verifyJobInfo(jobInfo, job, TorqueAdaptor.ADAPTOR_NAME, "Job_Id", "job_state");
+        SchedulerConnection.verifyJobInfo(jobInfo, job, TorqueAdaptor.ADAPTOR_NAME, "Job_Id_Number", "job_state");
 
         String stateCode = jobInfo.get("job_state");
 
@@ -111,8 +115,16 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             exception = new XenonException(TorqueAdaptor.ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;
         }
+        if (stateCode.contains("C")) {
+            done = true;
+        }
+        Integer exitStatus = null;
+        String exitStatusStr = jobInfo.get("exit_status");
+        if (exitStatusStr != null) {
+            exitStatus = Integer.valueOf(exitStatusStr);
+        }
 
-        return new JobStatusImplementation(job, stateCode, null, exception, stateCode.equals("R"), done, jobInfo);
+        return new JobStatusImplementation(job, stateCode, exitStatus, exception, stateCode.equals("R"), done, jobInfo);
     }
 
     private final long accountingGraceTime;
@@ -210,11 +222,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
      * Note: Works exactly once per job.
      */
     private synchronized boolean jobWasDeleted(Job job) {
-        //optimization of common case
-        if (deletedJobs.isEmpty()) {
-            return false;
-        }
-        return deletedJobs.remove(Long.parseLong(job.getIdentifier()));
+        return deletedJobs.remove(Long.valueOf(job.getIdentifier()));
     }
 
     private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws XenonException {
@@ -232,7 +240,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         List<Job> result = new ArrayList<>(1500);
 
         if (queueNames == null || queueNames.length == 0) {
-            String statusOutput = runCheckedCommand(null, "qstat", "-x");
+            String statusOutput = runCheckedCommand(null, "qstat", "-x").trim();
 
             jobsFromStatus(statusOutput, getScheduler(), result);
         } else {
@@ -241,8 +249,8 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
                 if (runner.success()) {
                     jobsFromStatus(runner.getStdout(), getScheduler(), result);
-                } else if (runner.getExitCode() == 1) {
-                    //sge returns "1" as the exit code if there is something wrong with the queue, ignore
+                } else if (runner.getExitCode() == 172) {
+                    //slurm returns "172" as the exit code if there is something wrong with the queue, ignore
                     LOGGER.warn("Failed to get queue status for queue " + runner);
                     throw new NoSuchQueueException(TorqueAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);                    
@@ -278,26 +286,30 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             throw new IllegalArgumentException("Queue names cannot be null");
         }
 
-        QueueStatus[] result = new QueueStatus[queueNames.length];
-
         Map<String, Map<String, String>> allMap = queryQueues(queueNames);
 
-        for (int i = 0; i < queueNames.length; i++) {
-            if (queueNames[i] == null) {
-                result[i] = null;
-            } else {
-                //state for only the requested queuee
-                Map<String, String> map = allMap.get(queueNames[i]);
-
-                if (map == null || map.isEmpty()) {
-                    Exception exception = new NoSuchQueueException(TorqueAdaptor.ADAPTOR_NAME,
-                            "Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
-                    result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
-                } else {
-                    result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, map);
-                }
-            }
+        if (queueNames.length == 0) {
+            queueNames = allMap.keySet().toArray(new String[allMap.size()]);
         }
+
+        QueueStatus[] result = new QueueStatus[queueNames.length];
+
+		for (int i = 0; i < queueNames.length; i++) {
+			if (queueNames[i] == null) {
+				result[i] = null;
+			} else {
+				//state for only the requested queuee
+				Map<String, String> map = allMap.get(queueNames[i]);
+
+                if (map == null) {
+					Exception exception = new NoSuchQueueException(TorqueAdaptor.ADAPTOR_NAME,
+							"Cannot get status of queue \"" + queueNames[i] + "\" from server, perhaps it does not exist?");
+					result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], exception, null);
+				} else {
+					result[i] = new QueueStatusImplementation(getScheduler(), queueNames[i], null, map);
+				}
+			}
+		}
 
         return result;
     }
@@ -317,7 +329,17 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             String[] args = new String[1 + queueNames.length];
             args[0] = "-Qf";
             System.arraycopy(queueNames, 0, args, 1, queueNames.length);
-            output = runCheckedCommand(null, "qstat", args);
+            RemoteCommandRunner runner = runCommand(null, "qstat", args);
+
+            if (runner.success()) {
+                output = runner.getStdout();
+            } else {
+                Map<String, Map<String,String>> badResult = Utils.emptyMap(queueNames.length);
+                for (String name : queueNames) {
+                    badResult.put(name, null);
+                }
+                return badResult;
+            }
         }
         String[] lines = ScriptingParser.NEWLINE_REGEX.split(output);
         
@@ -342,6 +364,9 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
                 } // else: empty line
             }
         }
+        if (currentQueueMap != null) {
+            result.put(currentQueueMap.get("qname"), currentQueueMap);
+        }
 
         return result;
     }
@@ -357,6 +382,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         String customScriptFile = description.getJobOptions().get(JOB_OPTION_JOB_SCRIPT);
 
         if (customScriptFile == null) {
+            checkWorkingDirectory(description.getWorkingDirectory());
             String jobScript = TorqueJobScriptGenerator.generate(description, fsEntryPath);
 
             output = runCheckedCommand(jobScript, "qsub");
@@ -372,9 +398,14 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "qsub", customScriptFile);
         }
 
-        String identifier = Long.toString(ScriptingParser.parseJobIDFromLine(output, TorqueAdaptor.ADAPTOR_NAME, "Your job"));
+        String identifier = Long.toString(ScriptingParser.parseJobIDFromLine(output, TorqueAdaptor.ADAPTOR_NAME, ""));
 
         updateJobsSeenMap(Collections.singleton(identifier));
+
+        if (!description.getJobOptions().containsKey(TorqueSchedulerConnection.JOB_OPTION_JOB_SCRIPT)) {
+            description.setStderr("xenon.e" + identifier);
+            description.setStdout("xenon.o" + identifier);
+        }
 
         Job result = new JobImplementation(getScheduler(), identifier, description, false, false);
 
@@ -384,19 +415,15 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
     @Override
     public JobStatus cancelJob(Job job) throws XenonException {
         String identifier = job.getIdentifier();
-        String qdelOutput = runCheckedCommand(null, "qdel", identifier);
-
-        String killedOutput = "has registered the job " + identifier + " for deletion";
-        String deletedOutput = "has deleted job " + identifier;
-
-        int matched = ScriptingParser.checkIfContains(qdelOutput, TorqueAdaptor.ADAPTOR_NAME, killedOutput, deletedOutput);
-
-        //keep track of the deleted jobs.
-        if (matched == 1) {
+        RemoteCommandRunner runner = runCommand(null, "qdel", identifier);
+        if (runner.success()) {
+            // deleted or already finished
             addDeletedJob(job);
+        } else if (runner.getExitCode() == 170) {
+            // job was already finished.
         } else {
-            //it will take a while to get this job to the accounting. Remember it existed for now
-            updateJobsSeenMap(Collections.singleton(identifier));
+            throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "could not run command qdel for job \"" + identifier + "\". Exit code = "
+                    + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }
 
         return getJobStatus(job);
@@ -443,17 +470,15 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             status = null;
         }
 
-        //perhaps the job was killed while it was not running yet ("deleted", in sge speak). This will make it disappear from
-        //qstat/qacct output completely
+        //perhaps the job was killed while it was not running yet.
         if (status == null && jobWasDeleted(job)) {
             Exception exception = new JobCanceledException(TorqueAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
                     + " deleted by user while still pending");
             status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
         }
 
-        //this job is neither in qstat nor qacct output. we assume it is "in between" for a certain grace time.
         if (status == null && haveRecentlySeen(job.getIdentifier())) {
-            status = new JobStatusImplementation(job, "unknown", null, null, false, false, new HashMap<String, String>(0));
+            status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
         }
 
         return status;
@@ -498,6 +523,6 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     @Override
     public Streams getStreams(Job job) throws XenonException {
-        throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "does not support interactive jobs");
+        throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "does not support interactive jobs");
     }
 }

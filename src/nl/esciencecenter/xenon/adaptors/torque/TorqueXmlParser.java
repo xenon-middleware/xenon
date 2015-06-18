@@ -25,6 +25,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
@@ -112,6 +113,9 @@ final class TorqueXmlParser {
      * @throws Exception
      */
     Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
+        if (data.trim().isEmpty()) {
+            return Utils.emptyMap(0);
+        }
         Document document = parseDocument(data);
 
         LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
@@ -126,11 +130,13 @@ final class TorqueXmlParser {
                 Map<String, String> jobInfo = Utils.emptyMap(20);
                 recursiveMapFromElement(node, jobInfo);
 
-                String jobID = jobInfo.get("Job_Id");
+                String jobID = String.valueOf(ScriptingParser.parseJobIDFromLine(jobInfo.get("Job_Id"), TorqueAdaptor.ADAPTOR_NAME, ""));
 
                 if (jobID == null || jobID.isEmpty()) {
                     throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
+
+                jobInfo.put("Job_Id_Number", jobID);
 
                 result.put(jobID, jobInfo);
             }
