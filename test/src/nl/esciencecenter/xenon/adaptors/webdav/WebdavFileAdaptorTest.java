@@ -36,4 +36,5 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
     public static void cleanupFTPFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.cleanupClass();
     }
+
 }

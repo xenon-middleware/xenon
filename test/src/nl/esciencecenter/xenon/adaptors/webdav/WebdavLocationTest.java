@@ -31,4 +31,16 @@ public class WebdavLocationTest {
         // Assert
         assertEquals("/path", location.getPath());
     }
+
+    @Test
+    public void toString_locationWithPath_correctPath() throws InvalidLocationException {
+        // Arrange
+        String url = "http://domain:80/path";
+
+        // Act
+        WebdavLocation location = WebdavLocation.parse(url);
+
+        // Assert
+        assertEquals("http://domain:80/path", location.toString());
+    }
 }

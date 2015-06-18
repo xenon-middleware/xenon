@@ -41,10 +41,10 @@ public class WebdavAdaptor extends Adaptor {
     protected static final int DEFAULT_PORT = 80;
 
     /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remove ftp servers.";
+    private static final String ADAPTOR_DESCRIPTION = "The webdav adaptor implements all functionality with remote webdav servers.";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("webdav");
+    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("http");
 
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
@@ -92,16 +92,16 @@ public class WebdavAdaptor extends Adaptor {
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
             new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
                     EnumSet.of(Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-                    new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                            Component.FILESYSTEM), "true", "Enable strict host key checking."),
-            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
-                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
-                    Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                                            "The polling delay for monitoring running jobs (in milliseconds)."),
-                                            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
-                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
-                    Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
-                    "The gateway machine used to create an SSH tunnel to the target."));
+            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
+                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
+                            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
+                                            Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
+                    "The polling delay for monitoring running jobs (in milliseconds)."),
+            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
+                                                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
+                                                            Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
+                                                            "The gateway machine used to create an SSH tunnel to the target."));
 
     private final WebdavFiles filesAdaptor;
     private Credentials credentialsAdaptor;

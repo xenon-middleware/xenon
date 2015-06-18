@@ -31,4 +31,9 @@ public class WebdavLocation extends Location {
         return path;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + getPath();
+    }
+
 }

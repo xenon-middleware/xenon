@@ -95,9 +95,9 @@ public class WebdavFiles implements Files {
                 properties);
 
         WebdavLocation webdavLocation = new WebdavLocation(location);
-        FileObject fileObject = openWithVfs(webdavLocation, credential);
+        FileObject fileObject = openWithVfs(scheme, webdavLocation, credential);
 
-        String cwd = null;
+        String cwd = getCurrentWorkingDirectory(fileObject);
         RelativePath entryPath = new RelativePath(cwd);
         String uniqueID = getNewUniqueID();
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
@@ -108,14 +108,28 @@ public class WebdavFiles implements Files {
         return fileSystem;
     }
 
-    private FileObject openWithVfs(WebdavLocation webdavLocation, Credential credential) throws XenonException {
+    private String getCurrentWorkingDirectory(FileObject fileObject) throws XenonException {
+        return "/";
+        //        String cwd = null;
+        //        try {
+        //            URL url = fileObject.getURL();
+        //            URI uri = url.toURI();
+        //            cwd = uri.getPath();
+        //        } catch (FileSystemException | URISyntaxException e) {
+        //            throw new XenonException(adaptor.getName(), "Could not retrieve current working directory", e);
+        //        }
+        //        return cwd;
+    }
+
+    private FileObject openWithVfs(String scheme, WebdavLocation webdavLocation, Credential credential) throws XenonException {
         FileObject file = null;
         try {
             FileSystemManager manager = VFS.getManager();
             StaticUserAuthenticator auth = getAuthenticator(webdavLocation, credential);
             FileSystemOptions opts = new FileSystemOptions();
             DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(opts, auth);
-            file = manager.resolveFile(webdavLocation.toString(), opts);
+
+            file = manager.resolveFile(scheme + "://" + webdavLocation.toString(), opts);
             boolean exists = file.exists();
             if (!exists) {
                 throw new XenonException(adaptor.getName(), MessageFormat.format("Location {0} does not exist", webdavLocation));
@@ -146,6 +160,7 @@ public class WebdavFiles implements Files {
 
     @Override
     public void close(FileSystem fileSystem) throws XenonException {
+        // ignored!
     }
 
     @Override
@@ -182,7 +197,23 @@ public class WebdavFiles implements Files {
     }
 
     @Override
-    public void createDirectory(Path dir) throws XenonException {
+    public void createDirectory(Path path) throws XenonException {
+        LOGGER.debug("createDirectory dir = {}", path);
+        FileObject fileSystem = getFileSystemByPath(path);
+        String absolutePath = path.getRelativePath().getRelativePath();
+        try {
+            FileObject newDirectory = fileSystem.resolveFile("public123");
+            boolean exists = newDirectory.exists();
+            boolean writeable = newDirectory.isWriteable();
+            boolean readable = newDirectory.isReadable();
+            boolean hidden = newDirectory.isHidden();
+            boolean contentOpen = newDirectory.isContentOpen();
+            boolean attached = newDirectory.isAttached();
+            newDirectory.createFolder();
+        } catch (FileSystemException e) {
+            throw new XenonException(adaptor.getName(), "Failed to create directory " + absolutePath, e);
+        }
+        LOGGER.debug("createDirectory OK");
     }
 
     @Override
@@ -195,7 +226,18 @@ public class WebdavFiles implements Files {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        return false;
+        LOGGER.debug("exists path = {}", path);
+        FileObject fileSystem = getFileSystemByPath(path);
+        String absolutePath = path.getRelativePath().getAbsolutePath();
+        boolean result;
+        try {
+            FileObject fileObject = fileSystem.resolveFile(absolutePath);
+            result = fileObject.exists();
+        } catch (FileSystemException e) {
+            throw new XenonException(adaptor.getName(), "Failed to inspect directory " + absolutePath, e);
+        }
+        LOGGER.debug("exists OK result = {}", result);
+        return result;
     }
 
     @Override
@@ -245,4 +287,8 @@ public class WebdavFiles implements Files {
     public void end() {
     }
 
+    private FileObject getFileSystemByPath(Path path) {
+        FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
+        return fileSystems.get(fileSystem.getUniqueID()).getFileObject();
+    }
 }

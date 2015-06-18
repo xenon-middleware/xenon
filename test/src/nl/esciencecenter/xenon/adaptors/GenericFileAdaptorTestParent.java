@@ -680,41 +680,72 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test04_createDirectory() throws Exception {
-
-        // test with null
+    public void test04_createDirectory_null_throw() throws Exception {
         test04_createDirectory(null, true);
+    }
 
+    @org.junit.Test
+    public void test04_createDirectory_nonExisting_noThrow() throws Exception {
         Path cwd = config.getWorkingDir(files, credentials);
         Path root = resolve(cwd, TEST_ROOT);
 
-        // test with non-existing dir
         test04_createDirectory(root, false);
 
-        // test with existing dir
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
+    }
+
+    @org.junit.Test
+    public void test04_createDirectory_existing_throw() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT);
+        files.createDirectory(root);
+
         test04_createDirectory(root, true);
 
-        // test with existing file
-        Path file0 = createTestFile(root, null);
-        test04_createDirectory(file0, true);
-        deleteTestFile(file0);
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
+    }
 
-        // test with non-existent parent dir
+    @org.junit.Test
+    public void test04_createDirectory_existingFile_throw() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT);
+        files.createDirectory(root);
+
+        Path file = createTestFile(root, null);
+        test04_createDirectory(file, true);
+
+        deleteTestFile(file);
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
+    }
+
+    @org.junit.Test
+    public void test04_createDirectory_nonExistingParent_throw() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT);
+        files.createDirectory(root);
+
         Path parent = createNewTestDirName(root);
         Path dir0 = createNewTestDirName(parent);
         test04_createDirectory(dir0, true);
 
-        // cleanup
         deleteTestDir(root);
-
-        // close test FS
         files.close(cwd.getFileSystem());
+    }
 
-        if (config.supportsClose()) {
-            // test with closed fs
-            test04_createDirectory(root, true);
+    @org.junit.Test
+    public void test04_createDirectory_closedFileSystemIfSupported_throw() throws Exception {
+        if (!config.supportsClose()) {
+            return;
         }
 
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT);
+        files.close(cwd.getFileSystem());
+
+        test04_createDirectory(root, true);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------

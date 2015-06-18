@@ -17,7 +17,7 @@ public class WebdavFileTestConfig extends FileTestConfig {
     private String username;
     private char[] password;
 
-    private static String scheme = "webdav";
+    private static String scheme = "http";
     private String correctLocation;
     private String wrongLocation;
     private String correctLocationWrongUser;
@@ -36,7 +36,7 @@ public class WebdavFileTestConfig extends FileTestConfig {
         username = getPropertyOrFail(p, "test.webdav.user");
         password = getPropertyOrFail(p, "test.webdav.password").toCharArray();
 
-        String uriScheme = "http://";
+        String uriScheme = "";//"http://"; TODO: clean up
         correctLocation = uriScheme + publicLocation;
         wrongLocation = uriScheme + username + "@doesnotexist71093880.com";
         correctLocationWrongUser = uriScheme + "incorrect@" + publicLocation;
@@ -50,7 +50,7 @@ public class WebdavFileTestConfig extends FileTestConfig {
 
     @Override
     public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
-        return null;
+        return files.newFileSystem(scheme, correctLocation, getNonDefaultCredential(credentials), null).getEntryPath();
     }
 
     @Override
