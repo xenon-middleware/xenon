@@ -59,13 +59,13 @@ public class TorqueXmlParserTest {
         String input = readFile("test/fixtures/torque/jobs.xml");
 
         String[] expectedJobIDs = new String[] {
-            "8921165.batch1.lisa.surfsara.nl",
-            "8931330.batch1.lisa.surfsara.nl",
-            "8938236.batch1.lisa.surfsara.nl",
-            "8941161.batch1.lisa.surfsara.nl",
-            "8941948.batch1.lisa.surfsara.nl",
-            "8942464.batch1.lisa.surfsara.nl",
-            "8954523.batch1.lisa.surfsara.nl",
+            "8921165",
+            "8931330",
+            "8938236",
+            "8941161",
+            "8941948",
+            "8942464",
+            "8954523",
             };
         Arrays.sort(expectedJobIDs);
 
