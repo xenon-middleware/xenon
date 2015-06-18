@@ -15,7 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,6 +36,7 @@ import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
 import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,12 +86,16 @@ public class SshJobs implements Jobs {
     
     private long submittedJobs = 0;
 
-    private Map<String, SchedulerInfo> schedulers = new HashMap<String, SchedulerInfo>();
+    private boolean isEnded;
+
+    private final Map<String, SchedulerInfo> schedulers;
 
     public SshJobs(XenonProperties properties, SshAdaptor sshAdaptor, XenonEngine xenonEngine) throws XenonException {
         this.xenonEngine = xenonEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
+        this.schedulers = Utils.emptyMap(30);
+        this.isEnded = false;
     }
 
     @Override
@@ -163,7 +167,7 @@ public class SshJobs implements Jobs {
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
 
-        if (description.getEnvironment().size() != 0) {
+        if (!description.getEnvironment().isEmpty()) {
             throw new UnsupportedJobDescriptionException(SshAdaptor.ADAPTOR_NAME, "Environment variables not supported!");
         }
 
@@ -214,7 +218,8 @@ public class SshJobs implements Jobs {
     }
 
     public void end() {
-        
+        isEnded = true;
+
         for (SchedulerInfo tmp : schedulers.values()) { 
             tmp.end();
         }
@@ -241,17 +246,18 @@ public class SshJobs implements Jobs {
 
         SchedulerImplementation s = (SchedulerImplementation) scheduler;
 
-        SchedulerInfo info = null;
-
+        SchedulerInfo info;
         synchronized (this) {
             info = schedulers.remove(s.getUniqueID());
-
-            if (info == null) {
-                throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
-            }
         }
 
-        info.end();
+        if (info == null) {
+            if (!isEnded) {
+                throw new NoSuchSchedulerException(SshAdaptor.ADAPTOR_NAME, "Cannot find scheduler: " + s.getUniqueID());
+            }
+        } else {
+            info.end();
+        }
     }
 
     @Override
