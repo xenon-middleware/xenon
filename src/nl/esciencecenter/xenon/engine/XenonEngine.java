@@ -38,7 +38,6 @@ import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
-import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptor;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
