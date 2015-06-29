@@ -633,7 +633,6 @@ public class FtpFiles implements Files {
     public FileAttributes getAttributes(Path path) throws XenonException {
         LOGGER.debug("getAttributes path = {}", path);
         assertPathExists(path);
-        FTPClient ftpClient = getFtpClientByPath(path);
         FTPFile listFile = getFtpFile(path);
         FileAttributes fileAttributes = new FtpFileAttributes(listFile);
         LOGGER.debug("getAttributes OK result = {}", fileAttributes);
