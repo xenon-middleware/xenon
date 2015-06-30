@@ -119,7 +119,7 @@ public class RemoteCommandRunner {
     }
 
     public boolean success() {
-        return exitCode == 0 && error.isEmpty();
+        return exitCode == 0;
     }
 
     public String toString() {
