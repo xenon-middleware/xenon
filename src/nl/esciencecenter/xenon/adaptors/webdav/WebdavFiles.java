@@ -305,14 +305,8 @@ public class WebdavFiles implements Files {
             throw new XenonException(adaptor.getName(), "Could not inspect path " + path, e);
         }
         try {
-            int response = client.executeMethod(method);
-            String responseBodyAsString = method.getStatusLine().toString();
+            executeMethod(client, method);
             properties = getProperties(method);
-            method.releaseConnection();
-            if (!isOkish(response)) {
-                throw new IOException(responseBodyAsString);
-            }
-
         } catch (IOException | DavException e) {
             throw new PathUninspectableException(adaptor.getName(), "Could not inspect path " + path, e);
         }
