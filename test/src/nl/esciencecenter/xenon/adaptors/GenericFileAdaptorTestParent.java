@@ -850,7 +850,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test05_createDirectories() throws Exception {
+    public void test05_createDirectories_parentIsFile_throw() throws Exception {
         Path cwd = config.getWorkingDir(files, credentials);
         Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
         files.createDirectories(root);
@@ -864,6 +864,18 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file);
         deleteTestDir(root);
         files.close(cwd.getFileSystem());
+    }
+
+    @org.junit.Test
+    public void test05_createDirectories_fileSystemClosed_throwIfSupported() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.close(cwd.getFileSystem());
+
+        if (config.supportsClose()) {
+            // test with closed fs
+            test05_createDirectories(root, true);
+        }
     }
 
     // From this point on we can use prepareTestDir
