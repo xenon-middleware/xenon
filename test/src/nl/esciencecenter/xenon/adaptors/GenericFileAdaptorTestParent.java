@@ -973,42 +973,76 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test07_createFile() throws Exception {
-
-        // prepare
+    public void test07_createFile_nullFile_throw() throws Exception {
         prepareTestDir("test07_createFile");
 
-        // test with null
         test07_createFile(null, true);
 
-        // test with non-existing file
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test07_createFile_nonExistingFile_noThrow() throws Exception {
+        prepareTestDir("test07_createFile");
+
         Path file0 = createNewTestFileName(testDir);
         test07_createFile(file0, false);
-
-        // test with existing file
-        test07_createFile(file0, true);
-
-        // test with existing dir
-        test07_createFile(testDir, true);
-
-        Path tmp = createNewTestDirName(testDir);
-        Path file1 = createNewTestFileName(tmp);
-
-        // test with non-existing parent
-        test07_createFile(file1, true);
 
         // cleanup
         files.delete(file0);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // close test FS
+    @org.junit.Test
+    public void test07_createFile_existingFile_throw() throws Exception {
+        prepareTestDir("test07_createFile");
+        Path existingFile = createNewTestFileName(testDir);
+        files.createFile(existingFile);
+
+        test07_createFile(existingFile, true);
+
+        // cleanup
+        files.delete(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test07_createFile_existingDir_throw() throws Exception {
+        prepareTestDir("test07_createFile");
+
+        test07_createFile(testDir, true);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test07_createFile_nonExistentParent_throw() throws Exception {
+        prepareTestDir("test07_createFile");
+        Path nonExistingDir = createNewTestDirName(testDir);
+        Path pathWithoutParent = createNewTestFileName(nonExistingDir);
+
+        test07_createFile(pathWithoutParent, true);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test07_createFile_closedFileSystem_throwIfSupported() throws Exception {
+        prepareTestDir("test07_createFile");
+        Path file0 = createNewTestFileName(testDir);
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed filesystem
             test07_createFile(file0, true);
         }
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
