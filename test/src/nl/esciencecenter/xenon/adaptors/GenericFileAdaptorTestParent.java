@@ -788,49 +788,82 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test05_createDirectories() throws Exception {
-
-        // test with null
+    public void test05_createDirectories_null_throw() throws Exception {
         test05_createDirectories(null, true);
+    }
 
+    @org.junit.Test
+    public void test05_createDirectories_nonExisting_noThrow() throws Exception {
         Path cwd = config.getWorkingDir(files, credentials);
-
         Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
 
-        // test with non-existing dir
         test05_createDirectories(root, false);
 
-        // test with existing dir
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
+    }
+
+    @org.junit.Test
+    public void test05_createDirectories_existingPath_throw() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.createDirectories(root);
+
         test05_createDirectories(root, true);
 
-        // dir with existing parents
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
+    }
+
+    @org.junit.Test
+    public void test05_createDirectories_existingParent_noThrow() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.createDirectories(root);
+
         Path dir0 = createNewTestDirName(root);
         test05_createDirectories(dir0, false);
-        deleteTestDir(dir0);
-
-        // dir with non-existing parents
-        Path dir1 = createNewTestDirName(dir0);
-        test05_createDirectories(dir1, false);
-
-        // dir where last parent is file
-        Path file0 = createTestFile(dir0, null);
-        Path dir2 = createNewTestDirName(file0);
-        test05_createDirectories(dir2, true);
 
         // cleanup
-        deleteTestDir(dir1);
-        deleteTestFile(file0);
         deleteTestDir(dir0);
         deleteTestDir(root);
-
-        // close test FS
         files.close(cwd.getFileSystem());
 
-        if (config.supportsClose()) {
-            // test with closed fs
-            test05_createDirectories(root, true);
-        }
+    }
 
+    @org.junit.Test
+    public void test05_createDirectories_nonExistingParents_noThrow() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.createDirectories(root);
+        Path nonExistingDir = createNewTestDirName(root);
+
+        // Directory with non-existing parents
+        Path pathWithoutParent = createNewTestDirName(nonExistingDir);
+        test05_createDirectories(pathWithoutParent, false);
+
+        // cleanup
+        deleteTestDir(pathWithoutParent);
+        deleteTestDir(nonExistingDir);
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
+    }
+
+    @org.junit.Test
+    public void test05_createDirectories() throws Exception {
+        Path cwd = config.getWorkingDir(files, credentials);
+        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.createDirectories(root);
+
+        // Directory where last parent is file
+        Path file = createTestFile(root, null);
+        Path pathWithFileParent = createNewTestDirName(file);
+        test05_createDirectories(pathWithFileParent, true);
+
+        // cleanup
+        deleteTestFile(file);
+        deleteTestDir(root);
+        files.close(cwd.getFileSystem());
     }
 
     // From this point on we can use prepareTestDir
