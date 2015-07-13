@@ -1016,7 +1016,7 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test08_exists() throws Exception {
+    public void test08_exists_nullFile_throw() throws Exception {
 
         // prepare
         prepareTestDir("test08_exists");
@@ -1024,9 +1024,37 @@ public abstract class GenericFileAdaptorTestParent {
         // test with null
         test08_exists(null, false, true);
 
+        // cleanup
+        deleteTestDir(testDir);
+
+        // close test FS
+        closeTestFS();
+
+    }
+
+    @org.junit.Test
+    public void test08_exists_nonExistent_returnFalse() throws Exception {
+
+        // prepare
+        prepareTestDir("test08_exists");
+
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         test08_exists(file0, false, false);
+
+        // cleanup
+        deleteTestDir(testDir);
+
+        // close test FS
+        closeTestFS();
+
+    }
+
+    @org.junit.Test
+    public void test08_exists_existingFile_returnTrue() throws Exception {
+
+        // prepare
+        prepareTestDir("test08_exists");
 
         // test with existing file
         Path file1 = createTestFile(testDir, null);
