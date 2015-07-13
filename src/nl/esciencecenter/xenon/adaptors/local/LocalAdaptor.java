@@ -80,10 +80,10 @@ public class LocalAdaptor extends Adaptor {
     public static final String SUBMITTED = JOBS + "submitted";
     
     /** The schemes supported by the adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<String>("local", "file");
+    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("local", "file");
 
     /** The locations supported by the adaptor */
-    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(null)", "(empty string)", "/");
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(null)", "(empty string)", "/");
     
     /** The properties supported by this adaptor */
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 

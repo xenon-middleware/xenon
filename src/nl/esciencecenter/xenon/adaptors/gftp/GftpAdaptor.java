@@ -198,7 +198,7 @@ public class GftpAdaptor extends Adaptor {
     /**
      * Helper method to create new Session.
      * 
-     * @param hostname
+     * @param host
      *            - hostname of Grid FTP Server.
      * @param port
      *            - port of Grid FTP server.
