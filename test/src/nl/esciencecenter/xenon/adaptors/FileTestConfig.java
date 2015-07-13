@@ -70,4 +70,8 @@ public abstract class FileTestConfig extends GenericTestConfig {
         return tmp;
     }
 
+    public String getNonDefaultCredentialLocation() throws Exception {
+        return getCorrectLocation();
+    }
+
 }

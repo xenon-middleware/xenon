@@ -22,6 +22,7 @@ public class WebdavFileTestConfig extends FileTestConfig {
     private String wrongLocation;
     private String correctLocationWrongUser;
     private String correctLocationWithUser;
+    private String privateLocation;
 
     protected WebdavFileTestConfig(String adaptorName, String configfile) throws FileNotFoundException, IOException {
         super(adaptorName, configfile);
@@ -30,17 +31,14 @@ public class WebdavFileTestConfig extends FileTestConfig {
     public WebdavFileTestConfig(String configfile) throws Exception {
         super(scheme, configfile);
 
-        String publicLocation = getPropertyOrFail(p, "test.webdav.publiclocation");
-        String privateLocation = getPropertyOrFail(p, "test.webdav.privatelocation");
-
         username = getPropertyOrFail(p, "test.webdav.user");
         password = getPropertyOrFail(p, "test.webdav.password").toCharArray();
 
-        String uriScheme = "";//"http://"; TODO: clean up
-        correctLocation = uriScheme + publicLocation;
-        wrongLocation = uriScheme + username + "@doesnotexist71093880.com";
-        correctLocationWrongUser = uriScheme + "incorrect@" + publicLocation;
-        correctLocationWithUser = uriScheme + username + "@" + publicLocation;
+        privateLocation = getPropertyOrFail(p, "test.webdav.privatelocation");
+        correctLocation = getPropertyOrFail(p, "test.webdav.publiclocation");
+        wrongLocation = username + "@doesnotexist71093880.com";
+        correctLocationWrongUser = "incorrect@" + getPropertyOrFail(p, "test.webdav.publiclocation");
+        correctLocationWithUser = username + "@" + getPropertyOrFail(p, "test.webdav.publiclocation");
     }
 
     @Override
@@ -89,6 +87,11 @@ public class WebdavFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public String getNonDefaultCredentialLocation() throws Exception {
+        return privateLocation;
+    }
+
+    @Override
     public Credential getDefaultCredential(Credentials credentials) throws Exception {
         return credentials.getDefaultCredential(scheme);
     }
@@ -113,4 +116,8 @@ public class WebdavFileTestConfig extends FileTestConfig {
         return true;
     }
 
+    @Override
+    public boolean supportNonDefaultCredential() {
+        return true;
+    }
 }

@@ -1,8 +1,8 @@
 package nl.esciencecenter.xenon.adaptors.webdav;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,6 @@ import nl.esciencecenter.xenon.adaptors.ftp.FtpFiles;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.Copy;
@@ -31,13 +30,26 @@ import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileSystemOptions;
-import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.auth.StaticUserAuthenticator;
-import org.apache.commons.vfs2.impl.DefaultFileSystemConfigBuilder;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.MultiStatus;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.client.methods.DavMethod;
+import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
+import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
+import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,17 +74,17 @@ public class WebdavFiles implements Files {
 
         private final FileSystemImplementation impl;
         private final Credential credential;
-        private final FileObject fileObject;
+        private final HttpClient client;
 
-        public FileSystemInfo(FileSystemImplementation impl, FileObject fileObject, Credential credential) {
+        public FileSystemInfo(FileSystemImplementation impl, HttpClient client, Credential credential) {
             super();
             this.impl = impl;
             this.credential = credential;
-            this.fileObject = fileObject;
+            this.client = client;
         }
 
-        public FileObject getFileObject() {
-            return fileObject;
+        public HttpClient getClient() {
+            return client;
         }
 
         public FileSystemImplementation getImpl() {
@@ -94,63 +106,51 @@ public class WebdavFiles implements Files {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
-        WebdavLocation webdavLocation = new WebdavLocation(location);
-        FileObject fileObject = openWithVfs(scheme, webdavLocation, credential);
+        WebdavLocation webdavLocation = new WebdavLocation(location, scheme);
 
-        String cwd = getCurrentWorkingDirectory(fileObject);
+        HttpClient client = getClient(webdavLocation);
+        HttpMethod method;
+        try {
+            method = new OptionsMethod(toFolderPath(webdavLocation.toString())); // TODO
+            int response = client.executeMethod(method);
+            String responseBodyAsString = method.getStatusLine().toString();
+            method.releaseConnection();
+            if (!isOkish(response)) {
+                throw new IOException(responseBodyAsString);
+            }
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not open connection to " + location, e);
+        }
+
+        String cwd = webdavLocation.getPath();
         RelativePath entryPath = new RelativePath(cwd);
         String uniqueID = getNewUniqueID();
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
-        FileSystemImplementation fileSystem = new FileSystemImplementation(adaptor.getName(), uniqueID, scheme, location,
-                entryPath, credential, xenonProperties);
-        fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, fileObject, credential));
+        FileSystemImplementation fileSystem = new FileSystemImplementation(adaptor.getName(), uniqueID, scheme,
+                webdavLocation.getHost(), entryPath, credential, xenonProperties);
+        fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, client, credential));
         LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", cwd, entryPath, uniqueID);
         return fileSystem;
     }
 
-    private String getCurrentWorkingDirectory(FileObject fileObject) throws XenonException {
-        return "/";
-        //        String cwd = null;
-        //        try {
-        //            URL url = fileObject.getURL();
-        //            URI uri = url.toURI();
-        //            cwd = uri.getPath();
-        //        } catch (FileSystemException | URISyntaxException e) {
-        //            throw new XenonException(adaptor.getName(), "Could not retrieve current working directory", e);
-        //        }
-        //        return cwd;
+    private HttpClient getClient(WebdavLocation webdavLocation) {
+        HostConfiguration hostConfig = new HostConfiguration();
+        hostConfig.setHost(webdavLocation.getHost(), webdavLocation.getPort());
+        HttpConnectionManager connectionManager = getConnectionManager(hostConfig);
+        HttpClient client = new HttpClient(connectionManager);
+        Credentials creds = new UsernamePasswordCredentials("xenon", "xenon1");
+        client.getState().setCredentials(AuthScope.ANY, creds);
+        client.setHostConfiguration(hostConfig);
+        return client;
     }
 
-    private FileObject openWithVfs(String scheme, WebdavLocation webdavLocation, Credential credential) throws XenonException {
-        FileObject file = null;
-        try {
-            FileSystemManager manager = VFS.getManager();
-            StaticUserAuthenticator auth = getAuthenticator(webdavLocation, credential);
-            FileSystemOptions opts = new FileSystemOptions();
-            DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(opts, auth);
-
-            file = manager.resolveFile(scheme + "://" + webdavLocation.toString(), opts);
-            boolean exists = file.exists();
-            if (!exists) {
-                throw new XenonException(adaptor.getName(), MessageFormat.format("Location {0} does not exist", webdavLocation));
-            }
-
-        } catch (FileSystemException e) {
-            throw new XenonException(adaptor.getName(), "Failed to start file system manager", e);
-        }
-        return file;
-    }
-
-    private StaticUserAuthenticator getAuthenticator(WebdavLocation webdavLocation, Credential credential) {
-        String password = "";
-        String user = "";
-        if (credential instanceof PasswordCredentialImplementation) {
-            PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
-            password = new String(passwordCredential.getPassword());
-            user = passwordCredential.getUsername();
-        }
-        StaticUserAuthenticator auth = new StaticUserAuthenticator(webdavLocation.toString(), user, password);
-        return auth;
+    private HttpConnectionManager getConnectionManager(HostConfiguration hostConfig) {
+        HttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
+        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+        int maxHostConnections = 20;
+        params.setMaxConnectionsPerHost(hostConfig, maxHostConnections);
+        connectionManager.setParams(params);
+        return connectionManager;
     }
 
     @Override
@@ -166,9 +166,7 @@ public class WebdavFiles implements Files {
     @Override
     public boolean isOpen(FileSystem fileSystem) throws XenonException {
         LOGGER.debug("isOpen fileSystem = {}", fileSystem);
-        FileSystemImplementation fs = (FileSystemImplementation) fileSystem;
-        FileSystemInfo fileSystemInfo = fileSystems.get(fs.getUniqueID());
-        boolean result = (fileSystemInfo != null) && fileSystemInfo.getFileObject().isAttached();
+        boolean result = true;
         LOGGER.debug("isOpen OK result = {}", result);
         return result;
     }
@@ -199,21 +197,28 @@ public class WebdavFiles implements Files {
     @Override
     public void createDirectory(Path path) throws XenonException {
         LOGGER.debug("createDirectory dir = {}", path);
-        FileObject fileSystem = getFileSystemByPath(path);
-        String absolutePath = path.getRelativePath().getRelativePath();
+        HttpClient client = getFileSystemByPath(path);
+        String folderPath = toFolderPath(path.toString());
+        DavMethod method = new MkColMethod(folderPath);
         try {
-            FileObject newDirectory = fileSystem.resolveFile("public123");
-            boolean exists = newDirectory.exists();
-            boolean writeable = newDirectory.isWriteable();
-            boolean readable = newDirectory.isReadable();
-            boolean hidden = newDirectory.isHidden();
-            boolean contentOpen = newDirectory.isContentOpen();
-            boolean attached = newDirectory.isAttached();
-            newDirectory.createFolder();
-        } catch (FileSystemException e) {
-            throw new XenonException(adaptor.getName(), "Failed to create directory " + absolutePath, e);
+            excuteMethod(client, method);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not create directory " + folderPath, e);
         }
         LOGGER.debug("createDirectory OK");
+    }
+
+    private static void excuteMethod(HttpClient client, DavMethod method) throws IOException, HttpException {
+        int response = client.executeMethod(method);
+        String responseBodyAsString = method.getStatusLine().toString();
+        method.releaseConnection();
+        if (!isOkish(response)) {
+            throw new IOException(responseBodyAsString);
+        }
+    }
+
+    private static boolean isOkish(int response) {
+        return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS;
     }
 
     @Override
@@ -227,15 +232,18 @@ public class WebdavFiles implements Files {
     @Override
     public boolean exists(Path path) throws XenonException {
         LOGGER.debug("exists path = {}", path);
-        FileObject fileSystem = getFileSystemByPath(path);
-        String absolutePath = path.getRelativePath().getAbsolutePath();
-        boolean result;
+        HttpClient client = getFileSystemByPath(path);
+        String folderPath = toFolderPath(path.toString());
+        //        org.apache.commons.httpclient.methods.
+
+        DavMethod method = new OptionsMethod(folderPath); // TODO correct method? Also, can only return true of throw if not exist
         try {
-            FileObject fileObject = fileSystem.resolveFile(absolutePath);
-            result = fileObject.exists();
-        } catch (FileSystemException e) {
-            throw new XenonException(adaptor.getName(), "Failed to inspect directory " + absolutePath, e);
+            excuteMethod(client, method);
+
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not inspect directory " + folderPath, e);
         }
+        boolean result = true;
         LOGGER.debug("exists OK result = {}", result);
         return result;
     }
@@ -272,7 +280,70 @@ public class WebdavFiles implements Files {
 
     @Override
     public FileAttributes getAttributes(Path path) throws XenonException {
-        return null;
+        LOGGER.debug("getAttributes path = {}", path);
+        HttpClient client = getFileSystemByPath(path);
+        FileAttributes fileAttributes = getFileOrDirAttributes(path, client);
+        LOGGER.debug("getAttributes OK result = {}", fileAttributes);
+        return fileAttributes;
+    }
+
+    private FileAttributes getFileOrDirAttributes(Path path, HttpClient client) throws XenonException {
+        WebdavFileAttributes fileAttributes;
+        try {
+            String folderPath = toFolderPath(path.toString());
+            DavPropertySet properties = getPathProperties(client, folderPath);
+            fileAttributes = new WebdavDirectoryAttributes(properties);
+        } catch (PathUninspectableException e) {
+            String filePath = toFilePath(path.toString());
+            DavPropertySet properties = getPathProperties(client, filePath);
+            fileAttributes = new WebdavRegularFileAttributes(properties);
+        }
+        return fileAttributes;
+    }
+
+    private DavPropertySet getFileOrDirProperties(Path path, HttpClient client) throws XenonException {
+        DavPropertySet properties = null;
+        try {
+            String folderPath = toFolderPath(path.toString());
+            properties = getPathProperties(client, folderPath);
+        } catch (PathUninspectableException e) {
+            String filePath = toFilePath(path.toString());
+            properties = getPathProperties(client, filePath);
+        }
+        return properties;
+    }
+
+    private DavPropertySet getPathProperties(HttpClient client, String path) throws XenonException {
+        PropFindMethod method;
+        DavPropertySet properties = null;
+        try {
+            method = new PropFindMethod(path, DavPropertyNameSet.PROPFIND_ALL_PROP_INCLUDE, DavPropertyNameSet.DEPTH_1);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not inspect path " + path, e);
+        }
+        try {
+            int response = client.executeMethod(method);
+            String responseBodyAsString = method.getStatusLine().toString();
+            properties = getProperties(method);
+            method.releaseConnection();
+            if (!isOkish(response)) {
+                throw new IOException(responseBodyAsString);
+            }
+
+        } catch (IOException | DavException e) {
+            throw new PathUninspectableException(adaptor.getName(), "Could not inspect path " + path, e);
+        }
+        return properties;
+    }
+
+    private DavPropertySet getProperties(PropFindMethod method) throws IOException, DavException {
+        MultiStatus document = method.getResponseBodyAsMultiStatus();
+        MultiStatusResponse[] responses = document.getResponses();
+        DavPropertySet properties = null;
+        for (MultiStatusResponse multiStatusResponse : responses) {
+            properties = multiStatusResponse.getProperties(200);
+        }
+        return properties;
     }
 
     @Override
@@ -287,8 +358,17 @@ public class WebdavFiles implements Files {
     public void end() {
     }
 
-    private FileObject getFileSystemByPath(Path path) {
+    private String toFolderPath(String path) {
+        return path.endsWith("/") ? path : path + "/";
+    }
+
+    private String toFilePath(String path) {
+        // Removes all, if any, trailing slashes
+        return path.replaceAll("/+$", "");
+    }
+
+    private HttpClient getFileSystemByPath(Path path) {
         FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
-        return fileSystems.get(fileSystem.getUniqueID()).getFileObject();
+        return fileSystems.get(fileSystem.getUniqueID()).getClient();
     }
 }

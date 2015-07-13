@@ -10,7 +10,7 @@ public abstract class Location {
     private final String user;
     private final String host;
     private final int port;
-    private final String scheme;
+    private String scheme;
     protected final String path;
     private static final String SCHEME_SEPARATOR = "://";
     private static final String DUMMY_SCHEME = "dummy";
@@ -62,8 +62,12 @@ public abstract class Location {
         return port;
     }
 
-    public Object getSCheme() {
+    public String getSCheme() {
         return scheme;
+    }
+
+    protected void setScheme(String scheme) {
+        this.scheme = scheme;
     }
 
     protected abstract String getAdaptorName();

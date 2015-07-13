@@ -13,6 +13,13 @@ public class WebdavLocation extends Location {
         super(location);
     }
 
+    public WebdavLocation(String location, String scheme) throws InvalidLocationException {
+        this(location);
+        if (getSCheme() == null) {
+            setScheme(scheme);
+        }
+    }
+
     @Override
     protected String getAdaptorName() {
         return WebdavAdaptor.ADAPTOR_NAME;
@@ -21,10 +28,6 @@ public class WebdavLocation extends Location {
     @Override
     protected int getDefaultPort() {
         return WebdavAdaptor.DEFAULT_PORT;
-    }
-
-    public static WebdavLocation parse(String location) throws InvalidLocationException {
-        return new WebdavLocation(location);
     }
 
     public String getPath() {
@@ -36,4 +39,11 @@ public class WebdavLocation extends Location {
         return super.toString() + getPath();
     }
 
+    public static WebdavLocation parse(String location) throws InvalidLocationException {
+        return new WebdavLocation(location);
+    }
+
+    public static WebdavLocation parse(String location, String scheme) throws InvalidLocationException {
+        return new WebdavLocation(location, scheme);
+    }
 }

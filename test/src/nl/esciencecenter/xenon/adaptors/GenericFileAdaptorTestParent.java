@@ -488,7 +488,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), nonDefaultCredential, null, false);
+        test00_newFileSystem(config.getScheme(), config.getNonDefaultCredentialLocation(), nonDefaultCredential, null, false);
     }
 
     @org.junit.Test

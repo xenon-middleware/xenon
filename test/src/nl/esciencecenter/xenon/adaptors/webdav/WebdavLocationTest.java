@@ -43,4 +43,30 @@ public class WebdavLocationTest {
         // Assert
         assertEquals("http://domain:80/path", location.toString());
     }
+
+    @Test
+    public void toString_locationWithoutSchemeAndScheme_correctScheme() throws InvalidLocationException {
+        // Arrange
+        String url = "domain:80/path";
+        String scheme = "http";
+
+        // Act
+        WebdavLocation location = WebdavLocation.parse(url, scheme);
+
+        // Assert
+        assertEquals("http://domain:80/path", location.toString());
+    }
+
+    @Test
+    public void toString_locationConflictingSchemes_useUrlScheme() throws InvalidLocationException {
+        // Arrange
+        String url = "https://domain:80/path";
+        String scheme = "http";
+
+        // Act
+        WebdavLocation location = WebdavLocation.parse(url, scheme);
+
+        // Assert
+        assertEquals("https://domain:80/path", location.toString());
+    }
 }
