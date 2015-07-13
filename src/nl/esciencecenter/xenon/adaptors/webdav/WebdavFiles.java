@@ -201,14 +201,14 @@ public class WebdavFiles implements Files {
         String folderPath = toFolderPath(path.toString());
         DavMethod method = new MkColMethod(folderPath);
         try {
-            excuteMethod(client, method);
+            executeMethod(client, method);
         } catch (IOException e) {
             throw new XenonException(adaptor.getName(), "Could not create directory " + folderPath, e);
         }
         LOGGER.debug("createDirectory OK");
     }
 
-    private static void excuteMethod(HttpClient client, DavMethod method) throws IOException, HttpException {
+    private static void executeMethod(HttpClient client, DavMethod method) throws IOException, HttpException {
         int response = client.executeMethod(method);
         String responseBodyAsString = method.getStatusLine().toString();
         method.releaseConnection();
@@ -230,20 +230,15 @@ public class WebdavFiles implements Files {
     }
 
     @Override
-    public boolean exists(Path path) throws XenonException {
+    public boolean exists(Path path) {
         LOGGER.debug("exists path = {}", path);
-        HttpClient client = getFileSystemByPath(path);
-        String folderPath = toFolderPath(path.toString());
-        //        org.apache.commons.httpclient.methods.
-
-        DavMethod method = new OptionsMethod(folderPath); // TODO correct method? Also, can only return true of throw if not exist
+        boolean result = false;
         try {
-            excuteMethod(client, method);
-
-        } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), "Could not inspect directory " + folderPath, e);
+            getAttributes(path);
+            result = true;
+        } catch (XenonException e) {
+            // getAttributes did not find evidence that the specified path exists
         }
-        boolean result = true;
         LOGGER.debug("exists OK result = {}", result);
         return result;
     }
@@ -299,18 +294,6 @@ public class WebdavFiles implements Files {
             fileAttributes = new WebdavRegularFileAttributes(properties);
         }
         return fileAttributes;
-    }
-
-    private DavPropertySet getFileOrDirProperties(Path path, HttpClient client) throws XenonException {
-        DavPropertySet properties = null;
-        try {
-            String folderPath = toFolderPath(path.toString());
-            properties = getPathProperties(client, folderPath);
-        } catch (PathUninspectableException e) {
-            String filePath = toFilePath(path.toString());
-            properties = getPathProperties(client, filePath);
-        }
-        return properties;
     }
 
     private DavPropertySet getPathProperties(HttpClient client, String path) throws XenonException {

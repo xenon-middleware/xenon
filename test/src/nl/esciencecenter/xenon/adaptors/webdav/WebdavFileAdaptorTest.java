@@ -16,6 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.webdav;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
@@ -83,5 +84,26 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         Path path = files.newPath(fs, new RelativePath(NONEXISTENT_PATH));
         files.getAttributes(path);
+    }
+
+    @Test
+    public void exists_nonExistent_returnFalse() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path path = files.newPath(fs, new RelativePath(NONEXISTENT_PATH));
+        assertFalse(files.exists(path));
+    }
+
+    @Test
+    public void exists_filePath_returnTrue() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path path = files.newPath(fs, new RelativePath(FILE_PATH));
+        assertTrue(files.exists(path));
+    }
+
+    @Test
+    public void exists_dirPath_returnTrue() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path path = files.newPath(fs, new RelativePath(DIR_PATH));
+        assertTrue(files.exists(path));
     }
 }
