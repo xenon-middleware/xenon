@@ -24,6 +24,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
+import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
@@ -45,9 +46,11 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.client.methods.DavMethod;
+import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
 import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
 import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
+import org.apache.jackrabbit.webdav.client.methods.PutMethod;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.slf4j.Logger;
@@ -218,15 +221,46 @@ public class WebdavFiles implements Files {
     }
 
     private static boolean isOkish(int response) {
-        return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS;
+        return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS
+                || response == HttpStatus.SC_NO_CONTENT;
     }
 
     @Override
     public void createFile(Path path) throws XenonException {
+        LOGGER.debug("createFile path = {}", path);
+        HttpClient client = getFileSystemByPath(path);
+        String filePath = toFilePath(path.toString());
+        DavMethod method = new PutMethod(filePath);
+        try {
+            executeMethod(client, method);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not create file " + filePath, e);
+        }
+        LOGGER.debug("createFile OK");
     }
 
     @Override
     public void delete(Path path) throws XenonException {
+        LOGGER.debug("delete path = {}", path);
+        assertExists(path);
+        HttpClient client = getFileSystemByPath(path);
+        String deletePath = getFileOrFolderPath(path);
+        DavMethod method = new DeleteMethod(deletePath);
+        try {
+            executeMethod(client, method);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not delete path " + deletePath, e);
+        }
+        LOGGER.debug("delete OK");
+    }
+
+    private String getFileOrFolderPath(Path path) throws XenonException {
+        FileAttributes attributes = getAttributes(path);
+        if (attributes.isDirectory()) {
+            return toFolderPath(path.toString());
+        } else {
+            return toFilePath(path.toString());
+        }
     }
 
     @Override
@@ -333,6 +367,13 @@ public class WebdavFiles implements Files {
     }
 
     public void end() {
+    }
+
+    private void assertExists(Path path) throws XenonException {
+        boolean exists = exists(path);
+        if (!exists) {
+            throw new NoSuchPathException(adaptor.getName(), "Path does not exist " + path.toString());
+        }
     }
 
     private String toFolderPath(String path) {
