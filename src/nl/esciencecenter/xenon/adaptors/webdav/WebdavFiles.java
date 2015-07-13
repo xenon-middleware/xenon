@@ -194,7 +194,19 @@ public class WebdavFiles implements Files {
     }
 
     @Override
-    public void createDirectories(Path dir) throws XenonException {
+    public void createDirectories(Path path) throws XenonException {
+        LOGGER.debug("createDirectories dir = {}", path);
+        RelativePath relativeParent = path.getRelativePath().getParent();
+
+        if (relativeParent != null) {
+            PathImplementation parentPath = new PathImplementation(path.getFileSystem(), relativeParent);
+            if (!exists(parentPath)) {
+                // Recursive call
+                createDirectories(parentPath);
+            }
+        }
+        createDirectory(path);
+        LOGGER.debug("createDirectories OK");
     }
 
     @Override

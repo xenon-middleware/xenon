@@ -35,6 +35,7 @@ import org.junit.Test;
  */
 public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
 
+    private static final String NONEXISTENTPARENT_NEWDIR_PATH = "/public/nonexistentparent/newdir";
     private static final String NEWFILE_PATH = "/public/newfile";
     private static final String NEWDIR_PATH = "/public/xenonnewdir";
     private static final String NONEXISTENT_PATH = "/public/nonexistent.txt";
@@ -149,6 +150,24 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
     public void delete_nonExistent_throw() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         Path path = files.newPath(fs, new RelativePath(NONEXISTENT_PATH));
+        files.delete(path);
+    }
+
+    @Test
+    public void createDir_newDirExistingParent_fileExists() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path path = files.newPath(fs, new RelativePath(NEWDIR_PATH));
+        files.createDirectories(path);
+        assertTrue(files.exists(path));
+        files.delete(path);
+    }
+
+    @Test
+    public void createDir_newDirNonExistingParent_fileExists() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path path = files.newPath(fs, new RelativePath(NONEXISTENTPARENT_NEWDIR_PATH));
+        files.createDirectories(path);
+        assertTrue(files.exists(path));
         files.delete(path);
     }
 }
