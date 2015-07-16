@@ -1170,48 +1170,73 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test09_delete() throws Exception {
-
-        // test with null
+    public void test09_delete_null_throw() throws Exception {
         test09_delete(null, true);
 
+        // cleanup
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test09_delete_unexistingFile_throw() throws Exception {
         prepareTestDir("test09_delete");
+        Path unexistingFile = createNewTestFileName(testDir);
 
-        // test with non-existing file
-        Path file0 = createNewTestFileName(testDir);
-        test09_delete(file0, true);
-
-        // test with existing file
-        Path file1 = createTestFile(testDir, null);
-        test09_delete(file1, false);
-
-        // test with existing empty dir
-        Path dir0 = createTestDir(testDir);
-        test09_delete(dir0, false);
-
-        // test with existing non-empty dir
-        Path dir1 = createTestDir(testDir);
-        Path file2 = createTestFile(dir1, null);
-        test09_delete(dir1, true);
-
-        // test with non-writable file
-        //        Path file3 = createTestFile(testDir, null);
-        //        files.setPosixFilePermissions(file3, new HashSet<PosixFilePermission>());
-
-        //      System.err.println("Attempting to delete: " + file3.getPath() + " " + files.getAttributes(file3));
-
-        //        test09_delete(file3, true);
+        test09_delete(unexistingFile, true);
 
         // cleanup
-        deleteTestFile(file2);
-        deleteTestDir(dir1);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test09_delete_existingFile_noThrow() throws Exception {
+        prepareTestDir("test09_delete");
+        Path existingFile = createTestFile(testDir, null);
+
+        test09_delete(existingFile, false);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test09_delete_existingEmptyDir_noThrow() throws Exception {
+        prepareTestDir("test09_delete");
+        Path existingEmptyDir = createTestDir(testDir);
+
+        test09_delete(existingEmptyDir, false);
+
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test09_delete_existingNonEmptyDir_throw() throws Exception {
+        prepareTestDir("test09_delete");
+        Path nonEmptyDir = createTestDir(testDir);
+        Path file = createTestFile(nonEmptyDir, null);
+
+        test09_delete(nonEmptyDir, true);
+
+        // cleanup
+        deleteTestFile(file);
+        deleteTestDir(nonEmptyDir);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test09_delete_closedFileSystem_throwIfSupported() throws Exception {
+        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
+         * deleting a dir from a closed file system (which it should) it would still throw
+         * an exception because the dir doesn't exist. Can be solved by testing for a
+         * specific type of exception.
+         */
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
             test09_delete(testDir, true);
         }
 
