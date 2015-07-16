@@ -27,6 +27,7 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -240,6 +241,7 @@ public class WebdavFiles implements Files {
     @Override
     public void createFile(Path path) throws XenonException {
         LOGGER.debug("createFile path = {}", path);
+        assertNotExists(path);
         HttpClient client = getFileSystemByPath(path);
         String filePath = toFilePath(path.toString());
         DavMethod method = new PutMethod(filePath);
@@ -382,9 +384,14 @@ public class WebdavFiles implements Files {
     }
 
     private void assertExists(Path path) throws XenonException {
-        boolean exists = exists(path);
-        if (!exists) {
+        if (!exists(path)) {
             throw new NoSuchPathException(adaptor.getName(), "Path does not exist " + path.toString());
+        }
+    }
+
+    private void assertNotExists(Path path) throws XenonException {
+        if (exists(path)) {
+            throw new PathAlreadyExistsException(adaptor.getName(), "Path already exists " + path.toString());
         }
     }
 
