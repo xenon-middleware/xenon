@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
@@ -34,28 +35,29 @@ public class RelativePath {
     public static final char DEFAULT_SEPARATOR = '/';
 
     /** The path elements in this relative path */
-    private final String[] elements;
+    private final List<String> elements;
 
     /** The separator used in this relative path */
     private final char separator;
 
-    class RelativePathIterator implements Iterator<RelativePath> {
+    /** Estimate of path element String length. */
+    private final int PATH_ELEMENT_LENGTH = 25;
 
+    class RelativePathIterator implements Iterator<RelativePath> {
         private int index = 1;
 
         @Override
         public boolean hasNext() {
-            return index <= elements.length;
+            return index <= elements.size();
         }
 
         @Override
         public RelativePath next() {
-
-            if (index > elements.length) {
+            if (!hasNext()) {
                 throw new NoSuchElementException("No more elements available!");
             }
 
-            return new RelativePath(separator, Arrays.copyOf(elements, index++));
+            return subpath(0, index++);
         }
 
         @Override
@@ -68,7 +70,7 @@ public class RelativePath {
      * Create a new empty RelativePath using the default separator.
      */
     public RelativePath() {
-        this(DEFAULT_SEPARATOR, new String[0]);
+        this(DEFAULT_SEPARATOR, new ArrayList<String>(0));
     }
 
     /**
@@ -108,27 +110,18 @@ public class RelativePath {
      *            the path elements to use.
      */
     public RelativePath(RelativePath... paths) {
-
-        if (paths.length == 0) {
-            elements = new String[0];
+        if (paths == null || paths.length == 0) {
+            elements = new ArrayList<>(0);
             separator = DEFAULT_SEPARATOR;
-            return;
-        }
-
-        if (paths.length == 1) {
-            elements = paths[0].elements;
+        } else {
+            elements = new ArrayList<>(paths.length);
+            for (RelativePath path : paths) {
+                if (path != null) {
+                    elements.addAll(path.elements);
+                }
+            }
             separator = paths[0].separator;
-            return;
         }
-
-        String[] tmp = merge(paths[0].elements, paths[1].elements);
-
-        for (int i = 2; i < paths.length; i++) {
-            tmp = merge(tmp, paths[i].elements);
-        }
-
-        elements = tmp;
-        separator = paths[0].separator;
     }
 
     /**
@@ -145,32 +138,42 @@ public class RelativePath {
      *            the separator to use.
      */
     public RelativePath(char separator, String... elements) {
-
-        this.separator = separator;
-
-        if (elements == null || elements.length == 0) {
-            this.elements = new String[0];
-        } else {
-
-            ArrayList<String> tmp = new ArrayList<String>();
-
-            for (int i = 0; i < elements.length; i++) {
-
-                String elt = elements[i];
-
-                if (elt != null && elt.length() > 0) {
-                    StringTokenizer tok = new StringTokenizer(elt, "" + this.separator);
-
-                    while (tok.hasMoreTokens()) {
-                        tmp.add(tok.nextToken());
-                    }
-                }
-            }
-
-            this.elements = tmp.toArray(new String[tmp.size()]);
-        }
+        this(separator, elements == null ? new ArrayList<String>(0) : Arrays.asList(elements));
     }
 
+    /**
+     * Create a new RelativePath using the given path elements and the separator.
+     *
+     * If the <code>elements</code> is <code>null</code> or an empty String array, the resulting RelativePath is empty.
+     *
+     * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is
+     * encountered. Elements that are <code>null</code> or contain an empty String are ignored.
+     *
+     * @param elements
+     *            the path elements to use.
+     * @param separator
+     *            the separator to use.
+     */
+    public RelativePath(char separator, List<String> elements) {
+        if (elements == null) {
+            elements = new ArrayList<>(0);
+        }
+        this.separator = separator;
+
+        String delim = String.valueOf(separator);
+
+        this.elements = new ArrayList<>(elements.size());
+        for (String elt : elements) {
+            if (elt == null || elt.isEmpty()) {
+                continue;
+            }
+            StringTokenizer tok = new StringTokenizer(elt, delim);
+
+            while (tok.hasMoreTokens()) {
+                this.elements.add(tok.nextToken());
+            }
+        }
+    }
     /**
      * Get the file name, or <code>null</code> if the RelativePath is empty.
      * 
@@ -179,11 +182,11 @@ public class RelativePath {
      * @return the resulting file name or <code>null</code>.
      */
     public RelativePath getFileName() {
-        if (elements.length == 0) {
+        if (isEmpty()) {
             return null;
         }
         
-        return new RelativePath(separator, elements[elements.length - 1]);
+        return new RelativePath(separator, getFileNameAsString());
     }
 
     /**
@@ -194,11 +197,11 @@ public class RelativePath {
      * @return the resulting file name or <code>null</code>.
      */
     public String getFileNameAsString() {
-        if (elements.length == 0) {
+        if (isEmpty()) {
             return null;
         }
         
-        return elements[elements.length - 1];
+        return elements.get(elements.size() - 1);
     }
     
     /**
@@ -216,14 +219,11 @@ public class RelativePath {
      * @return a RelativePath representing this RelativePaths parent.
      */
     public RelativePath getParent() {
-
-        if (elements.length == 0) {
+        if (isEmpty()) {
             return null;
         }
 
-        String[] parentElements = Arrays.copyOfRange(elements, 0, elements.length - 1);
-
-        return new RelativePath(separator, parentElements);
+        return new RelativePath(separator, elements.subList(0, elements.size() - 1));
     }
 
     /**
@@ -232,7 +232,7 @@ public class RelativePath {
      * @return the number of elements in the RelativePath, or 0 if this is empty.
      */
     public int getNameCount() {
-        return elements.length;
+        return elements.size();
     }
 
     /**
@@ -243,14 +243,11 @@ public class RelativePath {
      * 
      * @return the name element
      * 
-     * @throws IllegalArgumentException
+     * @throws IndexOutOfBoundsException
      *             If the index is negative or greater or equal to the number of elements in the path.
      */
     public RelativePath getName(int index) {
-        if (index < 0 || index >= elements.length) {
-            throw new IllegalArgumentException("index " + index + " not present in path " + this);
-        }
-        return new RelativePath(separator, elements[index]);
+        return new RelativePath(separator, elements.get(index));
     }
 
     /**
@@ -264,30 +261,16 @@ public class RelativePath {
      * @return a new RelativePath that is a subsequence of the name elements in this path.
      * 
      * @throws IllegalArgumentException
-     *             If the beginIndex or endIndex is negative or greater or equal to the number of elements in the path, or if
-     *             beginIndex is larger that or equal to the endIndex.
+     *             If beginIndex is larger than or equal to the endIndex.
+     * @throws ArrayIndexOutOfBoundsException
+     *             If beginIndex &lt; 0 or beginIndex &gt; elements.length
      */
     public RelativePath subpath(int beginIndex, int endIndex) {
-
-        if (beginIndex < 0 || beginIndex >= elements.length) {
-            throw new IllegalArgumentException("beginIndex " + beginIndex + " not present in path " + this);
+        if (beginIndex == endIndex) {
+            throw new IllegalArgumentException("beginIndex " + beginIndex + " equal to endIndex " + endIndex);
         }
 
-        if (endIndex < 0 || endIndex > elements.length) {
-            throw new IllegalArgumentException("endIndex " + endIndex + " not present in path " + this);
-        }
-
-        if (beginIndex >= endIndex) {
-            throw new IllegalArgumentException("beginIndex " + beginIndex + " larger than endIndex " + endIndex);
-        }
-
-        String[] tmp = new String[endIndex - beginIndex];
-
-        for (int i = beginIndex; i < endIndex; i++) {
-            tmp[i - beginIndex] = elements[i];
-        }
-
-        return new RelativePath(separator, tmp);
+        return new RelativePath(separator, elements.subList(beginIndex, endIndex));
     }
 
     /**
@@ -302,26 +285,8 @@ public class RelativePath {
      * @return If this RelativePath start with the name elements in the other RelativePath.
      */
     public boolean startsWith(RelativePath other) {
-
-        if (other.isEmpty()) {
-            return true;
-        }
-
-        if (isEmpty()) {
-            return false;
-        }
-
-        if (other.elements.length > elements.length) {
-            return false;
-        }
-
-        for (int i = 0; i < other.elements.length; i++) {
-            if (!other.elements[i].equals(elements[i])) {
-                return false;
-            }
-        }
-
-        return true;
+        return other.elements.size() <= elements.size()
+            && elements.subList(0, other.elements.size()).equals(other.elements);
     }
 
     /**
@@ -336,28 +301,10 @@ public class RelativePath {
      * @return If this RelativePath ends with the name elements in the other RelativePath.
      */
     public boolean endsWith(RelativePath other) {
+        int offset = elements.size() - other.elements.size();
 
-        if (other.isEmpty()) {
-            return true;
-        }
-
-        if (isEmpty()) {
-            return false;
-        }
-
-        if (other.elements.length > elements.length) {
-            return false;
-        }
-
-        int offset = elements.length - other.elements.length;
-
-        for (int i = 0; i < other.elements.length; i++) {
-            if (!other.elements[i].equals(elements[offset + i])) {
-                return false;
-            }
-        }
-
-        return true;
+        return other.elements.size() <= elements.size() &&
+            this.elements.subList(offset, elements.size()).equals(other.elements);
     }
 
     /**
@@ -389,28 +336,6 @@ public class RelativePath {
     public boolean endsWith(String other) {
         return endsWith(new RelativePath(other));
     }
-    
-    /**
-     * Concatenate two String arrays.
-     * 
-     * @param a
-     *            the first String array.
-     * @param b
-     *            the first String array.
-     * 
-     * @return the concatenation of the two String arrays.
-     */
-    private String[] merge(String[] a, String[] b) {
-
-        int count = a.length + b.length;
-
-        String[] tmp = new String[count];
-
-        System.arraycopy(a, 0, tmp, 0, a.length);
-        System.arraycopy(b, 0, tmp, a.length, b.length);
-
-        return tmp;
-    }
 
     /**
      * Resolve a RelativePath against this RelativePath.
@@ -426,16 +351,16 @@ public class RelativePath {
      *            the RelativePath.
      */
     public RelativePath resolve(RelativePath other) {
-
         if (other == null || other.isEmpty()) {
             return this;
-        }
-
-        if (isEmpty()) {
+        } else if (isEmpty()) {
             return other;
         }
 
-        return new RelativePath(separator, merge(elements, other.elements));
+        ArrayList<String> tmp = new ArrayList<>(elements.size() + other.elements.size());
+        tmp.addAll(elements);
+        tmp.addAll(other.elements);
+        return new RelativePath(separator, tmp);
     }
 
     /**
@@ -450,8 +375,7 @@ public class RelativePath {
      *            the path.
      */
     public RelativePath resolve(String other) {
-
-        if (other == null || other.length() == 0) {
+        if (other == null || other.isEmpty()) {
             return this;
         }
 
@@ -464,7 +388,7 @@ public class RelativePath {
      * @return If this RelativePath is empty.
      */
     public boolean isEmpty() {
-        return elements.length == 0;
+        return elements.isEmpty();
     }
 
     /**
@@ -487,7 +411,6 @@ public class RelativePath {
      *             If the RelativePath can not be resolved as a sibling to this RelativePath.
      */
     public RelativePath resolveSibling(RelativePath other) {
-
         if (isEmpty()) {
             if (other == null) {
                 return this;
@@ -496,13 +419,7 @@ public class RelativePath {
             }
         }
 
-        RelativePath parent = getParent();
-
-        if (other == null || other.isEmpty()) {
-            return parent;
-        }
-
-        return parent.resolve(other);
+        return getParent().resolve(other);
     }
 
     /**
@@ -520,44 +437,30 @@ public class RelativePath {
      *             If the path can not be relativized to this path.
      */
     public RelativePath relativize(RelativePath other) {
-
         if (isEmpty()) {
             return other;
         }
 
-        if (other.isEmpty()) {
-            return this;
-        }
-
-        RelativePath normalized = normalize();
-        RelativePath normalizedOther = other.normalize();
-
-        String[] elts = normalized.elements;
-        String[] eltsOther = normalizedOther.elements;
+        List<String> normalized = normalize().elements;
+        List<String> normalizedOther = other.normalize().elements;
 
         // The source may not be longer that target
-        if (elts.length > eltsOther.length) {
+        if (normalized.size() > normalizedOther.size()) {
             throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
         }
 
-        // If source and target must have the same start.
-        for (int i = 0; i < elts.length; i++) {
-            if (!elts[i].equals(eltsOther[i])) {
-                throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
-            }
+        // Source and target must have the same start.
+        if (!normalizedOther.subList(0, normalized.size()).equals(normalized)) {
+            throw new IllegalArgumentException("Cannot relativize " + other.getAbsolutePath() + " to " + getAbsolutePath());
         }
 
-        if (elts.length == eltsOther.length) {
-            return new RelativePath(separator, new String[0]);
-        }
-
-        return new RelativePath(separator, Arrays.copyOfRange(eltsOther, elts.length, eltsOther.length));
+        return new RelativePath(separator, normalizedOther.subList(normalized.size(), normalizedOther.size()));
     }
 
     /**
      * Create an {@link Iterator} that returns all possible sub RelativePaths of this RelativePath, in order of increasing length.
      * 
-     * For example, for the RelativePath "/a/b/c/d" the iterator returns "/a", "/a/b", "a/b/c", "/a/b/c/d".
+     * For example, for the RelativePath "/a/b/c/d" the iterator returns "/a", "/a/b", "/a/b/c", "/a/b/c/d".
      * 
      * @return the iterator.
      */
@@ -573,19 +476,14 @@ public class RelativePath {
      * @return a String representation of this RelativePath interpreted as a relative path.
      */
     public String getRelativePath() {
-
-        if (elements.length == 0) {
-            return "";
-        }
-
-        StringBuilder tmp = new StringBuilder();
+        StringBuilder tmp = new StringBuilder(elements.size() * PATH_ELEMENT_LENGTH);
 
         String sep = "";
         
-        for (int i = 0; i < elements.length; i++) {
+        for (String element : elements) {
             tmp.append(sep);
-            tmp.append(elements[i]);
-            sep = "" + separator;
+            tmp.append(element);
+            sep = String.valueOf(separator);
         }
         
         return tmp.toString();
@@ -599,22 +497,9 @@ public class RelativePath {
      * @return a String representation of this path interpreted as an absolute path.
      */
     public String getAbsolutePath() {
-        
-        if (elements.length == 0) {
-            return "" + separator;
-        }
-
-        StringBuilder tmp = new StringBuilder();
-
-        for (int i = 0; i < elements.length; i++) {
-            tmp.append(separator);
-            tmp.append(elements[i]);
-        }
-        
-        return tmp.toString();
+        return separator + getRelativePath();
     }
 
-    
     /**
      * Normalize this RelativePath by removing as many redundant path elements as possible.
      * 
@@ -626,16 +511,11 @@ public class RelativePath {
      * @return the normalize path.
      */
     public RelativePath normalize() {
-
         if (isEmpty()) {
             return this;
         }
 
-        ArrayList<String> stack = new ArrayList<String>();
-
-        for (String s : elements) {
-            stack.add(s);
-        }
+        ArrayList<String> stack = new ArrayList<>(elements);
 
         boolean change = true;
 
@@ -643,31 +523,27 @@ public class RelativePath {
             change = false;
 
             for (int i = stack.size() - 1; i >= 0; i--) {
+                if (i >= stack.size()) {
+                    continue;
+                }
 
-                if (i < stack.size()) {
+                String elt = stack.get(i);
 
-                    String elt = stack.get(i);
+                if (elt.equals(".")) {
+                    stack.remove(i);
+                    change = true;
+                } else if (i > 0 && elt.equals("..")) {
+                    String parent = stack.get(i - 1);
 
-                    if (elt.equals(".")) {
-                        stack.remove(i);
+                    if (!(parent.equals(".") || parent.equals(".."))) {
+                        stack.subList(i - 1, i + 1).clear();
                         change = true;
-
-                    } else if (i > 0 && elt.equals("..")) {
-                        String parent = stack.get(i - 1);
-
-                        if (!(parent.equals(".") || parent.equals(".."))) {
-                            // NOTE: order is VERY important here!
-                            stack.remove(i);
-                            stack.remove(i - 1);
-                            change = true;
-                        }
                     }
                 }
             }
         }
 
-        String[] tmp = stack.toArray(new String[stack.size()]);
-        return new RelativePath(separator, tmp);
+        return new RelativePath(separator, stack);
     }
 
     /* Generated */
@@ -675,7 +551,7 @@ public class RelativePath {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(elements);
+        result = prime * result + elements.hashCode();
         result = prime * result + separator;
         return result;
     }
@@ -685,26 +561,16 @@ public class RelativePath {
         if (this == obj) {
             return true;
         }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         RelativePath other = (RelativePath) obj;
-
-        if (separator != other.separator) {
-            return false;
-        }
-
-        return Arrays.equals(elements, other.elements);
+        return separator == other.separator && elements.equals(other.elements);
     }
 
     @Override
     public String toString() {
-        return "RelativePath [element=" + Arrays.toString(elements) + ", seperator=" + separator + "]";
+        return "RelativePath [element=" + elements + ", seperator=" + separator + "]";
     }
 }

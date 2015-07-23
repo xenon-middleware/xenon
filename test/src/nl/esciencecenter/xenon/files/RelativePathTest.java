@@ -23,8 +23,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 
-import nl.esciencecenter.xenon.files.RelativePath;
-
 import org.junit.Test;
 
 public class RelativePathTest {
@@ -334,8 +332,8 @@ public class RelativePathTest {
         try {
             path.getName(3);
             fail("Able to fetch index out of bounds");
-        } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "index 3 not present in path RelativePath [element=[mydir, myfile], seperator=/]");
+        } catch (IndexOutOfBoundsException e) {
+            assertEquals("Index: 3, Size: 2", e.getMessage());
         }
     }
 
@@ -381,12 +379,12 @@ public class RelativePathTest {
         doSubPath(new String[] { "a", "b", "c" }, 1, 3, new String[] { "b", "c" });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testSubpath_EndAfterLast() {
         doSubPath(new String[] { "a", "b", "c" }, 1, 5, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testSubpath_BeginBeforeFirst() {
         doSubPath(new String[] { "a", "b", "c" }, -1, 1, null);
     }
@@ -396,7 +394,7 @@ public class RelativePathTest {
         doSubPath(new String[] { "a", "b", "c" }, 2, 1, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testSubpath_BeginGreaterThanLength() {
         doSubPath(new String[] { "a", "b", "c" }, 4, 5, null);
     }
@@ -559,7 +557,7 @@ public class RelativePathTest {
         assertEquals(path2, path4);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testRelativize3() {
         RelativePath path = new RelativePath("a/b/c/d");
         RelativePath path2 = new RelativePath();
