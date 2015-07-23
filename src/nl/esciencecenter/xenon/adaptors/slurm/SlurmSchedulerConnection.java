@@ -306,7 +306,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         //Parse output. Ignore some header and footer lines.
         Map<String, String> info = ScriptingParser.parseKeyValueLines(output, ScriptingParser.EQUALS_REGEX,
-                SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of", "Slurmctld(primary/backup) at");
+                SlurmAdaptor.ADAPTOR_NAME, "Configuration data as of", "Slurmctld(primary/backup) at", "Account Gather");
 
         return new SlurmSetup(info, ignoreVersion, disableAccounting);
     }
