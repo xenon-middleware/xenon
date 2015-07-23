@@ -258,14 +258,24 @@ public class WebdavFiles implements Files {
         LOGGER.debug("delete path = {}", path);
         assertExists(path);
         HttpClient client = getFileSystemByPath(path);
-        String deletePath = getFileOrFolderPath(path);
-        DavMethod method = new DeleteMethod(deletePath);
+        FileAttributes attributes = getAttributes(path);
+        if (attributes.isDirectory()) {
+            assertIsEmpty(path);
+            String folderPath = toFolderPath(path.toString());
+            executeDeleteMethod(folderPath, client);
+        } else {
+            executeDeleteMethod(toFilePath(path.toString()), client);
+        }
+        LOGGER.debug("delete OK");
+    }
+
+    private void executeDeleteMethod(String deletePath, HttpClient client) throws XenonException {
+        DeleteMethod method = new DeleteMethod(deletePath);
         try {
             executeMethod(client, method);
         } catch (IOException e) {
             throw new XenonException(adaptor.getName(), "Could not delete path " + deletePath, e);
         }
-        LOGGER.debug("delete OK");
     }
 
     private String getFileOrFolderPath(Path path) throws XenonException {
@@ -381,6 +391,10 @@ public class WebdavFiles implements Files {
     }
 
     public void end() {
+    }
+
+    private void assertIsEmpty(Path path) {
+        // TODO throw if path not empty
     }
 
     private void assertExists(Path path) throws XenonException {
