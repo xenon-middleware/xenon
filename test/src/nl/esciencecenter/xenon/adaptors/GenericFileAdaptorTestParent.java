@@ -1377,61 +1377,117 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test11_newDirectoryStream() throws Exception {
-
-        // test with null
+    public void test11_newDirectoryStream_null_throw() throws Exception {
         test11_newDirectoryStream(null, null, true);
+        closeTestFS();
+    }
 
+    @org.junit.Test
+    public void test11_newDirectoryStream_emptyTestDir_noThrow() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
 
-        // test with empty dir
         test11_newDirectoryStream(testDir, null, false);
 
-        // test with non-existing dir
-        Path dir0 = createNewTestDirName(testDir);
-        test11_newDirectoryStream(dir0, null, true);
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // test with exising file
-        Path file0 = createTestFile(testDir, null);
-        test11_newDirectoryStream(file0, null, true);
+    @org.junit.Test
+    public void test11_newDirectoryStream_nonExistingDir_throw() throws Exception {
+        prepareTestDir("test11_newDirectoryStream");
+        Path nonExistingDir = createNewTestDirName(testDir);
 
-        // test with non-empty dir
-        Path file1 = createTestFile(testDir, null);
-        Path file2 = createTestFile(testDir, null);
-        Path file3 = createTestFile(testDir, null);
+        test11_newDirectoryStream(nonExistingDir, null, true);
 
-        Set<Path> tmp = new HashSet<Path>();
-        tmp.add(file0);
-        tmp.add(file1);
-        tmp.add(file2);
-        tmp.add(file3);
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        test11_newDirectoryStream(testDir, tmp, false);
+    @org.junit.Test
+    public void test11_newDirectoryStream_filePath_throw() throws Exception {
+        prepareTestDir("test11_newDirectoryStream");
+        Path file = createTestFile(testDir, null);
 
-        // test with subdirs
-        Path dir1 = createTestDir(testDir);
-        Path file4 = createTestFile(dir1, null);
+        test11_newDirectoryStream(file, null, true);
 
-        tmp.add(dir1);
+        // cleanup
+        deleteTestFile(file);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        test11_newDirectoryStream(testDir, tmp, false);
+    @org.junit.Test
+    public void test11_newDirectoryStream_multipleFiles_noThrow() throws Exception {
+        prepareTestDir("test11_newDirectoryStream");
+        Path nonEmptyDir = testDir;
+        Path file0 = createTestFile(nonEmptyDir, null);
+        Path file1 = createTestFile(nonEmptyDir, null);
+        Path file2 = createTestFile(nonEmptyDir, null);
+        Path file3 = createTestFile(nonEmptyDir, null);
 
-        deleteTestFile(file4);
-        deleteTestDir(dir1);
+        Set<Path> expectedResultSet = new HashSet<Path>();
+        expectedResultSet.add(file0);
+        expectedResultSet.add(file1);
+        expectedResultSet.add(file2);
+        expectedResultSet.add(file3);
+
+        test11_newDirectoryStream(nonEmptyDir, expectedResultSet, false);
+
+        // cleanup
         deleteTestFile(file3);
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test11_newDirectoryStream_subDir_dirReturned() throws Exception {
+        prepareTestDir("test11_newDirectoryStream");
+        Path subDir = createTestDir(testDir);
+        Set<Path> expectedResultSet = new HashSet<Path>();
+        expectedResultSet.add(subDir);
+
+        test11_newDirectoryStream(testDir, expectedResultSet, false);
+
+        // cleanup
+        deleteTestDir(subDir);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test11_newDirectoryStream_nonEmptySubDir_nestedContentNotReturned() throws Exception {
+        prepareTestDir("test11_newDirectoryStream");
+        Path subDir = createTestDir(testDir);
+        Path nestedFile = createTestFile(subDir, null);
+        Set<Path> expectedResultSet = new HashSet<Path>();
+        expectedResultSet.add(subDir);
+
+        test11_newDirectoryStream(testDir, expectedResultSet, false);
+
+        // cleanup
+        deleteTestFile(nestedFile);
+        deleteTestDir(subDir);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test11_newDirectoryStream_withClosedFileSystem_throwIfSupported() throws Exception {
+        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
+         * creating a directory stream of a dir from a closed file system (which it should) it would still throw
+         * an exception because the dir doesn't exist. Can be solved by testing for a
+         * specific type of exception.
+         */
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
             test11_newDirectoryStream(testDir, null, true);
         }
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
