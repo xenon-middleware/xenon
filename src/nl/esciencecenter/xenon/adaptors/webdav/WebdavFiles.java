@@ -3,6 +3,7 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,11 +11,11 @@ import java.util.Set;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
-import nl.esciencecenter.xenon.adaptors.ftp.FtpFiles;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
+import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -43,6 +44,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.MultiStatus;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
@@ -52,13 +54,14 @@ import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
 import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
 import org.apache.jackrabbit.webdav.client.methods.PutMethod;
+import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebdavFiles implements Files {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FtpFiles.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebdavFiles.class);
     private WebdavAdaptor adaptor;
 
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
@@ -302,13 +305,46 @@ public class WebdavFiles implements Files {
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
-        return null;
+    public DirectoryStream<Path> newDirectoryStream(Path path) throws XenonException {
+        return newDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
-        return null;
+    public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws XenonException {
+        LOGGER.debug("newDirectoryStream path = {} filter = <?>", path);
+        assertExists(path);
+        HttpClient client = getFileSystemByPath(path);
+        String folderPath = toFolderPath(path.toString());
+
+        DavMethod method = null;
+        try {
+            method = new PropFindMethod(folderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
+            client.executeMethod(method);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not create directory listing of " + folderPath, e);
+        }
+
+        MultiStatus multiStatus = null;
+        try {
+            multiStatus = method.getResponseBodyAsMultiStatus();
+        } catch (IOException | DavException e) {
+            throw new XenonException(adaptor.getName(), "Could not create directory listing of " + folderPath, e);
+        }
+        MultiStatusResponse[] responses = multiStatus.getResponses();
+        System.out.println("********* Requested path is " + path.toString());
+        System.out.println("********* Corrected path is " + folderPath);
+        System.out.println("********* Folders and files in " + folderPath + ":");
+        for (MultiStatusResponse response : responses) {
+            System.out.println("*********   # Element path: " + response.getHref());
+            for (DavProperty a : response.getProperties(200)) {
+                //                System.out.println("*********     o " + a.getName() + " = " + a.getValue());
+            }
+        }
+
+        DirectoryStream<Path> result = new WebdavDirectoryStream(path, filter, Arrays.asList(responses));
+
+        LOGGER.debug("newDirectoryStream OK");
+        return result;
     }
 
     @Override
