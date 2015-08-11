@@ -80,6 +80,12 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Adaptor does not support interactive jobs");
         }
 
+        if (description.getStdout() != null) {
+            throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Torque adaptor cannot set STDOUT: a custom STDOUT is set internally");
+        }
+        if (description.getStderr() != null) {
+            throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Torque adaptor cannot set STDERR: a custom STDERR is set internally");
+        }
         if (description.getStdin() != null) {
             throw new InvalidJobDescriptionException(TorqueAdaptor.ADAPTOR_NAME, "Torque cannot process STDIN");
         }

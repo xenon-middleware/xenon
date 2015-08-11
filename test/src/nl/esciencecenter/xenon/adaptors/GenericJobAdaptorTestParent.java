@@ -53,7 +53,6 @@ import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
 import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -130,7 +129,7 @@ public abstract class GenericJobAdaptorTestParent {
     // MUST be invoked by a @AfterClass method of the subclass! 
     public static void cleanupClass() throws Exception {
 
-        logger.debug("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
+        System.err.println("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
         Xenon xenon = XenonFactory.newXenon(null);
 
@@ -141,7 +140,7 @@ public abstract class GenericJobAdaptorTestParent {
         Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
-			Utils.recursiveDelete(files, root);
+            files.delete(root);
         }
 
         XenonFactory.endXenon(xenon);
@@ -725,15 +724,16 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-        Path out = resolve(root, job.getJobDescription().getStdout());
-        Path err = resolve(root, job.getJobDescription().getStderr());
+        Path out = resolve(root, "stdout.txt");
+        Path err = resolve(root, "stderr.txt");
 
-		System.out.println("MYDIALOG:" + out);
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
 
-        Utils.recursiveDelete(files, root);
-        
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
+
         files.close(cwd.getFileSystem());
 
         System.err.println("STDOUT: " + tmpout);
@@ -796,8 +796,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path out = resolve(root, job.getJobDescription().getStdout());
-        Path err = resolve(root, job.getJobDescription().getStderr());
+        Path out = resolve(root, "stdout.txt");
+        Path err = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(out));
         String tmperr = readFully(files.newInputStream(err));
@@ -816,12 +816,15 @@ public abstract class GenericJobAdaptorTestParent {
 
         assertTrue(tmperr.length() == 0);
         
-        Utils.recursiveDelete(files, root);
-        
+        files.delete(out);
+        files.delete(err);
+        files.delete(root);
+
         files.close(cwd.getFileSystem());
     }
 
-    private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
+    protected void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
+
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount);
 
         String workingDir = getWorkingDir(testName);
@@ -833,9 +836,18 @@ public abstract class GenericJobAdaptorTestParent {
 
         files.createDirectories(root);
 
+        Path[] out = new Path[jobCount];
+        Path[] err = new Path[jobCount];
+
+        Jobs jobs = xenon.jobs();
+
         Job[] j = new Job[jobCount];
 
         for (int i = 0; i < j.length; i++) {
+
+            out[i] = resolve(root, "stdout" + i + ".txt");
+            err[i] = resolve(root, "stderr" + i + ".txt");
+
             JobDescription description = new JobDescription();
             
             if (config.targetIsWindows()) { 
@@ -861,16 +873,14 @@ public abstract class GenericJobAdaptorTestParent {
         long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + (jobCount * config.getUpdateTime());
 
         boolean done = false;
-		Job[] jUpdate = new Job[j.length];
-		System.arraycopy(j, 0, jUpdate, 0, j.length);
-		
+
         while (!done) {
             JobStatus[] status = jobs.getJobStatuses(j);
 
             int count = 0;
 
             for (int i = 0; i < j.length; i++) {
-                if (jUpdate[i] != null) {
+                if (j[i] != null) {
                     if (status[i].isDone()) {
                         if (status[i].hasException()) {
                             System.err.println("Job " + i + " failed!");
@@ -878,7 +888,7 @@ public abstract class GenericJobAdaptorTestParent {
                         }
 
                         System.err.println("Job " + i + " done.");
-                        jUpdate[i] = null;
+                        j[i] = null;
                     } else {
                         count++;
                     }
@@ -899,10 +909,9 @@ public abstract class GenericJobAdaptorTestParent {
         }
 
         for (int i = 0; i < j.length; i++) {
-			Path out = resolve(root, j[i].getJobDescription().getStdout());
-			Path err = resolve(root, j[i].getJobDescription().getStderr());
-            String tmpout = readFully(files.newInputStream(out));
-            String tmperr = readFully(files.newInputStream(err));
+
+            String tmpout = readFully(files.newInputStream(out[i]));
+            String tmperr = readFully(files.newInputStream(err[i]));
 
             assertTrue(tmpout != null);
             
@@ -912,10 +921,13 @@ public abstract class GenericJobAdaptorTestParent {
 
             assertTrue(tmperr != null);
             assertTrue(tmperr.length() == 0);
+
+            files.delete(out[i]);
+            files.delete(err[i]);
         }
 
         jobs.close(scheduler);
-        Utils.recursiveDelete(files, root);
+        files.delete(root);
         files.close(cwd.getFileSystem());
     }
 
@@ -929,6 +941,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @org.junit.Test
     public void test33b_testMultiBatchJobSubmitWithPolling() throws Exception {
+
         System.err.println("STARTING TEST test33b");
 
         for (String queue : config.getQueueNames()) {
@@ -979,7 +992,18 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Utils.recursiveDelete(files, root);
+        Path out = resolve(root, description.getStdout());
+        Path err = resolve(root, description.getStderr());
+
+        if (files.exists(out)) {
+            files.delete(out);
+        }
+
+        if (files.exists(err)) {
+            files.delete(err);
+        }
+
+        files.delete(root);
         files.close(cwd.getFileSystem());
 
         assertTrue(status.hasException());
@@ -1040,7 +1064,18 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-		Utils.recursiveDelete(files, root);
+        Path out = resolve(root, description.getStdout());
+        Path err = resolve(root, description.getStderr());
+
+        if (files.exists(out)) {
+            files.delete(out);
+        }
+
+        if (files.exists(err)) {
+            files.delete(err);
+        }
+
+        files.delete(root);
         files.close(cwd.getFileSystem());
 
         assertTrue(status.hasException());
@@ -1080,13 +1115,8 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
-		
-		Job job;
-		try {
-			job = jobs.submitJob(scheduler, description);
-		} catch (InvalidJobDescriptionException ex) {
-			return; // cannot process stdin
-		}
+
+        Job job = jobs.submitJob(scheduler, description);
 
         JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
 
@@ -1100,13 +1130,16 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path stdout = resolve(root, job.getJobDescription().getStdout());
-        Path stderr = resolve(root, job.getJobDescription().getStderr());
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
 
-        Utils.recursiveDelete(files, root);
+        files.delete(stdin);
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
         files.close(cwd.getFileSystem());
 
         System.err.println("STDOUT: " + tmpout);
@@ -1157,13 +1190,8 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdout("stdout.txt");
         description.setStderr("stderr.txt");
 
-		Job job;
-		try {
-			job = jobs.submitJob(scheduler, description);
-		} catch (InvalidJobDescriptionException ex) {
-			return; // cannot process stdin
-		}
-        
+        Job job = jobs.submitJob(scheduler, description);
+
         JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
 
         if (status.isRunning()) {
@@ -1180,8 +1208,8 @@ public abstract class GenericJobAdaptorTestParent {
 
         jobs.close(scheduler);
 
-        Path stdout = resolve(root, job.getJobDescription().getStdout());
-        Path stderr = resolve(root, job.getJobDescription().getStderr());
+        Path stdout = resolve(root, "stdout.txt");
+        Path stderr = resolve(root, "stderr.txt");
 
         String tmpout = readFully(files.newInputStream(stdout));
         String tmperr = readFully(files.newInputStream(stderr));
@@ -1189,7 +1217,10 @@ public abstract class GenericJobAdaptorTestParent {
         System.err.println("STDOUT: " + tmpout);
         System.err.println("STDERR: " + tmperr);
 
-        Utils.recursiveDelete(files, root);
+        files.delete(stdin);
+        files.delete(stdout);
+        files.delete(stderr);
+        files.delete(root);
         files.close(cwd.getFileSystem());
 
         assertTrue(tmpout != null);
@@ -1275,7 +1306,7 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-		Utils.recursiveDelete(files, root);
+        files.delete(root);
         jobs.close(scheduler);
         files.close(cwd.getFileSystem());
     }
@@ -1319,7 +1350,7 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-		Utils.recursiveDelete(files, root);
+        files.delete(root);
         jobs.close(scheduler);
         files.close(cwd.getFileSystem());
     }
@@ -1411,7 +1442,7 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-		Utils.recursiveDelete(files, root);
+        files.delete(root);
         jobs.close(scheduler);
         files.close(cwd.getFileSystem());
     }
@@ -1447,14 +1478,8 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
 
-		Job job;
-		try {
-			job = jobs.submitJob(scheduler, description);
-		} catch (InvalidJobDescriptionException ex) {
-			return; // cannot process stdin
-		}
-
-		JobStatus status = jobs.waitUntilDone(job, 60000);
+        Job job = jobs.submitJob(scheduler, description);
+        JobStatus status = jobs.waitUntilDone(job, 60000);
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1486,10 +1511,14 @@ public abstract class GenericJobAdaptorTestParent {
             }
             
             assertTrue(tmperr.length() == 0);
+
+            files.delete(stdoutTmp);
+            files.delete(stderrTmp);
         }
 
-        Utils.recursiveDelete(files, root);
-        
+        files.delete(stdin);
+        files.delete(root);
+
         jobs.close(scheduler);
         files.close(cwd.getFileSystem());
     }
@@ -1690,13 +1719,14 @@ public abstract class GenericJobAdaptorTestParent {
             throw new Exception("Job failed!", status.getException());
         }
 
-        Path stdout = resolve(root, job.getJobDescription().getStdout());
+        Path stdout = resolve(root, "stdout.txt");
 
         String stdoutContent = readFully(files.newInputStream(stdout));
 
         assertTrue(stdoutContent.equals("some_value\n"));
 
-        Utils.recursiveDelete(files, root);
+        files.delete(stdout);
+        files.delete(root);
         files.close(cwd.getFileSystem());
     }
 
@@ -1788,11 +1818,11 @@ public abstract class GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        description.setWorkingDirectory(workingDir + ".new");
+        description.setStdout("aap.txt");
 
         JobDescription original = job.getJobDescription();
 
-        assertEquals("Job description should have been copied!", workingDir, original.getWorkingDirectory());
+        assertEquals("Job description should have been copied!", "stdout.txt", original.getStdout());
 
         JobStatus status = jobs.cancelJob(job);
 
@@ -1800,7 +1830,13 @@ public abstract class GenericJobAdaptorTestParent {
             jobs.waitUntilDone(job, 60000);
         }
 
-		Utils.recursiveDelete(files, root);
+        Path out = resolve(root, "stdout.txt");
+
+        if (files.exists(out)) {
+            files.delete(out);
+        }
+
+        files.delete(root);
         files.close(cwd.getFileSystem());
     }
 }
