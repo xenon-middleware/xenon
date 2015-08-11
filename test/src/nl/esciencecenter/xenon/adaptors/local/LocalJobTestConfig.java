@@ -66,7 +66,7 @@ public class LocalJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getDefaultCredential(Credentials c) throws Exception {
-        return null;
+        return c.getDefaultCredential(scheme);
     }
 
     @Override

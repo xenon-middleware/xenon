@@ -22,7 +22,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -107,7 +106,7 @@ public class LocalAdaptor extends Adaptor {
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         localFiles = new LocalFiles(this, xenonEngine.getCopyEngine());
-        localJobs = new LocalJobs(getProperties(), Utils.getLocalCWD(localFiles), xenonEngine);
+        localJobs = new LocalJobs(this, getProperties(), Utils.getLocalCWD(localFiles), xenonEngine);
         localCredentials = new LocalCredentials();
     }
 
@@ -124,29 +123,6 @@ public class LocalAdaptor extends Adaptor {
         throw new InvalidCredentialException(ADAPTOR_NAME, "Adaptor does not support this credential!");
     }
    
-    /** 
-     * Check if a location string is valid for the local scheduler. 
-     * 
-     * The location should -only- contain a file system root, such as "/" or "C:". 
-     * 
-     * @param location
-     *          the location to check.
-     * @throws InvalidLocationException
-     *          if the location is invalid.                   
-     */
-    void checkLocation(String location) throws InvalidLocationException {
-
-        if (location == null) {
-            throw new InvalidLocationException(ADAPTOR_NAME, "Location must contain a file system root! (not null)");
-        }
-
-        if (Utils.isLocalRoot(location)) { 
-            return;
-        }
-        
-        throw new InvalidLocationException(ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
-    }
-
     @Override
     public boolean supports(String scheme) {
 

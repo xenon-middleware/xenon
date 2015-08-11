@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -100,6 +101,28 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         if (!exists(parent)) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Parent directory " + parent + " does not exist!");
         }
+    }
+    
+    /** 
+     * Check if a location string is valid for the local filesystem. 
+     * 
+     * The location should -only- contain a file system root, such as "/" or "C:". 
+     * 
+     * @param location
+     *          the location to check.
+     * @throws InvalidLocationException
+     *          if the location is invalid.                   
+     */
+    static void checkFileLocation(String location) throws InvalidLocationException {
+        if (location == null) {
+            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must contain a file system root! (not null)");
+        }
+    
+        if (Utils.isLocalRoot(location)) { 
+            return;
+        }
+        
+        throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
     }
     
     /**
@@ -276,7 +299,8 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-        localAdaptor.checkLocation(location);
+        checkFileLocation(location);
+        
         localAdaptor.checkCredential(credential);
 
         XenonProperties p = new XenonProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
@@ -395,4 +419,6 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     public CopyStatus cancelCopy(Copy copy) throws XenonException {
         return copyEngine.cancel(copy);
     }
+
+   
 }
