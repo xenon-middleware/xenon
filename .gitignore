@@ -4,4 +4,6 @@
 /tmp_eclipse
 /dist
 /bin
-build
+/build
+/test/xenon.test.properties
+/.gradle
