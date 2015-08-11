@@ -1933,66 +1933,151 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test14_setPosixFilePermissions() throws Exception {
-
+    public void test14_setPosixFilePermissions_nullPath_throw() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
         }
 
-        // test with null, null
         test14_setPosixFilePermissions(null, null, true);
 
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_existingFileNullSet_throw() throws Exception {
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
         prepareTestDir("test14_setPosixFilePermissions");
+        Path existingFile = createTestFile(testDir, null);
 
-        // test with existing file, null set
-        Path file0 = createTestFile(testDir, null);
-        test14_setPosixFilePermissions(file0, null, true);
+        test14_setPosixFilePermissions(existingFile, null, true);
 
-        // test with existing file, empty set
-        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
-        test14_setPosixFilePermissions(file0, permissions, false);
-
-        // test with existing file, non-empty set
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
-        test14_setPosixFilePermissions(file0, permissions, false);
-
-        permissions.add(PosixFilePermission.OTHERS_READ);
-        test14_setPosixFilePermissions(file0, permissions, false);
-
-        permissions.add(PosixFilePermission.GROUP_READ);
-        test14_setPosixFilePermissions(file0, permissions, false);
-
-        // test with non-existing file
-        Path file1 = createNewTestFileName(testDir);
-        test14_setPosixFilePermissions(file1, permissions, true);
-
-        // test with existing dir
-        Path dir0 = createTestDir(testDir);
-
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
-        test14_setPosixFilePermissions(dir0, permissions, false);
-
-        permissions.add(PosixFilePermission.OTHERS_READ);
-        test14_setPosixFilePermissions(dir0, permissions, false);
-
-        permissions.add(PosixFilePermission.GROUP_READ);
-        test14_setPosixFilePermissions(dir0, permissions, false);
-
-        deleteTestDir(dir0);
-        deleteTestFile(file0);
+        // cleanup
+        deleteTestFile(existingFile);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_existingFileZeroPermissions_noThrow() throws Exception {
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
+        prepareTestDir("test14_setPosixFilePermissions");
+        Path existingFile = createTestFile(testDir, null);
+        Set<PosixFilePermission> emptyPermissions = new HashSet<PosixFilePermission>();
+
+        test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
+
+        // cleanup
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_existingFileFewPermissions_noThrow() throws Exception {
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
+        prepareTestDir("test14_setPosixFilePermissions");
+        Path existingFile = createTestFile(testDir, null);
+        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
+        permissions.add(PosixFilePermission.OWNER_EXECUTE);
+        permissions.add(PosixFilePermission.OWNER_READ);
+        permissions.add(PosixFilePermission.OWNER_WRITE);
+
+        test14_setPosixFilePermissions(existingFile, permissions, false);
+
+        // cleanup
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_existingFileMorePermissions_noThrow() throws Exception {
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
+        prepareTestDir("test14_setPosixFilePermissions");
+        Path existingFile = createTestFile(testDir, null);
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+
+        test14_setPosixFilePermissions(existingFile, permissions, false);
+
+        // cleanup
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_nonExistingFile_throw() throws Exception {
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
+        prepareTestDir("test14_setPosixFilePermissions");
+        Path existingFile = createTestFile(testDir, null);
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+        Path nonExistingFile = createNewTestFileName(testDir);
+
+        test14_setPosixFilePermissions(nonExistingFile, permissions, true);
+
+        // cleanup
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_existingDir_throw() throws Exception {
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
+        prepareTestDir("test14_setPosixFilePermissions");
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+        Path existingDir = createTestDir(testDir);
+
+        test14_setPosixFilePermissions(existingDir, permissions, false);
+
+        // cleanup
+        deleteTestDir(existingDir);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test14_setPosixFilePermissions_closedFileSystem_throw() throws Exception {
+        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
+         * setting the permissions of a file from a closed file system (which it should) it would still throw
+         * an exception because the file doesn't exist. Can be solved by testing for a
+         * specific type of exception.
+         */
+        if (!config.supportsPosixPermissions()) {
+            return;
+        }
+        prepareTestDir("test14_setPosixFilePermissions");
+        Path existingFile = createTestFile(testDir, null);
+        Set<PosixFilePermission> permissions = getVariousPosixPermissions();
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
-            test14_setPosixFilePermissions(file0, permissions, true);
+            test14_setPosixFilePermissions(existingFile, permissions, true);
         }
+    }
+
+    private Set<PosixFilePermission> getVariousPosixPermissions() {
+        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
+        permissions.add(PosixFilePermission.OWNER_EXECUTE);
+        permissions.add(PosixFilePermission.OWNER_READ);
+        permissions.add(PosixFilePermission.OWNER_WRITE);
+        permissions.add(PosixFilePermission.OTHERS_READ);
+        permissions.add(PosixFilePermission.GROUP_READ);
+        return permissions;
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
