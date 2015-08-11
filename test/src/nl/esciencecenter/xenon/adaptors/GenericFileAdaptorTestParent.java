@@ -2367,82 +2367,186 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test15_newAttributesDirectoryStream_with_filter() throws Exception {
-
-        // test with null
+    public void test16_newAttributesDirectoryStreamWithFilter_nullPath_throw() throws Exception {
         test16_newAttributesDirectoryStream(null, null, null, true);
+        closeTestFS();
+    }
 
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_nullFilter_throw() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
 
-        // test with empty dir + null filter
         test16_newAttributesDirectoryStream(testDir, null, null, true);
 
-        // test with empty dir + true filter
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_emptyDirTrueFilter_noThrow() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+
         test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, false);
 
-        // test with empty dir + false filter
-        test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, false);
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // test with non-existing dir
-        Path dir0 = createNewTestDirName(testDir);
-        test16_newAttributesDirectoryStream(dir0, new AllTrue(), null, true);
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_emptyDirFalseFilter_noThrow() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
 
-        // test with existing file
+        test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_nonExistingDir_throw() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        Path nonExistingDir = createNewTestDirName(testDir);
+
+        test16_newAttributesDirectoryStream(nonExistingDir, new AllTrue(), null, true);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_filePath_throw() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        Path existingFile = createTestFile(testDir, null);
+
+        test16_newAttributesDirectoryStream(existingFile, new AllTrue(), null, true);
+
+        // cleanup
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_nonEmptyDirTrueFilter_correctListing() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
         Path file0 = createTestFile(testDir, null);
-        test16_newAttributesDirectoryStream(file0, new AllTrue(), null, true);
-
-        // test with non-empty dir and allTrue
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
+        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file3, files.getAttributes(file3)));
 
-        Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
-        result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
-        result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
-        result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
-        result.add(new PathAttributesPairImplementation(file3, files.getAttributes(file3)));
+        test16_newAttributesDirectoryStream(testDir, new AllTrue(), expectedResultSet, false);
 
-        test16_newAttributesDirectoryStream(testDir, new AllTrue(), result, false);
-
-        // test with non-empty dir and allFalse
-        test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
-
-        // test with subdirs
-        Path dir1 = createTestDir(testDir);
-        Path file4 = createTestFile(dir1, null);
-
-        result.add(new PathAttributesPairImplementation(dir1, files.getAttributes(dir1)));
-        test16_newAttributesDirectoryStream(testDir, new AllTrue(), result, false);
-
-        // test with non-empty dir and select
-        Set<Path> tmp = new HashSet<Path>();
-        tmp.add(file0);
-        tmp.add(file1);
-        tmp.add(file2);
-
-        result = new HashSet<PathAttributesPair>();
-        result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
-        result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
-        result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
-
-        test16_newAttributesDirectoryStream(testDir, new Select(tmp), result, false);
-
-        deleteTestFile(file4);
-        deleteTestDir(dir1);
+        // cleanup
         deleteTestFile(file3);
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_nonEmptyDirFalseFilter_emptyListing() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        Path file0 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
+        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file3, files.getAttributes(file3)));
+
+        test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
+
+        // cleanup
+        deleteTestFile(file3);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_dirWithSubDirs_onlyTopDirContents() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        Path file0 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
+        Path subDir = createTestDir(testDir);
+        Path irrelevantFileInSubDir = createTestFile(subDir, null);
+        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
+        expectedResultSet.add(new PathAttributesPairImplementation(file3, files.getAttributes(file3)));
+        expectedResultSet.add(new PathAttributesPairImplementation(subDir, files.getAttributes(subDir)));
+
+        test16_newAttributesDirectoryStream(testDir, new AllTrue(), expectedResultSet, false);
+
+        // cleanup
+        deleteTestFile(irrelevantFileInSubDir);
+        deleteTestDir(subDir);
+        deleteTestFile(file3);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_selectFilter_selectedListing() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        Path selectedFile0 = createTestFile(testDir, null);
+        Path selectedFile1 = createTestFile(testDir, null);
+        Path selectedFile2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
+        Path subDir = createTestDir(testDir);
+        Path irrelevantFileInSubDir = createTestFile(subDir, null);
+        Set<Path> selection = new HashSet<Path>();
+        selection.add(selectedFile0);
+        selection.add(selectedFile1);
+        selection.add(selectedFile2);
+        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        expectedResultSet.add(new PathAttributesPairImplementation(selectedFile0, files.getAttributes(selectedFile0)));
+        expectedResultSet.add(new PathAttributesPairImplementation(selectedFile1, files.getAttributes(selectedFile1)));
+        expectedResultSet.add(new PathAttributesPairImplementation(selectedFile2, files.getAttributes(selectedFile2)));
+
+        test16_newAttributesDirectoryStream(testDir, new Select(selection), expectedResultSet, false);
+
+        // cleanup
+        deleteTestFile(irrelevantFileInSubDir);
+        deleteTestDir(subDir);
+        deleteTestFile(file3);
+        deleteTestFile(selectedFile2);
+        deleteTestFile(selectedFile1);
+        deleteTestFile(selectedFile0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test16_newAttributesDirectoryStreamWithFilter_closedFileSystem_throwIfSupported() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        deleteTestDir(testDir);
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
             test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, true);
         }
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
