@@ -35,7 +35,7 @@ public abstract class Location {
             URI url = new URI(augmentedLocation == null ? location : augmentedLocation);
             user = url.getUserInfo();
             host = url.getHost();
-            port = url.getPort() == -1 ? getDefaultPort() : url.getPort();
+            port = url.getPort();// == -1 ? getDefaultPort() : url.getPort();
             scheme = hasScheme ? url.getScheme() : null;
             path = url.getPath();
             validate();
@@ -59,6 +59,10 @@ public abstract class Location {
     }
 
     public int getPort() {
+    	if (port == -1){
+    		return getDefaultPort();
+    	}
+    
         return port;
     }
 
@@ -101,5 +105,10 @@ public abstract class Location {
             result.append(scheme);
             result.append(SCHEME_SEPARATOR);
         }
+    }
+    
+    /** Whether the default port was used because none was provided. */
+    public boolean usesDefaultPort() {
+        return port == -1;
     }
 }

@@ -32,6 +32,8 @@ public final class ScriptingParser {
 
     public static final Pattern WHITESPACE_REGEX = Pattern.compile("\\s+");
 
+    public static final Pattern DOT_REGEX = Pattern.compile("\\.");
+
     public static final Pattern BAR_REGEX = Pattern.compile("\\s*\\|\\s*");
 
     public static final Pattern NEWLINE_REGEX = Pattern.compile("\\r?\\n");
@@ -59,7 +61,7 @@ public final class ScriptingParser {
     public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines)
             throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, String> result = Utils.emptyMap(lines.length);
+        Map<String, String> result = new HashMap<>();
 
         for (String line : lines) {
             if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
@@ -110,7 +112,7 @@ public final class ScriptingParser {
     public static Map<String, String> parseKeyValueLines(String input, Pattern separatorRegEx, String adaptorName,
             String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, String> result = Utils.emptyMap(lines.length);
+        Map<String, String> result = new HashMap<>();
 
         for (String line : lines) {
             if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
@@ -156,13 +158,16 @@ public final class ScriptingParser {
 
                 //cut of anything after the job id
                 jobId = WHITESPACE_REGEX.split(jobId)[0];
-
-                try {
-                    return Long.parseLong(jobId);
-                } catch (NumberFormatException e) {
-                    throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
-                            + jobId + "\" is not a number", e);
+                // parse job ID's of the form 929292.host or host.29131
+                for (String jobIdPart : DOT_REGEX.split(jobId)) {
+                    try {
+                        return Long.parseLong(jobIdPart);
+                    } catch (NumberFormatException e) {
+                        //continue
+                    }
                 }
+                throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
+                                    + jobId + "\" is not a number");
             }
         }
         throw new XenonException(adaptorName, "Failed to get jobID from line: \"" + input
@@ -219,7 +224,7 @@ public final class ScriptingParser {
         }
 
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, Map<String, String>> result = Utils.emptyMap(lines.length);
+        Map<String, Map<String, String>> result = new HashMap<>();
 
         int headerLine = 0;
         String[] fields;
@@ -253,7 +258,7 @@ public final class ScriptingParser {
                         + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values));
             }
 
-            Map<String, String> map = Utils.emptyMap(fields.length);
+            Map<String, String> map = new HashMap<>();
             for (int j = 0; j < fields.length; j++) {
                 map.put(fields[j], cleanValue(values[j], valueSuffixes));
             }
@@ -323,7 +328,7 @@ public final class ScriptingParser {
     public static Map<String, Map<String, String>> parseKeyValueRecords(String input, String keyField, Pattern separatorRegEx,
             String adaptorName, String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, Map<String, String>> result = Utils.emptyMap(lines.length);
+        Map<String, Map<String, String>> result = new HashMap<>();
 
         Map<String, String> currentMap = null;
 

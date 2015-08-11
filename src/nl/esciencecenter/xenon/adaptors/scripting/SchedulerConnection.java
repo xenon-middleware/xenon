@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -86,9 +86,9 @@ public abstract class SchedulerConnection {
      *            the job description to check
      * @param adaptorName
      *            the name of the adaptor. Used when an exception is thrown
-     * @throws IncompleteJobDescription
+     * @throws IncompleteJobDescriptionException
      *             if the description is missing a mandatory value.
-     * @throws InvalidJobDescription
+     * @throws InvalidJobDescriptionException
      *             if the description contains illegal values.
      */
     protected static void verifyJobDescription(JobDescription description, String adaptorName) throws XenonException {
@@ -257,7 +257,7 @@ public abstract class SchedulerConnection {
                 arguments);
 
         if (!runner.success()) {
-            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin + \"" + stdin
+            throw new XenonException(adaptor.getName(), "could not run command \"" + executable + "\" with stdin \"" + stdin
                     + "\" arguments \"" + Arrays.toString(arguments) + "\" at \"" + subScheduler + "\". Exit code = "
                     + runner.getExitCode() + " Output: " + runner.getStdout() + " Error output: " + runner.getStderr());
         }

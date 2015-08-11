@@ -163,9 +163,9 @@ public class XenonEngineTest {
     @Test
     public void getAdaptorInfos_StandardAdaptors_Succeeds() throws Exception {
 
-        // We currently have 6 adaptors:
-        // local, ssh, gridengine, slurm, ftp, gftp
-        int count = 6;
+        // We currently have 7 adaptors:
+        // local, ssh, gridengine, slurm, ftp, gftp, torque
+        int count = 7;
 
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
 

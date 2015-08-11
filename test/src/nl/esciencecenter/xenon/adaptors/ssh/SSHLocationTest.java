@@ -7,13 +7,15 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 
 import org.junit.Test;
 
+import com.jcraft.jsch.ConfigRepository;
+
 public class SSHLocationTest {
 
     public static final int DEFAULT_PORT = 22;
 
     @Test
     public void test_parse_hostOnly() throws Exception {
-        SshLocation tmp = SshLocation.parse("host");
+        SshLocation tmp = SshLocation.parse("host", ConfigRepository.nullConfig);
         assertNull(tmp.getUser());
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == DEFAULT_PORT);
@@ -21,7 +23,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_userHost() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host");
+        SshLocation tmp = SshLocation.parse("user@host", ConfigRepository.nullConfig);
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == DEFAULT_PORT);
@@ -29,7 +31,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_hostPort() throws Exception {
-        SshLocation tmp = SshLocation.parse("host:33");
+        SshLocation tmp = SshLocation.parse("host:33", ConfigRepository.nullConfig);
         assertNull(tmp.getUser());
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == 33);
@@ -37,7 +39,7 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_userHostPort() throws Exception {
-        SshLocation tmp = SshLocation.parse("user@host:33");
+        SshLocation tmp = SshLocation.parse("user@host:33", ConfigRepository.nullConfig);
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == 33);
@@ -45,59 +47,85 @@ public class SSHLocationTest {
 
     @Test
     public void test_parse_withScheme_correctScheme() throws InvalidLocationException {
-        SshLocation tmp = SshLocation.parse("ssh://host");
+        SshLocation tmp = SshLocation.parse("ssh://host", ConfigRepository.nullConfig);
         assertEquals("ssh", tmp.getSCheme());
     }
 
     @Test
     public void test_parse_withScheme_correctHost() throws InvalidLocationException {
-        SshLocation tmp = SshLocation.parse("ssh://host");
+        SshLocation tmp = SshLocation.parse("ssh://host", ConfigRepository.nullConfig);
         assertEquals("host", tmp.getHost());
     }
 
     @Test
     public void test_parse_withScheme_correctPort() throws InvalidLocationException {
-        SshLocation tmp = SshLocation.parse("ssh://host:777");
+        SshLocation tmp = SshLocation.parse("ssh://host:777", ConfigRepository.nullConfig);
         assertEquals(777, tmp.getPort());
     }
 
     @Test
     public void test_parseToString_withOutScheme() throws InvalidLocationException {
         String url = "user@host:777";
-        SshLocation tmp = SshLocation.parse(url);
+        SshLocation tmp = SshLocation.parse(url, ConfigRepository.nullConfig);
         assertEquals(url, tmp.toString());
     }
 
     @Test
     public void test_parseToString_withScheme() throws InvalidLocationException {
         String url = "ssh://user@host:777";
-        SshLocation tmp = SshLocation.parse(url);
+        SshLocation tmp = SshLocation.parse(url, ConfigRepository.nullConfig);
         assertEquals(url, tmp.toString());
+    }
+
+    @Test
+    public void test_parse_userHostDefaultPort1() throws Exception {
+        SshLocation tmp = SshLocation.parse("user@host:-42", ConfigRepository.nullConfig);
+        assertEquals("user", tmp.getUser());
+        assertEquals("host", tmp.getHost());
+        assertEquals(DEFAULT_PORT, tmp.getPort());
+    }
+
+    @Test
+    public void test_parse_userHostDefaultPort2() throws Exception {
+        SshLocation tmp = SshLocation.parse("user@host:0", ConfigRepository.nullConfig);
+        assertEquals("user", tmp.getUser());
+        assertEquals("host", tmp.getHost());
+        assertEquals(DEFAULT_PORT, tmp.getPort());
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_parse_missingUser() throws Exception {
+        SshLocation.parse("@host:33", ConfigRepository.nullConfig);
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_parse_missingPort() throws Exception {
+        SshLocation.parse("host:", ConfigRepository.nullConfig);
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingPort2() throws Exception {
-        SshLocation.parse("host:  ");
+        SshLocation.parse("host:  ", ConfigRepository.nullConfig);
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_invalidPort() throws Exception {
-        SshLocation.parse("host:aap");
+        SshLocation.parse("host:aap", ConfigRepository.nullConfig);
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingHost1() throws Exception {
-        SshLocation.parse(":33");
+        SshLocation.parse(":33", ConfigRepository.nullConfig);
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingHost2() throws Exception {
-        SshLocation.parse("user@");
+        SshLocation.parse("user@", ConfigRepository.nullConfig);
     }
 
     @Test(expected = InvalidLocationException.class)
     public void test_parse_missingHost3() throws Exception {
-        SshLocation.parse("user@:33");
+        SshLocation.parse("user@:33", ConfigRepository.nullConfig);
     }
 
 }

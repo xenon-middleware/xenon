@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.slurm;
+package nl.esciencecenter.xenon.adaptors.torque;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -28,59 +28,58 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
-import nl.esciencecenter.xenon.util.Utils;
 
 /**
- * Adaptor for Slurm scheduler.
+ * Adaptor for TORQUE batch system.
  * 
+ * @author Joris Borgdorff <J.Borgdorff@esciencecenter.nl>
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class SlurmAdaptor extends ScriptingAdaptor {
+public class TorqueAdaptor extends ScriptingAdaptor {
 
     /** The name of this adaptor */
-    public static final String ADAPTOR_NAME = "slurm";
+    public static final String ADAPTOR_NAME = "torque";
 
     /** The prefix used by all properties related to this adaptor */
-    public static final String PREFIX = XenonEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
+    public static final String PREFIX = XenonEngine.ADAPTORS + TorqueAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("slurm");
+    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("torque");
     
     /** The locations supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)",
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)", 
             "(locations supported by ssh)");
     
-    /** Should the slurm version on the target machine be ignored ? */
+    /** Should the grid engine version on the target machine be ignored ? */
     public static final String IGNORE_VERSION_PROPERTY = PREFIX + "ignore.version";
 
-    /** Should the accounting usage be disabled? */
-    public static final String DISABLE_ACCOUNTING_USAGE = PREFIX + "disable.accounting.usage";
+    /** Timeout for waiting for the accounting info of a job to appear */
+    public static final String ACCOUNTING_GRACE_TIME_PROPERTY = PREFIX + "accounting.grace.time";
 
     /** Polling delay for jobs started by this adaptor. */
     public static final String POLL_DELAY_PROPERTY = PREFIX + "poll.delay";
 
     /** Human readable description of this adaptor */
-    public static final String ADAPTOR_DESCRIPTION = "The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local "
-            + "or the ssh adaptor to gain access to the scheduler machine.";
+    public static final String ADAPTOR_DESCRIPTION = "The Torque Adaptor submits jobs to a TORQUE batch system."
+            + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<XenonPropertyDescription>(
         new XenonPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
                 "false", "Skip version check is skipped when connecting to remote machines. "
-                 + "WARNING: it is not recommended to use this setting in production environments!"),
-        
-        new XenonPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
-                "false", "Do not use accounting info of slurm, even when available. Mostly for testing purposes"),
-                
+                        + "WARNING: it is not recommended to use this setting in production environments!"),
+        new XenonPropertyDescriptionImplementation(ACCOUNTING_GRACE_TIME_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER),
+                "60000", "Number of milliseconds a job is allowed to take going from the queue to the accinfo output."),
+
         new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                 "Number of milliseconds between polling the status of a job."));
 
     /**
-     * Create a new SlurmAdaptor.
+     * Create a new TorqueAdaptor.
      * 
      * @param properties
      *            the properties to use when creating the adaptor.
@@ -89,13 +88,13 @@ public class SlurmAdaptor extends ScriptingAdaptor {
      * @throws XenonException
      *             if the adaptor creation fails.
      */
-    public SlurmAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
+    public TorqueAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
         super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties), new SlurmSchedulerConnectionFactory());
+                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties), new TorqueSchedulerConnectionFactory());
     }
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        return Utils.emptyMap(0);
+        return new HashMap<>(0);
     }
 }
