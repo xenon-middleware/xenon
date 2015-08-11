@@ -102,7 +102,7 @@ public class SshJobs implements Jobs {
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
-        SshLocation sshLocation = SshLocation.parse(location);
+        SshLocation sshLocation = SshLocation.parse(location, adaptor.getSshConfig());
         
         String uniqueID = getNewUniqueID();
 

@@ -16,9 +16,9 @@ public abstract class Location {
 
     protected Location(String location) throws InvalidLocationException {
         // Parse the location
-        String user = null;
-        String host = null;
-        int port = getDefaultPort();
+        String newUser = null;
+        String newHost;
+        int newPort = -1;
 
         if (location == null) {
             throw new InvalidLocationException(getAdaptorName(), "Failed to parse " + getAdaptorName() + " location: (null)");
@@ -35,7 +35,7 @@ public abstract class Location {
         }
 
         if (index > 0) {
-            user = tmpLocation.substring(0, index);
+            newUser = tmpLocation.substring(0, index);
             tmpLocation = tmpLocation.substring(index + 1);
         }
 
@@ -62,7 +62,7 @@ public abstract class Location {
             }
 
             try {
-                port = Integer.valueOf(portAsString);
+                newPort = Integer.valueOf(portAsString);
             } catch (NumberFormatException e) {
                 throw new InvalidLocationException(getAdaptorName(), "Failed to parse " + getAdaptorName()
                         + " location! Invalid port: " + location, e);
@@ -71,20 +71,16 @@ public abstract class Location {
             tmpLocation = tmpLocation.substring(0, index);
         }
 
-        host = tmpLocation;
+        newHost = tmpLocation;
 
-        if (host.isEmpty()) {
+        if (newHost.isEmpty()) {
             throw new InvalidLocationException(getAdaptorName(), "Failed to parse " + getAdaptorName()
                     + " location! Missing host: " + location);
         }
 
-        if (port <= 0) {
-            port = getDefaultPort();
-        }
-
-        this.user = user;
-        this.host = host;
-        this.port = port;
+        this.user = newUser;
+        this.host = newHost;
+        this.port = newPort;
     }
 
     public String getUser() {
@@ -96,7 +92,16 @@ public abstract class Location {
     }
 
     public int getPort() {
-        return port;
+        if (port > 0) {
+            return port;
+        } else {
+            return getDefaultPort();
+        }
+    }
+
+    /** Whether the default port was used because none was provided. */
+    public boolean usesDefaultPort() {
+        return port <= 0;
     }
 
     protected abstract String getAdaptorName();
