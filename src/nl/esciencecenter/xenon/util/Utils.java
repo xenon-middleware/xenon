@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -49,183 +50,177 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
 
 /**
  * Utils contains various utilities for handling files, jobs, streams, and for getting OS specific information.
- * 
- * These utilities are used inside Xenon, but may also be used by applications. 
- * 
+ *
+ * These utilities are used inside Xenon, but may also be used by applications.
+ *
  * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * @version 1.0 
+ * @version 1.0
  * @since 1.0
  */
 public final class Utils {
 
     /** Name of this class (used in Exceptions) */
     private static final String NAME = "FileUtils";
-    
-    /** The default buffer size to use for copy operations */
-    public static final int DEFAULT_BUFFER_SIZE = 16*1024;
 
-    private Utils() { 
+    /** The default buffer size to use for copy operations */
+    public static final int DEFAULT_BUFFER_SIZE = 16 * 1024;
+
+    private Utils() {
         // DO NOT USE
     }
-    
+
     /**
-     * Returns a <code>Scheduler</code> that can be used to run jobs locally. 
-     * 
+     * Returns a <code>Scheduler</code> that can be used to run jobs locally.
+     *
      * @param jobs
-     *          the <code>Jobs</code> to use to instantiate the scheduler. 
-     * @return
-     *          the local <code>Scheduler</code>.
-     *          
+     *            the <code>Jobs</code> to use to instantiate the scheduler.
+     * @return the local <code>Scheduler</code>.
+     * 
      * @throws XenonException
-     *          If the creation of the Scheduler failed. 
+     *             If the creation of the Scheduler failed.
      */
-    public static Scheduler getLocalScheduler(Jobs jobs) throws XenonException { 
+    public static Scheduler getLocalScheduler(Jobs jobs) throws XenonException {
         return jobs.newScheduler("local", null, null, null);
     }
-    
+
     /**
-     * Create a <code>Scheduler</code> for the given scheme, but without using a location, credential, or properties. 
-     * 
-     * This methods is a shortcut for calling {@link Jobs#newScheduler(String, String, Credential, Map)} with only the 
-     * <code>scheme</code> set. 
-     * 
+     * Create a <code>Scheduler</code> for the given scheme, but without using a location, credential, or properties.
+     *
+     * This methods is a shortcut for calling {@link Jobs#newScheduler(String, String, Credential, Map)} with only the
+     * <code>scheme</code> set.
+     *
      * @param jobs
-     *          the <code>Jobs</code> to use to instantiate the scheduler. 
+     *            the <code>Jobs</code> to use to instantiate the scheduler.
      * @param scheme
-     *          the scheme to use to access the scheduler.
-     * @return
-     *          the local <code>Scheduler</code>.
-     *          
+     *            the scheme to use to access the scheduler.
+     * @return the local <code>Scheduler</code>.
+     * 
      * @throws XenonException
-     *          If the creation of the Scheduler failed. 
+     *             If the creation of the Scheduler failed.
      */
-    public static Scheduler newScheduler(Jobs jobs, String scheme) throws XenonException { 
+    public static Scheduler newScheduler(Jobs jobs, String scheme) throws XenonException {
         return jobs.newScheduler(scheme, null, null, null);
-    }    
-    
+    }
+
     /**
      * Copy all bytes from an input stream to an output stream.
-     * 
-     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize <= 0</code> then the 
-     * {@link #DEFAULT_BUFFER_SIZE} will be used.  
+     *
+     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize <= 0</code> then the
+     * {@link #DEFAULT_BUFFER_SIZE} will be used.
      * <p>
      * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
-     * 
+     *
      * @param in
-     *          the InputStream to read from.
+     *            the InputStream to read from.
      * @param out
-     *          the OutputStream to write to.
+     *            the OutputStream to write to.
      * @param bufferSize
-     *          the size of the temporary buffer, or <= 0 to use the {@link #DEFAULT_BUFFER_SIZE}. 
-     * @return
-     *          the number of bytes copied.
+     *            the size of the temporary buffer, or <= 0 to use the {@link #DEFAULT_BUFFER_SIZE}.
+     * @return the number of bytes copied.
      * @throws IOException
-     *          if an I/O error occurs during the copy operation. 
+     *             if an I/O error occurs during the copy operation.
      */
     public static long copy(InputStream in, OutputStream out, int bufferSize) throws IOException {
-        
+
         long bytes = 0;
 
-        if (bufferSize <= 0) { 
+        if (bufferSize <= 0) {
             bufferSize = DEFAULT_BUFFER_SIZE;
         }
-        
+
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-        
+
         int len = in.read(buffer);
 
         while (len != -1) {
             bytes += len;
-            out.write(buffer, 0, len);            
+            out.write(buffer, 0, len);
             len = in.read(buffer);
         }
-        
+
         return bytes;
     }
 
-    
     /**
      * Read all bytes from the input stream and return them in a byte array.
      * <p>
-     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
-     * @param in 
-     *          the input stream to read. 
-     * @return 
-     *          a byte array containing all bytes that the input stream produced. 
-     * @throws IOException 
-     *          if an I/O error was produced while reading the stream. 
+     * 
+     * @param in
+     *            the input stream to read.
+     * @return a byte array containing all bytes that the input stream produced.
+     * @throws IOException
+     *             if an I/O error was produced while reading the stream.
      */
-    public static byte [] readAllBytes(InputStream in) throws IOException {
-        
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream(); 
+    public static byte[] readAllBytes(InputStream in) throws IOException {
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         copy(in, buffer, DEFAULT_BUFFER_SIZE);
-        
+
         return buffer.toByteArray();
     }
 
     /**
      * Read all bytes from the input stream and return them in as a single String.
-     * 
-     * The bytes are converted to a String using Charset <code>cs</code>. 
+     *
+     * The bytes are converted to a String using Charset <code>cs</code>.
      * <p>
-     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
-     * @param in 
-     *          the input stream to read.
+     * 
+     * @param in
+     *            the input stream to read.
      * @param cs
-     *          the Charset to use          
-     * @return 
-     *          a byte array containing all bytes that the input stream produced. 
-     * @throws IOException 
-     *          if an I/O error was produced while reading the stream. 
+     *            the Charset to use
+     * @return a byte array containing all bytes that the input stream produced.
+     * @throws IOException
+     *             if an I/O error was produced while reading the stream.
      */
     public static String readToString(InputStream in, Charset cs) throws IOException {
-        
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream(); 
+
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         copy(in, buffer, DEFAULT_BUFFER_SIZE);
-        
+
         return buffer.toString(cs.name());
     }
 
     /**
-     * Read all bytes from the input stream and return them in as a single String. 
-     * 
-     * The bytes are converted to a String using the default Charset. 
-     * <p> 
-     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * Read all bytes from the input stream and return them in as a single String.
+     *
+     * The bytes are converted to a String using the default Charset.
+     * <p>
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
-     * 
-     * @param in 
-     *          the input stream to read.
-     * @return 
-     *          a byte array containing all bytes that the input stream produced. 
-     * @throws IOException 
-     *          if an I/O error was produced while reading the stream. 
+     *
+     * @param in
+     *            the input stream to read.
+     * @return a byte array containing all bytes that the input stream produced.
+     * @throws IOException
+     *             if an I/O error was produced while reading the stream.
      */
     public static String readToString(InputStream in) throws IOException {
         return readToString(in, Charset.defaultCharset());
     }
-    
+
     /**
      * Read all lines from a InputStream and return them in a {@link java.util.List}.
-     * 
+     *
      * <p>
-     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.  
+     * NOTE: <code>in</code> will NOT be explicitly closed once the end of the stream is reached.
      * </p>
-     * 
+     *
      * @param in
-     *          the InputStream to read from 
+     *            the InputStream to read from
      * @param cs
-     *          the Charset to use.
-     * @return 
-     *          a <code>List<String></code> containing all lines in the file.
+     *            the Charset to use.
+     * @return a <code>List<String></code> containing all lines in the file.
      * @throws IOException
-     *          if an I/O error was produced while reading the stream. 
+     *             if an I/O error was produced while reading the stream.
      */
     public static List<String> readLines(InputStream in, Charset cs) throws IOException {
 
@@ -246,32 +241,33 @@ public final class Utils {
 
     /**
      * Write lines of text to a file.
-     * 
-     * @param lines 
-     *          the lines of text to write.
-     * @param cs 
-     *          the Charset to use.
+     *
+     * @param lines
+     *            the lines of text to write.
+     * @param cs
+     *            the Charset to use.
      * @param out
-     *          the output stream to write to
+     *            the output stream to write to
      * @throws IOException
-     *          if an I/O error was produced while writing the stream. 
-     */ 
+     *             if an I/O error was produced while writing the stream.
+     */
     public static void writeLines(Iterable<? extends CharSequence> lines, Charset cs, OutputStream out) throws IOException {
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, cs));
-        
+
         for (CharSequence line : lines) {
             writer.write(line.toString());
             writer.newLine();
         }
-        
+
         writer.flush();
     }
-    
-    
-    /** 
-     * Close a <code>Closable</code> and ignore any exceptions thrown. 
-     * @param c the <code>Closable</code> to close.
+
+    /**
+     * Close a <code>Closable</code> and ignore any exceptions thrown.
+     * 
+     * @param c
+     *            the <code>Closable</code> to close.
      */
     public static void close(Closeable c) {
 
@@ -285,15 +281,14 @@ public final class Utils {
     }
 
     /**
-     * Return an {@link OpenOption} array containing all options needed to open a file for writing. 
-     *   
-     * The <code>truncate</code> parameter determines if an existing file will be truncated or appended. 
-     *   
-     * @param truncate 
-     *          Should an existing file be truncated ?
-     * @return
-     *          An {@link OpenOption} array containing all options needed to open a file for writing.  
-     */    
+     * Return an {@link OpenOption} array containing all options needed to open a file for writing.
+     * 
+     * The <code>truncate</code> parameter determines if an existing file will be truncated or appended.
+     * 
+     * @param truncate
+     *            Should an existing file be truncated ?
+     * @return An {@link OpenOption} array containing all options needed to open a file for writing.
+     */
     public static OpenOption[] openOptionsForWrite(boolean truncate) {
         if (truncate) {
             return new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.TRUNCATE };
@@ -304,368 +299,354 @@ public final class Utils {
 
     /**
      * Return the home directory of the current user as a String.
-     * 
+     *
      * @return the home directory of the current user.
-     * 
+     *
      * @throws XenonException
-     *          If the home directory could not be retrieved. 
+     *             If the home directory could not be retrieved.
      */
-    public static String getHome() throws XenonException { 
+    public static String getHome() throws XenonException {
         String home = System.getProperty("user.home");
-        
-        if (home == null || home.length() == 0) { 
+
+        if (home == null || home.length() == 0) {
             throw new XenonException(NAME, "Home directory property user.home not set!");
         }
 
-        return home;        
+        return home;
     }
 
     /**
      * Return the current working directory as a String.
-     * 
+     *
      * @return the current working directory.
-     * 
+     *
      * @throws XenonException
-     *          If the current working directory could not be retrieved. 
+     *             If the current working directory could not be retrieved.
      */
-    public static String getCWD() throws XenonException { 
+    public static String getCWD() throws XenonException {
         String cwd = System.getProperty("user.dir");
-        
-        if (cwd == null || cwd.length() == 0) { 
+
+        if (cwd == null || cwd.length() == 0) {
             throw new XenonException(NAME, "Current working directory property user.dir not set!");
         }
 
-        return cwd;        
+        return cwd;
     }
-    
+
     /**
      * Return the locally valid root element of an <code>String</code> representation of an absolute path.
-     * 
-     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an 
-     * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception 
-     * on Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.   
-     * 
+     *
+     * Examples of a root elements are "/" or "C:". If the provided path does not contain a locally valid root element, an
+     * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on
+     * Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.
+     *
      * @param path
-     *          The absolute path for which to determine the root element.
-     * @return 
-     *          The locally valid root element.
+     *            The absolute path for which to determine the root element.
+     * @return The locally valid root element.
      * @throws XenonException
-     *          If the provided <code>path</code> is not absolute, or does not contain a locally valid root. 
+     *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
-    public static String getLocalRoot(String path) throws XenonException { 
-        
-        if (isWindows()) { 
-            if (path != null && path.length() >= 2 && (path.charAt(1) == ':') && 
-                    Character.isLetter(path.charAt(0))) { 
+    public static String getLocalRoot(String path) throws XenonException {
+
+        if (isWindows()) {
+            if (path != null && path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
                 return path.substring(0, 2).toUpperCase();
             }
-            
+
             throw new XenonException(NAME, "Path is not absolute! " + path);
         }
-        
-        if (path != null && path.length() >= 1 && (path.charAt(0) == '/')) { 
+
+        if (path != null && path.length() >= 1 && (path.charAt(0) == '/')) {
             return "/";
         }
-            
+
         throw new XenonException(NAME, "Path is not absolute! " + path);
     }
-    
+
     /**
-     * Returns if we are currently running on Windows. 
-     * 
+     * Returns if we are currently running on Windows.
+     *
      * @return if we are currently running on Window.
      */
-    public static boolean isWindows() { 
+    public static boolean isWindows() {
         String os = System.getProperty("os.name");
         return (os != null && os.startsWith("Windows"));
     }
-    
+
     /**
-     * Returns if we are currently running on OSX. 
-     * 
+     * Returns if we are currently running on OSX.
+     *
      * @return if we are currently running on OSX.
      */
-    public static boolean isOSX() { 
+    public static boolean isOSX() {
         String os = System.getProperty("os.name");
         return (os != null && os.equals("MacOSX"));
     }
 
     /**
-     * Returns if we are currently running on Linux. 
-     * 
+     * Returns if we are currently running on Linux.
+     *
      * @return if we are currently running on Linux.
      */
-    public static boolean isLinux() { 
+    public static boolean isLinux() {
         String os = System.getProperty("os.name");
         return (os != null && os.equals("Linux"));
     }
-    
+
     /**
      * Check if <code>root</code> only contains a valid Windows root element such as "C:".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.  
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
-     *  
-     * @param root 
-     *          The root to check.
-     * @return 
-     *          If <code>root</code> only contains a valid Windows root element.
+     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * 
+     * @param root
+     *            The root to check.
+     * @return If <code>root</code> only contains a valid Windows root element.
      */
     public static boolean isWindowsRoot(String root) {
-        
-        if (root == null) { 
+
+        if (root == null) {
             return false;
         }
-        
-        if (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0))) { 
+
+        if (root.length() == 2 && root.endsWith(":") && Character.isLetter(root.charAt(0))) {
             return true;
         }
-        
-        if (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\') { 
+
+        if (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\') {
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Check if <code>root</code> only contains a valid Linux root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.  
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
-     *  
-     * @param root 
-     *          The root to check.
-     * @return 
-     *          If <code>root</code> only contains a valid Linux root element.
+     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * 
+     * @param root
+     *            The root to check.
+     * @return If <code>root</code> only contains a valid Linux root element.
      */
     public static boolean isLinuxRoot(String root) {
         return (root != null && root.equals("/"));
     }
-    
+
     /**
      * Check if <code>root</code> contains a valid OSX root element, which is "/".
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
-     *  
-     * @param root 
-     *          The root to check.
-     * @return 
-     *          If <code>root</code> only contains a valid OSX root element.
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * 
+     * @param root
+     *            The root to check.
+     * @return If <code>root</code> only contains a valid OSX root element.
      */
     public static boolean isOSXRoot(String root) {
         return (root != null && root.equals("/"));
     }
-    
+
     /**
      * Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.
      *
      * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.  
-     *  
+     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     *
      * Note that the result of this method depends on the OS the application is running on.
      *
-     * @param root 
-     *          The root to check.
-     * @return 
-     *          If <code>root</code> only contains a valid OSX root element.
+     * @param root
+     *            The root to check.
+     * @return If <code>root</code> only contains a valid OSX root element.
      */
     public static boolean isLocalRoot(String root) {
-        
-        if (isWindows()) { 
+
+        if (isWindows()) {
             return isWindowsRoot(root);
         }
-        
+
         return isLinuxRoot(root);
     }
 
     /**
      * Checks if the provide path starts with a valid Linux root, that is "/".
-     * 
+     *
      * @param path
-     *          The path to check. 
-     * @return
-     *          If the provide path starts with a valid Linux root.
+     *            The path to check.
+     * @return If the provide path starts with a valid Linux root.
      */
     public static boolean startsWithLinuxRoot(String path) {
-        
-        if (path == null) { 
+
+        if (path == null) {
             return false;
         }
-        
+
         return path.startsWith("/");
     }
 
     /**
      * Checks if the provide path starts with a valid Windows root, for example "C:".
-     * 
+     *
      * @param path
-     *          The path to check. 
-     * @return
-     *          If the provide path starts with a valid Windows root.
+     *            The path to check.
+     * @return If the provide path starts with a valid Windows root.
      */
     public static boolean startWithWindowsRoot(String path) {
 
-        if (path == null) { 
+        if (path == null) {
             return false;
         }
-        
+
         return path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
     }
-   
+
     /**
      * Checks if the provide path starts with a valid root, such as "/" or "C:".
-     * 
+     *
      * @param path
-     *          The path to check. 
-     * @return
-     *          If the provide path starts with a valid root.
+     *            The path to check.
+     * @return If the provide path starts with a valid root.
      */
     public static boolean startWithRoot(String path) {
         return startsWithLinuxRoot(path) || startWithWindowsRoot(path);
     }
-    
+
     /**
      * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
      * represents the part of <code>path</code> that is realtive to the <code>root</code>.
-     * 
+     *
      * For example, if "C:\dir\file" is provided as <code>path</code> and "C:" as <code>root</code>, a <code>RelativePath</code>
      * will be returned that represents "dir\file".
-     * 
+     *
      * @param path
-     *          The absolute path.
+     *            The absolute path.
      * @param root
-     *          The root element. 
-     * @return
-     *          A <code>RelativePath</code> that contains the part of <code>path</code> that is relative to <code>root</code>.
+     *            The root element.
+     * @return A <code>RelativePath</code> that contains the part of <code>path</code> that is relative to <code>root</code>.
      * @throws XenonException
-     *          If the <code>path</code> does not start with <code>root</code>.
+     *             If the <code>path</code> does not start with <code>root</code>.
      */
     public static RelativePath getRelativePath(String path, String root) throws XenonException {
-        
-        if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) { 
+
+        if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) {
             throw new XenonException(NAME, "Path does not start with root: " + path + " " + root);
         }
 
-        if (root.length() == path.length()) { 
+        if (root.length() == path.length()) {
             return new RelativePath(getLocalSeparator());
         }
-       
+
         return new RelativePath(getLocalSeparator(), path.substring(root.length()));
     }
 
     /**
      * Returns the local file system path separator character.
-     *  
-     * @return
-     *          The local file system path separator character. 
-     */    
+     * 
+     * @return The local file system path separator character.
+     */
     public static char getLocalSeparator() {
         return File.separatorChar;
     }
 
     /**
-     * Takes the String representation of a local path (for example "/bin/foo" or "C:\dir\test.txt") and converts it into a 
+     * Takes the String representation of a local path (for example "/bin/foo" or "C:\dir\test.txt") and converts it into a
      * <code>Path</code>.
-     *   
-     * <code>path</code> must contain an absolute path starting with a root such as "/" or "C:".   
-     *   
+     * 
+     * <code>path</code> must contain an absolute path starting with a root such as "/" or "C:".
+     * 
      * @param files
-     *          the files interface used to create the <code>Path</code>.
+     *            the files interface used to create the <code>Path</code>.
      * @param path
-     *          the local path to convert.
-     *           
-     * @return a <code>Path</code> representing the same location as <code>path</code>. 
-     *          
-     * @throws XenonException 
-     *          If the creation of the FileSystem failed.
+     *            the local path to convert.
+     * 
+     * @return a <code>Path</code> representing the same location as <code>path</code>.
+     * 
+     * @throws XenonException
+     *             If the creation of the FileSystem failed.
      */
-    public static Path fromLocalPath(Files files, String path) throws XenonException { 
+    public static Path fromLocalPath(Files files, String path) throws XenonException {
         String root = getLocalRoot(path);
         FileSystem fs = files.newFileSystem("file", root, null, null);
         return files.newPath(fs, getRelativePath(path, root));
     }
-    
+
     /**
      * Returns a <code>Path</code> that represents the current working directory.
-     * 
-     * This method retrieves the current working directory using {@link #getCWD()}, and converts this into a path using 
-     * {@link #fromLocalPath(Files, String)}. 
-     * 
+     *
+     * This method retrieves the current working directory using {@link #getCWD()}, and converts this into a path using
+     * {@link #fromLocalPath(Files, String)}.
+     *
      * @param files
-     *          the files interface used to create the <code>Path</code>.
-     * @return
-     *          a <code>Path</code> that represents the current working directory.
-     * 
+     *            the files interface used to create the <code>Path</code>.
+     * @return a <code>Path</code> that represents the current working directory.
+     *
      * @throws XenonException
-     *          If an I/O error occurred
+     *             If an I/O error occurred
      * @throws XenonException
-     *          If the creation of the FileSystem failed.
-     */    
-    public static Path getLocalCWD(Files files) throws XenonException { 
+     *             If the creation of the FileSystem failed.
+     */
+    public static Path getLocalCWD(Files files) throws XenonException {
         return fromLocalPath(files, getCWD());
     }
 
     /**
      * Returns a <code>Path</code> that represents the home directory of the current user.
-     * 
-     * This method retrieves the home directory using {@link #getHome()}, and converts this into a path using 
-     * {@link #fromLocalPath(Files, String)}. 
-     * 
+     *
+     * This method retrieves the home directory using {@link #getHome()}, and converts this into a path using
+     * {@link #fromLocalPath(Files, String)}.
+     *
      * @param files
-     *          the files interface used to create the <code>Path</code>.
-     * @return
-     *          a <code>Path</code> that represents the home directory of the current user.
-     * 
+     *            the files interface used to create the <code>Path</code>.
+     * @return a <code>Path</code> that represents the home directory of the current user.
+     *
      * @throws XenonException
-     *          If the creation of the FileSystem failed.
-     */    
-    public static Path getLocalHome(Files files) throws XenonException { 
+     *             If the creation of the FileSystem failed.
+     */
+    public static Path getLocalHome(Files files) throws XenonException {
         return fromLocalPath(files, getHome());
     }
-    
+
     /**
-     * Returns all local FileSystems. 
-     *   
-     * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of 
-     * these roots.   
-     *   
-     * @param files
-     *          the files interface to use to create the <code>FileSystems</code>.
-     * @return all local FileSystems.
+     * Returns all local FileSystems.
      * 
+     * This method detects all local file system roots, and returns one or more <code>FileSystems</code> representing each of
+     * these roots.
+     * 
+     * @param files
+     *            the files interface to use to create the <code>FileSystems</code>.
+     * @return all local FileSystems.
+     *
      * @throws XenonException
-     *          If the creation of the FileSystem failed.
+     *             If the creation of the FileSystem failed.
      */
-    public static FileSystem [] getLocalFileSystems(Files files) throws XenonException {
-        
-        File [] roots = File.listRoots();
-        
-        FileSystem [] result = new FileSystem[roots.length]; 
-        
-        for (int i=0;i<result.length;i++) { 
+    public static FileSystem[] getLocalFileSystems(Files files) throws XenonException {
+
+        File[] roots = File.listRoots();
+
+        FileSystem[] result = new FileSystem[roots.length];
+
+        for (int i = 0; i < result.length; i++) {
             result[i] = files.newFileSystem("file", getLocalRoot(roots[i].getPath()), null, null);
         }
-        
+
         return result;
     }
-    
 
     /**
      * Copies all bytes from an input stream to a file.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
-     * @param in the 
-     *          {@link java.util.InputStream} to read from.
-     * @param target 
-     *          the file to write to.
-     * @param truncate 
-     *          should the file be truncated before writing data into it ?
-     * 
+     *            the files interface to use for file access.
+     * @param in
+     *            the {@link java.util.InputStream} to read from.
+     * @param target
+     *            the file to write to.
+     * @param truncate
+     *            should the file be truncated before writing data into it ?
+     *
      * @return the number of bytes copied.
-     * 
+     *
      * @throws PathAlreadyExistsException
      *             if the target file exists but cannot be replaced because the {@code REPLACE_EXISTING} option is not specified
      *             <i>(optional specific exception)</i>
@@ -682,36 +663,36 @@ public final class Utils {
         long bytes = 0;
         OutputStream out = null;
 
-        try { 
-            out = files.newOutputStream(target, openOptionsForWrite(truncate));            
-            bytes = copy(in, out, DEFAULT_BUFFER_SIZE);            
+        try {
+            out = files.newOutputStream(target, openOptionsForWrite(truncate));
+            bytes = copy(in, out, DEFAULT_BUFFER_SIZE);
         } catch (IOException e) {
             throw new XenonException(NAME, "Failed to copy stream to file.", e);
-        } finally { 
+        } finally {
             close(out);
         }
-        
+
         return bytes;
     }
-    
+
     /**
      * Copies all bytes from a file to an output stream.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param source
-     *          the file to read from.
-     * @param out  
-     *          the {@link java.util.OutputStream} to write to.
-     * 
+     *            the file to read from.
+     * @param out
+     *            the {@link java.util.OutputStream} to write to.
+     *
      * @return the number of bytes copied.
-     * 
+     *
      * @throws XenonException
      *             if an I/O error occurs while reading or writing
-     * 
+     *
      */
     public static long copy(Files files, Path source, OutputStream out) throws XenonException {
-        
+
         long bytes = 0;
         InputStream in = null;
 
@@ -720,28 +701,28 @@ public final class Utils {
             bytes = copy(in, out, DEFAULT_BUFFER_SIZE);
         } catch (IOException e) {
             throw new XenonException(NAME, "Failed to copy stream to file.", e);
-        } finally { 
+        } finally {
             close(in);
         }
 
         return bytes;
     }
-        
+
     /**
-     * Opens a file for reading, returning a {@link java.util.BufferedReader} that may be used to read text from the file in an 
+     * Opens a file for reading, returning a {@link java.util.BufferedReader} that may be used to read text from the file in an
      * efficient manner.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access. 
+     *            the files interface to use for file access.
      * @param source
-     *          the file to read from.
+     *            the file to read from.
      * @param cs
-     *          the Charset to use. 
+     *            the Charset to use.
      *
      * @return the BufferedReader.
-     * 
+     *
      * @throws XenonException
-     *          if an I/O error occurs while opening or reading the file.
+     *             if an I/O error occurs while opening or reading the file.
      */
     public static BufferedReader newBufferedReader(Files files, Path source, Charset cs) throws XenonException {
         return new BufferedReader(new InputStreamReader(files.newInputStream(source), cs));
@@ -750,23 +731,22 @@ public final class Utils {
     /**
      * Opens or creates a file for writing, returning a BufferedWriter that may be used to write text to the file in an efficient
      * manner.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param target
-     *          the file to write to.
+     *            the file to write to.
      * @param cs
-     *          the Charset to use. 
+     *            the Charset to use.
      * @param truncate
-     *          should the file be truncated before writing data into it ?
-     *          
-     * @return the BufferedWriter.
+     *            should the file be truncated before writing data into it ?
      * 
+     * @return the BufferedWriter.
+     *
      * @throws XenonException
-     *          if an I/O error occurs while opening or writing the file.
+     *             if an I/O error occurs while opening or writing the file.
      */
-    public static BufferedWriter newBufferedWriter(Files files, Path target, Charset cs, boolean truncate)
-            throws XenonException {
+    public static BufferedWriter newBufferedWriter(Files files, Path target, Charset cs, boolean truncate) throws XenonException {
 
         OutputStream out = files.newOutputStream(target, openOptionsForWrite(truncate));
         return new BufferedWriter(new OutputStreamWriter(out, cs));
@@ -774,95 +754,95 @@ public final class Utils {
 
     /**
      * Read all the bytes from a file and return them as a <code>byte[]<\code>.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param source
-     *          the file to read from.
-     *          
-     * @return a <code>byte[]</code> containing all bytes in the file.
+     *            the file to read from.
      * 
+     * @return a <code>byte[]</code> containing all bytes in the file.
+     *
      * @throws XenonException
-     *          if an I/O error occurs while opening or reading the file.
+     *             if an I/O error occurs while opening or reading the file.
      */
     public static byte[] readAllBytes(Files files, Path source) throws XenonException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         copy(files, source, out);
         return out.toByteArray();
     }
-    
+
     /**
      * Read all the bytes from a file and return them as a <code>String<\code> using the <code>Charset</code> for conversion.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param source
-     *          the file to read from.
+     *            the file to read from.
      * @param cs
-     *          the Charset to use.
-     *          
-     * @return a <code>String</code> containing all data from the file as converted using <code>cs</code>.
+     *            the Charset to use.
      * 
+     * @return a <code>String</code> containing all data from the file as converted using <code>cs</code>.
+     *
      * @throws XenonException
-     *          if an I/O error occurs while opening or reading the file.
+     *             if an I/O error occurs while opening or reading the file.
      */
     public static String readToString(Files files, Path source, Charset cs) throws XenonException {
-        
+
         InputStream in = null;
-        
-        try { 
+
+        try {
             in = files.newInputStream(source);
             return readToString(in, cs);
         } catch (IOException e) {
             throw new XenonException(NAME, "Failed to read data", e);
-        } finally { 
+        } finally {
             close(in);
         }
     }
-    
+
     /**
      * Read all lines from a file and return them in a {@link java.util.List}.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param source
-     *          the file to read from.
+     *            the file to read from.
      * @param cs
-     *          the Charset to use.
-     *           
-     * @return a <code>List<String></code> containing all lines in the file.
+     *            the Charset to use.
      * 
+     * @return a <code>List<String></code> containing all lines in the file.
+     *
      * @throws XenonException
-     *          if an I/O error occurs while opening or reading the file.
+     *             if an I/O error occurs while opening or reading the file.
      */
     public static List<String> readAllLines(Files files, Path source, Charset cs) throws XenonException {
 
         InputStream in = null;
-        
-        try { 
+
+        try {
             in = files.newInputStream(source);
             return readLines(in, cs);
         } catch (IOException e) {
             throw new XenonException(NAME, "Failed to read lines", e);
-        } finally { 
+        } finally {
             close(in);
         }
     }
 
     /**
      * Writes bytes to a file.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param target
-     *          the file to write to.
+     *            the file to write to.
      * @param bytes
-     *          the bytes to write to the file.
+     *            the bytes to write to the file.
      * @param truncate
-     *          should the file be truncated before writing data into it ?
-     *          
+     *            should the file be truncated before writing data into it ?
+     * 
      * @throws XenonException
-     *          if an I/O error occurs while opening or writing to the file.
+     *             if an I/O error occurs while opening or writing to the file.
      */
     public static void write(Files files, Path target, byte[] bytes, boolean truncate) throws XenonException {
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
@@ -872,52 +852,52 @@ public final class Utils {
 
     /**
      * Write lines of text to a file.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access.
+     *            the files interface to use for file access.
      * @param target
-     *          the file to write to.
+     *            the file to write to.
      * @param lines
-     *          the text to write to the file. 
+     *            the text to write to the file.
      * @param cs
-     *          the Charset to use.
+     *            the Charset to use.
      * @param truncate
-     *          should the file be truncated before writing data into it ?
-     *          
+     *            should the file be truncated before writing data into it ?
+     * 
      * @throws XenonException
-     *          if an I/O error occurs while opening or writing to the file.
+     *             if an I/O error occurs while opening or writing to the file.
      */
-    public static void write(Files files, Path target, Iterable<? extends CharSequence> lines, Charset cs,
-            boolean truncate) throws XenonException {
+    public static void write(Files files, Path target, Iterable<? extends CharSequence> lines, Charset cs, boolean truncate)
+            throws XenonException {
 
         OutputStream out = null;
-        
-        try { 
+
+        try {
             out = files.newOutputStream(target, openOptionsForWrite(truncate));
             writeLines(lines, cs, out);
         } catch (IOException e) {
             throw new XenonException("FileUtils", "failed to write lines", e);
-        } finally { 
+        } finally {
             close(out);
         }
     }
 
     /**
-     * Walks over a file tree. 
-     * 
+     * Walks over a file tree.
+     *
      * <p>
-     * This method is equivalent to invoking {@link #walkFileTree(Files, Path, boolean, int, FileVisitor) 
-     * walkFileTree(files, start, false, Integer.MAX_VALUE, visitor}. 
+     * This method is equivalent to invoking {@link #walkFileTree(Files, Path, boolean, int, FileVisitor) walkFileTree(files,
+     * start, false, Integer.MAX_VALUE, visitor}.
      * </p>
-     * 
+     *
      * @param files
-     *          the files interface to use for file access. 
+     *            the files interface to use for file access.
      * @param start
-     *          the path to start from.
+     *            the path to start from.
      * @param visitor
-     *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
+     *            a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
      * @throws XenonException
-     *          if an I/O error occurs during the walk.
+     *             if an I/O error occurs during the walk.
      */
     public static void walkFileTree(Files files, Path start, FileVisitor visitor) throws XenonException {
         walkFileTree(files, start, false, Integer.MAX_VALUE, visitor);
@@ -927,83 +907,71 @@ public final class Utils {
      * Walks a file tree.
      *
      * <p>
-     * This method walks over a file tree, starting at <code>start</code> and then recursively applying the following steps:  
+     * This method walks over a file tree, starting at <code>start</code> and then recursively applying the following steps:
      * </p>
      * <ul>
-     * <li> 
-     * If the current path is a file, it is forwarded to 
-     * {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and the result of this call will be 
-     * returned.
-     * </li>
      * <li>
-     * If the current path is a link and <code>followLinks</code> is <code>true</code> the link is followed,  
-     * <code>walkFileTree</code> is called on the target of the link, and the result of this call is returned.
-     * </li>
-     * <li> 
-     * If the current path is a link and <code>followLinks</code> is <code>false</code> the link is not followed. Instead the 
-     * link itself is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and the
-     * result of this call is returned.
-     * </li>
+     * If the current path is a file, it is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files)
+     * visitor.visitFile} and the result of this call will be returned.</li>
      * <li>
-     * If the current path is a directory and the current distance from <code>start</code> is more than <code>maxDepth</code>, 
-     * the directory is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and 
-     * the result of this call is returned.
-     * </li>
+     * If the current path is a link and <code>followLinks</code> is <code>true</code> the link is followed,
+     * <code>walkFileTree</code> is called on the target of the link, and the result of this call is returned.</li>
      * <li>
-     * If the current path is a directory and the current distance from <code>start</code> is less or equal to 
-     * <code>maxDepth</code> the path is forwarded to 
-     * {@link FileVisitor#preVisitDirectory(Path, FileAttributes, Files) visitor.preVisitDirectory}. The subsequent 
-     * behavior then depends on the result of this call:
+     * If the current path is a link and <code>followLinks</code> is <code>false</code> the link is not followed. Instead the link
+     * itself is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and the result of this
+     * call is returned.</li>
+     * <li>
+     * If the current path is a directory and the current distance from <code>start</code> is more than <code>maxDepth</code>, the
+     * directory is forwarded to {@link FileVisitor#visitFile(Path, FileAttributes, Files) visitor.visitFile} and the result of
+     * this call is returned.</li>
+     * <li>
+     * If the current path is a directory and the current distance from <code>start</code> is less or equal to
+     * <code>maxDepth</code> the path is forwarded to {@link FileVisitor#preVisitDirectory(Path, FileAttributes, Files)
+     * visitor.preVisitDirectory}. The subsequent behavior then depends on the result of this call:
      * <ul>
-     * <li> 
-     * If {@link FileVisitResult#TERMINATE} is returned, the walk is terminated immediately and <code>walkFileTree</code> returns 
-     * {@link FileVisitResult#TERMINATE}.
-     * </li>
-     * <li> 
-     * If {@link FileVisitResult#SKIP_SUBTREE} is returned, the elements in the directory will not be visited. Instead 
-     * {@link FileVisitor#postVisitDirectory(Path, XenonException, Files) visitor.postVisitDirectory} and  
-     * {@link FileVisitResult#CONTINUE} is returned.
-     * </li>
-     * <li> 
-     * If {@link FileVisitResult#SKIP_SIBLINGS} is returned, the elements in the directory will not be visited and 
-     * {@link FileVisitResult#SKIP_SIBLINGS} is returned immediately.
-     * </li>
-     * <li> 
-     * If {@link FileVisitResult#CONTINUE} is returned <code>walkFileTree</code> is called on each of the elements 
-     * in the directory.
-     * If any of these calls returns {@link FileVisitResult#SKIP_SIBLINGS} the remaining elements will be 
-     * skipped, {@link FileVisitor#postVisitDirectory(Path, XenonException, Files) visitor.postVisitDirectory} will be 
-     * called, and its result will be returned.  
-     * If any of these calls returns {@link FileVisitResult#TERMINATE} the walk is terminated immediately and 
-     * {@link FileVisitResult#TERMINATE} is returned.
+     * <li>
+     * If {@link FileVisitResult#TERMINATE} is returned, the walk is terminated immediately and <code>walkFileTree</code> returns
+     * {@link FileVisitResult#TERMINATE}.</li>
+     * <li>
+     * If {@link FileVisitResult#SKIP_SUBTREE} is returned, the elements in the directory will not be visited. Instead
+     * {@link FileVisitor#postVisitDirectory(Path, XenonException, Files) visitor.postVisitDirectory} and
+     * {@link FileVisitResult#CONTINUE} is returned.</li>
+     * <li>
+     * If {@link FileVisitResult#SKIP_SIBLINGS} is returned, the elements in the directory will not be visited and
+     * {@link FileVisitResult#SKIP_SIBLINGS} is returned immediately.</li>
+     * <li>
+     * If {@link FileVisitResult#CONTINUE} is returned <code>walkFileTree</code> is called on each of the elements in the
+     * directory. If any of these calls returns {@link FileVisitResult#SKIP_SIBLINGS} the remaining elements will be skipped,
+     * {@link FileVisitor#postVisitDirectory(Path, XenonException, Files) visitor.postVisitDirectory} will be called, and its
+     * result will be returned. If any of these calls returns {@link FileVisitResult#TERMINATE} the walk is terminated immediately
+     * and {@link FileVisitResult#TERMINATE} is returned.</li>
+     * </ul>
      * </li>
      * </ul>
-     * </li>   
-     * </ul>
-     * 
+     *
      * @param files
-     *          the files interface to use for file access. 
+     *            the files interface to use for file access.
      * @param start
-     *          the path to start from.
+     *            the path to start from.
      * @param followLinks
-     *          should links be followed ?
+     *            should links be followed ?
      * @param maxDepth
-     *          the maximum distance from the start to walk to. 
+     *            the maximum distance from the start to walk to.
      * @param visitor
-     *          a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
-     *          
+     *            a {@link FileVisitor} that will be invoked for every {@link Path} encountered during the walk.
+     * 
      * @throws XenonException
-     *          if an I/O error occurs during the walk.
+     *             if an I/O error occurs during the walk.
      */
-    public static void walkFileTree(Files files, Path start, boolean followLinks, int maxDepth,
-            FileVisitor visitor) throws XenonException {
+    public static void walkFileTree(Files files, Path start, boolean followLinks, int maxDepth, FileVisitor visitor)
+            throws XenonException {
         FileAttributes attributes = files.getAttributes(start);
         walk(files, start, attributes, followLinks, maxDepth, visitor);
     }
 
     // Walk a file tree.
-    private static FileVisitResult walk(Files files, Path path, FileAttributes attributes, boolean followLinks,
-            int maxDepth, FileVisitor visitor) throws XenonException {
+    private static FileVisitResult walk(Files files, Path path, FileAttributes attributes, boolean followLinks, int maxDepth,
+            FileVisitor visitor) throws XenonException {
         FileVisitResult visitResult;
         XenonException exception = null;
 
@@ -1057,20 +1025,20 @@ public final class Utils {
 
     /**
      * Recursively copies directories, files and symbolic links from source to target.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access. 
+     *            the files interface to use for file access.
      * @param source
-     *          the path to copy from.
+     *            the path to copy from.
      * @param target
-     *          the path to copy to.
+     *            the path to copy to.
      * @param options
-     *          the options to use while copying. See {@link CopyOption} for details.
-     * 
+     *            the options to use while copying. See {@link CopyOption} for details.
+     *
      * @throws InvalidCopyOptionsException
-     *           if an invalid combination of options is used.
+     *             if an invalid combination of options is used.
      * @throws XenonException
-     *           if an I/O error occurs during the copying
+     *             if an I/O error occurs during the copying
      */
     public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options) throws XenonException {
 
@@ -1101,7 +1069,8 @@ public final class Utils {
             }
             for (Path f : files.newDirectoryStream(source)) {
                 Path fsource = f;
-                Path ftarget = files.newPath(target.getFileSystem(), target.getRelativePath().resolve(f.getRelativePath().getFileName()));
+                Path ftarget = files.newPath(target.getFileSystem(),
+                        target.getRelativePath().resolve(f.getRelativePath().getFileName()));
                 recursiveCopy(files, fsource, ftarget, options);
             }
         } else {
@@ -1122,14 +1091,14 @@ public final class Utils {
 
     /**
      * Recursively removes all directories, files and symbolic links in path.
-     * 
+     *
      * @param files
-     *          the files interface to use for file access. 
+     *            the files interface to use for file access.
      * @param path
-     *          the path to delete.
-     *          
+     *            the path to delete.
+     * 
      * @throws XenonException
-     *          if an I/O error occurs during the copying
+     *             if an I/O error occurs during the copying
      */
     public static void recursiveDelete(Files files, Path path) throws XenonException {
 
@@ -1144,39 +1113,52 @@ public final class Utils {
     }
 
     /**
-     * Resolve a relative <code>path</code> against <code>root</code> and return a new {@link Path} that represents this location.  
-     *   
-     * @param files 
-     *          the files interface to use for file access. 
+     * Resolve a relative <code>path</code> against <code>root</code> and return a new {@link Path} that represents this location.
+     * 
+     * @param files
+     *            the files interface to use for file access.
      * @param root
-     *          the root to resolve against.
+     *            the root to resolve against.
      * @param path
-     *          the relative path to resolve.
-     * @return
-     *          a new <code>Path</code> that represents the location.
+     *            the relative path to resolve.
+     * @return a new <code>Path</code> that represents the location.
      * @throws XenonException
-     *          if an I/O error occurs during the resolve.
+     *             if an I/O error occurs during the resolve.
      */
-    public static Path resolveWithRoot(Files files, Path root, String... path) throws XenonException { 
+    public static Path resolveWithRoot(Files files, Path root, String... path) throws XenonException {
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(new RelativePath(path)));
     }
 
     /**
-     * Resolve a relative <code>path</code> with the entry path of the <code>fileSystem</code> and return a new 
-     * {@link Path} that represents this location.  
-     *   
-     * @param files 
-     *          the files interface to use for file access. 
+     * Resolve a relative <code>path</code> with the entry path of the <code>fileSystem</code> and return a new {@link Path} that
+     * represents this location.
+     * 
+     * @param files
+     *            the files interface to use for file access.
      * @param fileSystem
-     *          the FileSystem for which to use the entry path.
+     *            the FileSystem for which to use the entry path.
      * @param path
-     *          the relative path to resolve.
-     * @return
-     *          a new <code>Path</code> that represents the location.
+     *            the relative path to resolve.
+     * @return a new <code>Path</code> that represents the location.
      * @throws XenonException
-     *          if an I/O error occurs during the resolve.
+     *             if an I/O error occurs during the resolve.
      */
-    public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String ... path) throws XenonException {
+    public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String... path) throws XenonException {
         return resolveWithRoot(files, fileSystem.getEntryPath(), path);
+    }
+
+    /**
+     * Creates empty mutable Map with sufficient initial capacity.
+     * 
+     * @param <K>
+     *            key type
+     * @param <V>
+     *            value type
+     * @param capacity
+     *            maximum size without resizing underlying data structure
+     * @return an empty map
+     */
+    public static <K, V> Map<K, V> emptyMap(int capacity) {
+        return new HashMap<>((capacity + 1) * 4 / 3);
     }
 }

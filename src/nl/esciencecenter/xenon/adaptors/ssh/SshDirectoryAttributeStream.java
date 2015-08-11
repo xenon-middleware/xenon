@@ -39,7 +39,7 @@ class SshDirectoryAttributeStream extends DirectoryStreamBase<LsEntry, PathAttri
     }
 
     @Override
-    protected String getFileNameFromEntry(LsEntry entry) {
+    protected String getFileNameFromEntry(LsEntry entry, Path parentPath) {
         return entry.getFilename();
     }
 

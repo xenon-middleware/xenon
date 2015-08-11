@@ -34,7 +34,7 @@ public abstract class DirectoryStreamBase<In, Out> implements DirectoryStream<Ou
     public DirectoryStreamBase(Path dir, DirectoryStream.Filter filter, List<In> listing) throws XenonException {
         stream = new LinkedList<Out>();
         for (In entry : listing) {
-            String filename = getFileNameFromEntry(entry);
+            String filename = getFileNameFromEntry(entry, dir);
             if (filename.equals(".") || filename.equals("..")) {
                 // filter out the "." and ".."
             } else {
@@ -49,7 +49,7 @@ public abstract class DirectoryStreamBase<In, Out> implements DirectoryStream<Ou
 
     protected abstract Out getStreamElementFromEntry(In entry, Path entryPath) throws XenonException;
 
-    protected abstract String getFileNameFromEntry(In entry);
+    protected abstract String getFileNameFromEntry(In entry, Path parentPath);
 
     @Override
     public Iterator<Out> iterator() {

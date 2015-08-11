@@ -140,7 +140,7 @@ public class FtpFiles implements Files {
         String cwd = getCurrentWorkingDirectory(ftpClient);
         RelativePath entryPath = new RelativePath(cwd);
         String uniqueID = getNewUniqueID();
-        FileSystemImplementation fileSystem = new FileSystemImplementation(FtpAdaptor.ADAPTOR_NAME, uniqueID, scheme, location,
+        FileSystemImplementation fileSystem = new FileSystemImplementation(adaptor.getName(), uniqueID, scheme, location,
                 entryPath, credential, xenonProperties);
         fileSystems.put(uniqueID, new FileSystemInfo(fileSystem, ftpClient, credential));
         LOGGER.debug("* newFileSystem OK remote cwd = {} entryPath = {} uniqueID = {}", cwd, entryPath, uniqueID);
@@ -633,7 +633,6 @@ public class FtpFiles implements Files {
     public FileAttributes getAttributes(Path path) throws XenonException {
         LOGGER.debug("getAttributes path = {}", path);
         assertPathExists(path);
-        FTPClient ftpClient = getFtpClientByPath(path);
         FTPFile listFile = getFtpFile(path);
         FileAttributes fileAttributes = new FtpFileAttributes(listFile);
         LOGGER.debug("getAttributes OK result = {}", fileAttributes);

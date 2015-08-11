@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.ftp;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -53,17 +52,6 @@ public class FTPFileTestConfig extends FileTestConfig {
         correctLocation = username + "@" + location;
         wrongLocation = username + "@doesnotexist71093880.com";
         correctLocationWrongUser = "incorrect@" + location;
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override
