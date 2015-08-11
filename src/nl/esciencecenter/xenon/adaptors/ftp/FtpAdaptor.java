@@ -104,7 +104,7 @@ public class FtpAdaptor extends Adaptor {
                                                             "The gateway machine used to create an SSH tunnel to the target."));
 
     private final FtpFiles filesAdaptor;
-    private FtpCredentials credentialsAdaptor;
+    private final FtpCredentials credentialsAdaptor;
 
     public FtpAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
         super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,

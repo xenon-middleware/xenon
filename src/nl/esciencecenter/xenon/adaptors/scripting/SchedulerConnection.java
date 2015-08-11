@@ -137,10 +137,12 @@ public abstract class SchedulerConnection {
     /**
      * Check if the info map for a job exists, contains the expected job ID, and contains the given additional fields
      * 
-     * @param info
+     * @param jobInfo
      *            the map the job info should be .
      * @param job
      *            the job to check the presence for.
+     * @param adaptorName
+     *            name of the current adaptor for error reporting.
      * @param jobIDField
      *            the field which contains the job id.
      * @param additionalFields
@@ -201,9 +203,9 @@ public abstract class SchedulerConnection {
 
         id = adaptor.getName() + "-" + getNextSchedulerID();
 
-        String subJobScheme = null;
-        String subFileScheme = null;
-        String subLocation = null;
+        String subJobScheme;
+        String subFileScheme;
+        String subLocation;
 
         if (location == null || location.length() == 0 || location.equals("/")) {
             subJobScheme = "local";
@@ -216,7 +218,7 @@ public abstract class SchedulerConnection {
         }
 
         LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), (subJobScheme + "://" + subLocation));
-        Map<String, String> subSchedulerProperties = new HashMap<String, String>();
+        Map<String, String> subSchedulerProperties = new HashMap<>(2);
 
         //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
         if (subJobScheme.equals("ssh")) {

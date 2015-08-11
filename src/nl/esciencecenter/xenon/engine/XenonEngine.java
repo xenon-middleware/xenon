@@ -71,7 +71,7 @@ public final class XenonEngine implements Xenon {
     public static final String ADAPTORS = PREFIX + "adaptors.";
 
     /** All XenonEngines created so far */
-    private static final List<XenonEngine> XENON_ENGINES = new ArrayList<XenonEngine>();
+    private static final List<XenonEngine> XENON_ENGINES = new ArrayList<>(1);
 
     /**
      * Create a new Xenon using the given properties.
@@ -116,8 +116,8 @@ public final class XenonEngine implements Xenon {
     }
 
     public static synchronized void endAll() {
-        for (int i = 0; i < XENON_ENGINES.size(); i++) {
-            XENON_ENGINES.get(i).end();
+        for (XenonEngine engine : XENON_ENGINES) {
+            engine.end();
         }
 
         XENON_ENGINES.clear();
@@ -154,9 +154,9 @@ public final class XenonEngine implements Xenon {
 
         // Store the properties for later reference.
         if (properties == null) {
-            this.properties = Collections.unmodifiableMap(new HashMap<String, String>());
+            this.properties = Collections.unmodifiableMap(new HashMap<String, String>(0));
         } else {
-            this.properties = Collections.unmodifiableMap(new HashMap<String, String>(properties));
+            this.properties = Collections.unmodifiableMap(new HashMap<>(properties));
         }
 
         // NOTE: Order is important here! We initialize the abstract engines first, as the adaptors may want to use them!
@@ -175,7 +175,7 @@ public final class XenonEngine implements Xenon {
         // Copy the map so we can manipulate it.
         Map<String, String> tmp = new HashMap<>(properties);
 
-        List<Adaptor> result = new ArrayList<>();
+        List<Adaptor> result = new ArrayList<>(10);
 
         result.add(new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX)));
         result.add(new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX)));
@@ -186,7 +186,7 @@ public final class XenonEngine implements Xenon {
         result.add(new GftpAdaptor(this, extract(tmp, GftpAdaptor.PREFIX)));
 
         // Check if there are any properties left. If so, this is a problem.
-        if (tmp.size() != 0) {
+        if (!tmp.isEmpty()) {
             throw new UnknownPropertyException("XenonEngine", "Unknown properties: " + tmp);
         }
 
@@ -195,7 +195,7 @@ public final class XenonEngine implements Xenon {
 
     private Map<String, String> extract(Map<String, String> source, String prefix) {
 
-        HashMap<String, String> tmp = new HashMap<>();
+        HashMap<String, String> tmp = new HashMap<>(source.size());
 
         Iterator<Entry<String, String>> itt = source.entrySet().iterator();
 

@@ -28,6 +28,7 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * Adaptor for Slurm scheduler.
@@ -46,10 +47,10 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = XenonEngine.ADAPTORS + SlurmAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<String>("slurm");
+    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("slurm");
     
     /** The locations supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(locations supported by local)", 
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)",
             "(locations supported by ssh)");
     
     /** Should the slurm version on the target machine be ignored ? */
@@ -95,6 +96,6 @@ public class SlurmAdaptor extends ScriptingAdaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        return new HashMap<String, String>();
+        return Utils.emptyMap(0);
     }
 }

@@ -19,17 +19,16 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * Read-only properties implementation. Also contains some utility functions for getting typed properties.
@@ -71,8 +70,8 @@ public class XenonProperties {
      * Creates an empty XenonProperties.
      */
     public XenonProperties() {
-        supportedProperties = new HashMap<>();
-        properties = new HashMap<>();
+        supportedProperties = Utils.emptyMap(0);
+        properties = Utils.emptyMap(0);
     }
 
     /**
@@ -94,8 +93,8 @@ public class XenonProperties {
 
         super();
 
-        this.supportedProperties = new HashMap<>();
-        this.properties = new HashMap<>();
+        this.supportedProperties = Utils.emptyMap(supportedProperties.length());
+        this.properties = Utils.emptyMap(supportedProperties.length());
 
         for (XenonPropertyDescription d : supportedProperties) {
             this.supportedProperties.put(d.getName(), d);
@@ -125,8 +124,8 @@ public class XenonProperties {
 
         super();
 
-        this.supportedProperties = new HashMap<>();
-        this.properties = new HashMap<>();
+        this.supportedProperties = Utils.emptyMap(supportedProperties.length());
+        this.properties = Utils.emptyMap(supportedProperties.length());
 
         for (XenonPropertyDescription d : supportedProperties) {
             if (d.getLevels().contains(level)) {
@@ -328,7 +327,7 @@ public class XenonProperties {
 
         try {
             return Integer.parseInt(value);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)",
                     e);
         }
@@ -359,7 +358,7 @@ public class XenonProperties {
 
         try {
             return Integer.parseInt(value);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected INTEGER)",
                     e);
         }
@@ -385,7 +384,7 @@ public class XenonProperties {
 
         try {
             return Long.parseLong(value);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected LONG)", e);
         }
     }
@@ -410,7 +409,7 @@ public class XenonProperties {
 
         try {
             return Double.parseDouble(value);
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             throw new InvalidPropertyException(NAME, "Property " + name + " has invalid value: " + value + " (expected DOUBLE)",
                     e);
         }
@@ -478,19 +477,17 @@ public class XenonProperties {
      * Returns a new XenonProperties that contains only the properties whose key start with a certain prefix.
      * 
      * @return an XenonProperties containing only the matching properties.
-     * @param tmp
+     * @param prefix
      *            the desired prefix
      */
     public XenonProperties filter(String prefix) {
-
         String tmp = prefix;
-
         if (tmp == null) {
             tmp = "";
         }
 
-        HashMap<String, XenonPropertyDescription> remaining = new HashMap<>();
-        HashMap<String, String> p = new HashMap<>();
+        Map<String, XenonPropertyDescription> remaining = Utils.emptyMap(supportedProperties.size());
+        Map<String, String> p = Utils.emptyMap(properties.size());
 
         for (String key : supportedProperties.keySet()) {
             if (key.startsWith(tmp)) {
@@ -509,18 +506,15 @@ public class XenonProperties {
      * Returns a new XenonProperties that contains only the properties with a given level.
      * 
      * @return an XenonProperties containing only the properties with the matching level.
-     * @param tmp
+     * @param level
      *            the desired prefix
      */
     public XenonProperties filter(Component level) {
-
-        HashMap<String, XenonPropertyDescription> remaining = new HashMap<>();
-        HashMap<String, String> p = new HashMap<>();
+        Map<String, XenonPropertyDescription> remaining = Utils.emptyMap(supportedProperties.size());
+        Map<String, String> p = Utils.emptyMap(properties.size());
 
         for (XenonPropertyDescription d : supportedProperties.values()) {
-
             if (d.getLevels().contains(level)) {
-
                 String key = d.getName();
                 remaining.put(key, d);
 
@@ -542,15 +536,14 @@ public class XenonProperties {
      * @return an XenonProperties containing all properties except the properties with the given prefix.
      */
     public XenonProperties exclude(String prefix) {
-
         String tmp = prefix;
 
         if (tmp == null) {
             tmp = "";
         }
 
-        HashMap<String, XenonPropertyDescription> remaining = new HashMap<>();
-        HashMap<String, String> p = new HashMap<>();
+        Map<String, XenonPropertyDescription> remaining = Utils.emptyMap(supportedProperties.size());
+        Map<String, String> p = Utils.emptyMap(properties.size());
 
         for (String key : supportedProperties.keySet()) {
             if (!key.startsWith(tmp)) {
@@ -574,15 +567,13 @@ public class XenonProperties {
      * @return an XenonProperties containing all properties except the properties with the given prefix.
      */
     public XenonProperties clear(String prefix) {
-
         String tmp = prefix;
-
         if (tmp == null) {
             tmp = "";
         }
 
-        HashMap<String, XenonPropertyDescription> remaining = new HashMap<>();
-        HashMap<String, String> p = new HashMap<>();
+        Map<String, XenonPropertyDescription> remaining = Utils.emptyMap(supportedProperties.size());
+        Map<String, String> p = Utils.emptyMap(properties.size());
 
         for (String key : supportedProperties.keySet()) {
             remaining.put(key, supportedProperties.get(key));
@@ -613,7 +604,7 @@ public class XenonProperties {
      * @return Sorted list of supported property names.
      */
     public String[] getPropertyNames() {
-        ArrayList<String> list = new ArrayList<String>(supportedProperties.keySet());
+        ArrayList<String> list = new ArrayList<>(supportedProperties.keySet());
         Collections.sort(list);
         return list.toArray(new String[list.size()]);
     }
@@ -632,27 +623,21 @@ public class XenonProperties {
      * 
      * @param out
      *            The stream to write output to.
-     * @param tmp
+     * @param prefix
      *            Only print properties which start with the given prefix. If null, will print all properties
      */
     public void printProperties(PrintStream out, String prefix) {
-
-        String tmp = prefix;
-
-        if (tmp == null) {
+        String tmp;
+        if (prefix == null) {
             tmp = "";
+        } else {
+            tmp = prefix.toLowerCase();
         }
 
-        tmp = tmp.toLowerCase(Locale.getDefault());
-
         for (XenonPropertyDescription d : supportedProperties.values()) {
-
             String key = d.getName();
-
-            if (key.toLowerCase(Locale.getDefault()).startsWith(tmp)) {
-
+            if (key.toLowerCase().startsWith(tmp)) {
                 String value = d.getDefaultValue();
-
                 if (properties.containsKey(key)) {
                     value = properties.get(key);
                 }
@@ -664,8 +649,8 @@ public class XenonProperties {
 
     @Override
     public String toString() {
-
-        StringBuilder sb = new StringBuilder("{");
+        StringBuilder sb = new StringBuilder(supportedProperties.size() * 60);
+        sb.append('{');
 
         String comma = "";
 
@@ -677,21 +662,20 @@ public class XenonProperties {
 
             if (properties.containsKey(d.getName())) {
                 sb.append(key);
-                sb.append("=");
+                sb.append('=');
                 sb.append(properties.get(key));
             } else {
                 sb.append("<<");
                 sb.append(key);
-                sb.append("=");
+                sb.append('=');
                 sb.append(d.getDefaultValue());
                 sb.append(">>");
             }
             comma = ", ";
         }
 
-        sb.append("}");
+        sb.append('}');
 
         return sb.toString();
     }
-
 }
