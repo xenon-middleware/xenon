@@ -1815,43 +1815,79 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test13_getAttributes() throws Exception {
-
+    public void test13_getAttributes_nullPath_throw() throws Exception {
         long currentTime = System.currentTimeMillis();
-
-        // test with null
         test13_getAttributes(null, false, -1, currentTime, true);
 
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test13_getAttributes_nonExistingFile_throw() throws Exception {
+        long currentTime = System.currentTimeMillis();
         prepareTestDir("test13_getAttributes");
+        Path nonExistingFile = createNewTestFileName(testDir);
 
-        // test with non-existing file
-        Path file0 = createNewTestFileName(testDir);
-        test13_getAttributes(file0, false, -1, currentTime, true);
+        test13_getAttributes(nonExistingFile, false, -1, currentTime, true);
 
-        // test with existing empty file
-        Path file1 = createTestFile(testDir, null);
-        test13_getAttributes(file1, false, 0, currentTime, false);
-
-        // test with existing non-empty file
-        Path file2 = createTestFile(testDir, new byte[] { 1, 2, 3 });
-        test13_getAttributes(file2, false, 3, currentTime, false);
-
-        // test with existing dir
-        Path dir0 = createTestDir(testDir);
-        test13_getAttributes(dir0, true, -1, currentTime, false);
-
-        // TODO: test with link!
-
-        deleteTestDir(dir0);
-        deleteTestFile(file2);
-        deleteTestFile(file1);
+        // cleanup
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test13_getAttributes_emptyFile_noThrow() throws Exception {
+        long currentTime = System.currentTimeMillis();
+        prepareTestDir("test13_getAttributes");
+        Path emptyFile = createTestFile(testDir, null);
+
+        test13_getAttributes(emptyFile, false, 0, currentTime, false);
+
+        // cleanup
+        deleteTestFile(emptyFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test13_getAttributes_nonEmptyFile_noThrow() throws Exception {
+        long currentTime = System.currentTimeMillis();
+        prepareTestDir("test13_getAttributes");
+        Path nonEmptyFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
+
+        test13_getAttributes(nonEmptyFile, false, 3, currentTime, false);
+
+        // cleanup
+        deleteTestFile(nonEmptyFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test13_getAttributes_existingDir_noThrow() throws Exception {
+        long currentTime = System.currentTimeMillis();
+        prepareTestDir("test13_getAttributes");
+        Path existingDir = createTestDir(testDir);
+
+        test13_getAttributes(existingDir, true, -1, currentTime, false);
+
+        // cleanup
+        deleteTestDir(existingDir);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test13_getAttributes_closedFileSystem_throwIfSupported() throws Exception {
+        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
+         * getting the attributes of a dir from a closed file system (which it should) it would still throw
+         * an exception because the dir doesn't exist. Can be solved by testing for a
+         * specific type of exception.
+         */
+        long currentTime = System.currentTimeMillis();
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
             test13_getAttributes(testDir, false, -1, currentTime, true);
         }
     }
