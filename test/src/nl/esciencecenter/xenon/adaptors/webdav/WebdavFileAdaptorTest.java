@@ -27,12 +27,14 @@ import nl.esciencecenter.xenon.files.RelativePath;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Christiaan Meijer <C.Meijer@esciencecenter.nl>
  *
  */
+@Ignore("Webdav adaptor is still work in process. See webdav feature branch.")
 public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
 
     private static final String NONEXISTENTPARENT_NEWDIR_PATH = "/public/nonexistentparent/newdir";
