@@ -1561,73 +1561,181 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test12_newDirectoryStream_with_filter() throws Exception {
-
-        // test with null
+    public void test12_newDirectoryStreamWithFilter_nullPath_throw() throws Exception {
         test12_newDirectoryStream(null, null, null, true);
+        closeTestFS();
+    }
 
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_nullFilter_throw() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
 
-        // test with empty dir + null filter
         test12_newDirectoryStream(testDir, null, null, true);
 
-        // test with empty dir + true filter
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_emptyDirTrueFilter_noThrow() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
+
         test12_newDirectoryStream(testDir, new AllTrue(), null, false);
 
-        // test with empty dir + false filter
-        test12_newDirectoryStream(testDir, new AllTrue(), null, false);
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // test with non-existing dir
-        Path dir0 = createNewTestDirName(testDir);
-        test12_newDirectoryStream(dir0, new AllTrue(), null, true);
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_emptyDirFalseFilter_noThrow() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
 
-        // test with existing file
+        test12_newDirectoryStream(testDir, new AllFalse(), null, false);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_nonExistingDir_throw() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
+        Path nonExistingDir = createNewTestDirName(testDir);
+
+        test12_newDirectoryStream(nonExistingDir, new AllTrue(), null, true);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_existingFile_throw() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
+        Path file = createTestFile(testDir, null);
+
+        test12_newDirectoryStream(file, new AllTrue(), null, true);
+
+        // cleanup
+        deleteTestFile(file);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_nonEmptyDirAllTrueFilter_nonEmptyListing() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
         Path file0 = createTestFile(testDir, null);
-        test12_newDirectoryStream(file0, new AllTrue(), null, true);
-
-        // test with non-empty dir and allTrue
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
+        Set<Path> expectedResultSet = new HashSet<Path>();
+        expectedResultSet.add(file0);
+        expectedResultSet.add(file1);
+        expectedResultSet.add(file2);
+        expectedResultSet.add(file3);
 
-        Set<Path> tmp = new HashSet<Path>();
-        tmp.add(file0);
-        tmp.add(file1);
-        tmp.add(file2);
-        tmp.add(file3);
+        test12_newDirectoryStream(testDir, new AllTrue(), expectedResultSet, false);
 
-        test12_newDirectoryStream(testDir, new AllTrue(), tmp, false);
-
-        // test with non-empty dir and allFalse
-        test12_newDirectoryStream(testDir, new AllFalse(), null, false);
-
-        tmp.remove(file3);
-
-        // test with non-empty dir and select
-        test12_newDirectoryStream(testDir, new Select(tmp), tmp, false);
-
-        // test with subdirs
-        Path dir1 = createTestDir(testDir);
-        Path file4 = createTestFile(dir1, null);
-
-        test12_newDirectoryStream(testDir, new Select(tmp), tmp, false);
-
-        deleteTestFile(file4);
-        deleteTestDir(dir1);
+        // cleanup
         deleteTestFile(file3);
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_nonEmptyDirAllFalseFilter_emptyListing() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
+        Path file0 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
+        Set<Path> expectedResultSet = new HashSet<Path>();
+
+        test12_newDirectoryStream(testDir, new AllFalse(), expectedResultSet, false);
+
+        // cleanup
+        deleteTestFile(file3);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_nonEmptyDirSelectFilter_selectListing() throws Exception {
+        prepareTestDir("test12_newDirectoryStream_with_filter");
+        Path selectedFile0 = createTestFile(testDir, null);
+        Path selectedFile1 = createTestFile(testDir, null);
+        Path selectedFile2 = createTestFile(testDir, null);
+        Path unselectedFile0 = createTestFile(testDir, null);
+        Set<Path> selection = new HashSet<Path>();
+        selection.add(selectedFile0);
+        selection.add(selectedFile1);
+        selection.add(selectedFile2);
+        HashSet<Path> expectedResultSet = new HashSet<>(selection);
+
+        test12_newDirectoryStream(testDir, new Select(selection), expectedResultSet, false);
+
+        // cleanup
+        deleteTestFile(unselectedFile0);
+        deleteTestFile(selectedFile2);
+        deleteTestFile(selectedFile1);
+        deleteTestFile(selectedFile0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_nonEmptyDirWithSubSelectFilter_selectListing() throws Exception {
+        /* TODO This test is quite interesting as it doesn't test that much that is specific to the sub dir situation. A better test would
+        have a selected file in one of the sub dirs to make sure that files in sub dirs are NOT listed even though they might pass the
+        filter. Or even better, use an allTrue filter to make the test simpler. I'll leave it like this for now as to not change the
+        functionality of the code during current refactoring.*/
+        prepareTestDir("test12_newDirectoryStream_with_filter");
+        Path selectedFile0 = createTestFile(testDir, null);
+        Path selectedFile1 = createTestFile(testDir, null);
+        Path selectedFile2 = createTestFile(testDir, null);
+        Path unselectedFile0 = createTestFile(testDir, null);
+        Set<Path> selection = new HashSet<Path>();
+        selection.add(selectedFile0);
+        selection.add(selectedFile1);
+        selection.add(selectedFile2);
+        Path subDir = createTestDir(testDir);
+        Path fileInSubDir = createTestFile(subDir, null);
+        HashSet<Path> expectedResultSet = new HashSet<>(selection);
+
+        test12_newDirectoryStream(testDir, new Select(selection), expectedResultSet, false);
+
+        // cleanup
+        deleteTestFile(fileInSubDir);
+        deleteTestDir(subDir);
+        deleteTestFile(unselectedFile0);
+        deleteTestFile(selectedFile2);
+        deleteTestFile(selectedFile1);
+        deleteTestFile(selectedFile0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test12_newDirectoryStreamWithFilter_closedFileSystem_throwIfSupported() throws Exception {
+        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
+         * listing a directory stream of a dir from a closed file system (which it should) it would still throw
+         * an exception because the dir doesn't exist. Can be solved by testing for a
+         * specific type of exception.
+         */
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
             test12_newDirectoryStream(testDir, new AllTrue(), null, true);
         }
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
