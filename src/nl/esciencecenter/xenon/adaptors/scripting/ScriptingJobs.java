@@ -34,10 +34,11 @@ import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 /**
  * Implementation of Xenon Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
@@ -63,7 +64,7 @@ public class ScriptingJobs implements Jobs {
         this.adaptorName = adaptor.getName();
         this.connectionFactory = connectionFactory;
 
-        connections = Utils.emptyMap(1);
+        connections = new HashMap<>();
     }
 
     private synchronized SchedulerConnection getConnection(Scheduler scheduler) throws NoSuchSchedulerException {
@@ -173,7 +174,7 @@ public class ScriptingJobs implements Jobs {
     }
 
     private SchedulerConnection[] getConnections(Job[] jobs) {
-        Map<String, SchedulerConnection> result = Utils.emptyMap(jobs.length);
+        Map<String, SchedulerConnection> result = new HashMap<>();
 
         for (Job job : jobs) {
             if (job != null) {

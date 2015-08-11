@@ -26,7 +26,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import java.util.HashMap;
 
 /**
  * Parses xml output from TORQUE batch system.
@@ -114,20 +115,20 @@ final class TorqueXmlParser {
      */
     Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
         if (data.trim().isEmpty()) {
-            return Utils.emptyMap(0);
+            return new HashMap<>();
         }
         Document document = parseDocument(data);
 
         LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
         NodeList nodes = document.getDocumentElement().getChildNodes();
         int numNodes = nodes.getLength();
-        Map<String, Map<String, String>> result = Utils.emptyMap(numNodes);
+        Map<String, Map<String, String>> result = new HashMap<>();
 
         for (int i = 0; i < numNodes; i++) {
             Node node = nodes.item(i);
 
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                Map<String, String> jobInfo = Utils.emptyMap(20);
+                Map<String, String> jobInfo = new HashMap<>();
                 recursiveMapFromElement(node, jobInfo);
 
                 String rawJobId = jobInfo.get("Job_Id");

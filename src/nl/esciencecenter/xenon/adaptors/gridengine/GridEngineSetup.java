@@ -74,7 +74,7 @@ public class GridEngineSetup {
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(output, "qname",
                 ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
 
-        Map<String, QueueInfo> result = Utils.emptyMap(maps.size());
+        Map<String, QueueInfo> result = new HashMap<>();
 
         for (Map.Entry<String, Map<String, String>> entry : maps.entrySet()) {
             result.put(entry.getKey(), new QueueInfo(entry.getValue()));

@@ -108,10 +108,10 @@ public class GridEngineSetupTest {
     public void test02d_calculateSlots_roundRobinPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = Utils.emptyMap(1);
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = Utils.emptyMap(1);
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);

@@ -27,12 +27,13 @@ import java.util.Arrays;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.w3c.dom.Document;
+
+import java.util.HashMap;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TorqueXmlParserTest {
@@ -95,10 +96,10 @@ public class TorqueXmlParserTest {
         String input = readFile("test/fixtures/torque/propertymap.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
-        Map<String, String> result = Utils.emptyMap(2);
+        Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
         
-        Map<String, String> expectedResult = Utils.emptyMap(2);
+        Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "1");
         expectedResult.put("b", "2");
         assertEquals(expectedResult, result);
@@ -109,10 +110,10 @@ public class TorqueXmlParserTest {
         String input = readFile("test/fixtures/torque/propertymap-recurse.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
-        Map<String, String> result = Utils.emptyMap(3);
+        Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
         
-        Map<String, String> expectedResult = Utils.emptyMap(3);
+        Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "1");
         expectedResult.put("b", "2");
         expectedResult.put("d", "3");
@@ -124,10 +125,10 @@ public class TorqueXmlParserTest {
         String input = readFile("test/fixtures/torque/propertymap-recurse-overwrite.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
-        Map<String, String> result = Utils.emptyMap(2);
+        Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
         
-        Map<String, String> expectedResult = Utils.emptyMap(2);
+        Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "3");
         expectedResult.put("b", "2");
         assertEquals(expectedResult, result);
@@ -138,10 +139,10 @@ public class TorqueXmlParserTest {
         String input = readFile("test/fixtures/torque/propertymap-recurse-with-value.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
-        Map<String, String> result = Utils.emptyMap(3);
+        Map<String, String> result = new HashMap<>();
         parser.recursiveMapFromElement(document.getDocumentElement(), result);
         
-        Map<String, String> expectedResult = Utils.emptyMap(3);
+        Map<String, String> expectedResult = new HashMap<>();
         expectedResult.put("a", "3");
         expectedResult.put("b", "2");
         expectedResult.put("c", "4");

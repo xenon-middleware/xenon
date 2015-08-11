@@ -36,10 +36,11 @@ import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
 import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 public class SshJobs implements Jobs {
 
@@ -94,7 +95,7 @@ public class SshJobs implements Jobs {
         this.xenonEngine = xenonEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;
-        this.schedulers = Utils.emptyMap(30);
+        this.schedulers = new HashMap<>();
         this.isEnded = false;
     }
 

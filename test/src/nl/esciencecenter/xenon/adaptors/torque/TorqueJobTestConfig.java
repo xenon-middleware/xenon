@@ -27,7 +27,6 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
-import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -186,13 +185,13 @@ public class TorqueJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getDefaultProperties() throws Exception {
-        Map<String, String> result = Utils.emptyMap(1);
+        Map<String, String> result = new HashMap<>();
         result.put("xenon.adaptors.torque.poll.delay", "100");
         return result;
     }
 
     public Map<String, String> getUnknownProperties() throws Exception {
-        Map<String, String> result = Utils.emptyMap(1);
+        Map<String, String> result = new HashMap<>();
         result.put("xenon.adaptors.torque.unknown.property", "some.value");
         return result;
     }
@@ -201,14 +200,14 @@ public class TorqueJobTestConfig extends JobTestConfig {
         @SuppressWarnings("unchecked")
         Map<String, String>[] result = new Map[1];
 
-        result[0] = Utils.emptyMap(1);
+        result[0] = new HashMap<>();
 
         result[0].put("xenon.adaptors.torque.poll.delay", "AAP");
         return result;
     }
 
     public Map<String, String> getCorrectProperties() throws Exception {
-        Map<String, String> result = Utils.emptyMap(1);
+        Map<String, String> result = new HashMap<>();
         result.put("xenon.adaptors.torque.poll.delay", "100");
         return result;
     }

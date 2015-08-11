@@ -340,7 +340,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             if (runner.success()) {
                 output = runner.getStdout();
             } else {
-                Map<String, Map<String,String>> badResult = Utils.emptyMap(queueNames.length);
+                Map<String, Map<String,String>> badResult = new HashMap<>();
                 for (String name : queueNames) {
                     badResult.put(name, null);
                 }
@@ -349,7 +349,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         }
         String[] lines = ScriptingParser.NEWLINE_REGEX.split(output);
         
-        Map<String, Map<String,String>> result = Utils.emptyMap(lines.length / 10);
+        Map<String, Map<String,String>> result = new HashMap<>();
 
         Map<String, String> currentQueueMap = null;
         for (String line : lines) {
@@ -358,7 +358,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
                 if (currentQueueMap != null) {
                     result.put(currentQueueMap.get("qname"), currentQueueMap);
                 }
-                currentQueueMap = Utils.emptyMap(20);
+                currentQueueMap = new HashMap<>();
                 currentQueueMap.put("qname", queueNameMatcher.group(1));
             } else {
                 String[] keyVal = ScriptingParser.EQUALS_REGEX.split(line, 2);

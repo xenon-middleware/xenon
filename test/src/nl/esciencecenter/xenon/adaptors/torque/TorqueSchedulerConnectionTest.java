@@ -35,6 +35,8 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.util.HashMap;
+
 /**
  * @author Niels Drost
  * @author Joris Borgdorff
@@ -149,12 +151,12 @@ public class TorqueSchedulerConnectionTest {
     public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";
         String jobIDfull = "555.localhost";
-        Map<String, String> jobInfo = Utils.emptyMap(2);
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("Job_Id", jobIDfull);
         jobInfo.put("Job_Id_Number", jobID);
         jobInfo.put("job_state", "Q");
         
-        Map<String, Map<String, String>> input = Utils.emptyMap(1);
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -172,12 +174,12 @@ public class TorqueSchedulerConnectionTest {
     public void test04b_getJobStatusFromQstatInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
         String jobIDfull = "555.localhost";
-        Map<String, String> jobInfo = Utils.emptyMap(2);
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("Job_Id", jobIDfull);
         jobInfo.put("Job_Id_Number", jobID);
         jobInfo.put("job_state", "R");
         
-        Map<String, Map<String, String>> input = Utils.emptyMap(1);
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -195,12 +197,12 @@ public class TorqueSchedulerConnectionTest {
     public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws XenonException {
         String jobID = "555";
         String jobIDfull = "555.localhost";
-        Map<String, String> jobInfo = Utils.emptyMap(2);
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("Job_Id", jobIDfull);
         jobInfo.put("Job_Id_Number", jobID);
         jobInfo.put("job_state", "E");
         
-        Map<String, Map<String, String>> input = Utils.emptyMap(1);
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -219,7 +221,7 @@ public class TorqueSchedulerConnectionTest {
     @Test
     public void test04d_getJobStatusFromQstatInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
-        Map<String, Map<String, String>> input = Utils.emptyMap(1);
+        Map<String, Map<String, String>> input = new HashMap<>();
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
 
@@ -231,9 +233,9 @@ public class TorqueSchedulerConnectionTest {
         String jobID = "555";
 
         //very incomplete job info
-        Map<String, String> jobInfo = Utils.emptyMap(0);
+        Map<String, String> jobInfo = new HashMap<>();
 
-        Map<String, Map<String, String>> input = Utils.emptyMap(1);
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
 
         Job job = new FakeScriptingJob(jobID);
