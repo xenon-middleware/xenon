@@ -2170,29 +2170,55 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @org.junit.Test
-    public void test15_newAttrributesDirectoryStream() throws Exception {
-
-        // test with null
+    public void test15_newAttributesDirectoryStream_nullPath_throw() throws Exception {
         test15_newAttributesDirectoryStream(null, null, true);
+        closeTestFS();
+    }
 
-        prepareTestDir("test15_newAttrributesDirectoryStream");
+    @org.junit.Test
+    public void test15_newAttributesDirectoryStream_nonExistingDir_throw() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream");
+        Path nonExistingDir = createNewTestDirName(testDir);
 
-        // test with empty dir
+        test15_newAttributesDirectoryStream(nonExistingDir, null, true);
+
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test15_newAttributesDirectoryStream_existingDir_noThrow() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream");
+
         test15_newAttributesDirectoryStream(testDir, null, false);
 
-        // test with non-existing dir
-        Path dir0 = createNewTestDirName(testDir);
-        test15_newAttributesDirectoryStream(dir0, null, true);
+        // cleanup
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // test with exising file
+    @org.junit.Test
+    public void test15_newAttributesDirectoryStream_existingFile_noThrow() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream");
+        test15_newAttributesDirectoryStream(testDir, null, false);
+        Path existingFile = createTestFile(testDir, null);
+
+        test15_newAttributesDirectoryStream(existingFile, null, true);
+
+        // cleanup
+        deleteTestFile(existingFile);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test15_newAttributesDirectoryStream_nonEmptyDir_correctListing() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream");
         Path file0 = createTestFile(testDir, null);
-        test15_newAttributesDirectoryStream(file0, null, true);
-
-        // test with non-empty dir
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-
         Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
@@ -2201,30 +2227,54 @@ public abstract class GenericFileAdaptorTestParent {
 
         test15_newAttributesDirectoryStream(testDir, result, false);
 
-        // test with subdirs
-        Path dir1 = createTestDir(testDir);
-        Path file4 = createTestFile(dir1, null);
-
-        result.add(new PathAttributesPairImplementation(dir1, files.getAttributes(dir1)));
-
-        test15_newAttributesDirectoryStream(testDir, result, false);
-
-        deleteTestFile(file4);
-        deleteTestDir(dir1);
+        // cleanup
         deleteTestFile(file3);
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
         deleteTestDir(testDir);
+        closeTestFS();
+    }
 
-        // Close test fs
+    @org.junit.Test
+    public void test15_newAttributesDirectoryStream_withSubDirs_onlyListTopDirContents() throws Exception {
+        prepareTestDir("test15_newAttributesDirectoryStream");
+        Path file0 = createTestFile(testDir, null);
+        Path file1 = createTestFile(testDir, null);
+        Path file2 = createTestFile(testDir, null);
+        Path file3 = createTestFile(testDir, null);
+        Path subDir = createTestDir(testDir);
+        Path irrelevantFileInSubDir = createTestFile(subDir, null);
+        Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
+        result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
+        result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
+        result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
+        result.add(new PathAttributesPairImplementation(file3, files.getAttributes(file3)));
+        result.add(new PathAttributesPairImplementation(subDir, files.getAttributes(subDir)));
+
+        test15_newAttributesDirectoryStream(testDir, result, false);
+
+        // cleanup
+        deleteTestFile(irrelevantFileInSubDir);
+        deleteTestDir(subDir);
+        deleteTestFile(file3);
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+        deleteTestDir(testDir);
+        closeTestFS();
+    }
+
+    @org.junit.Test
+    public void test15_newAttributesDirectoryStream_closedFileSystem_throw_IfSupported() throws Exception {
+        /* TODO test on correct type of exception */
+        prepareTestDir("test15_newAttributesDirectoryStream");
+        deleteTestDir(testDir);
         closeTestFS();
 
         if (config.supportsClose()) {
-            // test with closed fs
             test15_newAttributesDirectoryStream(testDir, null, true);
         }
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
