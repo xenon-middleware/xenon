@@ -1179,15 +1179,4 @@ public final class Utils {
     public static Path resolveWithEntryPath(Files files, FileSystem fileSystem, String ... path) throws XenonException {
         return resolveWithRoot(files, fileSystem.getEntryPath(), path);
     }
-
-    /**
-     * Creates empty mutable Map with sufficient initial capacity.
-     * @param <K> key type
-     * @param <V> value type
-     * @param capacity maximum size without resizing underlying data structure
-     * @return an empty map
-     */
-    public static <K, V> Map<K, V> emptyMap(int capacity) {
-        return new HashMap<>((capacity + 1) * 4 / 3);
-    }
 }

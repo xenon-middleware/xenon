@@ -182,6 +182,7 @@ public final class XenonEngine implements Xenon {
         result.add(new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX)));
         result.add(new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX)));
         result.add(new GftpAdaptor(this, extract(tmp, GftpAdaptor.PREFIX)));
+        result.add(new TorqueAdaptor(this, extract(tmp, TorqueAdaptor.PREFIX)));
 
         // Check if there are any properties left. If so, this is a problem.
         if (!tmp.isEmpty()) {

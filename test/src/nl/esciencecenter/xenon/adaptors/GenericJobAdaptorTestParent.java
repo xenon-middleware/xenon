@@ -823,7 +823,7 @@ public abstract class GenericJobAdaptorTestParent {
         files.close(cwd.getFileSystem());
     }
 
-    private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
+    protected void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
 
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount);
 
