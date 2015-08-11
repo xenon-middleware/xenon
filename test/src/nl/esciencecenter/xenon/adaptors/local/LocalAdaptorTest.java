@@ -30,50 +30,6 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class LocalAdaptorTest {
 
-    @org.junit.Test(expected = InvalidLocationException.class)
-    public void test_checkLocation_null() throws Exception {
-        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation(null);
-    }
-
-    @org.junit.Test(expected = InvalidLocationException.class)
-    public void test_checkLocation_empty() throws Exception {
-        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("");
-    }
-
-    @org.junit.Test
-    public void test_checkLocation_linuxRoot() throws Exception {
-        if (Utils.isLinux() || Utils.isOSX()) { 
-            new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("/");
-        }
-    }
-
-    @org.junit.Test
-    public void test_checkLocation_windowsRoot() throws Exception {
-        if (Utils.isWindows()) { 
-            new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("C:");
-        }
-    }
-
-    @org.junit.Test(expected = InvalidLocationException.class)
-    public void test_checkLocation_wrong() throws Exception {
-        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("ABC");
-    }
-
-    @org.junit.Test(expected = InvalidLocationException.class)
-    public void test_checkLocation_withPath() throws Exception {
-        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("/aap");
-    }
-
-    @org.junit.Test(expected = InvalidLocationException.class)
-    public void test_checkLocation_withWindowsPath() throws Exception {
-        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("C:/aap");
-    }
-    
-    @org.junit.Test(expected = InvalidLocationException.class)
-    public void test_checkLocation_withWindowsPath2() throws Exception {
-        new LocalAdaptor(Util.createXenonEngine(null), null).checkLocation("C:\\aap");
-    }
-
     @org.junit.Test
     public void test_supports_null() throws Exception {
         boolean value = new LocalAdaptor(Util.createXenonEngine(null), null).supports(null);

@@ -48,12 +48,17 @@ import nl.esciencecenter.xenon.jobs.Streams;
  * @since 1.0
  */
 public class LocalJobs implements Jobs, InteractiveProcessFactory {
+    
+    /** The parent adaptor */
+    private final LocalAdaptor localAdaptor;
 
     private final Scheduler localScheduler;
     private final JobQueues jobQueues;
 
-    public LocalJobs(XenonProperties properties, Path cwd, XenonEngine engine)
+    public LocalJobs(LocalAdaptor localAdaptor, XenonProperties properties, Path cwd, XenonEngine engine)
             throws XenonException {
+        
+        this.localAdaptor = localAdaptor;
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", "local", "/", 
                 new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
@@ -79,10 +84,8 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
             throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with location: " 
                     + location);
         }
-
-        if (credential != null) {
-            throw new InvalidCredentialException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with credentials!");
-        }
+        
+        localAdaptor.checkCredential(credential);
 
         if (properties != null && properties.size() > 0) {
             throw new UnknownPropertyException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");

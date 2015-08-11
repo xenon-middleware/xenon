@@ -16,7 +16,10 @@
 
 package nl.esciencecenter.xenon.adaptors.local;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,4 +39,49 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
     public static void cleanupLocalFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.cleanupClass();
     }
+    
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_null() throws Exception {
+        LocalFiles.checkFileLocation(null);
+    }
+
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_empty() throws Exception {
+        LocalFiles.checkFileLocation("");
+    }
+
+    @org.junit.Test
+    public void test_checkLocation_linuxRoot() throws Exception {
+        if (Utils.isLinux() || Utils.isOSX()) { 
+            LocalFiles.checkFileLocation("/");
+        }
+    }
+
+    @org.junit.Test
+    public void test_checkLocation_windowsRoot() throws Exception {
+        if (Utils.isWindows()) { 
+            LocalFiles.checkFileLocation("C:");
+        }
+    }
+
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_wrong() throws Exception {
+        LocalFiles.checkFileLocation("ABC");
+    }
+
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_withPath() throws Exception {
+        LocalFiles.checkFileLocation("/aap");
+    }
+
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_withWindowsPath() throws Exception {
+        LocalFiles.checkFileLocation("C:/aap");
+    }
+    
+    @org.junit.Test(expected = InvalidLocationException.class)
+    public void test_checkLocation_withWindowsPath2() throws Exception {
+        LocalFiles.checkFileLocation("C:\\aap");
+    }
+
 }
