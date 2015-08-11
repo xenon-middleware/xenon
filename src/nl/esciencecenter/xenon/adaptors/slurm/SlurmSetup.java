@@ -68,7 +68,7 @@ public class SlurmSetup {
                     SlurmAdaptor.IGNORE_VERSION_PROPERTY);
         } else {
             throw new IncompatibleVersionException(SlurmAdaptor.ADAPTOR_NAME, "Slurm version " + version
-                    + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + " to ignore");
+                    + " not supported by Slurm Adaptor. Set " + SlurmAdaptor.IGNORE_VERSION_PROPERTY + " in the properties passed to xenon.jobs().newScheduler() to ignore");
         }
     }
 
