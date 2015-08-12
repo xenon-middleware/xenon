@@ -1,0 +1,11 @@
+slots 99999
+user_lists NONE
+xuser_lists NONE
+start_proc_args /bin/true
+stop_proc_args /bin/true
+allocation_rule $fill_up
+control_slaves TRUE
+job_is_first_task TRUE
+urgency_slots min
+accounting_summary TRUE
+pe_name fillup

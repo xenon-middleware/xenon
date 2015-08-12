@@ -17,13 +17,16 @@ ADD insecure-ssh-keys .ssh
 RUN mkdir -p xenon_test/links && \
 echo "Hello World" > xenon_test/links/file0 && \
 touch xenon_test/links/file1 && \
-ln -s xenon_test/links/file0 xenon_test/links/link0 && \
-ln -s xenon_test/links/file1 xenon_test/links/link1 && \
-ln -s xenon_test/links/file2 xenon_test/links/link2 && \
-ln -s xenon_test/links/link0 xenon_test/links/link3 && \
-ln -s xenon_test/links/link2 xenon_test/links/link4 && \
-ln -s xenon_test/links/link6 xenon_test/links/link5 && \
-ln -s xenon_test/links/link5 xenon_test/links/link6
+ln -s /home/xenon/xenon_test/links/file0 /home/xenon/xenon_test/links/link0 && \
+ln -s /home/xenon/xenon_test/links/file1 /home/xenon/xenon_test/links/link1 && \
+ln -s /home/xenon/xenon_test/links/file2 /home/xenon/xenon_test/links/link2 && \
+ln -s /home/xenon/xenon_test/links/link0 /home/xenon/xenon_test/links/link3 && \
+ln -s /home/xenon/xenon_test/links/link2 /home/xenon/xenon_test/links/link4 && \
+ln -s /home/xenon/xenon_test/links/link6 /home/xenon/xenon_test/links/link5 && \
+ln -s /home/xenon/xenon_test/links/link5 /home/xenon/xenon_test/links/link6
 RUN chown -R xenon.xenon .
+
+# Upgrade OS
+RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold" && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 CMD ["/sbin/my_init"]
