@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +34,13 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.ConfigRepository;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
 import com.jcraft.jsch.JSch;
@@ -72,6 +75,12 @@ public class SshAdaptor extends Adaptor {
     /** Load the known_hosts file by default. */
     public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
 
+    /** Load the OpenSSH config file by default. */
+    public static final String LOAD_SSH_CONFIG = PREFIX + "loadSshConfig";
+    
+    /** OpenSSH config filename. */
+    public static final String SSH_CONFIG_FILE = PREFIX + "sshConfigFile";
+    
     /** Enable strict host key checking. */
     public static final String AUTOMATICALLY_ADD_HOST_KEY = PREFIX + "autoAddHostKey";
 
@@ -110,6 +119,10 @@ public class SshAdaptor extends Adaptor {
                     Component.FILESYSTEM), "true", "Enable strict host key checking."), 
             new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON), 
                     "true", "Load the standard known_hosts file."), 
+            new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN, EnumSet.of(Component.XENON), 
+                    "true", "Load the OpenSSH config file."), 
+            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.BOOLEAN, EnumSet.of(Component.XENON), 
+                    null, "OpenSSH config filename."), 
             new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
             new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4", 
@@ -143,6 +156,14 @@ public class SshAdaptor extends Adaptor {
             LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
             setKnownHostsFile(knownHosts);
         }
+        if (getProperties().getBooleanProperty(SshAdaptor.LOAD_SSH_CONFIG)) {
+            String sshConfig = getProperties().getProperty(SshAdaptor.SSH_CONFIG_FILE);
+            if (sshConfig == null) {
+                sshConfig = System.getProperty("user.home") + "/.ssh/config";
+            }
+            LOGGER.debug("Setting ssh known hosts file to: " + sshConfig);
+            setConfigFile(sshConfig);
+        }
     }
 
     private void setKnownHostsFile(String knownHostsFile) throws XenonException {
@@ -166,7 +187,16 @@ public class SshAdaptor extends Adaptor {
             }
         }
     }
-   
+    
+    private void setConfigFile(String sshConfigFile) throws XenonException {
+        try {
+            ConfigRepository configRepository = com.jcraft.jsch.OpenSSHConfig.parseFile(sshConfigFile);
+            jsch.setConfigRepository(configRepository);
+        } catch (IOException ex) {
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Could not set OpenSSH config file", ex);
+        }
+    }
+
     @Override
     public XenonPropertyDescription[] getSupportedProperties() {
         return VALID_PROPERTIES.asArray();
@@ -191,6 +221,10 @@ public class SshAdaptor extends Adaptor {
     public void end() {
         jobsAdaptor.end();
         filesAdaptor.end();
+    }
+    
+    public ConfigRepository getSshConfig() {
+        return jsch.getConfigRepository();
     }
 
     /*
@@ -254,14 +288,14 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    protected SshMultiplexedSession createNewSession(SshLocation location, Credential credential, XenonProperties properties)
+    SshMultiplexedSession createNewSession(SshLocation location, Credential credential, XenonProperties properties)
             throws XenonException {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        Map<String,String> result = new HashMap<String, String>();
+        Map<String,String> result = Utils.emptyMap(1);
         jobsAdaptor.getAdaptorSpecificInformation(result);
         return result;
     }

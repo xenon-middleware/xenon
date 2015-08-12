@@ -19,7 +19,6 @@ package nl.esciencecenter.xenon.adaptors.gftp;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -47,7 +46,7 @@ public class GftpFileTestConfig extends FileTestConfig {
 
         correctLocation = getPropertyOrFail(p, "test.gftp.location");
 
-        // Either test proxy file must be defined or userkey file + passphrase !  
+        // Either test proxy file must be defined or userkey file + passphrase !
         userCertFile = p.getProperty("test.gftp.usercert");
         userKeyFile = p.getProperty("test.gftp.userkey");
         proxyFile = p.getProperty("test.gftp.proxyfile");
@@ -64,17 +63,6 @@ public class GftpFileTestConfig extends FileTestConfig {
         debugPrintf(" - proxyFile file   =%s\n", proxyFile);
         debugPrintf(" - passphrase file  =%s\n", (passphrase != null) ? "<Not Null" : "<NULL>");
 
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override
@@ -119,12 +107,12 @@ public class GftpFileTestConfig extends FileTestConfig {
         }
 
         // Create new Proxy using test account: 
- 
+
         Map<String, String> props = new Hashtable<String, String>();
-        
-        props.put(GlobusProxyCredentials.PROPERTY_USER_CERT_FILE, userCertFile); 
+
+        props.put(GlobusProxyCredentials.PROPERTY_USER_CERT_FILE, userCertFile);
         props.put(GlobusProxyCredentials.PROPERTY_USER_KEY_FILE, userKeyFile);
-        
+
         Credential cred = credentials.newCertificateCredential(scheme, null, null, passphrase, props);
 
         if (cred instanceof GlobusProxyCredential) {
@@ -204,7 +192,7 @@ public class GftpFileTestConfig extends FileTestConfig {
     @Override
     public boolean supportsPosixPermissions() {
         // Depends on actual GridFTP FileSystem but API supports it.
-        // Disable testing for now: 
+        // Disable testing for now:
         return false;
     }
 

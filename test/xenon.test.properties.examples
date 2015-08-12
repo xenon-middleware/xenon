@@ -101,3 +101,32 @@ test.slurm.default.queue=otherpartition
 test.slurm.queues=mypartition,otherpartition
 test.slurm.queue.wait.time=4000
 test.slurm.update.time=10000
+
+
+######################################################################
+#
+# This is the configuration of the Torque tests. To completely 
+# run these test the following setup is required:
+#
+# An account on a machine that runs Torque and can be accessed 
+# via SSH using both public key authentication and a password.
+#
+####
+#
+# This is the location of the machine of the form host[:port], 
+# where both user and port are optional. In addition, a username and 
+# password must be provided to test password authentication to the 
+# host.
+# 
+test.torque.location=
+test.torque.user=
+test.torque.password=
+#
+# The default queue to use in Torque, a list of other queues to 
+# test, the update delay for the queues and Torque commands 
+# (in ms)
+#
+test.torque.default.queue=main.q
+test.torque.queues=main.q
+test.torque.queue.wait.time=60000
+test.torque.update.time=60000

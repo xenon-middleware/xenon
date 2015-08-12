@@ -131,7 +131,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();        
+        Map<String, String> props = new HashMap<>();
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertFalse(xprop.propertySet("aap"));
