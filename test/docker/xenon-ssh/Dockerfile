@@ -6,7 +6,7 @@
 #
 # Run with:
 #
-#     docker run -d --name=xenon-ssh -u $USER nlesc/xenon-ssh
+#     docker run -d --name=xenon-ssh -h xenon-ssh nlesc/xenon-ssh
 #
 # Get containers ip with
 #
@@ -16,7 +16,7 @@
 #
 #     ssh-keyscan -t rsa -H $XENON_SSH_LOCATION >> ~/.ssh/known_hosts
 #     # with keys
-#     ssh -i insecure-ssh-keys/id_rsa.pub xenon@$XENON_SSH_LOCATION
+#     ssh -i ../xenon-alpine-base/insecure-ssh-keys/id_rsa.pub xenon@$XENON_SSH_LOCATION
 #     # with password javagat
 #     ssh xenon@$XENON_SSH_LOCATION
 #
@@ -25,29 +25,15 @@
 # test.ssh.location=$XENON_SSH_LOCATION
 # test.ssh.user=xenon
 # test.ssh.password=javagat
-
-FROM phusion/baseimage
+FROM nlesc/xenon-alpine-base
 MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 
-RUN rm -f /etc/service/sshd/down
-RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+RUN apk update && /sbin/setup-sshd -c openssh && rm -rf /var/cache/apk/* || /bin/true && \
+ssh-keygen -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key && \
+ssh-keygen -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key && \
+ssh-keygen -N "" -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key && \
+ssh-keygen -N "" -t ed25519 -f /etc/ssh/ssh_host_ed25519_key
 
-# Create a test user
-RUN /usr/sbin/useradd -p $(openssl passwd javagat) -d /home/xenon -m --shell /bin/bash xenon
-WORKDIR /home/xenon
-ADD insecure-ssh-keys .ssh
 
-# Create symlinks
-RUN mkdir -p xenon_test/links && \
-echo "Hello World" > xenon_test/links/file0 && \
-touch xenon_test/links/file1 && \
-ln -s xenon_test/links/file0 xenon_test/links/link0 && \
-ln -s xenon_test/links/file1 xenon_test/links/link1 && \
-ln -s xenon_test/links/file2 xenon_test/links/link2 && \
-ln -s xenon_test/links/link0 xenon_test/links/link3 && \
-ln -s xenon_test/links/link2 xenon_test/links/link4 && \
-ln -s xenon_test/links/link6 xenon_test/links/link5 && \
-ln -s xenon_test/links/link5 xenon_test/links/link6
-RUN chown -R xenon.xenon .
-
-CMD ["/sbin/my_init"]
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-De"]
