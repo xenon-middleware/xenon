@@ -124,7 +124,11 @@ task prepareIntegrationTest << {
         def userProps = new Properties()
         userProps.load(reader)
 
-        // TODO: run script locally
+        // Initialize testing symlinks locally
+        exec {
+            executable = '/bin/bash'
+            args = ['test/scripts/create_symlinks']
+        }
 
         // Initialize testing symlinks on remote side
         ssh.run {
