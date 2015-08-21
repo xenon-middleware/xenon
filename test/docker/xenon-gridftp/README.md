@@ -1,57 +1,54 @@
 
 
 Grid ftp uses certificates for server and users.
-To create the certificates a certifcate authority is needed.
+To create the certificates a certificate authority is needed.
 The `ca` directory contains a Dockerfile that manage the ca.
 
 The grid servers need to be run with predefined hostnames.
 
 # Create a ca and certificates
 
-Build the ca container.
+## Build the ca container
 
 ```
 docker build -t nlesc/xenon-gridftp-ca ca
 ```
 
-## Create a new ca
+## Create certificates
 
 Start the container
 
 ```
-docker run -t -i --rm=true -e MYUID=$UID -v $PWD/files/globus:/var/lib/globus -v $PWD/files/grid-security:/etc/grid-security nlesc/xenon-gridftp-ca
+docker run -t --rm=true -e MYUID=$UID -v $PWD/files:/var/lib/globus nlesc/xenon-gridftp-ca
 ```
 
-In container run
+In `files/` directory the following files will have been generated:
+
+* `globus-simple-*_all.deb`, contains public key of ca
+* `hosts/<hostname>/`, contains key pair of `<hostname>`
+* `users/<username>/`, contains key pair of `<username>`, dn of user is `/O=eScienceCenter/OU=local/CN=<username>`
+* simple-ca, the ca
+
+The public ca should be installed on all gridftp servers and clients.
+The host key pairs should be installled on the gridftp servers.
+Each user should have a mapping in `/etc/grid-security/grid-mapfile` on each gridftp server.
+Gridftp is very picky about hostname resolving so gridftp server and clients should all be able to resolve fully qualified hostnames of each other.
+
+# Create gridftp container
+
+The gridftp image will have certificates for different hostnames.
+During boot of the container the certifcate belonging to the current hostname will be activated.
+If there is no certificate for the selected hostname the container will boot without gsi support.
+
+## Create container
 
 ```
-cd /var/lib/globus
-/usr/bin/grid-ca-create -noint -subject "CN=eScience Center Simple CA, O=eScienceCenter" \
--email nobody@example.com -days 3650 -pass mycainsecurepassword -nobuild
-echo 1 | grid-default-ca
-echo 1 | grid-ca-package -d -r
-chown -R $MYUID /var/lib/globus /etc/grid-security
-exit
+docker build -t nlesc/xenon-gridftp .
 ```
-## Create a host key pair
+## Run grid ftp servers
 
 ```
-NEWHOST=gridftp1.test
-cd /var/lib/globus
-mkdir $NEWHOST && cd $NEWHOST
-grid-cert-request -host $NEWHOST -nopassphrase -dir .
-grid-ca-sign -passin pass:mycainsecurepassword -days 3560 -in hostcert_request.pem -out hostcert.pem
-chown -R $MYUID /var/lib/globus /etc/grid-security
-exit
+docker run -t -i --rm=true -h gridftp2.xenontest.nlesc.nl nlesc/xenon-gridftp /bin/bash
 ```
 
-## Create a user key pair
-
-```
-mkdir testuser
-cd testuser
-grid-cert-request -nopassphrase -ca -dir .
-grid-ca-sign -days 3560  -in usercert_request.pem -out usercert.pem
-openssl rsa -in userkey.pem -out userkey.rsa.pem
-exit
-```
+### Test
