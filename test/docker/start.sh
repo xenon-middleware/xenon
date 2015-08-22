@@ -17,3 +17,6 @@ XENON_GRIDENGINE_LOCATION=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}"
 
 docker run -d --name=xenon-torque -h xenon-torque --privileged nlesc/xenon-torque
 XENON_TORQUE_LOCATION=$(docker inspect -f "{{ .NetworkSettings.IPAddress }}" xenon-torque)
+
+docker run -d -h gridftp1.xenontest.nlesc.nl --name=gridftp1 nlesc/xenon-gridftp
+docker run -d -h gridftp2.xenontest.nlesc.nl --name=gridftp2 nlesc/xenon-gridftp

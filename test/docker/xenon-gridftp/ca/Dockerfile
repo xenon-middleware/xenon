@@ -13,7 +13,7 @@ ENV CA_DAYS 3650
 ENV CA_PASSPHRASE mycainsecurepassword
 ENV CA_HOST1 gridftp1.xenontest.nlesc.nl
 ENV CA_HOST2 gridftp2.xenontest.nlesc.nl
-ENV CA_USER1 testuser
+ENV CA_USER1 xenon
 
 ADD new-ca.sh /usr/bin/
 ADD new-host.sh /usr/bin/
