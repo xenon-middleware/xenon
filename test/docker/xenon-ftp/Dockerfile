@@ -23,11 +23,16 @@
 # test.ftp.location=$XENON_FTP_LOCATION
 # test.ftp.user=xenon
 # test.ftp.password=javagat
-FROM nlesc/xenon-alpine-base
+
+FROM nlesc/xenon-phusion-base
 MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 
-RUN apk add --update vsftpd && rm -rf /var/cache/apk/* || /bin/true
-ADD vsftpd.conf /etc/vsftpd/vsftpd.conf
+RUN apt-get update && apt-get install -y vsftpd && \
+apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+mkdir /etc/service/vsftpd && echo "#!/bin/sh" > /etc/service/vsftpd/run && \
+echo "/usr/sbin/vsftpd /etc/vsftpd.conf" >> /etc/service/vsftpd/run && \
+chmod +x /etc/service/vsftpd/run && mkdir -p /var/run/vsftpd/empty
+
+ADD vsftpd.conf /etc/vsftpd.conf
 
 EXPOSE 21
-CMD ["/usr/sbin/vsftpd", "/etc/vsftpd/vsftpd.conf"]
