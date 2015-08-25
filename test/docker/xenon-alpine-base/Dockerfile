@@ -11,6 +11,7 @@ MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 RUN /usr/sbin/adduser -D xenon && echo xenon:javagat |chpasswd
 WORKDIR /home/xenon
 ADD insecure-ssh-keys .ssh
+RUN chmod go-r .ssh/id_rsa
 
 # Create symlinks
 RUN mkdir -p xenon_test/links && \
@@ -24,3 +25,6 @@ ln -s /home/xenon/xenon_test/links/link2 xenon_test/links/link4 && \
 ln -s /home/xenon/xenon_test/links/link6 xenon_test/links/link5 && \
 ln -s /home/xenon/xenon_test/links/link5 xenon_test/links/link6 && \
 chown -R xenon.xenon .
+
+# xenon prepare test runs a bash based test script
+RUN apk add --update bash && rm -rf /var/cache/apk/* || /bin/true
