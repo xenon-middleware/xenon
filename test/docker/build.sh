@@ -9,6 +9,11 @@ docker build -t nlesc/xenon-slurm xenon-slurm
 docker build -t nlesc/xenon-gridengine xenon-gridengine
 docker build -t nlesc/xenon-torque xenon-torque
 
- docker build -t nlesc/xenon-gridftp-ca ca
- docker run -t --rm=true -e MYUID=$UID -v $PWD/files:/var/lib/globus nlesc/xenon-gridftp-ca
- docker build -t nlesc/xenon-gridftp .
+if [ -e xenon-gridftp/files ] ; then
+  echo "Certificate already exist, not recreating certificates"
+else
+  docker build -t nlesc/xenon-gridftp-ca xenon-gridftp/ca
+  docker run -t --rm=true -e MYUID=$UID -v $PWD/xenon-gridftp/files:/var/lib/globus nlesc/xenon-gridftp-ca
+fi
+
+docker build -t nlesc/xenon-gridftp xenon-gridftp

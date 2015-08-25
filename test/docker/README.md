@@ -15,9 +15,13 @@ Because of this we can't use a shared set of keys between base images so they ar
 
 # Run integration tests
 
-To run the integration tests against the docker containers. They must be started and a config file must be supplied.
+Run the integration tests against the docker containers using docker compose.
+Tests suite is run from a docker container so it can connect to linked containers.
+The docker container is run with your own UID so test results are also owned by you.
 
-   ./test/docker/start.sh
-   ant integration -Dxenon.test.config=test/docker/xenon.test.properties.docker
-   ./test/docker/stop.sh
-
+```
+cp test/docker/xenon.test.properties.docker test/xenon.test.properties
+cd test/docker
+docker-compose run -e MYUID=$UID --rm xenon-test
+docker-compose kill && docker-compose rm -f
+```

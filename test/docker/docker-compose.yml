@@ -1,7 +1,7 @@
 xenon-ssh:
   image: nlesc/xenon-ssh
-#xenon-ftp:
-#  image: nlesc/xenon-ftp
+xenon-ftp:
+  image: nlesc/xenon-ftp
 xenon-webdav:
   image: nlesc/xenon-webdav
 xenon-torque:
@@ -25,7 +25,7 @@ xenon-test:
     - MYUID
   links:
     - xenon-ssh
-#    - xenon-ftp
+    - xenon-ftp
     - xenon-webdav
     - xenon-torque
     - xenon-slurm

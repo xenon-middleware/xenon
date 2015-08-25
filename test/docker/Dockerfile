@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y openjdk-7-jdk ant-optional libjsch-java
 apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 mkdir /code && mkdir -p /etc/my_init.d && touch /etc/service/sshd/down
 
-# ssh keys are already installed in base image
+# ssh keys are already installed in base image, config is needed by Xenon
+RUN setuser xenon touch /home/xenon/.ssh/config
 
 # Add globus cerficates
 ADD xenon-gridftp/files/ca-cerficates /etc/grid-security/certificates
