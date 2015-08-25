@@ -32,7 +32,8 @@ ADD gridengine.sh /etc/my_init.d/gridengine.sh
 # config
 ADD etc/gridengine /etc/gridengine/files
 WORKDIR /etc/gridengine/files
-RUN /etc/my_init.d/gridengine.sh && \
+RUN mkdir host_groups && /bin/echo -e "group_name @allhosts\nhostlist $HOSTNAME" > host_groups/allhosts && \
+/etc/my_init.d/gridengine.sh && \
 # submit host
 qconf -as $HOSTNAME && \
 # hosts for queues
@@ -44,6 +45,7 @@ qconf -Ap parallel_environments/round && \
 qconf -Ap parallel_environments/smp && \
 qconf -Aq queues/default && \
 qconf -Aq queues/slow && \
+qconf -Msconf scheduler && \
 killall sge_qmaster sge_execd
 
 CMD ["/sbin/my_init"]

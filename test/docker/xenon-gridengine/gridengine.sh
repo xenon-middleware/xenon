@@ -6,6 +6,7 @@ export SGE_HOST=$(cat /var/lib/gridengine/default/common/act_qmaster)
 # replace SGE_HOST text in files
 grep -Rl "$SGE_HOST" /var/lib/gridengine | xargs sed -i "s/$SGE_HOST/$HOSTNAME/g"
 
+
 /bin/echo -e "group_name @allhosts\nhostlist $HOSTNAME" > /etc/gridengine/files/host_groups/allhosts
 
 # SGE can not start in the foreground so use the rc scripts
