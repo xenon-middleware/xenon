@@ -86,6 +86,11 @@ sourceSets {
         }
         resources.srcDir file('test/fixtures')
     }
+    userguide {
+        java {
+            srcDir 'doc/userguide/src'
+        }
+    }
 }
 
 //     DOCUMENT
