@@ -16,12 +16,12 @@ Because of this we can't use a shared set of keys between base images so they ar
 # Run integration tests
 
 Run the integration tests against the docker containers using docker compose.
-Tests suite is run from a docker container so it can connect to linked containers.
+Tests suite is run from a docker container so it can connect to linked containers and has ssh/globus keys.
 The docker container is run with your own UID so test results are also owned by you.
 
 ```
-cp test/docker/xenon.test.properties.docker test/xenon.test.properties
 cd test/docker
+cp xenon.test.properties.docker ../xenon.test.properties
 docker-compose run -e MYUID=$UID --rm xenon-test
 docker-compose kill && docker-compose rm -f
 ```
