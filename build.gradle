@@ -91,6 +91,7 @@ sourceSets {
             srcDir 'doc/userguide/src'
         }
     }
+    examples
 }
 
 //     DOCUMENT
