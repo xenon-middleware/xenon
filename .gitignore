@@ -13,3 +13,4 @@
 
 # integration tests
 xenon.test.properties
+/xenon_test
