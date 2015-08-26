@@ -1,5 +1,10 @@
 xenon-ssh:
   image: nlesc/xenon-ssh
+# For ssh gateway tests
+xenon-ssh2:
+  image: nlesc/xenon-ssh
+  links:
+    - xenon-ssh
 xenon-ftp:
   image: nlesc/xenon-ftp
 xenon-webdav:
@@ -25,6 +30,7 @@ xenon-test:
     - MYUID
   links:
     - xenon-ssh
+    - xenon-ssh2
     - xenon-ftp
     - xenon-webdav
     - xenon-torque

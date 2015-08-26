@@ -40,7 +40,7 @@ test.ssh.loadSshConfig=false
 # machine above in the the form [user@]host[:port]. This machine
 # must be accessible via public key authentication.
 #
-test.ssh.gateway=xenon@xenon-slurm
+test.ssh.gateway=xenon@xenon-ssh2
 
 
 
