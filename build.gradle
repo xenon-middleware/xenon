@@ -27,7 +27,8 @@ targetCompatibility = '1.7'
 repositories {
     mavenCentral()
     jcenter()
-    flatDir { dirs 'lib', 'lib/cog-jglobus' }
+    // TODO lib/test, could interfere with main sourceset. eg junit.jar in distribution
+    flatDir { dirs 'lib', 'lib/cog-jglobus', 'lib/test' }
 }
 
 ext.cogJglobusVersion = '1.8.0'
