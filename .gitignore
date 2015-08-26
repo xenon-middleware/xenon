@@ -1,0 +1,15 @@
+# eclipse
+/.classpath
+/.project
+/.settings
+
+# intellij
+/.idea
+/*.iml
+
+# gradle
+/build
+/.gradle
+
+# integration tests
+xenon.test.properties
