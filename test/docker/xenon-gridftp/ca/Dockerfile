@@ -14,7 +14,7 @@ ENV CA_PASSPHRASE mycainsecurepassword
 ENV CA_HOST1 gridftp1.xenontest.nlesc.nl
 ENV CA_HOST2 gridftp2.xenontest.nlesc.nl
 ENV CA_USER1 xenon
-ENB CA_USER1_PASSPHRASE javagat
+ENV CA_USER1_PASSPHRASE javagat
 
 ADD new-ca.sh /usr/bin/
 ADD new-host.sh /usr/bin/
