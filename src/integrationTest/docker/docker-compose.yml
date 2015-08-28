@@ -25,7 +25,8 @@ xenon-gridftp2:
 xenon-test:
   build: .
   volumes:
-    - ../..:/code
+    - ../../..:/code
+    - ~/.gradle:/home/xenon/.gradle
   environment:
     - MYUID
   links:

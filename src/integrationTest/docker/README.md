@@ -20,8 +20,8 @@ Tests suite is run from a docker container so it can connect to linked container
 The docker container is run with your own UID so test results are also owned by you.
 
 ```
-cd test/docker
-cp xenon.test.properties.docker ../xenon.test.properties
+cd src/integrationTest/docker
+cp xenon.test.properties.docker ../../../xenon.test.properties
 docker-compose run -e MYUID=$UID --rm xenon-test
 docker-compose kill && docker-compose rm -f
 ```
