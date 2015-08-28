@@ -1,0 +1,294 @@
+//    PLUGINS
+// ==============
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.2'
+    id 'jacoco'
+    id 'org.hidetake.ssh' version '1.1.3'
+}
+
+defaultTasks 'clean', 'assemble', 'test'
+
+//    METADATA
+// ==============
+version = '1.1.0-SNAPSHOT'
+description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
+
+// will generate a warning with JDK 8, since the runtime jar (rt.jar) of
+// Java 7 is not available. Could configure gradle wrapper for this
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+//  DEPENDENCIES
+// ==============
+
+//Get dependencies from Maven central repository, from JCenter and then locally
+repositories {
+    mavenCentral()
+    jcenter()
+    // TODO lib/test, could interfere with main sourceset. eg junit.jar in distribution
+    flatDir { dirs 'lib', 'lib/cog-jglobus', 'lib/test' }
+}
+
+ext.cogJglobusVersion = '1.8.0'
+ext.jschVersion = '0.1.50'
+ext.apacheCommonsNetVersion = '3.3'
+
+// PROJECT DIRECTORIES
+// ==============
+sourceSets {
+    test {
+        java {
+            exclude 'nl/esciencecenter/xenon/integration/**'
+            exclude '**/IT*.java'
+            exclude '**/*IT.java'
+            exclude 'nl/esciencecenter/xenon/adaptors/*/*AdaptorTest.java'
+        }
+    }
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            // TODO move all integration tests to src/integrationTest/java
+            srcDirs 'src/test/java'
+            include 'nl/esciencecenter/xenon/integration/**'
+            include '**/IT*.java'
+            include '**/*IT.java'
+            include 'nl/esciencecenter/xenon/adaptors/*/*AdaptorTest.java'
+        }
+        // TODO move all integration resources to src/integrationTest/resources
+        resources.srcDirs 'src/test/resources'
+    }
+    userguide {
+        java {
+            srcDir 'doc/userguide/src'
+        }
+    }
+    examples
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+dependencies {
+    // Xenon dependencies. downloadJGlobus task (below) downloads
+    // xenon/lib/**/*.jar to ./lib/
+    compile group: 'com.jcraft', name: 'jsch', version: jschVersion
+    compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion
+    compile group: 'com.google.code.findbugs', name: 'findbugs', version: '2.0.2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
+    compile module(group: 'org.jglobus', name: 'cog-jglobus', version: cogJglobusVersion) {
+        dependency group: 'org.jglobus', name: 'cog-jobmanager', version: cogJglobusVersion
+        dependency group: 'org.jglobus', name: 'cog-url', version: cogJglobusVersion
+        dependency group: 'commons-logging', name: 'commons-logging', version: '1.1'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3', transitive: true
+        dependency group: 'cryptix', name: 'cryptix-asn1'
+        dependency group: 'cryptix', name: 'cryptix'
+        dependency group: 'cryptix', name: 'cryptix32'
+        dependency group: 'org.bountycastle', name: 'jce-jdk13', version: '131'
+        dependency group: 'org.ietf', name: 'jgss'
+        dependency group: 'com.claymoresystems', name: 'puretls', version: '0.9b4'
+    }
+
+    // Runtime dependencies
+    runtime group: 'ch.qos.logback', name: 'logback-core', version: '1.0.11'
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.11'
+
+    // Testing dependencies
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+    integrationTestCompile group: 'junit', name: 'junit', version: '4.11'
+    integrationTestCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+
+    userguideCompile sourceSets.main.output
+    examplesCompile sourceSets.main.output
+}
+
+//     DOCUMENT
+// ==============
+javadoc {
+    exclude 'nl/esciencecenter/xenon/engine/**', 'nl/esciencecenter/xenon/adaptors/**'
+
+    // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
+    failOnError = false
+}
+
+task javadocDevel(type: Javadoc) {
+    description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
+    group 'Documentation'
+    source = sourceSets.main.allJava
+    destinationDir = file("${project.docsDir}/javadoc-devel")
+    options.showFromPrivate()
+
+    // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
+    failOnError = false
+}
+
+
+task adaptorDocumentation(type: JavaExec) {
+    main = 'nl.esciencecenter.xenon.doc.AdaptorDocGenerator'
+    // TODO change builddir to build/docs/userguide, docs/userguide dir must be created before
+    args = ["${buildDir}/adaptors.md"]
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.userguide.runtimeClasspath
+}
+
+class ConcatFiles extends DefaultTask {
+    @InputFiles
+    FileCollection files
+    @OutputFile
+    File target
+    @TaskAction
+    void concat() {
+        target.withWriter { writer ->
+            files.each { file ->
+                file.withReader { reader ->
+                    writer << reader << '\n'
+                }
+            }
+        }
+    }
+}
+
+task userguideMarkdown(type: ConcatFiles, dependsOn: adaptorDocumentation) {
+    files = files('doc/userguide/userguide_src.md', "${buildDir}/adaptors.md")
+    target = file('doc/userguide/userguide.md')
+}
+
+task checkPandocPresence(type:Exec) {
+    executable 'pandoc'
+    args = ['-v']
+    ignoreExitValue true
+}
+
+task userGuidePdf(type:Exec, dependsOn: [checkPandocPresence, adaptorDocumentation]) {
+    workingDir 'doc/userguide'
+    executable 'pandoc'
+    args = ['userguide.md', '--latex-engine=xelatex', '-o', 'userguide.pdf']
+}
+
+//     TEST
+// ==============
+
+//Create the task that runs the integration tests found from the
+//configured source directory and uses the correct classpath.
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    //Ensure that integration tests are run every time when you invoke this task
+    outputs.upToDateWhen { false }
+}
+
+task jacocoIntegrationTestReport(type:JacocoReport){
+    description 'Generate coverage report of integration tests'
+    group 'Code coverage reporting'
+    executionData integrationTest
+    sourceSets sourceSets.main
+}
+jacocoTestReport.description = 'Generate coverage report of unit tests'
+jacocoTestReport.group = 'Code coverage reporting'
+
+task prepareIntegrationTest << {
+    file('xenon.test.properties').withReader { reader ->
+        def userProps = new Properties()
+        userProps.load(reader)
+
+        // Initialize testing symlinks locally
+        exec {
+            executable = '/bin/bash'
+            args = ['src/test/resources/scripts/create_symlinks']
+        }
+
+        // Initialize testing symlinks on remote side
+        ssh.run {
+            session(host: userProps.getProperty("test.ssh.location"),
+                    user: userProps.getProperty("test.ssh.user"),
+                    // TODO use privata key instead of password,
+                    // so we dont need to have password in cleartext
+                    //identity: file(userProps.getProperty("test.ssh.identity")),
+                    password: userProps.getProperty("test.ssh.password")
+                    ) {
+                shell interaction: {
+                    file('src/test/resources/scripts/create_symlinks').withInputStream { stream ->
+                        standardInput << stream << '\n' << 'exit 0' << '\n'
+                    }
+                }
+            }
+        }
+    }
+}
+
+//Ensure that the check task fails the build if there are failing integration tests.
+check.dependsOn integrationTest
+//Ensure that integration tests are prepared
+integrationTest.dependsOn prepareIntegrationTest
+//Ensure that our unit tests are run before our integration tests
+integrationTest.mustRunAfter test
+
+//Ensure that the HTML reports of unit and integration tests are written to different directories.
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+    reports.junitXml.destination = file("${project.buildDir}/${name}-results")
+}
+
+//    PACKAGE
+// ==============
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+// TODO Distributions:
+// 1. for maven, xenon.jar, xenon-src.jar, xenon-javadoc.jar
+// 2. minimal, xenon.jar + deps*.jar
+// 3. full, xenon.jar + deps*.jar + javadoc + examples + javadocdevel + unit tests +  integration tests
+
+//     PUBLISH
+// ==============
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            groupId 'nl.esciencecenter.xenon'
+            artifactId 'xenon'
+            version version
+
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'xenon'
+        name = 'xenon'
+        desc = description
+        userOrg = 'nlesc'
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://nlesc.github.io/Xenon'
+        vcsUrl = 'https://github.com/NLeSC/Xenon.git'
+        issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
+    }
+    publications = ['MyPublication']
+}
+
+task wrapper(type: Wrapper) {
+    description 'Generates gradle wrapper'
+    group 'Build Setup'
+    gradleVersion = '2.6'
+}

@@ -46,7 +46,7 @@ public class SandboxedLocalJobIT {
      * Xenon usage example:
      * <ol>
      * <li>Create temporary work directory</li>
-     * <li>Copy `test/fixtures/lorem_ipsum.txt` input file to work directory</li>
+     * <li>Copy `src/test/resources/fixtures/lorem_ipsum.txt` input file to work directory</li>
      * <li>Upload input file from work dir to sandbox.</li>
      * <li>Submit `/usr/bin/wc` of sandboxed file to local.</li>
      * <li>Poll job until isDone</li>
@@ -75,7 +75,7 @@ public class SandboxedLocalJobIT {
         xenon.files().createDirectory(workdir);
 
         // fill workdir
-        String input_file = System.getProperty("user.dir") + "/test/fixtures/lorem_ipsum.txt";
+        String input_file = System.getProperty("user.dir") + "/src/test/resources/fixtures/lorem_ipsum.txt";
         xenon.files().copy(xenon.files().newPath(localrootfs, new RelativePath(input_file)),
                 xenon.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
