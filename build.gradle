@@ -6,6 +6,7 @@ plugins {
     id 'com.jfrog.bintray' version '1.2'
     id 'jacoco'
     id 'org.hidetake.ssh' version '1.1.3'
+    id 'distribution'
 }
 
 defaultTasks 'clean', 'assemble', 'test'
@@ -258,6 +259,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+task examplesJar(type: Jar) {
+    classifier = 'examples'
+    from sourceSets.examples.output
+}
+
 artifacts {
     archives sourcesJar
     archives javadocJar
@@ -267,6 +273,41 @@ artifacts {
 // 1. for maven, xenon.jar, xenon-src.jar, xenon-javadoc.jar
 // 2. minimal, xenon.jar + deps*.jar
 // 3. full, xenon.jar + deps*.jar + javadoc + examples + javadocdevel + unit tests +  integration tests
+
+distributions {
+    main {
+        contents {
+            def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
+            into("lib") {
+                from(jar)
+                from(project.configurations.runtime)
+            }
+            into("docs") {
+                from(userguideMarkdown.target)
+                from('doc/userguide/userguide.pdf')
+                into("javadoc") {
+                    from(javadoc.destinationDir)
+                }
+                from(sourcesJar)
+            }
+            from {
+                ['README.md',
+                'LICENSE',
+                'NOTICE',
+                'notices'
+                ]
+            }
+            into('examples') {
+                from('src/examples')
+                // TODO would like to have example source code in examples/src/main/java, but it is in examples/java, rename did not work
+                from(examplesJar)
+            }
+        }
+    }
+}
+distZip.dependsOn javadoc, userGuidePdf
+distTar.dependsOn javadoc, userGuidePdf
+installDist.dependsOn javadoc, userGuidePdf
 
 //     PUBLISH
 // ==============
