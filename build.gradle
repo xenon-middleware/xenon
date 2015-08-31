@@ -303,5 +303,5 @@ bintray {
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
-    gradleVersion = '2.6'
+    gradleVersion = '2.7'
 }
