@@ -42,6 +42,14 @@ can be found in the file "INSTALL.md" in the Xenon distribution.
 In Addition, the "EXAMPLES.md" file explains how to compile and
 run the Xenon examples.
 
+## Build
+
+Xenon library can be built with:
+
+```
+./gradlew build
+```
+
 ## Offline build
 
 Plugins must be downloaded before going offline with
@@ -49,9 +57,63 @@ Plugins must be downloaded before going offline with
 ./gradlew tasks
 ```
 
-Then offline the dist can be built with
+The dist can be built offline with
 ```
 ./gradlew build --offline
+```
+
+## Development
+
+To open in an IDE like Eclipse or Intellij IDEA, create project files with `./gradlew eclipse` or `./gradlew idea` respectively.
+
+Perform tests with test and coverage reports in `build/reports` directory.
+````
+./gradlew test jacocoTestReport
+````
+
+Run integration tests by
+1. first copying `src/test/resources/xenon.test.properties.examples` to `xenon.test.properties`
+2. updating `xenon.test.properties` file to your infrastructure
+3. run intergration tests with
+
+```
+./gradlew check
+```
+
+Build distribution with
+```
+./gradlew assembleDist
+```
+
+Run SonarQube analysis (when you have a local SonarQube service running) with
+```
+./gradlew sonarqube -Dsonar.host.url=http://localhost:9000 \
+-Dsonar.jdbc.url=jdbc:mysql://localhost:3306/sonarqube \
+-Dsonar.jdbc.username=sonar -Dsonar.jdbc.password=sonar
+```
+
+## Generate documentation
+
+### Userguide
+
+The userguide (doc/userguide/userguide.pdf) can be generated with
+```
+./gradlew userguidePdf
+```
+
+### Javadoc
+
+A javadoc be generated with
+```
+./gradlew javadoc
+firefox build/docs/javadoc/index.html
+```
+### Development Javadoc
+
+A javadoc for developers be generated with
+```
+./gradlew javadocDevel
+firefox build/docs/javadoc-devel/index.html
 ```
 
 Copyrights & Disclaimers
