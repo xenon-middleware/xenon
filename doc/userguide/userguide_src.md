@@ -45,7 +45,7 @@ run the Xenon examples.
 Xenon uses the gradle build automation tool.
 Use `./gradlew tasks` to list all available tasks,
 
-## Build
+### Build
 
 Xenon library can be built with:
 
@@ -53,19 +53,28 @@ Xenon library can be built with:
 ./gradlew build
 ```
 
-## Offline build
+### Offline build
 
-Plugins must be downloaded before going offline with
-```
-./gradlew tasks
-```
+Requirements:
+
+* JDK
+* Gradle
+* pandoc and texlive to generate userguide.pdf
 
 The dist can be built offline with
 ```
-./gradlew build --offline
+gradle -b build.offline.gradle --offline build
 ```
+Replace `build` to run another Gradle task.
 
-## Development
+Offline limitations/workarounds:
+
+1. Integration test are not prepared. To run offline integration tests **you are responsible** for running `./src/test/resources/scripts/create_symlinks` on the locations specified in the `xenon.test.properties` file.
+2. Publishing to bintray must be done manually
+3. No test coverage, coverage report generation requires download
+4. No SonarQube analysis
+
+### Development
 
 To open in an IDE like Eclipse or Intellij IDEA, create project files with `./gradlew eclipse` or `./gradlew idea` respectively.
 
@@ -96,25 +105,25 @@ Run SonarQube analysis (when you have a local SonarQube service running) with
 -Dsonar.jdbc.username=sonar -Dsonar.jdbc.password=sonar
 ```
 
-## Generate documentation
+### Generate documentation
 
-### Userguide
+#### Userguide
 
 The userguide (doc/userguide/userguide.pdf) can be generated with
 ```
 ./gradlew userguidePdf
 ```
 
-### Javadoc
+#### Javadoc
 
-A javadoc be generated with
+Javadoc be generated with
 ```
 ./gradlew javadoc
 firefox build/docs/javadoc/index.html
 ```
-### Development Javadoc
+#### Development Javadoc
 
-A javadoc for developers be generated with
+Javadoc for developers be generated with
 ```
 ./gradlew javadocDevel
 firefox build/docs/javadoc-devel/index.html
