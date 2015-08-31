@@ -42,6 +42,9 @@ can be found in the file "INSTALL.md" in the Xenon distribution.
 In Addition, the "EXAMPLES.md" file explains how to compile and
 run the Xenon examples.
 
+Xenon uses the gradle build automation tool.
+Use `./gradlew tasks` to list all available tasks,
+
 ## Build
 
 Xenon library can be built with:
