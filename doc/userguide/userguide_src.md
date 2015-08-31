@@ -75,6 +75,7 @@ Perform tests with test and coverage reports in `build/reports` directory.
 ````
 
 Run integration tests by
+
 1. first copying `src/test/resources/xenon.test.properties.examples` to `xenon.test.properties`
 2. updating `xenon.test.properties` file to your infrastructure
 3. run intergration tests with
