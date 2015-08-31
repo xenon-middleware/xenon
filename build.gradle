@@ -129,10 +129,14 @@ task javadocDevel(type: Javadoc) {
 
 
 task adaptorDocumentation(type: JavaExec) {
+    description 'Generate Markdown adaptor appendix'
+    group 'documentation'
     main = 'nl.esciencecenter.xenon.doc.AdaptorDocGenerator'
-    // TODO change builddir to build/docs/userguide, docs/userguide dir must be created before
-    args = ["${buildDir}/adaptors.md"]
+    // TODO adaptors.md is made in wrong dir (build/), change builddir to build/docs/userguide, docs/userguide dir must be created before
+    File output = file("${buildDir}/adaptors.md")
+    args = [output]
     classpath = sourceSets.main.runtimeClasspath + sourceSets.userguide.runtimeClasspath
+    outputs.file output
 }
 
 class ConcatFiles extends DefaultTask {
@@ -153,8 +157,12 @@ class ConcatFiles extends DefaultTask {
 }
 
 task userguideMarkdown(type: ConcatFiles, dependsOn: adaptorDocumentation) {
+    description 'Concatenate userguide_src.md and adaptor appendix into userguid.md'
+    group 'documentation'
     files = files('doc/userguide/userguide_src.md', "${buildDir}/adaptors.md")
     target = file('doc/userguide/userguide.md')
+    inputs.files files
+    outputs.file target
 }
 
 task checkPandocPresence(type:Exec) {
@@ -164,9 +172,14 @@ task checkPandocPresence(type:Exec) {
 }
 
 task userGuidePdf(type:Exec, dependsOn: [checkPandocPresence, adaptorDocumentation]) {
+    description 'Convert markdown to pdf (requires pandoc and texlive)'
+    group 'documentation'
     workingDir 'doc/userguide'
     executable 'pandoc'
-    args = ['userguide.md', '--latex-engine=xelatex', '-o', 'userguide.pdf']
+    File output = file('doc/userguide/userguide.pdf')
+    inputs.file userguideMarkdown.target
+    outputs.file output
+    args = [userguideMarkdown.target, '-o', output]
 }
 
 //     TEST
