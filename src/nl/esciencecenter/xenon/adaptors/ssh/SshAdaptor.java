@@ -34,7 +34,6 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +161,7 @@ public class SshAdaptor extends Adaptor {
                 sshConfig = System.getProperty("user.home") + "/.ssh/config";
             }
             LOGGER.debug("Setting ssh known hosts file to: " + sshConfig);
-            setConfigFile(sshConfig);
+            setConfigFile(sshConfig, !getProperties().propertySet(SshAdaptor.LOAD_SSH_CONFIG));
         }
     }
 
@@ -188,12 +187,16 @@ public class SshAdaptor extends Adaptor {
         }
     }
     
-    private void setConfigFile(String sshConfigFile) throws XenonException {
+    private void setConfigFile(String sshConfigFile, boolean ignoreFail) throws XenonException {
         try {
             ConfigRepository configRepository = com.jcraft.jsch.OpenSSHConfig.parseFile(sshConfigFile);
             jsch.setConfigRepository(configRepository);
         } catch (IOException ex) {
-            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Could not set OpenSSH config file", ex);
+            if (ignoreFail) {
+                LOGGER.warn("OpenSSH config file cannot be read.", ex);
+            } else {
+                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot read OpenSSH config file", ex);
+            }
         }
     }
 
@@ -295,7 +298,7 @@ public class SshAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        Map<String,String> result = Utils.emptyMap(1);
+        Map<String,String> result = new HashMap<>(2);
         jobsAdaptor.getAdaptorSpecificInformation(result);
         return result;
     }
