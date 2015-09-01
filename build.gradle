@@ -20,7 +20,7 @@ plugins {
     id "org.sonarqube" version "1.0"
 }
 
-apply from: 'common.gradle'
+apply from: 'build-common.gradle'
 
 //     TEST
 // ==============

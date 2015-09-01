@@ -63,7 +63,7 @@ Requirements:
 
 The dist can be built offline with
 ```
-gradle -b build.offline.gradle --offline build
+gradle -b build-offline.gradle --offline build
 ```
 Replace `build` to run another Gradle task.
 

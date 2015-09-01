@@ -1,5 +1,5 @@
 // Common gradle configuration between offline and online build.
-// This file can not be run by itself either run build.gradle or build.offline.gradle .
+// This file can not be run by itself either run build.gradle or build-offline.gradle .
 
 defaultTasks 'clean', 'assemble', 'test'
 
