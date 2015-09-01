@@ -71,6 +71,9 @@ dependencies {
     // xenon/lib/**/*.jar to ./lib/
     compile group: 'com.jcraft', name: 'jsch', version: jschVersion
     compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion
+    compile 'commons-httpclient:commons-httpclient:3.0.1'
+    compile 'org.apache.jackrabbit:jackrabbit-webdav:2.10.1'
+    compile 'joda-time:joda-time:2.8.1'
     compile group: 'com.google.code.findbugs', name: 'findbugs', version: '2.0.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
     compile module(group: 'org.jglobus', name: 'cog-jglobus', version: cogJglobusVersion) {
