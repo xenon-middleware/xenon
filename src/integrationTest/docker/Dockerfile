@@ -22,4 +22,5 @@ ADD run-tests.sh /bin/run-tests.sh
 VOLUME ["/code"]
 WORKDIR /code
 
-CMD /bin/run-tests.sh
+ENTRYPOINT ["/bin/run-tests.sh"]
+CMD ["./gradlew", "check"]

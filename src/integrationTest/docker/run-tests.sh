@@ -12,4 +12,4 @@ fi
 # ssh in prepareIntegrationTest in build.gradle adds ecdsa key which it cant read
 setuser xenon ssh-keyscan -t rsa xenon-ssh >> /home/xenon/.ssh/known_hosts
 
-setuser xenon ./gradlew check -x test
+setuser xenon "$@"

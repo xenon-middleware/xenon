@@ -25,3 +25,8 @@ cp xenon.test.properties.docker ../../../xenon.test.properties
 docker-compose run -e MYUID=$UID --rm xenon-test
 docker-compose kill && docker-compose rm -f
 ```
+
+To run filter tests use
+```
+docker-compose run -e MYUID=$UID --rm xenon-test ./gradlew integrationTest --tests *gftp*
+```
