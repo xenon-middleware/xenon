@@ -14,4 +14,4 @@ plugins {
     id 'eclipse'
 }
 
-apply from: 'common.gradle'
+apply from: 'build-common.gradle'
