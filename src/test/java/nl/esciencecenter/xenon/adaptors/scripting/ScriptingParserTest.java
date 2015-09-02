@@ -427,9 +427,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test06k_parseTable_HorizontalSeparator_NormalResult() throws Exception {
-        Map<String, Map<String, String>> expected = Utils.emptyMap(1);
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = Utils.emptyMap(4);
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -449,9 +449,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test06l_parseTable_DoubleHorizontalSeparator_NormalResult() throws Exception {
-        Map<String, Map<String, String>> expected = Utils.emptyMap(1);
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = Utils.emptyMap(4);
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");

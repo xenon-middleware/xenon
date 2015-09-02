@@ -166,7 +166,7 @@ public class SshFiles implements Files {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential, 
                 properties);
         
-        SshLocation sshLocation = SshLocation.parse(location);
+        SshLocation sshLocation = SshLocation.parse(location, adaptor.getSshConfig());
         
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), 
                 properties);

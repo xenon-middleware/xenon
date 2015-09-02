@@ -60,7 +60,7 @@ public class FtpCredentials implements Credentials {
     @Override
     public Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws XenonException {
-        throw new XenonException(FtpAdaptor.ADAPTOR_NAME, "CertificateCredential not supported!");
+        throw new XenonException(adaptor.getName(), "CertificateCredential not supported!");
     }
 
     @Override

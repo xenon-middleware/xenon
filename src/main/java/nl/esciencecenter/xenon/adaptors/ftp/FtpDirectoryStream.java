@@ -21,7 +21,7 @@ public class FtpDirectoryStream extends DirectoryStreamBase<FTPFile, Path> {
     }
 
     @Override
-    protected String getFileNameFromEntry(FTPFile entry) {
+    protected String getFileNameFromEntry(FTPFile entry, Path parentPath) {
         return entry.getName();
     }
 

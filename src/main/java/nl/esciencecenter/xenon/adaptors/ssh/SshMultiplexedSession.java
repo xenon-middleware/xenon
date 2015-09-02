@@ -91,25 +91,24 @@ class SshMultiplexedSession {
 
         String credentialUserName = ((CredentialImplementation) credential).getUsername();
 
-        if (location.getUser() == null) { 
+        if (location.getUser() == null) {
             if (credentialUserName == null) { 
                 throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "No user name specified.");
             }
-        
+
             location = new SshLocation(credentialUserName, location.getHost(), location.getPort());
         }
 
         LOGGER.debug("Checking property: " + SshAdaptor.GATEWAY);
 
         if (properties.propertySet(SshAdaptor.GATEWAY)) {
-
             try {
-                gatewayLocation = SshLocation.parse(properties.getStringProperty(SshAdaptor.GATEWAY));
+                gatewayLocation = SshLocation.parse(properties.getStringProperty(SshAdaptor.GATEWAY), jsch.getConfigRepository());
             } catch (InvalidLocationException e) {
                 throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to parse gateway URI!", e);
             }
 
-            if (gatewayLocation.getUser() == null) { 
+            if (gatewayLocation.getUser() == null) {
                 gatewayLocation = new SshLocation(location.getUser(), gatewayLocation.getHost(), gatewayLocation.getPort());
             }
 
@@ -133,9 +132,7 @@ class SshMultiplexedSession {
 
     private synchronized SshSession findSession(Session s) throws XenonException {
 
-        for (int i = 0; i < sessions.size(); i++) {
-            SshSession info = sessions.get(i);
-
+        for (SshSession info : sessions) {
             if (info != null && info.getSession() == s) {
                 return info;
             }
@@ -213,9 +210,7 @@ class SshMultiplexedSession {
      */
     synchronized ChannelExec getExecChannel() throws XenonException {
 
-        for (int i = 0; i < sessions.size(); i++) {
-            SshSession s = sessions.get(i);
-
+        for (SshSession s : sessions) {
             ChannelExec channel = s.getExecChannel();
 
             if (channel != null) {
@@ -247,9 +242,7 @@ class SshMultiplexedSession {
      */
     synchronized ChannelSftp getSftpChannel() throws XenonException {
 
-        for (int i = 0; i < sessions.size(); i++) {
-            SshSession s = sessions.get(i);
-
+        for (SshSession s : sessions) {
             ChannelSftp channel = s.getSftpChannel();
 
             if (channel != null) {

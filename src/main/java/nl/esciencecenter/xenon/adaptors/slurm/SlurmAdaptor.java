@@ -74,7 +74,7 @@ public class SlurmAdaptor extends ScriptingAdaptor {
                  + "WARNING: it is not recommended to use this setting in production environments!"),
         
         new XenonPropertyDescriptionImplementation(DISABLE_ACCOUNTING_USAGE, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
-                "false", "Do not used accounting info of slurm, even when available. Mostly for testing purposes"),
+                "false", "Do not use accounting info of slurm, even when available. Mostly for testing purposes"),
                 
         new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                 "Number of milliseconds between polling the status of a job."));
