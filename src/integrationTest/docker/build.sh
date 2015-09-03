@@ -28,3 +28,5 @@ else
 fi
 
 docker build -t nlesc/xenon-gridftp xenon-gridftp
+
+docker build -t nlesc/xenon-test .

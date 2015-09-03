@@ -23,7 +23,7 @@ xenon-gridftp2:
   image: nlesc/xenon-gridftp
   hostname: gridftp2.xenontest.nlesc.nl
 xenon-test:
-  build: .
+  image: nlesc/xenon-test
   volumes:
     - ../../..:/code
     - ~/.gradle:/home/xenon/.gradle

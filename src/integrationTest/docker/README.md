@@ -6,12 +6,26 @@ The docker images are registered at the docker hub.
 
 # Build
 
+The build step is optional as the images are available on docker hub.
+
 The docker images can be build by running
 
-    ./build.sh
+```
+./build.sh
+```
 
 Building docker containers will send the build directory to the deamon.
 Because of this we can't use a shared set of keys between base images so they are copies.
+
+# Push
+
+The build images can be pushed to docker hub at https://hub.docker.com/u/nlesc/ with
+```
+docker login
+push.sh
+```
+
+You must have push rights in the nlesc organization.
 
 # Run integration tests
 
