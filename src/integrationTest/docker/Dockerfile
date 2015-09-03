@@ -4,7 +4,7 @@
 FROM nlesc/xenon-phusion-base
 MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 
-RUN apt-get update && apt-get install -y openjdk-7-jdk ant-optional libjsch-java && \
+RUN apt-get update && apt-get install -y openjdk-7-jdk && \
 apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 mkdir /code && mkdir -p /etc/my_init.d && touch /etc/service/sshd/down
 
