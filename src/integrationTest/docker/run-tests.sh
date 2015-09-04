@@ -10,6 +10,7 @@ echo "Uid of xenon user is already same as MYUID=$MYUID, not changing uid"
 fi
 
 # ssh in prepareIntegrationTest in build.gradle adds ecdsa key which it cant read
-setuser xenon ssh-keyscan -t rsa xenon-ssh >> /home/xenon/.ssh/known_hosts
+ssh-keyscan -t rsa xenon-ssh >> /home/xenon/.ssh/known_hosts
+chown xenon.xenon /home/xenon/.ssh/known_hosts
 
 setuser xenon "$@"
