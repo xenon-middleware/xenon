@@ -11,7 +11,8 @@ xenon-webdav:
   image: nlesc/xenon-webdav
 xenon-torque:
   image: nlesc/xenon-torque
-  privileged: true
+  cap_add:
+    - SYS_RESOURCE
 xenon-slurm:
   image: nlesc/xenon-slurm
 xenon-gridengine:
