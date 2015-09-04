@@ -69,6 +69,6 @@ cp -r /etc/ca-files/users/xenon /root/.globus
 touch somefile
 /usr/bin/globus-url-copy file:///somefile gsiftp://gridftp1.xenontest.nlesc.nl/home/xenon/somefile
 /usr/bin/globus-url-copy gsiftp://gridftp1.xenontest.nlesc.nl/home/xenon/somefile gsiftp://gridftp2.xenontest.nlesc.nl/home/xenon/somefile
-/usr/bin/globus-url-copy gsiftp://gridftp2.xenontest.nlesc.nl/home/xenon/somefile file://C
+/usr/bin/globus-url-copy gsiftp://gridftp2.xenontest.nlesc.nl/home/xenon/somefile file:///somefile2
 ```
 There should be a file `/somefile2` present after running commands above.
