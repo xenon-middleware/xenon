@@ -71,7 +71,7 @@ test.gridengine.default.queue=default
 test.gridengine.queues=default,slow
 test.gridengine.queue.wait.time=10000
 test.gridengine.update.time=4000
-test.gridengine.parallel.environment=round
+test.gridengine.parallel.environment=bi
 
 ######################################################################
 #
