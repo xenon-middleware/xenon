@@ -17,6 +17,7 @@ ADD xenon-gridftp/files/users/xenon /home/xenon/.globus
 RUN chown -R xenon.xenon /home/xenon/.globus
 
 # Tests will be run by xenon user which has uid taken from MYUID environment var
+ENV MYUID 1000
 ADD run-tests.sh /bin/run-tests.sh
 
 VOLUME ["/code"]
