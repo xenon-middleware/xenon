@@ -17,6 +17,12 @@ xenon-slurm:
   image: nlesc/xenon-slurm
 xenon-gridengine:
   image: nlesc/xenon-gridengine
+xenon-gridengine-exec1:
+  image: nlesc/xenon-gridengine-exec
+  volumes_from:
+    - xenon-gridengine
+  links:
+    - xenon-gridengine
 xenon-gridftp1:
   image: nlesc/xenon-gridftp
   hostname: gridftp1.xenontest.nlesc.nl
@@ -38,5 +44,6 @@ xenon-test:
     - xenon-torque
     - xenon-slurm
     - xenon-gridengine
+    - xenon-gridengine-exec1
     - xenon-gridftp1:gridftp1.xenontest.nlesc.nl
     - xenon-gridftp2:gridftp2.xenontest.nlesc.nl

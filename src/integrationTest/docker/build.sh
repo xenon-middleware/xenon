@@ -18,6 +18,7 @@ docker build -t nlesc/xenon-phusion-base xenon-phusion-base
 docker build -t nlesc/xenon-ftp xenon-ftp
 docker build -t nlesc/xenon-slurm xenon-slurm
 docker build -t nlesc/xenon-gridengine xenon-gridengine
+docker build -t nlesc/xenon-gridengine-exec xenon-gridengine-exec
 docker build -t nlesc/xenon-torque xenon-torque
 
 if [ -e xenon-gridftp/files ] ; then
