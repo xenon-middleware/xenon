@@ -26,7 +26,7 @@ public abstract class Location {
     protected Location(String location) throws InvalidLocationException {
         // Augment location with dummy scheme, if needed, to allow processing by URI
         String augmentedLocation = null;
-        boolean hasScheme = location.indexOf(SCHEME_SEPARATOR) >= 0;
+        boolean hasScheme = location.contains(SCHEME_SEPARATOR);
         if (!hasScheme) {
             augmentedLocation = DUMMY_SCHEME + SCHEME_SEPARATOR + location;
         }
@@ -35,12 +35,15 @@ public abstract class Location {
             URI url = new URI(augmentedLocation == null ? location : augmentedLocation);
             user = url.getUserInfo();
             host = url.getHost();
-            port = url.getPort();// == -1 ? getDefaultPort() : url.getPort();
+            port = url.getPort();
             scheme = hasScheme ? url.getScheme() : null;
             path = url.getPath();
             validate();
         } catch (URISyntaxException e) {
             throw new InvalidLocationException(getAdaptorName(), "Could not parse location " + location, e);
+        }
+        if (port <= 0 && port != -1) {
+            throw new InvalidLocationException(getAdaptorName(), "Port number of " + location + " must be positive or omited");
         }
     }
 
@@ -59,7 +62,7 @@ public abstract class Location {
     }
 
     public int getPort() {
-    	if (port == -1){
+    	if (port == -1) {
     		return getDefaultPort();
     	}
     
@@ -80,7 +83,7 @@ public abstract class Location {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(100);
         appendScheme(result);
         appendUser(result);
         appendHostAndPort(result);
