@@ -1,0 +1,17 @@
+// Build file which requires no downloads.
+
+//    PLUGINS
+// ==============
+
+plugins {
+    // Changes in the plugins section should be also be applied to build.gradle
+    id 'java'
+    id 'distribution'
+    // publishing
+    id 'maven-publish'
+    // ide
+    id 'idea'
+    id 'eclipse'
+}
+
+apply from: 'build-common.gradle'

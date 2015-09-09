@@ -1,0 +1,95 @@
+// Build file which can only run when dependencies and plugins have been downloaded.
+
+//    PLUGINS
+// ==============
+plugins {
+    // Changes in the plugins section should be also be applied to build.offline.gradle
+    id 'java'
+    id 'distribution'
+    // publishing
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.2'
+    // code coverage
+    id 'jacoco'
+    // integration tests
+    id 'org.hidetake.ssh' version '1.1.3'
+    // ide
+    id 'idea'
+    id 'eclipse'
+    // quality
+    id "org.sonarqube" version "1.0"
+}
+
+apply from: 'build-common.gradle'
+
+//     TEST
+// ==============
+
+task jacocoIntegrationTestReport(type:JacocoReport){
+    description 'Generate coverage report of integration tests'
+    group 'Code coverage reporting'
+    executionData integrationTest
+    sourceSets sourceSets.main
+}
+jacocoTestReport.description = 'Generate coverage report of unit tests'
+jacocoTestReport.group = 'Code coverage reporting'
+
+task prepareIntegrationTest << {
+    file('xenon.test.properties').withReader { reader ->
+        def userProps = new Properties()
+        userProps.load(reader)
+
+        // Initialize testing symlinks locally
+        exec {
+            executable = '/bin/bash'
+            args = ['src/test/resources/scripts/create_symlinks']
+        }
+
+        // Initialize testing symlinks on remote side
+        ssh.run {
+            session(host: userProps.getProperty("test.ssh.location"),
+                    user: userProps.getProperty("test.ssh.user"),
+                    // TODO use privata key instead of password,
+                    // so we dont need to have password in cleartext
+                    //identity: file(userProps.getProperty("test.ssh.identity")),
+                    password: userProps.getProperty("test.ssh.password")
+                    ) {
+                shell interaction: {
+                    file('src/test/resources/scripts/create_symlinks').withInputStream { stream ->
+                        standardInput << stream << '\n' << 'exit 0' << '\n'
+                    }
+                }
+            }
+        }
+    }
+}
+
+//Ensure that integration tests are prepared
+integrationTest.dependsOn prepareIntegrationTest
+
+//    CHECK
+// ==============
+
+sonarqube {
+    properties {
+        property "sonar.jacoco.itReportPath", "build/jacoco/integrationTest.exec"
+    }
+}
+// Ensure that integration coverage is availabe before sonar analysis.
+project.tasks["sonarqube"].dependsOn integrationTest
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'xenon'
+        name = 'xenon'
+        desc = description
+        userOrg = 'nlesc'
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://nlesc.github.io/Xenon'
+        vcsUrl = 'https://github.com/NLeSC/Xenon.git'
+        issueTrackerUrl = 'https://github.com/NLeSC/Xenon/issues'
+    }
+    publications = ['MyPublication']
+}

@@ -3,14 +3,14 @@
 # This is a sample configuration file for the Xenon test suite. 
 #
 # You can use this configuration by copying this file to 
-# "xenon.test.properties" in the this "test" directory and 
-# providing the correct values for each of fields.
+# "xenon.test.properties" in the main directory of Xenon and
+# providing the correct values for each field.
 #
 # By running:
 #
-#   ant test 
+#   gradle check
 # 
-# in the main directory of Xenon all tests will be run.
+# in the main directory all tests will be run.
 #
 
 ######################################################################

@@ -44,7 +44,7 @@ public class GridEngineXmlParserTest {
 
     @Test
     public void test01a_checkVersion() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -53,7 +53,7 @@ public class GridEngineXmlParserTest {
 
     @Test(expected = IncompatibleVersionException.class)
     public void test01b_checkVersion_NoSchema_Exception() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs-no-schema.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs-no-schema.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -62,7 +62,7 @@ public class GridEngineXmlParserTest {
 
     @Test(expected = IncompatibleVersionException.class)
     public void test01d_checkVersion_WrongSchema_ExceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs-wrong-schema.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs-wrong-schema.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -71,7 +71,7 @@ public class GridEngineXmlParserTest {
     
     @Test
     public void test01d_checkVersion_WrongSchemaIgnoreVersion_Ignored() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs-wrong-schema.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs-wrong-schema.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(true);
 
@@ -80,7 +80,7 @@ public class GridEngineXmlParserTest {
 
     @Test(expected = XenonException.class)
     public void test01c_checkVersion_EmptyFile_ExceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs-empty.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs-empty.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -90,7 +90,7 @@ public class GridEngineXmlParserTest {
     @Test
     public void test02a_parseQueueInfo_SomeQueues_Result() throws Throwable {
 
-        String input = readFile("test/fixtures/gridengine/queues.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/queues.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -105,7 +105,7 @@ public class GridEngineXmlParserTest {
     @Test(expected=XenonException.class)
     public void test02b_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
-        String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/queues-no-queues.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -115,7 +115,7 @@ public class GridEngineXmlParserTest {
     @Test(expected=XenonException.class)
     public void test02c_parseQueueInfo_NoQueues_ExceptionThrown() throws Throwable {
 
-        String input = readFile("test/fixtures/gridengine/queues-no-queues.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/queues-no-queues.xml");
 
         GridEngineXmlParser parser = new GridEngineXmlParser(false);
 
@@ -124,7 +124,7 @@ public class GridEngineXmlParserTest {
     
     @Test(expected = XenonException.class)
     public void test02d_parseQueueInfo_queueEmptyName_exceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/queues-queue-empty-name.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/queues-queue-empty-name.xml");
 
         System.err.println("parsing queue info from: " + input);
 
@@ -136,7 +136,7 @@ public class GridEngineXmlParserTest {
 
     @Test(expected = XenonException.class)
     public void test02e_parseQueueInfo_queueWithoutName_exceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/queues-queue-without-name.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/queues-queue-without-name.xml");
 
         System.err.println("parsing queue  info from: " + input);
 
@@ -150,7 +150,7 @@ public class GridEngineXmlParserTest {
 
     @Test
     public void test03a_parseJobInfo_SomeJobs_Result() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs.xml");
 
         System.err.println("parsing queue info from: " + input);
 
@@ -172,7 +172,7 @@ public class GridEngineXmlParserTest {
     
     @Test(expected = XenonException.class)
     public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs-empty-jobnumber.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs-empty-jobnumber.xml");
 
         System.err.println("parsing job info from: " + input);
 
@@ -184,7 +184,7 @@ public class GridEngineXmlParserTest {
 
     @Test(expected = XenonException.class)
     public void test03c_parseJobInfo_jobWithoutJobNumber_exceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/gridengine/jobs-without-jobnumber.xml");
+        String input = readFile("src/test/resources/fixtures/gridengine/jobs-without-jobnumber.xml");
 
         System.err.println("parsing job info from: " + input);
 
