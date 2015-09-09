@@ -1,0 +1,3 @@
+V	250901130050Z		01	unknown	/O=eScienceCenter/CN=host/gridftp1.xenontest.nlesc.nl
+V	250901130050Z		02	unknown	/O=eScienceCenter/CN=host/gridftp2.xenontest.nlesc.nl
+V	250901130050Z		03	unknown	/O=eScienceCenter/OU=local/CN=xenon

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/sbin/slurmd -D -N node-0

@@ -1,0 +1,49 @@
+xenon-ssh:
+  image: nlesc/xenon-ssh
+# For ssh gateway tests
+xenon-ssh2:
+  image: nlesc/xenon-ssh
+  links:
+    - xenon-ssh
+xenon-ftp:
+  image: nlesc/xenon-ftp
+xenon-webdav:
+  image: nlesc/xenon-webdav
+xenon-torque:
+  image: nlesc/xenon-torque
+  cap_add:
+    - SYS_RESOURCE
+xenon-slurm:
+  image: nlesc/xenon-slurm
+xenon-gridengine:
+  image: nlesc/xenon-gridengine
+xenon-gridengine-exec1:
+  image: nlesc/xenon-gridengine-exec
+  volumes_from:
+    - xenon-gridengine
+  links:
+    - xenon-gridengine
+xenon-gridftp1:
+  image: nlesc/xenon-gridftp
+  hostname: gridftp1.xenontest.nlesc.nl
+xenon-gridftp2:
+  image: nlesc/xenon-gridftp
+  hostname: gridftp2.xenontest.nlesc.nl
+xenon-test:
+  image: nlesc/xenon-test
+  volumes:
+    - ../../..:/code
+    - ~/.gradle:/home/xenon/.gradle
+  environment:
+    - MYUID
+  links:
+    - xenon-ssh
+    - xenon-ssh2
+    - xenon-ftp
+    - xenon-webdav
+    - xenon-torque
+    - xenon-slurm
+    - xenon-gridengine
+    - xenon-gridengine-exec1
+    - xenon-gridftp1:gridftp1.xenontest.nlesc.nl
+    - xenon-gridftp2:gridftp2.xenontest.nlesc.nl
