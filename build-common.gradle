@@ -119,6 +119,8 @@ task javadocDevel(type: Javadoc) {
     description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
     group 'Documentation'
     source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+    title = javadoc.title + ' for Xenon developers'
     destinationDir = file("${project.docsDir}/javadoc-devel")
     options.showFromPrivate()
 
