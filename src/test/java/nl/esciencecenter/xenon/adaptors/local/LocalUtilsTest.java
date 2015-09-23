@@ -46,27 +46,27 @@ public class LocalUtilsTest {
         constructor.newInstance();
     }
 
-    @org.junit.Test(expected = XenonException.class)
+    @org.junit.Test(expected = NullPointerException.class)
     public void test_delete_null() throws Exception {
         LocalUtils.delete(null);
     }
 
-    @org.junit.Test(expected = XenonException.class)
+    @org.junit.Test(expected = NullPointerException.class)
     public void test_createFile_null() throws Exception {
         LocalUtils.createFile(null);
     }
 
-    @org.junit.Test(expected = XenonException.class)
+    @org.junit.Test(expected = NullPointerException.class)
     public void test_move_null() throws Exception {
         LocalUtils.move(null, null);
     }
 
-    @org.junit.Test(expected = XenonException.class)
+    @org.junit.Test(expected = NullPointerException.class)
     public void test_setPosixFilePermissions_null() throws Exception {
         LocalUtils.setPosixFilePermissions(null, null);
     }
 
-    @org.junit.Test(expected = XenonException.class)
+    @org.junit.Test(expected = NullPointerException.class)
     public void test_newInputStream_null() throws Exception {
         LocalUtils.newInputStream(null);
     }

@@ -164,8 +164,10 @@ final class LocalUtils {
     }
 
     /**
+     * Create a local file
      * @param path
      * @throws XenonException
+     * @throws NullPointerException if the path is not set
      */
     static void createFile(Path path) throws XenonException {
         try {
@@ -176,18 +178,18 @@ final class LocalUtils {
     }
 
     /**
+     * Delete a local file
      * @param path
      * @throws XenonException
+     * @throws NullPointerException if the path is not set
      */
     static void delete(Path path) throws XenonException {
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
-
         } catch (java.nio.file.DirectoryNotEmptyException e2) {
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
-
         } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
         }
