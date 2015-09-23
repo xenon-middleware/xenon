@@ -47,7 +47,7 @@ final class GridEngineJobScriptGenerator {
 
     private static final int MINUTES_PER_HOUR = 60;
 
-    protected static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup,
+    static void generateParallelEnvironmentSpecification(JobDescription description, GridEngineSetup setup,
             Formatter script) throws XenonException {
         Map<String, String> options = description.getJobOptions();
 
@@ -71,7 +71,7 @@ final class GridEngineJobScriptGenerator {
         script.format("#$ -pe %s %d\n", pe, slots);
     }
 
-    protected static void generateSerialScriptContent(JobDescription description, Formatter script) {
+    static void generateSerialScriptContent(JobDescription description, Formatter script) {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
@@ -80,7 +80,7 @@ final class GridEngineJobScriptGenerator {
         script.format("\n");
     }
 
-    protected static void generateParallelScriptContent(JobDescription description, Formatter script) {
+    static void generateParallelScriptContent(JobDescription description, Formatter script) {
         script.format("for host in `cat $PE_HOSTFILE | cut -d \" \" -f 1` ; do\n");
 
         for (int i = 0; i < description.getProcessesPerNode(); i++) {
@@ -98,7 +98,7 @@ final class GridEngineJobScriptGenerator {
         script.format("\n");
     }
 
-    protected static String generate(JobDescription description, RelativePath fsEntryPath, GridEngineSetup setup)
+    static String generate(JobDescription description, RelativePath fsEntryPath, GridEngineSetup setup)
             throws XenonException {
         
         StringBuilder stringBuilder = new StringBuilder();

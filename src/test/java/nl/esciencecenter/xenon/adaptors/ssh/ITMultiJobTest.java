@@ -43,7 +43,7 @@ import nl.esciencecenter.xenon.util.Utils;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class MultiJobTest {
+public class ITMultiJobTest {
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
 
@@ -104,9 +104,9 @@ public class MultiJobTest {
         Credentials credentials = xenon.credentials();
 
         FileSystem filesystem = files.newFileSystem("sftp", user + "@" + location, credentials.getDefaultCredential("sftp"),
-                new HashMap<String, String>());
+                new HashMap<String, String>(0));
         Scheduler scheduler = jobs.newScheduler("ssh", user + "@" + location, credentials.getDefaultCredential("ssh"),
-                new HashMap<String, String>());
+                new HashMap<String, String>(0));
 
         String workingDir = TEST_ROOT + "/" + testName;
 

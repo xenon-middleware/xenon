@@ -33,7 +33,12 @@ public abstract class Location {
 
         try {
             URI url = new URI(augmentedLocation == null ? location : augmentedLocation);
-            user = url.getUserInfo();
+            String userPart = url.getUserInfo();
+            if (userPart == null || !userPart.isEmpty()) {
+                user = userPart;
+            } else {
+                user = null;
+            }
             host = url.getHost();
             port = url.getPort();
             scheme = hasScheme ? url.getScheme() : null;

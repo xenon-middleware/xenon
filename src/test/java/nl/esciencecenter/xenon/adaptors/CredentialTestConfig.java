@@ -20,8 +20,7 @@ package nl.esciencecenter.xenon.adaptors;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public abstract class CredentialTestConfig {
-
+public interface CredentialTestConfig {
     public abstract boolean supportsCertificateCredentials();
     public abstract boolean supportsPasswordCredentials();
 

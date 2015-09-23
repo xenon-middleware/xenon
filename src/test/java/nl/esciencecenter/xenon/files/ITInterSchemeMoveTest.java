@@ -23,9 +23,6 @@ import java.util.Properties;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
@@ -34,7 +31,7 @@ import org.junit.Test;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class InterSchemeMoveTest {
+public class ITInterSchemeMoveTest {
     
     private String getPropertyOrFail(Properties p, String property) throws Exception {
 

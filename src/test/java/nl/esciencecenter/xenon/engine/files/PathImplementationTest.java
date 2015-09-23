@@ -19,8 +19,6 @@ package nl.esciencecenter.xenon.engine.files;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
-import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -79,12 +77,12 @@ public class PathImplementationTest {
         assertEquals(rp, path.getRelativePath());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void test_subpath1() {
         new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla").subpath(-1, 1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void test_subpath2() {
         new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla").subpath(1, 5));
     }
