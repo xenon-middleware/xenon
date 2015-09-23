@@ -386,7 +386,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "qsub", customScriptFile);
         }
 
-        String identifier = Long.toString(ScriptingParser.parseJobIDFromLine(output, GridEngineAdaptor.ADAPTOR_NAME, "Your job"));
+        String identifier = ScriptingParser.parseJobIDFromLine(output, GridEngineAdaptor.ADAPTOR_NAME, "Your job");
 
         updateJobsSeenMap(Collections.singleton(identifier));
 

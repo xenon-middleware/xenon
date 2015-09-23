@@ -29,7 +29,6 @@ import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobCanceledException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -149,14 +148,12 @@ public class TorqueSchedulerConnectionTest {
 
     @Test
     public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
-        String jobID = "555";
-        String jobIDfull = "555.localhost";
-        Map<String, String> jobInfo = new HashMap<>();
-        jobInfo.put("Job_Id", jobIDfull);
-        jobInfo.put("Job_Id_Number", jobID);
+        String jobID = "555.localhost";
+        Map<String, String> jobInfo = new HashMap<>(3);
+        jobInfo.put("Job_Id", jobID);
         jobInfo.put("job_state", "Q");
         
-        Map<String, Map<String, String>> input = new HashMap<>();
+        Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -172,14 +169,12 @@ public class TorqueSchedulerConnectionTest {
 
     @Test
     public void test04b_getJobStatusFromQstatInfo_RunningJob_JobStatus() throws XenonException {
-        String jobID = "555";
-        String jobIDfull = "555.localhost";
-        Map<String, String> jobInfo = new HashMap<>();
-        jobInfo.put("Job_Id", jobIDfull);
-        jobInfo.put("Job_Id_Number", jobID);
+        String jobID = "555.localhost";
+        Map<String, String> jobInfo = new HashMap<>(3);
+        jobInfo.put("Job_Id", jobID);
         jobInfo.put("job_state", "R");
         
-        Map<String, Map<String, String>> input = new HashMap<>();
+        Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -195,14 +190,12 @@ public class TorqueSchedulerConnectionTest {
     
     @Test
     public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws XenonException {
-        String jobID = "555";
-        String jobIDfull = "555.localhost";
-        Map<String, String> jobInfo = new HashMap<>();
-        jobInfo.put("Job_Id", jobIDfull);
-        jobInfo.put("Job_Id_Number", jobID);
+        String jobID = "555.localhost";
+        Map<String, String> jobInfo = new HashMap<>(3);
+        jobInfo.put("Job_Id", jobID);
         jobInfo.put("job_state", "E");
         
-        Map<String, Map<String, String>> input = new HashMap<>();
+        Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -220,8 +213,8 @@ public class TorqueSchedulerConnectionTest {
 
     @Test
     public void test04d_getJobStatusFromQstatInfo_JobNotInMap_NullReturned() throws XenonException {
-        String jobID = "555";
-        Map<String, Map<String, String>> input = new HashMap<>();
+        String jobID = "555.localhost";
+        Map<String, Map<String, String>> input = new HashMap<>(0);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = TorqueSchedulerConnection.getJobStatusFromQstatInfo(input, job);
 
@@ -230,12 +223,12 @@ public class TorqueSchedulerConnectionTest {
 
     @Test(expected = XenonException.class)
     public void test04e_getJobStatusFromQstatInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
-        String jobID = "555";
+        String jobID = "555.localhost";
 
         //very incomplete job info
-        Map<String, String> jobInfo = new HashMap<>();
+        Map<String, String> jobInfo = new HashMap<>(0);
 
-        Map<String, Map<String, String>> input = new HashMap<>();
+        Map<String, Map<String, String>> input = new HashMap<>(2);
         input.put(jobID, jobInfo);
 
         Job job = new FakeScriptingJob(jobID);

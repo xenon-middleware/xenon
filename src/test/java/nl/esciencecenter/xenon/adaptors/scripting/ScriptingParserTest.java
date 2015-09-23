@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -220,19 +219,19 @@ public class ScriptingParserTest {
     public void test04a_testParseJobIDFromLine_SingleOption_Result() throws Exception {
         String input = "Some user submitted job 43424";
 
-        long result = ScriptingParser.parseJobIDFromLine(input, "fake", "Some user submitted job");
+        String result = ScriptingParser.parseJobIDFromLine(input, "fake", "Some user submitted job");
 
-        assertEquals("parser failed to get correct job ID from line", 43424, result);
+        assertEquals("parser failed to get correct job ID from line", "43424", result);
     }
 
     @Test
     public void test04b_testParseJobIDFromLine_MultipleOptions_Result() throws Exception {
         String input = "Some user submitted job 43425";
 
-        long result = ScriptingParser.parseJobIDFromLine(input, "fake", "Hey look a new job",
+        String result = ScriptingParser.parseJobIDFromLine(input, "fake", "Hey look a new job",
                 "Are you sure you wanted to submit", "Some user submitted job", "Ow no another job");
 
-        assertEquals("parser failed to get correct job ID from line", 43425, result);
+        assertEquals("parser failed to get correct job ID from line", "43425", result);
     }
 
     @Test(expected = XenonException.class)
@@ -245,13 +244,6 @@ public class ScriptingParserTest {
     @Test(expected = XenonException.class)
     public void test04d_testParseJobIDFromLine_NoJobID_ThrowsException() throws Exception {
         String input = "Some user submitted job  ";
-
-        ScriptingParser.parseJobIDFromLine(input, "fake", "Some user submitted job");
-    }
-
-    @Test(expected = XenonException.class)
-    public void test04e_testParseJobIDFromLine_JobIDNotANumber_ThrowsException() throws Exception {
-        String input = "Some user submitted job thefirstjobever";
 
         ScriptingParser.parseJobIDFromLine(input, "fake", "Some user submitted job");
     }

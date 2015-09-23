@@ -347,10 +347,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "sbatch", customScriptFile);
         }
 
-        long jobID = ScriptingParser.parseJobIDFromLine(output, SlurmAdaptor.ADAPTOR_NAME, "Submitted batch job",
+        String jobID = ScriptingParser.parseJobIDFromLine(output, SlurmAdaptor.ADAPTOR_NAME, "Submitted batch job",
                 "Granted job allocation");
 
-        return new JobImplementation(getScheduler(), Long.toString(jobID), description, false, false);
+        return new JobImplementation(getScheduler(), jobID, description, false, false);
     }
 
     private Job submitInteractiveJob(JobDescription description) throws XenonException {
