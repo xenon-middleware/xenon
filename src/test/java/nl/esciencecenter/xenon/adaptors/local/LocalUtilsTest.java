@@ -16,13 +16,17 @@
 
 package nl.esciencecenter.xenon.adaptors.local;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.adaptors.local.LocalUtils;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
@@ -123,15 +127,15 @@ public class LocalUtilsTest {
     @org.junit.Test
     public void test_xenonPermissions_null() throws Exception {
         Set<PosixFilePermission> tmp = LocalUtils.xenonPermissions(null);
-        assert (tmp == null);
+        assertNull(tmp);
     }
 
     @org.junit.Test
     public void test_javaPermissions_null() throws Exception {
         Set<java.nio.file.attribute.PosixFilePermission> tmp = LocalUtils.javaPermissions(null);
 
-        assert (tmp != null);
-        assert (tmp.size() == 0);
+        assertNotNull(tmp);
+        assertEquals(0, tmp.size());
     }
    
     @org.junit.Test
@@ -146,17 +150,6 @@ public class LocalUtilsTest {
 
         XenonFactory.endXenon(xenon);
 
-        assert (tmp.equals(System.getProperty("user.dir")));
+        assertEquals(System.getProperty("user.home"), tmp);
     }
-
-//    @org.junit.Test
-//    public void test_javaPermissionAttribute() throws Exception {
-//
-//        Set<PosixFilePermission> tmp = new HashSet<>();
-//        tmp.add(PosixFilePermission.OWNER_READ);
-//
-//        FileAttribute<Set<java.nio.file.attribute.PosixFilePermission>> out = LocalUtils.javaPermissionAttribute(tmp);
-//
-//        assert (out.value().contains(java.nio.file.attribute.PosixFilePermission.OWNER_READ));
-//    }
 }

@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.local;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -51,19 +52,39 @@ final class LocalUtils {
         // DO NOTE USE
     }
 
-    static java.nio.file.Path javaPath(Path path) throws XenonException {
+    /**
+     * Expand a Xenon Path to a Java Path.
+     *
+     * This will normalize the path and expand the user directory.
+     *
+     * @param path Xenon Path
+     * @return a normalized java Path
+     */
+    static java.nio.file.Path javaPath(Path path) {
         FileSystem fs = path.getFileSystem();
-        RelativePath tmp = path.getRelativePath();
-
-        return FileSystems.getDefault().getPath(fs.getLocation() + tmp.getAbsolutePath());
+        RelativePath relPath = path.getRelativePath().normalize();
+        int numElems = relPath.getNameCount();
+        // replace tilde
+        if (numElems != 0) {
+            String firstPart = relPath.getName(0).getRelativePath();
+            if (firstPart.equals("~")) {
+                RelativePath home = new RelativePath(System.getProperty("user.home"));
+                if (numElems == 1) {
+                    relPath = home;
+                } else {
+                    relPath = home.resolve(relPath.subpath(1, numElems));
+                }
+            }
+        }
+        return FileSystems.getDefault().getPath(fs.getLocation() + relPath.getAbsolutePath());
     }
 
     static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
-        Set<java.nio.file.attribute.PosixFilePermission> result = new HashSet<java.nio.file.attribute.PosixFilePermission>();
-
         if (permissions == null) {
-            return result;
+            return new HashSet<>(0);
         }
+
+        Set<java.nio.file.attribute.PosixFilePermission> result = new HashSet<>(permissions.size() * 4 / 3 + 1);
 
         for (PosixFilePermission permission : permissions) {
             result.add(java.nio.file.attribute.PosixFilePermission.valueOf(permission.toString()));
@@ -77,7 +98,7 @@ final class LocalUtils {
             return null;
         }
 
-        Set<PosixFilePermission> result = new HashSet<PosixFilePermission>();
+        Set<PosixFilePermission> result = new HashSet<>(permissions.size() * 4 / 3 + 1);
 
         for (java.nio.file.attribute.PosixFilePermission permission : permissions) {
             result.add(PosixFilePermission.valueOf(permission.toString()));
@@ -87,8 +108,7 @@ final class LocalUtils {
     }
 
     static java.nio.file.OpenOption[] javaOpenOptions(OpenOption[] options) {
-
-        ArrayList<java.nio.file.OpenOption> result = new ArrayList<java.nio.file.OpenOption>();
+        ArrayList<java.nio.file.OpenOption> result = new ArrayList<>(options.length);
 
         for (OpenOption opt : options) {
             switch (opt) {
@@ -124,7 +144,7 @@ final class LocalUtils {
     static InputStream newInputStream(Path path) throws XenonException {
         try {
             return Files.newInputStream(javaPath(path));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create InputStream.", e);
         }
     }
@@ -138,7 +158,7 @@ final class LocalUtils {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to set permissions " + path, e);
         }
     }
@@ -150,7 +170,7 @@ final class LocalUtils {
     static void createFile(Path path) throws XenonException {
         try {
             Files.createFile(LocalUtils.javaPath(path));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create file " + path, e);
         }
     }
@@ -160,7 +180,6 @@ final class LocalUtils {
      * @throws XenonException
      */
     static void delete(Path path) throws XenonException {
-
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
@@ -169,7 +188,7 @@ final class LocalUtils {
         } catch (java.nio.file.DirectoryNotEmptyException e2) {
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
         }
     }
@@ -183,7 +202,7 @@ final class LocalUtils {
 
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to move " + source + " to " + target, e);
         }
     }
@@ -208,7 +227,7 @@ final class LocalUtils {
                 CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
                 success = (killRunner.getExitCode() == 0);
             }
-        } catch (Exception e) {
+        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
             // Failed, so use the regular Java destroy.
         }
 
