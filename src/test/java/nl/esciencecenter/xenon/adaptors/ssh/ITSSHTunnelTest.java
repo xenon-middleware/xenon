@@ -31,7 +31,7 @@ import nl.esciencecenter.xenon.files.Files;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class SSHTunnelTest {
+public class ITSSHTunnelTest {
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
 
@@ -72,7 +72,7 @@ public class SSHTunnelTest {
         Files files = xenon.files();
         Credentials credentials = xenon.credentials();
 
-        HashMap<String, String> properties = new HashMap<String, String>();
+        HashMap<String, String> properties = new HashMap<>(3);
         properties.put("xenon.adaptors.ssh.gateway", gateway);
         properties.put("xenon.adaptors.ssh.strictHostKeyChecking", "false");
         
@@ -88,7 +88,7 @@ public class SSHTunnelTest {
     }
 
     public static void main(String [] args) throws Exception { 
-        new SSHTunnelTest().test_sshViaTunnel();
+        new ITSSHTunnelTest().test_sshViaTunnel();
     }
     
     
