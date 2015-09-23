@@ -16,6 +16,10 @@
 
 package nl.esciencecenter.xenon.engine;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -34,38 +38,28 @@ public class AdaptorStatusImplementationTest {
     public void testGetters() {
 
         AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
-                new ImmutableArray<String>("SCHEME1", "SCHEME2"),new ImmutableArray<String>("L1", "L2"), 
+                new ImmutableArray<>("SCHEME1", "SCHEME2"),new ImmutableArray<>("L1", "L2"), 
                 new ImmutableArray<XenonPropertyDescription>(), null);
 
-        String name = a.getName();
-
-        assert (name.equals("NAME"));
-
-        String description = a.getDescription();
-
-        assert (description.equals("DESCRIPTION"));
+        assertEquals("NAME", a.getName());
+        assertEquals("DESCRIPTION", a.getDescription());
 
         String[] schemes = a.getSupportedSchemes();
 
-        assert (schemes != null);
-        assert (schemes.length == 2);
-        assert (schemes[0].equals("SCHEME1"));
-        assert (schemes[1].equals("SCHEME2"));
+        assertNotNull(schemes);
+        assertEquals(2, schemes.length);
+        assertEquals("SCHEME1", schemes[0]);
+        assertEquals("SCHEME2", schemes[1]);
 
         String[] locations = a.getSupportedLocations();
 
-        assert (locations != null);
-        assert (locations.length == 2);
-        assert (locations[0].equals("L1"));
-        assert (locations[1].equals("L2"));
+        assertNotNull(locations);
+        assertEquals(2, locations.length);
+        assertEquals("L1", locations[0]);
+        assertEquals("L2", locations[1]);
         
-        XenonPropertyDescription[] props = a.getSupportedProperties();
-
-        assert (props == null);
-
-        Map<String, String> info = a.getAdaptorSpecificInformation();
-
-        assert (info == null);
+        assertEquals(0, a.getSupportedProperties().length);
+        assertNull(a.getAdaptorSpecificInformation());
     }
 
     @Test
