@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingAdaptor;
@@ -51,7 +50,6 @@ import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +110,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        SchedulerConnection.verifyJobInfo(jobInfo, job, TorqueAdaptor.ADAPTOR_NAME, "Job_Id_Number", "job_state");
+        SchedulerConnection.verifyJobInfo(jobInfo, job, TorqueAdaptor.ADAPTOR_NAME, "Job_Id", "job_state");
 
         String stateCode = jobInfo.get("job_state");
 
@@ -404,13 +402,19 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             output = runCheckedCommand(null, "qsub", customScriptFile);
         }
 
-        String identifier = Long.toString(ScriptingParser.parseJobIDFromLine(output, TorqueAdaptor.ADAPTOR_NAME, ""));
+        String identifier = ScriptingParser.parseJobIDFromLine(output, TorqueAdaptor.ADAPTOR_NAME, "");
 
         updateJobsSeenMap(Collections.singleton(identifier));
 
         if (!description.getJobOptions().containsKey(TorqueSchedulerConnection.JOB_OPTION_JOB_SCRIPT)) {
-            description.setStderr("xenon.e" + identifier);
-            description.setStdout("xenon.o" + identifier);
+            String[] idParts = identifier.split("\\.");
+            try {
+                long idNumber = Long.parseLong(idParts[0]);
+                description.setStderr("xenon.e" + idNumber);
+                description.setStdout("xenon.o" + idNumber);
+            } catch (NumberFormatException ex) {
+                LOGGER.warn("Standard out and standard err could not be set from Job ID {0}", identifier);
+            }
         }
 
         Job result = new JobImplementation(getScheduler(), identifier, description, false, false);

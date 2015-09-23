@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
-import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * @author Niels Drost
@@ -31,8 +30,6 @@ import nl.esciencecenter.xenon.util.Utils;
 public final class ScriptingParser {
 
     public static final Pattern WHITESPACE_REGEX = Pattern.compile("\\s+");
-
-    public static final Pattern DOT_REGEX = Pattern.compile("\\.");
 
     public static final Pattern BAR_REGEX = Pattern.compile("\\s*\\|\\s*");
 
@@ -54,6 +51,8 @@ public final class ScriptingParser {
      *            the text to parse.
      * @param adaptorName
      *            the adaptor name reported in case an exception occurs.
+     * @param ignoredLines
+     *            lines exactly matching one of these strings will be ignored.
      * @return a map containing all found key/value pairs.
      * @throws XenonException
      *             if the input cannot be parsed.
@@ -61,7 +60,7 @@ public final class ScriptingParser {
     public static Map<String, String> parseKeyValuePairs(String input, String adaptorName, String... ignoredLines)
             throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
 
         for (String line : lines) {
             if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
@@ -112,7 +111,7 @@ public final class ScriptingParser {
     public static Map<String, String> parseKeyValueLines(String input, Pattern separatorRegEx, String adaptorName,
             String... ignoredLines) throws XenonException {
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(lines.length * 4 / 3);
 
         for (String line : lines) {
             if (!line.isEmpty() && !containsAny(line, ignoredLines)) {
@@ -141,10 +140,10 @@ public final class ScriptingParser {
      * @return the job ID found on the input line.
      * @throws XenonException
      */
-    public static long parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws XenonException {
+    public static String parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws XenonException {
         for (String prefix : possiblePrefixes) {
             if (input.startsWith(prefix)) {
-                //cut of prefix
+                //cut off prefix
                 String jobId = input.substring(prefix.length()).trim();
 
                 //trim leading and trailing whitespace
@@ -157,17 +156,7 @@ public final class ScriptingParser {
                 }
 
                 //cut of anything after the job id
-                jobId = WHITESPACE_REGEX.split(jobId)[0];
-                // parse job ID's of the form 929292.host or host.29131
-                for (String jobIdPart : DOT_REGEX.split(jobId)) {
-                    try {
-                        return Long.parseLong(jobIdPart);
-                    } catch (NumberFormatException e) {
-                        //continue
-                    }
-                }
-                throw new XenonException(adaptorName, "failed to get jobID from line: \"" + input + "\" Job ID found \""
-                                    + jobId + "\" is not a number");
+                return WHITESPACE_REGEX.split(jobId)[0];
             }
         }
         throw new XenonException(adaptorName, "Failed to get jobID from line: \"" + input
@@ -224,7 +213,6 @@ public final class ScriptingParser {
         }
 
         String[] lines = NEWLINE_REGEX.split(input);
-        Map<String, Map<String, String>> result = new HashMap<>();
 
         int headerLine = 0;
         String[] fields;
@@ -246,6 +234,9 @@ public final class ScriptingParser {
             }
         }
 
+        Map<String, Map<String, String>> result = new HashMap<>(lines.length * 4 / 3);
+        int rowSize = (int)Math.ceil(fields.length / 0.75);
+
         for (int i = headerLine + 1; i < lines.length; i++) {
             if (HORIZONTAL_LINE_REGEX.matcher(lines[i]).find()) {
                 // do not parse separators
@@ -258,7 +249,7 @@ public final class ScriptingParser {
                         + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values));
             }
 
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(rowSize);
             for (int j = 0; j < fields.length; j++) {
                 map.put(fields[j], cleanValue(values[j], valueSuffixes));
             }

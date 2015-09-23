@@ -131,16 +131,12 @@ final class TorqueXmlParser {
                 Map<String, String> jobInfo = new HashMap<>();
                 recursiveMapFromElement(node, jobInfo);
 
-                String rawJobId = jobInfo.get("Job_Id");
-                if (rawJobId == null || rawJobId.isEmpty()) {
+                String jobId = jobInfo.get("Job_Id");
+                if (jobId == null || jobId.isEmpty()) {
                     throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
-                String jobID = String.valueOf(ScriptingParser.parseJobIDFromLine(rawJobId, TorqueAdaptor.ADAPTOR_NAME, ""));
-
-                jobInfo.put("Job_Id_Number", jobID);
-
-                result.put(jobID, jobInfo);
+                result.put(jobId, jobInfo);
             }
         }
 
