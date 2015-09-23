@@ -24,12 +24,14 @@ import java.util.StringTokenizer;
 
 /**
  * RelativePath contains a sequence of path elements separated by a separator.
- * 
+ *
+ * It is designed to be immutable.
+ *
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class RelativePath {
+public class RelativePath implements Iterable<RelativePath> {
 
     /** The default separator to use. */
     public static final char DEFAULT_SEPARATOR = '/';
@@ -340,15 +342,12 @@ public class RelativePath {
     /**
      * Resolve a RelativePath against this RelativePath.
      * 
-     * If <code>other</code> represents an empty RelativePath, this RelativePath is returned.
-     * 
-     * If this RelativePath is empty, the <code>other</code> RelativePath is returned.
-     * 
-     * Otherwise, a new RelativePath is returned that contains the concatenation of the path elements this RelativePath and the
+     * Concatenates the path elements of this RelativePath with the
      * <code>other</code> RelativePath.
      * 
      * @param other
-     *            the RelativePath.
+     *            the RelativePath to concatenate with.
+     * @return concatenation of this RelativePath with the other
      */
     public RelativePath resolve(RelativePath other) {
         if (other == null || other.isEmpty()) {
@@ -366,13 +365,12 @@ public class RelativePath {
     /**
      * Resolve a String containing a RelativePath against this path.
      * 
-     * This method converts the <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
+     * Converts the <code>other</code> into a <code>RelativePath</code> using {@link #RelativePath(String)} and then uses 
      * {@link #resolve(RelativePath)} to resolve the result against this path.
-     *
-     * If <code>other</code> represents an empty path, or <code>null</code> this RelativePath is returned.
      * 
      * @param other
-     *            the path.
+     *            the String to concatenate with.
+     * @return concatenation of this RelativePath with the other
      */
     public RelativePath resolve(String other) {
         if (other == null || other.isEmpty()) {
