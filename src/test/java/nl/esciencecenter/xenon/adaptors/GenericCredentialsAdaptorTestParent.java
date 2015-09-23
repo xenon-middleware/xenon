@@ -17,6 +17,7 @@
 package nl.esciencecenter.xenon.adaptors;
 
 import static org.junit.Assert.fail;
+
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
@@ -25,11 +26,13 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +42,8 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  *
  */
-public class GenericCredentialsAdaptorTestParent {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public abstract class GenericCredentialsAdaptorTestParent {
 
     private static final Logger logger = LoggerFactory.getLogger(GenericJobAdaptorTestParent.class);
 
@@ -100,8 +104,8 @@ public class GenericCredentialsAdaptorTestParent {
             String username = config.getUserName();
             char [] password = config.getPassword();
                         
-            for (int i=0;i<schemes.length;i++) { 
-                Credential c = credentials.newCertificateCredential(schemes[i], certfile, username, password, null);
+            for (String scheme : schemes) {
+                Credential c = credentials.newCertificateCredential(scheme, certfile, username, password, null);
                 credentials.close(c);
             }
         }

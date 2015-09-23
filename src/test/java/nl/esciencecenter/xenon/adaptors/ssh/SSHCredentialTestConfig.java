@@ -26,7 +26,7 @@ import nl.esciencecenter.xenon.adaptors.CredentialTestConfig;
  * @since 1.0
  *
  */
-public class SSHCredentialTestConfig extends CredentialTestConfig {
+public class SSHCredentialTestConfig implements CredentialTestConfig {
 
     @Override
     public boolean supportsCertificateCredentials() {

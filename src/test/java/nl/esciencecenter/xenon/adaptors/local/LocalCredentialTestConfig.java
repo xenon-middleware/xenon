@@ -24,7 +24,7 @@ import nl.esciencecenter.xenon.adaptors.CredentialTestConfig;
  * @since 1.0
  *
  */
-public class LocalCredentialTestConfig extends CredentialTestConfig {
+public class LocalCredentialTestConfig implements CredentialTestConfig {
 
     @Override
     public boolean supportsCertificateCredentials() {
