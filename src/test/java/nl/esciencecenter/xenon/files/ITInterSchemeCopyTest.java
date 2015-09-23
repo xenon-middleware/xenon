@@ -36,7 +36,7 @@ import org.junit.Test;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class InterSchemeCopyTest {
+public class ITInterSchemeCopyTest {
 
     private String getPropertyOrFail(Properties p, String property) throws Exception {
 
