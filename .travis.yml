@@ -6,9 +6,13 @@ jdk:
 sudo: false
 cache:
   directories:
-  - .gradle
-  - $HOME/.gradle
-  - lib
+    # Include individual gradle directories
+    # that don't invalidate the cache
+    - $HOME/.gradle/wrapper
+    - $HOME/.gradle/native
+    - $HOME/.gradle/daemon
+    - $HOME/.gradle/caches/jars-1
+    - $HOME/.gradle/caches/2.7
 addons:
   apt_packages:
     - pandoc
