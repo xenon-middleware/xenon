@@ -13,37 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.integration;
+package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.net.URI;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.files.AbstractFileTests;
 
-public class ITFileTests_SFTP_localhost extends AbstractFileTests {
+public class ITFileTests_SFTP_testuser_localhost extends AbstractFileTests {
 
     public String getTestUser() {
-        //run tests on localhost with default username 
-        return System.getProperty("user.name");
+
+        //run tests on localhost explicit with 'testuser' account!   
+        return "testuser";
     }
 
     public java.net.URI getTestLocation() throws Exception {
 
         String user = getTestUser();
-        return new URI("sftp://" + user + "@localhost/tmp/");
+        return new URI("sftp://" + user + "@localhost/tmp/testuser");
     }
 
     public Credential getCredentials() throws XenonException {
 
+        // use home user which runs the test:
+        String userHome = System.getProperty("user.home");
         Credentials creds = xenon.credentials();
-        String user = getTestUser();
-        Credential cred = creds.newCertificateCredential("ssh", "/home/" + user + "/.ssh/id_rsa", user, null, null);
+        String testUser = getTestUser();
+        Credential cred = creds.newCertificateCredential("ssh", userHome + "/.ssh/id_rsa", testUser, null, null);
+
         return cred;
     }
 
-    // ==============================
-    // Add SFTP Specific tests here:
-    // ==============================
+    // ===
+    // Sftp Specific tests here: 
+    // === 
 
 }
