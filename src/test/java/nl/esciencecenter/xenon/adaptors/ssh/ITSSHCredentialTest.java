@@ -29,22 +29,30 @@ import nl.esciencecenter.xenon.adaptors.GenericCredentialsAdaptorTestParent;
  * @since 1.0
  *
  */
-public class SSHCredentialTest extends GenericCredentialsAdaptorTestParent {
-
+public class ITSSHCredentialTest extends GenericCredentialsAdaptorTestParent {
     @BeforeClass
     public static void prepareLocalFileAdaptorTest() throws Exception {
         GenericCredentialsAdaptorTestParent.prepareClass(new SSHCredentialTestConfig());
     }
-    
-    @Ignore("'Correct' certificate file from config requires reading files, so it is an integration test")
+
+    @Ignore("Already tested in unit tests")
     @Override
-    public void test00_newCertificateCredential_OK() throws Exception {
-        super.test00_newCertificateCredential_OK();
+    public void test01_newCertificateCredential_WrongCertificate() throws Exception {
+        super.test01_newCertificateCredential_WrongCertificate();
     }
-    
-    @Ignore("Default credentials require reading in files, so it is an integration test")
+    @Ignore("Already tested in unit tests")
     @Override
-    public void test06_newDefaultCredential() throws Exception {
-        super.test06_newDefaultCredential();
+    public void test02_newCertificateCredential_Unsupported() throws Exception {
+        super.test02_newCertificateCredential_Unsupported();
+    }
+    @Ignore("Already tested in unit tests")
+    @Override
+    public void test04_newPasswordCredential_OK() throws Exception {
+        super.test04_newPasswordCredential_OK();
+    }
+    @Ignore("Already tested in unit tests")
+    @Override
+    public void test05_newPasswordCredential_Unsupported() throws Exception {
+        super.test05_newPasswordCredential_Unsupported();
     }
 }

@@ -119,9 +119,9 @@ public abstract class GenericCredentialsAdaptorTestParent {
             String username = config.getUserName();
             char [] password = config.getPassword();
                         
-            for (int i=0;i<schemes.length;i++) { 
-                try { 
-                    credentials.newCertificateCredential(schemes[i], certfile, username, password, null);
+            for (String scheme : schemes) {
+                try {
+                    credentials.newCertificateCredential(scheme, certfile, username, password, null);
                     fail("Expected exception for incorrect certificate file!");
                 } catch (XenonException e) { 
                     // expected
@@ -135,9 +135,9 @@ public abstract class GenericCredentialsAdaptorTestParent {
         if (!config.supportsCertificateCredentials()) {
             String [] schemes = config.supportedSchemes();
             
-            for (int i=0;i<schemes.length;i++) { 
-                try { 
-                    credentials.newCertificateCredential(schemes[i], "cert", "username", "password".toCharArray(), null);
+            for (String scheme : schemes) {
+                try {
+                    credentials.newCertificateCredential(scheme, "cert", "username", "password".toCharArray(), null);
                     fail("Expected exception for unsupported newCertificateCredential!");
                 } catch (XenonException e) { 
                     // expected
@@ -153,8 +153,8 @@ public abstract class GenericCredentialsAdaptorTestParent {
             String username = config.getUserName();
             char [] password = config.getPassword();
                         
-            for (int i=0;i<schemes.length;i++) { 
-                Credential c = credentials.newPasswordCredential(schemes[i], username, password, null);
+            for (String scheme : schemes) {
+                Credential c = credentials.newPasswordCredential(scheme, username, password, null);
                 credentials.close(c);
             }
         }
@@ -166,9 +166,9 @@ public abstract class GenericCredentialsAdaptorTestParent {
         if (!config.supportsPasswordCredentials()) {
             String [] schemes = config.supportedSchemes();
             
-            for (int i=0;i<schemes.length;i++) { 
-                try { 
-                    credentials.newPasswordCredential(schemes[i], "username", "password".toCharArray(), null);
+            for (String scheme : schemes) {
+                try {
+                    credentials.newPasswordCredential(scheme, "username", "password".toCharArray(), null);
                     fail("Expected exception for unsupported newPasswordCredential!");
                 } catch (XenonException e) { 
                     // expected
@@ -180,9 +180,9 @@ public abstract class GenericCredentialsAdaptorTestParent {
     @Test
     public void test06_newDefaultCredential() throws Exception {
         String [] schemes = config.supportedSchemes();
-            
-        for (int i=0;i<schemes.length;i++) { 
-            Credential c = credentials.getDefaultCredential(schemes[i]);
+
+        for (String scheme : schemes) {
+            Credential c = credentials.getDefaultCredential(scheme);
             credentials.close(c);
         }
     }

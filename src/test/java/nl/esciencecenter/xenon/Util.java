@@ -66,4 +66,8 @@ public class Util {
     public static String readFileToString(File file) throws FileNotFoundException, IOException {
         return Utils.readToString(new FileInputStream(file));
     }    
+
+    private Util() {
+        // utility class only
+    }
 }

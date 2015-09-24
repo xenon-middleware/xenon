@@ -36,8 +36,7 @@ import org.junit.BeforeClass;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class CredentialsEngineImplementationTest {
-
+public class ITCredentialsEngineImplementationTest {
     private static XenonEngine xenonEngine;
 
     @BeforeClass
@@ -51,19 +50,38 @@ public class CredentialsEngineImplementationTest {
     }
 
     @org.junit.Test
-    public void testPassword() throws Exception {
-
+    public void testDefault() throws Exception {
         CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
-        Credential c = ce.newPasswordCredential("ssh", "username", "password".toCharArray(), null);
+        Credential c = ce.getDefaultCredential("ssh");
 
-        assertTrue(c instanceof PasswordCredentialImplementation);
+        assertEquals("ssh", c.getAdaptorName());
+    }
 
-        PasswordCredentialImplementation pci = (PasswordCredentialImplementation) c;
+    @org.junit.Test
+    public void testCertificate() throws Exception {
+        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
+        
+        String certfile = Utils.getHome() + Utils.getLocalSeparator() + ".ssh" + Utils.getLocalSeparator() + "id_rsa";  
+        
+        if (!new File(certfile).exists()) { 
+            certfile = Utils.getHome() + Utils.getLocalSeparator() + ".ssh" + Utils.getLocalSeparator() + "id_dsa";
+        }
+        
+        if (!new File(certfile).exists()) { 
+            fail("Failed to find valid certificate file!");
+        }
+        
+        Credential c = ce.newCertificateCredential("ssh", certfile, "username", "password".toCharArray(), null);
 
-        assertEquals("ssh", pci.getAdaptorName());
-        assertEquals("username", pci.getUsername());
-        assertEquals(new HashMap<String, String>(), pci.getProperties());
+        assertTrue(c instanceof CertificateCredentialImplementation);
 
-        assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
+        CertificateCredentialImplementation cci = (CertificateCredentialImplementation) c;
+
+        assertEquals("ssh", cci.getAdaptorName());
+        assertEquals("username", cci.getUsername());
+        assertEquals(certfile, cci.getCertfile());
+        assertEquals(new HashMap<String, String>(0), cci.getProperties());
+
+        assertTrue(Arrays.equals(cci.getPassword(), "password".toCharArray()));
     }
 }

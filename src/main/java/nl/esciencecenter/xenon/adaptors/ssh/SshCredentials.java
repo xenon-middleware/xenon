@@ -75,7 +75,6 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential getDefaultCredential(String scheme) throws XenonException {
-
         String userHome = System.getProperty("user.home");
 
         if (userHome == null) {
