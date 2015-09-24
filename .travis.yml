@@ -9,4 +9,7 @@ cache:
   - .gradle
   - $HOME/.gradle
   - lib
-script: gradle check -xintegrationTest
+addons:
+  apt_packages:
+    - pandoc
+script: ./gradlew check -xintegrationTest
