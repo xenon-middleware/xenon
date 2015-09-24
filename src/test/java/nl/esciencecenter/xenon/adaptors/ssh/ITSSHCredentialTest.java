@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import nl.esciencecenter.xenon.adaptors.GenericCredentialsAdaptorTestParent;
 
@@ -35,24 +36,20 @@ public class ITSSHCredentialTest extends GenericCredentialsAdaptorTestParent {
         GenericCredentialsAdaptorTestParent.prepareClass(new SSHCredentialTestConfig());
     }
 
-    @Ignore("Already tested in unit tests")
+    @Ignore("Already tested in unit tests") @Test
     @Override
     public void test01_newCertificateCredential_WrongCertificate() throws Exception {
-        super.test01_newCertificateCredential_WrongCertificate();
     }
-    @Ignore("Already tested in unit tests")
+    @Ignore("Already tested in unit tests") @Test
     @Override
     public void test02_newCertificateCredential_Unsupported() throws Exception {
-        super.test02_newCertificateCredential_Unsupported();
     }
-    @Ignore("Already tested in unit tests")
+    @Ignore("Already tested in unit tests") @Test
     @Override
     public void test04_newPasswordCredential_OK() throws Exception {
-        super.test04_newPasswordCredential_OK();
     }
-    @Ignore("Already tested in unit tests")
+    @Ignore("Already tested in unit tests") @Test
     @Override
     public void test05_newPasswordCredential_Unsupported() throws Exception {
-        super.test05_newPasswordCredential_Unsupported();
     }
 }

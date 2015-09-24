@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Test;
 
 import nl.esciencecenter.xenon.adaptors.GenericCredentialsAdaptorTestParent;
 
@@ -36,15 +37,13 @@ public class SSHCredentialTest extends GenericCredentialsAdaptorTestParent {
         GenericCredentialsAdaptorTestParent.prepareClass(new SSHCredentialTestConfig());
     }
     
-    @Ignore("'Correct' certificate file from config requires reading files, so it is an integration test")
+    @Ignore("'Correct' certificate file from config requires reading files, so it is an integration test") @Test
     @Override
     public void test00_newCertificateCredential_OK() throws Exception {
-        super.test00_newCertificateCredential_OK();
     }
     
-    @Ignore("Default credentials require reading in files, so it is an integration test")
+    @Ignore("Default credentials require reading in files, so it is an integration test") @Test
     @Override
     public void test06_newDefaultCredential() throws Exception {
-        super.test06_newDefaultCredential();
     }
 }

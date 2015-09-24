@@ -18,16 +18,13 @@ package nl.esciencecenter.xenon.engine.credentials;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -62,7 +59,7 @@ public class CredentialsEngineImplementationTest {
 
         assertEquals("ssh", pci.getAdaptorName());
         assertEquals("username", pci.getUsername());
-        assertEquals(new HashMap<String, String>(), pci.getProperties());
+        assertEquals(new HashMap<String, String>(0), pci.getProperties());
 
         assertTrue(Arrays.equals(pci.getPassword(), "password".toCharArray()));
     }
