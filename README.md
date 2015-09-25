@@ -3,9 +3,10 @@
 Xenon
 =====
 
-Copyright 2013 The Netherlands eScience Center
+[![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop
+)](https://travis-ci.org/NLeSC/Xenon)
 
-Last modified: 9 Januari 2014
+Copyright 2013 The Netherlands eScience Center
 
 What is it?
 -----------

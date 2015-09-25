@@ -49,14 +49,14 @@ public interface Credentials {
      * 
      * @return the Credential.
      * 
-     * @throws UnknownPropertyException
+     * @throws nl.esciencecenter.xenon.UnknownPropertyException
      *             If an unknown property was passed.
-     * @throws InvalidPropertyException
+     * @throws nl.esciencecenter.xenon.InvalidPropertyException
      *             If a known property was passed with an illegal value.
      * @throws CertificateNotFoundException
      *             If the certificate file could not be found.
      * @throws XenonException
-     *             If the <code>Credential<code> could not be created.
+     *             If the Credential could not be created.
      */
     Credential newCertificateCredential(String scheme, String certfile, String username, char[] password,
             Map<String, String> properties) throws XenonException;
@@ -77,12 +77,12 @@ public interface Credentials {
      * 
      * @return the Credential.
      * 
-     * @throws UnknownPropertyException
+     * @throws nl.esciencecenter.xenon.UnknownPropertyException
      *             If an unknown property was passed.
-     * @throws InvalidPropertyException
+     * @throws nl.esciencecenter.xenon.InvalidPropertyException
      *             If a known property was passed with an illegal value.
      * @throws XenonException
-     *             If the <code>Credential<code> could not be created.
+     *             If the Credential could not be created.
      */
     Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws XenonException;
@@ -97,12 +97,14 @@ public interface Credentials {
      * 
      * @return the Credential.
      * 
-     * @throws UnknownPropertyException
+     * @throws nl.esciencecenter.xenon.UnknownPropertyException
      *             If an unknown property was passed.
-     * @throws InvalidPropertyException
+     * @throws nl.esciencecenter.xenon.InvalidPropertyException
      *             If a known property was passed with an illegal value.
+     * @throws nl.esciencecenter.xenon.InvalidCredentialException
+     *             If a valid credential cannot be created.
      * @throws XenonException
-     *             If the <code>Credential<code> could not be created.
+     *             If the Credential could not be created.
      */
     Credential getDefaultCredential(String scheme) throws XenonException;
 
@@ -122,6 +124,7 @@ public interface Credentials {
      * 
      * @param credential
      *            the Credential to test.
+     * @return whether the credential is open.
      * 
      * @throws XenonException
      *             If the test failed.

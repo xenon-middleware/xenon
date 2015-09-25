@@ -4,11 +4,6 @@ jdk:
   - openjdk7
   - oraclejdk8
 sudo: false
-cache:
-  directories:
-  - .gradle
-  - $HOME/.gradle
-  - lib
 addons:
   apt_packages:
     - pandoc
