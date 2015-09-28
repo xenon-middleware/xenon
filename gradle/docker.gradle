@@ -26,9 +26,9 @@ if (project.hasProperty("docker.filter")) {
 ext.dockerDir = 'src/integrationTest/docker'
 
 // UID in docker image
-ext.dockerUid = 1000
+ext.dockerUid = '1000'
 if (project.hasProperty('docker.uid')) {
-    ext.dockerUid = project.property('docker.uid') as int
+    ext.dockerUid = project.property('docker.uid')
 }
 
 //  DOCKER COMPOSE
@@ -96,12 +96,11 @@ task dockerCACertificates(type: Exec) {
     onlyIf {
         !generatedCAFiles.exists()
     }
-
     workingDir dockerDir
     def volumes = generatedCAFiles.absolutePath + ':/var/lib/globus'
-    commandLine ['docker', 'run', '-t', '--rm=true',
+    commandLine 'docker', 'run', '-t', '--rm=true',
                  '-e', 'MYUID=' + dockerUid, '-v', volumes,
-                 'nlesc/xenon-gridftp-ca']
+                 'nlesc/xenon-gridftp-ca'
 }
 
 //  DOCKER BUILD
