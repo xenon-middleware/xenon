@@ -15,8 +15,6 @@
  */
 package nl.esciencecenter.xenon.adaptors.torque;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
@@ -28,6 +26,8 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Generator for GridEngine job script.

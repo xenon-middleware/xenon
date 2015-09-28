@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.xenon.adaptors.ssh;
+package nl.esciencecenter.xenon.jobs;
 
 import static org.junit.Assert.assertTrue;
 

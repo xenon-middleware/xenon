@@ -31,27 +31,11 @@ ext.apacheCommonsNetVersion = '3.3'
 // PROJECT DIRECTORIES
 // ==============
 sourceSets {
-    test {
-        java {
-            exclude 'nl/esciencecenter/xenon/integration/**'
-            exclude '**/IT*.java'
-            exclude '**/*IT.java'
-            exclude 'nl/esciencecenter/xenon/adaptors/*/*AdaptorTest.java'
-        }
-    }
     integrationTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
-            // TODO move all integration tests to src/integrationTest/java
-            srcDirs 'src/test/java'
-            include 'nl/esciencecenter/xenon/integration/**'
-            include '**/IT*.java'
-            include '**/*IT.java'
-            include 'nl/esciencecenter/xenon/adaptors/*/*AdaptorTest.java'
         }
-        // TODO move all integration resources to src/integrationTest/resources
-        resources.srcDirs 'src/test/resources'
     }
     userguide {
         java {
@@ -195,8 +179,6 @@ task integrationTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-//Ensure that the check task fails the build if there are failing integration tests.
-check.dependsOn integrationTest
 //Ensure that our unit tests are run before our integration tests
 integrationTest.mustRunAfter test
 
@@ -289,3 +271,34 @@ task wrapper(type: Wrapper) {
     group 'Build Setup'
     gradleVersion = '2.7'
 }
+
+//     DOCKER
+// ==============
+
+task checkDockerComposePresence(type: Exec) {
+    executable 'docker-compose'
+    args = ['-v']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+class DockerCompose extends Exec {
+    def DockerCompose() {
+        workingDir 'src/integrationTest/docker'
+        executable 'docker-compose'
+        dependsOn project.tasks.checkDockerComposePresence
+    }
+}
+
+task dockerKill(type: DockerCompose) {
+    args = ['kill']
+}
+
+task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
+    args = ['rm', '-f']
+}
+
+task dockerTest(type: DockerCompose) {
+    args = ['run', '--rm', 'xenon-test']
+}
+dockerTest.finalizedBy dockerCleanup
+check.dependsOn dockerTest
