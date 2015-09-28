@@ -17,7 +17,7 @@ plugins {
     id 'idea'
     id 'eclipse'
     // quality
-    id "org.sonarqube" version "1.0"
+    id 'org.sonarqube' version '1.0'
 }
 
 apply from: 'build-common.gradle'
@@ -79,6 +79,7 @@ integrationTest.dependsOn prepareIntegrationTest
 sonarqube {
     properties {
         property "sonar.jacoco.itReportPath", "build/jacoco/integrationTest.exec"
+        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
     }
 }
 // Ensure that integration coverage is availabe before sonar analysis.
