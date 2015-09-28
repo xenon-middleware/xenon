@@ -21,6 +21,7 @@ plugins {
 }
 
 apply from: 'build-common.gradle'
+apply from: 'gradle/docker.gradle'
 
 //     TEST
 // ==============

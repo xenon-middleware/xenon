@@ -24,4 +24,4 @@ VOLUME ["/code"]
 WORKDIR /code
 
 ENTRYPOINT ["/bin/run-tests.sh"]
-CMD ["./gradlew", "-Pxenon.test.properties=src/integrationTest/docker/xenon.test.properties.docker", "check" "integrationTest", "-xdockerTest"]
+CMD ["./gradlew", "-Pxenon.test.properties=src/integrationTest/docker/xenon.test.properties.docker" "integrationTest"]

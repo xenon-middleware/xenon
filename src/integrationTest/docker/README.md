@@ -11,21 +11,26 @@ The build step is optional as the images are available on docker hub.
 The docker images can be build by running
 
 ```
-./build.sh
+gradle dockerBuild -Pdocker.uid=$UID
 ```
 
-Building docker containers will send the build directory to the deamon.
-Because of this we can't use a shared set of keys between base images so they are copies.
+where docker.uid is the base user UID on the docker system.
+Building docker containers will send the build directory to the daemon.
+Because of this we can't use a shared set of keys between base images so they are copies. To build a subset of the images, specify a simple wildcard in the docker.filter property.
+```
+gradle dockerBuild -Pdocker.uid=$UID -Pdocker.filter='*ftp'
+```
 
 # Push
 
 The build images can be pushed to docker hub at https://hub.docker.com/u/nlesc/ with
 ```
 docker login
-push.sh
+gradle dockerPush
 ```
 
-You must have push rights in the nlesc organization.
+You must have push rights in the nlesc organization. Again, use a wildcard with
+docker.filter to only push a subset of the images.
 
 # Run integration tests
 
@@ -34,13 +39,5 @@ Tests suite is run from a docker container so it can connect to linked container
 The docker container is run with your own UID so test results are also owned by you.
 
 ```
-cd src/integrationTest/docker
-cp xenon.test.properties.docker ../../../xenon.test.properties
-docker-compose run -e MYUID=$UID --rm xenon-test
-docker-compose kill && docker-compose rm -f
-```
-
-To run filter tests use
-```
-docker-compose run -e MYUID=$UID --rm xenon-test ./gradlew integrationTest --tests '*gftp*'
+gradle dockerIntegrationTest -Pdocker.uid=$UID
 ```

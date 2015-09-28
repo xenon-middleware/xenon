@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ $MYUID -ne $(id xenon -u) ]
+if [ "x$MYUID" -ne "x$(id xenon -u)" ]
 then
 echo "Changing uid of xenon user to MYUID=$MYUID"
 usermod -u $MYUID xenon

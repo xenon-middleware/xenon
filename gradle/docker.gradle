@@ -1,0 +1,110 @@
+ext.dockerDir = 'src/integrationTest/docker'
+
+// Images needed for integration tests
+ext.dockerImages = [
+    'xenon-alpine-base', 'xenon-ftp', 'xenon-gridengine',
+    'xenon-gridengine-exec', 'xenon-gridftp', 'xenon-phusion-base',
+    'xenon-slurm', 'xenon-ssh', 'xenon-torque', 'xenon-webdav',
+]
+// Filter images according to *ftp or *grid*
+if (project.hasProperty("docker.filter")) {
+    // Simplified filter syntax
+    def filter = project.property("docker.filter")
+    filter = filter.replaceAll(/\*/, ".*").replaceAll(/\?/, ".?")
+    ext.dockerImages = ext.dockerImages.findAll { it =~ filter }
+}
+// UID in docker image
+ext.dockerUid = project.hasProperty('docker.uid') ? (int)project.property('docker.uid') : 1000
+
+task checkDockerComposePresence(type: Exec) {
+    executable 'docker-compose'
+    args = ['-v']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+class DockerCompose extends Exec {
+    def DockerCompose() {
+        workingDir project.ext.dockerDir
+        executable 'docker-compose'
+        dependsOn project.tasks.checkDockerComposePresence
+    }
+}
+
+task dockerKill(type: DockerCompose) {
+    args = ['kill']
+}
+
+task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
+    args = ['rm', '-f']
+}
+
+task dockerIntegrationTest(type: DockerCompose) {
+    args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
+}
+
+def dockerImageRequirementsSpec = copySpec { 
+    from('src/integrationTest/resources/scripts') {
+        include 'create_symlinks'
+    }
+    from(dockerDir) {
+        include 'insecure-ssh-keys'
+    }
+}
+task dockerCopyAlpineRequirements(type: Copy) {
+    with dockerImageRequirementsSpec
+    into dockerDir + '/xenon-alpine-base'
+}
+task dockerCopyPhusionRequirements(type: Copy) {
+    with dockerImageRequirementsSpec
+    into dockerDir + '/xenon-phusion-base'
+}
+task dockerCopyTorqueRequirements(type: Copy) {
+    with dockerImageRequirementsSpec
+    into dockerDir + '/xenon-torque'
+}
+
+task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopyPhusionRequirements, dockerCopyTorqueRequirements]) {}
+
+task dockerCACertificates {
+    def generatedCAFiles = file(dockerDir + '/xenon-gridftp/files')
+    inputs.dir file(dockerDir + '/xenon-gridftp/ca')
+    outputs.dir generatedCAFiles
+    doLast {
+        exec {
+            workingDir dockerDir
+            commandLine 'docker', 'build', '-t', 'nlesc/xenon-gridftp-ca', 'xenon-gridftp/ca'
+        }
+        exec {
+            workingDir dockerDir
+            def volumes = generatedCAFiles.absolutePath + ':/var/lib/globus'
+            commandLine 'docker', 'run', '-t', '--rm=true', '-e', 'MYUID=' + dockerUid, '-v', volumes, 'nlesc/xenon-gridftp-ca'
+        }
+    }
+}
+
+task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements, dockerCACertificates]) << {
+    println "Building docker images for: " + dockerImages
+    dockerImages.each { image ->
+        exec {
+            workingDir dockerDir
+            commandLine 'docker', 'build', '-t', 'nlesc/' + image, image
+        }
+    }
+    exec {
+        workingDir dockerDir
+        commandLine 'docker', 'build', '-t', 'nlesc/xenon-test', '.'
+    }
+}
+
+task dockerPush(dependsOn: checkDockerComposePresence) << {
+    println "Pushing docker images of: " + dockerImages
+    dockerImages.each { image ->
+        exec {
+            workingDir dockerDir
+            commandLine 'docker', 'push', 'nlesc/' + image
+        }
+    }
+}
+
+dockerIntegrationTest.finalizedBy dockerCleanup
+dockerIntegrationTest.mustRunAfter test
