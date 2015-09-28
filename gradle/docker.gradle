@@ -67,8 +67,9 @@ task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopy
 
 task dockerCACertificates {
     def generatedCAFiles = file(dockerDir + '/xenon-gridftp/files')
-    inputs.dir file(dockerDir + '/xenon-gridftp/ca')
-    outputs.dir generatedCAFiles
+    onlyIf {
+        !generatedCAFiles.exists()
+    }
     doLast {
         exec {
             workingDir dockerDir
