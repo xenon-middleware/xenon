@@ -14,7 +14,7 @@ if (project.hasProperty("docker.filter")) {
     ext.dockerImages = ext.dockerImages.findAll { it =~ filter }
 }
 // UID in docker image
-ext.dockerUid = project.hasProperty('docker.uid') ? (int)project.property('docker.uid') : 1000
+ext.dockerUid = project.hasProperty('docker.uid') ? (project.property('docker.uid') as int) : 1000
 
 task checkDockerComposePresence(type: Exec) {
     executable 'docker-compose'
