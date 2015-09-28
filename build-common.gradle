@@ -302,3 +302,4 @@ task dockerTest(type: DockerCompose) {
 }
 dockerTest.finalizedBy dockerCleanup
 check.dependsOn dockerTest
+dockerTest.mustRunAfter test
