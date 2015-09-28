@@ -33,7 +33,6 @@ xenon-test:
   image: nlesc/xenon-test
   volumes:
     - ../../..:/code
-    - ~/.gradle:/home/xenon/.gradle
   environment:
     - MYUID
   links:
