@@ -35,7 +35,11 @@ jacocoTestReport.description = 'Generate coverage report of unit tests'
 jacocoTestReport.group = 'Code coverage reporting'
 
 task prepareIntegrationTest << {
-    file('xenon.test.properties').withReader { reader ->
+    def xenonPropertiesFile = 'xenon.test.properties'
+    if (project.hasProperty('xenon.test.properties')) {
+        xenonPropertiesFile = project.get('xenon.test.properties')
+    }
+    file(xenonPropertiesFile).withReader { reader ->
         def userProps = new Properties()
         userProps.load(reader)
 
