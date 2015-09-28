@@ -17,7 +17,6 @@
 package nl.esciencecenter.xenon.adaptors.local;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
 import nl.esciencecenter.xenon.util.Utils;
 

@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.integration;
+package nl.esciencecenter.xenon.files;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,13 +32,6 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.files.DirectoryStream;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -44,7 +40,7 @@ import nl.esciencecenter.xenon.util.Utils;
  * 
  * @author Piter T. de Boer
  */
-abstract public class AbstractFileTests {
+public abstract class AbstractFileTests {
 
     /**
      * Singleton Engine for all tests
@@ -113,14 +109,14 @@ abstract public class AbstractFileTests {
      * @return Xenon Credential for the FileSystem to be tested.
      * @throws XenonException
      */
-    abstract Credential getCredentials() throws XenonException;
+    public abstract Credential getCredentials() throws XenonException;
 
     /**
      * Return test location. Subclasses need to override this.
      * 
      * @return the test location as URI
      */
-    abstract public java.net.URI getTestLocation() throws Exception;
+    public abstract URI getTestLocation() throws Exception;
 
     // =========================================
     // Helper Methods for the integration tests.  
@@ -219,7 +215,7 @@ abstract public class AbstractFileTests {
     // SetUp Integration Tests
     // ========================
 
-    @org.junit.Before
+    @Before
     public void checkTestSetup() throws Exception {
         // Basic Sanity checks of the test environment; 
         // Typically Exceptions should be thrown here if the call fails. 
@@ -233,7 +229,7 @@ abstract public class AbstractFileTests {
     // Actual integration tests  
     // ========================
 
-    @org.junit.Test
+    @Test
     public void testGetTestDir() throws Exception {
         Path path = getTestDir();
         assertNotNull("TestPath returned NULL", path);
@@ -251,7 +247,7 @@ abstract public class AbstractFileTests {
     /**
      * Test creation and delete of file in one test. If this test fails, all other test will fail to!
      */
-    @org.junit.Test
+    @Test
     public void testCreateDeleteEmptyFile() throws Exception {
         Path filePath = Utils.resolveWithRoot(xenon.files(), getTestDir(), "testFile01");
 
@@ -283,7 +279,7 @@ abstract public class AbstractFileTests {
     /**
      * Test creation and deletion of directory in one test. If this test fails, all other test will fail to!
      */
-    @org.junit.Test
+    @Test
     public void testCreateDeleteEmptySubdir() throws Exception {
 
         Files files = getFiles();
@@ -312,7 +308,7 @@ abstract public class AbstractFileTests {
         assertFalse("Method hasNext() from empty directory iterator must return false.", iterator.hasNext());
     }
 
-    @org.junit.Test
+    @Test
     public void testgetFileSystemEntryPath() throws Exception {
 
         FileSystem fs = getFileSystem();
@@ -322,7 +318,7 @@ abstract public class AbstractFileTests {
         assertNotNull("Entry Path may not be null.", relEntryPath);
     }
 
-    @org.junit.Test
+    @Test
     public void testResolveRootPath() throws Exception {
 
         FileSystem fs = getFileSystem();
@@ -332,7 +328,7 @@ abstract public class AbstractFileTests {
         assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath);
     }
 
-    @org.junit.Test
+    @Test
     public void testNewDirectoryStreamTestDir() throws Exception {
 
         Path path = getTestDir();
@@ -347,7 +343,7 @@ abstract public class AbstractFileTests {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testNewDirectoryAttributesStreamTestDir() throws Exception {
 
         Path path = getTestDir();
@@ -361,7 +357,7 @@ abstract public class AbstractFileTests {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateListAndDelete3Subdirs() throws Exception {
 
         // PRE:
@@ -394,7 +390,7 @@ abstract public class AbstractFileTests {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateListAndDelete3FilesWithAttributes() throws Exception {
 
         // PRE: 
@@ -428,7 +424,7 @@ abstract public class AbstractFileTests {
         deletePaths(new Path[] { file1, file2, file3, testDirPath }, true);
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateListAndDelete3SubdirsWithAttributes() throws Exception {
 
         // PRE:
@@ -468,7 +464,7 @@ abstract public class AbstractFileTests {
     /**
      * Test write and read back 0 bytes.
      */
-    @org.junit.Test
+    @Test
     public void testStreamWriteAndReadNillBytes() throws Exception {
 
         // empty array: 
@@ -479,7 +475,7 @@ abstract public class AbstractFileTests {
     /**
      * Test write and read back 256 bytes to a NEW file.
      */
-    @org.junit.Test
+    @Test
     public void testStreamWriteAndRead256Bytes() throws Exception {
 
         // one byte: 
@@ -547,5 +543,4 @@ abstract public class AbstractFileTests {
         // POST: 
         deletePaths(new Path[] { testFilePath }, true);
     }
-
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.xenon.integration;
+package nl.esciencecenter.xenon.jobs;
 
 import static org.junit.Assert.assertTrue;
 
@@ -23,9 +23,6 @@ import java.nio.file.Path;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.Scheduler;
 
 import org.junit.Rule;
 import org.junit.Test;

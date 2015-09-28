@@ -25,9 +25,6 @@ import java.util.Properties;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;

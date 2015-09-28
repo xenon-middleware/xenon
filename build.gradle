@@ -42,11 +42,12 @@ task prepareIntegrationTest << {
     file(xenonPropertiesFile).withReader { reader ->
         def userProps = new Properties()
         userProps.load(reader)
+        def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
 
         // Initialize testing symlinks locally
         exec {
             executable = '/bin/bash'
-            args = ['src/test/resources/scripts/create_symlinks']
+            args = [create_symlinks]
         }
 
         // Initialize testing symlinks on remote side
@@ -59,7 +60,7 @@ task prepareIntegrationTest << {
                     password: userProps.getProperty("test.ssh.password")
                     ) {
                 shell interaction: {
-                    file('src/test/resources/scripts/create_symlinks').withInputStream { stream ->
+                    file(create_symlinks).withInputStream { stream ->
                         standardInput << stream << '\n' << 'exit 0' << '\n'
                     }
                 }
