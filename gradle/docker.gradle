@@ -40,6 +40,8 @@ task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
 
 task dockerIntegrationTest(type: DockerCompose) {
     args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
+    finalizedBy "dockerCleanup"
+    mustRunAfter "test"
 }
 
 def dockerImageRequirementsSpec = copySpec { 
@@ -106,6 +108,3 @@ task dockerPush(dependsOn: checkDockerComposePresence) << {
         }
     }
 }
-
-dockerIntegrationTest.finalizedBy dockerCleanup
-dockerIntegrationTest.mustRunAfter test
