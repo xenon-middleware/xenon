@@ -1,20 +1,38 @@
-ext.dockerDir = 'src/integrationTest/docker'
-
-// Images needed for integration tests
-ext.dockerImages = [
-    'xenon-alpine-base', 'xenon-ftp', 'xenon-gridengine',
-    'xenon-gridengine-exec', 'xenon-gridftp', 'xenon-phusion-base',
-    'xenon-slurm', 'xenon-ssh', 'xenon-torque', 'xenon-webdav',
+// Images: directories needed for integration tests
+// LinkedHashMap, so the keySet order is fixed
+ext.dockerDirectories = [
+    'alpine-base': 'xenon-alpine-base',
+    'phusion-base': 'xenon-phusion-base',
+    'ftp': 'xenon-ftp',
+    'gridengine': 'xenon-gridengine',
+    'gridengine-exec': 'xenon-gridengine-exec',
+    'gridftp-ca': 'xenon-gridftp/ca',
+    'gridftp': 'xenon-gridftp',
+    'slurm': 'xenon-slurm',
+    'ssh': 'xenon-ssh',
+    'torque': 'xenon-torque' ,
+    'webdav': 'xenon-webdav',
+    'test': '.'
 ]
+ext.dockerImages = ext.dockerDirectories.keySet()
 // Filter images according to *ftp or *grid*
 if (project.hasProperty("docker.filter")) {
-    // Simplified filter syntax
     def filter = project.property("docker.filter")
+    // Wildcard syntax
     filter = filter.replaceAll(/\*/, ".*").replaceAll(/\?/, ".?")
     ext.dockerImages = ext.dockerImages.findAll { it =~ filter }
 }
+
+ext.dockerDir = 'src/integrationTest/docker'
+
 // UID in docker image
-ext.dockerUid = project.hasProperty('docker.uid') ? (project.property('docker.uid') as int) : 1000
+ext.dockerUid = 1000
+if (project.hasProperty('docker.uid')) {
+    ext.dockerUid = project.property('docker.uid') as int
+}
+
+//  DOCKER COMPOSE
+// ================
 
 task checkDockerComposePresence(type: Exec) {
     executable 'docker-compose'
@@ -39,10 +57,16 @@ task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
 }
 
 task dockerIntegrationTest(type: DockerCompose) {
+    // FIXME: the current version of docker-compose 1.4.2 does not
+    // forward stdout if running from gradle (without TTY). Check if
+    // future versions support this.
     args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
-    finalizedBy "dockerCleanup"
-    mustRunAfter "test"
+    finalizedBy 'dockerCleanup'
+    mustRunAfter 'test'
 }
+
+//  DOCKER BUILD SETUP
+// ====================
 
 def dockerImageRequirementsSpec = copySpec { 
     from('src/integrationTest/resources/scripts') {
@@ -67,35 +91,29 @@ task dockerCopyTorqueRequirements(type: Copy) {
 
 task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopyPhusionRequirements, dockerCopyTorqueRequirements]) {}
 
-task dockerCACertificates {
+task dockerCACertificates(type: Exec) {
     def generatedCAFiles = file(dockerDir + '/xenon-gridftp/files')
     onlyIf {
         !generatedCAFiles.exists()
     }
-    doLast {
-        exec {
-            workingDir dockerDir
-            commandLine 'docker', 'build', '-t', 'nlesc/xenon-gridftp-ca', 'xenon-gridftp/ca'
-        }
-        exec {
-            workingDir dockerDir
-            def volumes = generatedCAFiles.absolutePath + ':/var/lib/globus'
-            commandLine 'docker', 'run', '-t', '--rm=true', '-e', 'MYUID=' + dockerUid, '-v', volumes, 'nlesc/xenon-gridftp-ca'
-        }
-    }
+
+    workingDir dockerDir
+    def volumes = generatedCAFiles.absolutePath + ':/var/lib/globus'
+    commandLine ['docker', 'run', '-t', '--rm=true',
+                 '-e', 'MYUID=' + dockerUid, '-v', volumes,
+                 'nlesc/xenon-gridftp-ca']
 }
+
+//  DOCKER BUILD
+// ==============
 
 task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements, dockerCACertificates]) << {
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
             workingDir dockerDir
-            commandLine 'docker', 'build', '-t', 'nlesc/' + image, image
+            commandLine 'docker', 'build', '-t', 'nlesc/xenon-' + image, dockerDirectories[image]
         }
-    }
-    exec {
-        workingDir dockerDir
-        commandLine 'docker', 'build', '-t', 'nlesc/xenon-test', '.'
     }
 }
 
@@ -104,7 +122,7 @@ task dockerPush(dependsOn: checkDockerComposePresence) << {
     dockerImages.each { image ->
         exec {
             workingDir dockerDir
-            commandLine 'docker', 'push', 'nlesc/' + image
+            commandLine 'docker', 'push', 'nlesc/xenon-' + image
         }
     }
 }
