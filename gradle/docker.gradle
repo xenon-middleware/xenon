@@ -61,6 +61,9 @@ task dockerIntegrationTest(type: DockerCompose) {
     // forward stdout if running from gradle (without TTY). Check if
     // future versions support this.
     args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
+    if (project.hasProperty('docker.tests')) {
+        args += ['./gradlew', 'integrationTest', '--tests', "'" + project.property('docker.tests') + "'"]
+    }
     finalizedBy 'dockerCleanup'
     mustRunAfter 'test'
 }
