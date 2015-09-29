@@ -63,6 +63,10 @@ public abstract class JobTestConfig extends GenericTestConfig {
 
     public abstract long getUpdateTime();
 
+    public long getJobTimeout() {
+        return getQueueWaitTime() + 5000 + getUpdateTime();
+    }
+
     public abstract boolean supportsParallelJobs();
     
     public abstract boolean supportsNullLocation();
