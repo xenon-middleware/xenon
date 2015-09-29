@@ -31,6 +31,8 @@ if (project.hasProperty('docker.uid')) {
     ext.dockerUid = project.property('docker.uid')
 }
 
+ext.dockerCacheContainerName = 'xenon-test-cache-' + (java.util.UUID.randomUUID() as String)
+
 //  DOCKER COMPOSE
 // ================
 
@@ -108,6 +110,37 @@ task dockerCACertificates(type: Exec) {
 
 //  DOCKER BUILD
 // ==============
+
+task dockerTestCache(dependsOn: checkDockerComposePresence) {
+    def testCacheSet = file('.docker-test-cache-set')
+    onlyIf {
+        !testCacheSet.exists()
+    }
+    doLast {
+        exec {
+            workingDir dockerDir
+            commandLine 'docker', 'run', '-e', 'MYUID=' + dockerUid,
+                '--name=' + dockerCacheContainerName, '-v', "$projectDir:/code",
+                'nlesc/xenon-test', './gradlew', 'dependencies'
+        }
+        exec {
+            workingDir dockerDir
+            commandLine 'docker', 'commit', dockerCacheContainerName,
+                'nlesc/xenon-test'
+        }
+        exec {
+            commandLine 'touch', testCacheSet.absolutePath
+        }
+    }
+    finalizedBy 'dockerTestCacheCleanup'
+}
+task dockerTestCacheCleanup(type: Exec) {
+    onlyIf {
+        !dockerTestCache.state.skipped
+    }
+    workingDir dockerDir
+    commandLine 'docker', 'rm', dockerCacheContainerName
+}
 
 task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements, dockerCACertificates]) << {
     println "Building docker images for: " + dockerImages

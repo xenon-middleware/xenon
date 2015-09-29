@@ -14,3 +14,6 @@
 # integration tests
 xenon.test.properties
 /xenon_test
+
+# docker cache
+.docker-test-cache-set
