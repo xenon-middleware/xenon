@@ -58,7 +58,7 @@ task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
     args = ['rm', '-f']
 }
 
-task dockerIntegrationTest(type: DockerCompose) {
+task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     // FIXME: the current version of docker-compose 1.4.2 does not
     // forward stdout if running from gradle (without TTY). Check if
     // future versions support this.
