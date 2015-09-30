@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.gridengine;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.JobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -35,25 +34,24 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  */
 public class GridEngineJobTestConfig extends JobTestConfig {
 
-    private String username;
-    private char[] passwd;
+    private final String username;
+    private final char[] passwd;
 
-    private String scheme;
-    private String fileScheme;
-    private String correctLocation;
-    private String wrongLocation;
-    private String correctLocationWrongUser;
+    private final String scheme;
+    private final String fileScheme;
+    private final String correctLocation;
+    private final String wrongLocation;
+    private final String correctLocationWrongUser;
     
-    private String defaultQueue;
-    private String[] queues;
+    private final String defaultQueue;
+    private final String[] queues;
 
-    private long queueWaitTime;
-    private long updateTime;
+    private final long queueWaitTime;
+    private final long updateTime;
 
-    private String parallelEnvironment;
+    private final String parallelEnvironment;
 
     public GridEngineJobTestConfig(String configfile) throws Exception {
-
         super("gridengine", configfile);
         
         scheme = "ge";
@@ -121,12 +119,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", username, passwd, new HashMap<String, String>());
+        return credentials.newPasswordCredential("ge", username, passwd, new HashMap<String, String>(0));
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
+        return credentials.newPasswordCredential("ge", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
     @Override
@@ -191,6 +189,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     public Map<String, String>[] getInvalidProperties() throws Exception {
+        @SuppressWarnings("unchecked")
         Map<String, String>[] result = new Map[] {new HashMap<>(2)};
         result[0].put("xenon.adaptors.gridengine.poll.delay", "AAP");
         return result;
