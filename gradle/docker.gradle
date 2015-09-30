@@ -64,7 +64,12 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     // future versions support this.
     args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
     if (project.hasProperty('docker.tests')) {
-        args += ['./gradlew', 'integrationTest', '--tests', "'" + project.property('docker.tests') + "'"]
+        args += [
+            './gradlew', 'integrationTest',
+            '-Pxenon.test.properties=src/integrationTest/docker/xenon.test.properties.docker',
+            '--project-cache-dir', '/home/xenon/gradle-cache',
+            '--tests', project.property('docker.tests')
+        ]
     }
     finalizedBy 'dockerCleanup'
     mustRunAfter 'test'
