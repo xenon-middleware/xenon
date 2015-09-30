@@ -1,6 +1,7 @@
 #!/bin/sh
 
 if [ -f /etc/ca-files/hosts/$(hostname -f)/hostcert.pem ] ; then
+    chmod 600 /etc/ca-files/hosts/$(hostname -f)/hostkey.pem
     ln -f -s /etc/ca-files/hosts/$(hostname -f)/hostcert.pem /etc/grid-security
     ln -f -s /etc/ca-files/hosts/$(hostname -f)/hostkey.pem /etc/grid-security
 else
