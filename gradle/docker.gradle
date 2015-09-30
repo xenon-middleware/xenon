@@ -83,7 +83,7 @@ def dockerImageRequirementsSpec = copySpec {
         include 'create_symlinks'
     }
     from(dockerDir) {
-        include 'insecure-ssh-keys'
+        include 'insecure-ssh-keys/*'
     }
 }
 task dockerCopyAlpineRequirements(type: Copy) {
