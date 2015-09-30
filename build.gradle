@@ -35,12 +35,13 @@ task jacocoIntegrationTestReport(type:JacocoReport){
 jacocoTestReport.description = 'Generate coverage report of unit tests'
 jacocoTestReport.group = 'Code coverage reporting'
 
+ext.xenonPropertiesFile = file('xenon.test.properties')
+if (project.hasProperty('xenon.test.properties')) {
+    ext.xenonPropertiesFile = file(project.get('xenon.test.properties'))
+}
+
 task prepareIntegrationTest << {
-    def xenonPropertiesFile = 'xenon.test.properties'
-    if (project.hasProperty('xenon.test.properties')) {
-        xenonPropertiesFile = project.get('xenon.test.properties')
-    }
-    file(xenonPropertiesFile).withReader { reader ->
+    xenonPropertiesFile.withReader { reader ->
         def userProps = new Properties()
         userProps.load(reader)
         def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
@@ -68,6 +69,10 @@ task prepareIntegrationTest << {
             }
         }
     }
+}
+
+integrationTest {
+    systemProperty 'xenon.test.properties', xenonPropertiesFile.absolutePath
 }
 
 //Ensure that integration tests are prepared
