@@ -106,7 +106,7 @@ task dockerCACertificates(type: Exec) {
     onlyIf {
         !generatedCAFiles.exists()
     }
-    workingDir dockerDir
+
     def volumes = generatedCAFiles.absolutePath + ':/var/lib/globus'
     commandLine 'docker', 'run', '-t', '--rm=true',
                  '-e', 'MYUID=' + dockerUid, '-v', volumes,
@@ -123,14 +123,12 @@ task dockerTestCache(dependsOn: checkDockerComposePresence) {
     }
     doLast {
         exec {
-            workingDir dockerDir
             commandLine 'docker', 'run', '-e', 'MYUID=' + dockerUid,
                 '--name=' + dockerCacheContainerName, '-v', "$projectDir:/code",
                 'nlesc/xenon-test', './gradlew', '--project-cache-dir',
                 '/home/xenon/gradle-cache', 'compileJava', 'compileTestJava'
         }
         exec {
-            workingDir dockerDir
             commandLine 'docker', 'commit', dockerCacheContainerName,
                 'nlesc/xenon-test'
         }
@@ -142,9 +140,8 @@ task dockerTestCache(dependsOn: checkDockerComposePresence) {
 }
 task dockerTestCacheCleanup(type: Exec) {
     onlyIf {
-        !dockerTestCache.state.skipped
+        dockerTestCache.state.didWork
     }
-    workingDir dockerDir
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
 
@@ -162,7 +159,6 @@ task dockerPush(dependsOn: checkDockerComposePresence) << {
     println "Pushing docker images of: " + dockerImages
     dockerImages.each { image ->
         exec {
-            workingDir dockerDir
             commandLine 'docker', 'push', 'nlesc/xenon-' + image
         }
     }
