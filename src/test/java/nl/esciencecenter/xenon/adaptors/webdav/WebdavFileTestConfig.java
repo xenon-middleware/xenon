@@ -31,14 +31,14 @@ public class WebdavFileTestConfig extends FileTestConfig {
     public WebdavFileTestConfig(String configfile) throws Exception {
         super(scheme, configfile);
 
-        username = getPropertyOrFail(p, "test.webdav.user");
-        password = getPropertyOrFail(p, "test.webdav.password").toCharArray();
+        username = getPropertyOrFail("test.webdav.user");
+        password = getPropertyOrFail("test.webdav.password").toCharArray();
 
-        privateLocation = getPropertyOrFail(p, "test.webdav.privatelocation");
-        correctLocation = getPropertyOrFail(p, "test.webdav.publiclocation");
+        privateLocation = getPropertyOrFail("test.webdav.privatelocation");
+        correctLocation = getPropertyOrFail("test.webdav.publiclocation");
         wrongLocation = username + "@doesnotexist71093880.com";
-        correctLocationWrongUser = "incorrect@" + getPropertyOrFail(p, "test.webdav.publiclocation");
-        correctLocationWithUser = username + "@" + getPropertyOrFail(p, "test.webdav.publiclocation");
+        correctLocationWrongUser = "incorrect@" + getPropertyOrFail("test.webdav.publiclocation");
+        correctLocationWithUser = username + "@" + getPropertyOrFail("test.webdav.publiclocation");
     }
 
     @Override

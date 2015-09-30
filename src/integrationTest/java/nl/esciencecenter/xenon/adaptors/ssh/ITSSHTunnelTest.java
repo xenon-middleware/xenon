@@ -16,10 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
@@ -33,38 +30,15 @@ import nl.esciencecenter.xenon.files.Files;
  */
 public class ITSSHTunnelTest {
 
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retireve property " + property);
-        }
-
-        return tmp;
-    }
-    
     @org.junit.Test
     public void test_sshViaTunnel() throws Exception {
-
-        Properties p = System.getProperties();
+        SSHJobTestConfig config = new SSHJobTestConfig(null);
         
-        String configfile = System.getProperty("test.config");
+        String gateway = config.getPropertyOrFail("test.ssh.gateway");
+        String location = config.getPropertyOrFail("test.ssh.location");
+        String username = config.getPropertyOrFail("test.ssh.user");
         
-        if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
-        }
-        
-        if (new File(configfile).exists()) {
-            p = new Properties();
-            p.load(new FileInputStream(configfile));    
-        }
-        
-        String gateway = getPropertyOrFail(p, "test.ssh.gateway");
-        String location = getPropertyOrFail(p, "test.ssh.location");
-        String username = getPropertyOrFail(p, "test.ssh.user");
-        
-        if (username != null) { 
+        if (username != null) {
             location = username + "@" + location;
         }
         

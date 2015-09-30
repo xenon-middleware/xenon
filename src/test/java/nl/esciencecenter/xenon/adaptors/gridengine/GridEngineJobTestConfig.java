@@ -59,17 +59,17 @@ public class GridEngineJobTestConfig extends JobTestConfig {
         scheme = "ge";
         fileScheme = "sftp";
         
-        username = getPropertyOrFail(p, "test.gridengine.user");
-        passwd = getPropertyOrFail(p, "test.gridengine.password").toCharArray();
+        username = getPropertyOrFail("test.gridengine.user");
+        passwd = getPropertyOrFail("test.gridengine.password").toCharArray();
 
-        String location = getPropertyOrFail(p, "test.gridengine.location");
+        String location = getPropertyOrFail("test.gridengine.location");
 
-        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
-        String queueList = getPropertyOrFail(p, "test.gridengine.queues");
+        defaultQueue = getPropertyOrFail("test.gridengine.default.queue");
+        String queueList = getPropertyOrFail("test.gridengine.queues");
         queues = queueList.split("\\s*,\\s*");
 
-        queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.queue.wait.time"));
-        updateTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.update.time"));
+        queueWaitTime = Long.parseLong(getPropertyOrFail("test.gridengine.queue.wait.time"));
+        updateTime = Long.parseLong(getPropertyOrFail("test.gridengine.update.time"));
 
         parallelEnvironment = p.getProperty("test.gridengine.parallel.environment");
 
@@ -82,17 +82,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
             wrongLocation = username + "@" + "doesnotexists.com";
             correctLocationWrongUser = "incorrect@" + location;
         }
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override

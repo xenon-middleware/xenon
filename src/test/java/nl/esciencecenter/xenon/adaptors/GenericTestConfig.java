@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -34,36 +36,53 @@ public abstract class GenericTestConfig {
 
     private final String adaptorName;
 
-    protected Properties p = new Properties();
+    protected final Properties p;
 
     protected GenericTestConfig(String adaptorName, String configfile) throws FileNotFoundException, IOException {
         this.adaptorName = adaptorName;
-        
-        if (configfile == null) {
-            configfile = System.getProperty("test.config");
+        this.p = getTestProperties(configfile);
+    }
+
+    public static Properties getTestProperties(String configFilename) throws FileNotFoundException, IOException {
+        Properties props = new Properties();
+        if (configFilename == null) {
+            configFilename = System.getProperty("xenon.test.properties");
         }
 
-        if (configfile == null) {
-            configfile = System.getProperty("user.dir") + File.separator + "xenon.test.properties";
+        if (configFilename == null) {
+            configFilename = System.getProperty("user.dir") + File.separator + "xenon.test.properties";
             
-            if (!new File(configfile).exists()) { 
-                configfile = null;
+            if (!new File(configFilename).exists()) {
+                configFilename = null;
             }
         }
 
-        if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
+        if (configFilename == null) {
+            configFilename = System.getProperty("user.home") + File.separator + "xenon.test.properties";
             
-            if (!new File(configfile).exists()) { 
-                configfile = null;
+            if (!new File(configFilename).exists()) {
+                configFilename = null;
             }
         }
 
-        if (configfile == null) { 
-            p.putAll(System.getProperties());
+        if (configFilename == null) { 
+            props.putAll(System.getProperties());
         } else { 
-            p.load(new FileInputStream(configfile));
-        }        
+            props.load(new FileInputStream(configFilename));
+        }
+        return props;
+    }
+
+    public static String getPropertyOrFail(String adaptorName, Properties props, String name) throws UnknownPropertyException {
+        String value = props.getProperty(name);
+        if (value == null) {
+            throw new UnknownPropertyException(adaptorName, "Failed to retrieve property " + name);
+        }
+        return value;
+    }
+
+    public final String getPropertyOrFail(String name) throws UnknownPropertyException {
+        return getPropertyOrFail(adaptorName, p, name);
     }
 
     public String getAdaptorName() {
