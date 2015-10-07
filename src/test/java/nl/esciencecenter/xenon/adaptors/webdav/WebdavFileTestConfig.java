@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
@@ -13,7 +14,6 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
 public class WebdavFileTestConfig extends FileTestConfig {
-
     private String username;
     private char[] password;
 
@@ -28,7 +28,7 @@ public class WebdavFileTestConfig extends FileTestConfig {
         super(adaptorName, configfile);
     }
 
-    public WebdavFileTestConfig(String configfile) throws Exception {
+    public WebdavFileTestConfig(String configfile) throws IOException {
         super(scheme, configfile);
 
         username = getPropertyOrFail(p, "test.webdav.user");
@@ -42,12 +42,12 @@ public class WebdavFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
+    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getDefaultCredential(credentials), null);
     }
 
     @Override
-    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+    public Path getWorkingDir(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getNonDefaultCredential(credentials), null).getEntryPath();
     }
 
@@ -62,53 +62,53 @@ public class WebdavFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public String getScheme() throws Exception {
+    public String getScheme() {
         return scheme;
     }
 
     @Override
-    public String getCorrectLocation() throws Exception {
+    public String getCorrectLocation() {
         return correctLocation;
     }
 
     @Override
-    public String getWrongLocation() throws Exception {
+    public String getWrongLocation() {
         return wrongLocation;
     }
 
     @Override
-    public String getCorrectLocationWithUser() throws Exception {
+    public String getCorrectLocationWithUser() {
         return correctLocationWithUser;
     }
 
     @Override
-    public String getCorrectLocationWithWrongUser() throws Exception {
+    public String getCorrectLocationWithWrongUser() {
         return correctLocationWrongUser;
     }
 
     @Override
-    public String getNonDefaultCredentialLocation() throws Exception {
+    public String getNonDefaultCredentialLocation() {
         return privateLocation;
     }
 
     @Override
-    public Credential getDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getDefaultCredential(Credentials credentials) throws XenonException {
         return credentials.getDefaultCredential(scheme);
     }
 
     @Override
-    public Map<String, String> getDefaultProperties() throws Exception {
+    public Map<String, String> getDefaultProperties() {
         return null;
     }
 
     @Override
-    public Credential getNonDefaultCredential(Credentials credential) throws Exception {
+    public Credential getNonDefaultCredential(Credentials credential) throws XenonException {
         return getPasswordCredential(credential);
     }
 
     @Override
-    public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, username, password, new HashMap<String, String>());
+    public Credential getPasswordCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential(scheme, username, password, new HashMap<String, String>(0));
     }
 
     @Override

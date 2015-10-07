@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.local;
 
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
@@ -55,7 +56,7 @@ public class LocalFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
+    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException {
         return Utils.getLocalCWD(files).getFileSystem();
     }
 
@@ -113,7 +114,7 @@ public class LocalFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Path getWorkingDir(Files files, Credentials c) throws Exception {
+    public Path getWorkingDir(Files files, Credentials c) throws XenonException {
         return Utils.resolveWithRoot(files, Utils.getLocalCWD(files), "test");
     }
 }

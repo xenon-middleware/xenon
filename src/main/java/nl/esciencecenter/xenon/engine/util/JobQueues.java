@@ -263,7 +263,6 @@ public class JobQueues {
     }
 
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
-
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
         if (timeout < 0) {
@@ -409,7 +408,6 @@ public class JobQueues {
     }
 
     public JobStatus cancelJob(Job job) throws XenonException {
-
         LOGGER.debug("{}: Cancel job {}", adaptorName, job);
 
         checkScheduler(job.getScheduler());

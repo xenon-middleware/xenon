@@ -17,9 +17,10 @@
 package nl.esciencecenter.xenon.adaptors.gftp;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
@@ -28,15 +29,14 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
 public class GftpFileTestConfig extends FileTestConfig {
+    private final static String scheme = GftpUtil.GFTP_SCHEME;
 
-    private String scheme = GftpUtil.GFTP_SCHEME;
-
-    private String correctLocation;
-    private String wrongLocation;
-    private String userCertFile;
-    private String userKeyFile;
-    private String proxyFile;
-    private char[] passphrase = null;
+    private final String correctLocation;
+    private final String wrongLocation;
+    private final String userCertFile;
+    private final String userKeyFile;
+    private final String proxyFile;
+    private final char[] passphrase;
 
     private GlobusProxyCredential tempProxy = null;
 
@@ -52,9 +52,7 @@ public class GftpFileTestConfig extends FileTestConfig {
         proxyFile = p.getProperty("test.gftp.proxyfile");
 
         String str = p.getProperty("test.gftp.passphrase");
-        if (str != null) {
-            passphrase = str.toCharArray();
-        }
+        passphrase = str != null ? str.toCharArray() : null;
         wrongLocation = "doesnotexist.nodomain";
 
         debugPrintf(" - correctLocation  =%s\n", correctLocation);
@@ -81,7 +79,7 @@ public class GftpFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getDefaultCredential(Credentials credentials) throws XenonException {
 
         debugPrintf("creds=" + credentials);
 
@@ -92,7 +90,7 @@ public class GftpFileTestConfig extends FileTestConfig {
         return tempProxy;
     }
 
-    private void initTempProxy(Credentials credentials) throws Exception {
+    private void initTempProxy(Credentials credentials) throws XenonException {
 
         if (proxyFile != null) {
             //            try {
@@ -108,7 +106,7 @@ public class GftpFileTestConfig extends FileTestConfig {
 
         // Create new Proxy using test account: 
 
-        Map<String, String> props = new Hashtable<String, String>();
+        Map<String, String> props = new HashMap<>(3);
 
         props.put(GlobusProxyCredentials.PROPERTY_USER_CERT_FILE, userCertFile);
         props.put(GlobusProxyCredentials.PROPERTY_USER_KEY_FILE, userKeyFile);
@@ -119,19 +117,19 @@ public class GftpFileTestConfig extends FileTestConfig {
             tempProxy = (GlobusProxyCredential) cred;
             debugPrintf("Created new proxy:%s\n", tempProxy);
         } else {
-            throw new Exception("Couldn't create/get default Credential. Created Credential is not a GlobusProxyCredential!");
+            throw new InvalidCredentialException(null, "Couldn't create/get default Credential. Created Credential is not a GlobusProxyCredential!");
         }
 
     }
 
     @Override
-    public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, null, null, new HashMap<String, String>());
+    public Credential getPasswordCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential(scheme, null, null, new HashMap<String, String>(0));
     }
 
     @Override
-    public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, null, null, new HashMap<String, String>());
+    public Credential getInvalidCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential(scheme, null, null, new HashMap<String, String>(0));
     }
 
     @Override
@@ -140,7 +138,7 @@ public class GftpFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getNonDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getNonDefaultCredential(Credentials credentials) throws XenonException {
         return getPasswordCredential(credentials);
     }
 
@@ -160,7 +158,7 @@ public class GftpFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
+    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getDefaultCredential(credentials), null);
     }
 
@@ -202,7 +200,7 @@ public class GftpFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+    public Path getWorkingDir(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem("gftp", correctLocation, getDefaultCredential(credentials), null).getEntryPath();
     }
 

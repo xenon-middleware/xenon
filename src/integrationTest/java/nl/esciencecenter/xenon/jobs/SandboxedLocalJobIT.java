@@ -18,16 +18,14 @@ package nl.esciencecenter.xenon.jobs;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.UUID;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -60,7 +58,6 @@ public class SandboxedLocalJobIT {
     @Test
     public void test() throws Exception, XenonException, URISyntaxException, InterruptedException, IOException {
         Xenon xenon = XenonFactory.newXenon(null);
-        Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
         FileSystem localrootfs = Utils.getLocalCWD(xenon.files()).getFileSystem();
@@ -114,9 +111,9 @@ public class SandboxedLocalJobIT {
             throw status.getException();
         }
 
-        File stdout = new File(workdir.getRelativePath().getAbsolutePath() + "/stdout.txt");
+        Path stdout = xenon.files().newPath(workdir.getFileSystem(), workdir.getRelativePath().resolve("stdout.txt"));
         
-        assertThat(Util.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
+        assertThat(Utils.readToString(xenon.files(), stdout, Charset.defaultCharset()), is("   9  525 3581 lorem_ipsum.txt\n"));
 
         Utils.recursiveDelete(xenon.files(), workdir);
     }

@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
 import nl.esciencecenter.xenon.files.FileAttributes;

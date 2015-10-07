@@ -225,7 +225,6 @@ public class JobExecutor implements Runnable {
      * Signal the polling thread to produce a status update.
      */
     private synchronized void triggerStatusUpdate() {
-
         if (done) {
             return;
         }

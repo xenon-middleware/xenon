@@ -16,11 +16,17 @@
 
 package nl.esciencecenter.xenon.adaptors;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Closeable;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +36,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
@@ -51,9 +58,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
-import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,29 +85,7 @@ public abstract class GenericFileAdaptorTestParent {
     private long counter = 0;
 
     @Rule
-    public TestWatcher watcher = new TestWatcher() {
-
-        @Override
-        public void starting(Description description) {
-            logger.info("Running test {}", description.getMethodName());
-        }
-
-        @Override
-        public void failed(Throwable reason, Description description) {
-            logger.info("Test {} failed due to exception", description.getMethodName(), reason);
-        }
-
-        @Override
-        public void succeeded(Description description) {
-            logger.info("Test {} succeeded", description.getMethodName());
-        }
-
-        @Override
-        public void skipped(AssumptionViolatedException reason, Description description) {
-            logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);
-        }
-
-    };
+    public TestWatcher watcher = new XenonTestWatcher();
 
     // MUST be invoked by a @BeforeClass method of the subclass!
     public static void prepareClass(FileTestConfig testConfig) throws Exception {
@@ -112,8 +95,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     // MUST be invoked by a @AfterClass method of the subclass!
     public static void cleanupClass() throws Exception {
-
-        System.err.println("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
+        logger.debug("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
         Xenon xenon = XenonFactory.newXenon(null);
 
@@ -165,10 +147,9 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     class Select implements DirectoryStream.Filter {
+        private final Set<Path> set;
 
-        private Set<Path> set;
-
-        public Select(Set<Path> set) {
+        Select(Set<Path> set) {
             this.set = set;
         }
 
@@ -178,24 +159,20 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    private void throwUnexpected(String name, Exception e) throws Exception {
-
-        throw new Exception(name + " throws unexpected Exception!", e);
+    private void throwUnexpected(String name, Throwable e) {
+        throw new AssertionError(name + " throws unexpected Exception!", e);
     }
 
-    private void throwExpected(String name) throws Exception {
-
-        throw new Exception(name + " did NOT throw Exception which was expected!");
+    private void throwExpected(String name) {
+        fail(name + " did NOT throw Exception which was expected!");
     }
 
-    private void throwWrong(String name, Object expected, Object result) throws Exception {
-
-        throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);
+    private void throwWrong(String name, Object expected, Object result) {
+        fail(name + " produced wrong result! Expected: " + expected + " but got: " + result);
     }
 
-    private void throwUnexpectedElement(String name, Object element) throws Exception {
-
-        throw new Exception(name + " produced unexpected element: " + element);
+    private void throwUnexpectedElement(String name, Object element) {
+        fail(name + " produced unexpected element: " + element);
     }
 
     //    private void throwMissingElement(String name, String element) throws Exception {
@@ -203,53 +180,43 @@ public abstract class GenericFileAdaptorTestParent {
     //        throw new Exception(name + " did NOT produce element: " + element);
     //    }
 
-    private void throwMissingElements(String name, Collection elements) throws Exception {
-
-        throw new Exception(name + " did NOT produce elements: " + elements);
+    private void throwMissingElements(String name, Collection elements) {
+        fail(name + " did NOT produce elements: " + elements);
     }
 
     private void close(Closeable c) {
-
         if (c == null) {
             return;
         }
         try {
             c.close();
-        } catch (Exception e) {
-            // ignore
+        } catch (IOException e) {
+            // ignore; should not ignore other (unexpected) errors.
         }
     }
 
     // Depends on: Path.resolve, RelativePath, exists
-    private Path createNewTestDirName(Path root) throws Exception {
-
+    private Path createNewTestDirName(Path root) throws XenonException {
         Path dir = resolve(root, "dir" + counter);
         counter++;
 
-        if (files.exists(dir)) {
-            throw new Exception("Generated test dir already exists! " + dir);
-        }
+        assertFalse("Generated test dir already exists! " + dir, files.exists(dir));
 
         return dir;
     }
 
     // Depends on: [createNewTestDirName], createDirectory, exists
     private Path createTestDir(Path root) throws Exception {
-
         Path dir = createNewTestDirName(root);
-
         files.createDirectory(dir);
 
-        if (!files.exists(dir)) {
-            throw new Exception("Failed to generate test dir! " + dir);
-        }
+        assertTrue("Failed to generate test dir! " + dir, files.exists(dir));
 
         return dir;
     }
 
     // Depends on: [createTestDir]
-    protected void prepareTestDir(String testName) throws Exception {
-
+    protected void prepareTestDir(String testName) throws XenonException {
         Path p = config.getWorkingDir(files, credentials);
 
         if (testDir != null) {
@@ -265,7 +232,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     // Depends on: [createTestDir]
     private void closeTestFS() throws Exception {
-
         if (testDir == null) {
             return;
         }
@@ -276,30 +242,25 @@ public abstract class GenericFileAdaptorTestParent {
 
     // Depends on: Path.resolve, RelativePath, exists
     private Path createNewTestFileName(Path root) throws Exception {
-
         Path file = resolve(root, "file" + counter);
         counter++;
 
-        if (files.exists(file)) {
-            throw new Exception("Generated NEW test file already exists! " + file);
-        }
+        assertFalse("Generated NEW test file already exists! " + file, files.exists(file));
 
         return file;
     }
 
     // Depends on: newOutputStream
     private void writeData(Path testFile, byte[] data) throws Exception {
-
-        OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE);
-        if (data != null) {
-            out.write(data);
+        try (OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE)) {
+            if (data != null) {
+                out.write(data);
+            }
         }
-        out.close();
     }
 
     // Depends on: [createNewTestFileName], createFile, [writeData]
     protected Path createTestFile(Path root, byte[] data) throws Exception {
-
         Path file = createNewTestFileName(root);
 
         files.createFile(file);
@@ -341,60 +302,6 @@ public abstract class GenericFileAdaptorTestParent {
         files.delete(dir);
     }
 
-    private byte[] readFully(InputStream in) throws Exception {
-
-        byte[] buffer = new byte[1024];
-
-        int offset = 0;
-        int read = in.read(buffer, offset, buffer.length - offset);
-
-        while (read != -1) {
-
-            offset += read;
-
-            if (offset == buffer.length) {
-                buffer = Arrays.copyOf(buffer, buffer.length * 2);
-            }
-
-            read = in.read(buffer, offset, buffer.length - offset);
-        }
-
-        close(in);
-
-        return Arrays.copyOf(buffer, offset);
-    }
-
-    //    private byte [] readFully(SeekableByteChannel channel) throws Exception {
-    //
-    //        ByteBuffer buffer = ByteBuffer.allocate(1024);
-    //
-    //        int read = channel.read(buffer);
-    //
-    //        while (read != -1) {
-    //
-    //            System.err.println("READ from channel " + read);
-    //
-    //            if (buffer.position() == buffer.limit()) {
-    //                ByteBuffer tmp = ByteBuffer.allocate(buffer.limit()*2);
-    //                buffer.flip();
-    //                tmp.put(buffer);
-    //                buffer = tmp;
-    //            }
-    //
-    //            read = channel.read(buffer);
-    //        }
-    //
-    //        close(channel);
-    //
-    //        buffer.flip();
-    //        byte [] tmp = new byte[buffer.remaining()];
-    //        buffer.get(tmp);
-    //
-    //        System.err.println("Returning byte[" + tmp.length + "]");
-    //
-    //        return tmp;
-    //    }
-
     // The test start here.
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -415,7 +322,7 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             FileSystem fs = files.newFileSystem(scheme, location, c, p);
             files.close(fs);
-        } catch (Exception e) {
+        } catch (XenonException e) {
             if (mustFail) {
                 // exception was expected.
                 return;
@@ -494,7 +401,7 @@ public abstract class GenericFileAdaptorTestParent {
     @org.junit.Test
     public void test00_newFileSystem_emptyProperties_noThrow() throws Exception {
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
-                new HashMap<String, String>(), false);
+                new HashMap<String, String>(0), false);
     }
 
     @org.junit.Test
@@ -519,12 +426,11 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], close, isOpen
 
     private void test01_isOpen(FileSystem fs, boolean expected, boolean mustFail) throws Exception {
-
         boolean result = false;
 
         try {
             result = files.isOpen(fs);
-        } catch (Exception e) {
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -602,7 +508,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             result = files.newPath(fs, path).getRelativePath().getAbsolutePath();
-        } catch (Exception e) {
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected exception
                 return;
@@ -660,12 +566,10 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], [createTestFile],
     //             createDirectory, [deleteTestDir], [deleteTestFile], [closeTestFileSystem]
 
-    private void test04_createDirectory(Path path, boolean mustFail) throws Exception {
-
+    private void test04_createDirectory(Path path, boolean mustFail) throws XenonException {
         try {
             files.createDirectory(path);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -766,19 +670,16 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             files.createDirectories(path);
 
-            assert (files.exists(path));
+            assertTrue(files.exists(path));
 
             FileAttributes att = files.getAttributes(path);
 
-            assert (att.isDirectory());
-
-        } catch (Exception e) {
-
+            assertTrue(att.isDirectory());
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
             }
-
             throwUnexpected("test05_createDirectories", e);
         }
 
@@ -966,11 +867,9 @@ public abstract class GenericFileAdaptorTestParent {
     //             [closeTestFileSystem]
 
     private void test07_createFile(Path path, boolean mustFail) throws Exception {
-
         try {
             files.createFile(path);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -1075,8 +974,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             result = files.exists(path);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -1150,8 +1048,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             files.delete(path);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -1333,19 +1230,19 @@ public abstract class GenericFileAdaptorTestParent {
     //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
     private void test11_newDirectoryStream(Path root, Set<Path> expected, boolean mustFail) throws Exception {
-
-        Set<Path> tmp = new HashSet<Path>();
+        Set<Path> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(0);
         }
 
         DirectoryStream<Path> in = null;
 
         try {
             in = files.newDirectoryStream(root);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -1360,7 +1257,6 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         for (Path p : in) {
-
             if (tmp.contains(p)) {
                 tmp.remove(p);
             } else {
@@ -1427,7 +1323,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file2 = createTestFile(nonEmptyDir, null);
         Path file3 = createTestFile(nonEmptyDir, null);
 
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(file0);
         expectedResultSet.add(file1);
         expectedResultSet.add(file2);
@@ -1448,7 +1344,7 @@ public abstract class GenericFileAdaptorTestParent {
     public void test11_newDirectoryStream_subDir_dirReturned() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
         Path subDir = createTestDir(testDir);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(2);
         expectedResultSet.add(subDir);
 
         test11_newDirectoryStream(testDir, expectedResultSet, false);
@@ -1464,7 +1360,7 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test11_newDirectoryStream");
         Path subDir = createTestDir(testDir);
         Path nestedFile = createTestFile(subDir, null);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(2);
         expectedResultSet.add(subDir);
 
         test11_newDirectoryStream(testDir, expectedResultSet, false);
@@ -1508,17 +1404,19 @@ public abstract class GenericFileAdaptorTestParent {
     public void test12_newDirectoryStream(Path root, DirectoryStream.Filter filter, Set<Path> expected, boolean mustFail)
             throws Exception {
 
-        Set<Path> tmp = new HashSet<Path>();
+        Set<Path> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(0);
         }
 
         DirectoryStream<Path> in = null;
 
         try {
             in = files.newDirectoryStream(root, filter);
-        } catch (Exception e) {
+        } catch (XenonException e) {
 
             if (mustFail) {
                 // expected
@@ -1536,7 +1434,6 @@ public abstract class GenericFileAdaptorTestParent {
         Iterator<Path> itt = in.iterator();
 
         while (itt.hasNext()) {
-
             Path p = itt.next();
 
             if (p == null) {
@@ -1547,7 +1444,7 @@ public abstract class GenericFileAdaptorTestParent {
                 tmp.remove(p);
             } else {
                 close(in);
-                throwUnexpectedElement("test12_newDirectoryStream_with_filter", p.toString());
+                throwUnexpectedElement("test12_newDirectoryStream_with_filter", p);
             }
         }
 
@@ -1631,7 +1528,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(file0);
         expectedResultSet.add(file1);
         expectedResultSet.add(file2);
@@ -1655,7 +1552,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(0);
 
         test12_newDirectoryStream(testDir, new AllFalse(), expectedResultSet, false);
 
@@ -1675,7 +1572,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path selectedFile1 = createTestFile(testDir, null);
         Path selectedFile2 = createTestFile(testDir, null);
         Path unselectedFile0 = createTestFile(testDir, null);
-        Set<Path> selection = new HashSet<Path>();
+        Set<Path> selection = new HashSet<>(4);
         selection.add(selectedFile0);
         selection.add(selectedFile1);
         selection.add(selectedFile2);
@@ -1703,7 +1600,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path selectedFile1 = createTestFile(testDir, null);
         Path selectedFile2 = createTestFile(testDir, null);
         Path unselectedFile0 = createTestFile(testDir, null);
-        Set<Path> selection = new HashSet<Path>();
+        Set<Path> selection = new HashSet<>(4);
         selection.add(selectedFile0);
         selection.add(selectedFile1);
         selection.add(selectedFile2);
@@ -1758,8 +1655,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             result = files.getAttributes(path);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -1793,7 +1689,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.lastAccessTime());
         }
 
-        System.err.println("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
+        logger.debug("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
                 + result.isExecutable() + " " + result.isSymbolicLink() + " " + result.isDirectory() + " "
                 + result.isRegularFile() + " " + result.isHidden() + " " + result.isOther() + " " + result.lastAccessTime() + " "
                 + result.lastModifiedTime());
@@ -1910,7 +1806,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             files.setPosixFilePermissions(path, permissions);
-        } catch (Exception e) {
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -1966,7 +1862,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
-        Set<PosixFilePermission> emptyPermissions = new HashSet<PosixFilePermission>();
+        Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
 
         test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
 
@@ -1983,10 +1879,10 @@ public abstract class GenericFileAdaptorTestParent {
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
-        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
+        Set<PosixFilePermission> permissions = EnumSet.of(
+                PosixFilePermission.OWNER_EXECUTE,
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE);
 
         test14_setPosixFilePermissions(existingFile, permissions, false);
 
@@ -2071,13 +1967,12 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     private Set<PosixFilePermission> getVariousPosixPermissions() {
-        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
-        permissions.add(PosixFilePermission.OTHERS_READ);
-        permissions.add(PosixFilePermission.GROUP_READ);
-        return permissions;
+        return EnumSet.of(
+                PosixFilePermission.OWNER_EXECUTE,
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OTHERS_READ,
+                PosixFilePermission.GROUP_READ);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2096,18 +1991,19 @@ public abstract class GenericFileAdaptorTestParent {
     private void test15_newAttributesDirectoryStream(Path root, Set<PathAttributesPair> expected, boolean mustFail)
             throws Exception {
 
-        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(0);
         }
 
         DirectoryStream<PathAttributesPair> in = null;
 
         try {
             in = files.newAttributesDirectoryStream(root);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -2121,34 +2017,31 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test15_newAttributesDirectoryStream");
         }
 
-        System.err.println("Comparing PathAttributesPairs:");
+        logger.debug("Comparing PathAttributesPairs:");
 
         for (PathAttributesPair p : in) {
-
-            System.err.println("Got input " + p.path() + " " + p.attributes());
+            logger.debug("Got input " + p.path() + " " + p.attributes());
 
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
-
-                System.err.println("  Comparing to " + x.path() + " " + x.attributes());
+                logger.debug("  Comparing to " + x.path() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
-                    System.err.println("Found!");
+                    logger.debug("Found!");
                     found = x;
                     break;
                 }
             }
 
-            System.err.println("  Found = " + found);
+            logger.debug("  Found = " + found);
 
             if (found != null) {
                 tmp.remove(found);
             } else {
-                System.err.println("NOT Found!");
+                logger.debug("NOT Found!");
                 close(in);
                 throwUnexpectedElement("test15_newAttributesDirectoryStream", p.path());
-
             }
 
             //            if (tmp.contains(p)) {
@@ -2219,7 +2112,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> result = new HashSet<>(6);
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2245,7 +2138,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> result = new HashSet<>(7);
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2295,17 +2188,19 @@ public abstract class GenericFileAdaptorTestParent {
     private void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter, Set<PathAttributesPair> expected,
             boolean mustFail) throws Exception {
 
-        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(10);
         }
 
         DirectoryStream<PathAttributesPair> in = null;
 
         try {
             in = files.newAttributesDirectoryStream(root, filter);
-        } catch (Exception e) {
+        } catch (XenonException e) {
 
             if (mustFail) {
                 // expected
@@ -2321,28 +2216,26 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         for (PathAttributesPair p : in) {
-
-            System.err.println("Got input " + p.path() + " " + p.attributes());
+            logger.debug("Got input " + p.path() + " " + p.attributes());
 
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
-
-                System.err.println("  Comparing to " + x.path() + " " + x.attributes());
+                logger.debug("  Comparing to " + x.path() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
-                    System.err.println("Found!");
+                    logger.debug("Found!");
                     found = x;
                     break;
                 }
             }
 
-            System.err.println("  Found = " + found);
+            logger.debug("  Found = " + found);
 
             if (found != null) {
                 tmp.remove(found);
             } else {
-                System.err.println("NOT Found!");
+                logger.warn("NOT Found!");
                 close(in);
                 throwUnexpectedElement("test16_newAttributesDirectoryStream_with_filter", p.path());
 
@@ -2361,7 +2254,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         close(in);
 
-        if (tmp.size() > 0) {
+        if (!tmp.isEmpty()) {
             throwMissingElements("test16_newAttributesDirectoryDirectoryStream_with_filter", tmp);
         }
     }
@@ -2437,7 +2330,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2461,7 +2354,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2487,7 +2380,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(7);
         expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2516,11 +2409,11 @@ public abstract class GenericFileAdaptorTestParent {
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<Path> selection = new HashSet<Path>();
+        Set<Path> selection = new HashSet<>(4);
         selection.add(selectedFile0);
         selection.add(selectedFile1);
         selection.add(selectedFile2);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(4);
         expectedResultSet.add(new PathAttributesPairImplementation(selectedFile0, files.getAttributes(selectedFile0)));
         expectedResultSet.add(new PathAttributesPairImplementation(selectedFile1, files.getAttributes(selectedFile1)));
         expectedResultSet.add(new PathAttributesPairImplementation(selectedFile2, files.getAttributes(selectedFile2)));
@@ -2566,8 +2459,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             in = files.newInputStream(file);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -2581,7 +2473,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test20_newInputStream");
         }
 
-        byte[] data = readFully(in);
+        byte[] data = Utils.readAllBytes(in);
 
         if (expected == null) {
             if (data.length != 0) {
@@ -2657,7 +2549,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             in = files.newInputStream(file);
-        } catch (Exception e) {
+        } catch (XenonException e) {
             // should not fail
             throwUnexpected("test20b_newInputStreamDoubleClose", e);
         }
@@ -2665,26 +2557,26 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             // should not fail
             in.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throwUnexpected("test20b_newInputStreamDoubleClose", e);
         }
 
         try {
             in.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             // should fail
         }
 
         try {
             in = files.newInputStream(file);
-        } catch (Exception e) {
+        } catch (XenonException e) {
             // should not fail
             throwUnexpected("test20b_newInputStreamDoubleClose", e);
         }
 
         try {
             in.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             // should not fail
             throwUnexpected("test20b_newInputStreamDoubleClose", e);
         }
@@ -2713,8 +2605,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             out = files.newOutputStream(path, options);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -2733,7 +2624,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         InputStream in = files.newInputStream(path);
 
-        byte[] tmp = readFully(in);
+        byte[] tmp = Utils.readAllBytes(in);
 
         if (expected == null) {
             if (data.length != 0) {
@@ -3051,8 +2942,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             copy = files.copy(source, target, options);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -3066,7 +2956,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         if (expected != null) {
-            byte[] tmp = readFully(files.newInputStream(target));
+            byte[] tmp = Utils.readAllBytes(files, target);
 
             if (!Arrays.equals(expected, tmp)) {
                 throwWrong("test23_copy", Arrays.toString(expected), Arrays.toString(tmp));
@@ -3076,7 +2966,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test23_copy() throws Exception {
-
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Goodbye World!".getBytes();
         byte[] data3 = "Hello World!Goodbye World!".getBytes();
@@ -3198,7 +3087,6 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(testDir);
 
         closeTestFS();
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -3215,7 +3103,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test24_copy_async() throws Exception {
-
         byte[] data = "Hello World!".getBytes();
 
         prepareTestDir("test24_copy_async");
@@ -3238,7 +3125,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         // Test the cancel
         copy = files.copy(file0, file1, new CopyOption[] { CopyOption.REPLACE, CopyOption.ASYNCHRONOUS });
-        status = files.cancelCopy(copy);
+        files.cancelCopy(copy);
 
         deleteTestFile(file1);
         deleteTestFile(file0);
@@ -3265,7 +3152,7 @@ public abstract class GenericFileAdaptorTestParent {
 
             try {
                 Utils.getLocalCWD(files);
-            } catch (Exception e) {
+            } catch (XenonException e) {
                 throwUnexpected("test25_getLocalCWD", e);
             }
 
@@ -3279,7 +3166,7 @@ public abstract class GenericFileAdaptorTestParent {
 
             try {
                 Utils.getLocalHome(files);
-            } catch (Exception e) {
+            } catch (XenonException e) {
                 throwUnexpected("test26_getLocalHomeFileSystem", e);
             }
 
@@ -3303,8 +3190,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         try {
             files.move(source, target);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -3390,13 +3276,11 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on:
 
     private void test28_readSymbolicLink(Path link, Path expected, boolean mustFail) throws Exception {
-
         Path target = null;
 
         try {
             target = files.readSymbolicLink(link);
-        } catch (Exception e) {
-
+        } catch (XenonException e) {
             if (mustFail) {
                 // expected
                 return;
@@ -3410,7 +3294,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         // make sure the target is what was expected
-        if (expected != null && !target.equals(expected)) {
+        if (expected != null && !expected.equals(target)) {
             throwWrong("test28_readSymbolicLink", expected, target);
         }
     }
@@ -3556,7 +3440,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path link5 = resolve(root, "link5"); // points to link6 (circular)
         Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
-        Set<Path> tmp = new HashSet<Path>();
+        Set<Path> tmp = new HashSet<>(12);
         tmp.add(file0);
         tmp.add(file1);
         tmp.add(link0);
@@ -3600,7 +3484,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path link5 = resolve(root, "link5"); // points to link6 (circular)
         Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
-        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> tmp = new HashSet<>(12);
         tmp.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         tmp.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         tmp.add(new PathAttributesPairImplementation(link0, files.getAttributes(link0)));

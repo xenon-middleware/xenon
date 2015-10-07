@@ -19,6 +19,7 @@ package nl.esciencecenter.xenon.adaptors.ftp;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
@@ -32,13 +33,13 @@ import nl.esciencecenter.xenon.files.Path;
  */
 public class FTPFileTestConfig extends FileTestConfig {
 
-    private String username;
-    private char[] passwd;
+    private final String username;
+    private final char[] passwd;
 
-    private static String scheme = "ftp";
-    private String correctLocation;
-    private String wrongLocation;
-    private String correctLocationWrongUser;
+    private static final String scheme = "ftp";
+    private final String correctLocation;
+    private final String wrongLocation;
+    private final String correctLocationWrongUser;
 
     public FTPFileTestConfig(String configfile) throws Exception {
 
@@ -55,12 +56,12 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
+    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getDefaultCredential(credentials), null);
     }
 
     @Override
-    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+    public Path getWorkingDir(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getNonDefaultCredential(credentials), null).getEntryPath();
     }
 
@@ -105,7 +106,7 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getDefaultCredential(Credentials credentials) throws XenonException {
         return credentials.getDefaultCredential(scheme);
     }
 
@@ -115,17 +116,17 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, username, passwd, new HashMap<String, String>());
+    public Credential getPasswordCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential(scheme, username, passwd, new HashMap<String, String>(0));
     }
 
     @Override
-    public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential(scheme, username, "wrongpassword".toCharArray(), new HashMap<String, String>());
+    public Credential getInvalidCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential(scheme, username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
     @Override
-    public Credential getNonDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getNonDefaultCredential(Credentials credentials) throws XenonException {
         return getPasswordCredential(credentials);
     }
 

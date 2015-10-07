@@ -19,6 +19,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.FileTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
@@ -31,17 +32,15 @@ import nl.esciencecenter.xenon.files.Path;
  *
  */
 public class SSHFileTestConfig extends FileTestConfig {
+    private final String username;
+    private final char[] passwd;
 
-    private String username;
-    private char[] passwd;
-
-    private String scheme = "sftp";
-    private String correctLocation;
-    private String wrongLocation;
-    private String correctLocationWrongUser;
+    private final static String scheme = "sftp";
+    private final String correctLocation;
+    private final String wrongLocation;
+    private final String correctLocationWrongUser;
 
     public SSHFileTestConfig(String configfile) throws Exception {
-
         super("ssh", configfile);
 
         String location = getPropertyOrFail(p, "test.ssh.location");
@@ -70,18 +69,18 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getDefaultCredential(Credentials credentials) throws XenonException {
         return credentials.getDefaultCredential("ssh");
     }
 
     @Override
-    public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", username, passwd, new HashMap<String, String>());
+    public Credential getPasswordCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential("ssh", username, passwd, new HashMap<String, String>(0));
     }
 
     @Override
-    public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
+    public Credential getInvalidCredential(Credentials credentials) throws XenonException {
+        return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
     @Override
@@ -90,7 +89,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Credential getNonDefaultCredential(Credentials credentials) throws Exception {
+    public Credential getNonDefaultCredential(Credentials credentials) throws XenonException {
         return getPasswordCredential(credentials);
     }
 
@@ -110,7 +109,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception {
+    public FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null);
     }
 
@@ -152,7 +151,7 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public Path getWorkingDir(Files files, Credentials credentials) throws Exception {
+    public Path getWorkingDir(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem("sftp", correctLocation, getDefaultCredential(credentials), null).getEntryPath();
     }
 }

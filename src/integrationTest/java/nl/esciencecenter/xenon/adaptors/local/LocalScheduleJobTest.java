@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.xenon.adaptors.torque;
+package nl.esciencecenter.xenon.adaptors.local;
 
-import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
+import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
 
 /**
- * @author Niels Drost <N.Drost@esciencecenter.nl>
+ * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TorqueJobAdaptorTest extends GenericJobAdaptorTestParent {
+public class LocalScheduleJobTest extends GenericScheduleJobTestParent {
+
     @BeforeClass
-    public static void prepareTorqueJobAdaptorTest() throws Exception {
-        GenericJobAdaptorTestParent.prepareClass(new TorqueJobTestConfig(null));
+    public static void prepareLocalJobAdaptorTest() throws Exception {
+        GenericScheduleJobTestParent.prepareClass(new LocalJobTestConfig());
     }
 
     @AfterClass
-    public static void cleanupTorqueJobAdaptorTest() throws Exception {
-        GenericJobAdaptorTestParent.cleanupClass();
+    public static void cleanupAltLocalJobsTest() throws Exception {
+        GenericScheduleJobTestParent.cleanupClass();
     }
 }
