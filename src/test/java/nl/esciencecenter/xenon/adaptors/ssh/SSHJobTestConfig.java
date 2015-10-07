@@ -47,25 +47,14 @@ public class SSHJobTestConfig extends JobTestConfig {
 
         super("ssh", configfile);
 
-        String location = getPropertyOrFail(p, "test.ssh.location");
+        String location = getPropertyOrFail("test.ssh.location");
            
-        username = getPropertyOrFail(p, "test.ssh.user");
-        passwd = getPropertyOrFail(p, "test.ssh.password").toCharArray();
+        username = getPropertyOrFail("test.ssh.user");
+        passwd = getPropertyOrFail("test.ssh.password").toCharArray();
 
         correctLocation = username + "@" + location;
         correctLocationWrongUser =  "incorrect@" + location;
         wrongLocation = username + "@doesnotexist.com";
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override

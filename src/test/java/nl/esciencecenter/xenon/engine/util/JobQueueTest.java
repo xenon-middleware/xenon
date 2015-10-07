@@ -24,17 +24,12 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
 import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
-import nl.esciencecenter.xenon.engine.util.BadParameterException;
-import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
-import nl.esciencecenter.xenon.engine.util.InteractiveProcessFactory;
-import nl.esciencecenter.xenon.engine.util.JobQueues;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -59,7 +54,8 @@ import org.junit.Test;
  */
 public class JobQueueTest {
 
-    public static final int POLLING_DELAY = 250;
+    public static final int POLLING_DELAY = JobQueues.MIN_POLLING_DELAY;
+    public static final int TEST_POLLING_DELAY = POLLING_DELAY + 10;
 
     static class MyProcessWrapper implements InteractiveProcess {
 
@@ -71,7 +67,7 @@ public class JobQueueTest {
         boolean done = false;
         int exit = -1;
 
-        public MyProcessWrapper(JobImplementation job, byte[] output, byte[] error) {
+        MyProcessWrapper(JobImplementation job, byte[] output, byte[] error) {
             this.job = job;
             this.output = output;
             this.error = error;
@@ -135,21 +131,21 @@ public class JobQueueTest {
         }
     }
 
-    public static Scheduler scheduler;
-    public static Xenon xenon;
-    public static Path cwd;
-    public static Files files;
-    public static FileSystem filesystem;
-    public static JobQueues jobQueue;
-    public static MyFactory myFactory;
+    static Scheduler scheduler;
+    static Xenon xenon;
+    static Path cwd;
+    static Files files;
+    static FileSystem filesystem;
+    static JobQueues jobQueue;
+    static MyFactory myFactory;
 
-    public static MyProcessWrapper currentWrapper;
+    static MyProcessWrapper currentWrapper;
 
-    public synchronized static MyProcessWrapper getCurrentWrapper() {
+    synchronized static MyProcessWrapper getCurrentWrapper() {
         return currentWrapper;
     }
 
-    public synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) {
+    synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) {
         currentWrapper = wrapper;
     }
 
@@ -173,8 +169,8 @@ public class JobQueueTest {
 
             System.err.println("Jobs stuck in queue: " + jobs.length);
 
-            for (int i = 0; i < jobs.length; i++) {
-                System.err.println("   " + jobs[i]);
+            for (Job job : jobs) {
+                System.err.println("   " + job);
             }
 
             throw new Exception("There are jobs stuck in the queue!");
@@ -387,7 +383,7 @@ public class JobQueueTest {
 
         // Wait for at least the polling delay!
         try {
-            Thread.sleep(POLLING_DELAY * 2);
+            Thread.sleep(TEST_POLLING_DELAY);
         } catch (InterruptedException e) {
             // ignored
         }
@@ -410,7 +406,7 @@ public class JobQueueTest {
 
         // Wait for at least the polling delay!
         try {
-            Thread.sleep(POLLING_DELAY * 2);
+            Thread.sleep(TEST_POLLING_DELAY);
         } catch (InterruptedException e) {
             // ignored
         }
@@ -437,7 +433,7 @@ public class JobQueueTest {
 
         // Wait for at least the polling delay!
         try {
-            Thread.sleep(POLLING_DELAY * 2);
+            Thread.sleep(TEST_POLLING_DELAY);
         } catch (InterruptedException e) {
             // ignored
         }
@@ -452,7 +448,7 @@ public class JobQueueTest {
 
         // Wait for at least the polling delay!
         try {
-            Thread.sleep(POLLING_DELAY * 2);
+            Thread.sleep(TEST_POLLING_DELAY);
         } catch (InterruptedException e) {
             // ignored
         }
@@ -467,7 +463,6 @@ public class JobQueueTest {
 
     @Test
     public void test_waitForJob() throws Exception {
-
         JobDescription d = new JobDescription();
         d.setExecutable("exec_waitForJob");
         d.setQueueName("unlimited");
@@ -475,7 +470,7 @@ public class JobQueueTest {
         Job job = jobQueue.submitJob(d);
 
         // Give the job 1 sec. to start.
-        JobStatus status = jobQueue.waitUntilDone(job, 1000);
+        JobStatus status = jobQueue.waitUntilDone(job, TEST_POLLING_DELAY);
 
         assertNotNull(status);
 
@@ -490,7 +485,7 @@ public class JobQueueTest {
         currentWrapper.setExitStatus(42);
         currentWrapper.setDone();
 
-        status = jobQueue.waitUntilDone(job, POLLING_DELAY * 3);
+        status = jobQueue.waitUntilDone(job, TEST_POLLING_DELAY);
 
         assertNotNull(status);
         assertTrue(status.isDone());

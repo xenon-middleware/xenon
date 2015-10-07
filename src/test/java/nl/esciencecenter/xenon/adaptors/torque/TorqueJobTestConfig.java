@@ -57,17 +57,17 @@ public class TorqueJobTestConfig extends JobTestConfig {
         scheme = "torque";
         fileScheme = "sftp";
         
-        username = getPropertyOrFail(p, "test.torque.user");
-        passwd = getPropertyOrFail(p, "test.torque.password").toCharArray();
+        username = getPropertyOrFail("test.torque.user");
+        passwd = getPropertyOrFail("test.torque.password").toCharArray();
 
-        String location = getPropertyOrFail(p, "test.torque.location");
+        String location = getPropertyOrFail("test.torque.location");
 
-        defaultQueue = getPropertyOrFail(p, "test.torque.default.queue");
-        String queueList = getPropertyOrFail(p, "test.torque.queues");
+        defaultQueue = getPropertyOrFail("test.torque.default.queue");
+        String queueList = getPropertyOrFail("test.torque.queues");
         queues = queueList.split("\\s*,\\s*");
 
-        queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.torque.queue.wait.time"));
-        updateTime = Long.parseLong(getPropertyOrFail(p, "test.torque.update.time"));
+        queueWaitTime = Long.parseLong(getPropertyOrFail("test.torque.queue.wait.time"));
+        updateTime = Long.parseLong(getPropertyOrFail("test.torque.update.time"));
 
         if (location == null || location.isEmpty() || location.equals("/")) { 
             correctLocation = "";
@@ -78,17 +78,6 @@ public class TorqueJobTestConfig extends JobTestConfig {
             wrongLocation = username + "@" + "doesnotexists.com";
             correctLocationWrongUser = "incorrect@" + location;
         }
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override

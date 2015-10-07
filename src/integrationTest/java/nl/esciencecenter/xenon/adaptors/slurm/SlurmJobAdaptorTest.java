@@ -24,6 +24,7 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +48,14 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         GenericJobAdaptorTestParent.cleanupClass();
     }
 
-    @org.junit.Test
+    @Test
     public void slurm_test06_getDefaultQueue() throws Exception {
         Scheduler scheduler = config.getDefaultScheduler(jobs, credentials);
 
         String reportedDefaultQueueName = jobs.getDefaultQueueName(scheduler);
 
         assertEquals(config.getDefaultQueueName(), reportedDefaultQueueName);
-        
+
         jobs.close(scheduler);
     }
 }

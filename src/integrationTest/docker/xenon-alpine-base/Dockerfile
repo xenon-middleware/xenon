@@ -8,7 +8,7 @@ FROM alpine:3.2
 MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 
 # Create a test user
-RUN /usr/sbin/adduser -D xenon && echo xenon:javagat |chpasswd
+RUN /usr/sbin/adduser -s /bin/sh -D xenon && echo xenon:javagat |chpasswd
 WORKDIR /home/xenon
 ADD insecure-ssh-keys /home/xenon/.ssh
 RUN chmod go-r /home/xenon/.ssh/id_rsa

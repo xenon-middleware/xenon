@@ -45,10 +45,10 @@ public class FTPFileTestConfig extends FileTestConfig {
 
         super(scheme, configfile);
 
-        String location = getPropertyOrFail(p, "test.ftp.location");
+        String location = getPropertyOrFail("test.ftp.location");
 
-        username = getPropertyOrFail(p, "test.ftp.user");
-        passwd = getPropertyOrFail(p, "test.ftp.password").toCharArray();
+        username = getPropertyOrFail("test.ftp.user");
+        passwd = getPropertyOrFail("test.ftp.password").toCharArray();
 
         correctLocation = username + "@" + location;
         wrongLocation = username + "@doesnotexist71093880.com";

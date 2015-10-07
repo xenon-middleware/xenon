@@ -44,7 +44,7 @@ public class GftpFileTestConfig extends FileTestConfig {
 
         super(GftpUtil.GFTP_SCHEME, configfile);
 
-        correctLocation = getPropertyOrFail(p, "test.gftp.location");
+        correctLocation = getPropertyOrFail("test.gftp.location");
 
         // Either test proxy file must be defined or userkey file + passphrase !
         userCertFile = p.getProperty("test.gftp.usercert");

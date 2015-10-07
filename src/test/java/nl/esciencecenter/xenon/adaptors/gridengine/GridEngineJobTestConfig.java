@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.gridengine;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.JobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -35,41 +34,40 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  */
 public class GridEngineJobTestConfig extends JobTestConfig {
 
-    private String username;
-    private char[] passwd;
+    private final String username;
+    private final char[] passwd;
 
-    private String scheme;
-    private String fileScheme;
-    private String correctLocation;
-    private String wrongLocation;
-    private String correctLocationWrongUser;
+    private final String scheme;
+    private final String fileScheme;
+    private final String correctLocation;
+    private final String wrongLocation;
+    private final String correctLocationWrongUser;
     
-    private String defaultQueue;
-    private String[] queues;
+    private final String defaultQueue;
+    private final String[] queues;
 
-    private long queueWaitTime;
-    private long updateTime;
+    private final long queueWaitTime;
+    private final long updateTime;
 
-    private String parallelEnvironment;
+    private final String parallelEnvironment;
 
     public GridEngineJobTestConfig(String configfile) throws Exception {
-
         super("gridengine", configfile);
         
         scheme = "ge";
         fileScheme = "sftp";
         
-        username = getPropertyOrFail(p, "test.gridengine.user");
-        passwd = getPropertyOrFail(p, "test.gridengine.password").toCharArray();
+        username = getPropertyOrFail("test.gridengine.user");
+        passwd = getPropertyOrFail("test.gridengine.password").toCharArray();
 
-        String location = getPropertyOrFail(p, "test.gridengine.location");
+        String location = getPropertyOrFail("test.gridengine.location");
 
-        defaultQueue = getPropertyOrFail(p, "test.gridengine.default.queue");
-        String queueList = getPropertyOrFail(p, "test.gridengine.queues");
+        defaultQueue = getPropertyOrFail("test.gridengine.default.queue");
+        String queueList = getPropertyOrFail("test.gridengine.queues");
         queues = queueList.split("\\s*,\\s*");
 
-        queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.queue.wait.time"));
-        updateTime = Long.parseLong(getPropertyOrFail(p, "test.gridengine.update.time"));
+        queueWaitTime = Long.parseLong(getPropertyOrFail("test.gridengine.queue.wait.time"));
+        updateTime = Long.parseLong(getPropertyOrFail("test.gridengine.update.time"));
 
         parallelEnvironment = p.getProperty("test.gridengine.parallel.environment");
 
@@ -82,17 +80,6 @@ public class GridEngineJobTestConfig extends JobTestConfig {
             wrongLocation = username + "@" + "doesnotexists.com";
             correctLocationWrongUser = "incorrect@" + location;
         }
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override
@@ -132,12 +119,12 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", username, passwd, new HashMap<String, String>());
+        return credentials.newPasswordCredential("ge", username, passwd, new HashMap<String, String>(0));
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ge", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
+        return credentials.newPasswordCredential("ge", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
     @Override
@@ -189,31 +176,27 @@ public class GridEngineJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getDefaultProperties() throws Exception {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("xenon.adaptors.gridengine.poll.delay", "100");
+        Map<String, String> result = new HashMap<>(3);
+        result.put("xenon.adaptors.gridengine.poll.delay", "10");
+        result.put("xenon.adaptors.gridengine.accounting.grace.time", String.valueOf(getUpdateTime()));
         return result;
     }
 
     public Map<String, String> getUnknownProperties() throws Exception {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.gridengine.unknown.property", "some.value");
         return result;
     }
 
     public Map<String, String>[] getInvalidProperties() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, String>[] result = new Map[1];
-
-        result[0] = new HashMap<String, String>();
-
+        Map<String, String>[] result = new Map[] {new HashMap<>(2)};
         result[0].put("xenon.adaptors.gridengine.poll.delay", "AAP");
         return result;
     }
 
     public Map<String, String> getCorrectProperties() throws Exception {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("xenon.adaptors.gridengine.poll.delay", "100");
-        return result;
+        return getDefaultProperties();
     }
 
     @Override

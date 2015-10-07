@@ -54,7 +54,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
         GenericScheduleJobTestParent.cleanupClass();
     }
 
-    @org.junit.Test
+    @Test
     public void ge_test01_jobWithCustomScript() throws Exception {
         String message = "Hello World! test01\n";
         String workingDir = getWorkingDir("ge_test01");
@@ -76,7 +76,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
             description.setExecutable(null);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, 60000);
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
             checkJobDone(status);
 
@@ -113,7 +113,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
 
             job = jobs.submitJob(scheduler, description);
 
-            JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
             checkJobDone(status);
 

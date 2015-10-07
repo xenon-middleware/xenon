@@ -271,35 +271,3 @@ task wrapper(type: Wrapper) {
     group 'Build Setup'
     gradleVersion = '2.7'
 }
-
-//     DOCKER
-// ==============
-
-task checkDockerComposePresence(type: Exec) {
-    executable 'docker-compose'
-    args = ['-v']
-    standardOutput = new ByteArrayOutputStream()
-}
-
-class DockerCompose extends Exec {
-    def DockerCompose() {
-        workingDir 'src/integrationTest/docker'
-        executable 'docker-compose'
-        dependsOn project.tasks.checkDockerComposePresence
-    }
-}
-
-task dockerKill(type: DockerCompose) {
-    args = ['kill']
-}
-
-task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
-    args = ['rm', '-f']
-}
-
-task dockerTest(type: DockerCompose) {
-    args = ['run', '--rm', 'xenon-test']
-}
-dockerTest.finalizedBy dockerCleanup
-check.dependsOn dockerTest
-dockerTest.mustRunAfter test
