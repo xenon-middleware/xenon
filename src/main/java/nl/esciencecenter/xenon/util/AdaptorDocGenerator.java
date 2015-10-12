@@ -110,9 +110,11 @@ public class AdaptorDocGenerator {
             Xenon xenon = XenonFactory.newXenon(null);
             AdaptorStatus[] adaptors = xenon.getAdaptorStatuses();
 
-            out.println("Appendix A: Adaptor Documentation");
+            out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Insert title here</title></head><body>");
+            out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
+            out.println("<h1>Adaptor Documentation</h1>");
             out.println("---------------------------------");
-            out.println("");
+            out.println("<pre>");
             out.println("This section contains the adaptor documentation which is generated "
                     + "from the information provided by the adaptors themselves.");
             out.println("");
@@ -133,6 +135,8 @@ public class AdaptorDocGenerator {
             }
 
             XenonFactory.endAll();
+
+            out.println("</pre></body></html>");
 
         } catch (Exception e) {
             System.err.println("Failed to generate adaptor documentation: " + e.getMessage());

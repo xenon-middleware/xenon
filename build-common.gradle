@@ -91,6 +91,7 @@ javadoc {
 
     // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
     failOnError = false
+    options.overview = file("${buildDir}/overview.html")
 }
 
 task javadocDevel(type: Javadoc) {
@@ -112,11 +113,12 @@ task adaptorDocumentation(type: JavaExec) {
     group 'documentation'
     main = 'nl.esciencecenter.xenon.util.AdaptorDocGenerator'
     // TODO adaptors.md is made in wrong dir (build/), change builddir to build/docs/userguide, docs/userguide dir must be created before
-    File output = file("${buildDir}/adaptors.md")
+    File output = file("${buildDir}/adaptors.html")
     args = [output]
     classpath = sourceSets.main.runtimeClasspath
     outputs.file output
 }
+javadoc.dependsOn adaptorDocumentation
 
 class ConcatFiles extends DefaultTask {
     @InputFiles
@@ -138,7 +140,7 @@ class ConcatFiles extends DefaultTask {
 task userguideMarkdown(type: ConcatFiles, dependsOn: adaptorDocumentation) {
     description 'Concatenate userguide_src.md and adaptor appendix into userguid.md'
     group 'documentation'
-    files = files('doc/user/userguide/userguide_src.md', "${buildDir}/adaptors.md")
+    files = files('doc/user/userguide/userguide_src.md', "${buildDir}/overview.html")
     target = file('doc/user/userguide/userguide.md')
     inputs.files files
     outputs.file target
