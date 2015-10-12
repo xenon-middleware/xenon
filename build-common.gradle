@@ -37,11 +37,6 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-    userguide {
-        java {
-            srcDir 'doc/user/userguide/src'
-        }
-    }
     examples
 }
 
@@ -86,7 +81,6 @@ dependencies {
     integrationTestCompile group: 'junit', name: 'junit', version: '4.11'
     integrationTestCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
 
-    userguideCompile sourceSets.main.output
     examplesCompile sourceSets.main.output
 }
 
@@ -116,11 +110,11 @@ task javadocDevel(type: Javadoc) {
 task adaptorDocumentation(type: JavaExec) {
     description 'Generate Markdown adaptor appendix'
     group 'documentation'
-    main = 'nl.esciencecenter.xenon.doc.AdaptorDocGenerator'
+    main = 'nl.esciencecenter.xenon.util.AdaptorDocGenerator'
     // TODO adaptors.md is made in wrong dir (build/), change builddir to build/docs/userguide, docs/userguide dir must be created before
     File output = file("${buildDir}/adaptors.md")
     args = [output]
-    classpath = sourceSets.main.runtimeClasspath + sourceSets.userguide.runtimeClasspath
+    classpath = sourceSets.main.runtimeClasspath
     outputs.file output
 }
 
@@ -144,8 +138,8 @@ class ConcatFiles extends DefaultTask {
 task userguideMarkdown(type: ConcatFiles, dependsOn: adaptorDocumentation) {
     description 'Concatenate userguide_src.md and adaptor appendix into userguid.md'
     group 'documentation'
-    files = files('doc/userguide/userguide_src.md', "${buildDir}/adaptors.md")
-    target = file('doc/userguide/userguide.md')
+    files = files('doc/user/userguide/userguide_src.md', "${buildDir}/adaptors.md")
+    target = file('doc/user/userguide/userguide.md')
     inputs.files files
     outputs.file target
 }
@@ -159,9 +153,9 @@ task checkPandocPresence(type:Exec) {
 task userguidePdf(type:Exec, dependsOn: [checkPandocPresence, userguideMarkdown]) {
     description 'Convert markdown to pdf (requires pandoc and texlive)'
     group 'documentation'
-    workingDir 'doc/userguide'
+    workingDir 'doc/user/userguide'
     executable 'pandoc'
-    File output = file('doc/userguide/userguide.pdf')
+    File output = file('doc/user/userguide/userguide.pdf')
     inputs.file userguideMarkdown.target
     outputs.file output
     args = [userguideMarkdown.target, '-o', output]
@@ -225,7 +219,7 @@ distributions {
             }
             into("docs") {
                 from(userguideMarkdown.target)
-                from('doc/userguide/userguide.pdf')
+                from('doc/user/userguide/userguide.pdf')
                 into("javadoc") {
                     from(javadoc.destinationDir)
                 }

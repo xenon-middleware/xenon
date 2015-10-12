@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nl.esciencecenter.xenon.doc;
+package nl.esciencecenter.xenon.util;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -28,12 +28,12 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * 
+ *
  */
 public class AdaptorDocGenerator {
-    
+
     private static PrintWriter out = null;
-    
+
     private static void printPropertyDescription(XenonPropertyDescription d) {
 
         out.println("__`" + d.getName() + "`__\n");
@@ -79,7 +79,7 @@ public class AdaptorDocGenerator {
 
         out.println();
         out.println();
-        
+
         out.println("#### Supported properties: ####\n\n");
 
         XenonPropertyDescription[] properties = a.getSupportedProperties();
@@ -93,20 +93,20 @@ public class AdaptorDocGenerator {
 
     public static void main(String[] args) {
 
-        if (args.length != 1) { 
+        if (args.length != 1) {
             System.err.println("Name of output file is required!");
             System.exit(1);
         }
-        
-        try { 
+
+        try {
             out = new PrintWriter(new BufferedWriter(new FileWriter(args[0])));
-        } catch (IOException e) { 
+        } catch (IOException e) {
             System.err.println("Failed to open output file: " + args[0] + " " + e.getMessage());
             e.printStackTrace(System.err);
             System.exit(1);
         }
 
-        try { 
+        try {
             Xenon xenon = XenonFactory.newXenon(null);
             AdaptorStatus[] adaptors = xenon.getAdaptorStatuses();
 
@@ -139,7 +139,7 @@ public class AdaptorDocGenerator {
             e.printStackTrace(System.err);
             System.exit(1);
         }
-        
+
         out.flush();
         out.close();
     }
