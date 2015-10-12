@@ -39,7 +39,7 @@ sourceSets {
     }
     userguide {
         java {
-            srcDir 'doc/userguide/src'
+            srcDir 'doc/user/userguide/src'
         }
     }
     examples
