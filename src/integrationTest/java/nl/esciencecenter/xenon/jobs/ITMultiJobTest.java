@@ -18,25 +18,18 @@ package nl.esciencecenter.xenon.jobs;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.adaptors.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
@@ -44,57 +37,36 @@ import nl.esciencecenter.xenon.util.Utils;
  * 
  */
 public class ITMultiJobTest {
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retireve property " + property);
-        }
-
-        return tmp;
-    }
-    
     private String readFully(InputStream in) throws IOException {
-
         byte[] buffer = new byte[1024];
 
         int offset = 0;
 
-        int tmp = in.read(buffer, 0, buffer.length - offset);
+        try {
+            int tmp = in.read(buffer, 0, buffer.length);
 
-        while (tmp != -1) {
+            while (tmp != -1) {
+                offset += tmp;
 
-            offset += tmp;
+                if (offset == buffer.length) {
+                    buffer = Arrays.copyOf(buffer, buffer.length * 2);
+                }
 
-            if (offset == buffer.length) {
-                buffer = Arrays.copyOf(buffer, buffer.length * 2);
+                tmp = in.read(buffer, offset, buffer.length - offset);
             }
-
-            tmp = in.read(buffer, offset, buffer.length - offset);
+        } finally {
+            in.close();
         }
-
-        in.close();
         return new String(buffer, 0, offset);
     }
-
    
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
-
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount + ")");
 
-        String configfile = System.getProperty("test.config");
-        
-        if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
-        }
-        
-        Properties p = new Properties();
-        p.load(new FileInputStream(configfile));
+        SSHJobTestConfig config = new SSHJobTestConfig(null);
 
-        String user = getPropertyOrFail(p, "test.ssh.user");
-        String location = getPropertyOrFail(p, "test.ssh.location");
+        String user = config.getPropertyOrFail("test.ssh.user");
+        String location = config.getPropertyOrFail("test.ssh.location");
         
         String TEST_ROOT = "xenon_test_SSH_" + System.currentTimeMillis();
 
@@ -120,7 +92,6 @@ public class ITMultiJobTest {
         Job[] j = new Job[jobCount];
 
         for (int i = 0; i < j.length; i++) {
-
             out[i] = Utils.resolveWithRoot(files, root, "stdout" + i + ".txt");
             err[i] = Utils.resolveWithRoot(files, root, "stderr" + i + ".txt");
 
@@ -178,7 +149,6 @@ public class ITMultiJobTest {
         }
 
         for (int i = 0; i < j.length; i++) {
-
             String tmpout = readFully(files.newInputStream(out[i]));
             String tmperr = readFully(files.newInputStream(err[i]));
 

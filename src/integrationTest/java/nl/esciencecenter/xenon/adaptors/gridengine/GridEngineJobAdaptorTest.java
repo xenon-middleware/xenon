@@ -86,7 +86,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setExecutable(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -162,7 +162,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job not finished");

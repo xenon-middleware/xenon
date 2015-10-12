@@ -55,17 +55,17 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
         super("slurm", configfile);
 
-        username = getPropertyOrFail(p, "test.slurm.user");
-        passwd = getPropertyOrFail(p, "test.slurm.password").toCharArray();
+        username = getPropertyOrFail("test.slurm.user");
+        passwd = getPropertyOrFail("test.slurm.password").toCharArray();
 
-        String location = getPropertyOrFail(p, "test.slurm.location");
+        String location = getPropertyOrFail("test.slurm.location");
 
-        defaultQueue = getPropertyOrFail(p, "test.slurm.default.queue");
-        String queueList = getPropertyOrFail(p, "test.slurm.queues");
+        defaultQueue = getPropertyOrFail("test.slurm.default.queue");
+        String queueList = getPropertyOrFail("test.slurm.queues");
         queues = queueList.split("\\s*,\\s*");
 
-        queueWaitTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.queue.wait.time"));
-        updateTime = Long.parseLong(getPropertyOrFail(p, "test.slurm.update.time"));
+        queueWaitTime = Long.parseLong(getPropertyOrFail("test.slurm.queue.wait.time"));
+        updateTime = Long.parseLong(getPropertyOrFail("test.slurm.update.time"));
 
         if (location == null || location.isEmpty() || location.equals("/")) { 
             correctLocation = "";
@@ -76,17 +76,6 @@ public class SlurmJobTestConfig extends JobTestConfig {
             wrongLocation = username + "@" + "doesnotexists.com";
             correctLocationWrongUser = "incorrect@" + location;
         }
-    }
-
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
     }
 
     @Override

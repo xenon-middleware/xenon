@@ -93,6 +93,11 @@ Run integration tests by
 ./gradlew check
 ```
 
+Run integration tests of a single adaptor by
+```
+./gradlew integrationTest --tests nl.esciencecenter.xenon.adaptors.gftp*
+```
+
 Build distribution with
 ```
 ./gradlew assembleDist

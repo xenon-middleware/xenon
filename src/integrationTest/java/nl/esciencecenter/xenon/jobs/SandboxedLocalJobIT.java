@@ -60,7 +60,6 @@ public class SandboxedLocalJobIT {
     @Test
     public void test() throws Exception, XenonException, URISyntaxException, InterruptedException, IOException {
         Xenon xenon = XenonFactory.newXenon(null);
-        Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
         FileSystem localrootfs = Utils.getLocalCWD(xenon.files()).getFileSystem();

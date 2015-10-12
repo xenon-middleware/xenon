@@ -8,4 +8,3 @@ addons:
   apt_packages:
     - pandoc
     - texlive
-script: ./gradlew check -xdockerTest --continue

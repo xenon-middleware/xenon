@@ -3,12 +3,12 @@
 # This is a sample configuration file for the Xenon test suite.
 #
 # You can use this configuration by copying this file to
-# "xenon.test.properties" in the this "test" directory and
+# "xenon.test.properties" in the this main directory and
 # providing the correct values for each of fields.
 #
 # By running:
 #
-#   ant test
+#   gradle integrationTest
 #
 # in the main directory of Xenon all tests will be run.
 #
@@ -69,8 +69,8 @@ test.gridengine.password=javagat
 #
 test.gridengine.default.queue=default
 test.gridengine.queues=default,slow
-test.gridengine.queue.wait.time=10000
-test.gridengine.update.time=4000
+test.gridengine.queue.wait.time=5000
+test.gridengine.update.time=2000
 test.gridengine.parallel.environment=bi
 
 ######################################################################
@@ -96,10 +96,10 @@ test.slurm.location=xenon-slurm
 # the update delay for the queues and the Slurm commands (in ms.),
 # and the parallel environment to use.
 #
-test.slurm.default.queue=otherpartition
+test.slurm.default.queue=mypartition
 test.slurm.queues=mypartition,otherpartition
-test.slurm.queue.wait.time=4000
-test.slurm.update.time=10000
+test.slurm.queue.wait.time=2000
+test.slurm.update.time=5000
 
 test.ftp.location=xenon-ftp
 test.ftp.user=xenon
@@ -116,5 +116,5 @@ test.torque.user=xenon
 test.torque.password=javagat
 test.torque.default.queue=batch
 test.torque.queues=debug,batch
-test.torque.queue.wait.time=4000
-test.torque.update.time=10000
+test.torque.queue.wait.time=2000
+test.torque.update.time=5000
