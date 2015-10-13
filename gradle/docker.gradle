@@ -6,12 +6,9 @@ ext.dockerDirectories = [
     'ftp': 'xenon-ftp',
     'gridengine': 'xenon-gridengine',
     'gridengine-exec': 'xenon-gridengine-exec',
-    'gridftp-ca': 'xenon-gridftp/ca',
-    'gridftp': 'xenon-gridftp',
     'slurm': 'xenon-slurm',
     'ssh': 'xenon-ssh',
     'torque': 'xenon-torque' ,
-    'webdav': 'xenon-webdav',
     'test': '.'
 ]
 ext.dockerImages = ext.dockerDirectories.keySet()
@@ -78,7 +75,7 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
 //  DOCKER BUILD SETUP
 // ====================
 
-def dockerImageRequirementsSpec = copySpec { 
+def dockerImageRequirementsSpec = copySpec {
     from('src/integrationTest/resources/scripts') {
         include 'create_symlinks'
     }
@@ -100,18 +97,6 @@ task dockerCopyTorqueRequirements(type: Copy) {
 }
 
 task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopyPhusionRequirements, dockerCopyTorqueRequirements]) {}
-
-task dockerCACertificates(type: Exec) {
-    def generatedCAFiles = file(dockerDir + '/xenon-gridftp/files')
-    onlyIf {
-        !generatedCAFiles.exists()
-    }
-
-    def volumes = generatedCAFiles.absolutePath + ':/var/lib/globus'
-    commandLine 'docker', 'run', '-t', '--rm=true',
-                 '-e', 'MYUID=' + dockerUid, '-v', volumes,
-                 'nlesc/xenon-gridftp-ca'
-}
 
 //  DOCKER BUILD
 // ==============
@@ -145,7 +130,7 @@ task dockerTestCacheCleanup(type: Exec) {
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
 
-task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements, dockerCACertificates]) << {
+task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements]) << {
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
