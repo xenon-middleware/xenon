@@ -41,16 +41,15 @@ if (project.hasProperty('xenon.test.properties')) {
 }
 
 task prepareIntegrationTest << {
+    def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
+    // Initialize testing symlinks locally
+    exec {
+        commandLine '/bin/bash', create_symlinks
+    }
+
     xenonPropertiesFile.withReader { reader ->
         def userProps = new Properties()
         userProps.load(reader)
-        def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
-
-        // Initialize testing symlinks locally
-        exec {
-            executable = '/bin/bash'
-            args = [create_symlinks]
-        }
 
         // Initialize testing symlinks on remote side
         ssh.run {

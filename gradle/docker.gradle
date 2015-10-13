@@ -101,8 +101,9 @@ task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopy
 //  DOCKER BUILD
 // ==============
 
+ext.testCacheSet = file('.docker-test-cache-set')
+
 task dockerTestCache(dependsOn: checkDockerComposePresence) {
-    def testCacheSet = file('.docker-test-cache-set')
     onlyIf {
         !testCacheSet.exists()
     }
@@ -117,12 +118,20 @@ task dockerTestCache(dependsOn: checkDockerComposePresence) {
             commandLine 'docker', 'commit', dockerCacheContainerName,
                 'nlesc/xenon-test'
         }
-        exec {
-            commandLine 'touch', testCacheSet.absolutePath
-        }
     }
-    finalizedBy 'dockerTestCacheCleanup'
+    finalizedBy 'dockerMarkTestCacheSet', 'dockerTestCacheCleanup'
 }
+task dockerMarkTestCacheSet(type: Exec) {
+    onlyIf {
+        dockerTestCache.state.executed && !dockerTestCache.state.failure
+    }
+    outputs.file testCacheSet
+    commandLine 'touch', testCacheSet.absolutePath
+}
+task resetDockerTestCache(type: Delete) {
+    delete testCacheSet
+}
+
 task dockerTestCacheCleanup(type: Exec) {
     onlyIf {
         dockerTestCache.state.didWork
@@ -130,7 +139,7 @@ task dockerTestCacheCleanup(type: Exec) {
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
 
-task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements]) << {
+task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, dockerCopyRequirements]) << {
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
