@@ -209,8 +209,7 @@ final class LocalUtils {
         }
     }
 
-    static void unixDestroy(java.lang.Process process) {
-
+    static void unixDestroy(Process process) {
         boolean success = false;
 
         try {

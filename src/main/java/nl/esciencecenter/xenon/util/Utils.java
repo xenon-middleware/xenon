@@ -1094,7 +1094,6 @@ public final class Utils {
      *             if an I/O error occurs during the copying
      */
     public static void recursiveDelete(Files files, Path path) throws XenonException {
-
         FileAttributes att = files.getAttributes(path);
 
         if (att.isDirectory()) {

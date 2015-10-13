@@ -197,7 +197,6 @@ public class JobQueues {
     }
 
     private JobExecutor findJob(List<JobExecutor> queue, Job job) throws XenonException {
-
         for (JobExecutor e : queue) {
             if (e.getJob().equals(job)) {
                 return e;
@@ -226,7 +225,6 @@ public class JobQueues {
     }
 
     public JobStatus getJobStatus(Job job) throws XenonException {
-
         LOGGER.debug("{}: getJobStatus for job {}", adaptorName, job.getIdentifier());
 
         checkScheduler(job.getScheduler());
