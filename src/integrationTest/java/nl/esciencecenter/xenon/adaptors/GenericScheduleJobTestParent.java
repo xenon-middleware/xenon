@@ -63,7 +63,6 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericScheduleJobTestParent {
-
     private static final Logger logger = LoggerFactory.getLogger(GenericScheduleJobTestParent.class);
 
     private static String TEST_ROOT;
@@ -145,10 +144,15 @@ public abstract class GenericScheduleJobTestParent {
     }
 
     protected void checkJobDone(JobStatus status) throws JobException {
+        assertNotNull(status);
         assertTrue("Job exceeded deadline!", status.isDone());
 
         if (status.hasException()) {
             throw new JobException("Job failed!", status.getException());
+        }
+
+        if (!status.getState().equals("unknown")) {
+            assertNotNull("Job exit code is null; status: " + status, status.getExitCode());
         }
     }
     
@@ -222,22 +226,29 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
     
+    /**
+     * Remove job root folder, stdout, stderr and other provided paths.
+     * @param job job to cleanup files for (null if not applicable)
+     * @param root job working directory to remove
+     * @param otherPaths other paths to remove
+     * @throws XenonException if resolving path or delete fails
+     */
     protected void cleanupJob(Job job, Path root, Path... otherPaths) throws XenonException {
         XenonException cleanupFailed = null;
-        Path[] allPaths = Arrays.copyOf(otherPaths, otherPaths.length + 3);
+        Path[] allPaths = Arrays.copyOf(otherPaths, otherPaths.length + 2);
         if (job != null) {
             JobDescription description = job.getJobDescription();
             if (description.getStdout() != null)
                 allPaths[otherPaths.length] = resolve(root, description.getStdout());
             if (description.getStderr() != null)
                 allPaths[otherPaths.length + 1] = resolve(root, description.getStderr());
-            if (description.getStdin() != null) 
-                allPaths[otherPaths.length + 2] = resolve(root, description.getStdin());
         }
         for (Path p : allPaths) {
             if (p != null) {
                 try {
-                    files.delete(p);
+                    if (files.exists(p)) {
+                        files.delete(p);
+                    }
                 } catch (XenonException ex) {
                     cleanupFailed = ex;
                 }
@@ -253,15 +264,20 @@ public abstract class GenericScheduleJobTestParent {
             files.close(root.getFileSystem());
         }
         if (cleanupFailed != null) {
-            throw cleanupFailed;
+            throw new AssertionError(cleanupFailed);
         }
     }
     
-    protected void runJob(String workingDir, JobDescription description, String expectedOutput) throws XenonException, Exception {
+    /** Run a job with in given directory, and compare the output with expected output.
+     * @param workingDir directory to run in
+     * @param description job description. Include stdout in the description if comparing with expectedOutput
+     * @param expectedOutput output that stdout should match, exactly. Provide null to only check that stderr is empty and stdout exists, if provided.
+     */
+    protected void runJob(String workingDir, JobDescription description, String expectedOutput) throws Exception {
         Path root = initJobDirectory(workingDir);
         try {
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
             checkJobDone(status);
             checkJobOutput(job, root, expectedOutput);
         } finally {
@@ -269,15 +285,31 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
 
+    /**
+     * Job description to set environment value and print it.
+     * Does not set stderr and stdout files.
+     *
+     * @param workDir directory to run in
+     * @param value value of the environement variable
+     * @return generated job description
+     */
     protected JobDescription printEnvJobDescription(String workDir, String value) {
         JobDescription description = new JobDescription();
         description.setExecutable("/usr/bin/printenv");
         description.setArguments("SOME_VARIABLE");
-        description.addEnvironment("SOME_VARIABLE", "some_value");
-        if (workDir != null) description.setWorkingDirectory(workDir);
+        description.addEnvironment("SOME_VARIABLE", value);
+        description.setWorkingDirectory(workDir);
         return description;
     }
 
+    /**
+     * Job description to print a message.
+     * Does not set stderr and stdout files. In Windows, this prints the hostname, not the message.
+     *
+     * @param workingDir directory to run in
+     * @param message message to print, if not in Windows.
+     * @return generated job description
+     */
     protected JobDescription echoJobDescription(String workingDir, String message) {
         JobDescription description = new JobDescription();
         
@@ -288,11 +320,18 @@ public abstract class GenericScheduleJobTestParent {
             description.setArguments("-n", message);
         }
 
-        //absolute working dir name used
         description.setWorkingDirectory(workingDir);
         return description;
     }
 
+    /**
+     * Job description that takes approximately a fixed time.
+     * Does not set stderr and stdout files.
+     *
+     * @param workingDir directory to run in
+     * @param seconds number of seconds the job should take.
+     * @return generated job description
+     */
     protected JobDescription timedJobDescription(String workingDir, int seconds) {
         JobDescription description = new JobDescription();
         
@@ -304,27 +343,40 @@ public abstract class GenericScheduleJobTestParent {
             description.setArguments(Integer.toString(seconds));
         }
 
-        //absolute working dir name used
         description.setWorkingDirectory(workingDir);
         return description;
     }
 
-    protected JobDescription catJobDescription(String workingDir, Path root, String message) throws XenonException, IOException {
-        Path stdin = resolve(root, "stdin.txt");
-
-        OutputStream out = files.newOutputStream(stdin, OpenOption.CREATE, OpenOption.APPEND, OpenOption.WRITE);
-        writeFully(out, message);
+    /**
+     * Job description prints the contents of a file
+     * Does not set stderr and stdout files.
+     *
+     * @param workingDir directory to run in
+     * @param stdin path to stdin to write contents to
+     * @param message message to store as contents
+     * @return generated job description
+     * @throws XenonException file cannot be created or written to
+     * @throws IOException file stream cannot be written to
+     */
+    protected JobDescription catJobDescription(String workingDir, Path stdin, String message) throws XenonException, IOException {
+        writeFully(stdin, message);
 
         JobDescription description = new JobDescription();
-        
         if (config.targetIsWindows()) { 
             description.setExecutable("c:\\Windows\\System32\\more.com");
         } else { 
             description.setExecutable("/bin/cat");
         }
-
         description.setWorkingDirectory(workingDir);
         description.setStdin("stdin.txt");
+
+        return description;
+    }
+
+    protected JobDescription nonExistingJobDescription(String workingDir) {
+        JobDescription description = new JobDescription();
+        description.setExecutable("non-existing-executable");
+        description.setWorkingDirectory(workingDir);
         return description;
     }
 
@@ -352,7 +404,7 @@ public abstract class GenericScheduleJobTestParent {
         String err = Utils.readToString(streams.getStderr());
 
         // NOTE: Job should already be done here!
-        JobStatus status = jobs.waitUntilDone(job, 5000);
+        JobStatus status = jobs.waitUntilDone(job, config.getUpdateTime());
 
         checkJobDone(status);
 
@@ -381,13 +433,12 @@ public abstract class GenericScheduleJobTestParent {
 
             job = jobs.submitJob(scheduler, description);
 
-            long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + config.getUpdateTime();
-            long pollDelay = (config.getQueueWaitTime() + config.getUpdateTime()) / 10;
+            long deadline = System.currentTimeMillis() + config.getJobTimeout(0);
 
             JobStatus status = jobs.getJobStatus(job);
 
             while (!status.isDone()) {
-                Thread.sleep(pollDelay);
+                Thread.sleep(config.getPollDelay());
                 assertTrue("Job exceeded deadline!", System.currentTimeMillis() < deadline);
                 status = jobs.getJobStatus(job);
             }
@@ -444,8 +495,7 @@ public abstract class GenericScheduleJobTestParent {
             }
 
             // Bit hard to determine realistic deadline here ?
-            long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + (jobCount * config.getUpdateTime());
-            long pollDelay = 1000;
+            long deadline = System.currentTimeMillis() + jobCount * config.getJobTimeout(1);
 
             boolean done = false;
 
@@ -458,7 +508,7 @@ public abstract class GenericScheduleJobTestParent {
                     if (j[i] != null) {
                         if (status[i].isDone()) {
                             if (status[i].hasException()) {
-                                throw new AssertionError("Job " + i + " failed", status[i].getException());
+                                throw new JobException("Job " + i + " failed", status[i].getException());
                             }
 
                             logger.info("Job " + i + " done.");
@@ -472,7 +522,7 @@ public abstract class GenericScheduleJobTestParent {
                 if (count == 0) {
                     done = true;
                 } else {
-                    Thread.sleep(pollDelay);
+                    Thread.sleep(config.getPollDelay());
                     assertTrue("Job exceeded deadline!", System.currentTimeMillis() < deadline);
                 }
             }
@@ -503,7 +553,13 @@ public abstract class GenericScheduleJobTestParent {
         String workingDir = getWorkingDir("test34");
         Path root = initJobDirectory(workingDir);
 
+        Job[] tmpJobs = new Job[4];
         try {
+            // Start uninteresting jobs, to make sure there is something on the queue.
+            for (int i = 0; i < tmpJobs.length; i++) {
+                tmpJobs[i] = jobs.submitJob(scheduler, timedJobDescription(null, 10));
+            }
+
             JobDescription description = timedJobDescription(workingDir, 60);
             description.setStdout("stdout.txt");
             description.setStderr("stderr.txt");
@@ -512,15 +568,21 @@ public abstract class GenericScheduleJobTestParent {
             job = jobs.submitJob(scheduler, description);
             JobStatus status = jobs.cancelJob(job);
 
-            // Wait until the job is killed. We assume it takes less than a minute!
-            if (!status.isDone()) {
-                status = jobs.waitUntilDone(job, config.getUpdateTime());
+            if (status.isRunning()) {
+                // Wait until the job is killed.
+                if (!status.isDone()) {
+                    status = jobs.waitUntilDone(job, config.getUpdateTime());
+                }
             }
 
             assertTrue("Failed to kill job! Expected status done, but job status is " + status, status.isDone());
-            assertTrue(status.hasException());
-            assertTrue(status.getException() instanceof JobCanceledException);
+            assertTrue("Job cancellation not registered: job status is " + status, status.hasException());
+            Exception e = status.getException();
+            assertTrue("Did not expect " + e + ": " + e.getMessage(), e instanceof JobCanceledException);
         } finally {
+            for (Job tmpJob : tmpJobs) {
+                if (tmpJob != null) jobs.cancelJob(tmpJob);
+            }
             cleanupJob(job, root);
         }
     }
@@ -540,9 +602,7 @@ public abstract class GenericScheduleJobTestParent {
             // Wait for job to run before killing it!
             JobStatus status = jobs.waitUntilRunning(job, config.getQueueWaitTime());
 
-            if (!status.isRunning()) {
-                throw new Exception("Job failed to start! Expected status running, but job status is " + status);
-            }
+            assertTrue("Job failed to start! Expected status running, but job status is " + status, status.isRunning());
 
             status = jobs.cancelJob(job);
 
@@ -552,7 +612,7 @@ public abstract class GenericScheduleJobTestParent {
             }
 
             assertTrue("Failed to kill job! Expected status done, but job status is " + status, status.isDone());
-            assertTrue(status.hasException());
+            assertTrue("Expected status with exception, but job status is " + status, status.hasException());
             assertTrue(status.getException() instanceof JobCanceledException);
         } finally {
             cleanupJob(job, root);
@@ -564,19 +624,20 @@ public abstract class GenericScheduleJobTestParent {
         String message = "Hello World! test36a";
         String workingDir = getWorkingDir("test36a");
         Path root = initJobDirectory(workingDir);
+        Path stdin = resolve(root, "stdin.txt");
 
         try {
-            JobDescription description = catJobDescription(workingDir, root, message);
+            JobDescription description = catJobDescription(workingDir, stdin, message);
             description.setStdout("stdout.txt");
             description.setStderr("stderr.txt");
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
 
             checkJobDone(status);
             checkJobOutput(job, root, message, message);
         } finally {
-            cleanupJob(job, root);
+            cleanupJob(job, root, stdin);
         }
     }
 
@@ -585,9 +646,10 @@ public abstract class GenericScheduleJobTestParent {
         String message = "Hello World! test36b";
         String workingDir = getWorkingDir("test36b");
         Path root = initJobDirectory(workingDir);
+        Path stdin = resolve(root, "stdin.txt");
 
         try {
-            JobDescription description = catJobDescription(workingDir, root, message);
+            JobDescription description = catJobDescription(workingDir, stdin, message);
             description.setStdout("stdout.txt");
             description.setStderr("stderr.txt");
 
@@ -602,14 +664,14 @@ public abstract class GenericScheduleJobTestParent {
             checkJobDone(status);
             checkJobOutput(job, root, message, message);
         } finally {
-            cleanupJob(job, root);
+            cleanupJob(job, root, stdin);
         }
     }
 
     @Test
     public void test37a_batchJobSubmitWithoutWorkDir() throws Exception {
         job = jobs.submitJob(scheduler, timedJobDescription(null, 1));
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(1));
         checkJobDone(status);
     }
 
@@ -636,14 +698,13 @@ public abstract class GenericScheduleJobTestParent {
         //note that we are _not_ creating this directory, making it invalid
         String workingDir = getWorkingDir("test37d");
 
-        JobDescription description = timedJobDescription(workingDir, 1);
-
         //submitting this job will either:
         // 1) throw an InvalidJobDescription when we submit the job
         // 2) produce an error when the job is run.
         try {
-            Job job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, 60000);
+            job = jobs.submitJob(scheduler, timedJobDescription(workingDir, 1));
+            // wait extra second for timed job
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(1));
 
             assertTrue("Job exceeded deadline! Expected status done, got " + status, status.isDone());
 
@@ -669,18 +730,19 @@ public abstract class GenericScheduleJobTestParent {
         String message = "Hello World! test38";
         String workingDir = getWorkingDir("test38");
         Path root = initJobDirectory(workingDir);
-        
+        Path stdin = resolve(root, "stdin.txt");
+
         try {
-            JobDescription description = catJobDescription(workingDir, root, message);
+            JobDescription description = catJobDescription(workingDir, stdin, message);
             description.setProcessesPerNode(2);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, 60000);
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
 
             checkJobDone(status);
             for (int i = 0; i < 2; i++) {
-                String outString = readFully(resolve(root, "stdout.txt." + i));
-                String errString = readFully(resolve(root, "stderr.txt." + i));
+                String outString = readFile(root, "stdout.txt." + i);
+                String errString = readFile(root, "stderr.txt." + i);
                 
                 assertNotNull(outString);
                 // Line ending may differ
@@ -703,46 +765,41 @@ public abstract class GenericScheduleJobTestParent {
             return;
         }
 
-        Job[] j = new Job[2];
-        j[0] = jobs.submitJob(scheduler, timedJobDescription(null, 1));
-        j[1] = jobs.submitJob(scheduler, timedJobDescription(null, 2));
+        Job[] j = new Job[] {
+            jobs.submitJob(scheduler, timedJobDescription(null, 1)),
+            jobs.submitJob(scheduler, timedJobDescription(null, 2)),
+        };
 
-        long now = System.currentTimeMillis();
-        long pollDelay = 1000;
-        long deadline = now + 10 * pollDelay;
+        long deadline = System.currentTimeMillis() + config.getJobTimeout(1) + config.getJobTimeout(2);
 
         JobStatus[] s = null;
-
-        while (now < deadline) {
+        while (System.currentTimeMillis() < deadline) {
             s = jobs.getJobStatuses(j);
-
-            assertFalse("Job exceeded deadline!", s[0].hasException() && s[1].hasException());
-
-            try {
-                Thread.sleep(pollDelay);
-            } catch (InterruptedException e) {
+            if (s[0].hasException() && s[1].hasException()) {
                 break;
             }
 
-            now = System.currentTimeMillis();
+            Thread.sleep(config.getPollDelay());
         }
 
-        assertNotNull("Job exceeded deadline!", s);
-        assertFalse("Job exceeded deadline!", s[0].hasException() && s[1].hasException());
+        assertNotNull("Job status could not be retrieved", s);
+        assertTrue("Job exceeded deadline!", s[0].hasException() && s[1].hasException());
     }
 
     @Test
     public void test40_batchJobSubmitWithExitcode() throws Exception {
         job = jobs.submitJob(scheduler, timedJobDescription(null, 1));
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(1));
 
         checkJobDone(status);
 
-        assertEquals(0, status.getExitCode().longValue());
+        if (!status.getState().equals("unknown")) {
+            assertEquals(0, status.getExitCode().longValue());
+        }
     }
 
     @Test
-    public void test40_batchJobSubmitWithNoneZeroExitcode() throws Exception {
+    public void test40_batchJobSubmitWithNonZeroExitcode() throws Exception {
         //run an ls with a non existing file. This should make ls return exitcode 2
         JobDescription description = new JobDescription();
         
@@ -756,11 +813,13 @@ public abstract class GenericScheduleJobTestParent {
         }
 
         job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(1));
 
         checkJobDone(status);
 
-        assertNotEquals(0, status.getExitCode().longValue());
+        if (!status.getState().equals("unknown")) {
+            assertNotEquals(0, status.getExitCode().longValue());
+        }
     }
 
     @Test
@@ -779,7 +838,7 @@ public abstract class GenericScheduleJobTestParent {
             description.setStdout("stdout.txt");
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, 60000);
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
 
             checkJobDone(status);
             checkJobOutput(job, root, envValue + "\n");
@@ -788,7 +847,7 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
 
-    @Test(expected=UnsupportedJobDescriptionException.class)
+    @Test
     public void test41b_batchJobSubmitWithEnvironmentVariable() throws Exception {
         if (config.supportsEnvironmentVariables() || config.targetIsWindows()) { 
             return;
@@ -809,7 +868,7 @@ public abstract class GenericScheduleJobTestParent {
             return;
         }
 
-        JobDescription description = echoJobDescription(null, null);
+        JobDescription description = echoJobDescription(null, "some message");
         description.setNodeCount(2);
         description.setProcessesPerNode(2);
 
@@ -824,30 +883,54 @@ public abstract class GenericScheduleJobTestParent {
     @Test
     public void test43_submit_JobDescriptionShouldBeCopied_Success() throws Exception {
         String workingDir = getWorkingDir("test43");
-
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = new JobDescription();
-            description.setExecutable("non-existing-executable");
-            description.setWorkingDirectory(workingDir);
+            JobDescription description = nonExistingJobDescription(workingDir);
             description.setStdout("stdout.txt");
 
             job = jobs.submitJob(scheduler, description);
 
             description.setStdout("aap.txt");
 
-            JobDescription original = job.getJobDescription();
-
-            assertEquals("Job description should have been copied!", "stdout.txt", original.getStdout());
+            assertNotEquals("Job description should have been copied!", job.getJobDescription().getStdout(), description.getStdout());
 
             JobStatus status = jobs.cancelJob(job);
 
             if (!status.isDone()) {
-                jobs.waitUntilDone(job, 60000);
+                jobs.waitUntilDone(job, config.getUpdateTime());
             }
         } finally {
             cleanupJobRecursive(root);
+        }
+    }
+
+    @Test
+    public void test44_submit_JobDescriptionShouldBeSame() throws Exception {
+        String workingDir = getWorkingDir("test44");
+        Path root = initJobDirectory(workingDir);
+        Path stdin = resolve(root, "stdin.txt");
+
+        try {
+            JobDescription description = catJobDescription(workingDir, stdin, "my message");
+            description.setStdout("stdout.txt");
+            description.setStderr("stderr.txt");
+
+            job = jobs.submitJob(scheduler, description);
+
+            JobStatus status = jobs.cancelJob(job);
+
+            if (!status.isDone()) {
+                jobs.waitUntilDone(job, config.getUpdateTime());
+            }
+
+            JobDescription submitted = job.getJobDescription();
+            assertEquals("stdout.txt", submitted.getStdout());
+            assertEquals("stderr.txt", submitted.getStderr());
+            assertEquals("stdin.txt", submitted.getStdin());
+            assertEquals(workingDir, submitted.getWorkingDirectory());
+        } finally {
+            cleanupJob(job, root, stdin);
         }
     }
 }

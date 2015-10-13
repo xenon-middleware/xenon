@@ -81,7 +81,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setExecutable(null);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
 
             checkJobDone(status);
 
@@ -110,7 +110,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setStderr("stderr.txt");
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
             checkJobDone(status);
 
             String outputContent = readFully(stdout);
@@ -265,7 +265,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
                 assertTrue(line.equals(message));
             }
 
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
             checkJobDone(status);
         } finally {
             try {
@@ -295,7 +295,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setStartSingleProcess(true);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
             checkJobDone(status);
             
             String outputContent = readFully(resolve(root, "stdout.txt"));

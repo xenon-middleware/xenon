@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 
@@ -76,7 +75,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
             description.setExecutable(null);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(0));
 
             checkJobDone(status);
 
@@ -84,7 +83,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
             job.getJobDescription().setStdout("stdout.txt");
             checkJobOutput(job, root, message);
         } finally {
-            cleanupJob(job, root, script);
+            cleanupJob(job, root, stdout, script);
         }
     }
 
@@ -113,7 +112,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
 
             job = jobs.submitJob(scheduler, description);
 
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
 
             checkJobDone(status);
 

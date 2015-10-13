@@ -48,7 +48,7 @@ public class SSHLocationTest {
     @Test
     public void test_parse_withScheme_correctScheme() throws InvalidLocationException {
         SshLocation tmp = SshLocation.parse("ssh://host", ConfigRepository.nullConfig);
-        assertEquals("ssh", tmp.getSCheme());
+        assertEquals("ssh", tmp.getScheme());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class SSHLocationTest {
     public void test_parseToString_withOutScheme() throws InvalidLocationException {
         String url = "user@host:777";
         SshLocation tmp = SshLocation.parse(url, ConfigRepository.nullConfig);
-        assertEquals(url, tmp.toString());
+        assertEquals("ssh://" + url, tmp.toString());
     }
 
     @Test

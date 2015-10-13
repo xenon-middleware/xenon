@@ -34,7 +34,6 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
-import nl.esciencecenter.xenon.adaptors.JobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.Files;
@@ -64,7 +63,6 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericJobAdaptorTestParent {
-
     private static final Logger logger = LoggerFactory.getLogger(GenericJobAdaptorTestParent.class);
 
     private static String TEST_ROOT;
@@ -76,19 +74,12 @@ public abstract class GenericJobAdaptorTestParent {
     protected Jobs jobs;
     protected Credentials credentials;
 
-    protected Path testDir;
-
     @Rule
     public TestWatcher watcher = new XenonTestWatcher();
     
     public Path resolve(Path root, String path) throws XenonException { 
         return files.newPath(root.getFileSystem(), root.getRelativePath().resolve(path));
     }
-
-//    public Path resolve(FileSystem fs, String path) throws XenonException {
-//        return resolve(fs.getEntryPath(), path);
-//    }
-
     
     // MUST be invoked by a @BeforeClass method of the subclass! 
     public static void prepareClass(JobTestConfig testConfig) {
@@ -98,8 +89,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     // MUST be invoked by a @AfterClass method of the subclass! 
     public static void cleanupClass() throws Exception {
-
-        System.err.println("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
+        logger.info("GenericJobAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
         Xenon xenon = XenonFactory.newXenon(null);
 
@@ -337,7 +327,7 @@ public abstract class GenericJobAdaptorTestParent {
         }
     }
 
-    @Test(expected=NoSuchSchedulerException.class)
+    @Test
     public void test13_open_close() throws Exception {
         if (config.supportsClose()) {
             Scheduler s = config.getDefaultScheduler(jobs, credentials);

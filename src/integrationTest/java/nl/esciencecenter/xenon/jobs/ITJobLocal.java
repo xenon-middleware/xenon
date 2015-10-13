@@ -53,6 +53,8 @@ public class ITJobLocal {
         description.setArguments("bla");
         description.setQueueName("single");
         description.setWorkingDirectory(testdir.toString());
+        description.setStdout("stdout.txt");
+        description.setStderr("stderr.txt");
 
         Scheduler scheduler = xenon.jobs().newScheduler("local", null, null, null);
         Job job = xenon.jobs().submitJob(scheduler, description);
