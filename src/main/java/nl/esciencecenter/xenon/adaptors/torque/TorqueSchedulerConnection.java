@@ -115,11 +115,11 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         String stateCode = jobInfo.get("job_state");
 
         Exception exception = null;
-        if (stateCode.contains("E")) {
+        if (stateCode.equals("E")) {
             exception = new XenonException(TorqueAdaptor.ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;
         }
-        if (stateCode.contains("C")) {
+        if (stateCode.equals("C")) {
             done = true;
         }
         Integer exitStatus = null;
@@ -480,15 +480,18 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             status = null;
         }
 
-        //perhaps the job was killed while it was not running yet.
-        if (status == null && jobWasDeleted(job)) {
+        if (status == null) {
+            if (jobWasDeleted(job)) {
+                Exception exception = new JobCanceledException(TorqueAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    + " deleted by user");
+                status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
+            } else if (haveRecentlySeen(job.getIdentifier())) {
+                status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
+            }
+        } else if (status.isDone() && jobWasDeleted(job)) {
             Exception exception = new JobCanceledException(TorqueAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
-                    + " deleted by user while still pending");
-            status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
-        }
-
-        if (status == null && haveRecentlySeen(job.getIdentifier())) {
-            status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
+                    + " deleted by user");
+            status = new JobStatusImplementation(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
         }
 
         return status;
