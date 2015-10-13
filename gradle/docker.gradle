@@ -103,7 +103,7 @@ task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopy
 
 ext.testCacheSet = file('.docker-test-cache-set')
 
-task dockerTestCache(dependsOn: checkDockerComposePresence) {
+task dockerTestCache(dependsOn: [checkDockerComposePresence, clean]) {
     onlyIf {
         !testCacheSet.exists()
     }
