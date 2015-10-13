@@ -128,5 +128,4 @@ public class LocalJobTestConfig extends JobTestConfig {
     public boolean targetIsWindows() {
         return Utils.isWindows();
     }
-
 }

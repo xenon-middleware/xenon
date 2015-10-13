@@ -16,11 +16,8 @@
 
 package nl.esciencecenter.xenon.adaptors;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credentials;

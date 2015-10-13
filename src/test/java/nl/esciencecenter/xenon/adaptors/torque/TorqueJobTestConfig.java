@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2013 Netherlands eScience Center
  *
@@ -18,7 +19,6 @@ package nl.esciencecenter.xenon.adaptors.torque;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.JobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -174,29 +174,26 @@ public class TorqueJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getDefaultProperties() throws Exception {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.torque.poll.delay", "100");
         return result;
     }
 
     public Map<String, String> getUnknownProperties() throws Exception {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.torque.unknown.property", "some.value");
         return result;
     }
 
     public Map<String, String>[] getInvalidProperties() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, String>[] result = new Map[1];
-
-        result[0] = new HashMap<>();
-
+        Map<String, String>[] result = new Map[] { new HashMap<>(2) };
         result[0].put("xenon.adaptors.torque.poll.delay", "AAP");
         return result;
     }
 
     public Map<String, String> getCorrectProperties() throws Exception {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.torque.poll.delay", "100");
         return result;
     }
