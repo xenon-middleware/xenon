@@ -865,516 +865,313 @@ Submitting an interactive job with output:
 [44]: http://nlesc.github.io/Xenon/javadoc/nl/esciencecenter/xenon/utils/JavaJobDescription.html
 [45]: https://github.com/NLeSC/Xenon/blob/develop/examples/src/nl/esciencecenter/xenon/examples/files/ShowFileAttributes.java
 
-Appendix A: Adaptor Documentation
----------------------------------
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Insert title here</title></head><body>
+A middleware abstraction library that provides a simple programming interface to various compute and storage resources.
+<h1>Adaptor Documentation</h1>
+<p>This section contains the adaptor documentation which is generated from the information provided by the adaptors themselves.</p>
+Xenon currently supports 6 adaptors: <ul><li><a href="#local">local</a></li>
+<li><a href="#ssh">ssh</a></li>
+<li><a href="#ftp">ftp</a></li>
+<li><a href="#gridengine">gridengine</a></li>
+<li><a href="#slurm">slurm</a></li>
+<li><a href="#torque">torque</a></li>
+</ul>
 
-This section contains the adaptor documentation which is generated from the information provided by the adaptors themselves.
-
-Xenon currently supports 8 adaptors: local, ssh, ftp, webdav, gridengine, slurm, gftp, torque.
-
-Adaptor: local
---------
-
+<h2><a name="local">Adaptor: local</a></h2>
+<p>
 The local adaptor implements all functionality with  standard java classes such as java.lang.Process and java.nio.file.Files.
-
-#### Supported schemes: ####
-local, file
-
-#### Supported locations: ####
-(null), (empty string), /
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.local.queue.pollingDelay`__
-
-The polling delay for monitoring running jobs (in milliseconds).
-
-- Expected type: INTEGER
-
-- Default value: 1000
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.local.queue.multi.maxConcurrentJobs`__
-
-The maximum number of concurrent jobs in the multiq..
-
-- Expected type: INTEGER
-
-- Default value: 4
-
-- Valid for: [XENON]
-
-
-
-Adaptor: ssh
---------
-
+</p
+<h4>Supported schemes:</h4><ul>
+<li>local</li><li>file</li></ul>
+<h4> Supported locations:</h4><ul>
+<li>(null)</li><li>(empty string)</li><li>/</li></ul>
+<h4> Supported properties: </h4>
+<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>
+<tr>
+<td><pre>xenon.adaptors.local.queue.pollingDelay</pre></td>
+<td>The polling delay for monitoring running jobs (in milliseconds).</td>
+<td>INTEGER</td>
+<td>1000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#XENON XENON}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.local.queue.multi.maxConcurrentJobs</pre></td>
+<td>The maximum number of concurrent jobs in the multiq..</td>
+<td>INTEGER</td>
+<td>4</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#XENON XENON}</b></p>
+</td>
+</tr>
+</table>
+<h2><a name="ssh">Adaptor: ssh</a></h2>
+<p>
 The SSH adaptor implements all functionality with remove ssh servers.
-
-#### Supported schemes: ####
-ssh, sftp
-
-#### Supported locations: ####
-[user@]host[:port]
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.ssh.autoAddHostKey`__
-
-Automatically add unknown host keys to known_hosts.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-__`xenon.adaptors.ssh.strictHostKeyChecking`__
-
-Enable strict host key checking.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-__`xenon.adaptors.ssh.loadKnownHosts`__
-
-Load the standard known_hosts file.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.ssh.loadSshConfig`__
-
-Load the OpenSSH config file.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.ssh.sshConfigFile`__
-
-OpenSSH config filename.
-
-- Expected type: BOOLEAN
-
-- Default value: null
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.ssh.queue.pollingDelay`__
-
-The polling delay for monitoring running jobs (in milliseconds).
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.ssh.queue.multi.maxConcurrentJobs`__
-
-The maximum number of concurrent jobs in the multiq..
-
-- Expected type: INTEGER
-
-- Default value: 4
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.ssh.gateway`__
-
-The gateway machine used to create an SSH tunnel to the target.
-
-- Expected type: STRING
-
-- Default value: null
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-
-Adaptor: ftp
---------
-
+</p
+<h4>Supported schemes:</h4><ul>
+<li>ssh</li><li>sftp</li></ul>
+<h4> Supported locations:</h4><ul>
+<li>[user@]host[:port]</li></ul>
+<h4> Supported properties: </h4>
+<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.autoAddHostKey</pre></td>
+<td>Automatically add unknown host keys to known_hosts.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#FILESYSTEM FILESYSTEM}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.strictHostKeyChecking</pre></td>
+<td>Enable strict host key checking.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#FILESYSTEM FILESYSTEM}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.loadKnownHosts</pre></td>
+<td>Load the standard known_hosts file.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#XENON XENON}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.loadSshConfig</pre></td>
+<td>Load the OpenSSH config file.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#XENON XENON}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.sshConfigFile</pre></td>
+<td>OpenSSH config filename.</td>
+<td>BOOLEAN</td>
+<td>null</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#XENON XENON}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.queue.pollingDelay</pre></td>
+<td>The polling delay for monitoring running jobs (in milliseconds).</td>
+<td>LONG</td>
+<td>1000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.queue.multi.maxConcurrentJobs</pre></td>
+<td>The maximum number of concurrent jobs in the multiq..</td>
+<td>INTEGER</td>
+<td>4</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ssh.gateway</pre></td>
+<td>The gateway machine used to create an SSH tunnel to the target.</td>
+<td>STRING</td>
+<td>null</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#FILESYSTEM FILESYSTEM}</b></p>
+</td>
+</tr>
+</table>
+<h2><a name="ftp">Adaptor: ftp</a></h2>
+<p>
 The FTP adaptor implements all functionality with remove ftp servers.
-
-#### Supported schemes: ####
-ftp
-
-#### Supported locations: ####
-[user@]host[:port]
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.ftp.autoAddHostKey`__
-
-Automatically add unknown host keys to known_hosts.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.ftp.strictHostKeyChecking`__
-
-Enable strict host key checking.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-__`xenon.adaptors.ftp.loadKnownHosts`__
-
-Load the standard known_hosts file.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.ftp.queue.pollingDelay`__
-
-The polling delay for monitoring running jobs (in milliseconds).
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.ftp.queue.multi.maxConcurrentJobs`__
-
-The maximum number of concurrent jobs in the multiq..
-
-- Expected type: INTEGER
-
-- Default value: 4
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.ftp.gateway`__
-
-The gateway machine used to create an SSH tunnel to the target.
-
-- Expected type: STRING
-
-- Default value: null
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-
-Adaptor: webdav
---------
-
-The webdav adaptor implements all functionality with remote webdav servers.
-
-#### Supported schemes: ####
-http
-
-#### Supported locations: ####
-[user@]host[:port]
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.webdav.autoAddHostKey`__
-
-Automatically add unknown host keys to known_hosts.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.webdav.strictHostKeyChecking`__
-
-Enable strict host key checking.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-__`xenon.adaptors.webdav.loadKnownHosts`__
-
-Load the standard known_hosts file.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.webdav.queue.pollingDelay`__
-
-The polling delay for monitoring running jobs (in milliseconds).
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.webdav.queue.multi.maxConcurrentJobs`__
-
-The maximum number of concurrent jobs in the multiq..
-
-- Expected type: INTEGER
-
-- Default value: 4
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.webdav.gateway`__
-
-The gateway machine used to create an SSH tunnel to the target.
-
-- Expected type: STRING
-
-- Default value: null
-
-- Valid for: [SCHEDULER, FILESYSTEM]
-
-
-
-Adaptor: gridengine
---------
-
+</p
+<h4>Supported schemes:</h4><ul>
+<li>ftp</li></ul>
+<h4> Supported locations:</h4><ul>
+<li>[user@]host[:port]</li></ul>
+<h4> Supported properties: </h4>
+<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>
+<tr>
+<td><pre>xenon.adaptors.ftp.autoAddHostKey</pre></td>
+<td>Automatically add unknown host keys to known_hosts.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#FILESYSTEM FILESYSTEM}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ftp.strictHostKeyChecking</pre></td>
+<td>Enable strict host key checking.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#FILESYSTEM FILESYSTEM}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ftp.loadKnownHosts</pre></td>
+<td>Load the standard known_hosts file.</td>
+<td>BOOLEAN</td>
+<td>true</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#XENON XENON}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ftp.queue.pollingDelay</pre></td>
+<td>The polling delay for monitoring running jobs (in milliseconds).</td>
+<td>LONG</td>
+<td>1000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ftp.queue.multi.maxConcurrentJobs</pre></td>
+<td>The maximum number of concurrent jobs in the multiq..</td>
+<td>INTEGER</td>
+<td>4</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.ftp.gateway</pre></td>
+<td>The gateway machine used to create an SSH tunnel to the target.</td>
+<td>STRING</td>
+<td>null</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#FILESYSTEM FILESYSTEM}</b></p>
+</td>
+</tr>
+</table>
+<h2><a name="gridengine">Adaptor: gridengine</a></h2>
+<p>
 The SGE Adaptor submits jobs to a (Sun/Ocacle/Univa) Grid Engine scheduler. This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.
-
-#### Supported schemes: ####
-ge, sge
-
-#### Supported locations: ####
-(locations supported by local), (locations supported by ssh)
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.gridengine.ignore.version`__
-
-Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.gridengine.accounting.grace.time`__
-
-Number of milliseconds a job is allowed to take going from the queue to the qacct output.
-
-- Expected type: LONG
-
-- Default value: 60000
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.gridengine.poll.delay`__
-
-Number of milliseconds between polling the status of a job.
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-
-Adaptor: slurm
---------
-
+</p
+<h4>Supported schemes:</h4><ul>
+<li>ge</li><li>sge</li></ul>
+<h4> Supported locations:</h4><ul>
+<li>(locations supported by local)</li><li>(locations supported by ssh)</li></ul>
+<h4> Supported properties: </h4>
+<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>
+<tr>
+<td><pre>xenon.adaptors.gridengine.ignore.version</pre></td>
+<td>Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!</td>
+<td>BOOLEAN</td>
+<td>false</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.gridengine.accounting.grace.time</pre></td>
+<td>Number of milliseconds a job is allowed to take going from the queue to the qacct output.</td>
+<td>LONG</td>
+<td>60000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.gridengine.poll.delay</pre></td>
+<td>Number of milliseconds between polling the status of a job.</td>
+<td>LONG</td>
+<td>1000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+</table>
+<h2><a name="slurm">Adaptor: slurm</a></h2>
+<p>
 The Slurm Adaptor submits jobs to a Slurm scheduler. This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.
-
-#### Supported schemes: ####
-slurm
-
-#### Supported locations: ####
-(locations supported by local), (locations supported by ssh)
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.slurm.ignore.version`__
-
-Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.slurm.disable.accounting.usage`__
-
-Do not use accounting info of slurm, even when available. Mostly for testing purposes
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.slurm.poll.delay`__
-
-Number of milliseconds between polling the status of a job.
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-
-Adaptor: gftp
---------
-
-Grid FTP adaptor based on Globus Grid FTP
-
-#### Supported schemes: ####
-gsiftp, gftp
-
-#### Supported locations: ####
-host[:port]
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.gftp.useActiveMode`__
-
-Whether the remote server should use active mode. This means the remote server connects back to the local clientDefault is false (= passive mode). 
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.gftp.useBlindMode`__
-
-Whether to use Blind mode GFTP: stat and list methods are not supported, only get and put.
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.gftp.useGftpV1`__
-
-Enforce the use of old Grid FTP V1.0 methods: Mlst and Mlsd methods are not supported in V1.
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.gftp.enforceDCAU`__
-
-Enforce the use of Data Channel Authentication (DCAU) and throw exceptions if not supported by the Grid FTP Server.Default behaviour is to switch off DCAU if not support by remote server.
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-
-Adaptor: torque
---------
-
+</p
+<h4>Supported schemes:</h4><ul>
+<li>slurm</li></ul>
+<h4> Supported locations:</h4><ul>
+<li>(locations supported by local)</li><li>(locations supported by ssh)</li></ul>
+<h4> Supported properties: </h4>
+<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>
+<tr>
+<td><pre>xenon.adaptors.slurm.ignore.version</pre></td>
+<td>Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!</td>
+<td>BOOLEAN</td>
+<td>false</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.slurm.disable.accounting.usage</pre></td>
+<td>Do not use accounting info of slurm, even when available. Mostly for testing purposes</td>
+<td>BOOLEAN</td>
+<td>false</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.slurm.poll.delay</pre></td>
+<td>Number of milliseconds between polling the status of a job.</td>
+<td>LONG</td>
+<td>1000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+</table>
+<h2><a name="torque">Adaptor: torque</a></h2>
+<p>
 The Torque Adaptor submits jobs to a TORQUE batch system. This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.
-
-#### Supported schemes: ####
-torque
-
-#### Supported locations: ####
-(locations supported by local), (locations supported by ssh)
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.torque.ignore.version`__
-
-Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.torque.accounting.grace.time`__
-
-Number of milliseconds a job is allowed to take going from the queue to the accinfo output.
-
-- Expected type: LONG
-
-- Default value: 60000
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.torque.poll.delay`__
-
-Number of milliseconds between polling the status of a job.
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-
+</p
+<h4>Supported schemes:</h4><ul>
+<li>torque</li></ul>
+<h4> Supported locations:</h4><ul>
+<li>(locations supported by local)</li><li>(locations supported by ssh)</li></ul>
+<h4> Supported properties: </h4>
+<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>
+<tr>
+<td><pre>xenon.adaptors.torque.ignore.version</pre></td>
+<td>Skip version check is skipped when connecting to remote machines. WARNING: it is not recommended to use this setting in production environments!</td>
+<td>BOOLEAN</td>
+<td>false</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.torque.accounting.grace.time</pre></td>
+<td>Number of milliseconds a job is allowed to take going from the queue to the accinfo output.</td>
+<td>LONG</td>
+<td>60000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+<tr>
+<td><pre>xenon.adaptors.torque.poll.delay</pre></td>
+<td>Number of milliseconds between polling the status of a job.</td>
+<td>LONG</td>
+<td>1000</td>
+<td>
+<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#SCHEDULER SCHEDULER}</b></p>
+</td>
+</tr>
+</table>
+</body></html>
 

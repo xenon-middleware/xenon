@@ -20,11 +20,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Set;
 
 import nl.esciencecenter.xenon.AdaptorStatus;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -41,7 +43,12 @@ public class AdaptorDocGenerator {
         out.println("<td>" + d.getDescription() + "</td>");
         out.println("<td>" + d.getType() + "</td>");
         out.println("<td>" +  d.getDefaultValue() + "</td>");
-        out.println("<td>" + d.getLevels() + "</td>");
+        out.println("<td>");
+        Set<Component> levels = d.getLevels();
+        for (Component level : levels) {
+            out.println("<p><b>{@link nl.esciencecenter.xenon.XenonPropertyDescription.Component#" + level + " "+ level + "}</b></p>");
+        }
+        out.println("</td>");
         out.println("</tr>");
     }
 

@@ -1,11 +1,15 @@
 #!/bin/bash
 
+set -x
+
 str=$1
 
 if [ -z $str ]; then
     echo "No input file. Aborting."
     exit -1
 fi
+
+echo "Input file: $str"
 
 # inkscape conversions of images
 inkscape -f images/xenon-design.svg -E images/xenon-design.eps
