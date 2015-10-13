@@ -193,7 +193,7 @@ public class SshAdaptor extends Adaptor {
             jsch.setConfigRepository(configRepository);
         } catch (IOException ex) {
             if (ignoreFail) {
-                LOGGER.warn("OpenSSH config file cannot be read.", ex);
+                LOGGER.warn("OpenSSH config file cannot be read.");
             } else {
                 throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot read OpenSSH config file", ex);
             }
