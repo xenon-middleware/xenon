@@ -20,9 +20,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -34,6 +31,12 @@ import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.util.Utils;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Abstract FileSystem tests. This class runs a set of test scenarios on the (remote) filesystem. This is one abstract test class
  * which can be used for all FileSystem adaptors.
@@ -41,39 +44,30 @@ import nl.esciencecenter.xenon.util.Utils;
  * @author Piter T. de Boer
  */
 public abstract class AbstractFileTests {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractFileTests.class);
+    protected Xenon xenon;
+    protected Files files;
 
     /**
-     * Singleton Engine for all tests
+     * The FileSystem instance to run integration tests on.
      */
-    protected static Xenon xenon = null;
+    protected FileSystem fileSystem;
 
-    protected static Files getFiles() throws XenonException {
+    @Before
+    public void setupFiles() throws XenonException, Exception {
+        xenon = XenonFactory.newXenon(null);
+        files = xenon.files();
+        URI uri = getTestLocation();
+        fileSystem = files.newFileSystem(uri.getScheme(), uri.getAuthority(), getCredentials(), null);
+    }
 
-        // class synchronization:
-        synchronized (AbstractFileTests.class) {
-
-            // init xenon singleton instance: 
-            if (xenon == null) {
-                xenon = XenonFactory.newXenon(null);
-            }
-
-            return xenon.files();
+    @After
+    public void cleanupFiles() throws XenonException {
+        try {
+            files.close(fileSystem);
+        } finally {
+            XenonFactory.endXenon(xenon);
         }
-    }
-
-    // todo logging
-    public static void debugPrintf(String format, Object... args) {
-        System.out.printf("DEBUG:" + format, args);
-    }
-
-    // todo logging
-    public static void infoPrintf(String format, Object... args) {
-        System.out.printf("INFO:" + format, args);
-    }
-
-    // todo logging
-    public static void errorPrintf(String format, Object... args) {
-        System.err.printf("ERROR:" + format, args);
     }
 
     protected static int uniqueIdcounter = 1;
@@ -81,27 +75,6 @@ public abstract class AbstractFileTests {
     // ========
     // Instance 
     // ======== 
-
-    /**
-     * The FileSystem instance to run integration tests on.
-     */
-    protected FileSystem fileSystem = null;
-
-    /**
-     * Get actual FileSystem implementation to run test on. Test this before other tests:
-     */
-    protected FileSystem getFileSystem() throws Exception {
-
-        // Use singleton for all tests. Could create new Filesystem instance per test.  
-        synchronized (this) {
-            if (fileSystem == null) {
-                URI uri = getTestLocation();
-                fileSystem = getFiles().newFileSystem(uri.getScheme(), uri.getAuthority(), getCredentials(), null);
-            }
-
-            return fileSystem;
-        }
-    }
 
     /**
      * Return credentials for this FileSystem if needed for the integration tests.
@@ -126,15 +99,14 @@ public abstract class AbstractFileTests {
      * Helper method to return current test dir. This directory must exist and must be writable.
      */
     protected Path getTestDir() throws Exception {
-        FileSystem fs = getFileSystem();
         String testPath = this.getTestLocation().getPath();
-        return getFiles().newPath(fs, new RelativePath(testPath));
+        return files.newPath(fileSystem, new RelativePath(testPath));
     }
 
     protected Path createSubdir(Path parentDirPath, String subDir) throws XenonException {
-        Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, subDir);
-        infoPrintf("createSubdir: '%s' -> '%s'\n", subDir, absPath);
-        getFiles().createDirectory(absPath);
+        Path absPath = Utils.resolveWithRoot(files, parentDirPath, subDir);
+        logger.info("createSubdir: '{}' -> '{}'", subDir, absPath);
+        files.createDirectory(absPath);
         return absPath;
     }
 
@@ -149,19 +121,17 @@ public abstract class AbstractFileTests {
      *            - prefix of the sub-directory. An unique number will be append to this name,
      * @return AbsolutPath of new created directory
      */
-    protected Path createUniqueTestSubdir(Path parentDirPath, String dirPrefix) throws XenonException,
-            XenonException {
+    protected Path createUniqueTestSubdir(Path parentDirPath, String dirPrefix) throws XenonException {
+        int myid;
+        Path absPath;
         do {
-            int myid = uniqueIdcounter++;
-            Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, dirPrefix + "." + myid);
+            myid = uniqueIdcounter++;
+            absPath = Utils.resolveWithRoot(files, parentDirPath, dirPrefix + "." + myid);
+        } while (files.exists(absPath));
 
-            if (getFiles().exists(absPath) == false) {
-                infoPrintf("createUniqueTestSubdir: '%s'+%d => '%s'\n", dirPrefix, myid, absPath);
-                getFiles().createDirectory(absPath);
-                return absPath;
-            }
-
-        } while (true);
+        logger.info("createUniqueTestSubdir: '{}'+{} => '{}'\n", dirPrefix, myid, absPath);
+        files.createDirectory(absPath);
+        return absPath;
     }
 
     /**
@@ -175,54 +145,36 @@ public abstract class AbstractFileTests {
      *            - actually create (empty) file on (remote) file system.
      * @return new Path, which points to existing file if createFile was true.
      * @throws XenonException
-     * @throws XenonException
      */
     protected Path createUniqueTestFile(Path parentDirPath, String filePrefix, boolean createFile)
             throws XenonException {
 
+        int myid;
+        Path absPath;
         do {
-            int myid = uniqueIdcounter++;
-            Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, filePrefix + "." + myid);
+            myid = uniqueIdcounter++;
+            absPath = Utils.resolveWithRoot(files, parentDirPath, filePrefix + "." + myid);
+        } while (files.exists(absPath));
 
-            if (getFiles().exists(absPath) == false) {
-
-                infoPrintf("createUniqueTestFile: '%s'+%d => '%s'\n", filePrefix, myid, absPath);
-                if (createFile) {
-                    getFiles().createFile(absPath);
-                }
-                return absPath;
-            }
-
-        } while (true);
+        logger.info("createUniqueTestFile: '{}'+{} => '{}'\n", filePrefix, myid, absPath);
+        if (createFile) {
+            files.createFile(absPath);
+        }
+        return absPath;
     }
 
     protected Path createFile(Path parentDirPath, String subFile) throws XenonException {
-        Path absPath = Utils.resolveWithRoot(xenon.files(), parentDirPath, subFile);
-        getFiles().createFile(absPath);
+        Path absPath = Utils.resolveWithRoot(files, parentDirPath, subFile);
+        files.createFile(absPath);
         return absPath;
     }
 
     protected void deletePaths(Path[] paths, boolean assertDeletion) throws XenonException {
-
         for (Path path : paths) {
-            getFiles().delete(path);
+            files.delete(path);
             if (assertDeletion)
-                assertFalse("After Files().delete(), the path may not exist:" + path, getFiles().exists(path));
+                assertFalse("After Files().delete(), the path may not exist:" + path, files.exists(path));
         }
-    }
-
-    // ========================
-    // SetUp Integration Tests
-    // ========================
-
-    @Before
-    public void checkTestSetup() throws Exception {
-        // Basic Sanity checks of the test environment; 
-        // Typically Exceptions should be thrown here if the call fails. 
-        URI uri = getTestLocation();
-        assertNotNull("Setup: Can't do tests on a NULL location", uri);
-        assertNotNull("Setup: The Files() interface is NULL", getFiles());
-        assertNotNull("Setup: Actual FileSystem to run tests on is NULL", getFileSystem());
     }
 
     // ========================
@@ -235,13 +187,13 @@ public abstract class AbstractFileTests {
         assertNotNull("TestPath returned NULL", path);
         assertNotNull("Actual path element of Path may not be NULL", path);
 
-        infoPrintf("Test location path scheme      =%s\n", path.getFileSystem().getScheme());
-        infoPrintf("Test location path location    =%s\n", path.getFileSystem().getLocation());
-        infoPrintf("Test location path          =%s\n", path.getRelativePath().getAbsolutePath());
-        infoPrintf("Test location toString()    =%s\n", path.toString());
-        infoPrintf("Test location getFileName() =%s\n", path.getRelativePath().getFileName());
+        logger.info("Test location path scheme      ={}\n", path.getFileSystem().getScheme());
+        logger.info("Test location path location    ={}\n", path.getFileSystem().getLocation());
+        logger.info("Test location path          ={}\n", path.getRelativePath().getAbsolutePath());
+        logger.info("Test location toString()    ={}\n", path.toString());
+        logger.info("Test location getFileName() ={}\n", path.getRelativePath().getFileName());
 
-        assertTrue("Root test location must exists (won't create here):" + path, getFiles().exists(path));
+        assertTrue("Root test location must exists (won't create here):" + path, files.exists(path));
     }
 
     /**
@@ -249,9 +201,7 @@ public abstract class AbstractFileTests {
      */
     @Test
     public void testCreateDeleteEmptyFile() throws Exception {
-        Path filePath = Utils.resolveWithRoot(xenon.files(), getTestDir(), "testFile01");
-
-        Files files = getFiles();
+        Path filePath = Utils.resolveWithRoot(files, getTestDir(), "testFile01");
 
         // Previous test run could have gone wrong. Indicate here that a previous test run failed. 
         boolean preExisting = files.exists(filePath);
@@ -259,8 +209,8 @@ public abstract class AbstractFileTests {
             try {
                 // try to delete first ! 
                 files.delete(filePath);
-            } catch (Exception e) {
-
+            } catch (XenonException e) {
+                // may fail, no problem
             }
             assertFalse(
                     "exists(): Can't test createFile is previous test file already exists. File should now be deleted, please run test again.",
@@ -281,17 +231,13 @@ public abstract class AbstractFileTests {
      */
     @Test
     public void testCreateDeleteEmptySubdir() throws Exception {
-
-        Files files = getFiles();
-
-        Path dirPath = Utils.resolveWithRoot(xenon.files(), getTestDir(), "testSubdir01");
+        Path dirPath = Utils.resolveWithRoot(files, getTestDir(), "testSubdir01");
         assertFalse("Previous test directory already exists. Please clean test location.:" + dirPath,
                 files.exists(dirPath));
 
-        getFiles().createDirectory(dirPath);
+        files.createDirectory(dirPath);
         // test both ? 
         boolean exists = files.exists(dirPath);
-        exists = files.exists(dirPath);
         assertTrue("After createDirectory(), method exists() reports false for path:" + dirPath, exists);
 
         assertDirIsEmpty(files, dirPath);
@@ -310,58 +256,43 @@ public abstract class AbstractFileTests {
 
     @Test
     public void testgetFileSystemEntryPath() throws Exception {
-
-        FileSystem fs = getFileSystem();
-
         // just test whether it works: 
-        Path relEntryPath = fs.getEntryPath();
+        Path relEntryPath = fileSystem.getEntryPath();
         assertNotNull("Entry Path may not be null.", relEntryPath);
     }
 
     @Test
     public void testResolveRootPath() throws Exception {
-
-        FileSystem fs = getFileSystem();
-
         // resolve "/", for current filesystems this must equal to "/" ? 
-        Path rootPath = getFiles().newPath(fs, new RelativePath("/"));
+        Path rootPath = files.newPath(fileSystem, new RelativePath("/"));
         assertEquals("Absolute path of resolved path '/' must equal to '/'.", "/", rootPath);
     }
 
     @Test
     public void testNewDirectoryStreamTestDir() throws Exception {
-
         Path path = getTestDir();
-        DirectoryStream<Path> dirStream = getFiles().newDirectoryStream(path);
-        Iterator<Path> iterator = dirStream.iterator();
 
         // Just test whether it works and directory is readable (other tests will fail if this doesn't work). 
-        while (iterator.hasNext()) {
-            Path pathEl = iterator.next();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", pathEl.getFileSystem().getScheme(), pathEl);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", pathEl.getFileSystem().getLocation(), pathEl);
+        for (Path pathEl : files.newDirectoryStream(path)) {
+            logger.info(" -(Path)Path     ={}:'{}'\n", pathEl.getFileSystem().getScheme(), pathEl);
+            logger.info(" -(Path)getPath()={}:'{}'\n", pathEl.getFileSystem().getLocation(), pathEl);
         }
     }
 
     @Test
     public void testNewDirectoryAttributesStreamTestDir() throws Exception {
-
         Path path = getTestDir();
-        DirectoryStream<PathAttributesPair> dirStream = getFiles().newAttributesDirectoryStream(path);
-        Iterator<PathAttributesPair> iterator = dirStream.iterator();
+        DirectoryStream<PathAttributesPair> dirStream = files.newAttributesDirectoryStream(path);
 
         // Just test whether it works and directory is readable (other tests will fail if this doesn't work). 
-        while (iterator.hasNext()) {
-            PathAttributesPair pathEl = iterator.next();
-            infoPrintf(" -(PathAttributesPair)path='%s'\n", pathEl.path());
+        for (PathAttributesPair pathEl : dirStream) {
+            logger.info(" -(PathAttributesPair)path='{}'\n", pathEl.path());
         }
     }
 
     @Test
     public void testCreateListAndDelete3Subdirs() throws Exception {
-
         // PRE:
-        Files files = getFiles();
         Path testDirPath = createUniqueTestSubdir(getTestDir(), "testSubdir3");
         assertDirIsEmpty(files, testDirPath);
 
@@ -370,19 +301,15 @@ public abstract class AbstractFileTests {
         Path dir2 = createSubdir(testDirPath, "subDir2");
         Path dir3 = createSubdir(testDirPath, "subDir3");
 
-        DirectoryStream<Path> dirStream = getFiles().newDirectoryStream(testDirPath);
-        Iterator<Path> iterator = dirStream.iterator();
-
         int count = 0;
 
-        while (iterator.hasNext()) {
-            Path pathEl = iterator.next();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", pathEl.getFileSystem().getScheme(), pathEl);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", pathEl.getFileSystem().getLocation(), pathEl);
+        for (Path pathEl : files.newDirectoryStream(testDirPath)) {
+            logger.info(" -(Path)Path     ={}:'{}'\n", pathEl.getFileSystem().getScheme(), pathEl);
+            logger.info(" -(Path)getPath()={}:'{}'\n", pathEl.getFileSystem().getLocation(), pathEl);
             count++;
         }
 
-        infoPrintf("Directory has:%d entries\n", count);
+        logger.info("Directory has: {} entries\n", count);
         assertEquals("Directory must have 3 sub directories\n", 3, count);
 
         // POST: 
@@ -392,9 +319,7 @@ public abstract class AbstractFileTests {
 
     @Test
     public void testCreateListAndDelete3FilesWithAttributes() throws Exception {
-
         // PRE: 
-        Files files = getFiles();
         Path testDirPath = createUniqueTestSubdir(getTestDir(), "testSubdir4");
         assertDirIsEmpty(files, testDirPath);
 
@@ -403,21 +328,19 @@ public abstract class AbstractFileTests {
         Path file2 = createFile(testDirPath, "file2");
         Path file3 = createFile(testDirPath, "file3");
 
-        DirectoryStream<PathAttributesPair> dirStream = getFiles().newAttributesDirectoryStream(testDirPath);
-        Iterator<PathAttributesPair> iterator = dirStream.iterator();
+        DirectoryStream<PathAttributesPair> dirStream = files.newAttributesDirectoryStream(testDirPath);
 
         // Regression test: this has failed before. Issue #91
         int count = 0;
 
-        while (iterator.hasNext()) {
-            PathAttributesPair el = iterator.next();
+        for (PathAttributesPair el : dirStream) {
             Path path = el.path();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", path.getFileSystem().getScheme(), path);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", path.getFileSystem().getLocation(), path);
+            logger.info(" -(Path)Path     ={}:'{}'\n", path.getFileSystem().getScheme(), path);
+            logger.info(" -(Path)getPath()={}:'{}'\n", path.getFileSystem().getLocation(), path);
             count++;
         }
 
-        infoPrintf("Directory has:%d entries\n", count);
+        logger.info("Directory has:{} entries\n", count);
         assertEquals("Directory must have 3 file entries\n", 3, count);
 
         // POST: 
@@ -426,9 +349,7 @@ public abstract class AbstractFileTests {
 
     @Test
     public void testCreateListAndDelete3SubdirsWithAttributes() throws Exception {
-
         // PRE:
-        Files files = getFiles();
         Path testDirPath = createUniqueTestSubdir(getTestDir(), "testSubdir5");
         assertDirIsEmpty(files, testDirPath);
 
@@ -437,20 +358,18 @@ public abstract class AbstractFileTests {
         Path dir2 = createSubdir(testDirPath, "subDir2");
         Path dir3 = createSubdir(testDirPath, "subDir3");
 
-        DirectoryStream<PathAttributesPair> dirStream = getFiles().newAttributesDirectoryStream(testDirPath);
-        Iterator<PathAttributesPair> iterator = dirStream.iterator();
+        DirectoryStream<PathAttributesPair> dirStream = files.newAttributesDirectoryStream(testDirPath);
 
         int count = 0;
 
-        while (iterator.hasNext()) {
-            PathAttributesPair el = iterator.next();
+        for (PathAttributesPair el : dirStream) {
             Path path = el.path();
-            infoPrintf(" -(Path)Path     =%s:'%s'\n", path.getFileSystem().getScheme(), path);
-            infoPrintf(" -(Path)getPath()=%s:'%s'\n", path.getFileSystem().getLocation(), path);
+            logger.info(" -(Path)Path     ={}:'{}'\n", path.getFileSystem().getScheme(), path);
+            logger.info(" -(Path)getPath()={}:'{}'\n", path.getFileSystem().getLocation(), path);
             count++;
         }
 
-        infoPrintf("Directory has:%d entries\n", count);
+        logger.info("Directory has:{} entries\n", count);
         assertEquals("Directory must have 3 sub directories\n", 3, count);
 
         // POST: 
@@ -466,7 +385,6 @@ public abstract class AbstractFileTests {
      */
     @Test
     public void testStreamWriteAndReadNillBytes() throws Exception {
-
         // empty array: 
         byte nilBytes[] = new byte[0];
         testStreamWriteAndReadBytes(nilBytes, 0);
@@ -477,7 +395,6 @@ public abstract class AbstractFileTests {
      */
     @Test
     public void testStreamWriteAndRead256Bytes() throws Exception {
-
         // one byte: 
         byte oneByte[] = new byte[1];
         oneByte[0] = 13;
@@ -497,23 +414,22 @@ public abstract class AbstractFileTests {
      * Helper method to write a series of bytes.
      */
     protected void testStreamWriteAndReadBytes(byte bytes[], int numBytes) throws Exception {
-
         // PRE: 
         Path testFilePath = createUniqueTestFile(getTestDir(), "testStreaReadWriteFile03", true);
-        assertTrue("Test file doesn't exists:" + testFilePath, getFiles().exists(testFilePath));
+        assertTrue("Test file doesn't exists:" + testFilePath, files.exists(testFilePath));
 
         // TEST: 
-        java.io.OutputStream outps = getFiles().newOutputStream(testFilePath, OpenOption.CREATE);
+        java.io.OutputStream outps = files.newOutputStream(testFilePath, OpenOption.CREATE);
 
         outps.write(bytes);
 
         try {
             outps.close();
         } catch (IOException e) {
-            debugPrintf("IOException when closing test file:%s\n", e);
+            logger.debug("IOException when closing test file:{}\n", e);
         }
 
-        InputStream inps = getFiles().newInputStream(testFilePath);
+        InputStream inps = files.newInputStream(testFilePath);
 
         byte readBytes[] = new byte[numBytes];
         int totalRead = 0;
@@ -537,7 +453,7 @@ public abstract class AbstractFileTests {
         try {
             inps.close();
         } catch (IOException e) {
-            debugPrintf("IOException when closing test file:%s\n", e);
+            logger.debug("IOException when closing test file:{}\n", e);
         }
 
         // POST: 

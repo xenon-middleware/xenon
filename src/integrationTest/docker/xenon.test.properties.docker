@@ -105,6 +105,8 @@ test.ftp.location=xenon-ftp
 test.ftp.user=xenon
 test.ftp.password=javagat
 
+test.sftp.locations=xenon@xenon-ssh/tmp/xenon,xenon@xenon-ssh2/tmp/xenon
+
 test.torque.location=xenon-torque
 test.torque.user=xenon
 test.torque.password=javagat
