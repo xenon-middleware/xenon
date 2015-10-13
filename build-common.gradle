@@ -144,6 +144,30 @@ task userguidePdf(type:Exec, dependsOn: [checkPandocPresence, userguideMarkdown]
     args = [userguideMarkdown.target, '-o', output]
 }
 
+task checkTexlivePresence(type:Exec) {
+    executable 'pdflatex'
+    args = ['-v']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+task checkInkscapePresence(type:Exec) {
+    executable 'inkscape'
+    args = ['-V']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+task tutorialPdf(type:Exec, dependsOn: [checkTexlivePresence, checkInkscapePresence]) {
+    description 'Generates tutorial pdf (requires inkscape and texlive)'
+    group 'documentation'
+    workingDir 'doc/user/tutorial'
+    executable './compile.sh'
+    File input = file('doc/user/tutorial/xenon-tutorial.tex')
+    File output = file('doc/user/tutorial/xenon-tutorial.pdf')
+    inputs.file input
+    outputs.file output
+    args = [input.getName()]
+}
+
 //     TEST
 // ==============
 
@@ -223,9 +247,9 @@ distributions {
         }
     }
 }
-distZip.dependsOn javadoc, userguidePdf
-distTar.dependsOn javadoc, userguidePdf
-installDist.dependsOn javadoc, userguidePdf
+distZip.dependsOn javadoc, userguidePdf, tutorialPdf
+distTar.dependsOn javadoc, userguidePdf, tutorialPdf
+installDist.dependsOn javadoc, userguidePdf, tutorialPdf
 
 //     PUBLISH
 // ==============
