@@ -113,7 +113,7 @@ task adaptorDocumentation(type: JavaExec) {
     group 'documentation'
     main = 'nl.esciencecenter.xenon.util.AdaptorDocGenerator'
     // TODO adaptors.md is made in wrong dir (build/), change builddir to build/docs/userguide, docs/userguide dir must be created before
-    File output = file("${buildDir}/adaptors.html")
+    File output = file("${buildDir}/overview.html")
     args = [output]
     classpath = sourceSets.main.runtimeClasspath
     outputs.file output

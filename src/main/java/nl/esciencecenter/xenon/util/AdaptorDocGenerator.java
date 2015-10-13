@@ -36,59 +36,54 @@ public class AdaptorDocGenerator {
 
     private static void printPropertyDescription(XenonPropertyDescription d) {
 
-        out.println("__`" + d.getName() + "`__\n");
-        out.println(d.getDescription() + "\n");
-        out.println("- Expected type: " + d.getType() + "\n");
-        out.println("- Default value: " + d.getDefaultValue() + "\n");
-        out.println("- Valid for: " + d.getLevels() + "\n\n");
+        out.println("<tr>");
+        out.println("<td>" + "<pre>" + d.getName() + "</pre></td>");
+        out.println("<td>" + d.getDescription() + "</td>");
+        out.println("<td>" + d.getType() + "</td>");
+        out.println("<td>" +  d.getDefaultValue() + "</td>");
+        out.println("<td>" + d.getLevels() + "</td>");
+        out.println("</tr>");
     }
 
     private static void printAdaptorDoc(AdaptorStatus a) {
 
-        out.println("Adaptor: " + a.getName());
-        out.println("--------");
+        out.println("<h2><a name=\"" + a.getName()  + "\">Adaptor: " + a.getName() + "</a></h2>");
 
-        out.println();
+
+        out.println("<p>");
         out.println(a.getDescription());
-        out.println();
+        out.println("</p");
 
-        out.println("#### Supported schemes: ####");
+        out.println("<h4>Supported schemes:</h4><ul>");
 
         String[] schemes = a.getSupportedSchemes();
 
-        String comma = "";
-
         for (int i = 0; i < schemes.length; i++) {
-            out.print(comma + schemes[i]);
-            comma = ", ";
+            out.print("<li>" + schemes[i] + "</li>");
         }
 
-        out.println();
-        out.println();
+        out.println("</ul>");
 
-        out.println("#### Supported locations: ####");
+        out.println("<h4> Supported locations:</h4><ul>");
 
         String[] locations = a.getSupportedLocations();
 
-        comma = "";
-
         for (int i = 0; i < locations.length; i++) {
-            out.print(comma + locations[i]);
-            comma = ", ";
+            out.print("<li>" + locations[i] + "</li>");
         }
 
-        out.println();
-        out.println();
+        out.println("</ul>");
 
-        out.println("#### Supported properties: ####\n\n");
+        out.println("<h4> Supported properties: </h4>");
 
         XenonPropertyDescription[] properties = a.getSupportedProperties();
 
+        out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>");
         for (XenonPropertyDescription d : properties) {
             printPropertyDescription(d);
         }
 
-        out.println();
+        out.println("</table>");
     }
 
     public static void main(String[] args) {
@@ -113,22 +108,17 @@ public class AdaptorDocGenerator {
             out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Insert title here</title></head><body>");
             out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
             out.println("<h1>Adaptor Documentation</h1>");
-            out.println("---------------------------------");
-            out.println("<pre>");
-            out.println("This section contains the adaptor documentation which is generated "
-                    + "from the information provided by the adaptors themselves.");
-            out.println("");
-            out.print("Xenon currently supports " + adaptors.length + " adaptors: ");
+            out.println("<p>This section contains the adaptor documentation which is generated "
+                    + "from the information provided by the adaptors themselves.</p>");
 
-            String comma = "";
+            out.print("Xenon currently supports " + adaptors.length + " adaptors: <ul>");
 
             for (AdaptorStatus a : adaptors) {
-                out.print(comma + a.getName());
-                comma = ", ";
+                out.println("<li><a href=\"#" + a.getName() + "\">" + a.getName() + "</a></li>");
             }
 
-            out.println(".");
-            out.println();
+            out.println("</ul>");
+            out.println("");
 
             for (AdaptorStatus a : adaptors) {
                 printAdaptorDoc(a);
@@ -136,7 +126,7 @@ public class AdaptorDocGenerator {
 
             XenonFactory.endAll();
 
-            out.println("</pre></body></html>");
+            out.println("</body></html>");
 
         } catch (Exception e) {
             System.err.println("Failed to generate adaptor documentation: " + e.getMessage());
