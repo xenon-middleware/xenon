@@ -1,4 +1,3 @@
-![logo](doc/images/NLeSC_Xenon_logo.png "Xenon Logo")
 
 Xenon
 =====

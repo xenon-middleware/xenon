@@ -33,13 +33,11 @@ import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.ftp.FtpAdaptor;
-import nl.esciencecenter.xenon.adaptors.gftp.GftpAdaptor;
 import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptor;
-import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptor;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
@@ -181,10 +179,8 @@ public final class XenonEngine implements Xenon {
         result.add(new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX)));
         result.add(new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX)));
         result.add(new FtpAdaptor(this, extract(tmp, FtpAdaptor.PREFIX)));
-        result.add(new WebdavAdaptor(this, extract(tmp, WebdavAdaptor.PREFIX)));
         result.add(new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX)));
         result.add(new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX)));
-        result.add(new GftpAdaptor(this, extract(tmp, GftpAdaptor.PREFIX)));
         result.add(new TorqueAdaptor(this, extract(tmp, TorqueAdaptor.PREFIX)));
 
         // Check if there are any properties left. If so, this is a problem.
