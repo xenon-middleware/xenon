@@ -64,7 +64,7 @@ public class XenonEngineTest {
     @Test(expected = UnknownPropertyException.class)
     public void newEngine_CorrectPropertiesAtWrongLevel_ThrowsException() throws Exception {
         Map<String, String> properties = new HashMap<>();
-        // This property is valid at scheduler level, not at xenon level 
+        // This property is valid at scheduler level, not at xenon level
         properties.put("xenon.adaptors.ssh.queue.pollingDelay", "1500");
         XenonEngine.newXenon(properties);
     }
@@ -91,7 +91,7 @@ public class XenonEngineTest {
         // These are xenon level properties
         properties.put("xenon.adaptors.ssh.loadKnownHosts", "false");
         properties.put("xenon.adaptors.local.queue.pollingDelay", "1500");
-        // This property is valid at scheduler level, not at xenon level 
+        // This property is valid at scheduler level, not at xenon level
         properties.put("xenon.adaptors.ssh.queue.pollingDelay", "1500");
         XenonEngine.newXenon(properties);
     }
@@ -163,9 +163,9 @@ public class XenonEngineTest {
     @Test
     public void getAdaptorInfos_StandardAdaptors_Succeeds() throws Exception {
 
-        // We currently have 8 adaptors:
-        // local, ssh, gridengine, slurm, ftp, gftp, torque, webdav
-        int count = 8;
+        // We currently have adaptors:
+        // local, ssh, gridengine, slurm, ftp, torque
+        int count = 6;
 
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
 
