@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.integration;
+package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.net.URI;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.files.AbstractFileTests;
 
 public class ITFileTests_SFTP_ui_grid_sara_nl extends AbstractFileTests {
 

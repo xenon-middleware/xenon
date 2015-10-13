@@ -21,8 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
@@ -64,10 +64,10 @@ public class JobQueues {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobQueues.class);
 
     /** The minimal allowed value for the polling delay */
-    private static final int MIN_POLLING_DELAY = 100;
+    public static final int MIN_POLLING_DELAY = 100;
 
     /** The maximum allowed value for the polling delay */
-    private static final int MAX_POLLING_DELAY = 60000;
+    public static final int MAX_POLLING_DELAY = 60000;
 
     private final String adaptorName;
 
@@ -109,9 +109,9 @@ public class JobQueues {
         this.pollingDelay = pollingDelay;
         
 
-        singleQ = new LinkedList<JobExecutor>();
-        multiQ = new LinkedList<JobExecutor>();
-        unlimitedQ = new LinkedList<JobExecutor>();
+        singleQ = new LinkedList<>();
+        multiQ = new LinkedList<>();
+        unlimitedQ = new LinkedList<>();
 
         if (multiQThreads < 1) {
             throw new BadParameterException(adaptorName, "Number of slots for the multi queue cannot be smaller than one!");

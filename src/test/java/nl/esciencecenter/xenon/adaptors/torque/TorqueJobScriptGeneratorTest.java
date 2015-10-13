@@ -66,7 +66,6 @@ public class TorqueJobScriptGeneratorTest {
     public void test01b_generate__FilledDescription_Result() throws XenonException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
-        description.addEnvironment("some", "environment.value");
         description.addEnvironment("some.more", "environment value with spaces");
         description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
@@ -87,8 +86,7 @@ public class TorqueJobScriptGeneratorTest {
                 + "#PBS -l list-of-resources\n"
                 + "#PBS -l nodes=1:ppn=1\n"
                 + "#PBS -l walltime=01:40:00\n"
-                + "export some.more=\"environment value with spaces\"\n"
-                + "export some=\"environment.value\"\n\n"
+                + "export some.more=\"environment value with spaces\"\n\n"
                 + "/bin/executable 'some' 'arguments'\n";
 
         assertEquals(expected, result);
@@ -103,7 +101,6 @@ public class TorqueJobScriptGeneratorTest {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
         description.addEnvironment("some", "environment.value");
-        description.addEnvironment("some.more", "environment value with spaces");
         description.addJobOption(TorqueSchedulerConnection.JOB_OPTION_RESOURCES, "list-of-resources");
         description.setExecutable("/bin/executable");
         description.setMaxTime(100);
@@ -123,7 +120,6 @@ public class TorqueJobScriptGeneratorTest {
                 + "#PBS -l list-of-resources\n"
                 + "#PBS -l nodes=4:ppn=10\n"
                 + "#PBS -l walltime=01:40:00\n"
-                + "export some.more=\"environment value with spaces\"\n"
                 + "export some=\"environment.value\"\n\n"
                 + "/bin/executable 'some' 'arguments'\n";
 

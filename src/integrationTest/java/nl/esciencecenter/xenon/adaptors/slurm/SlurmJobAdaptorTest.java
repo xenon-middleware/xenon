@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.Job;
@@ -89,7 +88,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setExecutable(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -156,7 +155,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job not finished");
@@ -293,8 +292,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
             j[i] = jobs.submitJob(scheduler, description);
         }
 
-        // Bit hard to determine realistic deadline here ?
-        long deadline = System.currentTimeMillis() + config.getQueueWaitTime() + (5 * config.getUpdateTime());
+        long deadline = System.currentTimeMillis() + config.getJobTimeout();
 
         boolean done = false;
 
@@ -392,7 +390,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
         logger.debug("got back stdout : {}", out);
         logger.debug("got back stderr : {}", err);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job not finished");
@@ -442,7 +440,7 @@ public class SlurmJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job not finished");

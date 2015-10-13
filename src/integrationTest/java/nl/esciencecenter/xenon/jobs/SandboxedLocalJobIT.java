@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.integration;
+package nl.esciencecenter.xenon.jobs;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -31,10 +31,6 @@ import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
-import nl.esciencecenter.xenon.jobs.Job;
-import nl.esciencecenter.xenon.jobs.JobDescription;
-import nl.esciencecenter.xenon.jobs.JobStatus;
-import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.util.Sandbox;
 import nl.esciencecenter.xenon.util.Utils;
 
@@ -64,7 +60,6 @@ public class SandboxedLocalJobIT {
     @Test
     public void test() throws Exception, XenonException, URISyntaxException, InterruptedException, IOException {
         Xenon xenon = XenonFactory.newXenon(null);
-        Credential credential = null;
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
         FileSystem localrootfs = Utils.getLocalCWD(xenon.files()).getFileSystem();

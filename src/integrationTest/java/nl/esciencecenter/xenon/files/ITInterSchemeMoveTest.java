@@ -16,16 +16,11 @@
 
 package nl.esciencecenter.xenon.files;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.ssh.SSHJobTestConfig;
 import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
@@ -34,33 +29,13 @@ import org.junit.Test;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class InterSchemeMoveTest {
-    
-    private String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retireve property " + property);
-        }
-
-        return tmp;
-    }
-    
+public class ITInterSchemeMoveTest {
     @Test(expected = XenonException.class)
     public void test_move() throws Exception {
+        SSHJobTestConfig config = new SSHJobTestConfig(null);
 
-        String configfile = System.getProperty("test.config");
-        
-        if (configfile == null) {
-            configfile = System.getProperty("user.home") + File.separator + "xenon.test.properties";
-        }
-        
-        Properties p = new Properties();
-        p.load(new FileInputStream(configfile));
-
-        String user = getPropertyOrFail(p, "test.ssh.user");
-        String location = getPropertyOrFail(p, "test.ssh.location");
+        String user = config.getPropertyOrFail("test.ssh.user");
+        String location = config.getPropertyOrFail("test.ssh.location");
         
         Xenon xenon = XenonEngine.newXenon(null);
 

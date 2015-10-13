@@ -28,9 +28,6 @@ import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
-import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
-import nl.esciencecenter.xenon.engine.PropertyTypeException;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 
 import org.junit.Test;
@@ -44,7 +41,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
 
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -59,7 +56,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -73,7 +70,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
 
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -88,7 +85,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -102,7 +99,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
 
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -117,7 +114,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -131,7 +128,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertFalse(xprop.propertySet("aap"));
@@ -145,7 +142,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
 
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -160,7 +157,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
 
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -174,7 +171,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
 
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -188,7 +185,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "bla", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "value");
 
         XenonProperties xprop = new XenonProperties(valid, props);
@@ -203,7 +200,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "value", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key2", "value2");
 
         new XenonProperties(supportedProperties, props);
@@ -218,7 +215,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key2", Type.STRING, EnumSet.of(Component.XENON), "value",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key2", "value2");
 
         XenonProperties xprop = new XenonProperties(supportedProperties, props);
@@ -235,7 +232,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key2", Type.STRING, EnumSet.of(Component.SCHEDULER), "value",
                         "test property"));
                 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key2", "value2");
 
         XenonProperties xprop = new XenonProperties(supportedProperties, props).filter(Component.XENON);
@@ -249,7 +246,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.XENON), "true", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "true");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -263,7 +260,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.XENON), "true", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "false");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -277,7 +274,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.XENON), "true", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertTrue(xprop.getBooleanProperty("key"));
@@ -290,7 +287,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.XENON), "true", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "bla");
         new XenonProperties(valid, props);
     }
@@ -302,7 +299,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.XENON), "aap", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         new XenonProperties(valid, props).getBooleanProperty("key");
     }
 
@@ -313,7 +310,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.BOOLEAN, EnumSet.of(Component.XENON), "true", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         new XenonProperties(valid, props).getBooleanProperty("noot");
     }
     
@@ -324,7 +321,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.STRING, EnumSet.of(Component.XENON), "value", 
                         "test property"));
         
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         XenonProperties xprop = new XenonProperties(supportedProperties, props);
         xprop.getBooleanProperty("key"); // throws exception        
     }
@@ -336,7 +333,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Component.XENON), "42", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -350,7 +347,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Component.XENON), "42", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertTrue(xprop.getIntegerProperty("key") == 42);
@@ -363,7 +360,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.INTEGER, EnumSet.of(Component.XENON), "aap", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         new XenonProperties(valid, props).getIntegerProperty("key"); // throws exception
     }
 
@@ -374,7 +371,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.DOUBLE, EnumSet.of(Component.XENON), "42.0", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1.0");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -388,7 +385,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.DOUBLE, EnumSet.of(Component.XENON), "42.0", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         XenonProperties xprop = new XenonProperties(valid, props);
 
         assertTrue(xprop.getDoubleProperty("key") == 42.0);
@@ -401,7 +398,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.DOUBLE, EnumSet.of(Component.XENON), "aap", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         new XenonProperties(valid, props).getDoubleProperty("key"); // throws exception
     }
 
@@ -413,7 +410,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1g");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -427,7 +424,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1G");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -441,7 +438,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1m");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -455,7 +452,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1M");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -469,7 +466,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1k");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -483,7 +480,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1K");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -497,7 +494,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1");
         XenonProperties xprop = new XenonProperties(valid, props);
 
@@ -511,7 +508,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("key", Type.SIZE, EnumSet.of(Component.XENON), "42g", 
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(2);
         props.put("key", "1X");
         XenonProperties xprop = new XenonProperties(valid, props);
         xprop.getSizeProperty("key"); // throws exception
@@ -526,7 +523,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.XENON), "noot",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(3);
         props.put("aap.key", "aap2");
         props.put("noot.key", "noot2");
         
@@ -544,7 +541,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.XENON), "noot",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         
         XenonProperties xprop = new XenonProperties(supportedProperties, props).filter("aap");
         
@@ -560,7 +557,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.XENON), "noot",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         
         XenonProperties xprop = new XenonProperties(supportedProperties, props).filter("bla");
         
@@ -576,7 +573,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.XENON), "noot",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         props.put("aap.key", "aap2");
         props.put("noot.key", "noot2");
         
@@ -594,7 +591,7 @@ public class XenonPropertiesTest {
                 new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.XENON), "noot",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         
         XenonProperties xprop = new XenonProperties(supportedProperties, props).exclude("noot");
         
@@ -606,15 +603,13 @@ public class XenonPropertiesTest {
         
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("aap.key", Type.STRING, EnumSet.of(Component.XENON), "aap",
-                        "test property"),
-                new XenonPropertyDescriptionImplementation("noot.key", Type.STRING, EnumSet.of(Component.XENON), "noot",
                         "test property"));
 
-        Map<String, String> props = new HashMap<>();
+        Map<String, String> props = new HashMap<>(0);
         
         XenonProperties xprop = new XenonProperties(supportedProperties, props).exclude("bla");
         
-        assertEquals("{<<noot.key=noot>>, <<aap.key=aap>>}", xprop.toString());
+        assertEquals("{<<aap.key=aap>>}", xprop.toString());
     }
     
     

@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.torque;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,7 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +33,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import java.util.HashMap;
 
 /**
  * Parses xml output from TORQUE batch system.
@@ -131,16 +129,12 @@ final class TorqueXmlParser {
                 Map<String, String> jobInfo = new HashMap<>();
                 recursiveMapFromElement(node, jobInfo);
 
-                String rawJobId = jobInfo.get("Job_Id");
-                if (rawJobId == null || rawJobId.isEmpty()) {
+                String jobId = jobInfo.get("Job_Id");
+                if (jobId == null || jobId.isEmpty()) {
                     throw new XenonException(TorqueAdaptor.ADAPTOR_NAME, "found job in queue with no job number");
                 }
 
-                String jobID = String.valueOf(ScriptingParser.parseJobIDFromLine(rawJobId, TorqueAdaptor.ADAPTOR_NAME, ""));
-
-                jobInfo.put("Job_Id_Number", jobID);
-
-                result.put(jobID, jobInfo);
+                result.put(jobId, jobInfo);
             }
         }
 

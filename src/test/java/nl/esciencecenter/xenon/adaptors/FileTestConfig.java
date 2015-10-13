@@ -59,19 +59,7 @@ public abstract class FileTestConfig extends GenericTestConfig {
         return false;
     }
 
-    protected String getPropertyOrFail(Properties p, String property) throws Exception {
-
-        String tmp = p.getProperty(property);
-
-        if (tmp == null) {
-            throw new Exception("Failed to retrieve property " + property);
-        }
-
-        return tmp;
-    }
-
     public String getNonDefaultCredentialLocation() throws Exception {
         return getCorrectLocation();
     }
-
 }

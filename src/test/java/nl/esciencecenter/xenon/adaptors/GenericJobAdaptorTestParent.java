@@ -649,7 +649,7 @@ public abstract class GenericJobAdaptorTestParent {
             String err = readFully(streams.getStderr());
 
             // NOTE: Job should already be done here!
-            JobStatus status = jobs.waitUntilDone(job, 5000);
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
             if (!status.isDone()) {
                 throw new Exception("Job exceeded dealine!");
@@ -1118,7 +1118,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline! status = " + status);
@@ -1256,7 +1256,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStderr(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1296,7 +1296,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(workingDir);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1340,7 +1340,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(workingDir);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1392,7 +1392,7 @@ public abstract class GenericJobAdaptorTestParent {
             return;
         }
 
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             fail("Job exceeded deadline! Expected status done, got " + status);
@@ -1432,7 +1432,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setWorkingDirectory(workingDir);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1479,7 +1479,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin("stdin.txt");
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1619,7 +1619,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1659,7 +1659,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1709,7 +1709,7 @@ public abstract class GenericJobAdaptorTestParent {
         description.setStdin(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -1827,7 +1827,7 @@ public abstract class GenericJobAdaptorTestParent {
         JobStatus status = jobs.cancelJob(job);
 
         if (!status.isDone()) {
-            jobs.waitUntilDone(job, 60000);
+            jobs.waitUntilDone(job, config.getUpdateTime());
         }
 
         Path out = resolve(root, "stdout.txt");

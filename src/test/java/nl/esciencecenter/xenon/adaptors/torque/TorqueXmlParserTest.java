@@ -20,11 +20,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import nl.esciencecenter.xenon.XenonException;
 
@@ -33,40 +33,39 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.w3c.dom.Document;
 
-import java.util.HashMap;
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TorqueXmlParserTest {
 
-    private static String readFile(String path) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
-        return new String(encoded, StandardCharsets.UTF_8);
+    private static String readFile(String pathName) throws IOException {
+        InputStream is = TorqueXmlParserTest.class.getResourceAsStream(pathName);
+        java.util.Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 
     @Test
     public void test01a_checkVersion() throws Throwable {
-        String input = readFile("test/fixtures/torque/jobs.xml");
+        String input = readFile("/fixtures/torque/jobs.xml");
         new TorqueXmlParser().parseDocument(input);
     }
 
     @Test(expected = XenonException.class)
     public void test01c_checkVersion_EmptyFile_ExceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/torque/jobs-empty.xml");
+        String input = readFile("/fixtures/torque/jobs-empty.xml");
         new TorqueXmlParser().parseDocument(input);
     }
 
     @Test
     public void test03a_parseJobInfo_SomeJobs_Result() throws Throwable {
-        String input = readFile("test/fixtures/torque/jobs.xml");
+        String input = readFile("/fixtures/torque/jobs.xml");
 
         String[] expectedJobIDs = new String[] {
-            "8921165",
-            "8931330",
-            "8938236",
-            "8941161",
-            "8941948",
-            "8942464",
-            "8954523",
+            "8921165.batch1.lisa.surfsara.nl",
+            "8931330.batch1.lisa.surfsara.nl",
+            "8938236.batch1.lisa.surfsara.nl",
+            "8941161.batch1.lisa.surfsara.nl",
+            "8941948.batch1.lisa.surfsara.nl",
+            "8942464.batch1.lisa.surfsara.nl",
+            "8954523.batch1.lisa.surfsara.nl",
             };
         Arrays.sort(expectedJobIDs);
 
@@ -81,19 +80,19 @@ public class TorqueXmlParserTest {
 
     @Test(expected = XenonException.class)
     public void test03b_parseJobInfo_jobEmptyJobNumber_exceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/torque/jobs-empty-jobnumber.xml");
+        String input = readFile("/fixtures/torque/jobs-empty-jobnumber.xml");
         new TorqueXmlParser().parseJobInfos(input);
     }
 
     @Test(expected = XenonException.class)
     public void test03c_parseJobInfo_jobWithoutJobNumber_exceptionThrown() throws Throwable {
-        String input = readFile("test/fixtures/torque/jobs-without-jobnumber.xml");
+        String input = readFile("/fixtures/torque/jobs-without-jobnumber.xml");
         new TorqueXmlParser().parseJobInfos(input);
     }
 
     @Test
     public void test04a_recursiveMap() throws Throwable {
-        String input = readFile("test/fixtures/torque/propertymap.xml");
+        String input = readFile("/fixtures/torque/propertymap.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
@@ -107,7 +106,7 @@ public class TorqueXmlParserTest {
 
     @Test
     public void test04b_recursiveMapRecurse() throws Throwable {
-        String input = readFile("test/fixtures/torque/propertymap-recurse.xml");
+        String input = readFile("/fixtures/torque/propertymap-recurse.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
@@ -122,7 +121,7 @@ public class TorqueXmlParserTest {
 
     @Test
     public void test04c_recursiveMapOverwrite() throws Throwable {
-        String input = readFile("test/fixtures/torque/propertymap-recurse-overwrite.xml");
+        String input = readFile("/fixtures/torque/propertymap-recurse-overwrite.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();
@@ -136,7 +135,7 @@ public class TorqueXmlParserTest {
 
     @Test
     public void test04d_recursiveMapWithValue() throws Throwable {
-        String input = readFile("test/fixtures/torque/propertymap-recurse-with-value.xml");
+        String input = readFile("/fixtures/torque/propertymap-recurse-with-value.xml");
         TorqueXmlParser parser = new TorqueXmlParser();
         Document document = parser.parseDocument(input);
         Map<String, String> result = new HashMap<>();

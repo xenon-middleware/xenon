@@ -25,8 +25,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
+import nl.esciencecenter.xenon.XenonException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

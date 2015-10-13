@@ -31,27 +31,11 @@ ext.apacheCommonsNetVersion = '3.3'
 // PROJECT DIRECTORIES
 // ==============
 sourceSets {
-    test {
-        java {
-            exclude 'nl/esciencecenter/xenon/integration/**'
-            exclude '**/IT*.java'
-            exclude '**/*IT.java'
-            exclude 'nl/esciencecenter/xenon/adaptors/*/*AdaptorTest.java'
-        }
-    }
     integrationTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
-            // TODO move all integration tests to src/integrationTest/java
-            srcDirs 'src/test/java'
-            include 'nl/esciencecenter/xenon/integration/**'
-            include '**/IT*.java'
-            include '**/*IT.java'
-            include 'nl/esciencecenter/xenon/adaptors/*/*AdaptorTest.java'
         }
-        // TODO move all integration resources to src/integrationTest/resources
-        resources.srcDirs 'src/test/resources'
     }
     userguide {
         java {
@@ -119,6 +103,8 @@ task javadocDevel(type: Javadoc) {
     description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
     group 'Documentation'
     source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+    title = javadoc.title + ' for Xenon developers'
     destinationDir = file("${project.docsDir}/javadoc-devel")
     options.showFromPrivate()
 
@@ -193,8 +179,6 @@ task integrationTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-//Ensure that the check task fails the build if there are failing integration tests.
-check.dependsOn integrationTest
 //Ensure that our unit tests are run before our integration tests
 integrationTest.mustRunAfter test
 

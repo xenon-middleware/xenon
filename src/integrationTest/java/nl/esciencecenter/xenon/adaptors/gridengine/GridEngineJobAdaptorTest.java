@@ -23,10 +23,8 @@ import static org.junit.Assume.assumeTrue;
 import java.io.OutputStream;
 
 import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
-import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.jobs.InvalidJobDescriptionException;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
@@ -88,7 +86,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
         description.setExecutable(null);
 
         Job job = jobs.submitJob(scheduler, description);
-        JobStatus status = jobs.waitUntilDone(job, 60000);
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job exceeded deadline!");
@@ -164,7 +162,7 @@ public class GridEngineJobAdaptorTest extends GenericJobAdaptorTestParent {
 
         Job job = jobs.submitJob(scheduler, description);
 
-        JobStatus status = jobs.waitUntilDone(job, config.getQueueWaitTime() + config.getUpdateTime());
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout());
 
         if (!status.isDone()) {
             throw new Exception("Job not finished");

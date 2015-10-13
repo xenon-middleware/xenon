@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.slurm.SlurmJobScriptGenerator;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 
 import org.junit.Test;
@@ -78,7 +77,6 @@ public class SlurmJobScriptGeneratorTest {
     public void testFilledDescription() throws XenonException {
         JobDescription description = new JobDescription();
         description.setArguments("some", "arguments");
-        description.addEnvironment("some", "environment.value");
         description.addEnvironment("some.more", "environment value with spaces");
         description.addJobOption("job", "option");
         description.setExecutable("/bin/executable");
@@ -96,8 +94,8 @@ public class SlurmJobScriptGeneratorTest {
         String expected = "#!/bin/sh\n" + "#SBATCH --job-name xenon\n" + "#SBATCH --workdir='/some/working/directory'\n"
                 + "#SBATCH --partition=the.queue\n" + "#SBATCH --nodes=5\n" + "#SBATCH --ntasks-per-node=55\n"
                 + "#SBATCH --time=100\n" + "#SBATCH --input='stdin.file'\n" + "#SBATCH --output='stdout.file'\n"
-                + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n"
-                + "export some=\"environment.value\"\n\n" + "srun /bin/executable 'some' 'arguments'\n";
+                + "#SBATCH --error='stderr.file'\n" + "export some.more=\"environment value with spaces\"\n\n"
+                + "srun /bin/executable 'some' 'arguments'\n";
 
         System.out.println(result);
 

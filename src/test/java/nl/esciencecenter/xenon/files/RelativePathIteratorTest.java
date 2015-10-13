@@ -16,10 +16,10 @@
 
 package nl.esciencecenter.xenon.files;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import nl.esciencecenter.xenon.files.RelativePath;
 
 import org.junit.Test;
 
@@ -42,11 +42,25 @@ public class RelativePathIteratorTest {
 
         while (itt.hasNext()) {
             RelativePath tmp = itt.next();
-            assert (s[i].equals(tmp.getRelativePath()));
+            assertEquals(s[i], tmp.getFileNameAsString());
             i++;
         }
 
-        assert (i == s.length);
+        assertEquals(i, s.length);
+    }
+
+    @Test
+    public void test_iterable() {
+        String[] s = new String[] { "aap", "noot", "mies" };
+        RelativePath path = new RelativePath(s);
+        int i = 0;
+
+        for (RelativePath tmp : path) {
+            assertEquals(s[i], tmp.getFileNameAsString());
+            i++;
+        }
+
+        assertEquals(i, s.length);
     }
 
     @Test

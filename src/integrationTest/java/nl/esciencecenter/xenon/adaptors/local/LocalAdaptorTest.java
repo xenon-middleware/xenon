@@ -17,12 +17,9 @@
 package nl.esciencecenter.xenon.adaptors.local;
 
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>

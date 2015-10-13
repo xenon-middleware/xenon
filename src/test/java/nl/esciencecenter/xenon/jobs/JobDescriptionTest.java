@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.jobs.JobDescription;
-
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
@@ -89,7 +87,7 @@ public class JobDescriptionTest {
         assertTrue(list.size() == 3);
         assertTrue(Arrays.equals(list.toArray(new String[3]), new String[] { "a", "b", "c" }));
 
-        Map<String, String> env = new HashMap<>();
+        Map<String, String> env = new HashMap<>(3);
         env.put("ENV1", "ARG1");
         env.put("ENV2", "ARG2");
 
@@ -97,7 +95,7 @@ public class JobDescriptionTest {
         Map<String, String> env2 = j.getEnvironment();
         assertTrue(env.equals(env2));
 
-        Map<String, String> opt = new HashMap<>();
+        Map<String, String> opt = new HashMap<>(3);
         opt.put("OPT1", "ARG1");
         opt.put("OPT2", "ARG2");
 
@@ -163,9 +161,9 @@ public class JobDescriptionTest {
         final int prime = 31;
         int result = 1;
 
-        result = prime * result + new ArrayList<String>().hashCode();
-        result = prime * result + new HashMap<String, String>().hashCode();
-        result = prime * result + new HashMap<String, String>().hashCode();
+        result = prime * result + new ArrayList<String>(0).hashCode();
+        result = prime * result + new HashMap<String, String>(0).hashCode();
+        result = prime * result + new HashMap<String, String>(0).hashCode();
         result = prime * result + 0;
         result = prime * result + 1237;
         result = prime * result + 15;
@@ -178,7 +176,7 @@ public class JobDescriptionTest {
         result = prime * result + 0;
         result = prime * result + 0;
 
-        assertTrue(hash == result);
+        assertEquals(result, hash);
     }
 
     @org.junit.Test
@@ -197,12 +195,12 @@ public class JobDescriptionTest {
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);
 
-        Map<String, String> env = new HashMap<>();
+        Map<String, String> env = new HashMap<>(3);
         env.put("ENV1", "ARG1");
         env.put("ENV2", "ARG2");
         j.setEnvironment(env);
 
-        Map<String, String> opt = new HashMap<>();
+        Map<String, String> opt = new HashMap<>(3);
         opt.put("OPT1", "ARG1");
         opt.put("OPT2", "ARG2");
         j.setJobOptions(opt);
@@ -227,7 +225,7 @@ public class JobDescriptionTest {
         result = prime * result + 0;
         result = prime * result + "aap".hashCode();
 
-        assertTrue(hash == result);
+        assertEquals(result, hash);
     }
 
     @org.junit.Test
@@ -303,7 +301,7 @@ public class JobDescriptionTest {
         assertFalse(j.equals(other));
         j.setArguments(args);
 
-        Map<String, String> env = new HashMap<>();
+        Map<String, String> env = new HashMap<>(3);
         env.put("ENV1", "ARG1");
         env.put("ENV2", "ARG2");
         other.setEnvironment(env);
@@ -311,7 +309,7 @@ public class JobDescriptionTest {
         other.setEnvironment(null);
         assertTrue(j.equals(other));
 
-        Map<String, String> opt = new HashMap<>();
+        Map<String, String> opt = new HashMap<>(3);
         opt.put("OPT1", "ARG1");
         opt.put("OPT2", "ARG2");
         other.setJobOptions(opt);
@@ -325,7 +323,7 @@ public class JobDescriptionTest {
     public void test_toString() throws Exception {
 
         String expected = "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], stdin=stdin.txt, stdout=stdout.txt,"
-                + " stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1, ENV2=ARG2}, jobOptions={OPT1=ARG1, OPT2=ARG2},"
+                + " stderr=stderr.txt, workingDirectory=aap, environment={ENV1=ARG1}, jobOptions={OPT1=ARG1},"
                 + " nodeCount=1, processesPerNode=1, startSingleProcess=false, maxTime=15, interactive=true]";
 
         JobDescription j = new JobDescription();
@@ -340,14 +338,12 @@ public class JobDescriptionTest {
         String[] args = new String[] { "a", "b", "c" };
         j.setArguments(args);
 
-        Map<String, String> env = new HashMap<>();
+        Map<String, String> env = new HashMap<>(2);
         env.put("ENV1", "ARG1");
-        env.put("ENV2", "ARG2");
         j.setEnvironment(env);
 
-        Map<String, String> opt = new HashMap<>();
+        Map<String, String> opt = new HashMap<>(2);
         opt.put("OPT1", "ARG1");
-        opt.put("OPT2", "ARG2");
         j.setJobOptions(opt);
 
         String tmp = j.toString();
