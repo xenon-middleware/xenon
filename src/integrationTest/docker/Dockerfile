@@ -11,11 +11,6 @@ mkdir /code && mkdir -p /etc/my_init.d && touch /etc/service/sshd/down
 # ssh keys are already installed in base image, config is needed by Xenon
 RUN setuser xenon touch /home/xenon/.ssh/config
 
-# Add globus cerficates
-ADD xenon-gridftp/files/ca-cerficates /etc/grid-security/certificates
-ADD xenon-gridftp/files/users/xenon /home/xenon/.globus
-RUN chown -R xenon.xenon /home/xenon/.globus
-
 # Tests will be run by xenon user which has uid taken from MYUID environment var
 ENV MYUID 1000
 ADD run-tests.sh /bin/run-tests.sh
