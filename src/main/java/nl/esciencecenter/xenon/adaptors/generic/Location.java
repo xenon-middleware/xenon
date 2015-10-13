@@ -9,28 +9,33 @@ public abstract class Location {
     private final String user;
     private final String host;
     private final int port;
-    private String scheme;
-    protected final String path;
+    private final String scheme;
+    private final String path;
     private static final String SCHEME_SEPARATOR = "://";
     private static final String DUMMY_SCHEME = "dummy";
 
     public Location(String user, String host, int port) {
+        this(user, host, port, null, "");
+    }
+
+    public Location(String user, String host, int port, String scheme, String path) {
         this.user = user;
         this.host = host;
         this.port = port;
-        scheme = null;
-        path = "";
+        this.scheme = scheme;
+        this.path = path;
     }
 
     /**
      * Parses a location URI as a Location.
      * @param location string containing a URI, the scheme may be omitted.
+     * @param defaultScheme scheme to use if the default scheme is not found
      * @throws InvalidLocationException
      *      if the location is null or
      *          not a valid URI or
      *      if the port number is provided but not positive.
      */
-    protected Location(String location) throws InvalidLocationException {
+    protected Location(String location, String defaultScheme) throws InvalidLocationException {
         if (location == null) {
             throw new InvalidLocationException(getAdaptorName(), "location may not be null.");
         }
@@ -48,7 +53,7 @@ public abstract class Location {
             }
             host = url.getHost();
             port = url.getPort();
-            scheme = hasScheme ? url.getScheme() : null;
+            scheme = hasScheme ? url.getScheme() : defaultScheme;
             path = url.getPath();
             validate();
         } catch (URISyntaxException e) {
@@ -81,12 +86,8 @@ public abstract class Location {
         return port;
     }
 
-    public String getSCheme() {
+    public String getScheme() {
         return scheme;
-    }
-
-    protected void setScheme(String scheme) {
-        this.scheme = scheme;
     }
 
     protected abstract String getAdaptorName();
@@ -103,6 +104,7 @@ public abstract class Location {
             result.append(user).append('@');
         }
         result.append(host).append(':').append(port);
+        result.append(path);
 
         return result.toString();
     }
@@ -110,5 +112,9 @@ public abstract class Location {
     /** Whether the default port was used because none was provided. */
     public boolean usesDefaultPort() {
         return port == -1;
+    }
+
+    public String getPath() {
+        return this.path;
     }
 }
