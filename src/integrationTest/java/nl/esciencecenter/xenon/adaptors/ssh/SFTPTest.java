@@ -22,7 +22,6 @@ import java.util.Collection;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.AbstractFileTests;
 
 import org.junit.runner.RunWith;
@@ -33,8 +32,9 @@ import com.jcraft.jsch.ConfigRepository;
 
 @RunWith(Parameterized.class)
 public class SFTPTest extends AbstractFileTests {
+
     @Parameters
-    public static Collection<String> getLocations() throws Exception {
+    public static Collection<Object[]> getLocations() throws Exception {
         SSHFileTestConfig config = new SSHFileTestConfig(null);
         String locationString = config.getProperty("test.sftp.locations", "");
         if (locationString.trim().isEmpty()) {
@@ -42,14 +42,14 @@ public class SFTPTest extends AbstractFileTests {
         }
 
         String[] locationArray = locationString.split(",");
-        Collection<String> locations = new ArrayList<>(locationArray.length);
+        Collection<Object[]> locations = new ArrayList<>(locationArray.length);
         for (String location : locationArray) {
             String trimmedLocation = location.trim();
             if (!trimmedLocation.isEmpty()) {
                 if (!trimmedLocation.contains("://")) {
                     trimmedLocation = "sftp://" + trimmedLocation;
                 }
-                locations.add(trimmedLocation);
+                locations.add(new Object[] { trimmedLocation });
             }
         }
         return locations;
@@ -62,7 +62,6 @@ public class SFTPTest extends AbstractFileTests {
     }
 
     public String getTestUser() {
-        // actual test user: use current user name. 
         return sshLocation.getUser();
     }
 
@@ -73,8 +72,4 @@ public class SFTPTest extends AbstractFileTests {
     public Credential getCredentials() throws XenonException {
         return xenon.credentials().getDefaultCredential("ssh");
     }
-
-    // ===
-    // Sftp Specific tests here: 
-    // ===
 }
