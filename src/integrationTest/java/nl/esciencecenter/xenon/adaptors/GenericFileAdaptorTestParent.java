@@ -578,14 +578,14 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test04_createDirectory_nonExisting_noThrow() throws Exception {
-        testDir = resolve(cwd, TEST_ROOT);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
 
         test04_createDirectory(testDir, false);
     }
 
     @Test
     public void test04_createDirectory_existing_throw() throws Exception {
-        testDir = resolve(cwd, TEST_ROOT);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
         files.createDirectory(testDir);
 
         test04_createDirectory(testDir, true);
@@ -593,7 +593,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test04_createDirectory_existingFile_throw() throws Exception {
-        testDir = resolve(cwd, TEST_ROOT);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
         files.createDirectory(testDir);
 
         Path file = createTestFile(testDir, null);
@@ -603,7 +603,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test04_createDirectory_nonExistingParent_throw() throws Exception {
-        testDir = resolve(cwd, TEST_ROOT);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
         Path parent = createNewTestDirName(testDir);
         Path dir0 = createNewTestDirName(parent);
         files.createDirectory(testDir);
@@ -617,10 +617,15 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        testDir = resolve(cwd, TEST_ROOT);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
         files.close(testDir.getFileSystem());
-
-        test04_createDirectory(testDir, true);
+        try {
+            test04_createDirectory(testDir, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -722,10 +727,17 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsClose()) {
             return;
         }
+        // Use root instead of testDir to prevent cleanup
         testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
         files.close(testDir.getFileSystem());
 
-        test05_createDirectories(testDir, true);
+        try {
+            test05_createDirectories(testDir, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1564,7 +1576,12 @@ public abstract class GenericFileAdaptorTestParent {
         Path existingFile = createTestFile(testDir, null);
         Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
 
-        test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
+        try {
+            test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
+        } finally {
+            // Set the permissions to write again before we can remove it
+            files.setPosixFilePermissions(existingFile, getVariousPosixPermissions());
+        }
 
         deleteTestFile(existingFile);
     }
