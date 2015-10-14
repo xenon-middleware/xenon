@@ -114,14 +114,10 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      *          if the location is invalid.                   
      */
     static void checkFileLocation(String location) throws InvalidLocationException {
-        if (location == null) {
-            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must contain a file system root! (not null)");
-        }
-    
-        if (Utils.isLocalRoot(location)) { 
+        if (location == null || location.isEmpty() || Utils.isLocalRoot(location)) {
             return;
         }
-        
+
         throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
     }
     
@@ -298,16 +294,15 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
-
         checkFileLocation(location);
-        
+
         localAdaptor.checkCredential(credential);
 
         XenonProperties p = new XenonProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         String root = Utils.getLocalRoot(location);
-        RelativePath relativePath = Utils.getRelativePath(location, root);
-        
+        RelativePath relativePath = new RelativePath(root).relativize(new RelativePath(location));
+
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, root,  
                 relativePath, credential, p);
     }

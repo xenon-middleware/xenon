@@ -41,7 +41,7 @@ public interface Files {
      * @param scheme
      *            the scheme to use to access the FileSystem.
      * @param location
-     *            the location of the FileSystem.
+     *            the location of the FileSystem, may be null for a local file system.
      * @param credential
      *            the Credentials to use to get access to the FileSystem.
      * @param properties

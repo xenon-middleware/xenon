@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -347,20 +348,29 @@ public final class Utils {
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
     public static String getLocalRoot(String path) throws XenonException {
-
         if (isWindows()) {
-            if (path != null && path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
+            if (path == null || path.isEmpty()) {
+                return "";
+            }
+            if (!path.contains("/") && !path.contains("\\")) {
+                // Windows URS, network drive
+                return path;
+            }
+            if (path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
                 return path.substring(0, 2).toUpperCase();
             }
 
-            throw new XenonException(NAME, "Path is not absolute! " + path);
+            throw new InvalidLocationException(NAME, "Path does not include drive name! " + path);
         }
 
-        if (path != null && path.length() >= 1 && (path.charAt(0) == '/')) {
+        if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
             return "/";
         }
 
-        throw new XenonException(NAME, "Path is not absolute! " + path);
+        throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
     }
 
     /**
