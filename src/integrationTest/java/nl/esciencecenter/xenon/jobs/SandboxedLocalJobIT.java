@@ -27,7 +27,6 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.Util;
-import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;

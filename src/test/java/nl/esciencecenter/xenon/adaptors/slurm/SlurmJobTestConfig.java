@@ -16,11 +16,8 @@
 
 package nl.esciencecenter.xenon.adaptors.slurm;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.JobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;

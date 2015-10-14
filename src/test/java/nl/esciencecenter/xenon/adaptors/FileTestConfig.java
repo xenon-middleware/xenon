@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;

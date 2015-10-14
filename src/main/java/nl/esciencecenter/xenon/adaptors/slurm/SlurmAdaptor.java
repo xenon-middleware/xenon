@@ -16,7 +16,6 @@
 package nl.esciencecenter.xenon.adaptors.slurm;
 
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;

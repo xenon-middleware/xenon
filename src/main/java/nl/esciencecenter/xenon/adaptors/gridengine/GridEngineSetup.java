@@ -24,7 +24,6 @@ import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
