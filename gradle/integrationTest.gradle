@@ -1,0 +1,80 @@
+// Depends on plugins:
+//    id 'org.hidetake.ssh' version '1.1.3'
+//    id 'jacoco'
+//    id 'org.sonarqube' version '1.0'
+
+//      TEST
+// ==============
+// integrationTest itself is defined in common.gradle.
+
+task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
+    def integrationTestProperties = new Properties()
+    doFirst {
+        xenonPropertiesFile.withReader { reader ->
+            integrationTestProperties.load(reader)
+            if (integrationTestProperties.getProperty('test.ssh.location') == null) {
+                throw new GradleException('SSH test location not set in ' + xenonPropertiesFile + '. Set the test.ssh.location property.');
+            }
+            if (integrationTestProperties.getProperty('test.ssh.user') == null) {
+                throw new GradleException('SSH test user not set in ' + xenonPropertiesFile + '. Set the test.ssh.user property.');
+            }
+            if (integrationTestProperties.getProperty('test.ssh.password') == null) {
+                throw new GradleException('SSH test password not set in ' + xenonPropertiesFile + '. Set the test.ssh.password property.');
+            }
+        }
+    }
+
+    doLast {
+        def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
+
+        // Initialize testing symlinks locally
+        exec {
+            executable = '/bin/bash'
+            args = [create_symlinks]
+        }
+
+        // Initialize testing symlinks on remote side
+        ssh.run {
+            session(host: integrationTestProperties.getProperty("test.ssh.location"),
+                    user: integrationTestProperties.getProperty("test.ssh.user"),
+                    // TODO use privata key instead of password,
+                    // so we dont need to have password in cleartext
+                    //identity: file(userProps.getProperty("test.ssh.identity")),
+                    password: integrationTestProperties.getProperty("test.ssh.password")
+                    ) {
+                shell interaction: {
+                    file(create_symlinks).withInputStream { stream ->
+                        standardInput << stream << '\n' << 'exit 0' << '\n'
+                    }
+                }
+            }
+        }
+    }
+}
+
+//Ensure that integration tests are prepared
+integrationTest.dependsOn prepareIntegrationTest
+
+//    COVERAGE
+// ==============
+
+task jacocoIntegrationTestReport(type: JacocoReport){
+    description 'Generate coverage report of integration tests'
+    group 'Code coverage reporting'
+    executionData integrationTest
+    sourceSets sourceSets.main
+}
+jacocoTestReport.description = 'Generate coverage report of unit tests'
+jacocoTestReport.group = 'Code coverage reporting'
+
+//   SONARQUBE
+// ==============
+
+sonarqube {
+    properties {
+        property "sonar.jacoco.itReportPath", "build/jacoco/integrationTest.exec"
+        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
+    }
+}
+// Ensure that integration coverage is availabe before sonar analysis.
+project.tasks["sonarqube"].dependsOn integrationTest

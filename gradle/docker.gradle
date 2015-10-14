@@ -115,7 +115,7 @@ task dockerTestCache(dependsOn: checkDockerComposePresence) {
             commandLine 'docker', 'run', '-e', 'MYUID=' + dockerUid,
                 '--name=' + dockerCacheContainerName, '-v', "$projectDir:/code",
                 'nlesc/xenon-test', './gradlew', '--project-cache-dir',
-                '/home/xenon/gradle-cache', 'compileJava', 'compileTestJava'
+                '/home/xenon/gradle-cache', 'downloadDependencies'
         }
         exec {
             commandLine 'docker', 'commit', dockerCacheContainerName,
