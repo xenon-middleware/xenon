@@ -20,6 +20,11 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.InvalidSchemeException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
@@ -64,7 +69,7 @@ public interface Files {
      *             If the creation of the FileSystem failed.
      */
     FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws XenonException;
+            throws UnknownPropertyException, InvalidPropertyException, InvalidSchemeException, InvalidLocationException, InvalidCredentialException, XenonException;
         
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
@@ -87,12 +92,8 @@ public interface Files {
      * @param filesystem
      *            the FileSystem to close.
      * 
-     * @throws CannotClosedException
-     *             If the FileSystem cannot be closed (for example a local FileSystem).
      * @throws XenonException
-     *             If the FileSystem failed to close.
-     * @throws XenonException
-     *             If an I/O error occurred.
+     *             If the FileSystem failed to close or if an I/O error occurred.
      */
     void close(FileSystem filesystem) throws XenonException;
 
@@ -103,9 +104,7 @@ public interface Files {
      *            the FileSystem to test.
      * 
      * @throws XenonException
-     *             If the test failed.
-     * @throws XenonException
-     *             If an I/O error occurred.
+     *             If the test failed or an I/O error occurred.
      */
     boolean isOpen(FileSystem filesystem) throws XenonException;
 
@@ -172,6 +171,8 @@ public interface Files {
      *            the existing source file or link.
      * @param target
      *            the target path.
+     * @param options
+     *            options for the copy operation.
      * @return a {@link CopyStatus} if the copy is asynchronous or <code>null</code> if it is blocking.
      * 
      * @throws NoSuchPathException
