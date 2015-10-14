@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -347,20 +348,29 @@ public final class Utils {
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
     public static String getLocalRoot(String path) throws XenonException {
-
         if (isWindows()) {
-            if (path != null && path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
+            if (path == null || path.isEmpty()) {
+                return "";
+            }
+            if (!path.contains("/") && !path.contains("\\")) {
+                // Windows URS, network drive
+                return path;
+            }
+            if (path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            if (path.length() >= 2 && (path.charAt(1) == ':') && Character.isLetter(path.charAt(0))) {
                 return path.substring(0, 2).toUpperCase();
             }
 
-            throw new XenonException(NAME, "Path is not absolute! " + path);
+            throw new InvalidLocationException(NAME, "Path does not include drive name! " + path);
         }
 
-        if (path != null && path.length() >= 1 && (path.charAt(0) == '/')) {
+        if (path == null || path.isEmpty() || (path.length() >= 1 && path.charAt(0) == '/')) {
             return "/";
         }
 
-        throw new XenonException(NAME, "Path is not absolute! " + path);
+        throw new InvalidLocationException(NAME, "Path is not absolute! " + path);
     }
 
     /**
@@ -404,7 +414,6 @@ public final class Utils {
      * @return If <code>root</code> only contains a valid Windows root element.
      */
     public static boolean isWindowsRoot(String root) {
-
         if (root == null) {
             return false;
         }
@@ -461,7 +470,6 @@ public final class Utils {
      * @return If <code>root</code> only contains a valid OSX root element.
      */
     public static boolean isLocalRoot(String root) {
-
         if (isWindows()) {
             return isWindowsRoot(root);
         }
@@ -477,7 +485,6 @@ public final class Utils {
      * @return If the provide path starts with a valid Linux root.
      */
     public static boolean startsWithLinuxRoot(String path) {
-
         if (path == null) {
             return false;
         }
@@ -493,7 +500,6 @@ public final class Utils {
      * @return If the provide path starts with a valid Windows root.
      */
     public static boolean startWithWindowsRoot(String path) {
-
         if (path == null) {
             return false;
         }
@@ -528,7 +534,6 @@ public final class Utils {
      *             If the <code>path</code> does not start with <code>root</code>.
      */
     public static RelativePath getRelativePath(String path, String root) throws XenonException {
-
         if (!path.toUpperCase(Locale.getDefault()).startsWith(root.toUpperCase(Locale.getDefault()))) {
             throw new XenonException(NAME, "Path does not start with root: " + path + " " + root);
         }
@@ -582,9 +587,7 @@ public final class Utils {
      * @return a <code>Path</code> that represents the current working directory.
      *
      * @throws XenonException
-     *             If an I/O error occurred
-     * @throws XenonException
-     *             If the creation of the FileSystem failed.
+     *             If an I/O error occurred or if the creation of the FileSystem failed.
      */
     public static Path getLocalCWD(Files files) throws XenonException {
         return fromLocalPath(files, getCWD());
@@ -659,7 +662,6 @@ public final class Utils {
      *             if an I/O error occurs when reading or writing
      */
     public static long copy(Files files, InputStream in, Path target, boolean truncate) throws XenonException {
-
         long bytes = 0;
         OutputStream out = null;
 
@@ -747,7 +749,6 @@ public final class Utils {
      *             if an I/O error occurs while opening or writing the file.
      */
     public static BufferedWriter newBufferedWriter(Files files, Path target, Charset cs, boolean truncate) throws XenonException {
-
         OutputStream out = files.newOutputStream(target, openOptionsForWrite(truncate));
         return new BufferedWriter(new OutputStreamWriter(out, cs));
     }
@@ -787,7 +788,6 @@ public final class Utils {
      *             if an I/O error occurs while opening or reading the file.
      */
     public static String readToString(Files files, Path source, Charset cs) throws XenonException {
-
         InputStream in = null;
 
         try {
@@ -816,7 +816,6 @@ public final class Utils {
      *             if an I/O error occurs while opening or reading the file.
      */
     public static List<String> readAllLines(Files files, Path source, Charset cs) throws XenonException {
-
         InputStream in = null;
 
         try {
