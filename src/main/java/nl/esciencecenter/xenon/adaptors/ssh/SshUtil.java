@@ -16,11 +16,6 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-
 import com.jcraft.jsch.SftpATTRS;
 
 /**
