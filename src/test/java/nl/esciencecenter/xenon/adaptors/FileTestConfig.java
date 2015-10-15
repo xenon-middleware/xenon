@@ -62,4 +62,8 @@ public abstract class FileTestConfig extends GenericTestConfig {
     public String getNonDefaultCredentialLocation() throws Exception {
         return getCorrectLocation();
     }
+
+    public boolean supportsNullFileSystemLocation() {
+        return false;
+    }
 }

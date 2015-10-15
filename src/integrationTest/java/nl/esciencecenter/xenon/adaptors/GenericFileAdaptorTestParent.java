@@ -100,6 +100,9 @@ public abstract class GenericFileAdaptorTestParent {
         Path p = config.getWorkingDir(files, xenon.credentials());
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
+        if (!files.exists(p)) {
+            files.createDirectory(p);
+        }
         if (!files.exists(root)) {
             files.createDirectory(root);
         }
@@ -340,7 +343,8 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test00_newFileSystem_nullCredentials_shouldThrow() throws Exception {
-        test00_newFileSystem(config.getScheme(), null, null, null, true);
+        boolean allowNullLocation = config.supportsNullFileSystemLocation();
+        test00_newFileSystem(config.getScheme(), null, null, null, !allowNullLocation);
     }
 
     @org.junit.Test

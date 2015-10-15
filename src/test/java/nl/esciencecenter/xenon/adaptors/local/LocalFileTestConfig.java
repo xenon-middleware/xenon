@@ -115,6 +115,11 @@ public class LocalFileTestConfig extends FileTestConfig {
 
     @Override
     public Path getWorkingDir(Files files, Credentials c) throws XenonException {
-        return Utils.resolveWithRoot(files, Utils.getLocalCWD(files), "test");
+        return Utils.resolveWithRoot(files, Utils.getLocalCWD(files), "build/integrationTest");
+    }
+
+    @Override
+    public boolean supportsNullFileSystemLocation() {
+        return true;
     }
 }
