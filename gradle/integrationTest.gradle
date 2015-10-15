@@ -25,12 +25,16 @@ task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
     }
 
     doLast {
+        def testDir = file('test')
+        testDir.mkdir()
+
         def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
 
         // Initialize testing symlinks locally
         exec {
+            workingDir testDir
             executable = '/bin/bash'
-            args = [create_symlinks]
+            args = ['../' + create_symlinks]
         }
 
         // Initialize testing symlinks on remote side
