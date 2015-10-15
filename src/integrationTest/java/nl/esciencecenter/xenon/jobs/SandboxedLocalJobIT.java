@@ -72,6 +72,10 @@ public class SandboxedLocalJobIT {
      */
     @Test
     public void test() throws XenonException {
+        // test uses unix utilities
+        if (Utils.isWindows()) {
+            return;
+        }
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
         FileSystem localrootfs = Utils.getLocalCWD(files).getFileSystem();

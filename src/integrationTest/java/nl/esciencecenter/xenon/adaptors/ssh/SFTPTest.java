@@ -32,7 +32,6 @@ import com.jcraft.jsch.ConfigRepository;
 
 @RunWith(Parameterized.class)
 public class SFTPTest extends AbstractFileTests {
-
     @Parameters
     public static Collection<Object[]> getLocations() throws Exception {
         SSHFileTestConfig config = new SSHFileTestConfig(null);
@@ -57,8 +56,9 @@ public class SFTPTest extends AbstractFileTests {
 
     private final SshLocation sshLocation;
     
-    public SFTPTest(String location) throws InvalidLocationException {
+    public SFTPTest(String location) throws Exception {
         sshLocation = SshLocation.parse(location, ConfigRepository.nullConfig);
+        initObject();
     }
 
     public String getTestUser() {

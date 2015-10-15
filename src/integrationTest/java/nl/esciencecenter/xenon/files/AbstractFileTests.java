@@ -53,6 +53,27 @@ public abstract class AbstractFileTests {
      */
     protected FileSystem fileSystem;
 
+    protected void initObject() throws Exception {
+        setupFiles();
+        try {
+            Path testDir = getTestDir();
+            if (!files.exists(testDir)) {
+                files.createDirectory(testDir);
+            }
+        } finally {
+            cleanupFiles();
+        }
+    }
+
+    protected void finalizeObject() throws Exception {
+        setupFiles();
+        try {
+            Utils.recursiveDelete(files, getTestDir());
+        } finally {
+            cleanupFiles();
+        }
+    }
+
     @Before
     public void setupFiles() throws XenonException, Exception {
         xenon = XenonFactory.newXenon(null);
