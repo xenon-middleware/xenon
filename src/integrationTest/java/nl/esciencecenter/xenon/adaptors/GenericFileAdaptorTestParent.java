@@ -92,6 +92,19 @@ public abstract class GenericFileAdaptorTestParent {
     public static void prepareClass(FileTestConfig testConfig) throws Exception {
         config = testConfig;
         TEST_ROOT = "xenon_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
+
+        Xenon xenon = XenonFactory.newXenon(null);
+
+        Files files = xenon.files();
+
+        Path p = config.getWorkingDir(files, xenon.credentials());
+        Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
+
+        if (!files.exists(root)) {
+            files.createDirectory(root);
+        }
+
+        XenonFactory.endXenon(xenon);
     }
 
     // MUST be invoked by a @AfterClass method of the subclass!
@@ -101,9 +114,8 @@ public abstract class GenericFileAdaptorTestParent {
         Xenon xenon = XenonFactory.newXenon(null);
 
         Files files = xenon.files();
-        Credentials credentials = xenon.credentials();
 
-        Path p = config.getWorkingDir(files, credentials);
+        Path p = config.getWorkingDir(files, xenon.credentials());
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
