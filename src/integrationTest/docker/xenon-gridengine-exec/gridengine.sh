@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# wait for sge master come online, otherwise execd is not registered at qmaster
+sleep 10
+
 # Remove master linked hostname and optional alias, to fix host resolving for sge
 export QMAST=$(cat /var/lib/gridengine/default/common/act_qmaster)
 # /etc/hosts is a busy file so cant be moved, use update mode (+<) to rewrite file
