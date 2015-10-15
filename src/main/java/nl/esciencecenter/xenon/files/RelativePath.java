@@ -45,7 +45,7 @@ public class RelativePath implements Iterable<RelativePath> {
     /** Estimate of path element String length. */
     private final int PATH_ELEMENT_LENGTH = 25;
 
-    class RelativePathIterator implements Iterator<RelativePath> {
+    private class RelativePathIterator implements Iterator<RelativePath> {
         private int index = 1;
 
         @Override

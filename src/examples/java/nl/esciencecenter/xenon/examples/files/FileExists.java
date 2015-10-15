@@ -43,7 +43,7 @@ public class FileExists {
     public static void main(String[] args) {
 
         if (args.length != 1) {
-            System.out.println("Example requires a URI as a parameter!");
+            System.out.println("Example requires a URI as a parameter");
             System.exit(1);
         }
 
@@ -79,9 +79,12 @@ public class FileExists {
             // Finally, we end Xenon to release all resources 
             XenonFactory.endXenon(xenon);
 
-        } catch (URISyntaxException | XenonException e) {
-            System.out.println("FileExists example failed: " + e.getMessage());
-            e.printStackTrace();
+        } catch (URISyntaxException ex) {
+            System.out.println("Provided URI was invalid (remember to add a scheme, e.g. file://): " + ex.getMessage());
+            ex.printStackTrace();
+        } catch (XenonException ex) {
+            System.out.println("FileExists example failed: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }

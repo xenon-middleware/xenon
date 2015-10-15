@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;

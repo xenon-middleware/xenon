@@ -16,12 +16,16 @@
 
 package nl.esciencecenter.xenon.adaptors.local;
 
+import static org.junit.Assert.assertEquals;
+
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
+import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -39,48 +43,86 @@ public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {
         GenericFileAdaptorTestParent.cleanupClass();
     }
     
-    @org.junit.Test(expected = InvalidLocationException.class)
+    @Test
     public void test_checkLocation_null() throws Exception {
         LocalFiles.checkFileLocation(null);
     }
 
-    @org.junit.Test(expected = InvalidLocationException.class)
+    @Test
     public void test_checkLocation_empty() throws Exception {
         LocalFiles.checkFileLocation("");
     }
 
-    @org.junit.Test
+    @Test
     public void test_checkLocation_linuxRoot() throws Exception {
         if (Utils.isLinux() || Utils.isOSX()) { 
             LocalFiles.checkFileLocation("/");
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test_checkLocation_windowsRoot() throws Exception {
         if (Utils.isWindows()) { 
             LocalFiles.checkFileLocation("C:");
         }
     }
 
-    @org.junit.Test(expected = InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_wrong() throws Exception {
         LocalFiles.checkFileLocation("ABC");
     }
 
-    @org.junit.Test(expected = InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withPath() throws Exception {
         LocalFiles.checkFileLocation("/aap");
     }
 
-    @org.junit.Test(expected = InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withWindowsPath() throws Exception {
         LocalFiles.checkFileLocation("C:/aap");
     }
     
-    @org.junit.Test(expected = InvalidLocationException.class)
+    @Test(expected = InvalidLocationException.class)
     public void test_checkLocation_withWindowsPath2() throws Exception {
         LocalFiles.checkFileLocation("C:\\aap");
     }
 
+    @Test
+    public void test_newFileSystem_nullLocation() throws Exception {
+        FileSystem fs = files.newFileSystem("local", null, credentials.getDefaultCredential("local"), null);
+        if (Utils.isWindows()) {
+            assertEquals("", fs.getLocation());
+        } else {
+            assertEquals("/", fs.getLocation());
+        }
+    }
+
+    @Test
+    public void test_newFileSystem_emptyLocation() throws Exception {
+        FileSystem fs = files.newFileSystem("local", "", credentials.getDefaultCredential("local"), null);
+        if (Utils.isWindows()) {
+            assertEquals("", fs.getLocation());
+        } else {
+            assertEquals("/", fs.getLocation());
+        }
+    }
+
+    @Test
+    public void test_newFileSystem_windowsNetworkLocation() throws Exception {
+        if (!Utils.isWindows()) {
+            return;
+        }
+
+        FileSystem fs = files.newFileSystem("local", "mynetwork", credentials.getDefaultCredential("local"), null);
+        assertEquals("mynetwork", fs.getLocation());
+    }
+
+    @Test(expected = InvalidLocationException.class)
+    public void test_newFileSystem_linuxNetworkLocation_throws() throws Exception {
+        if (Utils.isWindows()) {
+            throw new InvalidLocationException(null, null);
+        }
+
+        files.newFileSystem("local", "mynetwork", credentials.getDefaultCredential("local"), null);
+    }
 }

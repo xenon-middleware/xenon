@@ -89,7 +89,6 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      *  
      */
     private void checkParent(Path path) throws XenonException {
-        
         RelativePath parentName = path.getRelativePath().getParent();
         
         if (parentName == null) { 
@@ -114,14 +113,10 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      *          if the location is invalid.                   
      */
     static void checkFileLocation(String location) throws InvalidLocationException {
-        if (location == null) {
-            throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must contain a file system root! (not null)");
-        }
-    
-        if (Utils.isLocalRoot(location)) { 
+        if (location == null || location.isEmpty() || Utils.isLocalRoot(location)) {
             return;
         }
-        
+
         throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
     }
     
@@ -148,7 +143,6 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      */
     @Override
     public void move(Path source, Path target) throws XenonException {
-
         if (!exists(source)) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "Source " + source + " does not exist!");
         }
@@ -171,7 +165,6 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
     @Override
     public Path readSymbolicLink(Path link) throws XenonException {
-
         try {
             java.nio.file.Path path = LocalUtils.javaPath(link);
             java.nio.file.Path target = Files.readSymbolicLink(path);
@@ -190,7 +183,6 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter filter) throws XenonException {
-
         FileAttributes att = getAttributes(dir);
 
         if (!att.isDirectory()) {
@@ -298,16 +290,15 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
-
         checkFileLocation(location);
-        
+
         localAdaptor.checkCredential(credential);
 
         XenonProperties p = new XenonProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         String root = Utils.getLocalRoot(location);
-        RelativePath relativePath = Utils.getRelativePath(location, root);
-        
+        RelativePath relativePath = new RelativePath(root).relativize(new RelativePath(location));
+
         return new FileSystemImplementation(LocalAdaptor.ADAPTOR_NAME, "localfs-" + getNextFsID(), scheme, root,  
                 relativePath, credential, p);
     }
@@ -347,7 +338,6 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
-
         if (exists(dir)) {
             throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
