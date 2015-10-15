@@ -1756,16 +1756,6 @@ public abstract class GenericFileAdaptorTestParent {
                 close(in);
                 throwUnexpectedElement("test15_newAttributesDirectoryStream", p.path());
             }
-
-            //            if (tmp.contains(p)) {
-            //                System.err.println("Found!");
-            //                tmp.remove(p);
-            //            } else {
-            //                System.err.println("NOT Found!");
-            //
-            //                close(in);
-            //                throwUnexpectedElement("newAttributesDirectoryStream", p.path().getPath());
-            //            }
         }
 
         close(in);
@@ -1869,7 +1859,7 @@ public abstract class GenericFileAdaptorTestParent {
         } finally {
             // set up for cleaning again
             cwd = config.getWorkingDir(files, credentials);
-            testDir = resolve(cwd, TEST_ROOT, "test14_setPosixFilePermissions");
+            testDir = resolve(cwd, TEST_ROOT, "test15_newAttributesDirectoryStream");
         }
     }
 
@@ -1969,28 +1959,28 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_nullFilter_throw() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
 
         test16_newAttributesDirectoryStream(testDir, null, null, true);
     }
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_emptyDirTrueFilter_noThrow() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
 
         test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, false);
     }
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_emptyDirFalseFilter_noThrow() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
 
         test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
     }
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_nonExistingDir_throw() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path nonExistingDir = createNewTestDirName(testDir);
 
         test16_newAttributesDirectoryStream(nonExistingDir, new AllTrue(), null, true);
@@ -2009,7 +1999,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_nonEmptyDirTrueFilter_correctListing() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
@@ -2031,7 +2021,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_nonEmptyDirFalseFilter_emptyListing() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
@@ -2048,7 +2038,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_dirWithSubDirs_onlyTopDirContents() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
@@ -2075,7 +2065,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @org.junit.Test
     public void test16_newAttributesDirectoryStreamWithFilter_selectFilter_selectedListing() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path selectedFile0 = createTestFile(testDir, null);
         Path selectedFile1 = createTestFile(testDir, null);
         Path selectedFile2 = createTestFile(testDir, null);
@@ -2107,7 +2097,7 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsClose()) {
             return;
         }
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         files.close(cwd.getFileSystem());
 
         try {
@@ -2115,7 +2105,7 @@ public abstract class GenericFileAdaptorTestParent {
         } finally {
             // set up for cleaning again
             cwd = config.getWorkingDir(files, credentials);
-            testDir = resolve(cwd, TEST_ROOT, "test14_setPosixFilePermissions");
+            testDir = resolve(cwd, TEST_ROOT, "test16_newAttributesDirectoryStreamWithFilter");
         }
     }
 
