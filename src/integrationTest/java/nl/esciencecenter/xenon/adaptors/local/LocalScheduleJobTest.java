@@ -16,10 +16,15 @@
 
 package nl.esciencecenter.xenon.adaptors.local;
 
+import static org.junit.Assert.assertTrue;
+
 import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
+import nl.esciencecenter.xenon.jobs.JobDescription;
+import nl.esciencecenter.xenon.jobs.JobStatus;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -35,5 +40,19 @@ public class LocalScheduleJobTest extends GenericScheduleJobTestParent {
     @AfterClass
     public static void cleanupAltLocalJobsTest() throws Exception {
         GenericScheduleJobTestParent.cleanupClass();
+    }
+
+    @Test
+    public void test_jobTimeout() throws Exception {
+        job = jobs.submitJob(scheduler, timedJobDescription(null, 10));
+        long time = System.currentTimeMillis();
+
+        JobStatus status = jobs.waitUntilDone(job, 3 * 10 * 1000);
+        // check if the job terminated within 30 seconds
+        checkJobDone(status);
+
+        // check what the timeout was
+        long deltat = System.currentTimeMillis() - time;
+        assertTrue("Job terminated after " + (deltat / 1000.0) + " seconds (not 10)", deltat <= 15 * 1000);
     }
 }
