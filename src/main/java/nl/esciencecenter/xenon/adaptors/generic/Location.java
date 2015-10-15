@@ -79,11 +79,7 @@ public abstract class Location {
     }
 
     public int getPort() {
-    	if (port == -1) {
-    		return getDefaultPort();
-    	}
-    
-        return port;
+        return usesDefaultPort() ? getDefaultPort() : port;
     }
 
     public String getScheme() {
@@ -103,7 +99,7 @@ public abstract class Location {
         if (user != null) {
             result.append(user).append('@');
         }
-        result.append(host).append(':').append(port);
+        result.append(host).append(':').append(getPort());
         result.append(path);
 
         return result.toString();
