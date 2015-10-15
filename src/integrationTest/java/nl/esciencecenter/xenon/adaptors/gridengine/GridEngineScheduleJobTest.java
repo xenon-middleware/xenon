@@ -112,7 +112,9 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
 
             job = jobs.submitJob(scheduler, description);
 
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
+            // the job stays running for a minute using the docker container nlesc/xenon-gridengine
+            // wait little bit more than a minute so the job is done
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(66));
 
             checkJobDone(status);
 
