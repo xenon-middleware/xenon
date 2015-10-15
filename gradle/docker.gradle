@@ -48,10 +48,12 @@ class DockerCompose extends Exec {
 }
 
 task dockerKill(type: DockerCompose) {
+    description "Stop Xenon Docker integrationTest containers"
     args = ['kill']
 }
 
 task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
+    description "Remove Xenon Docker integrationTest containers"
     args = ['rm', '-f']
 }
 
@@ -59,6 +61,7 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     // FIXME: the current version of docker-compose 1.4.2 does not
     // forward stdout if running from gradle (without TTY). Check if
     // future versions support this.
+    description "Run integration tests from Docker"
     args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
     if (project.hasProperty('docker.tests')) {
         args += [
@@ -104,6 +107,8 @@ task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopy
 ext.testCacheSet = file('.docker-test-cache-set')
 
 task dockerTestCache(dependsOn: [checkDockerComposePresence, clean]) {
+    description "Cache gradle dependencies in xenon-test Docker container"
+    def testCacheSet = file('.docker-test-cache-set')
     onlyIf {
         !testCacheSet.exists()
     }
@@ -112,7 +117,7 @@ task dockerTestCache(dependsOn: [checkDockerComposePresence, clean]) {
             commandLine 'docker', 'run', '-e', 'MYUID=' + dockerUid,
                 '--name=' + dockerCacheContainerName, '-v', "$projectDir:/code",
                 'nlesc/xenon-test', './gradlew', '--project-cache-dir',
-                '/home/xenon/gradle-cache', 'compileJava', 'compileTestJava'
+                '/home/xenon/gradle-cache', 'downloadDependencies'
         }
         exec {
             commandLine 'docker', 'commit', dockerCacheContainerName,
@@ -133,6 +138,7 @@ task resetDockerTestCache(type: Delete) {
 }
 
 task dockerTestCacheCleanup(type: Exec) {
+    description "Remove temporary Docker cache container"
     onlyIf {
         dockerTestCache.state.didWork
     }
@@ -140,6 +146,7 @@ task dockerTestCacheCleanup(type: Exec) {
 }
 
 task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, dockerCopyRequirements]) << {
+    description "Build Docker images from Dockerfile"
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
@@ -150,6 +157,7 @@ task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, d
 }
 
 task dockerPush(dependsOn: checkDockerComposePresence) << {
+    description "Push Docker images to Dockerhub (run docker login first)"
     println "Pushing docker images of: " + dockerImages
     dockerImages.each { image ->
         exec {

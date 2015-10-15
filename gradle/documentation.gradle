@@ -1,0 +1,76 @@
+// javadoc and userguide generation
+
+javadoc {
+    exclude 'nl/esciencecenter/xenon/engine/**', 'nl/esciencecenter/xenon/adaptors/**'
+
+    // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
+    failOnError = false
+}
+
+task javadocDevel(type: Javadoc) {
+    description 'Generates Javadoc API documentation for the main source code for Xenon developers.'
+    group 'Documentation'
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+    title = javadoc.title + ' for Xenon developers'
+    destinationDir = file("${project.docsDir}/javadoc-devel")
+    options.showFromPrivate()
+
+    // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
+    failOnError = false
+}
+
+
+task adaptorDocumentation(type: JavaExec) {
+    description 'Generate Markdown adaptor appendix'
+    group 'documentation'
+    main = 'nl.esciencecenter.xenon.doc.AdaptorDocGenerator'
+    // TODO adaptors.md is made in wrong dir (build/), change builddir to build/docs/userguide, docs/userguide dir must be created before
+    File output = file("${buildDir}/adaptors.md")
+    args = [output]
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.userguide.runtimeClasspath
+    outputs.file output
+}
+
+class ConcatFiles extends DefaultTask {
+    @InputFiles
+    FileCollection files
+    @OutputFile
+    File target
+    @TaskAction
+    void concat() {
+        target.withWriter { writer ->
+            files.each { file ->
+                file.withReader { reader ->
+                    writer << reader << '\n'
+                }
+            }
+        }
+    }
+}
+
+task userguideMarkdown(type: ConcatFiles, dependsOn: adaptorDocumentation) {
+    description 'Concatenate userguide_src.md and adaptor appendix into userguid.md'
+    group 'documentation'
+    files = files('doc/userguide/userguide_src.md', "${buildDir}/adaptors.md")
+    target = file('doc/userguide/userguide.md')
+    inputs.files files
+    outputs.file target
+}
+
+task checkPandocPresence(type: Exec) {
+    executable 'pandoc'
+    args = ['-v']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+task userguidePdf(type: Exec, dependsOn: [checkPandocPresence, userguideMarkdown]) {
+    description 'Convert markdown to pdf (requires pandoc and texlive)'
+    group 'documentation'
+    workingDir 'doc/userguide'
+    executable 'pandoc'
+    File output = file('doc/userguide/userguide.pdf')
+    inputs.file userguideMarkdown.target
+    outputs.file output
+    args = [userguideMarkdown.target, '-o', output]
+}
