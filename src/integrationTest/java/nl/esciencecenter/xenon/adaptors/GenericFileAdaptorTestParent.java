@@ -17,6 +17,7 @@
 package nl.esciencecenter.xenon.adaptors;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -301,6 +302,12 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     // The test start here.
+
+    @Test
+    public void test_getFileSystemEntryPath_notNull() {
+        Path entryPath = cwd.getFileSystem().getEntryPath();
+        assertNotNull(entryPath);
+    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST newFileSystem
@@ -1017,7 +1024,6 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestDirName], [createTestFile], newDirectoryStream,
     //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
-
     private void test11_newDirectoryStream(Path root, Set<Path> expected, boolean mustFail) throws Exception {
         Set<Path> tmp;
 
