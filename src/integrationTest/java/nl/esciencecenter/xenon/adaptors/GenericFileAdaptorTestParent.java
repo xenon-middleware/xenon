@@ -33,6 +33,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
@@ -60,6 +62,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TestWatcher;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
@@ -88,6 +91,9 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Rule
     public TestWatcher watcher = new XenonTestWatcher();
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     // MUST be invoked by a @BeforeClass method of the subclass!
     public static void prepareClass(FileTestConfig testConfig) throws Exception {
@@ -321,103 +327,91 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p, boolean mustFail)
-            throws Exception {
-
-        try {
-            FileSystem fs = files.newFileSystem(scheme, location, c, p);
-            files.close(fs);
-        } catch (Exception e) {
-            if (mustFail) {
-                // exception was expected.
-                return;
-            }
-
-            // exception was not expected
-            throwUnexpected("test00_newFileSystem", e);
-        }
-
-        if (mustFail) {
-            // expected an exception!
-            throwExpected("test00_newFileSystem");
-        }
+    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p)
+            throws XenonException {
+        FileSystem fs = files.newFileSystem(scheme, location, c, p);
+        files.close(fs);
     }
 
-    @org.junit.Test
+    @Test(expected=XenonException.class)
     public void test00_newFileSystem_nullUriAndCredentials_shouldThrow() throws Exception {
-        test00_newFileSystem(null, null, null, null, true);
+        test00_newFileSystem(null, null, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_nullCredentials_shouldThrow() throws Exception {
-        boolean allowNullLocation = config.supportsNullFileSystemLocation();
-        test00_newFileSystem(config.getScheme(), null, null, null, !allowNullLocation);
+        if (!config.supportsNullFileSystemLocation()) {
+            exception.expect(InvalidLocationException.class);
+        }
+        test00_newFileSystem(config.getScheme(), null, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_nullProperties_throwIfApplicable() throws Exception {
         // test with correct URI without credential and without properties
-        boolean allowNull = config.supportNullCredential();
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null, !allowNull);
+        if (!config.supportNullCredential()) {
+            exception.expect(InvalidCredentialException.class);
+        }
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_correctArguments_noThrow() throws Exception {
         // test with correct scheme with, correct location, location
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null,
-                false);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null);
     }
 
-    @org.junit.Test
+    @Test(expected=InvalidLocationException.class)
     public void test00_newFileSystem_wrongLocation_throw() throws Exception {
         // test with correct scheme with, wrong location
-        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null, true);
+        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_userInUriIfSupported_noThrow() throws Exception {
         if (!config.supportUserInUri()) {
             return;
         }
 
         String uriWithUsername = config.getCorrectLocationWithUser();
-        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null, false);
+        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_wrongUserInUriIfSupported_throw() throws Exception {
         if (!config.supportUserInUri()) {
             return;
         }
 
         String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
-        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null, true);
+        exception.expect(InvalidLocationException.class);
+        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_nonDefaultCredentialIfSupported_noThrow() throws Exception {
         if (!config.supportNonDefaultCredential()) {
             return;
         }
 
         Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
-        test00_newFileSystem(config.getScheme(), config.getNonDefaultCredentialLocation(), nonDefaultCredential, null, false);
+        test00_newFileSystem(config.getScheme(), config.getNonDefaultCredentialLocation(), nonDefaultCredential, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_emptyProperties_noThrow() throws Exception {
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
-                new HashMap<String, String>(0), false);
+                new HashMap<String, String>(0));
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_correctProperties_noThrow() throws Exception {
         if (!config.supportsProperties()) {
             return;
         }
 
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
-                config.getCorrectProperties(), false);
+                config.getCorrectProperties());
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
