@@ -1,11 +1,22 @@
 language: java
 
-jdk:
-  - oraclejdk7
-  - openjdk7
-  - oraclejdk8
-# Stop when one of the Java versions do not work
 matrix:
+  # Only do docker integration tests with OpenJDK 7: the docker
+  # tests are not affected by JDK on host system.
+  include:
+    - jdk: oraclejdk7
+      env:
+        - GRADLE_BUILD_TASKS=assemble
+        - GRADLE_SCRIPT_TASKS=check
+    - jdk: openjdk7
+      env:
+        - GRADLE_BUILD_TASKS=assemble dockerBuild dockerTestCache
+        - GRADLE_SCRIPT_TASKS=check dockerIntegrationTest
+    - jdk: oraclejdk8
+      env:
+        - GRADLE_BUILD_TASKS=assemble
+        - GRADLE_SCRIPT_TASKS=check
+  # Stop when one of the Java versions do not work
   fast_finish: true
 
 sudo: required
@@ -13,19 +24,21 @@ sudo: required
 services:
   - docker
 
+# Install documentation dependencies
 addons:
   apt_packages:
     - pandoc
     - texlive
     - lmodern
 
+# Install Docker compose
 before_install:
   - curl -L https://github.com/docker/compose/releases/download/1.4.2/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
 install:
-  - gradle assemble dockerBuild dockerTestCache
+  - gradle $GRADLE_BUILD_TASKS
 
 script:
-  - gradle check dockerIntegrationTest
+  - gradle $GRADLE_SCRIPT_TASKS
