@@ -1,10 +1,30 @@
 language: java
+
 jdk:
   - oraclejdk7
   - openjdk7
   - oraclejdk8
-sudo: false
+# Stop when one of the Java versions do not work
+matrix:
+  fast_finish: true
+
+sudo: required
+
+services:
+  - docker
+
 addons:
   apt_packages:
     - pandoc
     - texlive
+
+before_install:
+  - curl -L https://github.com/docker/compose/releases/download/1.4.2/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+install:
+  - gradle assemble dockerBuild dockerTestCache
+
+script:
+  - gradle check dockerIntegrationTest
