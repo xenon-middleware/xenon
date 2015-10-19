@@ -72,7 +72,6 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
         ]
     }
     finalizedBy 'dockerCleanup'
-    mustRunAfter 'test'
 }
 
 //  DOCKER BUILD SETUP
