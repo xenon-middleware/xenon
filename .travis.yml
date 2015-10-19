@@ -40,7 +40,7 @@ before_install:
   - touch .docker-test-cache-set
 
 install:
-  - gradle $GRADLE_BUILD_TASKS -Ddocker.uid=$UID
+  - gradle $GRADLE_BUILD_TASKS -Pdocker.uid=$UID
 
 script:
-  - gradle $GRADLE_SCRIPT_TASKS -Ddocker.uid=$UID
+  - gradle $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
