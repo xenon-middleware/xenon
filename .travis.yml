@@ -17,6 +17,7 @@ addons:
   apt_packages:
     - pandoc
     - texlive
+    - lmodern
 
 before_install:
   - curl -L https://github.com/docker/compose/releases/download/1.4.2/docker-compose-`uname -s`-`uname -m` > docker-compose
