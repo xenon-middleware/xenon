@@ -6,12 +6,12 @@ matrix:
   include:
     - jdk: oraclejdk7
       env:
-        - GRADLE_BUILD_TASKS="assemble"
-        - GRADLE_SCRIPT_TASKS="check"
-    - jdk: openjdk7
-      env:
         - GRADLE_BUILD_TASKS="assemble dockerBuild"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
+    - jdk: openjdk7
+      env:
+        - GRADLE_BUILD_TASKS="assemble"
+        - GRADLE_SCRIPT_TASKS="check"
     - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble"
