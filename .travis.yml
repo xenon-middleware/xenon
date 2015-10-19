@@ -7,7 +7,7 @@ matrix:
     - jdk: oraclejdk7
       env:
         - GRADLE_BUILD_TASKS="assemble dockerBuild"
-        - GRADLE_SCRIPT_TASKS="clean dockerIntegrationTest check"
+        - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
       sudo: true
       services:
         - docker
@@ -40,7 +40,7 @@ before_install:
   - touch .docker-test-cache-set
 
 install:
-  - gradle $GRADLE_BUILD_TASKS
+  - gradle $GRADLE_BUILD_TASKS -Ddocker.uid=$UID
 
 script:
-  - gradle $GRADLE_SCRIPT_TASKS
+  - gradle $GRADLE_SCRIPT_TASKS -Ddocker.uid=$UID
