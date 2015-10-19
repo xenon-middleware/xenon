@@ -52,7 +52,7 @@ public class LocalFileTestConfig extends FileTestConfig {
             correctLocation = "/";
             supportPosix = true;
         }
-        wrongLocation = "aap";
+        wrongLocation = "/aap";
     }
 
     @Override
