@@ -361,7 +361,7 @@ public abstract class GenericFileAdaptorTestParent {
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null);
     }
 
-    @Test(expected=InvalidLocationException.class)
+    @Test(expected=XenonException.class)
     public void test00_newFileSystem_wrongLocation_throw() throws Exception {
         // test with correct scheme with, wrong location
         test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null);
