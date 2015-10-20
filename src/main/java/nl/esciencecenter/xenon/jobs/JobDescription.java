@@ -86,6 +86,7 @@ public class JobDescription {
 
     /**
      * Create a JobDescription by copying an existing one.
+     * @param original JobDescription to copy
      */
     public JobDescription(JobDescription original) {
         queueName = original.getQueueName();

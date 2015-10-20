@@ -16,20 +16,29 @@
 
 package nl.esciencecenter.xenon.adaptors;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.Closeable;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
@@ -50,10 +59,11 @@ import nl.esciencecenter.xenon.util.Utils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.internal.AssumptionViolatedException;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,57 +84,52 @@ public abstract class GenericFileAdaptorTestParent {
     protected Xenon xenon;
     protected Files files;
     protected Credentials credentials;
-
+    protected Path cwd;
     protected Path testDir;
 
     private long counter = 0;
 
     @Rule
-    public TestWatcher watcher = new TestWatcher() {
+    public TestWatcher watcher = new XenonTestWatcher();
 
-        @Override
-        public void starting(Description description) {
-            logger.info("Running test {}", description.getMethodName());
-        }
-
-        @Override
-        public void failed(Throwable reason, Description description) {
-            logger.info("Test {} failed due to exception", description.getMethodName(), reason);
-        }
-
-        @Override
-        public void succeeded(Description description) {
-            logger.info("Test {} succeeded", description.getMethodName());
-        }
-
-        @Override
-        public void skipped(AssumptionViolatedException reason, Description description) {
-            logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);
-        }
-
-    };
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     // MUST be invoked by a @BeforeClass method of the subclass!
     public static void prepareClass(FileTestConfig testConfig) throws Exception {
         config = testConfig;
         TEST_ROOT = "xenon_test_" + config.getAdaptorName() + "_" + System.currentTimeMillis();
-    }
-
-    // MUST be invoked by a @AfterClass method of the subclass!
-    public static void cleanupClass() throws Exception {
-
-        System.err.println("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
 
         Xenon xenon = XenonFactory.newXenon(null);
 
         Files files = xenon.files();
-        Credentials credentials = xenon.credentials();
 
-        Path p = config.getWorkingDir(files, credentials);
+        Path p = config.getWorkingDir(files, xenon.credentials());
+        Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
+
+        if (!files.exists(p)) {
+            files.createDirectory(p);
+        }
+        if (!files.exists(root)) {
+            files.createDirectory(root);
+        }
+
+        XenonFactory.endXenon(xenon);
+    }
+
+    // MUST be invoked by a @AfterClass method of the subclass!
+    public static void cleanupClass() throws Exception {
+        logger.debug("GenericFileAdaptorTest.cleanupClass() attempting to remove: " + TEST_ROOT);
+
+        Xenon xenon = XenonFactory.newXenon(null);
+
+        Files files = xenon.files();
+
+        Path p = config.getWorkingDir(files, xenon.credentials());
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
-            files.delete(root);
+            Utils.recursiveDelete(files, root);
         }
 
         XenonFactory.endXenon(xenon);
@@ -139,36 +144,46 @@ public abstract class GenericFileAdaptorTestParent {
         xenon = XenonFactory.newXenon(null);
         files = xenon.files();
         credentials = xenon.credentials();
+        cwd = config.getWorkingDir(files, credentials);
+        testDir = null;
     }
 
     @After
     public void cleanup() throws Exception {
-        XenonFactory.endXenon(xenon);
-        files = null;
-        xenon = null;
+        try {
+            if (testDir != null && files.exists(testDir)) {
+                Utils.recursiveDelete(files, testDir);
+            }
+        } finally {
+            try {
+                files.close(cwd.getFileSystem());
+            } catch (Exception ex) {
+                // that's fine
+            }
+            XenonFactory.endXenon(xenon);
+        }
     }
 
     // Various util functions ------------------------------------------------------------
 
-    class AllTrue implements DirectoryStream.Filter {
+    private class AllTrue implements DirectoryStream.Filter {
         @Override
         public boolean accept(Path entry) {
             return true;
         }
     }
 
-    class AllFalse implements DirectoryStream.Filter {
+    private class AllFalse implements DirectoryStream.Filter {
         @Override
         public boolean accept(Path entry) {
             return false;
         }
     }
 
-    class Select implements DirectoryStream.Filter {
+    private class Select implements DirectoryStream.Filter {
+        private final Set<Path> set;
 
-        private Set<Path> set;
-
-        public Select(Set<Path> set) {
+        Select(Set<Path> set) {
             this.set = set;
         }
 
@@ -178,24 +193,20 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    private void throwUnexpected(String name, Exception e) throws Exception {
-
-        throw new Exception(name + " throws unexpected Exception!", e);
+    private void throwUnexpected(String name, Throwable e) {
+        throw new AssertionError(name + " throws unexpected Exception!", e);
     }
 
-    private void throwExpected(String name) throws Exception {
-
-        throw new Exception(name + " did NOT throw Exception which was expected!");
+    private void throwExpected(String name) {
+        fail(name + " did NOT throw Exception which was expected!");
     }
 
-    private void throwWrong(String name, Object expected, Object result) throws Exception {
-
-        throw new Exception(name + " produced wrong result! Expected: " + expected + " but got: " + result);
+    private void throwWrong(String name, Object expected, Object result) {
+        fail(name + " produced wrong result! Expected: " + expected + " but got: " + result);
     }
 
-    private void throwUnexpectedElement(String name, Object element) throws Exception {
-
-        throw new Exception(name + " produced unexpected element: " + element);
+    private void throwUnexpectedElement(String name, Object element) {
+        fail(name + " produced unexpected element: " + element);
     }
 
     //    private void throwMissingElement(String name, String element) throws Exception {
@@ -203,103 +214,70 @@ public abstract class GenericFileAdaptorTestParent {
     //        throw new Exception(name + " did NOT produce element: " + element);
     //    }
 
-    private void throwMissingElements(String name, Collection elements) throws Exception {
-
-        throw new Exception(name + " did NOT produce elements: " + elements);
+    private void throwMissingElements(String name, Collection elements) {
+        fail(name + " did NOT produce elements: " + elements);
     }
 
     private void close(Closeable c) {
-
         if (c == null) {
             return;
         }
         try {
             c.close();
         } catch (Exception e) {
-            // ignore
+            // ignore; should not ignore other (unexpected) errors.
         }
     }
 
     // Depends on: Path.resolve, RelativePath, exists
-    private Path createNewTestDirName(Path root) throws Exception {
-
+    private Path createNewTestDirName(Path root) throws XenonException {
         Path dir = resolve(root, "dir" + counter);
         counter++;
 
-        if (files.exists(dir)) {
-            throw new Exception("Generated test dir already exists! " + dir);
-        }
+        assertFalse("Generated test dir already exists! " + dir, files.exists(dir));
 
         return dir;
     }
 
     // Depends on: [createNewTestDirName], createDirectory, exists
     private Path createTestDir(Path root) throws Exception {
-
         Path dir = createNewTestDirName(root);
-
         files.createDirectory(dir);
 
-        if (!files.exists(dir)) {
-            throw new Exception("Failed to generate test dir! " + dir);
-        }
+        assertTrue("Failed to generate test dir! " + dir, files.exists(dir));
 
         return dir;
     }
 
     // Depends on: [createTestDir]
-    protected void prepareTestDir(String testName) throws Exception {
+    protected void prepareTestDir(String testName) throws XenonException {
+        testDir = resolve(cwd, TEST_ROOT, testName);
 
-        Path p = config.getWorkingDir(files, credentials);
-
-        if (testDir != null) {
-            return;
-        }
-
-        testDir = resolve(p, TEST_ROOT, testName);
-
-        if (!files.exists(testDir)) {
-            files.createDirectories(testDir);
-        }
-    }
-
-    // Depends on: [createTestDir]
-    private void closeTestFS() throws Exception {
-
-        if (testDir == null) {
-            return;
-        }
-
-        files.close(testDir.getFileSystem());
-        testDir = null;
+        assertFalse("Test directory " + testName + " already exists", files.exists(testDir));
+        files.createDirectories(testDir);
     }
 
     // Depends on: Path.resolve, RelativePath, exists
     private Path createNewTestFileName(Path root) throws Exception {
-
         Path file = resolve(root, "file" + counter);
         counter++;
 
-        if (files.exists(file)) {
-            throw new Exception("Generated NEW test file already exists! " + file);
-        }
+        assertFalse("Generated NEW test file already exists! " + file, files.exists(file));
 
         return file;
     }
 
     // Depends on: newOutputStream
     private void writeData(Path testFile, byte[] data) throws Exception {
-
-        OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE);
-        if (data != null) {
-            out.write(data);
+        try (OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE)) {
+            if (data != null) {
+                out.write(data);
+            }
         }
-        out.close();
     }
 
     // Depends on: [createNewTestFileName], createFile, [writeData]
     protected Path createTestFile(Path root, byte[] data) throws Exception {
-
         Path file = createNewTestFileName(root);
 
         files.createFile(file);
@@ -311,91 +289,31 @@ public abstract class GenericFileAdaptorTestParent {
 
     // Depends on: exists, isDirectory, delete
     private void deleteTestFile(Path file) throws Exception {
-
-        if (!files.exists(file)) {
-            throw new Exception("Cannot delete non-existing file: " + file);
-        }
+        assertTrue("Cannot delete non-existing file: " + file, files.exists(file));
 
         FileAttributes att = files.getAttributes(file);
-
-        if (att.isDirectory()) {
-            throw new Exception("Cannot delete directory: " + file);
-        }
+        assertFalse("Cannot delete directory: " + file, att.isDirectory());
 
         files.delete(file);
     }
 
     // Depends on: exists, isDirectory, delete
     protected void deleteTestDir(Path dir) throws Exception {
-
-        if (!files.exists(dir)) {
-            throw new Exception("Cannot delete non-existing dir: " + dir);
-        }
+        assertTrue("Cannot delete non-existing directory: " + dir, files.exists(dir));
 
         FileAttributes att = files.getAttributes(dir);
-
-        if (!att.isDirectory()) {
-            throw new Exception("Cannot delete file: " + dir);
-        }
+        assertTrue("Cannot delete file: " + dir, att.isDirectory());
 
         files.delete(dir);
     }
 
-    private byte[] readFully(InputStream in) throws Exception {
-
-        byte[] buffer = new byte[1024];
-
-        int offset = 0;
-        int read = in.read(buffer, offset, buffer.length - offset);
-
-        while (read != -1) {
-
-            offset += read;
-
-            if (offset == buffer.length) {
-                buffer = Arrays.copyOf(buffer, buffer.length * 2);
-            }
-
-            read = in.read(buffer, offset, buffer.length - offset);
-        }
-
-        close(in);
-
-        return Arrays.copyOf(buffer, offset);
-    }
-
-    //    private byte [] readFully(SeekableByteChannel channel) throws Exception {
-    //
-    //        ByteBuffer buffer = ByteBuffer.allocate(1024);
-    //
-    //        int read = channel.read(buffer);
-    //
-    //        while (read != -1) {
-    //
-    //            System.err.println("READ from channel " + read);
-    //
-    //            if (buffer.position() == buffer.limit()) {
-    //                ByteBuffer tmp = ByteBuffer.allocate(buffer.limit()*2);
-    //                buffer.flip();
-    //                tmp.put(buffer);
-    //                buffer = tmp;
-    //            }
-    //
-    //            read = channel.read(buffer);
-    //        }
-    //
-    //        close(channel);
-    //
-    //        buffer.flip();
-    //        byte [] tmp = new byte[buffer.remaining()];
-    //        buffer.get(tmp);
-    //
-    //        System.err.println("Returning byte[" + tmp.length + "]");
-    //
-    //        return tmp;
-    //    }
-
     // The test start here.
+
+    @Test
+    public void test_getFileSystemEntryPath_notNull() {
+        Path entryPath = cwd.getFileSystem().getEntryPath();
+        assertNotNull(entryPath);
+    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST newFileSystem
@@ -409,102 +327,91 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p, boolean mustFail)
-            throws Exception {
-
-        try {
-            FileSystem fs = files.newFileSystem(scheme, location, c, p);
-            files.close(fs);
-        } catch (Exception e) {
-            if (mustFail) {
-                // exception was expected.
-                return;
-            }
-
-            // exception was not expected
-            throwUnexpected("test00_newFileSystem", e);
-        }
-
-        if (mustFail) {
-            // expected an exception!
-            throwExpected("test00_newFileSystem");
-        }
+    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p)
+            throws XenonException {
+        FileSystem fs = files.newFileSystem(scheme, location, c, p);
+        files.close(fs);
     }
 
-    @org.junit.Test
+    @Test(expected=XenonException.class)
     public void test00_newFileSystem_nullUriAndCredentials_shouldThrow() throws Exception {
-        test00_newFileSystem(null, null, null, null, true);
+        test00_newFileSystem(null, null, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_nullCredentials_shouldThrow() throws Exception {
-        test00_newFileSystem(config.getScheme(), null, null, null, true);
+        if (!config.supportsNullFileSystemLocation()) {
+            exception.expect(InvalidLocationException.class);
+        }
+        test00_newFileSystem(config.getScheme(), null, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_nullProperties_throwIfApplicable() throws Exception {
         // test with correct URI without credential and without properties
-        boolean allowNull = config.supportNullCredential();
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null, !allowNull);
+        if (!config.supportNullCredential()) {
+            exception.expect(InvalidCredentialException.class);
+        }
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_correctArguments_noThrow() throws Exception {
         // test with correct scheme with, correct location, location
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null,
-                false);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null);
     }
 
-    @org.junit.Test
+    @Test(expected=XenonException.class)
     public void test00_newFileSystem_wrongLocation_throw() throws Exception {
         // test with correct scheme with, wrong location
-        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null, true);
+        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_userInUriIfSupported_noThrow() throws Exception {
         if (!config.supportUserInUri()) {
             return;
         }
 
         String uriWithUsername = config.getCorrectLocationWithUser();
-        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null, false);
+        test00_newFileSystem(config.getScheme(), uriWithUsername, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_wrongUserInUriIfSupported_throw() throws Exception {
         if (!config.supportUserInUri()) {
             return;
         }
 
         String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
-        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null, true);
+        exception.expect(InvalidLocationException.class);
+        test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_nonDefaultCredentialIfSupported_noThrow() throws Exception {
         if (!config.supportNonDefaultCredential()) {
             return;
         }
 
         Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
-        test00_newFileSystem(config.getScheme(), config.getNonDefaultCredentialLocation(), nonDefaultCredential, null, false);
+        test00_newFileSystem(config.getScheme(), config.getNonDefaultCredentialLocation(), nonDefaultCredential, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_emptyProperties_noThrow() throws Exception {
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
-                new HashMap<String, String>(), false);
+                new HashMap<String, String>(0));
     }
 
-    @org.junit.Test
+    @Test
     public void test00_newFileSystem_correctProperties_noThrow() throws Exception {
         if (!config.supportsProperties()) {
             return;
         }
 
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
-                config.getCorrectProperties(), false);
+                config.getCorrectProperties());
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -519,7 +426,6 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], close, isOpen
 
     private void test01_isOpen(FileSystem fs, boolean expected, boolean mustFail) throws Exception {
-
         boolean result = false;
 
         try {
@@ -542,18 +448,18 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test01_isOpen_fsIsNull_throw() throws Exception {
         test01_isOpen(null, false, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test01_isOpen_openFs_true() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         test01_isOpen(fs, true, false);
     }
 
-    @org.junit.Test
+    @Test
     public void test01_isOpen_closedFsIfSupported_false() throws Exception {
         if (!config.supportsClose()) {
             return;
@@ -563,7 +469,7 @@ public abstract class GenericFileAdaptorTestParent {
         test01_isOpen(fs, false, false);
     }
 
-    @org.junit.Test
+    @Test
     public void test02_close_openFileSystemIfSupported_noThrow() throws Exception {
         if (!config.supportsClose()) {
             return;
@@ -573,7 +479,7 @@ public abstract class GenericFileAdaptorTestParent {
         files.close(openFileSystem);
     }
 
-    @org.junit.Test(expected = XenonException.class)
+    @Test(expected = XenonException.class)
     public void test02_close_closedFileSystemIfSupported_throw() throws Exception {
         if (!config.supportsClose()) {
             throw new XenonException(null, null); // Test should always pass in this case.
@@ -597,7 +503,6 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), Path.getPath(), RelativePath, close
 
     private void test03_newPath(FileSystem fs, RelativePath path, String expected, boolean mustFail) throws Exception {
-
         String result = null;
 
         try {
@@ -620,32 +525,38 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test03_newPath_nullFileSystemAndNullRelativePath_throw() throws Exception {
         test03_newPath(null, null, null, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test03_newPath_correctFileSystemAndNullRelativePath_throw() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         test03_newPath(fs, null, null, true);
         files.close(fs);
     }
 
-    @org.junit.Test
+    @Test
     public void test03_newPath_emptyRelativePath_noThrow() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
-        String root = "/";
-        test03_newPath(fs, new RelativePath(), root, false);
-        files.close(fs);
+        try {
+            String root = "/";
+            test03_newPath(fs, new RelativePath(), root, false);
+        } finally {
+            files.close(fs);
+        }
     }
 
-    @org.junit.Test
+    @Test
     public void test03_newPath_nonEmptyRelativePath_noThrow() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
-        String root = "/";
-        test03_newPath(fs, new RelativePath("test"), root + "test", false);
-        files.close(fs);
+        try {
+            String root = "/";
+            test03_newPath(fs, new RelativePath("test"), root + "test", false);
+        } finally {
+            files.close(fs);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -660,12 +571,10 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on: [getTestFileSystem], FileSystem.getEntryPath(), [createNewTestDirName], [createTestFile],
     //             createDirectory, [deleteTestDir], [deleteTestFile], [closeTestFileSystem]
 
-    private void test04_createDirectory(Path path, boolean mustFail) throws Exception {
-
+    private void test04_createDirectory(Path path, boolean mustFail) throws XenonException {
         try {
             files.createDirectory(path);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -679,73 +588,61 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test04_createDirectory_null_throw() throws Exception {
         test04_createDirectory(null, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test04_createDirectory_nonExisting_noThrow() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
 
-        test04_createDirectory(root, false);
-
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
+        test04_createDirectory(testDir, false);
     }
 
-    @org.junit.Test
+    @Test
     public void test04_createDirectory_existing_throw() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT);
-        files.createDirectory(root);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
+        files.createDirectory(testDir);
 
-        test04_createDirectory(root, true);
-
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
+        test04_createDirectory(testDir, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test04_createDirectory_existingFile_throw() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT);
-        files.createDirectory(root);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
+        files.createDirectory(testDir);
 
-        Path file = createTestFile(root, null);
+        Path file = createTestFile(testDir, null);
         test04_createDirectory(file, true);
-
         deleteTestFile(file);
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
     }
 
-    @org.junit.Test
+    @Test
     public void test04_createDirectory_nonExistingParent_throw() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT);
-        files.createDirectory(root);
-
-        Path parent = createNewTestDirName(root);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
+        Path parent = createNewTestDirName(testDir);
         Path dir0 = createNewTestDirName(parent);
-        test04_createDirectory(dir0, true);
+        files.createDirectory(testDir);
 
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
+        test04_createDirectory(dir0, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test04_createDirectory_closedFileSystemIfSupported_throw() throws Exception {
         if (!config.supportsClose()) {
             return;
         }
 
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT);
-        files.close(cwd.getFileSystem());
-
-        test04_createDirectory(root, true);
+        testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
+        files.close(testDir.getFileSystem());
+        try {
+            test04_createDirectory(testDir, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -762,23 +659,19 @@ public abstract class GenericFileAdaptorTestParent {
     //             [deleteTestDir], [createTestFile], [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
 
     private void test05_createDirectories(Path path, boolean mustFail) throws Exception {
-
         try {
             files.createDirectories(path);
 
-            assert (files.exists(path));
+            assertTrue(files.exists(path));
 
             FileAttributes att = files.getAttributes(path);
 
-            assert (att.isDirectory());
-
+            assertTrue(att.isDirectory());
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
             }
-
             throwUnexpected("test05_createDirectories", e);
         }
 
@@ -787,171 +680,82 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_null_throw() throws Exception {
         test05_createDirectories(null, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_nonExisting_noThrow() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
 
-        test05_createDirectories(root, false);
-
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
+        test05_createDirectories(testDir, false);
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_existingPath_throw() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-        files.createDirectories(root);
+        testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.createDirectories(testDir);
 
-        test05_createDirectories(root, true);
-
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
+        test05_createDirectories(testDir, true);
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_existingParent_noThrow() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-        files.createDirectories(root);
+        testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        Path dir0 = createNewTestDirName(testDir);
 
-        Path dir0 = createNewTestDirName(root);
+        files.createDirectories(testDir);
+
         test05_createDirectories(dir0, false);
-
-        // cleanup
         deleteTestDir(dir0);
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
-
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_nonExistingParents_noThrow() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-        files.createDirectories(root);
-        Path nonExistingDir = createNewTestDirName(root);
+        testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        Path nonExistingDir = createNewTestDirName(testDir);
 
         // Directory with non-existing parents
         Path pathWithoutParent = createNewTestDirName(nonExistingDir);
-        test05_createDirectories(pathWithoutParent, false);
 
-        // cleanup
+        files.createDirectories(testDir);
+        test05_createDirectories(pathWithoutParent, false);
         deleteTestDir(pathWithoutParent);
         deleteTestDir(nonExistingDir);
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_parentIsFile_throw() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-        files.createDirectories(root);
+        testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.createDirectories(testDir);
 
         // Directory where last parent is file
-        Path file = createTestFile(root, null);
+        Path file = createTestFile(testDir, null);
+
         Path pathWithFileParent = createNewTestDirName(file);
         test05_createDirectories(pathWithFileParent, true);
 
-        // cleanup
         deleteTestFile(file);
-        deleteTestDir(root);
-        files.close(cwd.getFileSystem());
     }
 
-    @org.junit.Test
+    @Test
     public void test05_createDirectories_fileSystemClosed_throwIfSupported() throws Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
-        Path root = resolve(cwd, TEST_ROOT, "test05_createDirectories");
-        files.close(cwd.getFileSystem());
+        if (!config.supportsClose()) {
+            return;
+        }
+        // Use root instead of testDir to prevent cleanup
+        testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
+        files.close(testDir.getFileSystem());
 
-        if (config.supportsClose()) {
-            // test with closed fs
-            test05_createDirectories(root, true);
+        try {
+            test05_createDirectories(testDir, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
         }
     }
-
-    // From this point on we can use prepareTestDir
-
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: isDirectory
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing file / existing dir / closed filesystem
-    //
-    // Total combinations : 4
-    //
-    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile]
-    //             [closeTestFileSystem]
-    //
-    //    private void test06_isDirectory(Path path, boolean expected, boolean mustFail) throws Exception {
-    //
-    //        boolean result = false;
-    //
-    //        try {
-    //            result = files.isDirectory(path);
-    //        } catch (Exception e) {
-    //
-    //            if (mustFail) {
-    //                // expected
-    //                return;
-    //            }
-    //
-    //            throwUnexpected("test06_isDirectory", e);
-    //        }
-    //
-    //        if (mustFail) {
-    //            throwExpected("test06_isDirectory");
-    //        }
-    //
-    //        if (result != expected) {
-    //            throwWrong("test06_isDirectory", "" + expected, "" + result);
-    //        }
-    //    }
-    //
-    //    @org.junit.Test
-    //    public void test06_isDirectory() throws Exception {
-    //
-    //
-    //
-    //        // prepare
-    //        FileSystem fs = config.getTestFileSystem(files, credentials);
-    //        prepareTestDir(fs, "test06_isDirectory");
-    //
-    //        // test with null
-    //        test06_isDirectory(null, false, true);
-    //
-    //        // test with non-existing file
-    //        Path file0 = createNewTestFileName(testDir);
-    //        test06_isDirectory(file0, false, false);
-    //
-    //        // test with existing file
-    //        Path file1 = createTestFile(testDir, null);
-    //        test06_isDirectory(file1, false, false);
-    //        deleteTestFile(file1);
-    //
-    //        // test with existing dir
-    //        test06_isDirectory(testDir, true, false);
-    //
-    //        // cleanup
-    //        deleteTestDir(testDir);
-    //        config.closeTestFileSystem(files, fs);
-    //
-    //        if (config.supportsClose()) {
-    //            // test with closed filesystem
-    //            test06_isDirectory(testDir, true, true);
-    //        }
-    //
-    //
-    //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: createFile
@@ -966,11 +770,9 @@ public abstract class GenericFileAdaptorTestParent {
     //             [closeTestFileSystem]
 
     private void test07_createFile(Path path, boolean mustFail) throws Exception {
-
         try {
             files.createFile(path);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -984,76 +786,64 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test07_createFile_nullFile_throw() throws Exception {
         prepareTestDir("test07_createFile");
 
         test07_createFile(null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test07_createFile_nonExistingFile_noThrow() throws Exception {
         prepareTestDir("test07_createFile");
-
         Path file0 = createNewTestFileName(testDir);
-        test07_createFile(file0, false);
 
-        // cleanup
-        files.delete(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
+        test07_createFile(file0, false);
+        deleteTestFile(file0);
     }
 
-    @org.junit.Test
+    @Test
     public void test07_createFile_existingFile_throw() throws Exception {
         prepareTestDir("test07_createFile");
         Path existingFile = createNewTestFileName(testDir);
-        files.createFile(existingFile);
 
+        files.createFile(existingFile);
         test07_createFile(existingFile, true);
 
-        // cleanup
-        files.delete(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
+        deleteTestFile(existingFile);
     }
 
-    @org.junit.Test
+    @Test
     public void test07_createFile_existingDir_throw() throws Exception {
         prepareTestDir("test07_createFile");
 
         test07_createFile(testDir, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test07_createFile_nonExistentParent_throw() throws Exception {
         prepareTestDir("test07_createFile");
         Path nonExistingDir = createNewTestDirName(testDir);
         Path pathWithoutParent = createNewTestFileName(nonExistingDir);
 
         test07_createFile(pathWithoutParent, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test07_createFile_closedFileSystem_throwIfSupported() throws Exception {
+        if (!config.supportsClose()) {
+            return;
+        }
         prepareTestDir("test07_createFile");
         Path file0 = createNewTestFileName(testDir);
-        closeTestFS();
+        files.close(testDir.getFileSystem());
 
-        if (config.supportsClose()) {
+        try {
             test07_createFile(file0, true);
+        } finally {
+            // prepare for removal in cleanup
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test07_createFile");
         }
     }
 
@@ -1070,13 +860,11 @@ public abstract class GenericFileAdaptorTestParent {
     //             [closeTestFileSystem], exists
 
     private void test08_exists(Path path, boolean expected, boolean mustFail) throws Exception {
-
         boolean result = false;
 
         try {
             result = files.exists(path);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -1094,32 +882,24 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test08_exists_nullFile_throw() throws Exception {
         prepareTestDir("test08_exists");
 
         // test with null
         test08_exists(null, false, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test08_exists_nonExistent_returnFalse() throws Exception {
         prepareTestDir("test08_exists");
 
         // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
         test08_exists(file0, false, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test08_exists_existingFile_returnTrue() throws Exception {
         prepareTestDir("test08_exists");
 
@@ -1127,10 +907,6 @@ public abstract class GenericFileAdaptorTestParent {
         Path file1 = createTestFile(testDir, null);
         test08_exists(file1, true, false);
         deleteTestFile(file1);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -1147,11 +923,9 @@ public abstract class GenericFileAdaptorTestParent {
     //             [closeTestFileSystem]
 
     private void test09_delete(Path path, boolean mustFail) throws Exception {
-
         try {
             files.delete(path);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -1169,50 +943,36 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test09_delete_null_throw() throws Exception {
         test09_delete(null, true);
-
-        // cleanup
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test09_delete_unexistingFile_throw() throws Exception {
         prepareTestDir("test09_delete");
         Path unexistingFile = createNewTestFileName(testDir);
 
         test09_delete(unexistingFile, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test09_delete_existingFile_noThrow() throws Exception {
         prepareTestDir("test09_delete");
         Path existingFile = createTestFile(testDir, null);
 
         test09_delete(existingFile, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test09_delete_existingEmptyDir_noThrow() throws Exception {
         prepareTestDir("test09_delete");
         Path existingEmptyDir = createTestDir(testDir);
 
         test09_delete(existingEmptyDir, false);
-
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test09_delete_existingNonEmptyDir_throw() throws Exception {
         prepareTestDir("test09_delete");
         Path nonEmptyDir = createTestDir(testDir);
@@ -1220,104 +980,31 @@ public abstract class GenericFileAdaptorTestParent {
 
         test09_delete(nonEmptyDir, true);
 
-        // cleanup
         deleteTestFile(file);
         deleteTestDir(nonEmptyDir);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
+     * deleting a dir from a closed file system (which it should) it would still throw
+     * an exception because the dir doesn't exist. Can be solved by testing for a
+     * specific type of exception.
+     */
+    @Test @Ignore
     public void test09_delete_closedFileSystem_throwIfSupported() throws Exception {
-        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
-         * deleting a dir from a closed file system (which it should) it would still throw
-         * an exception because the dir doesn't exist. Can be solved by testing for a
-         * specific type of exception.
-         */
-        closeTestFS();
-
-        if (config.supportsClose()) {
-            test09_delete(testDir, true);
+        if (!config.supportsClose()) {
+            return;
         }
+        prepareTestDir("test09_delete");
 
+        files.close(cwd.getFileSystem());
+        try {
+            test09_delete(testDir, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test09_delete");
+        }
     }
-
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: size
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing file size 0 / existing file size N / file from closed FS
-    //
-    // Total combinations : 5
-    //
-    // Depends on: [getTestFileSystem], [createTestDir], [createNewTestFileName], [createTestFile], [deleteTestFile],
-    //             [deleteTestDir], [closeTestFileSystem], size, close
-
-    //    private void test10_size(Path path, long expected, boolean mustFail) throws Exception {
-    //
-    //        long result = -1;
-    //
-    //        try {
-    //            result = files.size(path);
-    //        } catch (Exception e) {
-    //
-    //            if (mustFail) {
-    //                // expected
-    //                return;
-    //            }
-    //
-    //            throwUnexpected("test10_size", e);
-    //        }
-    //
-    //        if (mustFail) {
-    //            throwExpected("test10_size");
-    //        }
-    //
-    //        if (result != expected) {
-    //            throwWrong("test10_size", "" + expected, "" + result);
-    //        }
-    //    }
-    //
-    //    @org.junit.Test
-    //    public void test10_size() throws Exception {
-    //
-    //
-    //
-    //        // test with null parameter
-    //        test10_size(null, -1, true);
-    //
-    //        FileSystem fs = config.getTestFileSystem(files, credentials);
-    //        prepareTestDir(fs, "test10_size");
-    //
-    //        // test with non existing file
-    //        Path file1 = createNewTestFileName(testDir);
-    //        test10_size(file1, -1, true);
-    //
-    //        // test with existing empty file
-    //        Path file2 = createTestFile(testDir, new byte[0]);
-    //        test10_size(file2, 0, false);
-    //        deleteTestFile(file2);
-    //
-    //        // test with existing filled file
-    //        Path file3 = createTestFile(testDir, new byte[13]);
-    //        test10_size(file3, 13, false);
-    //        deleteTestFile(file3);
-    //
-    //        // test with dir
-    //        Path dir0 = createTestDir(testDir);
-    //        test10_size(dir0, 0, false);
-    //        deleteTestDir(dir0);
-    //        deleteTestDir(testDir);
-    //
-    //        // test with closed filesystem
-    //        if (config.supportsClose()) {
-    //            config.closeTestFileSystem(files, fs);
-    //            test10_size(file1, 0, true);
-    //        }
-    //
-    //
-    //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: newDirectoryStream
@@ -1331,13 +1018,13 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on: [getTestFileSystem], [createTestDir], [createNewTestDirName], [createTestFile], newDirectoryStream,
     //             [deleteTestDir], , [deleteTestFile], [deleteTestDir], [closeTestFileSystem]
-
     private void test11_newDirectoryStream(Path root, Set<Path> expected, boolean mustFail) throws Exception {
-
-        Set<Path> tmp = new HashSet<Path>();
+        Set<Path> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(0);
         }
 
         DirectoryStream<Path> in = null;
@@ -1345,7 +1032,6 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             in = files.newDirectoryStream(root);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -1360,7 +1046,6 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         for (Path p : in) {
-
             if (tmp.contains(p)) {
                 tmp.remove(p);
             } else {
@@ -1376,49 +1061,37 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_null_throw() throws Exception {
         test11_newDirectoryStream(null, null, true);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_emptyTestDir_noThrow() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
 
         test11_newDirectoryStream(testDir, null, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_nonExistingDir_throw() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
         Path nonExistingDir = createNewTestDirName(testDir);
 
         test11_newDirectoryStream(nonExistingDir, null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_filePath_throw() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
         Path file = createTestFile(testDir, null);
 
         test11_newDirectoryStream(file, null, true);
 
-        // cleanup
         deleteTestFile(file);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_multipleFiles_noThrow() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
         Path nonEmptyDir = testDir;
@@ -1427,7 +1100,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file2 = createTestFile(nonEmptyDir, null);
         Path file3 = createTestFile(nonEmptyDir, null);
 
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(file0);
         expectedResultSet.add(file1);
         expectedResultSet.add(file2);
@@ -1440,31 +1113,27 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_subDir_dirReturned() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
         Path subDir = createTestDir(testDir);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(2);
         expectedResultSet.add(subDir);
 
         test11_newDirectoryStream(testDir, expectedResultSet, false);
 
         // cleanup
         deleteTestDir(subDir);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_nonEmptySubDir_nestedContentNotReturned() throws Exception {
         prepareTestDir("test11_newDirectoryStream");
         Path subDir = createTestDir(testDir);
         Path nestedFile = createTestFile(subDir, null);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(2);
         expectedResultSet.add(subDir);
 
         test11_newDirectoryStream(testDir, expectedResultSet, false);
@@ -1472,21 +1141,22 @@ public abstract class GenericFileAdaptorTestParent {
         // cleanup
         deleteTestFile(nestedFile);
         deleteTestDir(subDir);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test11_newDirectoryStream_withClosedFileSystem_throwIfSupported() throws Exception {
-        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
-         * creating a directory stream of a dir from a closed file system (which it should) it would still throw
-         * an exception because the dir doesn't exist. Can be solved by testing for a
-         * specific type of exception.
-         */
-        closeTestFS();
+        if (!config.supportsClose()) {
+            return;
+        }
+        prepareTestDir("test11_newDirectoryStream");
 
-        if (config.supportsClose()) {
+        files.close(cwd.getFileSystem());
+        try {
             test11_newDirectoryStream(testDir, null, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test11_newDirectoryStream");
         }
     }
 
@@ -1508,10 +1178,12 @@ public abstract class GenericFileAdaptorTestParent {
     public void test12_newDirectoryStream(Path root, DirectoryStream.Filter filter, Set<Path> expected, boolean mustFail)
             throws Exception {
 
-        Set<Path> tmp = new HashSet<Path>();
+        Set<Path> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(0);
         }
 
         DirectoryStream<Path> in = null;
@@ -1536,7 +1208,6 @@ public abstract class GenericFileAdaptorTestParent {
         Iterator<Path> itt = in.iterator();
 
         while (itt.hasNext()) {
-
             Path p = itt.next();
 
             if (p == null) {
@@ -1547,7 +1218,7 @@ public abstract class GenericFileAdaptorTestParent {
                 tmp.remove(p);
             } else {
                 close(in);
-                throwUnexpectedElement("test12_newDirectoryStream_with_filter", p.toString());
+                throwUnexpectedElement("test12_newDirectoryStream_with_filter", p);
             }
         }
 
@@ -1560,78 +1231,57 @@ public abstract class GenericFileAdaptorTestParent {
         // close(in); // double close should result in exception
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nullPath_throw() throws Exception {
         test12_newDirectoryStream(null, null, null, true);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nullFilter_throw() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
 
         test12_newDirectoryStream(testDir, null, null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_emptyDirTrueFilter_noThrow() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
 
         test12_newDirectoryStream(testDir, new AllTrue(), null, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_emptyDirFalseFilter_noThrow() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
 
         test12_newDirectoryStream(testDir, new AllFalse(), null, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nonExistingDir_throw() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
         Path nonExistingDir = createNewTestDirName(testDir);
 
         test12_newDirectoryStream(nonExistingDir, new AllTrue(), null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_existingFile_throw() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
         Path file = createTestFile(testDir, null);
 
         test12_newDirectoryStream(file, new AllTrue(), null, true);
-
-        // cleanup
         deleteTestFile(file);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nonEmptyDirAllTrueFilter_nonEmptyListing() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(file0);
         expectedResultSet.add(file1);
         expectedResultSet.add(file2);
@@ -1644,18 +1294,16 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nonEmptyDirAllFalseFilter_emptyListing() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<Path> expectedResultSet = new HashSet<Path>();
+        Set<Path> expectedResultSet = new HashSet<>(0);
 
         test12_newDirectoryStream(testDir, new AllFalse(), expectedResultSet, false);
 
@@ -1664,18 +1312,16 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nonEmptyDirSelectFilter_selectListing() throws Exception {
         prepareTestDir("test12_newDirectoryStream_with_filter");
         Path selectedFile0 = createTestFile(testDir, null);
         Path selectedFile1 = createTestFile(testDir, null);
         Path selectedFile2 = createTestFile(testDir, null);
         Path unselectedFile0 = createTestFile(testDir, null);
-        Set<Path> selection = new HashSet<Path>();
+        Set<Path> selection = new HashSet<>(4);
         selection.add(selectedFile0);
         selection.add(selectedFile1);
         selection.add(selectedFile2);
@@ -1688,11 +1334,9 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(selectedFile2);
         deleteTestFile(selectedFile1);
         deleteTestFile(selectedFile0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_nonEmptyDirWithSubSelectFilter_selectListing() throws Exception {
         /* TODO This test is quite interesting as it doesn't test that much that is specific to the sub dir situation. A better test would
         have a selected file in one of the sub dirs to make sure that files in sub dirs are NOT listed even though they might pass the
@@ -1703,7 +1347,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path selectedFile1 = createTestFile(testDir, null);
         Path selectedFile2 = createTestFile(testDir, null);
         Path unselectedFile0 = createTestFile(testDir, null);
-        Set<Path> selection = new HashSet<Path>();
+        Set<Path> selection = new HashSet<>(4);
         selection.add(selectedFile0);
         selection.add(selectedFile1);
         selection.add(selectedFile2);
@@ -1720,21 +1364,22 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(selectedFile2);
         deleteTestFile(selectedFile1);
         deleteTestFile(selectedFile0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test12_newDirectoryStreamWithFilter_closedFileSystem_throwIfSupported() throws Exception {
-        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
-         * listing a directory stream of a dir from a closed file system (which it should) it would still throw
-         * an exception because the dir doesn't exist. Can be solved by testing for a
-         * specific type of exception.
-         */
-        closeTestFS();
+       if (!config.supportsClose()) {
+            return;
+        }
+        prepareTestDir("test12_newDirectoryStream_with_filter");
 
-        if (config.supportsClose()) {
+        files.close(cwd.getFileSystem());
+        try {
             test12_newDirectoryStream(testDir, new AllTrue(), null, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test12_newDirectoryStream_with_filter");
         }
     }
 
@@ -1759,7 +1404,6 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             result = files.getAttributes(path);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -1793,7 +1437,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.lastAccessTime());
         }
 
-        System.err.println("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
+        logger.debug("File " + path + " has attributes: " + result.isReadable() + " " + result.isWritable() + " "
                 + result.isExecutable() + " " + result.isSymbolicLink() + " " + result.isDirectory() + " "
                 + result.isRegularFile() + " " + result.isHidden() + " " + result.isOther() + " " + result.lastAccessTime() + " "
                 + result.lastModifiedTime());
@@ -1814,81 +1458,66 @@ public abstract class GenericFileAdaptorTestParent {
         return Math.abs(time1 - time2) < margin;
     }
 
-    @org.junit.Test
+    @Test
     public void test13_getAttributes_nullPath_throw() throws Exception {
         long currentTime = System.currentTimeMillis();
         test13_getAttributes(null, false, -1, currentTime, true);
-
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test13_getAttributes_nonExistingFile_throw() throws Exception {
         long currentTime = System.currentTimeMillis();
         prepareTestDir("test13_getAttributes");
         Path nonExistingFile = createNewTestFileName(testDir);
 
         test13_getAttributes(nonExistingFile, false, -1, currentTime, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test13_getAttributes_emptyFile_noThrow() throws Exception {
         long currentTime = System.currentTimeMillis();
         prepareTestDir("test13_getAttributes");
         Path emptyFile = createTestFile(testDir, null);
 
         test13_getAttributes(emptyFile, false, 0, currentTime, false);
-
-        // cleanup
         deleteTestFile(emptyFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test13_getAttributes_nonEmptyFile_noThrow() throws Exception {
         long currentTime = System.currentTimeMillis();
         prepareTestDir("test13_getAttributes");
         Path nonEmptyFile = createTestFile(testDir, new byte[] { 1, 2, 3 });
 
         test13_getAttributes(nonEmptyFile, false, 3, currentTime, false);
-
-        // cleanup
         deleteTestFile(nonEmptyFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test13_getAttributes_existingDir_noThrow() throws Exception {
         long currentTime = System.currentTimeMillis();
         prepareTestDir("test13_getAttributes");
         Path existingDir = createTestDir(testDir);
 
         test13_getAttributes(existingDir, true, -1, currentTime, false);
-
-        // cleanup
         deleteTestDir(existingDir);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test13_getAttributes_closedFileSystem_throwIfSupported() throws Exception {
-        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
-         * getting the attributes of a dir from a closed file system (which it should) it would still throw
-         * an exception because the dir doesn't exist. Can be solved by testing for a
-         * specific type of exception.
-         */
+        if (!config.supportsClose()) {
+            return;
+        }
         long currentTime = System.currentTimeMillis();
-        closeTestFS();
+        prepareTestDir("test13_getAttributes");
 
-        if (config.supportsClose()) {
+        files.close(cwd.getFileSystem());
+        try {
             test13_getAttributes(testDir, false, -1, currentTime, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test13_getAttributes");
         }
     }
 
@@ -1932,18 +1561,16 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_nullPath_throw() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
         }
 
         test14_setPosixFilePermissions(null, null, true);
-
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_existingFileNullSet_throw() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
@@ -1953,50 +1580,46 @@ public abstract class GenericFileAdaptorTestParent {
 
         test14_setPosixFilePermissions(existingFile, null, true);
 
-        // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_existingFileZeroPermissions_noThrow() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
-        Set<PosixFilePermission> emptyPermissions = new HashSet<PosixFilePermission>();
+        Set<PosixFilePermission> emptyPermissions = EnumSet.noneOf(PosixFilePermission.class);
 
-        test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
+        try {
+            test14_setPosixFilePermissions(existingFile, emptyPermissions, false);
+        } finally {
+            // Set the permissions to write again before we can remove it
+            files.setPosixFilePermissions(existingFile, getVariousPosixPermissions());
+        }
 
-        // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_existingFileFewPermissions_noThrow() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
-        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
+        Set<PosixFilePermission> permissions = EnumSet.of(
+                PosixFilePermission.OWNER_EXECUTE,
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE);
 
         test14_setPosixFilePermissions(existingFile, permissions, false);
 
-        // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_existingFileMorePermissions_noThrow() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
@@ -2007,13 +1630,10 @@ public abstract class GenericFileAdaptorTestParent {
 
         test14_setPosixFilePermissions(existingFile, permissions, false);
 
-        // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_nonExistingFile_throw() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
@@ -2027,11 +1647,9 @@ public abstract class GenericFileAdaptorTestParent {
 
         // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_existingDir_throw() throws Exception {
         if (!config.supportsPosixPermissions()) {
             return;
@@ -2044,40 +1662,34 @@ public abstract class GenericFileAdaptorTestParent {
 
         // cleanup
         deleteTestDir(existingDir);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test14_setPosixFilePermissions_closedFileSystem_throw() throws Exception {
-        /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
-         * setting the permissions of a file from a closed file system (which it should) it would still throw
-         * an exception because the file doesn't exist. Can be solved by testing for a
-         * specific type of exception.
-         */
-        if (!config.supportsPosixPermissions()) {
+        if (!config.supportsPosixPermissions() || !config.supportsClose()) {
             return;
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
         Set<PosixFilePermission> permissions = getVariousPosixPermissions();
-        deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
+        files.close(cwd.getFileSystem());
 
-        if (config.supportsClose()) {
+        try {
             test14_setPosixFilePermissions(existingFile, permissions, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test14_setPosixFilePermissions");
         }
     }
 
     private Set<PosixFilePermission> getVariousPosixPermissions() {
-        Set<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
-        permissions.add(PosixFilePermission.OWNER_EXECUTE);
-        permissions.add(PosixFilePermission.OWNER_READ);
-        permissions.add(PosixFilePermission.OWNER_WRITE);
-        permissions.add(PosixFilePermission.OTHERS_READ);
-        permissions.add(PosixFilePermission.GROUP_READ);
-        return permissions;
+        return EnumSet.of(
+                PosixFilePermission.OWNER_EXECUTE,
+                PosixFilePermission.OWNER_READ,
+                PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OTHERS_READ,
+                PosixFilePermission.GROUP_READ);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2096,10 +1708,12 @@ public abstract class GenericFileAdaptorTestParent {
     private void test15_newAttributesDirectoryStream(Path root, Set<PathAttributesPair> expected, boolean mustFail)
             throws Exception {
 
-        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(0);
         }
 
         DirectoryStream<PathAttributesPair> in = null;
@@ -2107,7 +1721,6 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             in = files.newAttributesDirectoryStream(root);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -2121,45 +1734,32 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test15_newAttributesDirectoryStream");
         }
 
-        System.err.println("Comparing PathAttributesPairs:");
+        logger.debug("Comparing PathAttributesPairs:");
 
         for (PathAttributesPair p : in) {
-
-            System.err.println("Got input " + p.path() + " " + p.attributes());
+            logger.debug("Got input " + p.path() + " " + p.attributes());
 
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
-
-                System.err.println("  Comparing to " + x.path() + " " + x.attributes());
+                logger.debug("  Comparing to " + x.path() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
-                    System.err.println("Found!");
+                    logger.debug("Found!");
                     found = x;
                     break;
                 }
             }
 
-            System.err.println("  Found = " + found);
+            logger.debug("  Found = " + found);
 
             if (found != null) {
                 tmp.remove(found);
             } else {
-                System.err.println("NOT Found!");
+                logger.debug("NOT Found!");
                 close(in);
                 throwUnexpectedElement("test15_newAttributesDirectoryStream", p.path());
-
             }
-
-            //            if (tmp.contains(p)) {
-            //                System.err.println("Found!");
-            //                tmp.remove(p);
-            //            } else {
-            //                System.err.println("NOT Found!");
-            //
-            //                close(in);
-            //                throwUnexpectedElement("newAttributesDirectoryStream", p.path().getPath());
-            //            }
         }
 
         close(in);
@@ -2169,36 +1769,27 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_nullPath_throw() throws Exception {
         test15_newAttributesDirectoryStream(null, null, true);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_nonExistingDir_throw() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream");
         Path nonExistingDir = createNewTestDirName(testDir);
 
         test15_newAttributesDirectoryStream(nonExistingDir, null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_existingDir_noThrow() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream");
 
         test15_newAttributesDirectoryStream(testDir, null, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_existingFile_noThrow() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream");
         test15_newAttributesDirectoryStream(testDir, null, false);
@@ -2208,18 +1799,16 @@ public abstract class GenericFileAdaptorTestParent {
 
         // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_nonEmptyDir_correctListing() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> result = new HashSet<>(6);
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2232,11 +1821,9 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_withSubDirs_onlyListTopDirContents() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream");
         Path file0 = createTestFile(testDir, null);
@@ -2245,7 +1832,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<PathAttributesPair> result = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> result = new HashSet<>(7);
         result.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         result.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         result.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2261,19 +1848,22 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test15_newAttributesDirectoryStream_closedFileSystem_throw_IfSupported() throws Exception {
-        /* TODO test on correct type of exception */
+        if (!config.supportsClose()) {
+            return;
+        }
         prepareTestDir("test15_newAttributesDirectoryStream");
-        deleteTestDir(testDir);
-        closeTestFS();
+        files.close(cwd.getFileSystem());
 
-        if (config.supportsClose()) {
+        try {
             test15_newAttributesDirectoryStream(testDir, null, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test15_newAttributesDirectoryStream");
         }
     }
 
@@ -2295,10 +1885,12 @@ public abstract class GenericFileAdaptorTestParent {
     private void test16_newAttributesDirectoryStream(Path root, DirectoryStream.Filter filter, Set<PathAttributesPair> expected,
             boolean mustFail) throws Exception {
 
-        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> tmp;
 
         if (expected != null) {
-            tmp.addAll(expected);
+            tmp = new HashSet<>(expected);
+        } else {
+            tmp = new HashSet<>(10);
         }
 
         DirectoryStream<PathAttributesPair> in = null;
@@ -2321,28 +1913,26 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         for (PathAttributesPair p : in) {
-
-            System.err.println("Got input " + p.path() + " " + p.attributes());
+            logger.debug("Got input " + p.path() + " " + p.attributes());
 
             PathAttributesPair found = null;
 
             for (PathAttributesPair x : tmp) {
-
-                System.err.println("  Comparing to " + x.path() + " " + x.attributes());
+                logger.debug("  Comparing to " + x.path() + " " + x.attributes());
 
                 if (x.path().equals(p.path()) && x.attributes().equals(p.attributes())) {
-                    System.err.println("Found!");
+                    logger.debug("Found!");
                     found = x;
                     break;
                 }
             }
 
-            System.err.println("  Found = " + found);
+            logger.debug("  Found = " + found);
 
             if (found != null) {
                 tmp.remove(found);
             } else {
-                System.err.println("NOT Found!");
+                logger.warn("NOT Found!");
                 close(in);
                 throwUnexpectedElement("test16_newAttributesDirectoryStream_with_filter", p.path());
 
@@ -2361,63 +1951,46 @@ public abstract class GenericFileAdaptorTestParent {
 
         close(in);
 
-        if (tmp.size() > 0) {
+        if (!tmp.isEmpty()) {
             throwMissingElements("test16_newAttributesDirectoryDirectoryStream_with_filter", tmp);
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_nullPath_throw() throws Exception {
         test16_newAttributesDirectoryStream(null, null, null, true);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_nullFilter_throw() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
 
         test16_newAttributesDirectoryStream(testDir, null, null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_emptyDirTrueFilter_noThrow() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
 
         test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_emptyDirFalseFilter_noThrow() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
 
         test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_nonExistingDir_throw() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path nonExistingDir = createNewTestDirName(testDir);
 
         test16_newAttributesDirectoryStream(nonExistingDir, new AllTrue(), null, true);
-
-        // cleanup
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_filePath_throw() throws Exception {
         prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
         Path existingFile = createTestFile(testDir, null);
@@ -2426,18 +1999,16 @@ public abstract class GenericFileAdaptorTestParent {
 
         // cleanup
         deleteTestFile(existingFile);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_nonEmptyDirTrueFilter_correctListing() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(6);
         expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2450,22 +2021,15 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_nonEmptyDirFalseFilter_emptyListing() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
-        expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
-        expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
-        expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
-        expectedResultSet.add(new PathAttributesPairImplementation(file3, files.getAttributes(file3)));
 
         test16_newAttributesDirectoryStream(testDir, new AllFalse(), null, false);
 
@@ -2474,20 +2038,18 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_dirWithSubDirs_onlyTopDirContents() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path file0 = createTestFile(testDir, null);
         Path file1 = createTestFile(testDir, null);
         Path file2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(7);
         expectedResultSet.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         expectedResultSet.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         expectedResultSet.add(new PathAttributesPairImplementation(file2, files.getAttributes(file2)));
@@ -2503,24 +2065,22 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_selectFilter_selectedListing() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
         Path selectedFile0 = createTestFile(testDir, null);
         Path selectedFile1 = createTestFile(testDir, null);
         Path selectedFile2 = createTestFile(testDir, null);
         Path file3 = createTestFile(testDir, null);
         Path subDir = createTestDir(testDir);
         Path irrelevantFileInSubDir = createTestFile(subDir, null);
-        Set<Path> selection = new HashSet<Path>();
+        Set<Path> selection = new HashSet<>(4);
         selection.add(selectedFile0);
         selection.add(selectedFile1);
         selection.add(selectedFile2);
-        Set<PathAttributesPair> expectedResultSet = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> expectedResultSet = new HashSet<>(4);
         expectedResultSet.add(new PathAttributesPairImplementation(selectedFile0, files.getAttributes(selectedFile0)));
         expectedResultSet.add(new PathAttributesPairImplementation(selectedFile1, files.getAttributes(selectedFile1)));
         expectedResultSet.add(new PathAttributesPairImplementation(selectedFile2, files.getAttributes(selectedFile2)));
@@ -2534,18 +2094,22 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(selectedFile2);
         deleteTestFile(selectedFile1);
         deleteTestFile(selectedFile0);
-        deleteTestDir(testDir);
-        closeTestFS();
     }
 
-    @org.junit.Test
+    @Test
     public void test16_newAttributesDirectoryStreamWithFilter_closedFileSystem_throwIfSupported() throws Exception {
-        prepareTestDir("test15_newAttributesDirectoryStream_with_filter");
-        deleteTestDir(testDir);
-        closeTestFS();
+        if (!config.supportsClose()) {
+            return;
+        }
+        prepareTestDir("test16_newAttributesDirectoryStreamWithFilter");
+        files.close(cwd.getFileSystem());
 
-        if (config.supportsClose()) {
+        try {
             test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, true);
+        } finally {
+            // set up for cleaning again
+            cwd = config.getWorkingDir(files, credentials);
+            testDir = resolve(cwd, TEST_ROOT, "test16_newAttributesDirectoryStreamWithFilter");
         }
     }
 
@@ -2567,7 +2131,6 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             in = files.newInputStream(file);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -2581,7 +2144,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwExpected("test20_newInputStream");
         }
 
-        byte[] data = readFully(in);
+        byte[] data = Utils.readAllBytes(in);
 
         if (expected == null) {
             if (data.length != 0) {
@@ -2599,9 +2162,8 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test20_newInputStream() throws Exception {
-
         byte[] data = "Hello World".getBytes();
 
         // test with null
@@ -2629,19 +2191,9 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file1);
         deleteTestFile(file2);
         deleteTestDir(dir0);
-        deleteTestDir(testDir);
-
-        // Close test fs
-        closeTestFS();
-
-        if (config.supportsClose()) {
-            // test with closed fs
-            test20_newInputStream(file2, data, true);
-        }
-
     }
 
-    @org.junit.Test
+    @Test
     public void test20b_newInputStreamDoubleClose() throws Exception {
 
         // See what happens when we close an in input stream twice and then reopen the stream. This failed
@@ -2690,8 +2242,6 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         deleteTestFile(file);
-        deleteTestDir(testDir);
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2714,7 +2264,6 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             out = files.newOutputStream(path, options);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -2733,7 +2282,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         InputStream in = files.newInputStream(path);
 
-        byte[] tmp = readFully(in);
+        byte[] tmp = Utils.readAllBytes(in);
 
         if (expected == null) {
             if (data.length != 0) {
@@ -2751,7 +2300,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test21_newOutputStream() throws Exception {
 
         byte[] data = "Hello World".getBytes();
@@ -2856,182 +2405,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file5 = createNewTestFileName(testDir);
         test21_newOutputStream(file5, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, false);
         deleteTestFile(file5);
-
-        deleteTestDir(testDir);
-
-        // Close test fs
-        closeTestFS();
-
-        if (config.supportsClose()) {
-            // test with closed fs
-            test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, null, null, true);
-        }
-
     }
-
-    // ---------------------------------------------------------------------------------------------------------------------------
-    // TEST: newByteChannel
-    //
-    // Possible parameters:
-    //
-    // Path null / non-existing file / existing empty file / existing non-empty file / existing dir / closed filesystem
-    // OpenOption null / CREATE / OPEN / OPEN_OR_CREATE / READ / TRUNCATE / READ / WRITE + combinations
-    //
-    // Total combinations : N
-    //
-    // Depends on:
-
-    //    public void test22_newByteChannel(Path path, OpenOption [] options, byte [] toWrite, byte [] toRead,
-    //            boolean mustFail) throws Exception {
-    //
-    //        if (!config.supportsNewByteChannel()) {
-    //            return;
-    //        }
-    //
-    //        SeekableByteChannel channel = null;
-    //
-    //        try {
-    //            channel = files.newByteChannel(path, options);
-    //        } catch (Exception e) {
-    //
-    //            if (mustFail) {
-    //                // expected
-    //                return;
-    //            }
-    //
-    //            throwUnexpected("test22_newByteChannel", e);
-    //        }
-    //
-    //        if (mustFail) {
-    //            close(channel);
-    //            throwExpected("test22_newByteChannel");
-    //        }
-    //
-    //        if (toWrite != null) {
-    //            channel.write(ByteBuffer.wrap(toWrite));
-    //        }
-    //
-    //        if (toRead != null) {
-    //
-    //            channel.position(0);
-    //
-    //            byte [] tmp = readFully(channel);
-    //
-    //            if (toRead.length != tmp.length) {
-    //                throwWrong("test22_newByteChannel", toRead.length + " bytes", tmp.length + " bytes");
-    //            }
-    //
-    //            if (!Arrays.equals(toRead, tmp)) {
-    //                throwWrong("test22_newByteChannel", Arrays.toString(toRead), Arrays.toString(tmp));
-    //            }
-    //        }
-    //
-    //        close(channel);
-    //    }
-
-    //    @org.junit.Test
-    //    public void test21_newByteChannel() throws Exception {
-    //
-    //        if (!config.supportsNewByteChannel()) {
-    //            return;
-    //        }
-    //
-    //        byte [] data = "Hello World".getBytes();
-    //        byte [] data2 = "Hello WorldHello World".getBytes();
-    //
-    //
-    //
-    //        // test with null
-    //        test22_newByteChannel(null, null, null, null, true);
-    //
-    //        FileSystem fs =  config.getTestFileSystem(files, credentials);
-    //        prepareTestDir(fs, "test22_newByteChannel");
-    //
-    //        // test with existing file and null options
-    //        Path file0 = createTestFile(testDir, null);
-    //        test22_newByteChannel(file0, null, null, null, true);
-    //
-    //        // test with existing file and empty options
-    //        test22_newByteChannel(file0, new OpenOption[0],  null, null, true);
-    //
-    //        // test with existing file and CREATE option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.CREATE }, null, null, true);
-    //
-    //        // test with existing file and OPEN option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN }, null, null, true);
-    //
-    //        // test with existing file and OPEN_OR_CREATE option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE }, null, null, true);
-    //
-    //        // test with existing file and APPEND option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.APPEND }, null, null, true);
-    //
-    //        // test with existing file and TRUNCATE option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.TRUNCATE }, null, null, true);
-    //
-    //        // test with existing file and READ option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.READ }, null, null, true);
-    //
-    //        // test with existing file and WRITE option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.WRITE }, null, null, true);
-    //
-    //        // test with existing file and CREATE + APPEND option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.CREATE, OpenOption.APPEND }, null, null, true);
-    //
-    //        // test with existing file and OPEN + READ + APPEND option
-    //        test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, OpenOption.APPEND }, null, null, true);
-    //
-    //        // test with existing file and OPEN + READ option
-    //        Path file1 = createTestFile(testDir, data);
-    //        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
-    //
-    //        // Test with existing file and OPEN + APPEND + READ + WRITE
-    //        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE, OpenOption.READ }, data, data, false);
-    //
-    //        // Test with existing file and OPEN + APPEND + READ + WRITE
-    //        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.APPEND, OpenOption.WRITE, OpenOption.READ }, null, null, true);
-    //
-    //        // test with existing file and OPEN + WRITE without APPEND option
-    //        test22_newByteChannel(file1, new OpenOption [] { OpenOption.OPEN, OpenOption.WRITE }, null, null, true);
-    //
-    //        // test with existing file and CREATE + WRITE + APPEND
-    //        test22_newByteChannel(file1, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, null, null, true);
-    //
-    //        deleteTestFile(file1);
-    //
-    //        // test with non-existing file and CREATE + WRITE + APPEND
-    //        Path file2 = createNewTestFileName(testDir);
-    //        test22_newByteChannel(file2, new OpenOption [] { OpenOption.CREATE, OpenOption.WRITE, OpenOption.APPEND }, data, null, false);
-    //        test22_newByteChannel(file2, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, data, false);
-    //        deleteTestFile(file2);
-    //
-    //        // test with non-existing file and OPEN + READ
-    //        Path file3 = createNewTestFileName(testDir);
-    //        test22_newByteChannel(file3, new OpenOption [] { OpenOption.OPEN, OpenOption.READ }, null, null, true);
-    //
-    //        // test with non-existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
-    //        Path file4 = createNewTestFileName(testDir);
-    //        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.READ }, data, data, false);
-    //
-    //        // test with existing file and OPEN_OR_CREATE + WRITE + READ + APPEND
-    //        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.WRITE, OpenOption.APPEND }, data,
-    //                null, false);
-    //        test22_newByteChannel(file4, new OpenOption [] { OpenOption.OPEN, OpenOption.READ, }, null, data2, false);
-    //
-    //        deleteTestFile(file0);
-    //        deleteTestFile(file4);
-    //
-    //        deleteTestDir(testDir);
-    //
-    //        if (config.supportsClose()) {
-    //            // test with closed fs
-    //            config.closeTestFileSystem(files,fs);
-    //            test22_newByteChannel(file0, new OpenOption [] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND, OpenOption.READ },
-    //                    null, null, true);
-    //        }
-    //
-    //
-    //    }
 
     // ---------------------------------------------------------------------------------------------------------------------------
     // TEST: copy (synchronous)
@@ -3046,13 +2420,9 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on:
 
     private void test23_copy(Path source, Path target, CopyOption[] options, byte[] expected, boolean mustFail) throws Exception {
-
-        Copy copy;
-
         try {
-            copy = files.copy(source, target, options);
+            files.copy(source, target, options);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -3066,7 +2436,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         if (expected != null) {
-            byte[] tmp = readFully(files.newInputStream(target));
+            byte[] tmp = Utils.readAllBytes(files, target);
 
             if (!Arrays.equals(expected, tmp)) {
                 throwWrong("test23_copy", Arrays.toString(expected), Arrays.toString(tmp));
@@ -3074,9 +2444,8 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test23_copy() throws Exception {
-
         byte[] data = "Hello World!".getBytes();
         byte[] data2 = "Goodbye World!".getBytes();
         byte[] data3 = "Hello World!Goodbye World!".getBytes();
@@ -3195,10 +2564,6 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestFile(file2);
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-
-        closeTestFS();
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -3213,9 +2578,8 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on:
 
-    @org.junit.Test
+    @Test
     public void test24_copy_async() throws Exception {
-
         byte[] data = "Hello World!".getBytes();
 
         prepareTestDir("test24_copy_async");
@@ -3238,12 +2602,10 @@ public abstract class GenericFileAdaptorTestParent {
 
         // Test the cancel
         copy = files.copy(file0, file1, new CopyOption[] { CopyOption.REPLACE, CopyOption.ASYNCHRONOUS });
-        status = files.cancelCopy(copy);
+        files.cancelCopy(copy);
 
         deleteTestFile(file1);
         deleteTestFile(file0);
-        deleteTestDir(testDir);
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -3258,31 +2620,17 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on:
 
-    @org.junit.Test
+    @Test
     public void test25_getLocalCWD() throws Exception {
-
         if (config.supportsLocalCWD()) {
-
-            try {
-                Utils.getLocalCWD(files);
-            } catch (Exception e) {
-                throwUnexpected("test25_getLocalCWD", e);
-            }
-
+            Utils.getLocalCWD(files);
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test26_getLocalHomeFileSystem() throws Exception {
-
         if (config.supportsLocalHome()) {
-
-            try {
-                Utils.getLocalHome(files);
-            } catch (Exception e) {
-                throwUnexpected("test26_getLocalHomeFileSystem", e);
-            }
-
+            Utils.getLocalHome(files);
         }
     }
 
@@ -3304,7 +2652,6 @@ public abstract class GenericFileAdaptorTestParent {
         try {
             files.move(source, target);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -3335,7 +2682,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test27_move() throws Exception {
 
         test27_move(null, null, true);
@@ -3372,10 +2719,6 @@ public abstract class GenericFileAdaptorTestParent {
         test27_move(dir1, file1, false);
 
         deleteTestDir(file1);
-        deleteTestDir(testDir);
-
-        closeTestFS();
-
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -3390,13 +2733,11 @@ public abstract class GenericFileAdaptorTestParent {
     // Depends on:
 
     private void test28_readSymbolicLink(Path link, Path expected, boolean mustFail) throws Exception {
-
         Path target = null;
 
         try {
             target = files.readSymbolicLink(link);
         } catch (Exception e) {
-
             if (mustFail) {
                 // expected
                 return;
@@ -3410,12 +2751,12 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         // make sure the target is what was expected
-        if (expected != null && !target.equals(expected)) {
+        if (expected != null && !expected.equals(target)) {
             throwWrong("test28_readSymbolicLink", expected, target);
         }
     }
 
-    @org.junit.Test
+    @Test
     public void test28_readSymbolicLink() throws Exception {
 
         if (!config.supportsSymboliclinks()) {
@@ -3441,27 +2782,18 @@ public abstract class GenericFileAdaptorTestParent {
         test28_readSymbolicLink(dir0, null, true);
 
         deleteTestDir(dir0);
-        deleteTestDir(testDir);
-
-        closeTestFS();
-
     }
 
-    @org.junit.Test
+    @Test
     public void test29_readSymbolicLink() throws Exception {
-
         if (!config.supportsSymboliclinks()) {
             return;
         }
 
-        Path cwd = config.getWorkingDir(files, credentials);
-
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
         Path root = resolve(cwd, "xenon_test/links");
 
-        if (!files.exists(root)) {
-            throw new Exception("Cannot find symbolic link test dir at " + root);
-        }
+        assertTrue("Cannot find symbolic link test dir at " + root, files.exists(root));
 
         // prepare the test files
         Path file0 = resolve(root, "file0"); // exists
@@ -3497,51 +2829,18 @@ public abstract class GenericFileAdaptorTestParent {
 
         // link6 should point to link5 which points to link6
         test28_readSymbolicLink(link6, link5, false);
-
     }
 
-    //    @org.junit.Test
-    //    public void test30_isSymbolicLink() throws Exception {
-    //
-    //
-    //
-    //        FileSystem fs = config.getTestFileSystem(files, credentials);
-    //
-    //        // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
-    //        Path root = fs.getEntryPath().resolve(new RelativePath("xenon_test/links"));
-    //
-    //        if (!files.exists(root)) {
-    //            throw new Exception("Cannot find symbolic link test dir at " + root.getPath());
-    //        }
-    //
-    //        // prepare the test files
-    //        boolean v = files.isSymbolicLink(root.resolve(new RelativePath("file0")));
-    //        assertFalse(v);
-    //
-    //        v = files.isSymbolicLink(root.resolve(new RelativePath("link0")));
-    //        assertTrue(v);
-    //
-    //        v = files.isSymbolicLink(root.resolve(new RelativePath("file2")));
-    //        assertFalse(v);
-    //
-    //
-    //    }
-
-    @org.junit.Test
+    @Test
     public void test31_newDirectoryStreamWithBrokenLinks() throws Exception {
-
         if (!config.supportsSymboliclinks()) {
             return;
         }
 
-        Path cwd = config.getWorkingDir(files, credentials);
-
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
         Path root = resolve(cwd, "xenon_test/links");
 
-        if (!files.exists(root)) {
-            throw new Exception("Cannot find symbolic link test dir at " + root);
-        }
+        assertTrue("Cannot find symbolic link test dir at " + root, files.exists(root));
 
         // prepare the test files
         Path file0 = resolve(root, "file0"); // exists
@@ -3556,7 +2855,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path link5 = resolve(root, "link5"); // points to link6 (circular)
         Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
-        Set<Path> tmp = new HashSet<Path>();
+        Set<Path> tmp = new HashSet<>(12);
         tmp.add(file0);
         tmp.add(file1);
         tmp.add(link0);
@@ -3568,24 +2867,17 @@ public abstract class GenericFileAdaptorTestParent {
         tmp.add(link6);
 
         test11_newDirectoryStream(root, tmp, false);
-
     }
 
-    @org.junit.Test
+    @Test
     public void test32_newAttributesDirectoryStreamWithBrokenLinks() throws Exception {
-
         if (!config.supportsSymboliclinks()) {
             return;
         }
 
-        Path cwd = config.getWorkingDir(files, credentials);
-
         // Use external test dir with is assumed to be in fs.getEntryPath().resolve("xenon_test/links");
         Path root = resolve(cwd, "xenon_test/links");
-
-        if (!files.exists(root)) {
-            throw new Exception("Cannot find symbolic link test dir at " + root);
-        }
+        assertTrue("Cannot find symbolic link test dir at " + root, files.exists(root));
 
         // prepare the test files
         Path file0 = resolve(root, "file0"); // exists
@@ -3600,7 +2892,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path link5 = resolve(root, "link5"); // points to link6 (circular)
         Path link6 = resolve(root, "link6"); // points to link5 (circular)
 
-        Set<PathAttributesPair> tmp = new HashSet<PathAttributesPair>();
+        Set<PathAttributesPair> tmp = new HashSet<>(12);
         tmp.add(new PathAttributesPairImplementation(file0, files.getAttributes(file0)));
         tmp.add(new PathAttributesPairImplementation(file1, files.getAttributes(file1)));
         tmp.add(new PathAttributesPairImplementation(link0, files.getAttributes(link0)));
@@ -3612,20 +2904,10 @@ public abstract class GenericFileAdaptorTestParent {
         tmp.add(new PathAttributesPairImplementation(link6, files.getAttributes(link6)));
 
         test15_newAttributesDirectoryStream(root, tmp, false);
-
     }
 
-    /*
-    public Path readSymbolicLink(Path link) throws XenonException;
-
-    public boolean isSymbolicLink(Path path) throws XenonException;
-
-
-     */
-
-    @org.junit.Test
+    @Test
     public void test33_multipleFileSystemsOpenSimultaneously() throws Exception {
-
         // Open two file systems. They should both be open afterwards.
         FileSystem fs0 = files.newFileSystem(config.getScheme(), config.getCorrectLocation(),
                 config.getDefaultCredential(credentials), null);
@@ -3637,7 +2919,5 @@ public abstract class GenericFileAdaptorTestParent {
         // Close them both. We should get no exceptions.
         files.close(fs0);
         files.close(fs1);
-
     }
-
 }

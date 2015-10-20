@@ -18,9 +18,7 @@ package nl.esciencecenter.xenon.jobs;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 
 import nl.esciencecenter.xenon.Xenon;
@@ -37,29 +35,7 @@ import nl.esciencecenter.xenon.util.Utils;
  * 
  */
 public class ITMultiJobTest {
-    private String readFully(InputStream in) throws IOException {
-        byte[] buffer = new byte[1024];
 
-        int offset = 0;
-
-        try {
-            int tmp = in.read(buffer, 0, buffer.length);
-
-            while (tmp != -1) {
-                offset += tmp;
-
-                if (offset == buffer.length) {
-                    buffer = Arrays.copyOf(buffer, buffer.length * 2);
-                }
-
-                tmp = in.read(buffer, offset, buffer.length - offset);
-            }
-        } finally {
-            in.close();
-        }
-        return new String(buffer, 0, offset);
-    }
-   
     private void submitToQueueWithPolling(String testName, String queueName, int jobCount) throws Exception {
         System.err.println("STARTING TEST submitToQueueWithPolling(" + testName + ", " + queueName + ", " + jobCount + ")");
 
@@ -149,8 +125,8 @@ public class ITMultiJobTest {
         }
 
         for (int i = 0; i < j.length; i++) {
-            String tmpout = readFully(files.newInputStream(out[i]));
-            String tmperr = readFully(files.newInputStream(err[i]));
+            String tmpout = Utils.readToString(files, out[i], Charset.defaultCharset());
+            String tmperr = Utils.readToString(files, err[i], Charset.defaultCharset());
 
             assertTrue(tmpout != null);
             assertTrue(tmpout.length() == 0);

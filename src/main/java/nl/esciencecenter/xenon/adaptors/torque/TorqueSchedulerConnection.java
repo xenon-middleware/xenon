@@ -115,11 +115,11 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         String stateCode = jobInfo.get("job_state");
 
         Exception exception = null;
-        if (stateCode.contains("E")) {
+        if (stateCode.equals("E")) {
             exception = new XenonException(TorqueAdaptor.ADAPTOR_NAME, "Job reports error state: " + stateCode);
             done = true;
         }
-        if (stateCode.contains("C")) {
+        if (stateCode.equals("C")) {
             done = true;
         }
         Integer exitStatus = null;
@@ -141,7 +141,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
     private final Map<String, Long> lastSeenMap;
 
     //list of jobs we have killed before they even started. These will not end up in qstat, so we keep them here.
-    private final Set<Long> deletedJobs;
+    private final Set<String> deletedJobs;
 
     private final Scheduler scheduler;
 
@@ -219,14 +219,14 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
     }
 
     private synchronized void addDeletedJob(Job job) {
-        deletedJobs.add(Long.parseLong(job.getIdentifier()));
+        deletedJobs.add(job.getIdentifier());
     }
 
     /**
      * Note: Works exactly once per job.
      */
     private synchronized boolean jobWasDeleted(Job job) {
-        return deletedJobs.remove(Long.valueOf(job.getIdentifier()));
+        return deletedJobs.remove(job.getIdentifier());
     }
 
     private void jobsFromStatus(String statusOutput, Scheduler scheduler, List<Job> result) throws XenonException {
@@ -338,7 +338,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             if (runner.success()) {
                 output = runner.getStdout();
             } else {
-                Map<String, Map<String,String>> badResult = new HashMap<>();
+                Map<String, Map<String,String>> badResult = new HashMap<>(2);
                 for (String name : queueNames) {
                     badResult.put(name, null);
                 }
@@ -347,7 +347,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         }
         String[] lines = ScriptingParser.NEWLINE_REGEX.split(output);
         
-        Map<String, Map<String,String>> result = new HashMap<>();
+        Map<String, Map<String,String>> result = new HashMap<>(10);
 
         Map<String, String> currentQueueMap = null;
         for (String line : lines) {
@@ -356,7 +356,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
                 if (currentQueueMap != null) {
                     result.put(currentQueueMap.get("qname"), currentQueueMap);
                 }
-                currentQueueMap = new HashMap<>();
+                currentQueueMap = new HashMap<>(lines.length);
                 currentQueueMap.put("qname", queueNameMatcher.group(1));
             } else {
                 String[] keyVal = ScriptingParser.EQUALS_REGEX.split(line, 2);
@@ -480,15 +480,18 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             status = null;
         }
 
-        //perhaps the job was killed while it was not running yet.
-        if (status == null && jobWasDeleted(job)) {
+        if (status == null) {
+            if (jobWasDeleted(job)) {
+                Exception exception = new JobCanceledException(TorqueAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
+                    + " deleted by user");
+                status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
+            } else if (haveRecentlySeen(job.getIdentifier())) {
+                status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
+            }
+        } else if (status.isDone() && jobWasDeleted(job)) {
             Exception exception = new JobCanceledException(TorqueAdaptor.ADAPTOR_NAME, "Job " + job.getIdentifier()
-                    + " deleted by user while still pending");
-            status = new JobStatusImplementation(job, "killed", null, exception, false, true, null);
-        }
-
-        if (status == null && haveRecentlySeen(job.getIdentifier())) {
-            status = new JobStatusImplementation(job, "unknown", null, null, false, true, new HashMap<String, String>(0));
+                    + " deleted by user");
+            status = new JobStatusImplementation(job, "killed", status.getExitCode(), exception, false, true, status.getSchedulerSpecficInformation());
         }
 
         return status;

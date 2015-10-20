@@ -6,49 +6,61 @@ import java.net.URISyntaxException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 
 public abstract class Location {
-
     private final String user;
     private final String host;
     private final int port;
-    private String scheme;
-    protected final String path;
+    private final String scheme;
+    private final String path;
     private static final String SCHEME_SEPARATOR = "://";
     private static final String DUMMY_SCHEME = "dummy";
 
     public Location(String user, String host, int port) {
+        this(user, host, port, null, "");
+    }
+
+    public Location(String user, String host, int port, String scheme, String path) {
         this.user = user;
         this.host = host;
         this.port = port;
-        scheme = null;
-        path = "";
+        this.scheme = scheme;
+        this.path = path;
     }
 
-    protected Location(String location) throws InvalidLocationException {
-        // Augment location with dummy scheme, if needed, to allow processing by URI
-        String augmentedLocation = null;
-        boolean hasScheme = location.contains(SCHEME_SEPARATOR);
-        if (!hasScheme) {
-            augmentedLocation = DUMMY_SCHEME + SCHEME_SEPARATOR + location;
+    /**
+     * Parses a location URI as a Location.
+     * @param location string containing a URI, the scheme may be omitted.
+     * @param defaultScheme scheme to use if the default scheme is not found
+     * @throws InvalidLocationException
+     *      if the location is null or
+     *          not a valid URI or
+     *      if the port number is provided but not positive.
+     */
+    protected Location(String location, String defaultScheme) throws InvalidLocationException {
+        if (location == null) {
+            throw new InvalidLocationException(getAdaptorName(), "location may not be null.");
         }
+        // Augment location with dummy scheme, if needed, to allow processing by URI
+        boolean hasScheme = location.contains(SCHEME_SEPARATOR);
+        String uriLocation = hasScheme ? location : DUMMY_SCHEME + SCHEME_SEPARATOR + location;
 
         try {
-            URI url = new URI(augmentedLocation == null ? location : augmentedLocation);
+            URI url = new URI(uriLocation);
             String userPart = url.getUserInfo();
-            if (userPart == null || !userPart.isEmpty()) {
-                user = userPart;
-            } else {
+            if (userPart == null || userPart.isEmpty()) {
                 user = null;
+            } else {
+                user = userPart;
             }
             host = url.getHost();
             port = url.getPort();
-            scheme = hasScheme ? url.getScheme() : null;
+            scheme = hasScheme ? url.getScheme() : defaultScheme;
             path = url.getPath();
             validate();
         } catch (URISyntaxException e) {
             throw new InvalidLocationException(getAdaptorName(), "Could not parse location " + location, e);
         }
         if (port <= 0 && port != -1) {
-            throw new InvalidLocationException(getAdaptorName(), "Port number of " + location + " must be positive or omited");
+            throw new InvalidLocationException(getAdaptorName(), "Port number of " + location + " must be positive or omitted");
         }
     }
 
@@ -67,19 +79,11 @@ public abstract class Location {
     }
 
     public int getPort() {
-    	if (port == -1) {
-    		return getDefaultPort();
-    	}
-    
-        return port;
+        return usesDefaultPort() ? getDefaultPort() : port;
     }
 
-    public String getSCheme() {
+    public String getScheme() {
         return scheme;
-    }
-
-    protected void setScheme(String scheme) {
-        this.scheme = scheme;
     }
 
     protected abstract String getAdaptorName();
@@ -89,34 +93,24 @@ public abstract class Location {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(100);
-        appendScheme(result);
-        appendUser(result);
-        appendHostAndPort(result);
+        if (scheme != null) {
+            result.append(scheme).append(SCHEME_SEPARATOR);
+        }
+        if (user != null) {
+            result.append(user).append('@');
+        }
+        result.append(host).append(':').append(getPort());
+        result.append(path);
+
         return result.toString();
     }
 
-    private void appendHostAndPort(StringBuilder result) {
-        result.append(host);
-        result.append(":");
-        result.append(port);
-    }
-
-    private void appendUser(StringBuilder result) {
-        if (user != null) {
-            result.append(user);
-            result.append("@");
-        }
-    }
-
-    private void appendScheme(StringBuilder result) {
-        if (scheme != null) {
-            result.append(scheme);
-            result.append(SCHEME_SEPARATOR);
-        }
-    }
-    
     /** Whether the default port was used because none was provided. */
     public boolean usesDefaultPort() {
         return port == -1;
+    }
+
+    public String getPath() {
+        return this.path;
     }
 }

@@ -167,7 +167,6 @@ public class SshJobs implements Jobs {
     
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
-
         if (!description.getEnvironment().isEmpty()) {
             throw new UnsupportedJobDescriptionException(SshAdaptor.ADAPTOR_NAME, "Environment variables not supported!");
         }

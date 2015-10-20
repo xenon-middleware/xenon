@@ -124,14 +124,9 @@ public final class Utils {
      *             if an I/O error occurs during the copy operation.
      */
     public static long copy(InputStream in, OutputStream out, int bufferSize) throws IOException {
-
         long bytes = 0;
 
-        if (bufferSize <= 0) {
-            bufferSize = DEFAULT_BUFFER_SIZE;
-        }
-
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        byte[] buffer = new byte[bufferSize > 0 ? bufferSize : DEFAULT_BUFFER_SIZE];
 
         int len = in.read(buffer);
 
@@ -157,7 +152,6 @@ public final class Utils {
      *             if an I/O error was produced while reading the stream.
      */
     public static byte[] readAllBytes(InputStream in) throws IOException {
-
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         copy(in, buffer, DEFAULT_BUFFER_SIZE);
@@ -182,7 +176,6 @@ public final class Utils {
      *             if an I/O error was produced while reading the stream.
      */
     public static String readToString(InputStream in, Charset cs) throws IOException {
-
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         copy(in, buffer, DEFAULT_BUFFER_SIZE);
@@ -1100,7 +1093,6 @@ public final class Utils {
      *             if an I/O error occurs during the copying
      */
     public static void recursiveDelete(Files files, Path path) throws XenonException {
-
         FileAttributes att = files.getAttributes(path);
 
         if (att.isDirectory()) {

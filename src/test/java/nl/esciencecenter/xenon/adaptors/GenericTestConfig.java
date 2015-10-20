@@ -72,6 +72,11 @@ public abstract class GenericTestConfig {
         return props;
     }
 
+    public String getProperty(String name, String defaultValue) {
+        String prop = p.getProperty(name);
+        return prop != null ? prop : defaultValue;
+    }
+
     public static String getPropertyOrFail(String adaptorName, Properties props, String name) throws UnknownPropertyException {
         String value = props.getProperty(name);
         if (value == null) {

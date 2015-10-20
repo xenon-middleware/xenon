@@ -18,24 +18,41 @@ package nl.esciencecenter.xenon.jobs;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.UUID;
 
+import nl.esciencecenter.xenon.JobException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.Util;
 import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Sandbox;
 import nl.esciencecenter.xenon.util.Utils;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class SandboxedLocalJobIT {
+    private Xenon xenon;
+    private Scheduler scheduler;
+    private Files files;
+
+    @Before
+    public void setupXenon() throws XenonException {
+        xenon = XenonFactory.newXenon(null);
+        files = xenon.files();
+        scheduler = xenon.jobs().newScheduler("local", "", null, null);
+    }
+
+    @After
+    public void cleanupXenon() throws XenonException {
+        xenon.jobs().close(scheduler);
+        XenonFactory.endAll();
+    }
 
     /**
      * Xenon usage example:
@@ -52,70 +69,69 @@ public class SandboxedLocalJobIT {
      * </ol>
      * 
      * @throws XenonException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     * @throws IOException
      */
     @Test
-    public void test() throws Exception, XenonException, URISyntaxException, InterruptedException, IOException {
-        Xenon xenon = XenonFactory.newXenon(null);
+    public void test() throws XenonException {
+        // test uses unix utilities
+        if (Utils.isWindows()) {
+            return;
+        }
         String tmpdir = System.getProperty("java.io.tmpdir");
         String work_id = UUID.randomUUID().toString();
-        FileSystem localrootfs = Utils.getLocalCWD(xenon.files()).getFileSystem();
+        FileSystem localrootfs = Utils.getLocalCWD(files).getFileSystem();
 
         // create workdir
         String workFn = tmpdir + "/AAP" + work_id;
-        Path workdir = xenon.files().newPath(localrootfs, new RelativePath(workFn));
-        xenon.files().createDirectory(workdir);
-
-        // fill workdir
-        String input_file = System.getProperty("user.dir") + "/src/test/resources/fixtures/lorem_ipsum.txt";
-        xenon.files().copy(xenon.files().newPath(localrootfs, new RelativePath(input_file)),
-                xenon.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
+        Path workdir = files.newPath(localrootfs, new RelativePath(workFn));
 
         // create sandbox
         String sandbox_id = "MIES" + UUID.randomUUID().toString();
-        Path sandboxPath = xenon.files().newPath(localrootfs, new RelativePath(tmpdir));
-        Sandbox sandbox = new Sandbox(xenon.files(), sandboxPath, sandbox_id);
+        Path sandboxPath = files.newPath(localrootfs, new RelativePath(tmpdir));
+        Sandbox sandbox = new Sandbox(files, sandboxPath, sandbox_id);
 
-        sandbox.addUploadFile(xenon.files().newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
-                "lorem_ipsum.txt");
+        try {
+            files.createDirectory(workdir);
 
-        sandbox.addDownloadFile("stdout.txt", xenon.files().newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
-        sandbox.addDownloadFile("stderr.txt", xenon.files().newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
+            // fill workdir
+            String input_file = System.getProperty("user.dir") + "/src/test/resources/fixtures/lorem_ipsum.txt";
+            files.copy(files.newPath(localrootfs, new RelativePath(input_file)),
+                    files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
-        // upload lorem_ipsum.txt to sandbox
-        sandbox.upload();
+            sandbox.addUploadFile(files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
+                    "lorem_ipsum.txt");
 
-        JobDescription description = new JobDescription();
-        description.setArguments("lorem_ipsum.txt");
-        description.setExecutable("/usr/bin/wc");
-        description.setQueueName("single");
-        description.setStdout("stdout.txt");
-        description.setStderr("stderr.txt");
-        description.setWorkingDirectory(sandbox.getPath().getRelativePath().getAbsolutePath());
+            sandbox.addDownloadFile("stdout.txt", files.newPath(localrootfs, new RelativePath(workFn + "/stdout.txt")));
+            sandbox.addDownloadFile("stderr.txt", files.newPath(localrootfs, new RelativePath(workFn + "/stderr.txt")));
 
-        Scheduler scheduler = xenon.jobs().newScheduler("local", "", null, null);
+            // upload lorem_ipsum.txt to sandbox
+            sandbox.upload();
 
-        Job job = xenon.jobs().submitJob(scheduler, description);
+            JobDescription description = new JobDescription();
+            description.setArguments("lorem_ipsum.txt");
+            description.setExecutable("/usr/bin/wc");
+            description.setQueueName("single");
+            description.setStdout("stdout.txt");
+            description.setStderr("stderr.txt");
+            description.setWorkingDirectory(sandbox.getPath().getRelativePath().getAbsolutePath());
 
-        // TODO add timeout
-        while (!xenon.jobs().getJobStatus(job).isDone()) {
-            Thread.sleep(500);
+            Job job = xenon.jobs().submitJob(scheduler, description);
+            JobStatus status = xenon.jobs().waitUntilDone(job, 1000);
+
+            sandbox.download();
+
+            if (status.hasException()) {
+                throw new JobException("Job failed", status.getException());
+            }
+
+            Path stdout = files.newPath(workdir.getFileSystem(), workdir.getRelativePath().resolve("stdout.txt"));
+
+            assertThat(Utils.readToString(files, stdout, Charset.defaultCharset()), is("   9  525 3581 lorem_ipsum.txt\n"));
+        } finally {
+            try {
+                sandbox.delete();
+            } finally {
+                Utils.recursiveDelete(files, workdir);
+            }
         }
-
-        sandbox.download();
-        sandbox.delete();
-
-        JobStatus status = xenon.jobs().getJobStatus(job);
-        if (status.hasException()) {
-            throw status.getException();
-        }
-
-        File stdout = new File(workdir.getRelativePath().getAbsolutePath() + "/stdout.txt");
-        
-        assertThat(Util.readFileToString(stdout), is("   9  525 3581 lorem_ipsum.txt\n"));
-
-        Utils.recursiveDelete(xenon.files(), workdir);
     }
 }

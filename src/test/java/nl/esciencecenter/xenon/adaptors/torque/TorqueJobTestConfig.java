@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2013 Netherlands eScience Center
  *
@@ -173,29 +174,26 @@ public class TorqueJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getDefaultProperties() throws Exception {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.torque.poll.delay", "100");
         return result;
     }
 
     public Map<String, String> getUnknownProperties() throws Exception {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.torque.unknown.property", "some.value");
         return result;
     }
 
     public Map<String, String>[] getInvalidProperties() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, String>[] result = new Map[1];
-
-        result[0] = new HashMap<>();
-
+        Map<String, String>[] result = new Map[] { new HashMap<>(2) };
         result[0].put("xenon.adaptors.torque.poll.delay", "AAP");
         return result;
     }
 
     public Map<String, String> getCorrectProperties() throws Exception {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>(2);
         result.put("xenon.adaptors.torque.poll.delay", "100");
         return result;
     }

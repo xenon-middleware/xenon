@@ -33,17 +33,16 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  */
 public class SSHJobTestConfig extends JobTestConfig {
 
-    private String username;
-    private char[] passwd;
+    private final String username;
+    private final char[] passwd;
 
-    private String scheme = "ssh";
+    private final String scheme = "ssh";
     
-    private String correctLocation;
-    private String correctLocationWrongUser;
-    private String wrongLocation;
+    private final String correctLocation;
+    private final String correctLocationWrongUser;
+    private final String wrongLocation;
 
     public SSHJobTestConfig(String configfile) throws Exception {
-
         super("ssh", configfile);
 
         String location = getPropertyOrFail("test.ssh.location");
@@ -78,12 +77,12 @@ public class SSHJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", username, passwd, new HashMap<String, String>());
+        return credentials.newPasswordCredential("ssh", username, passwd, new HashMap<String, String>(0));
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
+        return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
     @Override

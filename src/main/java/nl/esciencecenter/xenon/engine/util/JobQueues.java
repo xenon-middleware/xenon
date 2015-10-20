@@ -197,7 +197,6 @@ public class JobQueues {
     }
 
     private JobExecutor findJob(List<JobExecutor> queue, Job job) throws XenonException {
-
         for (JobExecutor e : queue) {
             if (e.getJob().equals(job)) {
                 return e;
@@ -226,7 +225,6 @@ public class JobQueues {
     }
 
     public JobStatus getJobStatus(Job job) throws XenonException {
-
         LOGGER.debug("{}: getJobStatus for job {}", adaptorName, job.getIdentifier());
 
         checkScheduler(job.getScheduler());
@@ -263,7 +261,6 @@ public class JobQueues {
     }
 
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
-
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
         if (timeout < 0) {
@@ -409,7 +406,6 @@ public class JobQueues {
     }
 
     public JobStatus cancelJob(Job job) throws XenonException {
-
         LOGGER.debug("{}: Cancel job {}", adaptorName, job);
 
         checkScheduler(job.getScheduler());

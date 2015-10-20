@@ -103,7 +103,9 @@ task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopy
 //  DOCKER BUILD
 // ==============
 
-task dockerTestCache(dependsOn: checkDockerComposePresence) {
+ext.testCacheSet = file('.docker-test-cache-set')
+
+task dockerTestCache(dependsOn: [checkDockerComposePresence, clean]) {
     description "Cache gradle dependencies in xenon-test Docker container"
     def testCacheSet = file('.docker-test-cache-set')
     onlyIf {
@@ -120,12 +122,20 @@ task dockerTestCache(dependsOn: checkDockerComposePresence) {
             commandLine 'docker', 'commit', dockerCacheContainerName,
                 'nlesc/xenon-test'
         }
-        exec {
-            commandLine 'touch', testCacheSet.absolutePath
-        }
     }
-    finalizedBy 'dockerTestCacheCleanup'
+    finalizedBy 'dockerMarkTestCacheSet', 'dockerTestCacheCleanup'
 }
+task dockerMarkTestCacheSet(type: Exec) {
+    onlyIf {
+        dockerTestCache.state.executed && !dockerTestCache.state.failure
+    }
+    outputs.file testCacheSet
+    commandLine 'touch', testCacheSet.absolutePath
+}
+task resetDockerTestCache(type: Delete) {
+    delete testCacheSet
+}
+
 task dockerTestCacheCleanup(type: Exec) {
     description "Remove temporary Docker cache container"
     onlyIf {
@@ -134,7 +144,7 @@ task dockerTestCacheCleanup(type: Exec) {
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
 
-task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements]) << {
+task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, dockerCopyRequirements]) << {
     description "Build Docker images from Dockerfile"
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->

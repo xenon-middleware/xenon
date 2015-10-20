@@ -35,43 +35,29 @@ import nl.esciencecenter.xenon.util.JavaJobDescription;
  * @since 1.0
  */
 class LocalInteractiveProcess implements InteractiveProcess {
-
-    private final java.lang.Process process;
+    private final Process process;
 
     private int exitCode;
     private boolean done;
 
-    private Streams streams;
+    private final Streams streams;
 
     LocalInteractiveProcess(JobImplementation job) throws XenonException {
-
         JobDescription description = job.getJobDescription();
 
         ProcessBuilder builder = new ProcessBuilder();
 
         builder.command().add(description.getExecutable());
-
-        //We need to special case for the java job description here,
-        //as it needs to be told the path separator in case the target is a windows machine.
-        List<String> arguments;
-        if (description instanceof JavaJobDescription) {
-            JavaJobDescription javaDescription = (JavaJobDescription) description;
-            arguments = javaDescription.getArguments(File.pathSeparatorChar);
-        } else {
-            arguments = description.getArguments();
-        }
-
-        builder.command().addAll(arguments);
+        builder.command().addAll(description.getArguments());
         builder.environment().putAll(description.getEnvironment());
 
         String workingDirectory = description.getWorkingDirectory();
-
         if (workingDirectory == null) {
             workingDirectory = System.getProperty("user.dir");
         }
 
-        builder.directory(new java.io.File(workingDirectory));
-        
+        builder.directory(new File(workingDirectory));
+
         try { 
             process = builder.start();
         } catch (IOException e) { 
@@ -85,7 +71,6 @@ class LocalInteractiveProcess implements InteractiveProcess {
     }
 
     public boolean isDone() {
-
         if (done) {
             return true;
         }
@@ -95,7 +80,7 @@ class LocalInteractiveProcess implements InteractiveProcess {
             done = true;
             return true;
         } catch (IllegalThreadStateException e) {
-            // ignored
+            // exit code cannot be found: indicates the process has not yet finished
             return false;
         }
     }
@@ -104,8 +89,13 @@ class LocalInteractiveProcess implements InteractiveProcess {
         return exitCode;
     }
 
+    /**
+     * Destroy (stop) process.
+     * Does nothing if the process has already finished. Does not
+     * re-evaluate whether process has finished. Will run the kill command on
+     * Unix, and Process.destroy() if that does not work or does not apply.
+     */
     public void destroy() {
-
         if (done) {
             return;
         }

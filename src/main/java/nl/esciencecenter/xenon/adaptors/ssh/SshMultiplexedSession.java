@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
@@ -59,7 +59,7 @@ class SshMultiplexedSession {
 
     private int nextSessionID = 0;
 
-    private List<SshSession> sessions = new ArrayList<>();
+    private final List<SshSession> sessions = new ArrayList<>();
 
     SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation location, Credential cred, XenonProperties properties)
             throws XenonException {
@@ -69,9 +69,8 @@ class SshMultiplexedSession {
         this.jsch = jsch;
         this.location = location;
         this.properties = properties;
-        
+
         credential = cred;
-        
         if (credential == null) {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");
         }

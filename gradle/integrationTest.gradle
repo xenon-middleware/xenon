@@ -25,12 +25,16 @@ task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
     }
 
     doLast {
-        def create_symlinks = 'src/integrationTest/resources/scripts/create_symlinks'
+        def testDir = file('build/integrationTest')
+        testDir.mkdir()
+
+        def create_symlinks = file('src/integrationTest/resources/scripts/create_symlinks')
 
         // Initialize testing symlinks locally
         exec {
+            workingDir testDir
             executable = '/bin/bash'
-            args = [create_symlinks]
+            args = [create_symlinks.absolutePath]
         }
 
         // Initialize testing symlinks on remote side
@@ -43,7 +47,7 @@ task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
                     password: integrationTestProperties.getProperty("test.ssh.password")
                     ) {
                 shell interaction: {
-                    file(create_symlinks).withInputStream { stream ->
+                    create_symlinks.withInputStream { stream ->
                         standardInput << stream << '\n' << 'exit 0' << '\n'
                     }
                 }

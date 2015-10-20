@@ -44,7 +44,7 @@ public class FtpAdaptor extends Adaptor {
     private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remove ftp servers.";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ftp");
+    protected static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ftp");
 
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");

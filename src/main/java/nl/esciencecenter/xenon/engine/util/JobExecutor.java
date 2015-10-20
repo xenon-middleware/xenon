@@ -106,7 +106,6 @@ public class JobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
-
         if (!done && state.equals("RUNNING")) {
             triggerStatusUpdate();
             waitForStatusUpdate(pollingDelay);
@@ -225,7 +224,6 @@ public class JobExecutor implements Runnable {
      * Signal the polling thread to produce a status update.
      */
     private synchronized void triggerStatusUpdate() {
-
         if (done) {
             return;
         }

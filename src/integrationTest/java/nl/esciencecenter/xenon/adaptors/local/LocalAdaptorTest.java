@@ -16,8 +16,8 @@
 
 package nl.esciencecenter.xenon.adaptors.local;
 
-import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.Util;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 

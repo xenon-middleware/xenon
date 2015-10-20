@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -193,23 +194,21 @@ public class JavaJobDescription extends JobDescription {
      */
     @Override
     public List<String> getArguments() {
-        return getArguments(':');
+        return getArguments(File.pathSeparatorChar);
     }
 
     /**
      * Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java
      * arguments.
      * 
-     * @param pathSeperator
+     * @param pathSeparator
      *            the seperator to use in the classpath. Defaults to the unix path seperator ':'
      * 
      * @return the command line arguments
      */
-    public List<String> getArguments(char pathSeperator) {
-        List<String> result = new ArrayList<String>();
-        for (String option : getJavaOptions()) {
-            result.add(option);
-        }
+    public List<String> getArguments(char pathSeparator) {
+        List<String> result = new ArrayList<>();
+        result.addAll(getJavaOptions());
 
         if (!getJavaClasspath().isEmpty()) {
             result.add("-classpath");
@@ -219,7 +218,7 @@ public class JavaJobDescription extends JobDescription {
                 if (classpath == null) {
                     classpath = element;
                 } else {
-                    classpath = classpath + pathSeperator + element;
+                    classpath = classpath + pathSeparator + element;
                 }
             }
             result.add(classpath);
@@ -234,9 +233,7 @@ public class JavaJobDescription extends JobDescription {
             result.add(getJavaMain());
         }
 
-        for (String javaArgument : getJavaArguments()) {
-            result.add(javaArgument);
-        }
+        result.addAll(getJavaArguments());
         return result;
     }
 
