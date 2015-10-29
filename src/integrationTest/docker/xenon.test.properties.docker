@@ -69,8 +69,8 @@ test.gridengine.password=javagat
 #
 test.gridengine.default.queue=default
 test.gridengine.queues=default,slow
-test.gridengine.queue.wait.time=5000
-test.gridengine.update.time=2000
+test.gridengine.queue.wait.time=50000
+test.gridengine.update.time=20000
 test.gridengine.parallel.environment=bi
 
 ######################################################################
