@@ -4,6 +4,7 @@ Xenon
 
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop
 )](https://travis-ci.org/NLeSC/Xenon)
+[![Coverage Status](https://coveralls.io/repos/NLeSC/Xenon/badge.svg?branch=develop&service=github)](https://coveralls.io/github/NLeSC/Xenon?branch=develop)
 
 Copyright 2013 The Netherlands eScience Center
 
