@@ -14,7 +14,8 @@ fi
 
 # ssh in prepareIntegrationTest in build.gradle adds ecdsa key which it cant read
 # fill known hosts so prepareIntegrationTest
-setuser xenon ssh-keyscan -t rsa xenon-ssh >> /home/xenon/.ssh/known_hosts
+ssh-keyscan -t rsa xenon-ssh >> /home/xenon/.ssh/known_hosts
+chown xenon.xenon /home/xenon/.ssh/known_hosts
 
 if [ "$BOOT_DELAY" != "" ]; then
     echo 'Waiting' $BOOT_DELAY 'seconds for services to boot-up...'
