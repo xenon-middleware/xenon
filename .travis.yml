@@ -8,6 +8,7 @@ matrix:
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
+        - GRADLE_AFTER_SUCCESS_TASKS="jacocoTestReport coveralls"
       sudo: true
       services:
         - docker
@@ -44,3 +45,6 @@ install:
 
 script:
   - gradle $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
+
+after_success:
+  - test $GRADLE_AFTER_SUCCESS_TASKS && gradle $GRADLE_AFTER_SUCCESS_TASKS
