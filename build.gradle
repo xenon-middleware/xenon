@@ -20,10 +20,12 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.4.0'
     // quality
     id 'org.sonarqube' version '1.0'
+    id 'pmd'
 }
 
 apply from: 'gradle/common.gradle'
 apply from: 'gradle/integrationTest.gradle'
+apply from: 'gradle/codestyle.gradle'
 
 //  DEPENDENCIES
 // ==============
@@ -74,7 +76,17 @@ task downloadRuntimeDependencies(type: Copy) {
     into runtimeLibDir
 }
 
-task downloadDependencies(dependsOn: [downloadCompileDependencies, downloadTestDependencies, downloadRuntimeDependencies]) {
+task downloadCodestyleDependencies(type: Copy) {
+    from configurations.pmd.files
+    into codestyleLibDir
+}
+
+task downloadDependencies(dependsOn: [
+        downloadCompileDependencies,
+        downloadTestDependencies,
+        downloadRuntimeDependencies,
+        downloadCodestyleDependencies
+    ]) {
     description "download all Java dependencies, as resolved by gradle, into the lib directory"
 }
 

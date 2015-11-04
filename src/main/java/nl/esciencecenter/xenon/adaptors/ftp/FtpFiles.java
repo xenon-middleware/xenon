@@ -703,7 +703,7 @@ public class FtpFiles implements Files {
             try {
                 close(fs);
             } catch (XenonException e) {
-                // ignore for now
+                // TODO: ignore for now
             }
         }
         LOGGER.debug("end OK");
