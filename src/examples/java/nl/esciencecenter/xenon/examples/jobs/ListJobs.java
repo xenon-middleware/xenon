@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
@@ -54,8 +55,18 @@ public class ListJobs {
             // Next, we retrieve the Jobs and Credentials API
             Jobs jobs = xenon.jobs();
 
+            // Create credential from an URI like ssh://<username>:<password>@localhost
+            String userInfo = location.getUserInfo();
+            String username = userInfo.substring(0, userInfo.indexOf(':'));
+            char[] password = userInfo.substring(userInfo.indexOf(':')).toCharArray();
+            Credential credential = xenon.credentials().newPasswordCredential(
+                location.getScheme(),
+                username,
+                password,
+                null
+            );
             // Create a scheduler to run the job
-            Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
+            Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), credential, null);
 
             // Retrieve all jobs of all queues.
             Job[] result = jobs.getJobs(scheduler);
