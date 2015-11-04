@@ -17,3 +17,4 @@ xenon.test.properties
 
 # docker cache
 .docker-test-cache-set
+/bin/

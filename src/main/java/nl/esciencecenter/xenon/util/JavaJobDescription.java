@@ -322,26 +322,28 @@ public class JavaJobDescription extends JobDescription {
         }
 
         JavaJobDescription other = (JavaJobDescription) obj;
+        
         if (!javaArguments.equals(other.javaArguments)) {
             return false;
         }
+        
         if (!javaClasspath.equals(other.javaClasspath)) {
             return false;
         }
+        
         if (javaMain == null) {
             if (other.javaMain != null) {
                 return false;
-            }
+            }        
         } else if (!javaMain.equals(other.javaMain)) {
             return false;
         }
+        
         if (!javaOptions.equals(other.javaOptions)) {
             return false;
         }
-        if (!javaSystemProperties.equals(other.javaSystemProperties)) {
-            return false;
-        }
-        return true;
+        
+        return javaSystemProperties.equals(other.javaSystemProperties);
     }
 
 }

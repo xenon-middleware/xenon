@@ -150,7 +150,7 @@ public class GridEngineSetup {
      * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
      * give is dependent on the parallel environment settings.
      */
-    int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
+     int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
         ParallelEnvironmentInfo pe = parallelEnvironments.get(parallelEnvironmentName);
         QueueInfo queue = queues.get(queueName);
 

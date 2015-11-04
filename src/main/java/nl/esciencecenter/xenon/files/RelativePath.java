@@ -527,13 +527,13 @@ public class RelativePath implements Iterable<RelativePath> {
 
                 String elt = stack.get(i);
 
-                if (elt.equals(".")) {
+                if (".".equals(elt)) {
                     stack.remove(i);
                     change = true;
-                } else if (i > 0 && elt.equals("..")) {
+                } else if (i > 0 && "..".equals(elt)) {
                     String parent = stack.get(i - 1);
 
-                    if (!(parent.equals(".") || parent.equals(".."))) {
+                    if (!(".".equals(parent) || "..".equals(parent))) {
                         stack.subList(i - 1, i + 1).clear();
                         change = true;
                     }

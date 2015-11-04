@@ -211,12 +211,16 @@ public class Sandbox {
      * @throws XenonException 
      */
     public void addUploadFile(Path src, String dest) throws XenonException {
+
+        String destination = dest;
+
         if (src == null) {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
-        if (dest == null) {
-            dest = src.getRelativePath().getFileNameAsString();
-        }
+        
+        if (destination == null) {
+            destination = src.getRelativePath().getFileNameAsString();
+        } 
 
         uploadFiles.add(new Pair(src, resolve(files, path, dest)));
     }
@@ -240,11 +244,14 @@ public class Sandbox {
      * @throws XenonException 
      */
     public void addDownloadFile(String src, Path dest) throws XenonException {
+
+        String source = src;
+        
         if (dest == null) {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
-        if (src == null) {
-            src = dest.getRelativePath().getFileNameAsString();
+        if (source == null) {
+            source = dest.getRelativePath().getFileNameAsString();
         }
 
         downloadFiles.add(new Pair(resolve(files, path, src), dest));
