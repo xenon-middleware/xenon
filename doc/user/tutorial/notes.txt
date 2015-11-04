@@ -38,3 +38,12 @@ docker-compose --version
 
 
 
+# runnig unit tests
+cd ~/Xenon
+./gradlew test
+#results are in: file:///home/daisycutter/github/nlesc/xenon/build/reports/test/index.html
+
+# integration tests (first time is slow, because it's downloading all the docker images)
+cd ~/Xenon
+./gradlew dockerIntegrationTest
+#results are in: file:///home/daisycutter/github/nlesc/xenon/build/reports/integrationTest/index.html
