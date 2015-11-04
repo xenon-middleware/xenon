@@ -22,6 +22,7 @@ if [ "$BOOT_DELAY" != "" ]; then
     sleep $BOOT_DELAY
     echo 'Grid engine should have 2 exec hosts:'
     setuser xenon ssh-keyscan -t rsa xenon-gridengine >> /home/xenon/.ssh/known_hosts
+    chown xenon.xenon /home/xenon/.ssh/known_hosts
     setuser xenon ssh xenon-gridengine qhost
 fi
 
