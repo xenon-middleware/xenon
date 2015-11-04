@@ -1,0 +1,19 @@
+// Check coding style with PMD
+
+pmd {
+    // TODO: remove when PMD warnings are fixed
+    ignoreFailures = true
+
+	toolVersion = '5.0.5'
+    sourceSets = [sourceSets.main]
+	ruleSets = []
+	ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+pmdTest {
+	ruleSetFiles = files("config/pmd/test_ruleset.xml")
+}
+
+pmdIntegrationTest {
+	ruleSetFiles = files("config/pmd/test_ruleset.xml")
+}
