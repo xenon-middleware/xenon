@@ -46,7 +46,7 @@ final class TorqueJobScriptGenerator {
 
     private static final int MINUTES_PER_HOUR = 60;
 
-    static void generateScriptContent(JobDescription description, Formatter script) {
+    public static void generateScriptContent(JobDescription description, Formatter script) {
         script.format("%s", description.getExecutable());
 
         for (String argument : description.getArguments()) {
@@ -55,8 +55,7 @@ final class TorqueJobScriptGenerator {
         script.format("\n");
     }
 
-    static String generate(JobDescription description, RelativePath fsEntryPath)
-            throws XenonException {
+    public static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
         
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);

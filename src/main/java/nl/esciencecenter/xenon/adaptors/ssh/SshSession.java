@@ -49,19 +49,19 @@ class SshSession {
         this.sessionID = sessionID;
     }
 
-    Session getSession() {
+    protected Session getSession() {
         return session;
     }
 
-    int getTunnelPort() {
+    protected int getTunnelPort() {
         return tunnelPort;
     }
 
-    int getSessionID() {
+    protected int getSessionID() {
         return sessionID;
     }
 
-    boolean incOpenChannels(String info) {
+    protected boolean incOpenChannels(String info) {
 
         if (openChannels == MAX_OPEN_CHANNELS) {
             return false;
@@ -72,18 +72,18 @@ class SshSession {
         return true;
     }
 
-    void decOpenChannels(String info) {
+    protected void decOpenChannels(String info) {
         openChannels--;
         LOGGER.debug("SSHSESSION-{}: --Open channels: {} {}", sessionID, openChannels, info);
     }
 
-    ChannelSftp getSftpChannelFromCache() {
+    protected ChannelSftp getSftpChannelFromCache() {
         ChannelSftp channel = sftpChannelCache;
         sftpChannelCache = null;
         return channel;
     }
 
-    boolean putSftpChannelInCache(ChannelSftp channel) {
+    protected boolean putSftpChannelInCache(ChannelSftp channel) {
         
         if (sftpChannelCache != null) {
 
@@ -100,19 +100,19 @@ class SshSession {
         return true;
     }
 
-    void releaseExecChannel(ChannelExec channel) {
+    protected void releaseExecChannel(ChannelExec channel) {
         LOGGER.debug("SSHSESSION-{}: Releasing EXEC channel", sessionID);
         channel.disconnect();
         decOpenChannels("EXEC");
     }
 
-    void failedExecChannel(ChannelExec channel) {
+    protected void failedExecChannel(ChannelExec channel) {
         LOGGER.debug("SSHSESSION-{}: Releasing FAILED EXEC channel", sessionID);
         channel.disconnect();
         decOpenChannels("FAILED EXEC");
     }
 
-    void releaseSftpChannel(ChannelSftp channel) {
+    protected void releaseSftpChannel(ChannelSftp channel) {
         LOGGER.debug("SSHSESSION-{}: Releasing SFTP channel", sessionID);
 
         if (!putSftpChannelInCache(channel)) {
@@ -121,13 +121,13 @@ class SshSession {
         }
     }
 
-    void failedSftpChannel(ChannelSftp channel) {
+    protected void failedSftpChannel(ChannelSftp channel) {
         LOGGER.debug("SSHSESSION-{}: Releasing FAILED SFTP channel", sessionID);
         channel.disconnect();
         decOpenChannels("FAILED SFTP");
     }
 
-    void disconnect() {
+    protected void disconnect() {
         if (sftpChannelCache != null) {
             sftpChannelCache.disconnect();
         }
@@ -135,7 +135,7 @@ class SshSession {
         session.disconnect();
     }
 
-    ChannelExec getExecChannel() throws XenonException {
+    protected ChannelExec getExecChannel() throws XenonException {
 
         if (openChannels == MAX_OPEN_CHANNELS) {
             return null;
@@ -155,7 +155,7 @@ class SshSession {
         return channel;
     }
 
-    ChannelSftp getSftpChannel() throws XenonException {
+    protected ChannelSftp getSftpChannel() throws XenonException {
 
         ChannelSftp channel = getSftpChannelFromCache();
 
@@ -181,7 +181,7 @@ class SshSession {
         return channel;
     }
 
-    int addTunnel(int localPort, String targetHost, int targetPort) throws XenonException {
+    protected int addTunnel(int localPort, String targetHost, int targetPort) throws XenonException {
 
         LOGGER.debug("SSHSESSION-{}: Creating tunnel from localhost:{} via {}:{} to {}:{}", sessionID, localPort,
                 session.getHost(), session.getPort(), targetHost, targetPort);
@@ -199,7 +199,7 @@ class SshSession {
         }
     }
 
-    void removeTunnel(int localPort) throws XenonException {
+    protected void removeTunnel(int localPort) throws XenonException {
 
         LOGGER.debug("SSHSESSION-{}: Removing tunnel at localhost:{}", sessionID, localPort);
 

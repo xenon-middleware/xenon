@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class StreamForwarder extends Thread {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
 
     public static final int BUFFER_SIZE = 1024;
 

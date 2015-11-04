@@ -27,7 +27,7 @@ public class SshUtil {
         // do not use
     }
 
-    static boolean equals(SftpATTRS a1, SftpATTRS a2) {
+    public static boolean equals(SftpATTRS a1, SftpATTRS a2) {
 
         // Handles case of aliased object + both null
         if (a1 == a2) {
@@ -64,10 +64,6 @@ public class SshUtil {
             return false;
         }
 
-        if (a1.getSize() != a2.getSize()) {
-            return false;
-        }
-
-        return true;
+        return (a1.getSize() == a2.getSize());
     }
 }
