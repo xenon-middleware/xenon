@@ -15,19 +15,20 @@ xenon-slurm:
   image: nlesc/xenon-slurm
 xenon-gridengine:
   image: nlesc/xenon-gridengine
-xenon-gridengine-exec1:
-  image: nlesc/xenon-gridengine-exec
-  volumes_from:
-    - xenon-gridengine
-  links:
-    - xenon-gridengine
+# TODO Docker test on travis-ci can not run multi host gridengine due hostname resolving errors
+#xenon-gridengine-exec1:
+#  image: nlesc/xenon-gridengine-exec
+#  volumes_from:
+#    - xenon-gridengine
+#  links:
+#    - xenon-gridengine
 xenon-test:
   image: nlesc/xenon-test
   volumes:
     - ../../..:/code
   environment:
     - MYUID
-  command: ./gradlew -Pxenon.test.properties=src/integrationTest/docker/xenon.test.properties.docker --stacktrace --info --project-cache-dir /home/xenon/gradle-cache integrationTest
+  command: ./gradlew -Pxenon.test.properties=src/integrationTest/docker/xenon.test.properties.docker --stacktrace --project-cache-dir /home/xenon/gradle-cache integrationTest
   links:
     - xenon-ssh
     - xenon-ssh2
@@ -35,4 +36,4 @@ xenon-test:
     - xenon-torque
     - xenon-slurm
     - xenon-gridengine
-    - xenon-gridengine-exec1
+#    - xenon-gridengine-exec1

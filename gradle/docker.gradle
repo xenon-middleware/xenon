@@ -62,7 +62,7 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     // forward stdout if running from gradle (without TTY). Check if
     // future versions support this.
     description "Run integration tests from Docker"
-    args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
+    args = ['run', '--rm', '-e','BOOT_DELAY=15', '-e', 'MYUID=' + dockerUid, 'xenon-test']
     if (project.hasProperty('docker.tests')) {
         args += [
             './gradlew', 'integrationTest',
