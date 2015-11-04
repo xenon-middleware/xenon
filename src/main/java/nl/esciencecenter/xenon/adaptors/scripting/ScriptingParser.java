@@ -81,9 +81,15 @@ public final class ScriptingParser {
         return result;
     }
 
-    //returns if the given input contains any of the expressions given
-    // not private for testing reasons.
-    static boolean containsAny(String input, String... options) {
+    /**
+     * Returns if the given input String contains any of the option Strings given.
+     * 
+     * @param input String to check on  
+     * @param options Strings to check for
+     * 
+     * @return is any of the Strings in options is contain in the input string 
+     */
+    public static boolean containsAny(String input, String... options) {
         for (String string : options) {
             if (input.contains(string)) {
                 return true;
@@ -172,8 +178,7 @@ public final class ScriptingParser {
      *            the possible suffixes to remove
      * @return
      */
-    // not private for testing reasons.
-    static String cleanValue(String value, String... suffixes) {
+    public static String cleanValue(String value, String... suffixes) {
         String trimmed = value.trim();
 
         for (String suffix : suffixes) {

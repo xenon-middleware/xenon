@@ -155,6 +155,9 @@ public class CopyInfo {
             case ASYNCHRONOUS:
                 async = true;
                 break;
+            default:
+                // All cases should have been handled above
+                throw new InvalidCopyOptionsException(adaptorName, "Unknown copy option: " + opt);                           
             }
         }
 

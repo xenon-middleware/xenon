@@ -76,7 +76,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     private static final String QACCT_HEADER = "==============================================================";
 
-    static void verifyJobDescription(JobDescription description) throws XenonException {
+    protected static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, GridEngineAdaptor.ADAPTOR_NAME);
 
         if (description.isInteractive()) {
@@ -110,7 +110,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         }
     }
 
-    static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws XenonException {
         Integer exitcode = null;
         Exception exception = null;
         String state = "done";
@@ -145,7 +145,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         return new JobStatusImplementation(job, state, exitcode, exception, false, true, info);
     }
 
-    static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
         boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 

@@ -32,7 +32,6 @@ import java.util.Set;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;

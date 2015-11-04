@@ -193,6 +193,9 @@ public class XenonProperties {
                 break;
             case STRING:
                 break;
+            default:
+                // All cases should have been handled above
+                throw new InvalidPropertyException(NAME, "Unknown property \"" + key + "=" + value + " provided");
             }
         } catch (IllegalArgumentException | InvalidPropertyException e) {
             throw new InvalidPropertyException(NAME, "Property \"" + key + "\" has invalid value: " + value + " (expected " + t 
@@ -578,10 +581,8 @@ public class XenonProperties {
         for (String key : supportedProperties.keySet()) {
             remaining.put(key, supportedProperties.get(key));
 
-            if (!key.startsWith(tmp)) {
-                if (properties.containsKey(key)) {
-                    p.put(key, properties.get(key));
-                }
+            if (!key.startsWith(tmp) && properties.containsKey(key)) {
+                p.put(key, properties.get(key));
             }
         }
 
