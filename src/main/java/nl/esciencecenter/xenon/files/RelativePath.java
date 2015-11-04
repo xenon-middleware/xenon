@@ -151,15 +151,19 @@ public class RelativePath implements Iterable<RelativePath> {
      * Otherwise, each of the elements will be parsed individually, splitting them into elements wherever a separator is
      * encountered. Elements that are <code>null</code> or contain an empty String are ignored.
      *
-     * @param elements
+     * @param elts
      *            the path elements to use.
      * @param separator
      *            the separator to use.
      */
-    public RelativePath(char separator, List<String> elements) {
+    public RelativePath(char separator, List<String> elts) {
+        
+        List<String> elements = elts;
+        
         if (elements == null) {
             elements = new ArrayList<>(0);
         }
+        
         this.separator = separator;
 
         String delim = String.valueOf(separator);

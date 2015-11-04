@@ -112,7 +112,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      * @throws InvalidLocationException
      *          if the location is invalid.                   
      */
-    static void checkFileLocation(String location) throws InvalidLocationException {
+    public static void checkFileLocation(String location) throws InvalidLocationException {
         if (location == null || location.isEmpty() || Utils.isLocalRoot(location)) {
             return;
         }
@@ -341,7 +341,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         checkParent(dir);
 
         try {
-            java.nio.file.Files.createDirectory(LocalUtils.javaPath(dir));
+            Files.createDirectory(LocalUtils.javaPath(dir));
         } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create directory " + dir, e);
         }

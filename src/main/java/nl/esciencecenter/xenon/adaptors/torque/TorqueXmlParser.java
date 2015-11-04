@@ -55,7 +55,7 @@ final class TorqueXmlParser {
         }
     }
 
-    Document parseDocument(String data) throws XenonException {
+    protected Document parseDocument(String data) throws XenonException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
@@ -79,7 +79,7 @@ final class TorqueXmlParser {
      * @throws IllegalArgumentException if root is not an XML element
      */
     // not private for testing purposes
-    void recursiveMapFromElement(Node root, Map<String, String> result) {
+    protected void recursiveMapFromElement(Node root, Map<String, String> result) {
         if (root.getNodeType() != Node.ELEMENT_NODE) {
             throw new IllegalArgumentException("Node " + root + " is not an XML element.");
         }
@@ -111,7 +111,7 @@ final class TorqueXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
+    protected Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
         if (data.trim().isEmpty()) {
             return new HashMap<>();
         }

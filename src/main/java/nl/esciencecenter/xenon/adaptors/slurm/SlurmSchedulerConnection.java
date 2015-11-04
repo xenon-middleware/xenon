@@ -69,8 +69,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final String RUNNING_STATE = "RUNNING";
 
-    //get an exit code from the scontrol "ExitCode" output field
-    static Integer exitcodeFromString(String value) throws XenonException {
+    // Retrieve an exit code from the "ExitCode" output field of scontrol
+    protected static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
             return null;
         }
@@ -86,7 +86,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     }
 
-    static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromSacctInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
         if (jobInfo == null) {
@@ -119,7 +119,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromScontrolInfo(Map<String, String> jobInfo, Job job) throws XenonException {
         if (jobInfo == null) {
             LOGGER.debug("job {} not found in scontrol output", job.getIdentifier());
             return null;
@@ -154,7 +154,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return result;
     }
 
-    static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromSqueueInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
 
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
@@ -171,7 +171,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
     }
 
-    static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
+    protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
         Map<String, String> queueInfo = info.get(queueName);
 
         if (queueInfo == null) {
@@ -183,11 +183,11 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     //failed also implies done
-    static boolean isDoneState(String state) {
+    protected static boolean isDoneState(String state) {
         return state.equals(DONE_STATE) || isFailedState(state);
     }
 
-    static boolean isFailedState(String state) {
+    protected static boolean isFailedState(String state) {
         for (String validState : FAILED_STATES) {
             if (state.startsWith(validState)) {
                 return true;
@@ -196,7 +196,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return false;
     }
 
-    static void verifyJobDescription(JobDescription description) throws XenonException {
+    protected  static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, SlurmAdaptor.ADAPTOR_NAME);
 
         if (description.isInteractive()) {
@@ -247,7 +247,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private final Map<String, Job> interactiveJobs;
 
-    SlurmSchedulerConnection(ScriptingAdaptor adaptor, String location, Credential credential, XenonProperties properties,
+    protected SlurmSchedulerConnection(ScriptingAdaptor adaptor, String location, Credential credential, XenonProperties properties,
             XenonEngine engine) throws XenonException {
 
         super(adaptor, "slurm", location, credential, properties, engine, properties

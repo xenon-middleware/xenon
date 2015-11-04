@@ -67,7 +67,7 @@ public class GridEngineXmlParser {
         }
     }
 
-    void checkVersion(Document document) throws IncompatibleVersionException {
+    protected void checkVersion(Document document) throws IncompatibleVersionException {
         Element documentElement = document.getDocumentElement();
 
         if (!documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SGE62_SCHEMA_VALUE)) {
@@ -85,7 +85,7 @@ public class GridEngineXmlParser {
         }
     }
 
-    Document parseDocument(String data) throws XenonException {
+    protected Document parseDocument(String data) throws XenonException {
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
             Document result = documentBuilder.parse(in);
@@ -135,7 +135,7 @@ public class GridEngineXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseQueueInfos(String input) throws XenonException {
+    protected Map<String, Map<String, String>> parseQueueInfos(String input) throws XenonException {
         Document document = parseDocument(input);
 
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
@@ -178,7 +178,7 @@ public class GridEngineXmlParser {
      *             if the server version is not compatible with this adaptor
      * @throws Exception
      */
-    Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
+    protected Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
         Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
 
         Document document = parseDocument(data);
