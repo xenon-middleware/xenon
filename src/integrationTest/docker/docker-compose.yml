@@ -15,12 +15,13 @@ xenon-slurm:
   image: nlesc/xenon-slurm
 xenon-gridengine:
   image: nlesc/xenon-gridengine
-xenon-gridengine-exec1:
-  image: nlesc/xenon-gridengine-exec
-  volumes_from:
-    - xenon-gridengine
-  links:
-    - xenon-gridengine
+# TODO Docker test on travis-ci can not run multi host gridengine due hostname resolving errors
+#xenon-gridengine-exec1:
+#  image: nlesc/xenon-gridengine-exec
+#  volumes_from:
+#    - xenon-gridengine
+#  links:
+#    - xenon-gridengine
 xenon-test:
   image: nlesc/xenon-test
   volumes:
@@ -35,4 +36,4 @@ xenon-test:
     - xenon-torque
     - xenon-slurm
     - xenon-gridengine
-    - xenon-gridengine-exec1
+#    - xenon-gridengine-exec1

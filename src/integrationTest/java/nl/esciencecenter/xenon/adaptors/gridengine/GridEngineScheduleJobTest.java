@@ -27,18 +27,11 @@ import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * 
- */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
     private static final Logger logger = LoggerFactory.getLogger(GridEngineScheduleJobTest.class);
@@ -88,6 +81,7 @@ public class GridEngineScheduleJobTest extends GenericScheduleJobTestParent {
     }
 
     @Test
+    @Ignore("Docker test on travis-ci can not run multi host gridengine due to hostname resolving errors")
     public void ge_test04_parallel_batchJob() throws Exception {
         String parallelEnvironment = ((GridEngineJobTestConfig) config).getParallelEnvironment();
         
