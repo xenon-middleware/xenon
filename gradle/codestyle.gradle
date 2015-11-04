@@ -1,10 +1,12 @@
 // Check coding style with PMD
+// Depends on plugins:
+//    id 'pmd'
 
 pmd {
     // TODO: remove when PMD warnings are fixed
     ignoreFailures = true
 
-	toolVersion = '5.0.5'
+	toolVersion = '5.4.0'
     sourceSets = [sourceSets.main]
 	ruleSets = []
 	ruleSetFiles = files("config/pmd/ruleset.xml")
