@@ -31,11 +31,10 @@ addons:
     - pandoc
     - texlive
     - lmodern
-    - docker-engine
 
 # Install Docker compose
 before_install:
-  - docker version
+  - test $GRADLE_AFTER_SUCCESS_TASKS && sudo apt-get install -y docker-engine && docker version
   - mkdir -p "$HOME/bin"
   - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose"
   - chmod +x "$HOME/bin/docker-compose"
