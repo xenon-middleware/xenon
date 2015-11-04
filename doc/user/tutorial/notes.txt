@@ -1,6 +1,6 @@
 # docker instructions from: https://docs.docker.com/engine/installation/ubuntulinux/
 
-#check ubunt os version by 
+#check ubunt os version by
 lsb_release -d
 
 # check which groups exist
@@ -17,4 +17,24 @@ sudo usermod -aG docker ubuntu
 sudo usermod -G <name-of-group> -a <name-of-user>
 
 
-# install docker-compose
+# install docker-compose. install instructions from:
+https://docs.docker.com/compose/install/
+
+# check the latest version of docker compose here: https://github.com/docker/compose/releases, this determines the VERSION_NUM in the command below. Mine is 1.5.0.
+
+# download the docker-compose program using curl form the terminal
+cd ~
+curl -L https://github.com/docker/compose/releases/download/VERSION_NUM/docker-compose-`uname -s`-`uname -m` > docker-compose
+
+# then move the downloaded file into the right directory on your system
+cd ~
+sudo mv docker-compose /usr/local/bin/
+
+# Apply executable permissions to the binary:
+sudo chmod +x /usr/local/bin/docker-compose
+
+# verify that it worked
+docker-compose --version
+
+
+
