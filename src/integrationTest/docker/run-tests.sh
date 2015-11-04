@@ -20,7 +20,7 @@ chown xenon.xenon /home/xenon/.ssh/known_hosts
 if [ "$BOOT_DELAY" != "" ]; then
     echo 'Waiting' $BOOT_DELAY 'seconds for services to boot-up...'
     sleep $BOOT_DELAY
-    echo 'Grid engine should have 2 exec hosts:'
+    echo 'Grid engine should have one exec host:'
     setuser xenon ssh-keyscan -t rsa xenon-gridengine >> /home/xenon/.ssh/known_hosts
     chown xenon.xenon /home/xenon/.ssh/known_hosts
     setuser xenon ssh xenon-gridengine qhost
