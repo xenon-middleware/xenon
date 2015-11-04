@@ -17,7 +17,6 @@ package nl.esciencecenter.xenon.adaptors.local;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.jobs.JobImplementation;
@@ -25,7 +24,6 @@ import nl.esciencecenter.xenon.engine.jobs.StreamsImplementation;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
-import nl.esciencecenter.xenon.util.JavaJobDescription;
 
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.

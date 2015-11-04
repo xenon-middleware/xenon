@@ -30,13 +30,13 @@ public class SshFileAttributes implements FileAttributes {
     private static final int MILLISECONDS_PER_SECOND = 1000;
 
     /** Bit set to set user ID on execution */
-    static final int SUID = 04000;
+    public static final int SUID = 04000;
 
     /** Bit set to set group ID on execution */
-    static final int SGID = 02000;
+    public static final int SGID = 02000;
 
     /** Bit set to set sticky bit ****** NOT DOCUMENTED *****/
-    static final int SVTX = 01000;
+    public static final int SVTX = 01000;
 
     private final SftpATTRS attributes;
     private final Path path;

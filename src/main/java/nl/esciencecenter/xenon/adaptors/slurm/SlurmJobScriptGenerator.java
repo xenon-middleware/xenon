@@ -38,7 +38,9 @@ public final class SlurmJobScriptGenerator {
         return path;
     }
     
-    static String[] generateInteractiveArguments(JobDescription description, RelativePath fsEntryPath, UUID tag) throws XenonException {
+    public static String[] generateInteractiveArguments(JobDescription description, RelativePath fsEntryPath, UUID tag) 
+            throws XenonException {
+        
         ArrayList<String> arguments = new ArrayList<String>();
 
         //suppress printing of status messages
@@ -72,7 +74,7 @@ public final class SlurmJobScriptGenerator {
         return arguments.toArray(new String[arguments.size()]);
     }
 
-    static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
+    public static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 

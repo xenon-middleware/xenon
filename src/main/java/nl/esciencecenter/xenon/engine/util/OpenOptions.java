@@ -100,6 +100,9 @@ public class OpenOptions {
             case READ:
                 result.setReadMode(opt);
                 break;
+            default:
+                // All case should have been handled above
+                throw new InvalidOpenOptionsException(adaptorName, "Unknown open mode " + opt);
             }
         }
 

@@ -46,14 +46,7 @@ public class JavaJobDescription extends JobDescription {
     private final List<String> javaArguments = new ArrayList<String>();
 
     private final List<String> javaClasspath = new ArrayList<String>();
-
-    /**
-     * Create a JavaJobDescription which describes the java application.
-     */
-    public JavaJobDescription() {
-        super();
-    }
-
+   
     /**
      * Returns the JVM options.
      * 

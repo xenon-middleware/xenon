@@ -334,13 +334,16 @@ public final class Utils {
      * exception will be thrown. For example, providing "/user/local" will return "/" on Linux or OSX, but throw an exception on
      * Windows; providing "C:\test" will return "C:" on Windows but throw an exception on Linux or OSX.
      *
-     * @param path
+     * @param p
      *            The absolute path for which to determine the root element.
      * @return The locally valid root element.
      * @throws XenonException
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
-    public static String getLocalRoot(String path) throws XenonException {
+    public static String getLocalRoot(String p) throws XenonException {
+        
+        String path = p;
+        
         if (isWindows()) {
             if (path == null || path.isEmpty()) {
                 return "";
@@ -415,11 +418,7 @@ public final class Utils {
             return true;
         }
 
-        if (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\') {
-            return true;
-        }
-
-        return false;
+        return (root.length() == 3 && root.endsWith(":") && Character.isLetter(root.charAt(0)) && root.charAt(3) == '\\');        
     }
 
     /**

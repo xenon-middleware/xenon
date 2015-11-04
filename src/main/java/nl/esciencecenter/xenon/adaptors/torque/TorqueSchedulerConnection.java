@@ -65,13 +65,15 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueSchedulerConnection.class);
 
+    private final static Pattern queueInfoName = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
+    
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
     public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
     public static final String JOB_OPTION_RESOURCES = "job.resources";
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT, JOB_OPTION_RESOURCES };
 
-    static void verifyJobDescription(JobDescription description) throws XenonException {
+    public static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, TorqueAdaptor.ADAPTOR_NAME);
 
         if (description.isInteractive()) {
@@ -102,7 +104,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         SchedulerConnection.verifyJobDescription(description, TorqueAdaptor.ADAPTOR_NAME);
     }
 
-    static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
+    protected static JobStatus getJobStatusFromQstatInfo(Map<String, Map<String, String>> info, Job job) throws XenonException {
         boolean done = false;
         Map<String, String> jobInfo = info.get(job.getIdentifier());
 
@@ -317,10 +319,8 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
         return result;
     }
-
-    private final static Pattern queueInfoName = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
     
-    Map<String, Map<String,String>> queryQueues(String... queueNames)
+    protected Map<String, Map<String,String>> queryQueues(String... queueNames)
             throws XenonException {
         if (queueNames == null) {
             throw new IllegalArgumentException("Queue names cannot be null");
