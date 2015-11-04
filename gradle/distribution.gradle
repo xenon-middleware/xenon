@@ -6,16 +6,19 @@
 //    PACKAGE
 // ==============
 task sourcesJar(type: Jar, dependsOn: classes) {
+    description "Creates jar file of Java sources"
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
+    description "Creates jar file of javadoc"
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
 task examplesJar(type: Jar) {
+    description "Creates jar file of Xenon examples"
     classifier = 'examples'
     from sourceSets.examples.output
 }
