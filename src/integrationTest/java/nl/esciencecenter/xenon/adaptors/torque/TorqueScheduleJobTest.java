@@ -52,11 +52,11 @@ public class TorqueScheduleJobTest extends GenericScheduleJobTestParent {
             super(original);
         }
         @Override
-        public void setStderr(String filename) {}
+        public void setStderr(String filename) {/* noop */}
         @Override
-        public void setStdout(String filename) {}
+        public void setStdout(String filename) {/* noop */}
         @Override
-        public void setStdin(String filename) {}
+        public void setStdin(String filename) {/* noop */}
     }
 
     @Override
