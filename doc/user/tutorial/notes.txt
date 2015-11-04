@@ -1,0 +1,20 @@
+# docker instructions from: https://docs.docker.com/engine/installation/ubuntulinux/
+
+#check ubunt os version by 
+lsb_release -d
+
+# check which groups exist
+cat /etc/group
+
+# check of which groups you are a member
+groups
+
+
+# create docker group
+sudo usermod -aG docker ubuntu
+
+# add yourself to the docker group, log out and back in afterwards
+sudo usermod -G <name-of-group> -a <name-of-user>
+
+
+# install docker-compose
