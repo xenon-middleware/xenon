@@ -71,6 +71,7 @@ class SshMultiplexedSession {
         this.properties = properties;
 
         credential = cred;
+        
         if (credential == null) {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");
         }
@@ -109,8 +110,8 @@ class SshMultiplexedSession {
 
             if (gatewayLocation.getUser() == null) {
                 gatewayLocation = new SshLocation(location.getUser(), gatewayLocation.getHost(), gatewayLocation.getPort());
+                
             }
-
             LOGGER.debug("Creating gateway via {}", gatewayLocation);
 
             gatewaySession = createSession(jsch, -1, gatewayLocation, credential, null, null, properties);
@@ -194,7 +195,12 @@ class SshMultiplexedSession {
         try {
             session.connect();
         } catch (JSchException e) {
-            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            
+            if ("Auth cancel".equals(e.getMessage())) { 
+                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            } else {
+                throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            }
         }
 
         return new SshSession(session, tunnelPort, sessionID);

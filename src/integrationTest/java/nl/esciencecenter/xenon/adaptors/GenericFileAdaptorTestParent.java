@@ -48,6 +48,7 @@ import nl.esciencecenter.xenon.files.CopyStatus;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.FileSystemClosedException;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -59,7 +60,6 @@ import nl.esciencecenter.xenon.util.Utils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -339,16 +339,15 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void test00_newFileSystem_nullCredentials_shouldThrow() throws Exception {
+    public void test00_newFileSystem_nullLocation_shouldThrow() throws Exception {
         if (!config.supportsNullFileSystemLocation()) {
             exception.expect(InvalidLocationException.class);
         }
-        test00_newFileSystem(config.getScheme(), null, null, null);
+        test00_newFileSystem(config.getScheme(), null, config.getDefaultCredential(credentials), null);
     }
 
     @Test
-    public void test00_newFileSystem_nullProperties_throwIfApplicable() throws Exception {
-        // test with correct URI without credential and without properties
+    public void test00_newFileSystem_nullCredentials_shouldThrow() throws Exception {
         if (!config.supportNullCredential()) {
             exception.expect(InvalidCredentialException.class);
         }
@@ -384,7 +383,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
 
         String uriWithWrongUser = config.getCorrectLocationWithWrongUser();
-        exception.expect(InvalidLocationException.class);
+        exception.expect(InvalidCredentialException.class);
         test00_newFileSystem(config.getScheme(), uriWithWrongUser, null, null);
     }
 
@@ -984,12 +983,7 @@ public abstract class GenericFileAdaptorTestParent {
         deleteTestDir(nonEmptyDir);
     }
 
-    /*TODO this is not a valid test in the sense that even if the adaptor wouldn't mind
-     * deleting a dir from a closed file system (which it should) it would still throw
-     * an exception because the dir doesn't exist. Can be solved by testing for a
-     * specific type of exception.
-     */
-    @Test @Ignore
+    @Test
     public void test09_delete_closedFileSystem_throwIfSupported() throws Exception {
         if (!config.supportsClose()) {
             return;
@@ -997,8 +991,14 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test09_delete");
 
         files.close(cwd.getFileSystem());
+        
         try {
-            test09_delete(testDir, true);
+            files.delete(testDir);
+        } catch (FileSystemClosedException e) { 
+            // This is the expected exception 
+        } catch (Exception e) {
+            // We do not expect another exception 
+            throwUnexpected("test09_delete", e);
         } finally {
             // set up for cleaning again
             cwd = config.getWorkingDir(files, credentials);

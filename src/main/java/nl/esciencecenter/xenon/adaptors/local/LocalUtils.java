@@ -67,7 +67,7 @@ final class LocalUtils {
         // replace tilde
         if (numElems != 0) {
             String firstPart = relPath.getName(0).getRelativePath();
-            if (firstPart.equals("~")) {
+            if ("~".equals(firstPart)) {
                 RelativePath home = new RelativePath(System.getProperty("user.home"));
                 if (numElems == 1) {
                     relPath = home;

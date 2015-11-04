@@ -870,7 +870,7 @@ Appendix A: Adaptor Documentation
 
 This section contains the adaptor documentation which is generated from the information provided by the adaptors themselves.
 
-Xenon currently supports 8 adaptors: local, ssh, ftp, webdav, gridengine, slurm, gftp, torque.
+Xenon currently supports 6 adaptors: local, ssh, ftp, gridengine, slurm, torque.
 
 Adaptor: local
 --------
@@ -931,7 +931,7 @@ Automatically add unknown host keys to known_hosts.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 __`xenon.adaptors.ssh.strictHostKeyChecking`__
@@ -942,7 +942,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 __`xenon.adaptors.ssh.loadKnownHosts`__
@@ -1008,7 +1008,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
@@ -1045,7 +1045,7 @@ Enable strict host key checking.
 
 - Default value: true
 
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 __`xenon.adaptors.ftp.loadKnownHosts`__
@@ -1089,88 +1089,7 @@ The gateway machine used to create an SSH tunnel to the target.
 
 - Default value: null
 
-- Valid for: [FILESYSTEM, SCHEDULER]
-
-
-
-Adaptor: webdav
---------
-
-The webdav adaptor implements all functionality with remote webdav servers.
-
-#### Supported schemes: ####
-http
-
-#### Supported locations: ####
-[user@]host[:port]
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.webdav.autoAddHostKey`__
-
-Automatically add unknown host keys to known_hosts.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.webdav.strictHostKeyChecking`__
-
-Enable strict host key checking.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [FILESYSTEM, SCHEDULER]
-
-
-__`xenon.adaptors.webdav.loadKnownHosts`__
-
-Load the standard known_hosts file.
-
-- Expected type: BOOLEAN
-
-- Default value: true
-
-- Valid for: [XENON]
-
-
-__`xenon.adaptors.webdav.queue.pollingDelay`__
-
-The polling delay for monitoring running jobs (in milliseconds).
-
-- Expected type: LONG
-
-- Default value: 1000
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.webdav.queue.multi.maxConcurrentJobs`__
-
-The maximum number of concurrent jobs in the multiq..
-
-- Expected type: INTEGER
-
-- Default value: 4
-
-- Valid for: [SCHEDULER]
-
-
-__`xenon.adaptors.webdav.gateway`__
-
-The gateway machine used to create an SSH tunnel to the target.
-
-- Expected type: STRING
-
-- Default value: null
-
-- Valid for: [FILESYSTEM, SCHEDULER]
+- Valid for: [SCHEDULER, FILESYSTEM]
 
 
 
@@ -1267,65 +1186,6 @@ Number of milliseconds between polling the status of a job.
 - Default value: 1000
 
 - Valid for: [SCHEDULER]
-
-
-
-Adaptor: gftp
---------
-
-Grid FTP adaptor based on Globus Grid FTP
-
-#### Supported schemes: ####
-gsiftp, gftp
-
-#### Supported locations: ####
-host[:port]
-
-#### Supported properties: ####
-
-
-__`xenon.adaptors.gftp.useActiveMode`__
-
-Whether the remote server should use active mode. This means the remote server connects back to the local clientDefault is false (= passive mode). 
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.gftp.useBlindMode`__
-
-Whether to use Blind mode GFTP: stat and list methods are not supported, only get and put.
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.gftp.useGftpV1`__
-
-Enforce the use of old Grid FTP V1.0 methods: Mlst and Mlsd methods are not supported in V1.
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
-
-
-__`xenon.adaptors.gftp.enforceDCAU`__
-
-Enforce the use of Data Channel Authentication (DCAU) and throw exceptions if not supported by the Grid FTP Server.Default behaviour is to switch off DCAU if not support by remote server.
-
-- Expected type: BOOLEAN
-
-- Default value: false
-
-- Valid for: [FILESYSTEM]
 
 
 

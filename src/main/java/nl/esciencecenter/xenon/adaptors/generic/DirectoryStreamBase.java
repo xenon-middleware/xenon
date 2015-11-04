@@ -27,32 +27,32 @@ import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.Path;
 
-public abstract class DirectoryStreamBase<In, Out> implements DirectoryStream<Out>, Iterator<Out> {
+public abstract class DirectoryStreamBase<I, O> implements DirectoryStream<O>, Iterator<O> {
 
-    private final Deque<Out> stream;
+    private final Deque<O> stream;
 
-    public DirectoryStreamBase(Path dir, DirectoryStream.Filter filter, List<In> listing) throws XenonException {
-        stream = new LinkedList<Out>();
-        for (In entry : listing) {
+    public DirectoryStreamBase(Path dir, DirectoryStream.Filter filter, List<I> listing) throws XenonException {
+        stream = new LinkedList<O>();
+        for (I entry : listing) {
             String filename = getFileNameFromEntry(entry, dir);
-            if (filename.equals(".") || filename.equals("..")) {
+            if (".".equals(filename) || "..".equals(filename)) {
                 // filter out the "." and ".."
             } else {
                 Path entryPath = new PathImplementation(dir.getFileSystem(), dir.getRelativePath().resolve(filename));
                 if (filter.accept(entryPath)) {
-                    Out streamElement = getStreamElementFromEntry(entry, entryPath);
+                    O streamElement = getStreamElementFromEntry(entry, entryPath);
                     stream.add(streamElement);
                 }
             }
         }
     }
 
-    protected abstract Out getStreamElementFromEntry(In entry, Path entryPath) throws XenonException;
+    protected abstract O getStreamElementFromEntry(I entry, Path entryPath) throws XenonException;
 
-    protected abstract String getFileNameFromEntry(In entry, Path parentPath);
+    protected abstract String getFileNameFromEntry(I entry, Path parentPath);
 
     @Override
-    public Iterator<Out> iterator() {
+    public Iterator<O> iterator() {
         return this;
     }
 
@@ -67,7 +67,7 @@ public abstract class DirectoryStreamBase<In, Out> implements DirectoryStream<Ou
     }
 
     @Override
-    public synchronized Out next() {
+    public synchronized O next() {
 
         if (stream.size() > 0) {
             return stream.removeFirst();

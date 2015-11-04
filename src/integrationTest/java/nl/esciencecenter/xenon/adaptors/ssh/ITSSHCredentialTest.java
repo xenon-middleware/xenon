@@ -35,7 +35,7 @@ public class ITSSHCredentialTest extends GenericCredentialsAdaptorTestParent {
     public static void prepareLocalFileAdaptorTest() throws Exception {
         GenericCredentialsAdaptorTestParent.prepareClass(new SSHCredentialTestConfig());
     }
-
+/*
     @Ignore("Already tested in unit tests") @Test
     @Override
     public void test01_newCertificateCredential_WrongCertificate() throws Exception {
@@ -52,4 +52,5 @@ public class ITSSHCredentialTest extends GenericCredentialsAdaptorTestParent {
     @Override
     public void test05_newPasswordCredential_Unsupported() throws Exception {
     }
+    */
 }
