@@ -34,6 +34,7 @@ addons:
 
 # Install Docker compose
 before_install:
+  - docker version && apt-cache policy docker-engine
   - mkdir -p "$HOME/bin"
   - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose"
   - chmod +x "$HOME/bin/docker-compose"
