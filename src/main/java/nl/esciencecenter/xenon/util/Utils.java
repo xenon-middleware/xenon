@@ -1070,7 +1070,7 @@ public final class Utils {
                 if (ignore) {
                     // do nothing as requested
                 } else if (replace) {
-                    files.copy(source, target, nl.esciencecenter.xenon.files.CopyOption.REPLACE);
+                    files.copy(source, target, CopyOption.REPLACE);
                 } else {
                     throw new PathAlreadyExistsException(target.getFileSystem().getAdaptorName(), "Target " + target
                             + " already exists!");

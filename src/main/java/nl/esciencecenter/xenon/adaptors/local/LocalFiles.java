@@ -246,14 +246,10 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
             tmp.setWriteMode(OpenOption.WRITE);
         }
 
-        if (tmp.getOpenMode() == OpenOption.CREATE) {
-            if (exists(path)) {
-                throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path);
-            }
-        } else if (tmp.getOpenMode() == OpenOption.OPEN) {
-            if (!exists(path)) {
-                throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
-            }
+        if (tmp.getOpenMode() == OpenOption.CREATE && exists(path)) {
+            throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "File already exists: " + path);
+        } else if (tmp.getOpenMode() == OpenOption.OPEN && !exists(path)) {
+            throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
         }
 
         try {

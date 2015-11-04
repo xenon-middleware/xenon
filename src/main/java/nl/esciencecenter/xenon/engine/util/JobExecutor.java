@@ -124,13 +124,13 @@ public class JobExecutor implements Runnable {
 
     private synchronized void updateState(String state, int exitStatus, Exception e) {
 
-        if (state.equals("ERROR") || state.equals("KILLED")) {
+        if ("ERROR".equals(state) || "KILLED".equals(state)) {
             error = e;
             done = true;
-        } else if (state.equals("DONE")) {
+        } else if ("DONE".equals(state)) {
             this.exitStatus = exitStatus;
             done = true;
-        } else if (state.equals("RUNNING")) {
+        } else if ("RUNNING".equals(state)) {
             hasRun = true;
         } else {
             throw new InternalError("Illegal state: " + state);
@@ -165,7 +165,7 @@ public class JobExecutor implements Runnable {
 
         triggerStatusUpdate();
 
-        while (state.equals("PENDING")) {
+        while ("PENDING".equals(state)) {
             // Note: will wait forever if leftover == 0.
             try {
                 wait(leftover);

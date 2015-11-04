@@ -164,7 +164,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             done = true;
         }
 
-        return new JobStatusImplementation(job, longState, null, exception, longState.equals("running"), done, jobInfo);
+        return new JobStatusImplementation(job, longState, null, exception, "running".equals(longState), done, jobInfo);
     }
 
     private final long accountingGraceTime;
