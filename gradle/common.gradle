@@ -18,6 +18,7 @@ targetCompatibility = '1.7'
 ext.compileLibDir = file('lib')
 ext.runtimeLibDir = file('lib/runtime')
 ext.testLibDir = file('lib/test')
+ext.codestyleLibDir = file('lib/codestyle')
 
 sourceSets {
     integrationTest {

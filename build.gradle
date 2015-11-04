@@ -76,7 +76,17 @@ task downloadRuntimeDependencies(type: Copy) {
     into runtimeLibDir
 }
 
-task downloadDependencies(dependsOn: [downloadCompileDependencies, downloadTestDependencies, downloadRuntimeDependencies]) {
+task downloadCodestyleDependencies(type: Copy) {
+    from configurations.pmd.files
+    into codestyleLibDir
+}
+
+task downloadDependencies(dependsOn: [
+        downloadCompileDependencies,
+        downloadTestDependencies,
+        downloadRuntimeDependencies,
+        downloadCodestyleDependencies
+    ]) {
     description "download all Java dependencies, as resolved by gradle, into the lib directory"
 }
 
