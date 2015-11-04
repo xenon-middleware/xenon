@@ -8,7 +8,7 @@ matrix:
       env:
         - GRADLE_BUILD_TASKS="assemble dockerBuild"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
-        - GRADLE_AFTER_SUCCESS_TASKS="jacocoTestReport coveralls"
+        - INTEGRATION_TEST=1
       sudo: true
       services:
         - docker
@@ -20,7 +20,7 @@ matrix:
     - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble"
-        - GRADLE_SCRIPT_TASKS="check"
+        - GRADLE_SCRIPT_TASKS="check jacocoTestReport coveralls"
       sudo: false
   # Stop when one of the Java versions do not work
   fast_finish: true
@@ -34,10 +34,13 @@ addons:
 
 # Install Docker compose
 before_install:
-  - test $GRADLE_AFTER_SUCCESS_TASKS && sudo apt-get install -y docker-engine && docker version
+  - if [ $INTEGRATION_TEST == "1" ]; then
+    sudo apt-get install -y docker-engine
+    docker version
+    curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose"
+    chmod +x "$HOME/bin/docker-compose"
+    fi
   - mkdir -p "$HOME/bin"
-  - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose"
-  - chmod +x "$HOME/bin/docker-compose"
   - export PATH="$PATH:$HOME/bin"
   - touch .docker-test-cache-set
 
@@ -46,6 +49,3 @@ install:
 
 script:
   - gradle $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
-
-after_success:
-  - test $GRADLE_AFTER_SUCCESS_TASKS && gradle $GRADLE_AFTER_SUCCESS_TASKS
