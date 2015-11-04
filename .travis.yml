@@ -6,7 +6,7 @@ matrix:
   include:
     - jdk: oraclejdk7
       env:
-        - GRADLE_BUILD_TASKS="assemble dockerBuild"
+        - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
         - INTEGRATION_TEST=1
       sudo: true
