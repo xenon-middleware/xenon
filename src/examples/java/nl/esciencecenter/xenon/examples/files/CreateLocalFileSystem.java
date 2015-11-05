@@ -30,7 +30,6 @@ import nl.esciencecenter.xenon.util.Utils;
  * 
  * This example is hard coded to use the local file system. A more generic example is shown in {@link CreateFileSystem}. 
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

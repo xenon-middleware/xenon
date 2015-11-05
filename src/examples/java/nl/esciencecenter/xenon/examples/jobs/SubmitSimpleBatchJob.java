@@ -35,7 +35,6 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  * 
  * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/sleep".
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

@@ -26,7 +26,6 @@ import nl.esciencecenter.xenon.XenonFactory;
 /**
  * A simple example of how to configure an Xenon with properties.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
