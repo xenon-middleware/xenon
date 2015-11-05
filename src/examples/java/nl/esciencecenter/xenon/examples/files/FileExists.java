@@ -34,7 +34,6 @@ import nl.esciencecenter.xenon.files.RelativePath;
  * 
  * This example assumes the user provides a URI with the location of the files to check on the command line.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

@@ -31,15 +31,20 @@ the Java classpath:
 - The `Xenon-<version>.jar` and all its dependencies. These can be
   found in the `lib` directory of the binary distribution of Xenon.
 
+- The `logback.xml` to configure the logging. This can be found in the current working directory.
+
 For example, running the following command from the `examples`
 directory should run the `CreatingXenon` example:
 
 ```
-java -cp ../lib/*:Xenon-*-examples.jar nl.esciencecenter.xenon.examples.CreatingXenon
+java -cp ../lib/*:Xenon-*-examples.jar:. nl.esciencecenter.xenon.examples.CreatingXenon
 ```
 
 Note that the classpath is specified in Linux/OSX format here. On
 Windows use `;..\lib\*;Xenon-*-examples.jar`.
+
+All the examples can be run with `./run_examples.sh`. 
+This script requires a Linux machine with passwordless ssh to localhost.
 
 Compiling examples
 ------------------
@@ -50,3 +55,4 @@ After changing the source code of an example it can be compiled and run with
 javac -cp "../lib/*" java/nl/esciencecenter/xenon/examples/CreatingXenon.java
 java -cp ../lib/*:java nl.esciencecenter.xenon.examples.CreatingXenon
 ```
+

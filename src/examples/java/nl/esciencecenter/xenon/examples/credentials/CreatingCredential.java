@@ -25,7 +25,6 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 /**
  * A simple example of how to create credentials.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
