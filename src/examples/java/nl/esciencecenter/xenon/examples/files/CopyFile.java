@@ -33,7 +33,6 @@ import nl.esciencecenter.xenon.files.RelativePath;
  * 
  * This example assumes the user provides the source URI and target URI on the command line. The target file must not exists yet!
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

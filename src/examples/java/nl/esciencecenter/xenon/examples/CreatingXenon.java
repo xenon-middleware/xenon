@@ -26,7 +26,6 @@ import nl.esciencecenter.xenon.jobs.Jobs;
 /**
  * A simple example of how to create an Xenon and how to retrieve the various interfaces.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

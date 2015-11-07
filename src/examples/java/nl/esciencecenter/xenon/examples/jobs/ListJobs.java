@@ -23,6 +23,7 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
@@ -30,8 +31,9 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  * An example of how to retrieve a list of jobs from a scheduler.
  * 
  * This example assumes the user provides a URI with the scheduler location on the command line.
- * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ *
+ * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/sleep".
+ *
  * @version 1.0
  * @since 1.0
  */
@@ -57,6 +59,12 @@ public class ListJobs {
             // Create a scheduler to run the job
             Scheduler scheduler = jobs.newScheduler(location.getScheme(), location.getAuthority(), null, null);
 
+            // Submit a job
+            JobDescription description = new JobDescription();
+            description.setExecutable("/bin/sleep");
+            description.setArguments("5");
+            Job job = jobs.submitJob(scheduler, description);
+
             // Retrieve all jobs of all queues.
             Job[] result = jobs.getJobs(scheduler);
 
@@ -66,6 +74,9 @@ public class ListJobs {
             for (Job j : result) {
                 System.out.println("  " + j.getIdentifier());
             }
+
+            // Wait for the job to finish
+            jobs.waitUntilDone(job, 60000);
 
             // Close the scheduler
             jobs.close(scheduler);
