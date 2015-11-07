@@ -37,7 +37,6 @@ import nl.esciencecenter.xenon.util.Utils;
  * 
  * Note: this example assumes the job is submitted to a machine Linux machine, as it tries to run "/bin/hostname".
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
@@ -57,7 +56,7 @@ public class SubmitInteractiveJobWithOutput {
             // We can now create a JobDescription for the job we want to run.
             JobDescription description = new JobDescription();
             description.setExecutable("/bin/hostname");
-            description.setArguments("-a");
+            description.setArguments("-f");
             description.setInteractive(true);
             
             // Create a scheduler to run the job
