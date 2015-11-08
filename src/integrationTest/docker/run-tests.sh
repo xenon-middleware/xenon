@@ -21,6 +21,10 @@ if [ "$BOOT_DELAY" != "" ]; then
     echo 'Waiting' $BOOT_DELAY 'seconds for services to boot-up...'
     sleep $BOOT_DELAY
     echo 'Sanity checks:'
+
+    echo 'SSH server should be accessable'
+    setuser xenon ssh xenon-ssh uptime
+
     echo 'Grid engine should have one exec host'
     setuser xenon ssh-keyscan -t rsa xenon-gridengine >> /home/xenon/.ssh/known_hosts
     chown xenon.xenon /home/xenon/.ssh/known_hosts
