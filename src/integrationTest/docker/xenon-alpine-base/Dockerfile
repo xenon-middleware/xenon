@@ -11,7 +11,7 @@ MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 RUN /usr/sbin/adduser -s /bin/sh -D xenon && echo xenon:javagat |chpasswd
 WORKDIR /home/xenon
 ADD insecure-ssh-keys /home/xenon/.ssh
-RUN chmod 600 /home/xenon/.ssh/id_rsa
+RUN chmod 600 /home/xenon/.ssh/*
 
 # xenon prepare test runs a bash based test script
 RUN apk add --update bash && rm -rf /var/cache/apk/* || /bin/true
