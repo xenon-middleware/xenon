@@ -34,6 +34,7 @@ ext.dockerCacheContainerName = 'xenon-test-cache-' + (java.util.UUID.randomUUID(
 // ================
 
 task checkDockerComposePresence(type: Exec) {
+    description "Whether docker compose is installed and accessible from gradle"
     executable 'docker-compose'
     args = ['-v']
     standardOutput = new ByteArrayOutputStream()
@@ -98,7 +99,13 @@ task dockerCopyTorqueRequirements(type: Copy) {
     into dockerDir + '/xenon-torque'
 }
 
-task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopyPhusionRequirements, dockerCopyTorqueRequirements]) {}
+task dockerCopyRequirements(dependsOn: [
+        dockerCopyAlpineRequirements,
+        dockerCopyPhusionRequirements,
+        dockerCopyTorqueRequirements
+    ]) {
+    description "Copy required files for building the docker containers."
+}
 
 //  DOCKER BUILD
 // ==============
@@ -126,6 +133,7 @@ task dockerTestCache(dependsOn: [checkDockerComposePresence, clean]) {
     finalizedBy 'dockerMarkTestCacheSet', 'dockerTestCacheCleanup'
 }
 task dockerMarkTestCacheSet(type: Exec) {
+	description "Avoid re-running test cache generation"
     onlyIf {
         dockerTestCache.state.executed && !dockerTestCache.state.failure
     }
@@ -133,6 +141,7 @@ task dockerMarkTestCacheSet(type: Exec) {
     commandLine 'touch', testCacheSet.absolutePath
 }
 task resetDockerTestCache(type: Delete) {
+	description "Re-run test cache generation"
     delete testCacheSet
 }
 

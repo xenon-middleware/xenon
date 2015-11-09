@@ -476,8 +476,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         JobStatus status = getJobStatusFromQstatInfo(qstatInfo, job);
 
         if (status != null && status.hasException()) {
-            cancelJob(job);
-            status = null;
+            status = cancelJob(job);
         }
 
         if (status == null) {

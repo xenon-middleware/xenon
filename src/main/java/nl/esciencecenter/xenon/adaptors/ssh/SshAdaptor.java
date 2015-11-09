@@ -163,6 +163,9 @@ public class SshAdaptor extends Adaptor {
             LOGGER.debug("Setting ssh known hosts file to: " + sshConfig);
             setConfigFile(sshConfig, !getProperties().propertySet(SshAdaptor.LOAD_SSH_CONFIG));
         }
+        if (jsch.getConfigRepository() == null) {
+            jsch.setConfigRepository(ConfigRepository.nullConfig);
+        }
     }
 
     private void setKnownHostsFile(String knownHostsFile) throws XenonException {

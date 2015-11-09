@@ -8,6 +8,7 @@
 // integrationTest itself is defined in common.gradle.
 
 task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
+    description "Set up files and directories to run integration tests"
     def integrationTestProperties = new Properties()
     doFirst {
         xenonPropertiesFile.withReader { reader ->

@@ -59,6 +59,7 @@ task userguideMarkdown(type: ConcatFiles, dependsOn: adaptorDocumentation) {
 }
 
 task checkPandocPresence(type: Exec) {
+    description "Whether pandoc is installed and accessible for gradle"
     executable 'pandoc'
     args = ['-v']
     standardOutput = new ByteArrayOutputStream()
