@@ -9,6 +9,7 @@ matrix:
         - GRADLE_BUILD_TASKS="assemble dockerBuild"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
         - INTEGRATION_TEST=1
+        - JDK=oraclejdk7
       sudo: true
       services:
         - docker
@@ -16,11 +17,13 @@ matrix:
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
+        - JDK=openjdk7
       sudo: false
     - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble"
-        - GRADLE_SCRIPT_TASKS="check jacocoTestReport coveralls"
+        - GRADLE_SCRIPT_TASKS="check"
+        - JDK=oraclejdk8
       sudo: false
   # Stop when one of the Java versions do not work
   fast_finish: true
@@ -49,3 +52,13 @@ install:
 
 script:
   - gradle $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
+
+after_script:
+  - if [ $INTEGRATION_TEST == "1" ]; then
+    gradle jacocoIntegrationTestReport;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+    else
+    gradle jacocoTestReport;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml;
+    fi
+

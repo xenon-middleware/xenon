@@ -112,7 +112,7 @@ task dockerCopyRequirements(dependsOn: [
 
 ext.testCacheSet = file('.docker-test-cache-set')
 
-task dockerTestCache(dependsOn: [checkDockerComposePresence, clean]) {
+task dockerTestCache(dependsOn: [checkDockerComposePresence]) {
     description "Cache gradle dependencies in xenon-test Docker container"
     def testCacheSet = file('.docker-test-cache-set')
     onlyIf {
