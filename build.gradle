@@ -18,7 +18,6 @@ plugins {
     // code coverage
     id 'jacoco'
     // quality
-    id 'org.sonarqube' version '1.0'
     id 'pmd'
 }
 
