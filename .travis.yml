@@ -57,8 +57,8 @@ script:
 after_script:
   - gradle jacocoTestReport coveralls
   - if [ $INTEGRATION_TEST == "1" ]; then
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
     else
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml;
     fi
 
