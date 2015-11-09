@@ -90,13 +90,6 @@ task downloadDependencies(dependsOn: [
     description "download all Java dependencies, as resolved by gradle, into the lib directory"
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
-    }
-}
-
 //  PUBLISH
 // =========
 bintray {
