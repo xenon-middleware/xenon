@@ -67,7 +67,7 @@ jacocoTestReport {
     description 'Generate coverage report of unit tests'
     group 'Code coverage reporting'
     reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
+        xml.enabled = true // codecov depends on xml format report
         html.enabled = true
     }
 }
@@ -78,7 +78,7 @@ task jacocoIntegrationTestReport(type: JacocoReport){
     executionData integrationTest
     sourceSets sourceSets.main
     reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
+        xml.enabled = true // codecov depends on xml format report
         html.enabled = true
     }
 }
