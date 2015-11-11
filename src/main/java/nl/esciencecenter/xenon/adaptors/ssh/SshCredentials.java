@@ -27,6 +27,8 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
+import nl.esciencecenter.xenon.engine.credentials.ProxyCredentialImplementation;
+
 
 public class SshCredentials implements Credentials {
 
@@ -75,8 +77,15 @@ public class SshCredentials implements Credentials {
 
     @Override
     public Credential getDefaultCredential(String scheme) throws XenonException {
-        String userHome = System.getProperty("user.home");
 
+        // Is ssh-agent is used, we return a ProxyCredential as default.
+        if (adaptor.usingAgent()) { 
+            return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), properties);
+        }  
+
+        // If ssh-agent is not used, we default to a credential adaptor that contains a public-private key pair.          
+        String userHome = System.getProperty("user.home");
+        
         if (userHome == null) {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user home directory.");
         }
@@ -87,13 +96,6 @@ public class SshCredentials implements Credentials {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
         }
 
-        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
-
-        if (certFile.exists()) {
-            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), properties, certFile.getPath(),
-                    user, null);
-        }
-
         File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
 
         if (certFile2.exists()) {
@@ -101,6 +103,13 @@ public class SshCredentials implements Credentials {
                     user, null);
         }
 
+        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
+
+        if (certFile.exists()) {
+            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), properties, certFile.getPath(),
+                    user, null);
+        }
+        
         throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried "
                 + certFile.getPath() + " and " + certFile2.getPath());
     }

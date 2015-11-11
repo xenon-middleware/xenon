@@ -60,20 +60,20 @@ public class SshJobs implements Jobs {
         private final SshMultiplexedSession session;
         private final JobQueues jobQueues;
 
-        SchedulerInfo(SshMultiplexedSession session, JobQueues jobQueues) {
+        private SchedulerInfo(SshMultiplexedSession session, JobQueues jobQueues) {
             this.session = session;
             this.jobQueues = jobQueues;
         }
 
-        SshMultiplexedSession getSession() {
+        private SshMultiplexedSession getSession() {
             return session;
         }
 
-        JobQueues getJobQueues() {
+        private JobQueues getJobQueues() {
             return jobQueues;
         }
 
-        void end() {
+        private void end() {
             jobQueues.end();
             session.disconnect();
         }

@@ -196,6 +196,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return false;
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     protected  static void verifyJobDescription(JobDescription description) throws XenonException {
         SchedulerConnection.verifyJobOptions(description.getJobOptions(), VALID_JOB_OPTIONS, SlurmAdaptor.ADAPTOR_NAME);
 

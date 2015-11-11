@@ -978,6 +978,28 @@ OpenSSH config filename.
 - Valid for: [XENON]
 
 
+__`xenon.adaptors.ssh.agent`__
+
+Use a (local) ssh-agent.
+
+- Expected type: BOOLEAN
+
+- Default value: false
+
+- Valid for: [XENON]
+
+
+__`xenon.adaptors.ssh.agentForwarding`__
+
+Use ssh-agent forwarding
+
+- Expected type: BOOLEAN
+
+- Default value: false
+
+- Valid for: [XENON]
+
+
 __`xenon.adaptors.ssh.queue.pollingDelay`__
 
 The polling delay for monitoring running jobs (in milliseconds).

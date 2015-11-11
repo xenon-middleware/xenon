@@ -71,6 +71,7 @@ public enum OpenOption {
      * 
      * @return if <code>options</code> contains <code>option<code>.
      */
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     public static boolean contains(OpenOption toFind, OpenOption... options) {
 
         if (toFind == null || options == null || options.length == 0) {
