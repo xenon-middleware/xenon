@@ -43,7 +43,7 @@ distributions {
             }
             into("docs") {
                 from(userguideMarkdown.target)
-                from('doc/userguide/userguide.pdf')
+                from('doc/user/userguide/userguide.pdf')
                 into("javadoc") {
                     from(javadoc.destinationDir)
                 }
