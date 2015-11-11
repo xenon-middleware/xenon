@@ -19,9 +19,15 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.files.NoSuchPathException;
+
+import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.Buffer;
+import com.jcraft.jsch.SftpException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -156,4 +162,53 @@ public class SSHUtilTest {
     }
 
     
+    @org.junit.Test
+    public void testsftpExceptionToXenonException1() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_OK, "test"));
+        assertTrue(e instanceof XenonException);
+        assertEquals(e.getMessage(), "ssh adaptor: test");
+    }
+    
+    public void testsftpExceptionToXenonException2() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_EOF, "test"));
+        assertTrue(e instanceof EndOfFileException);
+    }
+    
+    public void testsftpExceptionToXenonException3() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_NO_SUCH_FILE, "test"));
+        assertTrue(e instanceof NoSuchPathException);
+    }
+    
+    public void testsftpExceptionToXenonException4() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_PERMISSION_DENIED, "test"));
+        assertTrue(e instanceof PermissionDeniedException);
+    }
+    
+    public void testsftpExceptionToXenonException5() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_FAILURE, "test"));
+        assertTrue(e instanceof XenonException);
+        assertEquals(e.getMessage(), "SSH gave an unknown error");
+    }
+    
+    public void testsftpExceptionToXenonException6() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_NO_CONNECTION, "test"));
+        assertTrue(e instanceof XenonException);
+        assertEquals(e.getMessage(), "SSH received a malformed message");
+    }
+    
+    public void testsftpExceptionToXenonException7() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_CONNECTION_LOST, "test"));
+        assertTrue(e instanceof ConnectionLostException);
+    }
+
+    public void testsftpExceptionToXenonException8() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(ChannelSftp.SSH_FX_OP_UNSUPPORTED, "test"));
+        assertTrue(e instanceof UnsupportedIOOperationException);
+    }
+    
+    public void testsftpExceptionToXenonException9() throws Exception {
+        XenonException e = SshUtil.sftpExceptionToXenonException(new SftpException(42, "test"));
+        assertTrue(e instanceof XenonException);
+        assertEquals(e.getMessage(), "Unknown SSH exception");
+    }
 }
