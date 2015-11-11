@@ -59,6 +59,8 @@ task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
 
 //Ensure that integration tests are prepared
 integrationTest.dependsOn prepareIntegrationTest
+integrationTest.group = 'Verification'
+integrationTest.description = 'Run the integration tests.'
 
 //    COVERAGE
 // ==============

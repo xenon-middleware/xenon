@@ -50,11 +50,13 @@ class DockerCompose extends Exec {
 
 task dockerKill(type: DockerCompose) {
     description "Stop Xenon Docker integrationTest containers"
+    group 'Docker'
     args = ['kill']
 }
 
 task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
     description "Remove Xenon Docker integrationTest containers"
+    group 'Docker'
     args = ['rm', '-f']
 }
 
@@ -62,7 +64,9 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     // FIXME: the current version of docker-compose 1.4.2 does not
     // forward stdout if running from gradle (without TTY). Check if
     // future versions support this.
-    description "Run integration tests from Docker"
+    description "Run integration tests using Docker containers as client and servers"
+    group 'Verification'
+
     args = ['run', '--rm', '-e','BOOT_DELAY=15', '-e', 'MYUID=' + dockerUid, 'xenon-test']
     if (project.hasProperty('docker.tests')) {
         args += [
@@ -134,6 +138,7 @@ task dockerTestCache(dependsOn: [checkDockerComposePresence]) {
 }
 task dockerMarkTestCacheSet(type: Exec) {
 	description "Avoid re-running test cache generation"
+    group 'Docker'
     onlyIf {
         dockerTestCache.state.executed && !dockerTestCache.state.failure
     }
@@ -142,11 +147,13 @@ task dockerMarkTestCacheSet(type: Exec) {
 }
 task resetDockerTestCache(type: Delete) {
 	description "Re-run test cache generation"
+    group 'Docker'
     delete testCacheSet
 }
 
 task dockerTestCacheCleanup(type: Exec) {
     description "Remove temporary Docker cache container"
+    group 'Docker'
     onlyIf {
         dockerTestCache.state.didWork
     }
@@ -154,7 +161,6 @@ task dockerTestCacheCleanup(type: Exec) {
 }
 
 task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, dockerCopyRequirements]) << {
-    description "Build Docker images from Dockerfile"
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
@@ -163,9 +169,10 @@ task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, d
         }
     }
 }
+dockerBuild.description = "Build Docker images from Dockerfile"
+dockerBuild.group = 'Docker'
 
 task dockerPush(dependsOn: checkDockerComposePresence) << {
-    description "Push Docker images to Dockerhub (run docker login first)"
     println "Pushing docker images of: " + dockerImages
     dockerImages.each { image ->
         exec {
@@ -173,3 +180,6 @@ task dockerPush(dependsOn: checkDockerComposePresence) << {
         }
     }
 }
+dockerPush.description = "Push Docker images to Dockerhub (run docker login first)"
+dockerPush.group = 'Docker'
+
