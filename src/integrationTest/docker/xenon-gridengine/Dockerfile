@@ -54,6 +54,7 @@ qconf -Ap parallel_environments/smp && \
 qconf -Aq queues/default && \
 qconf -Aq queues/slow && \
 qconf -Msconf scheduler && \
+qconf -Mconf configurations/global && \
 killall sge_qmaster sge_execd
 
 CMD ["/sbin/my_init"]

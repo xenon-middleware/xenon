@@ -36,7 +36,7 @@ public final class CommandLineUtils {
      */
     public static String protectAgainstShellMetas(String argument) {
         char[] chars = argument.toCharArray();
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder(chars.length + 10);
         b.append('\'');
         for (char c : chars) {
             if (c == '\'') {

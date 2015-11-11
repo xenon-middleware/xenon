@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 
@@ -29,12 +30,8 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -44,9 +41,6 @@ import org.slf4j.LoggerFactory;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericCredentialsAdaptorTestParent {
-
-    private static final Logger logger = LoggerFactory.getLogger(GenericJobAdaptorTestParent.class);
-
     private static CredentialTestConfig config;
     
     // MUST be invoked by a @BeforeClass method of the subclass! 
@@ -55,29 +49,7 @@ public abstract class GenericCredentialsAdaptorTestParent {
     }
     
     @Rule
-    public TestWatcher watcher = new TestWatcher() {
-
-        @Override
-        public void starting(Description description) {
-            logger.info("Running test {}", description.getMethodName());
-        }
-
-        @Override
-        public void failed(Throwable reason, Description description) {
-            logger.info("Test {} failed due to exception", description.getMethodName(), reason);
-        }
-
-        @Override
-        public void succeeded(Description description) {
-            logger.info("Test {} succeeded", description.getMethodName());
-        }
-
-        @Override
-        public void skipped(AssumptionViolatedException reason, Description description) {
-            logger.info("Test {} skipped due to failed assumption", description.getMethodName(), reason);
-        }
-
-    };
+    public TestWatcher watcher = new XenonTestWatcher();
     
     @Before
     public void prepare() throws Exception {

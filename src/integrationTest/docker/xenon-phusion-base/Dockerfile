@@ -12,7 +12,7 @@ RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
 RUN /usr/sbin/useradd -p $(openssl passwd javagat) -d /home/xenon -m --shell /bin/bash xenon
 WORKDIR /home/xenon
 ADD insecure-ssh-keys /home/xenon/.ssh
-RUN chmod go-r /home/xenon/.ssh/id_rsa
+RUN chmod 600 /home/xenon/.ssh/*
 
 # Create symlinks
 ADD create_symlinks /tmp/

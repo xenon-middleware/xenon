@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,14 +46,7 @@ public class JavaJobDescription extends JobDescription {
     private final List<String> javaArguments = new ArrayList<String>();
 
     private final List<String> javaClasspath = new ArrayList<String>();
-
-    /**
-     * Create a JavaJobDescription which describes the java application.
-     */
-    public JavaJobDescription() {
-        super();
-    }
-
+   
     /**
      * Returns the JVM options.
      * 
@@ -193,23 +187,21 @@ public class JavaJobDescription extends JobDescription {
      */
     @Override
     public List<String> getArguments() {
-        return getArguments(':');
+        return getArguments(File.pathSeparatorChar);
     }
 
     /**
      * Constructs the command line arguments from the class path, the JVM options, the system properties, the main and the java
      * arguments.
      * 
-     * @param pathSeperator
+     * @param pathSeparator
      *            the seperator to use in the classpath. Defaults to the unix path seperator ':'
      * 
      * @return the command line arguments
      */
-    public List<String> getArguments(char pathSeperator) {
-        List<String> result = new ArrayList<String>();
-        for (String option : getJavaOptions()) {
-            result.add(option);
-        }
+    public List<String> getArguments(char pathSeparator) {
+        List<String> result = new ArrayList<>();
+        result.addAll(getJavaOptions());
 
         if (!getJavaClasspath().isEmpty()) {
             result.add("-classpath");
@@ -219,7 +211,7 @@ public class JavaJobDescription extends JobDescription {
                 if (classpath == null) {
                     classpath = element;
                 } else {
-                    classpath = classpath + pathSeperator + element;
+                    classpath = classpath + pathSeparator + element;
                 }
             }
             result.add(classpath);
@@ -234,9 +226,7 @@ public class JavaJobDescription extends JobDescription {
             result.add(getJavaMain());
         }
 
-        for (String javaArgument : getJavaArguments()) {
-            result.add(javaArgument);
-        }
+        result.addAll(getJavaArguments());
         return result;
     }
 
@@ -325,26 +315,28 @@ public class JavaJobDescription extends JobDescription {
         }
 
         JavaJobDescription other = (JavaJobDescription) obj;
+        
         if (!javaArguments.equals(other.javaArguments)) {
             return false;
         }
+        
         if (!javaClasspath.equals(other.javaClasspath)) {
             return false;
         }
+        
         if (javaMain == null) {
             if (other.javaMain != null) {
                 return false;
-            }
+            }        
         } else if (!javaMain.equals(other.javaMain)) {
             return false;
         }
+        
         if (!javaOptions.equals(other.javaOptions)) {
             return false;
         }
-        if (!javaSystemProperties.equals(other.javaSystemProperties)) {
-            return false;
-        }
-        return true;
+        
+        return javaSystemProperties.equals(other.javaSystemProperties);
     }
 
 }

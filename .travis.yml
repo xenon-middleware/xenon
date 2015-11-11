@@ -1,13 +1,64 @@
 language: java
-jdk:
-  - oraclejdk7
-  - openjdk7
-  - oraclejdk8
-sudo: false
+
+matrix:
+  # Only do docker integration tests with Oracle JDK 7: the docker
+  # tests are not affected by JDK on host system.
+  include:
+    - jdk: oraclejdk7
+      env:
+        - GRADLE_BUILD_TASKS="assemble dockerBuild"
+        - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
+        - INTEGRATION_TEST=1
+        - JDK=oraclejdk7
+      sudo: true
+      services:
+        - docker
+    - jdk: openjdk7
+      env:
+        - GRADLE_BUILD_TASKS="assemble"
+        - GRADLE_SCRIPT_TASKS="check"
+        - JDK=openjdk7
+      sudo: false
+    - jdk: oraclejdk8
+      env:
+        - GRADLE_BUILD_TASKS="assemble"
+        - GRADLE_SCRIPT_TASKS="check"
+        - JDK=oraclejdk8
+      sudo: false
+  # Stop when one of the Java versions do not work
+  fast_finish: true
+
+# Install documentation dependencies
 addons:
   apt_packages:
     - pandoc
     - texlive
-    - texlive-latex-extra
-    - texlive-font-utils
-    - inkscape
+    - lmodern
+
+# Install Docker compose
+before_install:
+  - if [ $INTEGRATION_TEST == "1" ]; then
+    sudo apt-get install -y docker-engine;
+    docker version;
+    mkdir -p "$HOME/bin";
+    export PATH="$PATH:$HOME/bin";
+    curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
+    chmod +x "$HOME/bin/docker-compose";
+    fi
+  - touch .docker-test-cache-set
+
+install:
+  - gradle $GRADLE_BUILD_TASKS -Pdocker.uid=$UID
+
+script:
+  - gradle $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
+
+after_script:
+  - if [ $INTEGRATION_TEST == "1" ]; then
+    gradle jacocoIntegrationTestReport;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+    else
+    gradle jacocoTestReport;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml;
+    fi
+

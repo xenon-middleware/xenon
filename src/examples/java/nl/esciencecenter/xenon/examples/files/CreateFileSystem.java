@@ -32,7 +32,6 @@ import nl.esciencecenter.xenon.files.Files;
  *  
  * This example assumes the user provides the URI of the file system on the command line.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

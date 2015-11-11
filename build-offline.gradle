@@ -12,7 +12,22 @@ plugins {
     // ide
     id 'idea'
     id 'eclipse'
+    id 'pmd'
 }
 
-apply from: 'build-common.gradle'
-apply from: 'gradle/docker.gradle'
+apply from: 'gradle/common.gradle'
+
+//  DEPENDENCIES
+// ==============
+repositories {}
+dependencies {
+    compile fileTree(dir: compileLibDir, include: '*.jar')
+    testCompile fileTree(dir: testLibDir, include: '*.jar')
+    runtime fileTree(dir: runtimeLibDir, include: '*.jar')
+    pmd fileTree(dir: codestyleLibDir, include: '*.jar')
+
+    userguideCompile sourceSets.main.output
+    examplesCompile sourceSets.main.output
+}
+
+apply from: 'gradle/codestyle.gradle'

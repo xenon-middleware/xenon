@@ -24,7 +24,6 @@ import nl.esciencecenter.xenon.adaptors.scripting.RemoteCommandRunner;
 import nl.esciencecenter.xenon.adaptors.scripting.SchedulerConnection;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GridEngineSetup {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(GridEngineSetup.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineSetup.class);
 
     private final String[] queueNames;
 
@@ -52,7 +51,7 @@ public class GridEngineSetup {
      *            names of parallel environments to list
      * @return a list of all qconf arguments needed to list all parallel environments
      */
-    static String[] qconfPeDetailsArguments(String[] parallelEnvironmentNames) {
+    protected static String[] qconfPeDetailsArguments(String[] parallelEnvironmentNames) {
         String[] result = new String[parallelEnvironmentNames.length * 2];
         for (int i = 0; i < parallelEnvironmentNames.length; i++) {
             result[2 * i] = "-sp";
@@ -151,7 +150,7 @@ public class GridEngineSetup {
      * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
      * give is dependent on the parallel environment settings.
      */
-    int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
+    protected int calculateSlots(String parallelEnvironmentName, String queueName, int nodeCount) throws XenonException {
         ParallelEnvironmentInfo pe = parallelEnvironments.get(parallelEnvironmentName);
         QueueInfo queue = queues.get(queueName);
 

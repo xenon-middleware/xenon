@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
@@ -59,17 +59,17 @@ class SshMultiplexedSession {
 
     private int nextSessionID = 0;
 
-    private List<SshSession> sessions = new ArrayList<>();
+    private final List<SshSession> sessions = new ArrayList<>();
 
-    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation location, Credential cred, XenonProperties properties)
+    SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation loc, Credential cred, XenonProperties prop)
             throws XenonException {
 
-        LOGGER.debug("SSHSESSION(..,..,{},..,{}", location, properties);
+        LOGGER.debug("SSHSESSION(..,..,{},..,{}", loc, prop);
 
         this.jsch = jsch;
-        this.location = location;
-        this.properties = properties;
-        
+        this.location = loc;
+        this.properties = prop;
+
         credential = cred;
         
         if (credential == null) {
@@ -110,8 +110,8 @@ class SshMultiplexedSession {
 
             if (gatewayLocation.getUser() == null) {
                 gatewayLocation = new SshLocation(location.getUser(), gatewayLocation.getHost(), gatewayLocation.getPort());
+                
             }
-
             LOGGER.debug("Creating gateway via {}", gatewayLocation);
 
             gatewaySession = createSession(jsch, -1, gatewayLocation, credential, null, null, properties);
@@ -195,7 +195,12 @@ class SshMultiplexedSession {
         try {
             session.connect();
         } catch (JSchException e) {
-            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            
+            if ("Auth cancel".equals(e.getMessage())) { 
+                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            } else {
+                throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+            }
         }
 
         return new SshSession(session, tunnelPort, sessionID);
@@ -208,7 +213,7 @@ class SshMultiplexedSession {
      * @return the channel
      * @throws XenonException
      */
-    synchronized ChannelExec getExecChannel() throws XenonException {
+    protected synchronized ChannelExec getExecChannel() throws XenonException {
 
         for (SshSession s : sessions) {
             ChannelExec channel = s.getExecChannel();
@@ -226,11 +231,11 @@ class SshMultiplexedSession {
         }
     }
 
-    synchronized void releaseExecChannel(ChannelExec channel) throws XenonException {
+    protected synchronized void releaseExecChannel(ChannelExec channel) throws XenonException {
         findSession(channel).releaseExecChannel(channel);
     }
 
-    synchronized void failedExecChannel(ChannelExec channel) throws XenonException {
+    protected synchronized void failedExecChannel(ChannelExec channel) throws XenonException {
         findSession(channel).failedExecChannel(channel);
     }
 
@@ -240,7 +245,7 @@ class SshMultiplexedSession {
      * @return the channel
      * @throws XenonException
      */
-    synchronized ChannelSftp getSftpChannel() throws XenonException {
+    protected synchronized ChannelSftp getSftpChannel() throws XenonException {
 
         for (SshSession s : sessions) {
             ChannelSftp channel = s.getSftpChannel();
@@ -258,15 +263,15 @@ class SshMultiplexedSession {
         }
     }
 
-    synchronized void releaseSftpChannel(ChannelSftp channel) throws XenonException {
+    protected synchronized void releaseSftpChannel(ChannelSftp channel) throws XenonException {
         findSession(channel).releaseSftpChannel(channel);
     }
 
-    synchronized void failedSftpChannel(ChannelSftp channel) throws XenonException {
+    protected synchronized void failedSftpChannel(ChannelSftp channel) throws XenonException {
         findSession(channel).failedSftpChannel(channel);
     }
 
-    synchronized void disconnect() {
+    protected synchronized void disconnect() {
 
         while (sessions.size() > 0) {
 

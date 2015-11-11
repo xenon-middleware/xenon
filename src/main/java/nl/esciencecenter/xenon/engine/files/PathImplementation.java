@@ -54,7 +54,6 @@ public final class PathImplementation implements Path {
     private final RelativePath relativePath;
 
     public PathImplementation(FileSystem filesystem, RelativePath path) {
-
         if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
         }
@@ -68,7 +67,6 @@ public final class PathImplementation implements Path {
     }
 
     public PathImplementation(FileSystem filesystem, RelativePath... paths) {
-
         if (filesystem == null) {
             throw new IllegalArgumentException("FileSystem may not be null!");
         }

@@ -18,8 +18,8 @@ package nl.esciencecenter.xenon.adaptors;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Properties;
 
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -35,9 +35,9 @@ public abstract class FileTestConfig extends GenericTestConfig {
         super(adaptorName, configfile);
     }
 
-    public abstract FileSystem getTestFileSystem(Files files, Credentials credentials) throws Exception;
+    public abstract FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException;
 
-    public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
+    public abstract Path getWorkingDir(Files files, Credentials credentials) throws XenonException;
 
     public abstract boolean supportsPosixPermissions();
 
@@ -61,5 +61,9 @@ public abstract class FileTestConfig extends GenericTestConfig {
 
     public String getNonDefaultCredentialLocation() throws Exception {
         return getCorrectLocation();
+    }
+
+    public boolean supportsNullFileSystemLocation() {
+        return false;
     }
 }

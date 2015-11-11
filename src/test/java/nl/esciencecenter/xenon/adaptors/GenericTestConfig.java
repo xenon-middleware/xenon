@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
@@ -71,6 +70,11 @@ public abstract class GenericTestConfig {
             props.load(new FileInputStream(configFilename));
         }
         return props;
+    }
+
+    public String getProperty(String name, String defaultValue) {
+        String prop = p.getProperty(name);
+        return prop != null ? prop : defaultValue;
     }
 
     public static String getPropertyOrFail(String adaptorName, Properties props, String name) throws UnknownPropertyException {

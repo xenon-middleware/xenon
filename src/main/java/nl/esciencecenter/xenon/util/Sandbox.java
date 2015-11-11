@@ -137,6 +137,8 @@ public class Sandbox {
      */
     public Sandbox(Files files, Path root, String sandboxName) throws XenonException {
 
+        String name = sandboxName;
+
         if (files == null) {
             throw new XenonException("Sandbox", "Need an files interface to create a sandbox!");
         }
@@ -145,12 +147,12 @@ public class Sandbox {
             throw new XenonException("Sandbox", "Need an root directory to create a sandbox!");
         }
 
-        if (sandboxName == null) {
-            sandboxName = "xenon_sandbox_" + UUID.randomUUID();
+        if (name == null) {
+            name = "xenon_sandbox_" + UUID.randomUUID();
         }
 
         this.files = files;
-        this.path = resolve(files, root, sandboxName);
+        this.path = resolve(files, root, name);
     }
 
     private static Path resolve(Files files, Path root, String path) throws XenonException {
@@ -211,14 +213,18 @@ public class Sandbox {
      * @throws XenonException 
      */
     public void addUploadFile(Path src, String dest) throws XenonException {
+
+        String destination = dest;
+
         if (src == null) {
             throw new IllegalArgumentException("the source path cannot be null when adding an upload file");
         }
-        if (dest == null) {
-            dest = src.getRelativePath().getFileNameAsString();
-        }
+        
+        if (destination == null) {
+            destination = src.getRelativePath().getFileNameAsString();
+        } 
 
-        uploadFiles.add(new Pair(src, resolve(files, path, dest)));
+        uploadFiles.add(new Pair(src, resolve(files, path, destination)));
     }
 
     /**
@@ -240,14 +246,18 @@ public class Sandbox {
      * @throws XenonException 
      */
     public void addDownloadFile(String src, Path dest) throws XenonException {
+
+        String source = src;
+        
         if (dest == null) {
             throw new IllegalArgumentException("the destination path cannot be null when adding a download file");
         }
-        if (src == null) {
-            src = dest.getRelativePath().getFileNameAsString();
+        
+        if (source == null) {
+            source = dest.getRelativePath().getFileNameAsString();
         }
 
-        downloadFiles.add(new Pair(resolve(files, path, src), dest));
+        downloadFiles.add(new Pair(resolve(files, path, source), dest));
     }
 
     private void copy(List<Pair> pairs, CopyOption... options) throws XenonException {
@@ -336,11 +346,7 @@ public class Sandbox {
             return false;
         }
 
-        if (!uploadFiles.equals(other.uploadFiles)) {
-            return false;
-        }
-
-        return true;
+        return uploadFiles.equals(other.uploadFiles);
     }
 
     @Override

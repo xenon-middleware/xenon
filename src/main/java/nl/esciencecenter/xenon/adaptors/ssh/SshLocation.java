@@ -12,7 +12,7 @@ public class SshLocation extends Location {
     }
 
     protected SshLocation(String location) throws InvalidLocationException {
-        super(location);
+        super(location, SshAdaptor.ADAPTOR_SCHEME.get(0));
     }
 
     @Override
@@ -25,6 +25,18 @@ public class SshLocation extends Location {
         return SshAdaptor.DEFAULT_PORT;
     }
 
+    /**
+     * Parses a location string resembling an URI to a SSHLocation.
+     *
+     * A ConfigRepository may provide an SSH config with a default host name,
+     * user, and port, for a given host.
+     *
+     * @param locationString location string resembling an URI
+     * @param sshConfig general SSH config for SSH hosts
+     * @return a matching SSHLocation
+     * @throws InvalidLocationException when the locationString cannot be parsed
+     * @throws NullPointerException when sshConfig is null.
+     */
     public static SshLocation parse(String locationString, ConfigRepository sshConfig) throws InvalidLocationException {
         SshLocation location = new SshLocation(locationString);
         ConfigRepository.Config sshHostConfig = sshConfig.getConfig(location.getHost());

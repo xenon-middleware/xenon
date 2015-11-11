@@ -34,6 +34,7 @@ ext.dockerCacheContainerName = 'xenon-test-cache-' + (java.util.UUID.randomUUID(
 // ================
 
 task checkDockerComposePresence(type: Exec) {
+    description "Whether docker compose is installed and accessible from gradle"
     executable 'docker-compose'
     args = ['-v']
     standardOutput = new ByteArrayOutputStream()
@@ -48,10 +49,14 @@ class DockerCompose extends Exec {
 }
 
 task dockerKill(type: DockerCompose) {
+    description "Stop Xenon Docker integrationTest containers"
+    group 'Docker'
     args = ['kill']
 }
 
 task dockerCleanup(type: DockerCompose, dependsOn: dockerKill) {
+    description "Remove Xenon Docker integrationTest containers"
+    group 'Docker'
     args = ['rm', '-f']
 }
 
@@ -59,7 +64,10 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
     // FIXME: the current version of docker-compose 1.4.2 does not
     // forward stdout if running from gradle (without TTY). Check if
     // future versions support this.
-    args = ['run', '--rm', '-e', 'MYUID=' + dockerUid, 'xenon-test']
+    description "Run integration tests using Docker containers as client and servers"
+    group 'Verification'
+
+    args = ['run', '--rm', '-e','BOOT_DELAY=15', '-e', 'MYUID=' + dockerUid, 'xenon-test']
     if (project.hasProperty('docker.tests')) {
         args += [
             './gradlew', 'integrationTest',
@@ -69,7 +77,6 @@ task dockerIntegrationTest(type: DockerCompose, dependsOn: 'dockerTestCache') {
         ]
     }
     finalizedBy 'dockerCleanup'
-    mustRunAfter 'test'
 }
 
 //  DOCKER BUILD SETUP
@@ -96,12 +103,21 @@ task dockerCopyTorqueRequirements(type: Copy) {
     into dockerDir + '/xenon-torque'
 }
 
-task dockerCopyRequirements(dependsOn: [dockerCopyAlpineRequirements, dockerCopyPhusionRequirements, dockerCopyTorqueRequirements]) {}
+task dockerCopyRequirements(dependsOn: [
+        dockerCopyAlpineRequirements,
+        dockerCopyPhusionRequirements,
+        dockerCopyTorqueRequirements
+    ]) {
+    description "Copy required files for building the docker containers."
+}
 
 //  DOCKER BUILD
 // ==============
 
-task dockerTestCache(dependsOn: checkDockerComposePresence) {
+ext.testCacheSet = file('.docker-test-cache-set')
+
+task dockerTestCache(dependsOn: [checkDockerComposePresence]) {
+    description "Cache gradle dependencies in xenon-test Docker container"
     def testCacheSet = file('.docker-test-cache-set')
     onlyIf {
         !testCacheSet.exists()
@@ -111,26 +127,40 @@ task dockerTestCache(dependsOn: checkDockerComposePresence) {
             commandLine 'docker', 'run', '-e', 'MYUID=' + dockerUid,
                 '--name=' + dockerCacheContainerName, '-v', "$projectDir:/code",
                 'nlesc/xenon-test', './gradlew', '--project-cache-dir',
-                '/home/xenon/gradle-cache', 'compileJava', 'compileTestJava'
+                '/home/xenon/gradle-cache', 'downloadDependencies'
         }
         exec {
             commandLine 'docker', 'commit', dockerCacheContainerName,
                 'nlesc/xenon-test'
         }
-        exec {
-            commandLine 'touch', testCacheSet.absolutePath
-        }
     }
-    finalizedBy 'dockerTestCacheCleanup'
+    finalizedBy 'dockerMarkTestCacheSet', 'dockerTestCacheCleanup'
 }
+task dockerMarkTestCacheSet(type: Exec) {
+	description "Avoid re-running test cache generation"
+    group 'Docker'
+    onlyIf {
+        dockerTestCache.state.executed && !dockerTestCache.state.failure
+    }
+    outputs.file testCacheSet
+    commandLine 'touch', testCacheSet.absolutePath
+}
+task resetDockerTestCache(type: Delete) {
+	description "Re-run test cache generation"
+    group 'Docker'
+    delete testCacheSet
+}
+
 task dockerTestCacheCleanup(type: Exec) {
+    description "Remove temporary Docker cache container"
+    group 'Docker'
     onlyIf {
         dockerTestCache.state.didWork
     }
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
 
-task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements]) << {
+task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, dockerCopyRequirements]) << {
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
@@ -139,6 +169,8 @@ task dockerBuild(dependsOn: [checkDockerComposePresence, dockerCopyRequirements]
         }
     }
 }
+dockerBuild.description = "Build Docker images from Dockerfile"
+dockerBuild.group = 'Docker'
 
 task dockerPush(dependsOn: checkDockerComposePresence) << {
     println "Pushing docker images of: " + dockerImages
@@ -148,3 +180,6 @@ task dockerPush(dependsOn: checkDockerComposePresence) << {
         }
     }
 }
+dockerPush.description = "Push Docker images to Dockerhub (run docker login first)"
+dockerPush.group = 'Docker'
+

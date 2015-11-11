@@ -60,14 +60,14 @@ final class LocalUtils {
      * @param path Xenon Path
      * @return a normalized java Path
      */
-    static java.nio.file.Path javaPath(Path path) {
+    public static java.nio.file.Path javaPath(Path path) {
         FileSystem fs = path.getFileSystem();
         RelativePath relPath = path.getRelativePath().normalize();
         int numElems = relPath.getNameCount();
         // replace tilde
         if (numElems != 0) {
             String firstPart = relPath.getName(0).getRelativePath();
-            if (firstPart.equals("~")) {
+            if ("~".equals(firstPart)) {
                 RelativePath home = new RelativePath(System.getProperty("user.home"));
                 if (numElems == 1) {
                     relPath = home;
@@ -79,7 +79,7 @@ final class LocalUtils {
         return FileSystems.getDefault().getPath(fs.getLocation() + relPath.getAbsolutePath());
     }
 
-    static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
+    public static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
         if (permissions == null) {
             return new HashSet<>(0);
         }
@@ -93,7 +93,7 @@ final class LocalUtils {
         return result;
     }
 
-    static Set<PosixFilePermission> xenonPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
+    public static Set<PosixFilePermission> xenonPermissions(Set<java.nio.file.attribute.PosixFilePermission> permissions) {
         if (permissions == null) {
             return null;
         }
@@ -107,7 +107,7 @@ final class LocalUtils {
         return result;
     }
 
-    static java.nio.file.OpenOption[] javaOpenOptions(OpenOption[] options) {
+    public static java.nio.file.OpenOption[] javaOpenOptions(OpenOption[] options) {
         ArrayList<java.nio.file.OpenOption> result = new ArrayList<>(options.length);
 
         for (OpenOption opt : options) {
@@ -141,7 +141,7 @@ final class LocalUtils {
      * @param path
      * @throws XenonException
      */
-    static InputStream newInputStream(Path path) throws XenonException {
+    public static InputStream newInputStream(Path path) throws XenonException {
         try {
             return Files.newInputStream(javaPath(path));
         } catch (IOException e) {
@@ -154,7 +154,7 @@ final class LocalUtils {
      * @param permissions
      * @throws XenonException
      */
-    static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
+    public static void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
         try {
             PosixFileAttributeView view = Files.getFileAttributeView(LocalUtils.javaPath(path), PosixFileAttributeView.class);
             view.setPermissions(LocalUtils.javaPermissions(permissions));
@@ -169,7 +169,7 @@ final class LocalUtils {
      * @throws XenonException
      * @throws NullPointerException if the path is not set
      */
-    static void createFile(Path path) throws XenonException {
+    public static void createFile(Path path) throws XenonException {
         try {
             Files.createFile(LocalUtils.javaPath(path));
         } catch (IOException e) {
@@ -183,7 +183,7 @@ final class LocalUtils {
      * @throws XenonException
      * @throws NullPointerException if the path is not set
      */
-    static void delete(Path path) throws XenonException {
+    public static void delete(Path path) throws XenonException {
         try {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
@@ -200,7 +200,7 @@ final class LocalUtils {
      * @param target
      * @throws XenonException
      */
-    static void move(Path source, Path target) throws XenonException {
+    public static void move(Path source, Path target) throws XenonException {
 
         try {
             Files.move(LocalUtils.javaPath(source), LocalUtils.javaPath(target));
@@ -209,8 +209,7 @@ final class LocalUtils {
         }
     }
 
-    static void unixDestroy(java.lang.Process process) {
-
+    public static void unixDestroy(Process process) {
         boolean success = false;
 
         try {

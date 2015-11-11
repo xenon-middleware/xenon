@@ -166,11 +166,11 @@ public class JobQueues {
             getJobs(unlimitedQ, out);
         } else {
             for (String name : queueNames) {
-                if (name.equals("single")) {
+                if ("single".equals(name)) {
                     getJobs(singleQ, out);
-                } else if (name.equals("multi")) {
+                } else if ("multi".equals(name)) {
                     getJobs(multiQ, out);
-                } else if (name.equals("unlimited")) {
+                } else if ("unlimited".equals(name)) {
                     getJobs(unlimitedQ, out);
                 } else {
                     throw new NoSuchQueueException(adaptorName, "Queue \"" + name + "\" does not exist");
@@ -185,11 +185,11 @@ public class JobQueues {
 
     private List<JobExecutor> findQueue(String queueName) throws XenonException {
 
-        if (queueName == null || queueName.equals("single")) {
+        if (queueName == null || "single".equals(queueName)) {
             return singleQ;
-        } else if (queueName.equals("multi")) {
+        } else if ("multi".equals(queueName)) {
             return multiQ;
-        } else if (queueName.equals("unlimited")) {
+        } else if ("unlimited".equals(queueName)) {
             return unlimitedQ;
         } else {
             throw new XenonException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
@@ -197,7 +197,6 @@ public class JobQueues {
     }
 
     private JobExecutor findJob(List<JobExecutor> queue, Job job) throws XenonException {
-
         for (JobExecutor e : queue) {
             if (e.getJob().equals(job)) {
                 return e;
@@ -226,7 +225,6 @@ public class JobQueues {
     }
 
     public JobStatus getJobStatus(Job job) throws XenonException {
-
         LOGGER.debug("{}: getJobStatus for job {}", adaptorName, job.getIdentifier());
 
         checkScheduler(job.getScheduler());
@@ -263,7 +261,6 @@ public class JobQueues {
     }
 
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
-
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
         if (timeout < 0) {
@@ -317,7 +314,7 @@ public class JobQueues {
             description.setQueueName("single");
         }
 
-        if (!(queue.equals("single") || queue.equals("multi") || queue.equals("unlimited"))) {
+        if (!("single".equals(queue) || "multi".equals(queue) || "unlimited".equals(queue))) {
             throw new InvalidJobDescriptionException(adaptorName, "Queue " + queue + " not available locally!");
         }
 
@@ -384,10 +381,10 @@ public class JobQueues {
         LOGGER.debug("{}: Submitting job to queue {}", adaptorName, queueName);
 
         // NOTE: the verifyJobDescription ensures that the queueName has a valid value!
-        if (queueName.equals("unlimited")) {
+        if ("unlimited".equals(queueName)) {
             unlimitedQ.add(executor);
             unlimitedExecutor.execute(executor);
-        } else if (queueName.equals("multi")) {
+        } else if ("multi".equals(queueName)) {
             multiQ.add(executor);
             multiExecutor.execute(executor);
         } else {
@@ -409,7 +406,6 @@ public class JobQueues {
     }
 
     public JobStatus cancelJob(Job job) throws XenonException {
-
         LOGGER.debug("{}: Cancel job {}", adaptorName, job);
 
         checkScheduler(job.getScheduler());
@@ -445,11 +441,11 @@ public class JobQueues {
 
         checkScheduler(scheduler);
 
-        if (queueName.equals("single")) {
+        if ("single".equals(queueName)) {
             return new QueueStatusImplementation(scheduler, "single", null, null);
-        } else if (queueName.equals("multi")) {
+        } else if ("multi".equals(queueName)) {
             return new QueueStatusImplementation(scheduler, "multi", null, null);
-        } else if (queueName.equals("unlimited")) {
+        } else if ("unlimited".equals(queueName)) {
             return new QueueStatusImplementation(scheduler, "unlimited", null, null);
         } else {
             throw new NoSuchQueueException(adaptorName, "No such queue: " + queueName);

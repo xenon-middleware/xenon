@@ -25,11 +25,10 @@ import nl.esciencecenter.xenon.engine.util.InteractiveProcessFactory;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class SshInteractiveProcessFactory implements InteractiveProcessFactory {
-
+class SshInteractiveProcessFactory implements InteractiveProcessFactory {
     private final SshMultiplexedSession session;
 
-    public SshInteractiveProcessFactory(SshMultiplexedSession session) {
+    SshInteractiveProcessFactory(SshMultiplexedSession session) {
         this.session = session;
     }
 

@@ -15,7 +15,7 @@ MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 RUN /usr/sbin/useradd -p $(openssl passwd javagat) -d /home/xenon -m --shell /bin/bash xenon
 WORKDIR /home/xenon
 ADD insecure-ssh-keys .ssh
-RUN chmod go-r .ssh/id_rsa
+RUN chmod 600 .ssh/*
 
 # Create symlinks
 ADD create_symlinks /tmp/

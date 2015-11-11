@@ -31,6 +31,7 @@ import nl.esciencecenter.xenon.files.CopyStatus;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.FileSystemClosedException;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -60,7 +61,7 @@ public class FilesEngine implements Files {
         this.xenonEngine = xenonEngine;
     }
 
-    private Files getFilesAdaptor(FileSystem filesystem) {
+    private Files getFilesAdaptorFromEngine(FileSystem filesystem) throws XenonException {        
         try {
             Adaptor adaptor = xenonEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
@@ -70,11 +71,23 @@ public class FilesEngine implements Files {
             throw new XenonRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
+        
+    private Files getFilesAdaptor(FileSystem filesystem) throws XenonException {        
+
+        Files files = getFilesAdaptorFromEngine(filesystem);
+        
+        if (!files.isOpen(filesystem)) {
+            throw new FileSystemClosedException("FilesEngine", "FileSystem " + filesystem.getLocation() + " is closed");
+        }
+        
+        return files;
+    }
 
     private Files getFilesAdaptor(Path path) throws XenonException {
         return getFilesAdaptor(path.getFileSystem());
     }
-
+    
+        
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
@@ -95,7 +108,7 @@ public class FilesEngine implements Files {
 
     @Override
     public boolean isOpen(FileSystem filesystem) throws XenonException {
-        return getFilesAdaptor(filesystem).isOpen(filesystem);
+        return getFilesAdaptorFromEngine(filesystem).isOpen(filesystem);
     }
 
     @Override

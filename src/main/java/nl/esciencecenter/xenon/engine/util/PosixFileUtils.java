@@ -133,6 +133,9 @@ public class PosixFileUtils {
             case OTHERS_EXECUTE:
                 bits |= EXEC_OTHERS;
                 break;
+            default:
+                // The above should catch all options.
+                break;
             }
         }
 

@@ -16,6 +16,7 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSchException;
 
 /**
  * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes.
@@ -40,7 +42,7 @@ import com.jcraft.jsch.ChannelExec;
  * @version 1.0
  * @since 1.0
  */
-public class SshInteractiveProcess implements InteractiveProcess {
+class SshInteractiveProcess implements InteractiveProcess {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SshInteractiveProcess.class);
     
@@ -49,50 +51,48 @@ public class SshInteractiveProcess implements InteractiveProcess {
     private final Streams streams;
     private boolean done = false;
     
-    public SshInteractiveProcess(SshMultiplexedSession session, Job job) throws XenonException {
-
+    SshInteractiveProcess(SshMultiplexedSession session, Job job) throws XenonException {
         this.session = session;
         this.channel = session.getExecChannel();
 
         JobDescription description = job.getJobDescription();
 
-        StringBuilder command = new StringBuilder();
-        
+        channel.setCommand(buildCommand(description));
+
+        Map<String, String> environment = description.getEnvironment();
+        for (Entry<String, String> entry : environment.entrySet()) {
+            channel.setEnv(entry.getKey(), entry.getValue());
+        }
+
+        // set the streams first, then connect the channel.
+        try {
+            streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
+            channel.connect();
+        } catch (JSchException|IOException e) {
+            session.failedExecChannel(channel);
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
+        }
+    }
+
+    private static String buildCommand(JobDescription description) {
+        StringBuilder command = new StringBuilder(200);
+
         String workdir = description.getWorkingDirectory();
 
-        if (workdir != null) { 
-            command.append("cd " + workdir + " && ");
+        if (workdir != null) {
+            command.append("cd ");
+            command.append(CommandLineUtils.protectAgainstShellMetas(workdir));
+            command.append(" && ");
         }
-        
+
         command.append(description.getExecutable());
-        
+
         for (String s : description.getArguments()) {
             command.append(" ");
             command.append(CommandLineUtils.protectAgainstShellMetas(s));
         }
-        
-        channel.setCommand(command.toString());
 
-        Map<String, String> environment = description.getEnvironment();
-
-        for (Entry<String, String> entry : environment.entrySet()) {
-            channel.setEnv(entry.getKey(), entry.getValue());
-        }
-    
-        // set the streams first, then connect the channel.
-        try {
-            streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
-        } catch (Exception e) {
-            session.failedExecChannel(channel);
-            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
-
-        try {
-            channel.connect();
-        } catch (Exception e) {
-            session.failedExecChannel(channel);
-            throw new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        }
+        return command.toString();
     }
 
     @Override
@@ -110,7 +110,6 @@ public class SshInteractiveProcess implements InteractiveProcess {
 
     @Override
     public synchronized boolean isDone() {
-
         if (done) {
             return true;
         }
@@ -132,7 +131,6 @@ public class SshInteractiveProcess implements InteractiveProcess {
 
     @Override
     public void destroy() {
-
         if (isDone()) {
             return;
         }

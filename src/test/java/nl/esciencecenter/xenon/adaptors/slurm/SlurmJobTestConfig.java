@@ -16,11 +16,8 @@
 
 package nl.esciencecenter.xenon.adaptors.slurm;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import nl.esciencecenter.xenon.adaptors.JobTestConfig;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -37,19 +34,19 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  */
 public class SlurmJobTestConfig extends JobTestConfig {
 
-    private String username;
-    private char[] passwd;
+    private final String username;
+    private final char[] passwd;
 
-    private String scheme = "slurm";
-    private String correctLocation;
-    private String wrongLocation;
-    private String correctLocationWrongUser;
+    private final String scheme = "slurm";
+    private final String correctLocation;
+    private final String wrongLocation;
+    private final String correctLocationWrongUser;
     
-    private String defaultQueue;
-    private String[] queues;
+    private final String defaultQueue;
+    private final String[] queues;
 
-    private long queueWaitTime;
-    private long updateTime;
+    private final long queueWaitTime;
+    private final long updateTime;
 
     public SlurmJobTestConfig(String configfile) throws Exception {
 
@@ -85,7 +82,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getUnknownProperties() throws Exception {
-        Map<String, String> properties = new HashMap<>();
+        Map<String, String> properties = new HashMap<>(2);
         properties.put("some.key", "some value");
 
         return properties;
@@ -99,7 +96,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getCorrectProperties() throws Exception {
-        return new HashMap<String, String>();
+        return new HashMap<>(0);
     }
 
     @Override
@@ -129,12 +126,12 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Credential getPasswordCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", username, passwd, new HashMap<String, String>());
+        return credentials.newPasswordCredential("slurm", username, passwd, new HashMap<String, String>(0));
     }
 
     @Override
     public Credential getInvalidCredential(Credentials credentials) throws Exception {
-        return credentials.newPasswordCredential("slurm", username, "wrongpassword".toCharArray(), new HashMap<String, String>());
+        return credentials.newPasswordCredential("slurm", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
     @Override
@@ -182,7 +179,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
 
     @Override
     public Map<String, String> getDefaultProperties() throws Exception {
-        return new HashMap<>();
+        return new HashMap<>(0);
     }
 
     @Override
@@ -244,5 +241,4 @@ public class SlurmJobTestConfig extends JobTestConfig {
     public boolean targetIsWindows() {
         return false;
     }
-
 }

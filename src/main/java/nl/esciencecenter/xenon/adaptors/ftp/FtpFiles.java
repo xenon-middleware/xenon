@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
@@ -117,12 +121,12 @@ public class FtpFiles implements Files {
 
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties)
-            throws XenonException {
+            throws InvalidCredentialException, InvalidLocationException, UnknownPropertyException, InvalidPropertyException, XenonException {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
         if (credential == null) {
-            throw new XenonException(adaptor.getName(), "Credentials was null.");
+            throw new InvalidCredentialException(adaptor.getName(), "Credentials was null.");
         }
 
         XenonProperties xenonProperties = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
@@ -698,7 +702,7 @@ public class FtpFiles implements Files {
             try {
                 close(fs);
             } catch (XenonException e) {
-                // ignore for now
+                // TODO: ignore for now
             }
         }
         LOGGER.debug("end OK");

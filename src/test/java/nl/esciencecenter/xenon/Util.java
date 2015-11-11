@@ -16,24 +16,18 @@
 
 package nl.esciencecenter.xenon;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.engine.XenonEngine;
-import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class Util {
-
     /**
      * Invoke the private constructor of XenonEngine. Needed in some tests.
      * 
@@ -62,10 +56,6 @@ public class Util {
         method.setAccessible(true);
         method.invoke(e);
     }
-    
-    public static String readFileToString(File file) throws FileNotFoundException, IOException {
-        return Utils.readToString(new FileInputStream(file));
-    }    
 
     private Util() {
         // utility class only

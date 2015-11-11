@@ -72,7 +72,7 @@ public class SlurmSetup {
         }
     }
 
-    boolean accountingAvailable() {
+    public boolean accountingAvailable() {
         return accountingAvailable;
     }
 }
