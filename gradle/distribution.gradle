@@ -42,8 +42,6 @@ distributions {
                 from(project.configurations.runtime)
             }
             into("docs") {
-                from(userguideMarkdown.target)
-                from('doc/user/userguide/userguide.pdf')
                 into("javadoc") {
                     from(javadoc.destinationDir)
                 }
@@ -64,9 +62,9 @@ distributions {
         }
     }
 }
-distZip.dependsOn javadoc, userguidePdf
-distTar.dependsOn javadoc, userguidePdf
-installDist.dependsOn javadoc, userguidePdf
+distZip.dependsOn javadoc
+distTar.dependsOn javadoc
+installDist.dependsOn javadoc
 
 //     PUBLISH
 // ==============
