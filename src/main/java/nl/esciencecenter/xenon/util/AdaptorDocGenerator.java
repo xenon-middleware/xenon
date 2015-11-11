@@ -28,13 +28,23 @@ import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
- * Generates html snippet with options of adaptors.
+ * Generates html snippet with options of all adaptors.
  */
 public class AdaptorDocGenerator {
-    
-    private static PrintWriter out = null;
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            System.err.println("Name of output file is required!");
+            System.exit(1);
+        }
 
-    private static void printPropertyDescription(XenonPropertyDescription d) {
+        AdaptorDocGenerator generator = new AdaptorDocGenerator();
+        generator.toFile(args[0]);
+    }
+
+    public AdaptorDocGenerator() {
+    }
+
+    private void printPropertyDescription(PrintWriter out, XenonPropertyDescription d) {
 
         out.println("<tr>");
         out.println("<td>" + "<pre>" + d.getName() + "</pre></td>");
@@ -51,7 +61,7 @@ public class AdaptorDocGenerator {
         out.println("</tr>");
     }
 
-    private static void printAdaptorDoc(AdaptorStatus a) {
+    private void printAdaptorDoc(PrintWriter out, AdaptorStatus a) {
 
         out.println("<h2><a name=\"" + a.getName()  + "\">Adaptor: " + a.getName() + "</a></h2>");
 
@@ -86,27 +96,29 @@ public class AdaptorDocGenerator {
 
         out.println("<table border=1><tr><th>Name</th><th>Description</th><th>Expected type</th><th>Default</th><th>Valid for</th></tr>");
         for (XenonPropertyDescription d : properties) {
-            printPropertyDescription(d);
+            printPropertyDescription(out, d);
         }
 
         out.println("</table>");
     }
 
-    public static void main(String[] args) {
-
-        if (args.length != 1) {
-            System.err.println("Name of output file is required!");
-            System.exit(1);
-        }
-
+    public void toFile(String filename) {
+        PrintWriter out = null;
         try {
-            out = new PrintWriter(new BufferedWriter(new FileWriter(args[0])));
+            out = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
         } catch (IOException e) {
-            System.err.println("Failed to open output file: " + args[0] + " " + e.getMessage());
+            System.err.println("Failed to open output file: " + filename + " " + e.getMessage());
             e.printStackTrace(System.err);
             System.exit(1);
         }
 
+        generate(out);
+
+        out.flush();
+        out.close();
+    }
+
+    public void generate(PrintWriter out) {
         try {
             Xenon xenon = XenonFactory.newXenon(null);
             AdaptorStatus[] adaptors = xenon.getAdaptorStatuses();
@@ -127,7 +139,7 @@ public class AdaptorDocGenerator {
             out.println("");
 
             for (AdaptorStatus a : adaptors) {
-                printAdaptorDoc(a);
+                printAdaptorDoc(out, a);
             }
 
             XenonFactory.endAll();
@@ -139,8 +151,5 @@ public class AdaptorDocGenerator {
             e.printStackTrace(System.err);
             System.exit(1);
         }
-
-        out.flush();
-        out.close();
     }
 }
