@@ -28,13 +28,6 @@ matrix:
   # Stop when one of the Java versions do not work
   fast_finish: true
 
-# Install documentation dependencies
-addons:
-  apt_packages:
-    - pandoc
-    - texlive
-    - lmodern
-
 # Install Docker compose
 before_install:
   - if [ $INTEGRATION_TEST == "1" ]; then

@@ -27,11 +27,6 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-    userguide {
-        java {
-            srcDir 'doc/userguide/src'
-        }
-    }
     examples
 }
 
