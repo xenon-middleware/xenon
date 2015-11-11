@@ -1,7 +1,10 @@
-# docker instructions from: https://docs.docker.com/engine/installation/ubuntulinux/
 
-#check ubunt os version by
-lsb_release -d
+# installing docker
+
+# your Ubuntu needs to be a 64 bit version
+
+# check if your linux kernel is high enough (minimum is 3.10) with
+uname -r      # mine says '3.13.0-67-generic'
 
 # check which groups exist
 cat /etc/group
@@ -9,16 +12,114 @@ cat /etc/group
 # check of which groups you are a member
 groups
 
+# now follow instructions from: https://docs.docker.com/engine/installation/ubuntulinux/ to install docker
+# now we need to install docker. The Ubuntu repositories contain an older version of docker, which you should not use. Instead, use the newer version from Docker's own PPA.
 
-# create docker group
-sudo usermod -aG docker ubuntu
+# First check if you have the older version by
+docker -v
+# mine says
+Docker version 1.9.0, build 76d6bc9
+# if your version is lower, go ahead and uninstall
+#First find out where your docker program lives with
+which docker
+# and then find out which package your docker is a part of with
+dpkg -S `which docker`
+# If you alreay had docker installed, then the package name is likely either docker.io or lxc-docker. Either way uninstall the entire package, including its settings with
+sudo apt-get remove --purge docker.io
+# or
+sudo apt-get remove --purge lxc-docker*
+
+# now add pgp key for the new repository
+sudo apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+
+# check your ubuntu os version by
+lsb_release -dc
+# remember your distribution's codename for the next step (mine is trusty)
+
+# open or create /etc/apt/sources.list.d/docker.list in an editor such as nano, gedit, leafpad, etc. I'm using nano:
+sudo nano /etc/apt/sources.list.d/docker.list
+# delete any existing entries
+
+# add one of the following options
+# this one...
+
+# Ubuntu Precise
+deb https://apt.dockerproject.org/repo ubuntu-precise main
+
+# ...this one...
+# Ubuntu Trusty
+deb https://apt.dockerproject.org/repo ubuntu-trusty main
+
+# ...this one...
+# Ubuntu Vivid
+deb https://apt.dockerproject.org/repo ubuntu-vivid main
+
+# ...or this one.
+# Ubuntu Wily
+deb https://apt.dockerproject.org/repo ubuntu-wily main
+
+# save and close /etc/apt/sources.list.d/docker.list
+
+# now let apt update the package information
+sudo apt-get update
+
+# check if your are using the right docker
+apt-cache policy docker-engine
+# mine says:
+docker-engine:
+  Installed: 1.9.0-0~trusty
+  Candidate: 1.9.0-0~trusty
+  Version table:
+ *** 1.9.0-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+        100 /var/lib/dpkg/status
+     1.8.3-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.8.2-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.8.1-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.8.0-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.7.1-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.7.0-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.6.2-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.6.1-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.6.0-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+     1.5.0-0~trusty 0
+        500 https://apt.dockerproject.org/repo/ ubuntu-trusty/main amd64 Packages
+
+# if your ubuntu version is Ubuntu Wily 15.10, Ubuntu Vivid 15.04, or Ubuntu Trusty 14.04 (LTS), you're in luck, as these OS'es have everything you'll need already. If you're not on one of these Ubuntu versions, refer to https://docs.docker.com/engine/installation/ubuntulinux/ for instructions on installing some additional packages.
+
+# now we're finally ready to install docker:
+sudo apt-get install docker-engine
+
+# the docker service should have started (you can check this in the install output); if for some reason it hasn't you can start it manually by
+sudo service docker start
+
+# now let's try a small example to see if it works:
+sudo docker run hello-world
+
+# This command downloads a test image (containing an operating system, not a picture) and runs it in a container. When the container runs, it prints an informational message. Then, it exits.
+
+# The docker images are stored in /var/lib/docker, so make sure you have enough disk space there.
+
+# The docker daemon binds to a Unix socket instead of a TCP port. By default that Unix socket is owned by the user root and other users can access it with sudo. For this reason, docker daemon always runs as the root user.
+
+# To avoid having to use sudo when you use the docker command, we will create a Unix group called docker and add users to it. When the docker daemon starts, it makes the ownership of the Unix socket read/writable by the docker group.
 
 # add yourself to the docker group, log out and back in afterwards
-sudo usermod -G <name-of-group> -a <name-of-user>
-
+sudo usermod -G docker -a <name-of-user>
 
 # install docker-compose. install instructions from:
 https://docs.docker.com/compose/install/
+
+# docker-compose is a tool for defining and running multi-container Docker applications. With docker-compose, you use a Compose file to configure your application’s services.
 
 # check the latest version of docker compose here: https://github.com/docker/compose/releases, this determines the VERSION_NUM in the command below. Mine is 1.5.0.
 
@@ -35,10 +136,10 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # verify that it worked
 docker-compose --version
+# mine says
+docker-compose version: 1.5.0
 
-
-
-# runnig unit tests
+# running unit tests
 cd ~/Xenon
 ./gradlew test
 #results are in: file:///home/daisycutter/github/nlesc/xenon/build/reports/test/index.html
