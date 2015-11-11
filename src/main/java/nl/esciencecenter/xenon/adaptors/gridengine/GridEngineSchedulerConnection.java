@@ -110,6 +110,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         }
     }
 
+    @SuppressWarnings("PMD.EmptyIfStmt")
     protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws XenonException {
         Integer exitcode = null;
         Exception exception = null;
@@ -129,7 +130,6 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         } catch (NumberFormatException e) {
             throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "cannot parse exit code of job " + job.getIdentifier()
                     + " from string " + exitcodeString, e);
-
         }
 
         if (failedString.equals("0")) {

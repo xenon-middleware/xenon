@@ -507,14 +507,10 @@ public class SshFiles implements Files {
             tmp.setWriteMode(OpenOption.WRITE);
         }
 
-        if (tmp.getOpenMode() == OpenOption.CREATE) {
-            if (exists(path)) {
-                throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
-            }
-        } else if (tmp.getOpenMode() == OpenOption.OPEN) {
-            if (!exists(path)) {
-                throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
-            }
+        if (tmp.getOpenMode() == OpenOption.CREATE && exists(path)) {
+            throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
+        } else if (tmp.getOpenMode() == OpenOption.OPEN && !exists(path)) {
+            throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
         }
 
         int mode = ChannelSftp.OVERWRITE;

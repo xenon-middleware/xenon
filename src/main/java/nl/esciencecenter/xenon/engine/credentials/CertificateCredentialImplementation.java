@@ -57,7 +57,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
 
     @Override
     public String toString() {
-        return "CertificateCredentialImplementation [adaptorName=" + getAdaptorName() + ", username=" + getUsername() 
+        return "CertificateCredentialImplementation [adaptorName=" + getAdaptorName() + ", default username=" + getUsername() 
                 + ", certfile=" + certfile + "]";
     }
 }
