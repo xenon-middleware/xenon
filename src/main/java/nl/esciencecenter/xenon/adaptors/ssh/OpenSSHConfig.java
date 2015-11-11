@@ -157,8 +157,21 @@ public class OpenSSHConfig implements ConfigRepository {
     }
 
     private static class HostConfig implements Config {
+        private final static HashMap<String, String> jschToOpenSSHMap = new HashMap<>(15);
+        static {
+            jschToOpenSSHMap.put("kex", "KexAlgorithms");
+            jschToOpenSSHMap.put("server_host_key", "HostKeyAlgorithms");
+            jschToOpenSSHMap.put("cipher.c2s", "Ciphers");
+            jschToOpenSSHMap.put("cipher.s2c", "Ciphers");
+            jschToOpenSSHMap.put("mac.c2s", "Macs");
+            jschToOpenSSHMap.put("mac.s2c", "Macs");
+            jschToOpenSSHMap.put("compression.s2c", "Compression");
+            jschToOpenSSHMap.put("compression.c2s", "Compression");
+            jschToOpenSSHMap.put("compression_level", "CompressionLevel");
+            jschToOpenSSHMap.put("maxauthtries", "NumberOfPasswordPrompts");
+        }
         private final Map<String, OpenSSHArgument> properties;
-
+        
         HostConfig() {
             this.properties = new HashMap<>();
         }
@@ -169,13 +182,25 @@ public class OpenSSHConfig implements ConfigRepository {
                 properties.put(arg.getKey(), arg);
             }
         }
+        
+        private OpenSSHArgument getJschArgument(String name) {
+            String jschValue = jschToOpenSSHMap.get(name.toLowerCase());
+            if (jschValue != null) {
+                return this.properties.get(jschValue.toLowerCase());
+            } else {
+                return null;
+            }
+        }
 
         private String getSingleValue(String name) {
-            OpenSSHArgument arg = this.properties.get(name.toLowerCase());
+            OpenSSHArgument arg = getJschArgument(name);
             if (arg == null) {
-                return null;
-            } else {
+                arg = this.properties.get(name.toLowerCase());
+            }
+            if (arg != null) {
                 return arg.getValue();
+            } else {
+                return null;
             }
         }
 
@@ -223,11 +248,14 @@ public class OpenSSHConfig implements ConfigRepository {
          */
         @Override
         public String[] getValues(String property) {
-            OpenSSHArgument arg = this.properties.get(property.toLowerCase());
+            OpenSSHArgument arg = getJschArgument(property);
             if (arg == null) {
-                return null;
-            } else {
+                arg = this.properties.get(property.toLowerCase());
+            }
+            if (arg != null) {
                 return arg.getValues();
+            } else {
+                return null;
             }
         }
     }
