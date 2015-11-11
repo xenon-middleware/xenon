@@ -27,6 +27,15 @@ public class SshUtil {
         // do not use
     }
 
+    /**
+     * 
+     * 
+     * 
+     * @param a1
+     * @param a2
+     * @return
+     */    
+    @SuppressWarnings({ "PMD.CompareObjectsWithEquals", "PMD.NPathComplexity" })
     public static boolean equals(SftpATTRS a1, SftpATTRS a2) {
 
         // Handles case of aliased object + both null

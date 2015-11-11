@@ -62,6 +62,7 @@ public class PosixFileUtils {
         // do not use
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
         HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();

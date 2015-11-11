@@ -47,21 +47,21 @@ before_install:
     export PATH="$PATH:$HOME/bin";
     curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
     chmod +x "$HOME/bin/docker-compose";
+    touch .docker-test-cache-set;
     fi
-  - touch .docker-test-cache-set
 
 install:
-  - gradle $GRADLE_BUILD_TASKS -Pdocker.uid=$UID
+  - ./gradlew $GRADLE_BUILD_TASKS -Pdocker.uid=$UID
 
 script:
-  - gradle $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
+  - ./gradlew $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
 
 after_script:
   - if [ $INTEGRATION_TEST == "1" ]; then
-    gradle jacocoIntegrationTestReport;
+    ./gradlew jacocoIntegrationTestReport;
     bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
     else
-    gradle jacocoTestReport;
+    ./gradlew jacocoTestReport;
     bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml;
     fi
 

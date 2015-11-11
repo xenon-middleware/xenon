@@ -340,6 +340,7 @@ public final class Utils {
      * @throws XenonException
      *             If the provided <code>path</code> is not absolute, or does not contain a locally valid root.
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     public static String getLocalRoot(String p) throws XenonException {
         
         String path = p;
@@ -1031,6 +1032,7 @@ public final class Utils {
      * @throws XenonException
      *             if an I/O error occurs during the copying
      */
+    @SuppressWarnings("PMD.EmptyIfStmt")
     public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options) throws XenonException {
 
         boolean exist = files.exists(target);

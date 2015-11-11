@@ -488,6 +488,7 @@ public class JobDescription {
     }
 
     /* Generated */
+    @SuppressWarnings("PMD.NPathComplexity")
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -509,6 +510,7 @@ public class JobDescription {
         return result;
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

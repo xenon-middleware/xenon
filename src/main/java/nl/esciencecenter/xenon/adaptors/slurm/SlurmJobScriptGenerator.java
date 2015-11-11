@@ -74,6 +74,7 @@ public final class SlurmJobScriptGenerator {
         return arguments.toArray(new String[arguments.size()]);
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     public static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);

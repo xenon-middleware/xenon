@@ -34,13 +34,16 @@ repositories {
     jcenter()
 }
 
-ext.jschVersion = '0.1.50'
+ext.jschVersion = '0.1.53'
+ext.jschAgentproxyVersion = '0.0.9'
 ext.apacheCommonsNetVersion = '3.3'
 
 dependencies {
     // Xenon dependencies.
     // xenon/lib/**/*.jar to ./lib/
     compile group: 'com.jcraft', name: 'jsch', version: jschVersion
+    compile group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: jschAgentproxyVersion 
+    compile group: 'com.jcraft', name: 'jsch.agentproxy.connector-factory', version: jschAgentproxyVersion
     compile group: 'commons-net', name: 'commons-net', version: apacheCommonsNetVersion
     compile group: 'com.google.code.findbugs', name: 'findbugs', version: '2.0.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
