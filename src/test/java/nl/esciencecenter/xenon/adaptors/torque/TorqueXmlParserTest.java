@@ -38,7 +38,8 @@ public class TorqueXmlParserTest {
 
     private static String readFile(String pathName) throws IOException {
         InputStream is = TorqueXmlParserTest.class.getResourceAsStream(pathName);
-        java.util.Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
+        // we read until end of file, delimited by \\A
+        Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 
