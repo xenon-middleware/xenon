@@ -103,13 +103,6 @@ Build distribution with
 ./gradlew assembleDist
 ```
 
-Run SonarQube analysis (when you have a local SonarQube service running) with
-```
-./gradlew sonarqube -Dsonar.host.url=http://localhost:9000 \
--Dsonar.jdbc.url=jdbc:mysql://localhost:3306/sonarqube \
--Dsonar.jdbc.username=sonar -Dsonar.jdbc.password=sonar
-```
-
 ### Generate documentation
 
 #### Userguide
