@@ -62,6 +62,12 @@ class SshMultiplexedSession {
 
     private final List<SshSession> sessions = new ArrayList<>();
 
+    protected SshMultiplexedSession() {
+        // Needed for unit testing
+        jsch = null;
+        properties = null;
+    }
+    
     @SuppressWarnings("PMD.EmptyIfStmt")
     SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation loc, Credential cred, XenonProperties prop)
             throws XenonException {
