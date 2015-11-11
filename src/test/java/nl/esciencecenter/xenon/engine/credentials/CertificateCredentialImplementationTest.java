@@ -43,6 +43,6 @@ public class CertificateCredentialImplementationTest {
 
         assertTrue(Arrays.equals(pwc.getPassword(), "password".toCharArray()));
         assertTrue(pwc.toString().equals(
-                "CertificateCredentialImplementation [adaptorName=test, username=username, certfile=certfile]"));
+                "CertificateCredentialImplementation [adaptorName=test, default username=username, certfile=certfile]"));
     }
 }
