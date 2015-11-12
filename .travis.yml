@@ -33,6 +33,9 @@ addons:
   apt_packages:
     - pandoc
     - texlive
+    - texlive-latex-extra
+    - texlive-font-utils
+    - inkscape
     - lmodern
 
 # Install Docker compose
