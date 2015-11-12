@@ -30,6 +30,8 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
  *
  */
 public class PosixFileUtils {
+    
+    // FIXME: Are these correct ? Some seem to be missing ?  
 
     /** read by owner */
     public static final int READ_OWNER = 00400;
