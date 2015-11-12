@@ -1,16 +1,12 @@
 ######################################################################
 #
-# This is a sample configuration file for the Xenon test suite.
-#
-# You can use this configuration by copying this file to
-# "xenon.test.properties" in the this main directory and
-# providing the correct values for each of fields.
+# This is a configuration file for the Xenon test suite using docker containers.
 #
 # By running:
 #
-#   gradle integrationTest
+#   ./gradlew dockerIntegrationTest -Pdocker.uid=$UID
 #
-# in the main directory of Xenon all tests will be run.
+# in the main directory of Xenon all integration tests will be run.
 #
 
 ######################################################################
@@ -101,14 +97,49 @@ test.slurm.queues=mypartition,otherpartition
 test.slurm.queue.wait.time=2000
 test.slurm.update.time=5000
 
-test.ftp.location=xenon-ftp
-test.ftp.user=xenon
-test.ftp.password=javagat
-
+######################################################################
+#
+# This is the configuration of the Torque tests. To completely
+# run these test the following setup is required:
+#
+# An account on a machine that runs Torque and can be accessed
+# via SSH using both public key authentication and a password.
+#
+####
+#
+# This is the location of the machine of the form host[:port],
+# where both user and port are optional. In addition, a username and
+# password must be provided to test password authentication to the
+# host.
+#
 test.torque.location=xenon-torque
 test.torque.user=xenon
 test.torque.password=javagat
+#
+# The default queue to use in Torque, a list of other queues to
+# test, the update delay for the queues and Torque commands
+# (in ms)
+#
 test.torque.default.queue=batch
 test.torque.queues=debug,batch
 test.torque.queue.wait.time=2000
 test.torque.update.time=5000
+
+######################################################################
+#
+# This is the configuration of the FTP tests. To completely
+# run these test the following setup is required:
+#
+# An account on a machine that runs FTP and can be accessed
+# via FTP using username and password.
+#
+####
+#
+# This is the location of the machine of the form host[:port],
+# where both user and port are optional. In addition, a username and
+# password must be provided to test password authentication to the
+# host.
+#
+test.ftp.location=xenon-ftp
+test.ftp.user=xenon
+test.ftp.password=javagat
