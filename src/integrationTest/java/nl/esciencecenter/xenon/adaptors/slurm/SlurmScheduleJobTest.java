@@ -93,7 +93,77 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
     }
 
     @Test
-    public void slurm_test04_parallel_batchJob() throws Exception {
+    public void slurm_test04_parallel_batchJob1() throws Exception {
+        String message = "Hello World! Test Slurm 04";
+        String workingDir = getWorkingDir("slurm_test04");
+        Path root = initJobDirectory(workingDir);
+        Path stdout = resolve(root, "stdout.txt");
+
+        try {
+            JobDescription description = new JobDescription();
+            description.setWorkingDirectory(workingDir);
+            description.setExecutable("/bin/echo");
+            description.setArguments(message);
+            description.setNodeCount(2);
+            description.setProcessesPerNode(1);
+            description.setStdout("stdout.txt");
+            description.setStderr("stderr.txt");
+
+            job = jobs.submitJob(scheduler, description);
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(66));
+            checkJobDone(status);
+
+            String outputContent = readFully(stdout);
+            logger.debug("got back result: {}", outputContent);
+
+            String[] lines = outputContent.split("\\r?\\n");
+
+            assertEquals(2, lines.length);
+            for (String line : lines) {
+                assertEquals(message, line);
+            }
+        } finally {
+            cleanupJob(job, root);            
+        }
+    }
+
+    @Test
+    public void slurm_test04_parallel_batchJob2() throws Exception {
+        String message = "Hello World! Test Slurm 04";
+        String workingDir = getWorkingDir("slurm_test04");
+        Path root = initJobDirectory(workingDir);
+        Path stdout = resolve(root, "stdout.txt");
+
+        try {
+            JobDescription description = new JobDescription();
+            description.setWorkingDirectory(workingDir);
+            description.setExecutable("/bin/echo");
+            description.setArguments(message);
+            description.setNodeCount(1);
+            description.setProcessesPerNode(2);
+            description.setStdout("stdout.txt");
+            description.setStderr("stderr.txt");
+
+            job = jobs.submitJob(scheduler, description);
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(66));
+            checkJobDone(status);
+
+            String outputContent = readFully(stdout);
+            logger.debug("got back result: {}", outputContent);
+
+            String[] lines = outputContent.split("\\r?\\n");
+
+            assertEquals(2, lines.length);
+            for (String line : lines) {
+                assertEquals(message, line);
+            }
+        } finally {
+            cleanupJob(job, root);            
+        }
+    }
+
+    @Test
+    public void slurm_test04_parallel_batchJob3() throws Exception {
         String message = "Hello World! Test Slurm 04";
         String workingDir = getWorkingDir("slurm_test04");
         Path root = initJobDirectory(workingDir);
@@ -110,7 +180,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setStderr("stderr.txt");
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(66));
             checkJobDone(status);
 
             String outputContent = readFully(stdout);
@@ -126,8 +196,9 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             cleanupJob(job, root);            
         }
     }
-    
 
+    
+    
     @org.junit.Test
     public void slurm_test05_jobStatusWithAccountingDisabled() throws Exception {
         String message = "Hello World! test05";

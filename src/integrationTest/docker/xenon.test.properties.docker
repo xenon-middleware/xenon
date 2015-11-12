@@ -98,8 +98,8 @@ test.slurm.location=xenon-slurm
 #
 test.slurm.default.queue=mypartition
 test.slurm.queues=mypartition,otherpartition
-test.slurm.queue.wait.time=2000
-test.slurm.update.time=5000
+test.slurm.queue.wait.time=30000
+test.slurm.update.time=30000
 
 test.ftp.location=xenon-ftp
 test.ftp.user=xenon
