@@ -41,9 +41,6 @@ public class AdaptorDocGenerator {
         generator.toFile(args[0]);
     }
 
-    public AdaptorDocGenerator() {
-    }
-
     private void printPropertyDescription(PrintWriter out, XenonPropertyDescription d) {
 
         out.println("<tr>");
