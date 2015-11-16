@@ -1,0 +1,11 @@
+# exclude everything...
+*
+
+# except these files
+!xenon-tutorial.tex
+!xenon-tutorial.tex.fmt
+!xenon-tutorial.pdf
+!images/*
+!compile.sh
+!notes.txt
+

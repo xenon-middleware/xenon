@@ -31,6 +31,7 @@ public abstract class DirectoryStreamBase<I, O> implements DirectoryStream<O>, I
 
     private final Deque<O> stream;
 
+    @SuppressWarnings("PMD.EmptyIfStmt")
     public DirectoryStreamBase(Path dir, DirectoryStream.Filter filter, List<I> listing) throws XenonException {
         stream = new LinkedList<>();
         for (I entry : listing) {

@@ -110,7 +110,7 @@ public class LocalAdaptor extends Adaptor {
         localCredentials = new LocalCredentials();
     }
 
-    void checkCredential(Credential credential) throws XenonException {
+    protected void checkCredential(Credential credential) throws XenonException {
 
         if (credential == null) {
             return;

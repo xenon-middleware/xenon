@@ -73,6 +73,7 @@ public enum PosixFilePermission {
      * 
      * @return if <code>options</code> contains <code>option<code>.
      */
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     public static boolean contains(PosixFilePermission toFind, PosixFilePermission... options) {
 
         if (toFind == null || options == null || options.length == 0) {

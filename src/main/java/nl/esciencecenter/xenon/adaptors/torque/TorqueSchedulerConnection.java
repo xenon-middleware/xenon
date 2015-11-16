@@ -421,6 +421,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
     }
 
     @Override
+    @SuppressWarnings("PMD.EmptyIfStmt")
     public JobStatus cancelJob(Job job) throws XenonException {
         String identifier = job.getIdentifier();
         RemoteCommandRunner runner = runCommand(null, "qdel", identifier);

@@ -27,11 +27,6 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-    userguide {
-        java {
-            srcDir 'doc/userguide/src'
-        }
-    }
     examples
 }
 
@@ -84,3 +79,7 @@ task wrapper(type: Wrapper) {
     group 'Build Setup'
     gradleVersion = '2.8'
 }
+
+cleanIdeaWorkspace.group = 'IDE'
+cleanIdeaWorkspace.description = 'Removes the IDEA workspace file'
+

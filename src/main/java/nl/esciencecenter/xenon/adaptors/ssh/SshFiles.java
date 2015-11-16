@@ -142,7 +142,7 @@ public class SshFiles implements Files {
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
             session.disconnect();
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -242,7 +242,7 @@ public class SshFiles implements Files {
             channel.mkdir(dir.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -325,7 +325,7 @@ public class SshFiles implements Files {
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -393,7 +393,7 @@ public class SshFiles implements Files {
             channel.rename(source.getRelativePath().getAbsolutePath(), target.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -423,7 +423,7 @@ public class SshFiles implements Files {
             result = channel.ls(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -478,7 +478,7 @@ public class SshFiles implements Files {
             in = channel.get(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
         
         LOGGER.debug("newInputStream OK");
@@ -505,14 +505,10 @@ public class SshFiles implements Files {
             tmp.setWriteMode(OpenOption.WRITE);
         }
 
-        if (tmp.getOpenMode() == OpenOption.CREATE) {
-            if (exists(path)) {
-                throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
-            }
-        } else if (tmp.getOpenMode() == OpenOption.OPEN) {
-            if (!exists(path)) {
-                throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
-            }
+        if (tmp.getOpenMode() == OpenOption.CREATE && exists(path)) {
+            throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "File already exists: " + path);
+        } else if (tmp.getOpenMode() == OpenOption.OPEN && !exists(path)) {
+            throw new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "File does not exist: " + path);
         }
 
         int mode = ChannelSftp.OVERWRITE;
@@ -530,7 +526,7 @@ public class SshFiles implements Files {
             out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
         
         LOGGER.debug("newOutputStream OK");
@@ -559,7 +555,7 @@ public class SshFiles implements Files {
             }
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -600,7 +596,7 @@ public class SshFiles implements Files {
             channel.chmod(PosixFileUtils.permissionsToBits(permissions), path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -621,7 +617,7 @@ public class SshFiles implements Files {
             result = channel.lstat(path.getRelativePath().getAbsolutePath());
         } catch (SftpException e) {
             session.failedSftpChannel(channel);
-            throw sftpExceptionToXenonException(e);
+            throw SshUtil.sftpExceptionToXenonException(e);
         }
 
         session.releaseSftpChannel(channel);
@@ -718,65 +714,6 @@ public class SshFiles implements Files {
     }
     
     
-    /*
-    SSH_FX_OK
-       Indicates successful completion of the operation.
-    SSH_FX_EOF
-      indicates end-of-file condition; for SSH_FX_READ it means that no
-        more data is available in the file, and for SSH_FX_READDIR it
-       indicates that no more files are contained in the directory.
-    SSH_FX_NO_SUCH_FILE
-       is returned when a reference is made to a file which should exist
-       but doesn't.
-    SSH_FX_PERMISSION_DENIED
-       is returned when the authenticated user does not have sufficient
-       permissions to perform the operation.
-    SSH_FX_FAILURE
-       is a generic catch-all error message; it should be returned if an
-       error occurs for which there is no more specific error code
-       defined.
-    SSH_FX_BAD_MESSAGE
-       may be returned if a badly formatted packet or protocol
-       incompatibility is detected.
-    SSH_FX_NO_CONNECTION
-       is a pseudo-error which indicates that the client has no
-       connection to the server (it can only be generated locally by the
-       client, and MUST NOT be returned by servers).
-    SSH_FX_CONNECTION_LOST
-       is a pseudo-error which indicates that the connection to the
-       server has been lost (it can only be generated locally by the
-       client, and MUST NOT be returned by servers).
-    SSH_FX_OP_UNSUPPORTED
-       indicates that an attempt was made to perform an operation which
-       is not supported for the server (it may be generated locally by
-       the client if e.g.  the version number exchange indicates that a
-       required feature is not supported by the server, or it may be
-       returned by the server if the server does not implement an
-       operation).
-    */
-    private XenonException sftpExceptionToXenonException(SftpException e) {
-        switch (e.id) {
-        case ChannelSftp.SSH_FX_OK:
-            return new XenonException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
-        case ChannelSftp.SSH_FX_EOF:
-            return new EndOfFileException(SshAdaptor.ADAPTOR_NAME, "Unexpected EOF", e);
-        case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-            return new NoSuchPathException(SshAdaptor.ADAPTOR_NAME, "No such file", e);
-        case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-            return new PermissionDeniedException(SshAdaptor.ADAPTOR_NAME, "Permission denied", e);
-        case ChannelSftp.SSH_FX_FAILURE:
-            return new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH gave an unknown error", e);
-        case ChannelSftp.SSH_FX_BAD_MESSAGE:
-            return new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH received a malformed message", e);
-        case ChannelSftp.SSH_FX_NO_CONNECTION:
-            return new NotConnectedException(SshAdaptor.ADAPTOR_NAME, "SSH does not have a connection!", e);
-        case ChannelSftp.SSH_FX_CONNECTION_LOST:
-            return new ConnectionLostException(SshAdaptor.ADAPTOR_NAME, "SSH lost connection!", e);
-        case ChannelSftp.SSH_FX_OP_UNSUPPORTED:
-            return new UnsupportedIOOperationException(SshAdaptor.ADAPTOR_NAME, "Unsupported operation", e);
-        default:
-            return new XenonException(SshAdaptor.ADAPTOR_NAME, "Unknown SSH exception", e);
-        }
-    }
+    
 
 }

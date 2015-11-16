@@ -133,6 +133,7 @@ public class JobQueues {
 		return jobID.get();
 	}
 	
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     private void checkScheduler(Scheduler scheduler) throws XenonException {
 
         if (scheduler == null) {
@@ -305,6 +306,7 @@ public class JobQueues {
         return status;
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private void verifyJobDescription(JobDescription description) throws XenonException {
 
         String queue = description.getQueueName();

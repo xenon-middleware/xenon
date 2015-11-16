@@ -211,6 +211,7 @@ public final class ScriptingParser {
      * @return a map containing key/value maps of all records.
      * @throws XenonException when parsing fails
      */
+    @SuppressWarnings("PMD.NPathComplexity")
     public static Map<String, Map<String, String>> parseTable(String input, String keyField, Pattern fieldSeparatorRegEx,
             String adaptorName, String... valueSuffixes) throws XenonException {
         if (input.isEmpty()) {

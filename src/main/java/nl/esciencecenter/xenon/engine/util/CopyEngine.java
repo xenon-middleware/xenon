@@ -238,6 +238,7 @@ public final class CopyEngine {
         }
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private void doResume(CopyInfo ac) throws XenonException {
 
         if (ac.isCancelled()) {
@@ -373,6 +374,7 @@ public final class CopyEngine {
         append(source, 0, target, ac);
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private void doCopy(CopyInfo ac) throws XenonException {
 
         if (ac.isCancelled()) {

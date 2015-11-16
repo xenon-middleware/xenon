@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.engine.util.BadParameterException;
 import nl.esciencecenter.xenon.engine.util.CommandNotFoundException;
 import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
 import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
+import nl.esciencecenter.xenon.files.FileSystemClosedException;
 import nl.esciencecenter.xenon.files.IllegalSourcePathException;
 import nl.esciencecenter.xenon.files.IllegalTargetPathException;
 import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
@@ -477,6 +478,28 @@ public class ExceptionsTest {
     public void testPropertyTypeException2() throws Exception {
         Throwable t = new Throwable();
         testException(new PropertyTypeException("name", "message", t), t);
+    }
+
+    @Test
+    public void testInvalidSchemeException1() throws Exception {
+        testException(new InvalidSchemeException("name", "message"));
+    }
+
+    @Test
+    public void testInvalidSchemeException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new InvalidSchemeException("name", "message", t), t);
+    }
+
+    @Test
+    public void testFileSystemClosedException1() throws Exception {
+        testException(new FileSystemClosedException("name", "message"));
+    }
+
+    @Test
+    public void testFileSystemClosedException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new FileSystemClosedException("name", "message", t), t);
     }
 
     

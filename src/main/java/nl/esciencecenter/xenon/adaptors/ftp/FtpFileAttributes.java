@@ -110,6 +110,7 @@ public class FtpFileAttributes implements FileAttributes {
         return permissions;
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private static PosixFilePermission getPosixFilePermission(int userType, int permissionType) {
         PosixFilePermission permission = null;
         if (userType == FTPFile.USER_ACCESS) {
