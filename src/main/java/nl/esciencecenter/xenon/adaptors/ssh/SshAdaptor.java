@@ -239,7 +239,7 @@ public class SshAdaptor extends Adaptor {
         try {
             ConfigRepository configRepository = OpenSSHConfig.parse(new File(sshConfigFile));
             jsch.setConfigRepository(configRepository);
-        } catch (IOException ex) {
+        } catch (IOException|XenonException ex) {
             if (ignoreFail) {
                 LOGGER.warn("OpenSSH config file cannot be read.");
             } else {
