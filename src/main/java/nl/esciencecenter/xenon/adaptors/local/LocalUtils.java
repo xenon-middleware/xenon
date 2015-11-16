@@ -131,6 +131,8 @@ final class LocalUtils {
             case READ:
                 result.add(StandardOpenOption.READ);
                 break;
+            default:
+                // No other options left         
             }
         }
 

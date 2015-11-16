@@ -234,6 +234,7 @@ public class LocalFileAttributes implements FileAttributes {
     }
     
     @Override
+    @SuppressWarnings("PMD.NPathComplexity")
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -266,6 +267,7 @@ public class LocalFileAttributes implements FileAttributes {
     }
 
     @Override
+    @SuppressWarnings("PMD.NPathComplexity")
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

@@ -28,6 +28,7 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
+import nl.esciencecenter.xenon.engine.credentials.ProxyCredentialImplementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,13 @@ class SshMultiplexedSession {
 
     private final List<SshSession> sessions = new ArrayList<>();
 
+    protected SshMultiplexedSession() {
+        // Needed for unit testing
+        jsch = null;
+        properties = null;
+    }
+    
+    @SuppressWarnings("PMD.EmptyIfStmt")
     SshMultiplexedSession(SshAdaptor adaptor, JSch jsch, SshLocation loc, Credential cred, XenonProperties prop)
             throws XenonException {
 
@@ -83,8 +91,10 @@ class SshMultiplexedSession {
             } catch (JSchException e) {
                 throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
             }
+        } else if (credential instanceof ProxyCredentialImplementation) {
+            // Nothing to do here
         } else if (credential instanceof PasswordCredentialImplementation) {
-            // handled per session
+            // Nothing to do here -- handled per session
         } else {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Unknown credential type.");
         }
@@ -154,11 +164,11 @@ class SshMultiplexedSession {
         int sessionPort = location.getPort();
         int tunnelPort = -1;
 
-        LOGGER.info("SSHSESSION: XXXX Creating new session to {} using credential {} via gateway {} (session {})", location, credential, gatewayLocation, gateway);
-
+        LOGGER.debug("Creating new session to {} using credential {} via gateway {} (session {})", location, credential, 
+                gatewayLocation, gateway);
+                
         if (gateway != null) {
-            LOGGER.debug("SSHSESSION: Using tunnel to " + gatewayLocation);
-
+            LOGGER.debug("Using tunnel to " + gatewayLocation);
             tunnelPort = gateway.addTunnel(0, location.getHost(), location.getPort());
             sessionPort = tunnelPort;
             sessionHost = "localhost";
@@ -178,23 +188,23 @@ class SshMultiplexedSession {
         }
 
         if (properties.getBooleanProperty(SshAdaptor.STRICT_HOST_KEY_CHECKING)) {
-            LOGGER.debug("SSHSESSION: Strict host key checking enabled");
-
             if (properties.getBooleanProperty(SshAdaptor.AUTOMATICALLY_ADD_HOST_KEY)) {
-                LOGGER.debug("SSHSESSION: Automatically add host key to known_hosts");
+                LOGGER.debug("Automatically add host key to known_hosts");
                 session.setConfig("StrictHostKeyChecking", "ask");
                 session.setUserInfo(new Robot(true));
             } else {
                 session.setConfig("StrictHostKeyChecking", "yes");
             }
         } else {
-            LOGGER.debug("SSHSESSION: Strict host key checking disabled");
+            LOGGER.debug("Strict host key checking disabled");
             session.setConfig("StrictHostKeyChecking", "no");
         }
 
         try {
             session.connect();
         } catch (JSchException e) {
+
+            LOGGER.debug("Failed to connect ssh session!!!");
             
             if ("Auth cancel".equals(e.getMessage())) { 
                 throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);

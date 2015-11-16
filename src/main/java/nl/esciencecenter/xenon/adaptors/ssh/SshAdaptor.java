@@ -33,19 +33,21 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ConfigRepository;
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;
+import com.jcraft.jsch.IdentityRepository;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.agentproxy.AgentProxyException;
+import com.jcraft.jsch.agentproxy.Connector;
+import com.jcraft.jsch.agentproxy.ConnectorFactory;
+import com.jcraft.jsch.agentproxy.RemoteIdentityRepository;
 
 public class SshAdaptor extends Adaptor {
 
@@ -72,6 +74,12 @@ public class SshAdaptor extends Adaptor {
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
 
+    /** Enable the use of an ssh-agent */
+    public static final String AGENT = PREFIX + "agent";
+
+    /** Enable the use of ssh-agent-forwarding */
+    public static final String AGENT_FORWARDING = PREFIX + "agentForwarding";
+    
     /** Load the known_hosts file by default. */
     public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
 
@@ -123,6 +131,10 @@ public class SshAdaptor extends Adaptor {
                     "true", "Load the OpenSSH config file."), 
             new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.BOOLEAN, EnumSet.of(Component.XENON), 
                     null, "OpenSSH config filename."), 
+            new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN, EnumSet.of(Component.XENON), 
+                    "false", "Use a (local) ssh-agent."), 
+            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, EnumSet.of(Component.XENON), 
+                    "false", "Use ssh-agent forwarding"), 
             new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
             new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4", 
@@ -136,6 +148,8 @@ public class SshAdaptor extends Adaptor {
 
     private final SshCredentials credentialsAdaptor;
 
+    private final boolean useAgent;
+    
     private JSch jsch;
 
     public SshAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
@@ -156,6 +170,7 @@ public class SshAdaptor extends Adaptor {
             LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
             setKnownHostsFile(knownHosts);
         }
+        
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_SSH_CONFIG)) {
             String sshConfig = getProperties().getProperty(SshAdaptor.SSH_CONFIG_FILE);
             if (sshConfig == null) {
@@ -164,6 +179,35 @@ public class SshAdaptor extends Adaptor {
             LOGGER.debug("Setting ssh known hosts file to: " + sshConfig);
             setConfigFile(sshConfig, !getProperties().propertySet(SshAdaptor.LOAD_SSH_CONFIG));
         }
+        
+        if (getProperties().getBooleanProperty(SshAdaptor.AGENT)) {
+            // Connect to the local ssh-agent
+            LOGGER.debug("Connecting to ssh-agent");
+            
+            //jsch.setConfig("PreferredAuthentications", "publickey");
+            
+            Connector connector = null;
+
+            try {
+                ConnectorFactory cf = ConnectorFactory.getDefault();
+                connector = cf.createConnector();
+            } catch(AgentProxyException e){
+                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Failed to connect to ssh-agent", e);
+            }
+
+            IdentityRepository ident = new RemoteIdentityRepository(connector);
+            jsch.setIdentityRepository(ident);
+            
+            useAgent = true;
+        } else { 
+            useAgent = false;
+        }
+        
+        if (getProperties().getBooleanProperty(SshAdaptor.AGENT_FORWARDING)) {
+            // Enable ssh-agent-forwarding
+            LOGGER.warn("TODO: Enabling ssh-agent-forwarding");
+        }
+        
         if (jsch.getConfigRepository() == null) {
             jsch.setConfigRepository(ConfigRepository.nullConfig);
         }
@@ -239,6 +283,10 @@ public class SshAdaptor extends Adaptor {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
 
+    protected boolean usingAgent() { 
+        return useAgent;
+    }
+    
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         Map<String,String> result = new HashMap<>(2);

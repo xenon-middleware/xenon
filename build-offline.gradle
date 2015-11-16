@@ -26,7 +26,6 @@ dependencies {
     runtime fileTree(dir: runtimeLibDir, include: '*.jar')
     pmd fileTree(dir: codestyleLibDir, include: '*.jar')
 
-    userguideCompile sourceSets.main.output
     examplesCompile sourceSets.main.output
 }
 
