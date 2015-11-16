@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -234,9 +235,9 @@ public class SshAdaptor extends Adaptor {
     
     private void setConfigFile(String sshConfigFile, boolean ignoreFail) throws XenonException {
         try {
-            ConfigRepository configRepository = com.jcraft.jsch.OpenSSHConfig.parseFile(sshConfigFile);
+            ConfigRepository configRepository = OpenSSHConfig.parse(new File(sshConfigFile));
             jsch.setConfigRepository(configRepository);
-        } catch (IOException ex) {
+        } catch (IOException|XenonException ex) {
             if (ignoreFail) {
                 LOGGER.warn("OpenSSH config file cannot be read.");
             } else {

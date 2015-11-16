@@ -21,6 +21,17 @@ public class SSHLocationTest {
         assertTrue(tmp.getPort() == DEFAULT_PORT);
     }
 
+    /** Test if empty values are updated with SSH config settings. */
+    @Test
+    public void test_parse_hostOnlyWithConfig() throws Exception {
+        String confString = "Host host\nHostName host.fqdn\nUser myuser\nPort 42";
+        OpenSSHConfig config = OpenSSHConfig.parse(confString);
+        SshLocation tmp = SshLocation.parse("host", config);
+        assertEquals("myuser", tmp.getUser());
+        assertEquals("host.fqdn", tmp.getHost());
+        assertEquals(42, tmp.getPort());
+    }
+
     @Test
     public void test_parse_userHost() throws Exception {
         SshLocation tmp = SshLocation.parse("user@host", ConfigRepository.nullConfig);
@@ -43,6 +54,17 @@ public class SSHLocationTest {
         assertEquals(tmp.getUser(), "user");
         assertEquals(tmp.getHost(), "host");
         assertTrue(tmp.getPort() == 33);
+    }
+
+    /** Test if filled values are not overwritten by SSH config settings. */
+    @Test
+    public void test_parse_userHostPortConfig() throws Exception {
+        String confString = "Host host\nHostName host.fqdn\nUser myuser\nPort 42";
+        OpenSSHConfig config = OpenSSHConfig.parse(confString);
+        SshLocation tmp = SshLocation.parse("user@host:33", config);
+        assertEquals("user", tmp.getUser());
+        assertEquals("host.fqdn", tmp.getHost());
+        assertEquals(33, tmp.getPort());
     }
 
     @Test
