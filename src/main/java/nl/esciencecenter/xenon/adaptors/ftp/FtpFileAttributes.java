@@ -99,7 +99,7 @@ public class FtpFileAttributes implements FileAttributes {
     }
 
     private HashSet<PosixFilePermission> getPermissions() {
-        HashSet<PosixFilePermission> permissions = new HashSet<PosixFilePermission>();
+        HashSet<PosixFilePermission> permissions = new HashSet<>();
         for (int userType : userTypes) {
             for (int permissionType : permissionTypes) {
                 if (attributes.hasPermission(userType, permissionType)) {

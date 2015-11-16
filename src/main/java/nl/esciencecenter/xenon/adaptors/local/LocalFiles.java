@@ -74,7 +74,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         return fsID++;
     }
 
-    public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) throws XenonException {
+    public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) {
         this.localAdaptor = localAdaptor;
         this.copyEngine = copyEngine;
     }
@@ -321,11 +321,9 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
             throw new PathAlreadyExistsException(LocalAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
 
-        Iterator<RelativePath> itt = dir.getRelativePath().iterator();
+        for (RelativePath superDirectory : dir.getRelativePath()) {
+            Path tmp = newPath(dir.getFileSystem(), superDirectory);
 
-        while (itt.hasNext()) {
-            Path tmp = newPath(dir.getFileSystem(), itt.next());
-            
             if (!exists(tmp)) {
                 createDirectory(tmp);
             }

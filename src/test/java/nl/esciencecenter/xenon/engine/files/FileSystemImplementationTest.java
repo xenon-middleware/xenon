@@ -137,7 +137,7 @@ public class FileSystemImplementationTest {
                 null, p);
 
         Map<String, String> p2 = fi.getProperties();
-        assert ("test".equals((String) p2.get("test")));
+        assert ("test".equals(p2.get("test")));
     }
 
     @org.junit.Test

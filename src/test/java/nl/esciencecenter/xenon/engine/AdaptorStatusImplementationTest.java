@@ -63,8 +63,8 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testToString() {
 
-        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<String>("SCHEME1", "SCHEME2"), 
-                new ImmutableArray<String>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
+        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<>("SCHEME1", "SCHEME2"),
+                new ImmutableArray<>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
 
         assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, " +
         		"SCHEME2], supportedProperties=[], adaptorSpecificInformation=null]"));

@@ -55,8 +55,7 @@ final class TorqueJobScriptGenerator {
         script.format("\n");
     }
 
-    public static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
-        
+    public static String generate(JobDescription description, RelativePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 

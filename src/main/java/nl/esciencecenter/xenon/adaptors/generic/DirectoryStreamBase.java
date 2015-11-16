@@ -32,7 +32,7 @@ public abstract class DirectoryStreamBase<I, O> implements DirectoryStream<O>, I
     private final Deque<O> stream;
 
     public DirectoryStreamBase(Path dir, DirectoryStream.Filter filter, List<I> listing) throws XenonException {
-        stream = new LinkedList<O>();
+        stream = new LinkedList<>();
         for (I entry : listing) {
             String filename = getFileNameFromEntry(entry, dir);
             if (".".equals(filename) || "..".equals(filename)) {

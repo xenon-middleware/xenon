@@ -30,9 +30,9 @@ import com.jcraft.jsch.ChannelSftp;
  * 
  */
 public class SshInputStream extends InputStream {
-    private InputStream in;
-    private SshMultiplexedSession session;
-    private ChannelSftp channel;
+    private final InputStream in;
+    private final SshMultiplexedSession session;
+    private final ChannelSftp channel;
 
     public SshInputStream(InputStream in, SshMultiplexedSession session, ChannelSftp channel) {
         this.in = in;

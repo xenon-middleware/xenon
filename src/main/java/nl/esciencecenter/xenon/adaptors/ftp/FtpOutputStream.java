@@ -17,11 +17,11 @@ import org.apache.commons.net.ftp.FTPClient;
  */
 public class FtpOutputStream extends OutputStream {
 
-    private OutputStream outputStream;
-    private FTPClient ftpClient;
+    private final OutputStream outputStream;
+    private final FTPClient ftpClient;
     private boolean completedPendingFtpCommand = false;
-    private Path path;
-    private FtpFiles ftpFiles;
+    private final Path path;
+    private final FtpFiles ftpFiles;
 
     public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient, Path path, FtpFiles ftpFiles) {
         this.outputStream = outputStream;

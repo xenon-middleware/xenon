@@ -21,16 +21,16 @@ package nl.esciencecenter.xenon.adaptors;
  * 
  */
 public interface CredentialTestConfig {
-    public abstract boolean supportsCertificateCredentials();
-    public abstract boolean supportsPasswordCredentials();
+    boolean supportsCertificateCredentials();
+    boolean supportsPasswordCredentials();
 
-    public abstract String getCorrectCertFile();
-    public abstract String getIncorrectCertFile();
+    String getCorrectCertFile();
+    String getIncorrectCertFile();
 
-    public abstract String getUserName();
-    public abstract char [] getPassword();
+    String getUserName();
+    char[] getPassword();
 
-    public abstract String [] supportedSchemes();
+    String [] supportedSchemes();
 }
 
 

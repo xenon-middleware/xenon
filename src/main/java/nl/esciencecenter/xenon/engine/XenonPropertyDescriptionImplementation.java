@@ -59,7 +59,7 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
             throw new IllegalArgumentException("No level specified!");
         }
 
-        this.levels = new HashSet<Component>(levels);
+        this.levels = new HashSet<>(levels);
 
         this.defaultValue = defaultValue;
 

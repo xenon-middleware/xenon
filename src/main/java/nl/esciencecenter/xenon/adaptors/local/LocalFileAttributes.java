@@ -98,7 +98,7 @@ public class LocalFileAttributes implements FileAttributes {
 
             isWindows = Utils.isWindows(); 
 
-            BasicFileAttributes basicAttributes = null;
+            BasicFileAttributes basicAttributes;
             
             if (isWindows) {                
                 // These should always work.

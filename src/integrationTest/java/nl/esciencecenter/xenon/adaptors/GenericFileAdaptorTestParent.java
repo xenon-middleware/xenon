@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
+@SuppressWarnings("ALL")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericFileAdaptorTestParent {
 
@@ -93,7 +94,7 @@ public abstract class GenericFileAdaptorTestParent {
     public TestWatcher watcher = new XenonTestWatcher();
 
     @Rule
-    public ExpectedException exception = ExpectedException.none();
+    public final ExpectedException exception = ExpectedException.none();
 
     // MUST be invoked by a @BeforeClass method of the subclass!
     public static void prepareClass(FileTestConfig testConfig) throws Exception {
@@ -1424,16 +1425,16 @@ public abstract class GenericFileAdaptorTestParent {
             throwWrong("test13_getfileAttributes", "size=" + size, "size=" + result.size());
         }
 
-        if (isWithinMargin(currentTime, result.lastModifiedTime()) == false) {
+        if (!isWithinMargin(currentTime, result.lastModifiedTime())) {
             throwWrong("test13_getfileAttributes", "lastModifiedTime=" + currentTime,
                     "lastModifiedTime=" + result.lastModifiedTime());
         }
 
-        if (isWithinMargin(currentTime, result.creationTime()) == false) {
+        if (!isWithinMargin(currentTime, result.creationTime())) {
             throwWrong("test13_getfileAttributes", "creationTime=" + currentTime, "creationTime=" + result.creationTime());
         }
 
-        if (isWithinMargin(currentTime, result.lastAccessTime()) == false) {
+        if (!isWithinMargin(currentTime, result.lastAccessTime())) {
             throwWrong("test13_getfileAttributes", "lastAccessTime=" + currentTime, "lastAccessTime=" + result.lastAccessTime());
         }
 

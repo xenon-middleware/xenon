@@ -16,15 +16,25 @@
 
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import com.jcraft.jsch.MockSftpATTRS;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class SSHUtilTest {
 
-    @org.junit.Test
-    public void testConstructor() throws Exception {
-        // Dummy test for coverage
-        new SshUtil();
+    @Test
+    public void testEquals() throws Exception {
+        assertTrue(SshUtil.equals(MockSftpATTRS.fullySetAttrs(), MockSftpATTRS.fullySetAttrs()));
+        assertFalse(SshUtil.equals(MockSftpATTRS.emptySetAttrs(), MockSftpATTRS.fullySetAttrs()));
+        assertFalse(SshUtil.equals(MockSftpATTRS.fullySetAttrs(), MockSftpATTRS.emptySetAttrs()));
+        assertFalse(SshUtil.equals(null, MockSftpATTRS.emptySetAttrs()));
+        assertFalse(SshUtil.equals(MockSftpATTRS.emptySetAttrs(), null));
+        assertTrue(SshUtil.equals(null, null));
     }
 }

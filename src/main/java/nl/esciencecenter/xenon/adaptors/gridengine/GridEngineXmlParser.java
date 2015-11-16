@@ -48,9 +48,9 @@ public class GridEngineXmlParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(GridEngineXmlParser.class);
 
     //Tag containing version of xml schema used in qstat -xml output
-    public static final String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
+    private static final String SGE62_SCHEMA_ATTRIBUTE = "xmlns:xsd";
 
-    public static final String SGE62_SCHEMA_VALUE = "http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11";
+    private static final String SGE62_SCHEMA_VALUE = "http://gridengine.sunsource.net/source/browse/*checkout*/gridengine/source/dist/util/resources/schemas/qstat/qstat.xsd?revision=1.11";
 
     private final DocumentBuilder documentBuilder;
 
@@ -67,7 +67,7 @@ public class GridEngineXmlParser {
         }
     }
 
-    protected void checkVersion(Document document) throws IncompatibleVersionException {
+    private void checkVersion(Document document) throws IncompatibleVersionException {
         Element documentElement = document.getDocumentElement();
 
         if (!documentElement.getAttribute(SGE62_SCHEMA_ATTRIBUTE).equals(SGE62_SCHEMA_VALUE)) {
@@ -102,7 +102,7 @@ public class GridEngineXmlParser {
     }
 
     private Map<String, String> mapFromElement(Element root) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         NodeList tagNodes = root.getChildNodes();
 
@@ -138,7 +138,7 @@ public class GridEngineXmlParser {
     protected Map<String, Map<String, String>> parseQueueInfos(String input) throws XenonException {
         Document document = parseDocument(input);
 
-        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> result = new HashMap<>();
 
         LOGGER.debug("root node of xml file: " + document.getDocumentElement().getNodeName());
         NodeList clusterNodes = document.getElementsByTagName("cluster_queue_summary");
@@ -179,7 +179,7 @@ public class GridEngineXmlParser {
      * @throws Exception
      */
     protected Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
-        Map<String, Map<String, String>> result = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> result = new HashMap<>();
 
         Document document = parseDocument(data);
 

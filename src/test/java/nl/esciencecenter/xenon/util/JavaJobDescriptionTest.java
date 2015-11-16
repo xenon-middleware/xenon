@@ -66,12 +66,12 @@ public class JavaJobDescriptionTest {
 
         //system properties
 
-        Map<String, String> in = new HashMap<String, String>();
+        Map<String, String> in = new HashMap<>();
         in.put("some.key", "some.value");
         j.setJavaSystemProperties(in);
         j.addJavaSystemProperty("other.key", "other.value");
 
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("some.key", "some.value");
         expected.put("other.key", "other.value");
 
@@ -90,7 +90,7 @@ public class JavaJobDescriptionTest {
         j.addJavaArgument("g");
         List<String> argumentList = j.getJavaArguments();
         assertNotNull(argumentList);
-        assertArrayEquals(new String[] { "d", "e", "f", "g" }, argumentList.toArray(new String[0]));
+        assertArrayEquals(new String[] { "d", "e", "f", "g" }, argumentList.toArray(new String[4]));
 
         //class path
 
@@ -98,7 +98,7 @@ public class JavaJobDescriptionTest {
         j.addJavaClasspathElement("k");
         List<String> classpathList = j.getJavaClasspath();
         assertNotNull(classpathList);
-        assertArrayEquals(new String[] { "h", "i", "j", "k" }, classpathList.toArray(new String[0]));
+        assertArrayEquals(new String[] { "h", "i", "j", "k" }, classpathList.toArray(new String[4]));
     }
 
     @org.junit.Test(expected = IllegalArgumentException.class)
@@ -180,7 +180,7 @@ public class JavaJobDescriptionTest {
                 "-Dproperty.key=property.value", "nl.esciencecenter.main.class", "argument" };
 
         assertNotNull(arguments);
-        assertArrayEquals(expected, arguments.toArray(new String[0]));
+        assertArrayEquals(expected, arguments.toArray(new String[arguments.size()]));
     }
 
     @org.junit.Test
@@ -196,7 +196,7 @@ public class JavaJobDescriptionTest {
         String[] expected = new String[] { "-jar", "somefile.jar" };
 
         assertNotNull(arguments);
-        assertArrayEquals(expected, arguments.toArray(new String[0]));
+        assertArrayEquals(expected, arguments.toArray(new String[arguments.size()]));
     }
 
     @org.junit.Test
@@ -298,7 +298,7 @@ public class JavaJobDescriptionTest {
         String main = "main";
         String[] classpath = new String[] { "class", "path" };
 
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("some.key", "some.value");
 
         JavaJobDescription j = new JavaJobDescription();

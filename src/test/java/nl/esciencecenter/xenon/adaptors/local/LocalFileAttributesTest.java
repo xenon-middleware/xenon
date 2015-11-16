@@ -90,7 +90,7 @@ public class LocalFileAttributesTest {
 
         FileAttributes att = new LocalFileAttributes(path);
 
-        int hash = att.hashCode();
+        att.hashCode();
 
         // TODO: check hashcode ?
 

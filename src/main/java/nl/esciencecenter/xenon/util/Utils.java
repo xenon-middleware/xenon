@@ -65,7 +65,7 @@ public final class Utils {
     private static final String NAME = "FileUtils";
 
     /** The default buffer size to use for copy operations */
-    public static final int DEFAULT_BUFFER_SIZE = 16 * 1024;
+    private static final int DEFAULT_BUFFER_SIZE = 16 * 1024;
 
     private Utils() {
         // DO NOT USE
@@ -218,7 +218,7 @@ public final class Utils {
      */
     public static List<String> readLines(InputStream in, Charset cs) throws IOException {
 
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in, cs));
 
@@ -477,11 +477,8 @@ public final class Utils {
      * @return If the provide path starts with a valid Linux root.
      */
     public static boolean startsWithLinuxRoot(String path) {
-        if (path == null) {
-            return false;
-        }
+        return path != null && path.startsWith("/");
 
-        return path.startsWith("/");
     }
 
     /**
@@ -492,11 +489,8 @@ public final class Utils {
      * @return If the provide path starts with a valid Windows root.
      */
     public static boolean startWithWindowsRoot(String path) {
-        if (path == null) {
-            return false;
-        }
+        return path != null && path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
 
-        return path.length() >= 2 && path.charAt(1) == ':' && Character.isLetter(path.charAt(0));
     }
 
     /**
@@ -1059,10 +1053,9 @@ public final class Utils {
                 files.createDirectories(target);
             }
             for (Path f : files.newDirectoryStream(source)) {
-                Path fsource = f;
                 Path ftarget = files.newPath(target.getFileSystem(),
                         target.getRelativePath().resolve(f.getRelativePath().getFileName()));
-                recursiveCopy(files, fsource, ftarget, options);
+                recursiveCopy(files, f, ftarget, options);
             }
         } else {
             if (exist) {

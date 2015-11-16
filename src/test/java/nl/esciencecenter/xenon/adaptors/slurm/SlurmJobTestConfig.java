@@ -37,7 +37,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     private final String username;
     private final char[] passwd;
 
-    private final String scheme = "slurm";
+    private final static String scheme = "slurm";
     private final String correctLocation;
     private final String wrongLocation;
     private final String correctLocationWrongUser;
@@ -173,7 +173,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public String getInvalidQueueName() throws Exception {
+    public String getInvalidQueueName() {
         return "aap";
     }
 

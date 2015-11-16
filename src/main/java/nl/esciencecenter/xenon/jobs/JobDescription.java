@@ -15,11 +15,7 @@
  */
 package nl.esciencecenter.xenon.jobs;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -474,19 +470,6 @@ public class JobDescription {
                 + maxTime + ", interactive=" + interactive + "]";
     }
 
-    private boolean compare(Object a, Object b) {
-
-        if (a == null) {
-            return (b == null);
-        }
-
-        if (b == null) {
-            return false;
-        }
-
-        return a.equals(b);
-    }
-
     /* Generated */
     @Override
     public int hashCode() {
@@ -514,25 +497,25 @@ public class JobDescription {
         if (this == obj) {
             return true;
         }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         JobDescription other = (JobDescription) obj;
 
-        if (interactive != other.interactive || maxTime != other.maxTime || nodeCount != other.nodeCount
-                || startSingleProcess != other.startSingleProcess || processesPerNode != other.processesPerNode) {
-            return false;
-        }
-
-        return compare(executable, other.executable) && compare(workingDirectory, other.workingDirectory)
-                && compare(queueName, other.queueName) && compare(stdin, other.stdin) && compare(stdout, other.stdout)
-                && compare(stderr, other.stderr) && compare(arguments, other.arguments)
-                && compare(environment, other.environment) && compare(jobOptions, other.jobOptions);
+        return interactive == other.interactive
+                && maxTime == other.maxTime
+                && nodeCount == other.nodeCount
+                && startSingleProcess == other.startSingleProcess
+                && processesPerNode == other.processesPerNode
+                && Objects.equals(executable, other.executable)
+                && Objects.equals(workingDirectory, other.workingDirectory)
+                && Objects.equals(queueName, other.queueName)
+                && Objects.equals(stdin, other.stdin)
+                && Objects.equals(stdout, other.stdout)
+                && Objects.equals(stderr, other.stderr)
+                && Objects.equals(arguments, other.arguments)
+                && Objects.equals(environment, other.environment)
+                && Objects.equals(jobOptions, other.jobOptions);
     }
 }

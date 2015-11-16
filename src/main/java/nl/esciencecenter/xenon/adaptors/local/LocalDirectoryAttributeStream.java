@@ -41,7 +41,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     /** The LocalDirectoryStream to retrieve the files */
     private final LocalDirectoryStream stream;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws XenonException {
+    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) {
         this.localFiles = localFiles;
         this.stream = stream;
     }

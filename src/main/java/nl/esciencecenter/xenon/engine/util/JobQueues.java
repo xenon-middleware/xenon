@@ -53,7 +53,7 @@ public class JobQueues {
      * Simple thread factory which returns daemon threads instead of normal threads
      *
      */
-    class DaemonThreadFactory implements ThreadFactory {
+    private class DaemonThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable runnable) {
             Thread thread = Executors.defaultThreadFactory().newThread(runnable);
             thread.setDaemon(true);
@@ -93,7 +93,7 @@ public class JobQueues {
 
     private final InteractiveProcessFactory factory;
 
-    private final AtomicLong jobID = new AtomicLong(0l);
+    private final AtomicLong jobID = new AtomicLong(0L);
 
     public JobQueues(String adaptorName, Files myFiles, Scheduler myScheduler, Path workingDirectory,
             InteractiveProcessFactory factory, int multiQThreads, long pollingDelay) throws BadParameterException {
@@ -158,7 +158,7 @@ public class JobQueues {
 
         LOGGER.debug("{}: getJobs for queues {}", adaptorName, queueNames);
 
-        LinkedList<Job> out = new LinkedList<Job>();
+        LinkedList<Job> out = new LinkedList<>();
 
         if (queueNames == null || queueNames.length == 0) {
             getJobs(singleQ, out);
@@ -416,7 +416,7 @@ public class JobQueues {
 
         boolean killed = e.kill();
 
-        JobStatus status = null;
+        JobStatus status;
 
         if (killed) {
             status = e.getStatus();

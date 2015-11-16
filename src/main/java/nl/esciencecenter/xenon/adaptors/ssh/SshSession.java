@@ -62,7 +62,6 @@ class SshSession {
     }
 
     protected boolean incOpenChannels(String info) {
-
         if (openChannels == MAX_OPEN_CHANNELS) {
             return false;
         }
@@ -84,16 +83,10 @@ class SshSession {
     }
 
     protected boolean putSftpChannelInCache(ChannelSftp channel) {
-        
         if (sftpChannelCache != null) {
-
-            if (sftpChannelCache == channel) {
-                // If the given channel is the one that is currently cached, we should return true to 
-                // prevent the channel from being closed. 
-                return true;
-            }
-            
-            return false;
+            // If the given channel is the one that is currently cached, we should return true to
+            // prevent the channel from being closed.
+            return sftpChannelCache == channel;
         }
 
         sftpChannelCache = channel;
@@ -141,7 +134,7 @@ class SshSession {
             return null;
         }
 
-        ChannelExec channel = null;
+        ChannelExec channel;
 
         try {
             LOGGER.debug("SSHSESSION-{}: Creating EXEC channel {}", sessionID, openChannels);

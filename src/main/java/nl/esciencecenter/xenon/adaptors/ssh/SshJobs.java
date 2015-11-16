@@ -91,7 +91,7 @@ public class SshJobs implements Jobs {
 
     private final Map<String, SchedulerInfo> schedulers;
 
-    public SshJobs(XenonProperties properties, SshAdaptor sshAdaptor, XenonEngine xenonEngine) throws XenonException {
+    public SshJobs(XenonProperties properties, SshAdaptor sshAdaptor, XenonEngine xenonEngine) {
         this.xenonEngine = xenonEngine;
         this.adaptor = sshAdaptor;
         this.properties = properties;

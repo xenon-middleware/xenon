@@ -31,9 +31,9 @@ import com.jcraft.jsch.ChannelSftp;
  * 
  */
 public class SshOutputStream extends OutputStream {
-    private OutputStream out;
-    private SshMultiplexedSession session;
-    private ChannelSftp channel;
+    private final OutputStream out;
+    private final SshMultiplexedSession session;
+    private final ChannelSftp channel;
 
     public SshOutputStream(OutputStream out, SshMultiplexedSession session, ChannelSftp channel) {
         this.out = out;

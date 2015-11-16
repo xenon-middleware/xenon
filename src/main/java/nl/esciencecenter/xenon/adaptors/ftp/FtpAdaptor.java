@@ -141,6 +141,6 @@ public class FtpAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 }

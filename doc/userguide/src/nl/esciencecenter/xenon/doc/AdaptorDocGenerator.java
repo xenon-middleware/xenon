@@ -30,7 +30,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
-public class AdaptorDocGenerator {
+class AdaptorDocGenerator {
     
     private static PrintWriter out = null;
     
@@ -58,8 +58,8 @@ public class AdaptorDocGenerator {
 
         String comma = "";
 
-        for (int i = 0; i < schemes.length; i++) {
-            out.print(comma + schemes[i]);
+        for (String scheme : schemes) {
+            out.print(comma + scheme);
             comma = ", ";
         }
 
@@ -72,8 +72,8 @@ public class AdaptorDocGenerator {
 
         comma = "";
 
-        for (int i = 0; i < locations.length; i++) {
-            out.print(comma + locations[i]);
+        for (String location : locations) {
+            out.print(comma + location);
             comma = ", ";
         }
 

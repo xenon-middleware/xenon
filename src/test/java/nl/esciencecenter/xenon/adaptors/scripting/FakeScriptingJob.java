@@ -20,7 +20,7 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
 public class FakeScriptingJob implements Job {
-    final String identifier;
+    private final String identifier;
 
     public FakeScriptingJob(String identifier) {
         this.identifier = identifier;

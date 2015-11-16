@@ -254,7 +254,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 .getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
 
         //map containing references to interactive jobs (normally ssh jobs)
-        interactiveJobs = new HashMap<String, Job>();
+        interactiveJobs = new HashMap<>();
 
         boolean ignoreVersion = getProperties().getBooleanProperty(SlurmAdaptor.IGNORE_VERSION_PROPERTY);
         boolean disableAccounting = getProperties().getBooleanProperty(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE);
@@ -478,7 +478,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws XenonException {
         if (!config.accountingAvailable()) {
-            return new HashMap<String, Map<String, String>>();
+            return new HashMap<>();
         }
 
         //this command will not complain if the job given does not exist

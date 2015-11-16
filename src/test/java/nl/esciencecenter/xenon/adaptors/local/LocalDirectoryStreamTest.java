@@ -23,7 +23,6 @@ import java.util.NoSuchElementException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
-import nl.esciencecenter.xenon.adaptors.local.LocalDirectoryStream;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileSystem;
@@ -89,9 +88,6 @@ public class LocalDirectoryStreamTest {
     }
 
     private Xenon xenon;
-    private Files files;
-    private FileSystem fs;
-    private Path root;
     private Path testDir;
 
     class AllTrue implements DirectoryStream.Filter {
@@ -113,9 +109,8 @@ public class LocalDirectoryStreamTest {
 
         xenon = XenonFactory.newXenon(null);
 
-        files = xenon.files();
-        root = Utils.getLocalCWD(files);
-        fs = root.getFileSystem();
+        Files files = xenon.files();
+        Path root = Utils.getLocalCWD(files);
         testDir = resolve(files, root, TEST_DIR);
     }
 
@@ -184,7 +179,8 @@ public class LocalDirectoryStreamTest {
 
         LocalDirectoryStream stream = new LocalDirectoryStream(testDir, new AllTrue());
 
-        while (true) {
+        // expecting at most 10000 items, otherwise, the stream might go on forever
+        for (int i = 0; i < 10000; i++) {
             stream.next();
         }
     }

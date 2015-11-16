@@ -102,7 +102,7 @@ public class SshFiles implements Files {
     private final XenonEngine xenonEngine;
     private final SshAdaptor adaptor;
 
-    private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
+    private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     public SshFiles(SshAdaptor sshAdaptor, XenonEngine xenonEngine) {
         this.xenonEngine = xenonEngine;
@@ -135,7 +135,7 @@ public class SshFiles implements Files {
         
         ChannelSftp channel = session.getSftpChannel();
 
-        String wd = null;
+        String wd;
 
         try {
             wd = channel.pwd();
@@ -258,12 +258,10 @@ public class SshFiles implements Files {
         if (exists(dir)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
-        
-        Iterator<RelativePath> itt = dir.getRelativePath().iterator();
 
-        while (itt.hasNext()) {
-            Path tmp = newPath(dir.getFileSystem(), itt.next());
-            
+        for (RelativePath superDirectory : dir.getRelativePath()) {
+            Path tmp = newPath(dir.getFileSystem(), superDirectory);
+
             if (!exists(tmp)) {
                 createDirectory(tmp);
             }
@@ -419,7 +417,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        List<LsEntry> result = null;
+        List<LsEntry> result;
 
         try {
             result = channel.ls(path.getRelativePath().getAbsolutePath());
@@ -474,7 +472,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        InputStream in = null;
+        InputStream in;
         
         try {
             in = channel.get(path.getRelativePath().getAbsolutePath());
@@ -526,7 +524,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        OutputStream out = null;
+        OutputStream out;
         
         try {
             out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
@@ -548,7 +546,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        Path result = null;
+        Path result;
 
         try {
             String target = channel.readlink(path.getRelativePath().getAbsolutePath());
@@ -617,7 +615,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        SftpATTRS result = null;
+        SftpATTRS result;
 
         try {
             result = channel.lstat(path.getRelativePath().getAbsolutePath());

@@ -61,7 +61,7 @@ public interface XenonPropertyDescription {
     /**
      * The Component enumeration lists all possible parts of Xenon for which a property can be provided. 
      */
-    public enum Component {
+    enum Component {
         /** 
          * Properties for <code>XENON</code> components can be passed to 
          * {@link nl.esciencecenter.xenon.XenonFactory#newXenon(Map)}. 
@@ -90,7 +90,7 @@ public interface XenonPropertyDescription {
     /**
      * This Type enumeration lists all possible types of properties recognized by Xenon.
      */
-    public enum Type {
+    enum Type {
         /** 
          * Properties of type <code>BOOLEAN</code> can be either <code>"true"</code> or <code>"false"</code>.  
          */        

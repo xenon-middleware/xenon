@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
+@SuppressWarnings("TryWithIdenticalCatches")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class GenericJobAdaptorTestParent {
     private static final Logger logger = LoggerFactory.getLogger(GenericJobAdaptorTestParent.class);
@@ -178,8 +179,6 @@ public abstract class GenericJobAdaptorTestParent {
                 
                 jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
-            } catch (InvalidCredentialException e) {
-                // expected
             } catch (XenonException e) {
                 // allowed
             }

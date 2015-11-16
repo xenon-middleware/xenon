@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class FTPLocationTest {
 
-    public static final int DEFAULT_PORT = 21;
+    private static final int DEFAULT_PORT = 21;
 
     @Test
     public void test_parse_hostOnly() throws Exception {

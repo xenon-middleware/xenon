@@ -64,7 +64,7 @@ public class PosixFileUtils {
 
     public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
-        HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();
+        HashSet<PosixFilePermission> result = new HashSet<>();
 
         if ((bit & READ_OWNER) != 0) {
             result.add(PosixFilePermission.OWNER_READ);

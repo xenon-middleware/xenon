@@ -81,8 +81,7 @@ public class JobExecutor implements Runnable {
         return hasRun;
     }
 
-    public synchronized boolean kill() throws XenonException {
-
+    public synchronized boolean kill() {
         if (done) {
             return true;
         }
@@ -296,8 +295,7 @@ public class JobExecutor implements Runnable {
 
     @Override
     public void run() {
-
-        Process process = null;
+        Process process;
 
         JobDescription description = job.getJobDescription();
 
