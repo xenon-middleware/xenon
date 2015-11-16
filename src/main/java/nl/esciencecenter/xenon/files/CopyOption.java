@@ -64,28 +64,25 @@ public enum CopyOption {
     /**
      * Perform the copy asynchronously.
      */
-    ASYNCHRONOUS, ;
+    ASYNCHRONOUS;
 
     /**
-     * Check if a sequence of <code>CopyOption</code>s contains a specific option.
+     * Check if the CopyOption is listed in a sequence.
      * 
-     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     * If <code>options<code> is <code>null</code><code>false</code> will be returned.
      * 
-     * @param toFind
-     *            the option to check for.
      * @param options
      *            the options to check.
      * 
-     * @return if <code>options</code> contains <code>option<code>.
+     * @return if <code>options</code> contains <code>CopyOption<code>.
      */
-    public static boolean contains(CopyOption toFind, CopyOption... options) {
-
-        if (toFind == null || options == null || options.length == 0) {
+    public boolean occursIn(CopyOption... options) {
+        if (options == null) {
             return false;
         }
 
         for (CopyOption option : options) {
-            if (option != null && option == toFind) {
+            if (this == option) {
                 return true;
             }
         }

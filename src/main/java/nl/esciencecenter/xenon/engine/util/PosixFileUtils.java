@@ -29,6 +29,7 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
  * @since 1.0
  *
  */
+@SuppressWarnings("OctalInteger")
 public class PosixFileUtils {
     
     // FIXME: Are these correct ? Some seem to be missing ?  

@@ -19,8 +19,6 @@ package nl.esciencecenter.xenon.files;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import nl.esciencecenter.xenon.files.OpenOption;
-
 import org.junit.Test;
 
 /**
@@ -32,36 +30,25 @@ public class OpenOptionTest {
     @Test
     public void testContains_empty_doesNotContainIt() {
         OpenOption[] options = new OpenOption[0];
-        assertFalse(OpenOption.contains(OpenOption.CREATE, options));
+        assertFalse(OpenOption.CREATE.occursIn(options));
     }
 
     @Test
     public void testContains_filled_doesContainIt() {
         OpenOption[] options = new OpenOption[] { OpenOption.APPEND, OpenOption.CREATE };
-        assertTrue(OpenOption.contains(OpenOption.CREATE, options));
+        assertTrue(OpenOption.CREATE.occursIn(options));
     }
 
     @Test
     public void testContains_filled_doesNotContainIt() {
         OpenOption[] options = new OpenOption[] { OpenOption.OPEN };
-        assertFalse(OpenOption.contains(OpenOption.CREATE, options));
-    }
-
-    @Test
-    public void testContains_optionsNull_doesNotContainIt() {
-        assertFalse(OpenOption.contains(null, OpenOption.CREATE));
-    }
-
-    @Test
-    public void testContains_optionNull_doesNotContainIt() {
-        OpenOption[] options = new OpenOption[] { OpenOption.TRUNCATE, OpenOption.CREATE };
-        assertFalse(OpenOption.contains(null, options));
+        assertFalse(OpenOption.CREATE.occursIn(options));
     }
 
     @Test
     public void testContains_optionsFilledNull_doesNotContainIt() {
         OpenOption[] options = new OpenOption[] { null };
-        assertFalse(OpenOption.contains(OpenOption.CREATE, options));
+        assertFalse(OpenOption.CREATE.occursIn(options));
     }
 
     @Test

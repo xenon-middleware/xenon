@@ -71,8 +71,7 @@ public class AdaptorTest {
         }
 
         @Override
-        public void end() {
-        }
+        public void end() { /* noop */ }
 
     }
 

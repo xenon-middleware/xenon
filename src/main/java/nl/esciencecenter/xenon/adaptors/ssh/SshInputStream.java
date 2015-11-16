@@ -46,18 +46,8 @@ public class SshInputStream extends InputStream {
     }
 
     @Override
-    public int hashCode() {
-        return in.hashCode();
-    }
-
-    @Override
     public int read(byte[] b) throws IOException {
         return in.read(b);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return in.equals(obj);
     }
 
     @Override

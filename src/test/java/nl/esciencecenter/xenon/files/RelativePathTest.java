@@ -252,13 +252,13 @@ public class RelativePathTest {
 
     @Test
     public void testRelativePathPathSeperator8a() {
-        RelativePath path = new RelativePath('/', new String[0]);
+        RelativePath path = new RelativePath('/');
         assertEquals(path.getRelativePath(), "");
     }
 
     @Test
     public void testRelativePathPathSeperator8b() {
-        RelativePath path = new RelativePath('/', new String[0]);
+        RelativePath path = new RelativePath('/');
         assertEquals(path.getAbsolutePath(), "/");
     }
     

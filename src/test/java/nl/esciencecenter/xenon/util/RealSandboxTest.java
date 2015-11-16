@@ -457,6 +457,7 @@ public class RealSandboxTest {
         assertTrue(pair.hashCode() == result);
 
         result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + src.hashCode();
 
@@ -464,12 +465,15 @@ public class RealSandboxTest {
 
         result = 1;
         result = prime * result + dst.hashCode();
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertTrue(pair4.hashCode() == result);
 
         result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertTrue(pair2.hashCode() == result);

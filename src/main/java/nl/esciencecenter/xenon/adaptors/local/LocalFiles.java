@@ -18,8 +18,6 @@ package nl.esciencecenter.xenon.adaptors.local;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,32 +32,19 @@ import nl.esciencecenter.xenon.engine.files.PathImplementation;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
-import nl.esciencecenter.xenon.files.Copy;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.CopyStatus;
-import nl.esciencecenter.xenon.files.DirectoryStream;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * LocalFiles implements an Xenon <code>Files</code> adaptor for local file operations.
  * 
- * @see nl.esciencecenter.xenon.files.Files
+ * @see Files
  * 
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
-public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
+public class LocalFiles implements Files {
 
     /** The parent adaptor */
     private final LocalAdaptor localAdaptor;
@@ -132,8 +117,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
      *            the existing source path.
      * @param target
      *            the non existing target path.
-     * @return the target path.
-     * 
+     *
      * @throws NoSuchPathException
      *             If the source file does not exist or the target parent directory does not exist.
      * @throws PathAlreadyExistsException
@@ -167,7 +151,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
     public Path readSymbolicLink(Path link) throws XenonException {
         try {
             java.nio.file.Path path = LocalUtils.javaPath(link);
-            java.nio.file.Path target = Files.readSymbolicLink(path);
+            java.nio.file.Path target = java.nio.file.Files.readSymbolicLink(path);
 
             RelativePath parent = link.getRelativePath().getParent();
 
@@ -253,7 +237,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         }
 
         try {
-            return Files.newOutputStream(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
+            return java.nio.file.Files.newOutputStream(LocalUtils.javaPath(path), LocalUtils.javaOpenOptions(options));
         } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create OutputStream.", e);
         }
@@ -266,7 +250,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        return Files.exists(LocalUtils.javaPath(path));
+        return java.nio.file.Files.exists(LocalUtils.javaPath(path));
     }
 
     @Override
@@ -339,7 +323,7 @@ public class LocalFiles implements nl.esciencecenter.xenon.files.Files {
         checkParent(dir);
 
         try {
-            Files.createDirectory(LocalUtils.javaPath(dir));
+            java.nio.file.Files.createDirectory(LocalUtils.javaPath(dir));
         } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to create directory " + dir, e);
         }

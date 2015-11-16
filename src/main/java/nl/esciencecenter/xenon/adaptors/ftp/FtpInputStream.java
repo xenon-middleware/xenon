@@ -57,16 +57,6 @@ public class FtpInputStream extends InputStream {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return inputStream.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return inputStream.hashCode();
-    }
-
-    @Override
     public synchronized void mark(int readlimit) {
         inputStream.mark(readlimit);
     }

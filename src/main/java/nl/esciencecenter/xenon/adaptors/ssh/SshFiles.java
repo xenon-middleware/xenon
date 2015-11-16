@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,22 +38,7 @@ import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
-import nl.esciencecenter.xenon.files.Copy;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.CopyStatus;
-import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.files.DirectoryStream;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 
 import org.slf4j.Logger;
@@ -513,7 +497,7 @@ public class SshFiles implements Files {
 
         int mode = ChannelSftp.OVERWRITE;
 
-        if (OpenOption.contains(OpenOption.APPEND, options)) {
+        if (OpenOption.APPEND.occursIn(options)) {
             mode = ChannelSftp.APPEND;
         }
 

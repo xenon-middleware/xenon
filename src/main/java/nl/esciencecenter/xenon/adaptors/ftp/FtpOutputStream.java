@@ -62,18 +62,8 @@ public class FtpOutputStream extends OutputStream {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return outputStream.equals(obj);
-    }
-
-    @Override
     public void flush() throws IOException {
         outputStream.flush();
-    }
-
-    @Override
-    public int hashCode() {
-        return outputStream.hashCode();
     }
 
     @Override

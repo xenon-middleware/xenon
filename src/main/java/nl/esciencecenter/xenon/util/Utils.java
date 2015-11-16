@@ -629,7 +629,7 @@ public final class Utils {
      * @param files
      *            the files interface to use for file access.
      * @param in
-     *            the {@link java.util.InputStream} to read from.
+     *            the {@link java.io.InputStream} to read from.
      * @param target
      *            the file to write to.
      * @param truncate
@@ -640,7 +640,7 @@ public final class Utils {
      * @throws PathAlreadyExistsException
      *             if the target file exists but cannot be replaced because the {@code REPLACE_EXISTING} option is not specified
      *             <i>(optional specific exception)</i>
-     * @throws DirectoryNotEmptyException
+     * @throws nl.esciencecenter.xenon.files.DirectoryNotEmptyException
      *             the {@code REPLACE_EXISTING} option is specified but the file cannot be replaced because it is a non-empty
      *             directory <i>(optional specific exception)</i> *
      * @throws InvalidCopyOptionsException
@@ -672,7 +672,7 @@ public final class Utils {
      * @param source
      *            the file to read from.
      * @param out
-     *            the {@link java.util.OutputStream} to write to.
+     *            the {@link java.io.OutputStream} to write to.
      *
      * @return the number of bytes copied.
      *
@@ -698,7 +698,7 @@ public final class Utils {
     }
 
     /**
-     * Opens a file for reading, returning a {@link java.util.BufferedReader} that may be used to read text from the file in an
+     * Opens a file for reading, returning a {@link java.io.BufferedReader} that may be used to read text from the file in an
      * efficient manner.
      *
      * @param files
@@ -1030,8 +1030,8 @@ public final class Utils {
     public static void recursiveCopy(Files files, Path source, Path target, CopyOption... options) throws XenonException {
 
         boolean exist = files.exists(target);
-        boolean replace = CopyOption.contains(CopyOption.REPLACE, options);
-        boolean ignore = CopyOption.contains(CopyOption.IGNORE, options);
+        boolean replace = CopyOption.REPLACE.occursIn(options);
+        boolean ignore = CopyOption.IGNORE.occursIn(options);
         if (replace && ignore) {
             throw new InvalidCopyOptionsException("FileUtils", "Can not replace and ignore existing files at the same time");
         }

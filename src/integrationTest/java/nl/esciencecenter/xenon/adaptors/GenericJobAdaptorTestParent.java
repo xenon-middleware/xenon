@@ -518,8 +518,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test25a_getJobStatuses() throws Exception {
-
-        JobStatus[] tmp = jobs.getJobStatuses(new Job[0]);
+        JobStatus[] tmp = jobs.getJobStatuses();
 
         assertNotNull(tmp);
         assertEquals(0, tmp.length);

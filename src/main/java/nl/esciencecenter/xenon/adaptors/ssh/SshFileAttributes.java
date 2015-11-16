@@ -24,18 +24,22 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
 
 import com.jcraft.jsch.SftpATTRS;
 
+@SuppressWarnings("OctalInteger")
 public class SshFileAttributes implements FileAttributes {
 
     /** Number of millisecond per second seems to be 1000 */
     private static final int MILLISECONDS_PER_SECOND = 1000;
 
     /** Bit set to set user ID on execution */
+    @SuppressWarnings("OctalInteger")
     public static final int SUID = 04000;
 
     /** Bit set to set group ID on execution */
+    @SuppressWarnings("OctalInteger")
     public static final int SGID = 02000;
 
     /** Bit set to set sticky bit ****** NOT DOCUMENTED *****/
+    @SuppressWarnings("OctalInteger")
     public static final int SVTX = 01000;
 
     private final SftpATTRS attributes;

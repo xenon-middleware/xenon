@@ -363,8 +363,8 @@ public class RealFileUtilsTest {
     @SuppressWarnings("CanBeFinal")
     class MyFileVisitor implements FileVisitor {
 
-        final Path[] dirs;
-        final Path[] files;
+        private final Path[] dirs;
+        private final Path[] files;
 
         MyFileVisitor(Path[] dirs, Path[] files) {
             this.dirs = dirs;
@@ -549,7 +549,7 @@ public class RealFileUtilsTest {
 
     class MyFileVisitor4 implements FileVisitor {
 
-        int countFiles = 0;
+        private int countFiles = 0;
 
         @Override
         public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)

@@ -19,7 +19,6 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.JobDescription;

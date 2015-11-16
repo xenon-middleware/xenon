@@ -25,10 +25,6 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  */
 public class FakeScriptingScheduler implements Scheduler {
 
-    public FakeScriptingScheduler() {
-
-    }
-
     @Override
     public String getAdaptorName() {
         return null;
