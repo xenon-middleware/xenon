@@ -16,8 +16,7 @@
 
 package nl.esciencecenter.xenon.engine.files;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -29,9 +28,10 @@ import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
-import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.RelativePath;
+
+import org.junit.Test;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
@@ -39,47 +39,47 @@ import nl.esciencecenter.xenon.files.RelativePath;
  */
 public class FileSystemImplementationTest {
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_fail_adaptor_null() throws Exception {
         new FileSystemImplementation(null, null, null, null, null, null, null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_fail_identifier_null() throws Exception {
         new FileSystemImplementation("AAP", null,null, null, null, null, null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_fail_URI_null() throws Exception {
         new FileSystemImplementation("AAP", "NOOT", null, null,null, null, null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_fail_path_null() throws Exception {
         new FileSystemImplementation("AAP", "NOOT", "file", null, null, null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test_ok() throws Exception {
         new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"), null, null);
     }
 
-    @org.junit.Test
+    @Test
     public void test_ok2() throws Exception {
         new FileSystemImplementation("AAP", "NOOT", "file", "C:", new RelativePath("aap"), null, null);
     }
 
     
-    @org.junit.Test
+    @Test
     public void test_ID_ok() throws Exception {
         FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
 
         String tmp = fi.getUniqueID();
-        assert (tmp.equals("NOOT"));
+        assertEquals("NOOT", tmp);
     }
 
-    @org.junit.Test
+    @Test
     public void test_getCredential() throws Exception {
         FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file","/", new RelativePath("aap"),
                 null, null);
@@ -89,7 +89,7 @@ public class FileSystemImplementationTest {
         assertNull(c);
     }
 
-    @org.junit.Test
+    @Test
     public void test_getCredential2() throws Exception {
         Credential c = new Credential() {
 
@@ -109,19 +109,19 @@ public class FileSystemImplementationTest {
 
         Credential c2 = fi.getCredential();
 
-        assertTrue(c == c2);
+        assertSame(c, c2);
     }
 
-    @org.junit.Test
+    @Test
     public void test_name_ok() throws Exception {
         FileSystemImplementation fi = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
 
         String tmp = fi.getAdaptorName();
-        assert (tmp.equals("AAP"));
+        assertEquals("AAP", tmp);
     }
 
-    @org.junit.Test
+    @Test
     public void test_properties_ok() throws Exception {
 
         Map<String, String> tmp = new HashMap<>();
@@ -137,10 +137,10 @@ public class FileSystemImplementationTest {
                 null, p);
 
         Map<String, String> p2 = fi.getProperties();
-        assert ("test".equals((String) p2.get("test")));
+        assertEquals("test", p2.get("test"));
     }
 
-    @org.junit.Test
+    @Test
     public void test_hashCode() throws Exception {
         int tmp = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"), null, null)
                 .hashCode();
@@ -148,64 +148,59 @@ public class FileSystemImplementationTest {
         int result = 31 + "AAP".hashCode();
         result = 31 * result + "NOOT".hashCode();
 
-        assert (tmp == result);
+        assertEquals(tmp, result);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals1() throws Exception {
         FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
-        boolean v = f1.equals(f1);
 
-        assert (v);
+        assertEquals(f1, f1);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals2() throws Exception {
         FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
         boolean v = f1.equals(null);
-        assert (!v);
+        assertFalse(v);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals3() throws Exception {
         FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
         boolean v = f1.equals("Hello World");
-        assert (!v);
+        assertFalse(v);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals4() throws Exception {
         FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
         FileSystemImplementation f2 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
-        boolean v = f1.equals(f2);
-
-        assert (v);
+        assertEquals(f1, f2);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals5() throws Exception {
         FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
         FileSystemImplementation f2 = new FileSystemImplementation("MIES", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
-        boolean v = f1.equals(f2);
 
-        assert (!v);
+        assertNotEquals(f1, f2);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals6() throws Exception {
         FileSystemImplementation f1 = new FileSystemImplementation("AAP", "NOOT", "file", "/", new RelativePath("aap"),
                 null, null);
         FileSystemImplementation f2 = new FileSystemImplementation("AAP", "MIES", "file", "/", new RelativePath("aap"),
                 null, null);
-        boolean v = f1.equals(f2);
 
-        assert (!v);
+        assertNotEquals(f1, f2);
     }
 }

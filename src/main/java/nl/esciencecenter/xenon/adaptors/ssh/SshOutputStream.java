@@ -31,9 +31,9 @@ import com.jcraft.jsch.ChannelSftp;
  * 
  */
 public class SshOutputStream extends OutputStream {
-    private OutputStream out;
-    private SshMultiplexedSession session;
-    private ChannelSftp channel;
+    private final OutputStream out;
+    private final SshMultiplexedSession session;
+    private final ChannelSftp channel;
 
     public SshOutputStream(OutputStream out, SshMultiplexedSession session, ChannelSftp channel) {
         this.out = out;
@@ -47,11 +47,6 @@ public class SshOutputStream extends OutputStream {
     }
 
     @Override
-    public int hashCode() {
-        return out.hashCode();
-    }
-
-    @Override
     public void write(byte[] b) throws IOException {
         out.write(b);
     }
@@ -59,11 +54,6 @@ public class SshOutputStream extends OutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return out.equals(obj);
     }
 
     @Override

@@ -19,7 +19,6 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.JobDescription;
@@ -55,8 +54,7 @@ final class TorqueJobScriptGenerator {
         script.format("\n");
     }
 
-    public static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
-        
+    public static String generate(JobDescription description, RelativePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder(500);
         Formatter script = new Formatter(stringBuilder, Locale.US);
 

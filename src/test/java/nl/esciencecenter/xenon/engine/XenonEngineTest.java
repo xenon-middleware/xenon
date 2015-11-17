@@ -42,7 +42,7 @@ public class XenonEngineTest {
 
     @Test
     public void newEngine_EmptyProperties_Succeeds() throws Exception {
-        HashMap<String, String> tmp = new HashMap<String, String>();
+        HashMap<String, String> tmp = new HashMap<>();
         Xenon x = XenonEngine.newXenon(tmp);
         assertEquals("Expected empty hashmap", tmp, x.getProperties());
     }
@@ -208,7 +208,7 @@ public class XenonEngineTest {
     @Test
     public void toString_XenonNoProperties_Succeeds() throws Exception {
         XenonEngine x1 = (XenonEngine) XenonEngine.newXenon(null);
-        String tmp = x1.toString();
+        x1.toString();
 
         // TODO; should check output of toString() ?
     }

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public class ITJobLocal {
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     final Logger logger = LoggerFactory.getLogger(ITJobLocal.class);
 

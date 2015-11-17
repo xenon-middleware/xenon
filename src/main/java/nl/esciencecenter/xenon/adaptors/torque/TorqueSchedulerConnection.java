@@ -267,9 +267,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             }
         }
 
-        Job[] resultArray = result.toArray(new Job[result.size()]);
-
-        return resultArray;
+        return result.toArray(new Job[result.size()]);
     }
 
     @Override
@@ -417,9 +415,9 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
             }
         }
 
-        Job result = new JobImplementation(getScheduler(), identifier, description, false, false);
+        //noinspection UnnecessaryLocalVariable
 
-        return result;
+        return new JobImplementation(getScheduler(), identifier, description, false, false);
     }
 
     @Override

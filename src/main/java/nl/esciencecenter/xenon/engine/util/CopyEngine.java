@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class CopyEngine {
 
-    class CopyThread extends Thread {
+    private class CopyThread extends Thread {
         public void run() {
             CopyInfo ac = dequeue();
 
@@ -83,10 +83,10 @@ public final class CopyEngine {
     private final Files owner;
 
     /** Pending copies */
-    private Deque<CopyInfo> pending = new LinkedList<>();
+    private final Deque<CopyInfo> pending = new LinkedList<>();
 
     /** Finished copies */
-    private Map<String, CopyInfo> finished = new LinkedHashMap<>();
+    private final Map<String, CopyInfo> finished = new LinkedHashMap<>();
 
     /** Running copy */
     private CopyInfo running;

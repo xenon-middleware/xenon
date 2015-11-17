@@ -44,7 +44,7 @@ public class FtpCredentials implements Credentials {
         return res;
     }
 
-    private XenonProperties properties;
+    private final XenonProperties properties;
     private FtpAdaptor adaptor;
 
     public FtpCredentials(XenonProperties properties, FtpAdaptor ftpAdaptor) {

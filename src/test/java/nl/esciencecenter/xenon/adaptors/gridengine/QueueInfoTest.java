@@ -38,7 +38,7 @@ public class QueueInfoTest {
 
     @Test
     public void test01a_queueInfoFromMap_Map_Result() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("qname", "some.q");
         input.put("slots", "200");
@@ -56,7 +56,7 @@ public class QueueInfoTest {
 
     @Test(expected = XenonException.class)
     public void test01b_queueInfoFromMap_NoName_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         //input.put("qname", "some.q");
         input.put("slots", "200");
@@ -74,7 +74,7 @@ public class QueueInfoTest {
 
     @Test(expected = XenonException.class)
     public void test01c_queueInfoFromMap_NoSlots_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("qname", "some.q");
         //input.put("slots", "200");
@@ -92,7 +92,7 @@ public class QueueInfoTest {
 
     @Test(expected = XenonException.class)
     public void test01d_queueInfoFromMap_IncorrectSlots_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("qname", "some.q");
         input.put("slots", "twohundred");
@@ -110,7 +110,7 @@ public class QueueInfoTest {
 
     @Test(expected = XenonException.class)
     public void test01e_queueInfoFromMap_NoPeList_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("qname", "some.q");
         input.put("slots", "200");

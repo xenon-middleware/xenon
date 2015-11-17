@@ -112,7 +112,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     @SuppressWarnings("PMD.EmptyIfStmt")
     protected static JobStatus getJobStatusFromQacctInfo(Map<String, String> info, Job job) throws XenonException {
-        Integer exitcode = null;
+        Integer exitcode;
         Exception exception = null;
         String state = "done";
 
@@ -196,8 +196,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         parser = new GridEngineXmlParser(ignoreVersion);
 
-        lastSeenMap = new HashMap<String, Long>();
-        deletedJobs = new HashSet<Long>();
+        lastSeenMap = new HashMap<>();
+        deletedJobs = new HashSet<>();
 
         //will run a few commands to fetch info
         setupInfo = new GridEngineSetup(this);
@@ -278,7 +278,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
     @Override
     public Job[] getJobs(String... queueNames) throws XenonException {
-        ArrayList<Job> result = new ArrayList<Job>();
+        ArrayList<Job> result = new ArrayList<>();
 
         if (queueNames == null || queueNames.length == 0) {
             String statusOutput = runCheckedCommand(null, "qstat", "-xml");
@@ -302,9 +302,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             }
         }
 
-        Job[] resultArray = result.toArray(new Job[result.size()]);
-
-        return resultArray;
+        return result.toArray(new Job[result.size()]);
     }
 
     @Override
@@ -390,9 +388,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         updateJobsSeenMap(Collections.singleton(identifier));
 
-        Job result = new JobImplementation(getScheduler(), identifier, description, false, false);
-
-        return result;
+        return new JobImplementation(getScheduler(), identifier, description, false, false);
     }
 
     @Override
@@ -421,7 +417,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         if (!runner.success()) {
             LOGGER.debug("failed to get job status {}", runner);
-            return new HashMap<String, Map<String, String>>();
+            return new HashMap<>();
         }
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(runner.getStdout());
@@ -440,10 +436,8 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
             return null;
         }
 
-        Map<String, String> result = ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.WHITESPACE_REGEX,
+        return ScriptingParser.parseKeyValueLines(runner.getStdout(), ScriptingParser.WHITESPACE_REGEX,
                 GridEngineAdaptor.ADAPTOR_NAME, QACCT_HEADER);
-
-        return result;
     }
 
     /**

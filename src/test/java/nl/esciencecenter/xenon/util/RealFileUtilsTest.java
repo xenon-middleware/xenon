@@ -43,7 +43,7 @@ import org.junit.Test;
 
 public class RealFileUtilsTest {
 
-    public static String ROOT = "xenon_RealFileUtilsTest_" + System.currentTimeMillis();
+    public static final String ROOT = "xenon_RealFileUtilsTest_" + System.currentTimeMillis();
 
     public static Xenon xenon;
     public static Files files;
@@ -360,10 +360,11 @@ public class RealFileUtilsTest {
         files.delete(testFile);
     }
 
+    @SuppressWarnings("CanBeFinal")
     class MyFileVisitor implements FileVisitor {
 
-        Path[] dirs;
-        Path[] files;
+        private final Path[] dirs;
+        private final Path[] files;
 
         MyFileVisitor(Path[] dirs, Path[] files) {
             this.dirs = dirs;
@@ -371,9 +372,8 @@ public class RealFileUtilsTest {
         }
 
         private void check(Path[] avail, Path path) throws XenonException {
-
-            for (int i = 0; i < avail.length; i++) {
-                if (path.equals(avail[i])) {
+            for (Path option : avail) {
+                if (path.equals(option)) {
                     return;
                 }
             }
@@ -549,7 +549,7 @@ public class RealFileUtilsTest {
 
     class MyFileVisitor4 implements FileVisitor {
 
-        int countFiles = 0;
+        private int countFiles = 0;
 
         @Override
         public FileVisitResult postVisitDirectory(Path dir, XenonException exception, Files files)

@@ -49,7 +49,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("ge", "sge");
     
     /** The locations supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<String>("(locations supported by local)", 
+    private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)",
             "(locations supported by ssh)");
     
     /** Should the grid engine version on the target machine be ignored ? */
@@ -94,6 +94,6 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 }

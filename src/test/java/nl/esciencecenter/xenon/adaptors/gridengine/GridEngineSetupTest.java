@@ -53,10 +53,10 @@ public class GridEngineSetupTest {
     public void test02a_calculateSlots_singleNodePe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
@@ -72,10 +72,10 @@ public class GridEngineSetupTest {
     public void test02b_calculateSlots_singleNodePeMultipleNodes_exceptionThrown() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.PE_SLOTS, 0));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
@@ -87,10 +87,10 @@ public class GridEngineSetupTest {
     public void test02c_calculateSlots_fillUpPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.FILL_UP, 0));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
@@ -127,10 +127,10 @@ public class GridEngineSetupTest {
     public void test02d_calculateSlots_roundRobinPe_tooManySlots_Fails() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.ROUND_ROBIN, 0));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
@@ -142,10 +142,10 @@ public class GridEngineSetupTest {
     public void test02e_calculateSlots_integerPe_slots() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 3));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
@@ -162,10 +162,10 @@ public class GridEngineSetupTest {
     public void test02e_calculateSlots_InvalidPe_exceptionThrown() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
         queueInfos.put("some.q", new QueueInfo("some.q", 4, "some.pe"));
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);
 
@@ -176,9 +176,9 @@ public class GridEngineSetupTest {
     public void test02e_calculateSlots_InvalidQueue_exceptionThrown() throws XenonException {
         String[] queueNames = new String[] { "some.q" };
 
-        Map<String, QueueInfo> queueInfos = new HashMap<String, QueueInfo>();
+        Map<String, QueueInfo> queueInfos = new HashMap<>();
 
-        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> peInfos = new HashMap<>();
         peInfos.put("some.pe", new ParallelEnvironmentInfo("some.pe", 100, AllocationRule.INTEGER, 3));
 
         GridEngineSetup testSetup = new GridEngineSetup(queueNames, queueInfos, peInfos);

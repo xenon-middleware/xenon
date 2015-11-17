@@ -63,7 +63,7 @@ public class FileUtilsTest {
     
     @Test
     public void testRecursiveCopy_SingleFile_CopiedFile() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcFile = mock(Path.class);
         Path dstFile = mock(Path.class);
@@ -85,7 +85,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_SingleDirectory_MkdirTarget() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
         Files files = mock(Files.class);
         Path srcDir = mock(Path.class);
         Path dstDir = mock(Path.class);
@@ -114,7 +114,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_DirectoryWithAFile_MkdirAndCopy() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
 // FIXME: 
 //        
 //        Files files = mock(Files.class);
@@ -160,7 +160,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_SingleFileExists_FileAlreadyExistsException() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -191,7 +191,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_SingleDirectoryExists_FileAlreadyExistsException() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        
@@ -230,7 +230,7 @@ public class FileUtilsTest {
 
     @Test
     public void testRecursiveCopy_DirectoryWithAFileExists_FileAlreadyExistsException() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
 //        Files files = mock(Files.class);
 //        Path srcDir = mock(Path.class); // foo
 //        Path srcFile = mock(Path.class); // foo/myfile
@@ -280,7 +280,7 @@ public class FileUtilsTest {
 
     @Test
     public void recursiveCopy_IgnoreDir_DirNotCopied() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);
@@ -315,7 +315,7 @@ public class FileUtilsTest {
 
     @Test
     public void recursiveCopy_IgnoreFile_FileNotCopied() throws XenonException,
-            nl.esciencecenter.xenon.files.InvalidCopyOptionsException {
+            InvalidCopyOptionsException {
 // FIXME:        
 //        
 //        Files files = mock(Files.class);

@@ -16,21 +16,23 @@
 
 package nl.esciencecenter.xenon.adaptors;
 
+import java.io.IOException;
+
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public interface CredentialTestConfig {
-    public abstract boolean supportsCertificateCredentials();
-    public abstract boolean supportsPasswordCredentials();
+    boolean supportsCertificateCredentials();
+    boolean supportsPasswordCredentials();
 
-    public abstract String getCorrectCertFile();
-    public abstract String getIncorrectCertFile();
+    String getCorrectCertFile() throws IOException;
+    String getIncorrectCertFile();
 
-    public abstract String getUserName();
-    public abstract char [] getPassword();
+    String getUserName();
+    char[] getPassword();
 
-    public abstract String [] supportedSchemes();
+    String [] supportedSchemes();
 }
 
 

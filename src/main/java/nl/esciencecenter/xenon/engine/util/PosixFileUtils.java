@@ -29,6 +29,7 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
  * @since 1.0
  *
  */
+@SuppressWarnings("OctalInteger")
 public class PosixFileUtils {
     
     // FIXME: Are these correct ? Some seem to be missing ?  
@@ -67,7 +68,7 @@ public class PosixFileUtils {
     @SuppressWarnings("PMD.NPathComplexity")
     public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
-        HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();
+        HashSet<PosixFilePermission> result = new HashSet<>();
 
         if ((bit & READ_OWNER) != 0) {
             result.add(PosixFilePermission.OWNER_READ);

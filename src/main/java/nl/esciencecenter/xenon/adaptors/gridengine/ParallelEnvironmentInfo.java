@@ -28,12 +28,12 @@ import nl.esciencecenter.xenon.XenonException;
 class ParallelEnvironmentInfo {
 
     public enum AllocationRule {
-        INTEGER, PE_SLOTS, ROUND_ROBIN, FILL_UP;
+        INTEGER, PE_SLOTS, ROUND_ROBIN, FILL_UP
     }
 
-    public static final String ALLOCATION_PE_SLOTS = "$pe_slots";
-    public static final String ALLOCATION_ROUND_ROBIN = "$round_robin";
-    public static final String ALLOCATION_FILL_UP = "$fill_up";
+    private static final String ALLOCATION_PE_SLOTS = "$pe_slots";
+    private static final String ALLOCATION_ROUND_ROBIN = "$round_robin";
+    private static final String ALLOCATION_FILL_UP = "$fill_up";
 
     private final String name;
     private final int slots;

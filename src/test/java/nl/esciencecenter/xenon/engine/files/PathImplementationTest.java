@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PathImplementationTest {
-    FileSystem fs;
+    private FileSystem fs;
 
     @Before
     public void setUp() throws Exception {

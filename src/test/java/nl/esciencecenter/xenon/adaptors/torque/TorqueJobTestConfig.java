@@ -164,7 +164,7 @@ public class TorqueJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public String getInvalidQueueName() throws Exception {
+    public String getInvalidQueueName() {
         return "aap";
     }
 

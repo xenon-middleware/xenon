@@ -71,16 +71,15 @@ public class AdaptorTest {
         }
 
         @Override
-        public void end() {
-        }
+        public void end() { /* noop */ }
 
     }
 
     @Test
     public void test0() throws XenonException {
 
-        ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
-        ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
+        ImmutableArray<String> schemes = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
 
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, 
                 new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
@@ -94,8 +93,8 @@ public class AdaptorTest {
     @Test
     public void test1() throws XenonException {
 
-        ImmutableArray<String> schemes = new ImmutableArray<String>("SCHEME1", "SCHEME2");
-        ImmutableArray<String> locations = new ImmutableArray<String>("L1", "L2");
+        ImmutableArray<String> schemes = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
 
         ImmutableArray<XenonPropertyDescription> supportedProperties = new ImmutableArray<XenonPropertyDescription>(
                 new XenonPropertyDescriptionImplementation("xenon.adaptors.test.p1", Type.STRING, EnumSet.of(Component.XENON),

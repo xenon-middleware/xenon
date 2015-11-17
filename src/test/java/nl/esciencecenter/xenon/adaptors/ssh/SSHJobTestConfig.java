@@ -36,7 +36,7 @@ public class SSHJobTestConfig extends JobTestConfig {
     private final String username;
     private final char[] passwd;
 
-    private final String scheme = "ssh";
+    private final static String scheme = "ssh";
     
     private final String correctLocation;
     private final String correctLocationWrongUser;
@@ -116,7 +116,7 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public String getInvalidQueueName() throws Exception {
+    public String getInvalidQueueName() {
         return "aap";
     }
 

@@ -17,11 +17,11 @@ import org.apache.commons.net.ftp.FTPClient;
  */
 public class FtpOutputStream extends OutputStream {
 
-    private OutputStream outputStream;
-    private FTPClient ftpClient;
+    private final OutputStream outputStream;
+    private final FTPClient ftpClient;
     private boolean completedPendingFtpCommand = false;
-    private Path path;
-    private FtpFiles ftpFiles;
+    private final Path path;
+    private final FtpFiles ftpFiles;
 
     public FtpOutputStream(OutputStream outputStream, FTPClient ftpClient, Path path, FtpFiles ftpFiles) {
         this.outputStream = outputStream;
@@ -62,18 +62,8 @@ public class FtpOutputStream extends OutputStream {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return outputStream.equals(obj);
-    }
-
-    @Override
     public void flush() throws IOException {
         outputStream.flush();
-    }
-
-    @Override
-    public int hashCode() {
-        return outputStream.hashCode();
     }
 
     @Override

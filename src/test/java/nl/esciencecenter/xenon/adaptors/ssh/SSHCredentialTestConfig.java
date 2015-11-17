@@ -17,6 +17,7 @@
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.io.File;
+import java.io.IOException;
 
 import nl.esciencecenter.xenon.adaptors.CredentialTestConfig;
 
@@ -39,7 +40,7 @@ public class SSHCredentialTestConfig implements CredentialTestConfig {
     }
 
     @Override
-    public String getCorrectCertFile() {
+    public String getCorrectCertFile() throws IOException {
         
         String location = System.getProperty("user.home");
         
@@ -55,7 +56,7 @@ public class SSHCredentialTestConfig implements CredentialTestConfig {
             return dsa.getAbsolutePath();
         }
 
-        throw new RuntimeException("Cannot find an SSH key in " + location);
+        throw new IOException("Cannot find an SSH key in " + location);
     }
 
     @Override

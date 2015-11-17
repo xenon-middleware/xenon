@@ -174,7 +174,7 @@ class SshMultiplexedSession {
             sessionHost = "localhost";
         }
 
-        Session session = null;
+        Session session;
 
         try {
             session = jsch.getSession(location.getUser(), sessionHost, sessionPort);

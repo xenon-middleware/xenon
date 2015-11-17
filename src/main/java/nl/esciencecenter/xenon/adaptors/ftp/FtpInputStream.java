@@ -15,12 +15,13 @@ import org.apache.commons.net.ftp.FTPClient;
  * @author Christiaan Meijer
  *
  */
+@SuppressWarnings("CanBeFinal")
 public class FtpInputStream extends InputStream {
-    private InputStream inputStream;
-    private FTPClient ftpClient;
+    private final InputStream inputStream;
+    private final FTPClient ftpClient;
     private boolean completedPendingFtpCommand = false;
-    private Path path;
-    private FtpFiles ftpFiles;
+    private final Path path;
+    private final FtpFiles ftpFiles;
 
     public FtpInputStream(InputStream inputStream, FTPClient ftpClient, Path path, FtpFiles ftpFiles) {
         this.inputStream = inputStream;
@@ -53,16 +54,6 @@ public class FtpInputStream extends InputStream {
     @Override
     public int available() throws IOException {
         return inputStream.available();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return inputStream.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return inputStream.hashCode();
     }
 
     @Override

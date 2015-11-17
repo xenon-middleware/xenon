@@ -2,8 +2,6 @@ package nl.esciencecenter.xenon.util;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

@@ -38,7 +38,7 @@ public class ParallelEnvironmentInfoTest {
 
     @Test
     public void test01a_parallelEnvironmentInfoFromMap_IntegerRule_Result() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "200");
@@ -55,7 +55,7 @@ public class ParallelEnvironmentInfoTest {
 
     @Test
     public void test01b_parallelEnvironmentInfoFromMap_PeSlotsRule_Result() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "200");
@@ -71,7 +71,7 @@ public class ParallelEnvironmentInfoTest {
 
     @Test
     public void test01c_parallelEnvironmentInfoFromMap_RoundRobinRule_Result() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "200");
@@ -87,7 +87,7 @@ public class ParallelEnvironmentInfoTest {
 
     @Test
     public void test01d_parallelEnvironmentInfoFromMap_RoundRobinRule_Result() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "200");
@@ -103,7 +103,7 @@ public class ParallelEnvironmentInfoTest {
     
     @Test(expected=XenonException.class)
     public void test01e_parallelEnvironmentInfoFromMap_IncorrectAllocationRule_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "200");
@@ -114,7 +114,7 @@ public class ParallelEnvironmentInfoTest {
     
     @Test(expected=XenonException.class)
     public void test01f_parallelEnvironmentInfoFromMap_NoName_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("slots", "200");
         input.put("allocation_rule", "2");
@@ -124,7 +124,7 @@ public class ParallelEnvironmentInfoTest {
     
     @Test(expected=XenonException.class)
     public void test01g_parallelEnvironmentInfoFromMap_NoSlots_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("allocation_rule", "2");
@@ -134,7 +134,7 @@ public class ParallelEnvironmentInfoTest {
     
     @Test(expected=XenonException.class)
     public void test01h_parallelEnvironmentInfoFromMap_IncorrectSlots_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "twohundred");
@@ -145,7 +145,7 @@ public class ParallelEnvironmentInfoTest {
     
     @Test(expected=XenonException.class)
     public void test01i_parallelEnvironmentInfoFromMap_NoAllocationRule_ExceptionThrown() throws XenonException {
-        Map<String, String> input = new HashMap<String, String>();
+        Map<String, String> input = new HashMap<>();
 
         input.put("pe_name", "some.pe");
         input.put("slots", "200");

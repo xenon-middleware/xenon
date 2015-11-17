@@ -57,12 +57,9 @@ class SshSession {
         return tunnelPort;
     }
 
-    protected int getSessionID() {
-        return sessionID;
-    }
+    protected int getSessionID() { return sessionID; }
 
     protected boolean incOpenChannels(String info) {
-
         if (openChannels == MAX_OPEN_CHANNELS) {
             return false;
         }
@@ -77,23 +74,28 @@ class SshSession {
         LOGGER.debug("SSHSESSION-{}: --Open channels: {} {}", sessionID, openChannels, info);
     }
 
+    /**
+     * Cached channel from putSftpChannelInCache() is returned and removed from cache.
+     */
     protected ChannelSftp getSftpChannelFromCache() {
         ChannelSftp channel = sftpChannelCache;
         sftpChannelCache = null;
         return channel;
     }
 
+    /**
+     * Caches one channel.
+     *
+     * If a channel is already cached, it does nothing. Gets reset by getSftpChannelFromCache().
+     * @param channel channel to cache
+     * @return whether the given channel is now the cached channel
+     */
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
     protected boolean putSftpChannelInCache(ChannelSftp channel) {
-        
-        if (sftpChannelCache != null) {
-            // If the given channel is the one that is currently cached, we should return true to 
-            // prevent the channel from being closed. 
-            return (sftpChannelCache == channel);
+        if (sftpChannelCache == null) {
+            sftpChannelCache = channel;
         }
-
-        sftpChannelCache = channel;
-        return true;
+        return sftpChannelCache == channel;
     }
 
     protected void releaseExecChannel(ChannelExec channel) {
@@ -137,7 +139,7 @@ class SshSession {
             return null;
         }
 
-        ChannelExec channel = null;
+        ChannelExec channel;
 
         try {
             LOGGER.debug("SSHSESSION-{}: Creating EXEC channel {}", sessionID, openChannels);

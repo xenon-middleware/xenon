@@ -42,8 +42,9 @@ public abstract class GenericTestConfig {
         this.p = getTestProperties(configfile);
     }
 
-    public static Properties getTestProperties(String configFilename) throws FileNotFoundException, IOException {
+    public static Properties getTestProperties(String defaultConfigFilename) throws FileNotFoundException, IOException {
         Properties props = new Properties();
+        String configFilename = defaultConfigFilename;
         if (configFilename == null) {
             configFilename = System.getProperty("xenon.test.properties");
         }

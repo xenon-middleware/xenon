@@ -83,7 +83,7 @@ public class SubmitBatchJobWithOutput {
             } else {
                 
                 // Access output using local or SSH as a scheme.
-                Path workingDir = null;
+                Path workingDir;
                 
                 if (location.getScheme().equals("local") || location.getAuthority() == null) { 
                     workingDir = Utils.getLocalCWD(files);

@@ -51,8 +51,8 @@ public class Sandbox {
 
     private final Path path;
 
-    private List<Pair> uploadFiles = new LinkedList<Pair>();
-    private List<Pair> downloadFiles = new LinkedList<Pair>();
+    private List<Pair> uploadFiles = new LinkedList<>();
+    private final List<Pair> downloadFiles = new LinkedList<>();
 
     /**
      * Pair represents the combination of a source and destination path
@@ -115,9 +115,7 @@ public class Sandbox {
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Pair [source=").append(source).append(", destination=").append(destination).append("]");
-            return builder.toString();
+            return "Pair [source=" + source + ", destination=" + destination + "]";
         }
     }
 
@@ -186,9 +184,9 @@ public class Sandbox {
      * @throws XenonException 
      */
     public void setUploadFiles(Path... files) throws XenonException {
-        uploadFiles = new LinkedList<Pair>();
-        for (int i = 0; i < files.length; i++) {
-            addUploadFile(files[i]);
+        uploadFiles = new LinkedList<>();
+        for (Path file : files) {
+            addUploadFile(file);
         }
     }
 
@@ -325,35 +323,20 @@ public class Sandbox {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         Sandbox other = (Sandbox) obj;
-
-        if (!files.equals(other.files)) {
-            return false;
-        }
-
-        if (!path.equals(other.path)) {
-            return false;
-        }
-
-        if (!downloadFiles.equals(other.downloadFiles)) {
-            return false;
-        }
-
-        return uploadFiles.equals(other.uploadFiles);
+        return files.equals(other.files)
+                && path.equals(other.path)
+                && downloadFiles.equals(other.downloadFiles)
+                && uploadFiles.equals(other.uploadFiles);
     }
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Sandbox [files=").append(files).append(", path=").append(path).append(", uploadFiles=")
-                .append(uploadFiles).append(", downloadFiles=").append(downloadFiles).append("]");
-        return builder.toString();
+        return "Sandbox [files=" + files + ", path=" + path + ", uploadFiles=" +
+                uploadFiles + ", downloadFiles=" + downloadFiles + "]";
     }
 }

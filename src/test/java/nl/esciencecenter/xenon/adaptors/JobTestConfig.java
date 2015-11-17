@@ -35,7 +35,7 @@ public abstract class JobTestConfig extends GenericTestConfig {
         super(adaptorName, configfile);
     }
 
-    public boolean supportsClose() throws Exception {
+    public boolean supportsClose() {
         return false;
     }
 
@@ -57,7 +57,7 @@ public abstract class JobTestConfig extends GenericTestConfig {
 
     public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
 
-    public abstract String getInvalidQueueName() throws Exception;
+    public abstract String getInvalidQueueName();
 
     public abstract long getQueueWaitTime();
 

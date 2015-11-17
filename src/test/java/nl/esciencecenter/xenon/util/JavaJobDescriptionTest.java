@@ -31,13 +31,16 @@ import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.util.JavaJobDescription;
 
+import org.junit.Test;
+
 /**
  * @author Niels Drost
  * 
  */
+@SuppressWarnings("ALL")
 public class JavaJobDescriptionTest {
 
-    @org.junit.Test
+    @Test
     public void test_new() throws Exception {
         new JavaJobDescription();
     }
@@ -52,7 +55,7 @@ public class JavaJobDescriptionTest {
     //
     //    private final List<String> javaClassPath = new ArrayList<String>();
 
-    @org.junit.Test
+    @Test
     public void test_setters_getters() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
 
@@ -66,12 +69,12 @@ public class JavaJobDescriptionTest {
 
         //system properties
 
-        Map<String, String> in = new HashMap<String, String>();
+        Map<String, String> in = new HashMap<>();
         in.put("some.key", "some.value");
         j.setJavaSystemProperties(in);
         j.addJavaSystemProperty("other.key", "other.value");
 
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("some.key", "some.value");
         expected.put("other.key", "other.value");
 
@@ -90,7 +93,7 @@ public class JavaJobDescriptionTest {
         j.addJavaArgument("g");
         List<String> argumentList = j.getJavaArguments();
         assertNotNull(argumentList);
-        assertArrayEquals(new String[] { "d", "e", "f", "g" }, argumentList.toArray(new String[0]));
+        assertArrayEquals(new String[] { "d", "e", "f", "g" }, argumentList.toArray(new String[4]));
 
         //class path
 
@@ -98,52 +101,52 @@ public class JavaJobDescriptionTest {
         j.addJavaClasspathElement("k");
         List<String> classpathList = j.getJavaClasspath();
         assertNotNull(classpathList);
-        assertArrayEquals(new String[] { "h", "i", "j", "k" }, classpathList.toArray(new String[0]));
+        assertArrayEquals(new String[] { "h", "i", "j", "k" }, classpathList.toArray(new String[4]));
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_addOption_Null_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaOption(null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_addOption_Empty_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaOption("");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_addArgument_Null_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaArgument(null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_addArgument_Empty_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaArgument("");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_addClasspathElement_Null_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaClasspathElement(null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_addClasspathElement_Empty_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.addJavaClasspathElement("");
     }
 
-    @org.junit.Test(expected = XenonRuntimeException.class)
+    @Test(expected = XenonRuntimeException.class)
     public void test_setArguments_AnyArgument_Exception() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.setArguments("some", "arguments");
     }
 
-    @org.junit.Test
+    @Test
     public void test_setExecutable_Null_Java() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.setExecutable(null);
@@ -153,7 +156,7 @@ public class JavaJobDescriptionTest {
         assertEquals("java", executable);
     }
 
-    @org.junit.Test
+    @Test
     public void test_setExecutable_Something_Something() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
         j.setExecutable("something");
@@ -163,7 +166,7 @@ public class JavaJobDescriptionTest {
         assertEquals("something", executable);
     }
 
-    @org.junit.Test
+    @Test
     public void test_getArguments() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
 
@@ -180,10 +183,10 @@ public class JavaJobDescriptionTest {
                 "-Dproperty.key=property.value", "nl.esciencecenter.main.class", "argument" };
 
         assertNotNull(arguments);
-        assertArrayEquals(expected, arguments.toArray(new String[0]));
+        assertArrayEquals(expected, arguments.toArray(new String[arguments.size()]));
     }
 
-    @org.junit.Test
+    @Test
     public void test_getArguments_NoMain() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
 
@@ -196,10 +199,10 @@ public class JavaJobDescriptionTest {
         String[] expected = new String[] { "-jar", "somefile.jar" };
 
         assertNotNull(arguments);
-        assertArrayEquals(expected, arguments.toArray(new String[0]));
+        assertArrayEquals(expected, arguments.toArray(new String[arguments.size()]));
     }
 
-    @org.junit.Test
+    @Test
     public void test_toString() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
 
@@ -225,7 +228,7 @@ public class JavaJobDescriptionTest {
         assertEquals(expected, j.toString());
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals() throws Exception {
         JavaJobDescription one = new JavaJobDescription();
         JavaJobDescription other = new JavaJobDescription();
@@ -273,7 +276,7 @@ public class JavaJobDescriptionTest {
 
     }
 
-    @org.junit.Test
+    @Test
     public void test_hashcode_empty() throws Exception {
         JavaJobDescription j = new JavaJobDescription();
 
@@ -284,6 +287,7 @@ public class JavaJobDescriptionTest {
 
         result = prime * result + new ArrayList<String>().hashCode();
         result = prime * result + new ArrayList<String>().hashCode();
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + new ArrayList<String>().hashCode();
         result = prime * result + new HashMap<String, String>().hashCode();
@@ -291,14 +295,14 @@ public class JavaJobDescriptionTest {
         assertEquals(result, j.hashCode());
     }
 
-    @org.junit.Test
+    @Test
     public void test_hashcode_filled() throws Exception {
         String[] arguments = new String[] { "some", "arguments" };
         String[] options = new String[] { "some", "options" };
         String main = "main";
         String[] classpath = new String[] { "class", "path" };
 
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put("some.key", "some.value");
 
         JavaJobDescription j = new JavaJobDescription();

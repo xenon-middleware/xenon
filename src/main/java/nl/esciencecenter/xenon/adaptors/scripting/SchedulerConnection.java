@@ -285,7 +285,7 @@ public abstract class SchedulerConnection {
      */
     protected void checkQueueNames(String[] givenQueueNames) throws NoSuchQueueException {
         //create a hash set with all given queues
-        HashSet<String> invalidQueues = new HashSet<String>(Arrays.asList(givenQueueNames));
+        HashSet<String> invalidQueues = new HashSet<>(Arrays.asList(givenQueueNames));
 
         //remove all valid queues from the set
         invalidQueues.removeAll(Arrays.asList(getQueueNames()));

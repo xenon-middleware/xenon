@@ -414,6 +414,7 @@ public class XenonPropertiesTest {
         props.put("key", "1g");
         XenonProperties xprop = new XenonProperties(valid, props);
 
+        //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L*1024L*1024L);
     }
     
@@ -428,6 +429,7 @@ public class XenonPropertiesTest {
         props.put("key", "1G");
         XenonProperties xprop = new XenonProperties(valid, props);
 
+        //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L*1024L*1024L);
     }
 
@@ -442,6 +444,7 @@ public class XenonPropertiesTest {
         props.put("key", "1m");
         XenonProperties xprop = new XenonProperties(valid, props);
 
+        //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L*1024L);
     }
     
@@ -456,6 +459,7 @@ public class XenonPropertiesTest {
         props.put("key", "1M");
         XenonProperties xprop = new XenonProperties(valid, props);
 
+        //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L*1024L);
     }
 
@@ -470,6 +474,7 @@ public class XenonPropertiesTest {
         props.put("key", "1k");
         XenonProperties xprop = new XenonProperties(valid, props);
 
+        //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L);
     }
     
@@ -484,6 +489,7 @@ public class XenonPropertiesTest {
         props.put("key", "1K");
         XenonProperties xprop = new XenonProperties(valid, props);
 
+        //noinspection PointlessArithmeticExpression
         assertTrue(xprop.getSizeProperty("key") == 1L*1024L);
     }
 

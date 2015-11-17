@@ -184,9 +184,7 @@ public class SshAdaptor extends Adaptor {
             // Connect to the local ssh-agent
             LOGGER.debug("Connecting to ssh-agent");
             
-            //jsch.setConfig("PreferredAuthentications", "publickey");
-            
-            Connector connector = null;
+            Connector connector;
 
             try {
                 ConnectorFactory cf = ConnectorFactory.getDefault();

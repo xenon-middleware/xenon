@@ -213,7 +213,7 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test03a_getJobStatusFromQacctInfo_doneJob_JobStatus() throws XenonException {
         String jobnumber = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
         jobInfo.put("exit_status", "5");
         jobInfo.put("failed", "0");
@@ -233,7 +233,7 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test03b_getJobStatusFromQacctInfo_CanceledJob_JobStatusWithException() throws XenonException {
         String jobnumber = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
         jobInfo.put("exit_status", "0");
         jobInfo.put("failed", "100: This job was canceled");
@@ -254,7 +254,7 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test03c_getJobStatusFromQacctInfo_JobWithNonZeroexit_status_JobStatusWithNoException() throws XenonException {
         String jobnumber = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
         jobInfo.put("exit_status", "11");
         jobInfo.put("failed", "0");
@@ -274,7 +274,7 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test03d_getJobStatusFromQacctInfo_FailedJob_JobStatusWithException() throws XenonException {
         String jobnumber = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
         jobInfo.put("exit_status", "4");
         jobInfo.put("failed", "666: SomethingWentWrongNoIdea");
@@ -306,7 +306,7 @@ public class GridEngineSchedulerConnectionTest {
     public void test03f_getJobStatusFromQacctInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobnumber = "555";
         //empty job info
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
 
         Job job = new FakeScriptingJob(jobnumber);
 
@@ -317,7 +317,7 @@ public class GridEngineSchedulerConnectionTest {
     public void test03g_getJobStatusFromQacctInfo_ExitCodeNotANumber_ExceptionThrown() throws XenonException {
         String jobnumber = "555";
         //empty job info
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("jobnumber", jobnumber);
         jobInfo.put("exit_status", "four");
         jobInfo.put("failed", "0");
@@ -330,12 +330,12 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test04a_getJobStatusFromQstatInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JB_job_number", jobID);
         jobInfo.put("state", "qw");
         jobInfo.put("long_state", "pending");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = GridEngineSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -352,12 +352,12 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test04b_getJobStatusFromQstatInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JB_job_number", jobID);
         jobInfo.put("state", "r");
         jobInfo.put("long_state", "running");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = GridEngineSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -374,12 +374,12 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test04c_getJobStatusFromQstatInfo_ErrorJob_JobStatusWithExcepion() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JB_job_number", jobID);
         jobInfo.put("state", "qEw");
         jobInfo.put("long_state", "error");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = GridEngineSchedulerConnection.getJobStatusFromQstatInfo(input, job);
@@ -398,7 +398,7 @@ public class GridEngineSchedulerConnectionTest {
     @Test
     public void test04d_getJobStatusFromQstatInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = GridEngineSchedulerConnection.getJobStatusFromQstatInfo(input, job);
 
@@ -410,9 +410,9 @@ public class GridEngineSchedulerConnectionTest {
         String jobID = "555";
 
         //very incomplete job info
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
 
         Job job = new FakeScriptingJob(jobID);

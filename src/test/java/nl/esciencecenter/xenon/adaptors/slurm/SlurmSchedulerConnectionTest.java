@@ -92,12 +92,12 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test02a_getJobStatusFromSacctInfo_CompletedJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
         jobInfo.put("State", "COMPLETED");
         jobInfo.put("ExitCode", "5:0");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
@@ -114,12 +114,12 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test02b_getJobStatusFromSacctInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
         jobInfo.put("State", "RUNNING");
         jobInfo.put("ExitCode", "0:0");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
@@ -136,12 +136,12 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test02c_getJobStatusFromSacctInfo_CanceledJob_JobStatusWithException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
         jobInfo.put("State", "CANCELLED");
         jobInfo.put("ExitCode", "0:0");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
@@ -159,12 +159,12 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test02d_getJobStatusFromSacctInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
         jobInfo.put("State", "FAILED");
         jobInfo.put("ExitCode", "11:0");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
@@ -181,12 +181,12 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test02e_getJobStatusFromSacctInfo_FailedJobWithZeroExitCode_JobStatusWithException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
         jobInfo.put("State", "FAILED");
         jobInfo.put("ExitCode", "0:0");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
@@ -205,7 +205,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test02f_getJobStatusFromSacctInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSacctInfo(input, job);
 
@@ -216,9 +216,9 @@ public class SlurmSchedulerConnectionTest {
     public void test02g_getJobStatusFromSacctInfo_InvalidJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
         //very invalid info, no info at all
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
 
         Job job = new FakeScriptingJob(jobID);
@@ -229,7 +229,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test03a_getJobStatusFromScontrolInfo_CompletedJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "COMPLETED");
         jobInfo.put("ExitCode", "5:0");
@@ -250,7 +250,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test03b_getJobStatusFromScontrolInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "RUNNING");
         jobInfo.put("ExitCode", "0:0");
@@ -271,7 +271,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test03c_getJobStatusFromScontrolInfo_CanceledJob_JobStatusWithException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "CANCELLED");
         jobInfo.put("ExitCode", "0:0");
@@ -293,7 +293,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test03d_getJobStatusFromScontrolInfo_JobWithNonZeroExitCode_JobStatusWithNoException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "FAILED");
         jobInfo.put("ExitCode", "11:0");
@@ -314,7 +314,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test03e_getJobStatusFromScontrolInfo_FailedJob_JobStatusWithException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "FAILED");
         jobInfo.put("ExitCode", "4:0");
@@ -337,7 +337,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test03f_getJobStatusFromScontrolInfo_FailedJobWithNoReason_JobStatusWithException() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobId", jobID);
         jobInfo.put("JobState", "FAILED");
         jobInfo.put("ExitCode", "4:0");
@@ -370,7 +370,7 @@ public class SlurmSchedulerConnectionTest {
     public void test03h_getJobStatusFromScontrolInfo_IncompleteJobInfo_ExceptionThrown() throws XenonException {
         String jobID = "555";
         //empty job info
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
 
         Job job = new FakeScriptingJob(jobID);
 
@@ -380,11 +380,11 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test04a_getJobStatusFromSqueueInfo_PendingJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JOBID", jobID);
         jobInfo.put("STATE", "PENDING");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
@@ -401,11 +401,11 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test04b_getJobStatusFromSqueueInfo_RunningJob_JobStatus() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JOBID", jobID);
         jobInfo.put("STATE", "RUNNING");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
@@ -422,7 +422,7 @@ public class SlurmSchedulerConnectionTest {
     @Test
     public void test04c_getJobStatusFromSqueueInfo_JobNotInMap_NullReturned() throws XenonException {
         String jobID = "555";
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         Job job = new FakeScriptingJob(jobID);
         JobStatus result = SlurmSchedulerConnection.getJobStatusFromSqueueInfo(input, job);
 
@@ -434,9 +434,9 @@ public class SlurmSchedulerConnectionTest {
         String jobID = "555";
 
         //very incomplete job info
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(jobID, jobInfo);
 
         Job job = new FakeScriptingJob(jobID);
@@ -450,12 +450,12 @@ public class SlurmSchedulerConnectionTest {
 
         Scheduler scheduler = new FakeScriptingScheduler();
 
-        Map<String, String> queueInfo = new HashMap<String, String>();
+        Map<String, String> queueInfo = new HashMap<>();
 
         queueInfo.put("MaxUsers", "5");
         queueInfo.put("Nodes", "23");
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
         input.put(queueName, queueInfo);
 
         QueueStatus result = SlurmSchedulerConnection.getQueueStatusFromSInfo(input, queueName, scheduler);
@@ -472,7 +472,7 @@ public class SlurmSchedulerConnectionTest {
 
         Scheduler scheduler = new FakeScriptingScheduler();
 
-        Map<String, Map<String, String>> input = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> input = new HashMap<>();
 
         QueueStatus result = SlurmSchedulerConnection.getQueueStatusFromSInfo(input, queueName, scheduler);
 

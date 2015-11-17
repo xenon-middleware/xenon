@@ -48,7 +48,7 @@ public class CreateLocalFileSystem {
             Credential c = credentials.getDefaultCredential("file");
 
             // We need to know the OS to determine the root of the file system 
-            String root = null;
+            String root;
             
             if (Utils.isWindows()) { 
                 root = "C:";

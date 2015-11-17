@@ -169,7 +169,6 @@ public class XenonProperties {
     }
 
     private void checkType(XenonPropertyDescription description, String key, String value) throws InvalidPropertyException {
-
         Type t = description.getType();
 
         try {
