@@ -1,100 +1,55 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Xenon by NLeSC</title>
+---
+layout: default
+---
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Xenon</h1>
+<header>
+<h1>Xenon</h1>
 
-        <h4>A middleware abstraction library that provides a simple programming interface to various compute and storage resources.</h4>
+<h4>A middleware abstraction library that provides a simple programming interface to various compute and storage resources.</h4>
 
-        <ul>
-          <li><a href="https://github.com/NLeSC/Xenon/releases">All<strong>Releases</strong></a></li>
-          <li><a href="https://github.com/NLeSC/Xenon/releases/download/v1.0.0/nlesc-xenon-1.0.0-bin.zip">Latest<strong>Release</strong></a></li>
-          <li><a href="https://github.com/NLeSC/Xenon">View On <strong>GitHub</strong></a></li>
-        </ul>
+<h3 class="page-heading">Versions</h3>
 
-      </header>
-      <section>
-        <p><img src="http://nlesc.github.io/Xenon/images/NLeSC_Xenon_logo.png" alt="logo"></p>
+<span>Latest version is <b><a href="{{ post.url | prepend: site.baseurl }}">{{ site.posts[0].title }}</a></b></span>
 
-<p>Copyright 2013 The Netherlands eScience Center</p>
+<ul class="post-list">
+  {% for post in site.posts %}
+  <li>
+      <a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+  </li>
+  {% endfor %}
+</ul>
 
-<p>Last modified: 25 September 2013</p>
+</header>
 
-<h2>
-<a name="what-is-it" class="anchor" href="#what-is-it"><span class="octicon octicon-link"></span></a>What is it?</h2>
+    <section>
+            <p><img src="http://nlesc.github.io/Xenon/images/NLeSC_Xenon_logo.png" alt="logo"></p>
 
-<p>Xenon is a middleware abstraction library. It provides a simple programming 
-interface to various pieces of software that can be used to access distributed
-compute and storage resources. </p>
+    <h2>
+    <a name="what-is-it" class="anchor" href="#what-is-it"><span class="octicon octicon-link"></span></a>What is it?</h2>
 
-<h2>
-<a name="why-Xenon" class="anchor" href="#why-Xenon"><span class="octicon octicon-link"></span></a>Why Xenon?</h2>
+    <p>Xenon is a middleware abstraction library. It provides a simple programming
+    interface to various pieces of software that can be used to access distributed
+    compute and storage resources. </p>
 
-<p>Xenon is developed by the Netherlands eScience Center as a support library 
-for our projects. Several projects develop end-user applications that require 
-access to distributed compute and storage resources. Xenon provides a simple 
-API to those resources, allowing those applications to be developed more 
-rapidly. The experience gained during end-user application development is used 
-to improve the Xenon API and implementation. </p>
+    <h2>
+    <a name="why-Xenon" class="anchor" href="#why-Xenon"><span class="octicon octicon-link"></span></a>Why Xenon?</h2>
 
-<h2>
-<a name="the-latest-version" class="anchor" href="#the-latest-version"><span class="octicon octicon-link"></span></a>The Latest Version</h2>
+    <p>Xenon is developed by the Netherlands eScience Center as a support library
+    for our projects. Several projects develop end-user applications that require
+    access to distributed compute and storage resources. Xenon provides a simple
+    API to those resources, allowing those applications to be developed more
+    rapidly. The experience gained during end-user application development is used
+    to improve the Xenon API and implementation. </p>
 
-<p>Details of the latest version can be found on the Xenon project web site at:</p>
-<p><a href="https://github.com/NLeSC/Xenon">https://github.com/NLeSC/Xenon</a>.</p>
+    <h2>
+    <a name="copyrights--disclaimers" class="anchor" href="#copyrights--disclaimers"><span class="octicon octicon-link"></span></a>Copyrights &amp; Disclaimers</h2>
 
-<h2>
-<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+    <p>Xenon is copyrighted by the Netherlands eScience Center and releases under
+    the Apache License, Version 2.0.</p>
 
-<p>For an overview of Xenon please consult the <strong>online users guide</strong>:</p>
+    <p>See <a href="http://www.esciencecenter.nl">http://www.esciencecenter.nl</a> for more information on the Netherlands
+    eScience Center.</p>
 
-<p><a href="https://github.com/NLeSC/Xenon/blob/develop/doc/userguide.md">https://github.com/NLeSC/Xenon/blob/develop/doc/userguide.md</a></p>
+    <p>See the "LICENSE" and "NOTICE" files for more information on the third party libraries included in Xenon.</p>
 
-<p>A pdf version of the user guide is also available in the docs directory 
-"docs/usersguide.pdf" or online at:</p>
-
-<p><a href="http://nlesc.github.io/Xenon/userguide.pdf">http://nlesc.github.io/Xenon/userguide.pdf</a></p>
-
-<p>See the file "INSTALL.txt" for a description of how to install Xenon. </p>
-
-<p>The javadoc of Xenon library is available online at: </p>
-
-<p><a href="http://nlesc.github.io/Xenon/javadoc">http://nlesc.github.io/Xenon/javadoc</a></p>
-
-<p>The source of Xenon can be found in "src/". Example applications can be 
-found in "examples/src/".</p>
-
-<h2>
-<a name="copyrights--disclaimers" class="anchor" href="#copyrights--disclaimers"><span class="octicon octicon-link"></span></a>Copyrights &amp; Disclaimers</h2>
-
-<p>Xenon is copyrighted by the Netherlands eScience Center and releases under 
-the Apache License, Version 2.0.</p>
-
-<p>See <a href="http://www.esciencecenter.nl">http://www.esciencecenter.nl</a> for more information on the Netherlands
-eScience Center.</p>
-
-<p>See the "LICENSE" and "NOTICE" files for more information on the third party libraries included in Xenon.</p>
-
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/NLeSC">NLeSC</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
-</html>
+          </section>
