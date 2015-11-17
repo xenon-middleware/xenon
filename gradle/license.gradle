@@ -1,0 +1,12 @@
+// Checking license 
+// Depends on plugins:
+//   id 'com.github.hierynomus.license' version '0.12.1'
+
+license {
+    ext.copyright_year = 2013
+    ext.copyright_owner = 'Netherlands eScience Center'
+    header rootProject.file('config/license/HEADER')
+    strictCheck true
+    excludes(["**/*.examples", "**/create_symlinks", "**/fixtures/**"])
+}
+
