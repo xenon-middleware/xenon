@@ -5,8 +5,8 @@
 //    id 'org.ajoberstar.release-opinion' version '1.3.2'
 // Depends on distribution.gradle
 
-//  PUBLISH
-// =========
+//  PUBLISH ARTIFACTS
+// ==================
 bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
@@ -23,8 +23,26 @@ bintray {
     publications = ['MyPublication']
 }
 
-import org.ajoberstar.grgit.Grgit
-
-release {
-    grgit = Grgit.open('.')
+// PUBLISH DOCUMENTATION
+githubPages {
+  repoUri = 'git@github.com:sverhoeven/Xenon.git'
+  pages {
+    from(javadoc) {
+      into "javadoc/$version"
+    }
+  }
+  deleteExistingFiles = false
 }
+
+//import org.ajoberstar.grgit.*
+
+//ext.repo = Grgit.open(project.file('.'))
+
+//release {
+    //grgit = ext.repo
+//}
+tasks.publish.dependsOn 'bintrayUpload', 'publishGhPages'
+
+//task release() {
+    //dependsOn 'bintrayUpload', 'publishGhPages'
+//}
