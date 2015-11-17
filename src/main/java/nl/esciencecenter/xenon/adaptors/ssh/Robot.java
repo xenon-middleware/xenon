@@ -26,10 +26,10 @@ class Robot implements UserInfo {
 
     private final boolean yesNo;
 
-    Robot(boolean yesyNo) {
-        this.yesNo = yesyNo;
+    Robot(boolean yesNo) {
+        this.yesNo = yesNo;
     }
-
+    
     @Override
     public String getPassphrase() {
         return null;

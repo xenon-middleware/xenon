@@ -83,7 +83,7 @@ public abstract class GenericTestConfig {
         if (value == null) {
             throw new UnknownPropertyException(adaptorName, "Failed to retrieve property " + name);
         }
-        return value;
+        return value.trim();
     }
 
     public final String getPropertyOrFail(String name) throws UnknownPropertyException {

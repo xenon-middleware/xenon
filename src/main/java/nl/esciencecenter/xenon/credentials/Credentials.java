@@ -33,7 +33,7 @@ public interface Credentials {
     /**
      * Constructs a certificate Credential.
      * 
-     * A certificate Credential is created out of a certificate file (containing the certificate), a user name, and (optionally)
+     * A certificate credential is created out of a certificate file (containing the certificate), a user name, and (optionally)
      * a password needed to access the credential.
      *
      * @param scheme
@@ -64,7 +64,7 @@ public interface Credentials {
     /**
      * Constructs a password credential.
      * 
-     * A password Credential consists of a user name and a password.
+     * A password credential consists of a user name and a password.
      * 
      * @param scheme
      *          the scheme for which to create a credential.                
@@ -86,7 +86,7 @@ public interface Credentials {
      */
     Credential newPasswordCredential(String scheme, String username, char[] password, Map<String, String> properties)
             throws XenonException;
-
+    
     /**
      * Creates a default credential for the given scheme.
      * 
