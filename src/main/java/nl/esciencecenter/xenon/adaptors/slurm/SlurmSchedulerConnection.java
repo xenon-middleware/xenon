@@ -168,7 +168,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         String state = jobInfo.get("STATE");
 
-        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
+        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING") || state.equals("COMPLETING"), false,
+                jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {

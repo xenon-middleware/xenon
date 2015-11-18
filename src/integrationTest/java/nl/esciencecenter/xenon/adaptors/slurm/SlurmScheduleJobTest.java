@@ -335,7 +335,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
                 assertTrue(line.equals(message));
             }
 
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(30));
             checkJobDone(status);
         } finally {
             try {
@@ -365,7 +365,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setStartSingleProcess(true);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(30));
             checkJobDone(status);
             
             String outputContent = readFully(resolve(root, "stdout.txt"));

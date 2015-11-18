@@ -20,10 +20,8 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
- *
  */
 public class SSHCertificateCredentialImplementation extends CertificateCredentialImplementation {
 

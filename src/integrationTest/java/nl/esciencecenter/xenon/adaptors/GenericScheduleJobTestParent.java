@@ -402,8 +402,8 @@ public abstract class GenericScheduleJobTestParent {
         String out = Utils.readToString(streams.getStdout());
         String err = Utils.readToString(streams.getStderr());
 
-        // NOTE: Job should already be done here!
-        JobStatus status = jobs.waitUntilDone(job, config.getUpdateTime());
+        // Wait for 30 sec for the job to complete
+        JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(30));
 
         checkJobDone(status);
 
