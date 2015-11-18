@@ -19,11 +19,14 @@ plugins {
     id 'jacoco'
     // quality
     id 'pmd'
+    // license
+    id 'com.github.hierynomus.license' version '0.12.1'
 }
 
 apply from: 'gradle/common.gradle'
 apply from: 'gradle/integrationTest.gradle'
 apply from: 'gradle/codestyle.gradle'
+apply from: 'gradle/license.gradle'
 
 //  DEPENDENCIES
 // ==============
@@ -107,3 +110,4 @@ bintray {
     }
     publications = ['MyPublication']
 }
+
