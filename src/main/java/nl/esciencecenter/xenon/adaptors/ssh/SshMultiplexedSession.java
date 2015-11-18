@@ -84,15 +84,16 @@ class SshMultiplexedSession {
             credential = adaptor.credentialsAdaptor().getDefaultCredential("ssh");
         }
 
-        if (credential instanceof CertificateCredentialImplementation) {
-            CertificateCredentialImplementation certificate = (CertificateCredentialImplementation) credential;
-            try {
-                jsch.addIdentity(certificate.getCertfile(), Arrays.toString(certificate.getPassword()));
-            } catch (JSchException e) {
-                throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
+        if (credential instanceof SSHCertificateCredentialImplementation) {
+            SSHCertificateCredentialImplementation certificate = (SSHCertificateCredentialImplementation) credential;
+                
+            if (!certificate.usingAgent()) { 
+                try {
+                    jsch.addIdentity(certificate.getCertfile(), Arrays.toString(certificate.getPassword()));
+                } catch (JSchException e) {
+                    throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Could not read private key file.", e);
+                }
             }
-        } else if (credential instanceof ProxyCredentialImplementation) {
-            // Nothing to do here
         } else if (credential instanceof PasswordCredentialImplementation) {
             // Nothing to do here -- handled per session
         } else {
@@ -157,6 +158,10 @@ class SshMultiplexedSession {
         return s;
     }
 
+    private static byte [] convertPassword(char [] password) {
+        return new String(password).getBytes();                
+    }
+    
     private static synchronized SshSession createSession(JSch jsch, int sessionID, SshLocation location, Credential credential,
             SshSession gateway, SshLocation gatewayLocation, XenonProperties properties) throws XenonException {
 
@@ -173,7 +178,33 @@ class SshMultiplexedSession {
             sessionPort = tunnelPort;
             sessionHost = "localhost";
         }
-
+        
+        if (credential instanceof SSHCertificateCredentialImplementation) { 
+            
+            SSHCertificateCredentialImplementation cred = (SSHCertificateCredentialImplementation) credential;
+            
+            if (!cred.usingAgent()) {
+                
+                char [] password = cred.getPassword();
+            
+                if (password == null || password.length == 0) {
+                    try {
+                        jsch.addIdentity(cred.getCertfile());
+                    } catch (JSchException e) {
+                        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Failed to add (unprotected) certificate " 
+                                + cred.getCertfile() + " to identity", e);
+                    }
+                } else {
+                    try {
+                        jsch.addIdentity(cred.getCertfile(), convertPassword(password));
+                    } catch (JSchException e) {
+                        throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, 
+                                "Failed to add (passphrase protected) certificate " + cred.getCertfile() + " to identity", e);
+                    }
+                }
+            }
+        }
+        
         Session session;
 
         try {
@@ -184,7 +215,8 @@ class SshMultiplexedSession {
 
         if (credential instanceof PasswordCredentialImplementation) {
             PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
-            session.setPassword(new String(passwordCredential.getPassword()));
+            // session.setPassword(new String(passwordCredential.getPassword()));
+            session.setPassword(convertPassword(passwordCredential.getPassword()));
         }
 
         if (properties.getBooleanProperty(SshAdaptor.STRICT_HOST_KEY_CHECKING)) {

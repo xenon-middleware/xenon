@@ -32,6 +32,20 @@ test.ssh.user=xenon
 test.ssh.password=javagat
 test.ssh.loadSshConfig=false
 #
+# Provides the location of a credential that can be used to access the
+# machine provided at test.ssh.location. This credential should -not-
+# be protected by a passphrase and valid for the user in test.ssh.user.
+#
+test.ssh.credential.open=/home/xenon/.ssh/id_rsa
+#
+# Provides the location and passphrase of a credential that can be used
+# to access the machine at the test.ssh.location. This credential -must-
+# be protected by the given passphrase and be valid for the user specified
+# in test.ssh.user.
+#
+test.ssh.credential.protected=/home/xenon/.ssh/id_dsa
+test.ssh.credential.protected.passphrase=javagat2
+#
 # The hostname of an SSH tunnel that will be used to access the
 # machine above in the the form [user@]host[:port]. This machine
 # must be accessible via public key authentication.

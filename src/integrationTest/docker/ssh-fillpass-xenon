@@ -1,0 +1,5 @@
+#!/usr/bin/expect -f
+spawn ssh-add /home/xenon/.ssh/id_dsa
+expect "Enter passphrase for /home/xenon/.ssh/id_dsa:"
+send "javagat2\n";
+interact
