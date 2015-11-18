@@ -69,6 +69,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final String RUNNING_STATE = "RUNNING";
 
+    private static final String COMPLETING_STATE = "COMPLETING";
+   
     // Retrieve an exit code from the "ExitCode" output field of scontrol
     protected static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
@@ -111,7 +113,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             exception = new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals(RUNNING_STATE),
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, isRunningState(state),
                 isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
@@ -146,7 +148,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                     + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"),
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, isRunningState(state),
                 isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
@@ -168,8 +170,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         String state = jobInfo.get("STATE");
 
-        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING") || state.equals("COMPLETING"), false,
-                jobInfo);
+        return new JobStatusImplementation(job, state, null, null, isRunningState(state), false, jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
@@ -183,6 +184,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
     }
 
+    protected static boolean isRunningState(String state) {
+        return state.equals(RUNNING_STATE) || state.equals(COMPLETING_STATE); 
+    }
+    
     //failed also implies done
     protected static boolean isDoneState(String state) {
         return state.equals(DONE_STATE) || isFailedState(state);
