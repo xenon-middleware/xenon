@@ -17,6 +17,10 @@ fi
 ssh-keyscan -t rsa xenon-ssh >> /home/xenon/.ssh/known_hosts
 chown xenon.xenon /home/xenon/.ssh/known_hosts
 
+eval `setuser xenon ssh-agent`
+setuser xenon /bin/ssh-fillpass-xenon
+setuser xenon ssh-add -l
+
 if [ "$BOOT_DELAY" != "" ]; then
     echo 'Waiting' $BOOT_DELAY 'seconds for services to boot-up...'
     sleep $BOOT_DELAY
@@ -40,5 +44,4 @@ if [ "$BOOT_DELAY" != "" ]; then
     chown xenon.xenon /home/xenon/.ssh/known_hosts
     setuser xenon ssh xenon-torque qstat -Q
 fi
-
 setuser xenon "$@"
