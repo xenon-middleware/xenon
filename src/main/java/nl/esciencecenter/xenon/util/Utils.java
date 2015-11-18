@@ -59,6 +59,7 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  * @version 1.0
  * @since 1.0
  */
+@SuppressWarnings("PMD.ExcessiveClassLength")
 public final class Utils {
 
     /** Name of this class (used in Exceptions) */
