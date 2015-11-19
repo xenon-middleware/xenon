@@ -8,7 +8,22 @@
 
     <div class="page-content">
       <div class="wrapper">
+        <header>
+        <h1>Xenon</h1>
+
+        <h4>A middleware abstraction library that provides a simple programming interface to various compute and storage resources.</h4>
+
+
+        <p>Latest version is <b>{{ site.posts[0].title }}</b></p>
+
+        {% assign latestversion=site.posts[0].title %}
+        {% include version.html version=latestversion %}
+
+        <p><a href="{{ site.baseurl }}versions.html">Older versions</a></p>
+        </header>
+        <section>
         {{ content }}
+        </section>
       </div>
     </div>
 

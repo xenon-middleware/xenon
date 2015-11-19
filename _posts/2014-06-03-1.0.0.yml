@@ -1,1 +1,17 @@
-bla
+<ul>
+    <li>
+      <a href="https://github.com/NLeSC/Xenon/releases/tag/v1.0.0">Release</a>
+    </li>
+    <li>
+      <a href="https://github.com/NLeSC/Xenon/tree/v1.0.0">Source code</a>
+    </li>
+    <li>
+      <a href="https://github.com/NLeSC/Xenon/raw/v1.0.0/doc/userguide.pdf">Userguide</a>
+    </li>
+    <li>
+      <a href="{{ site.baseurl }}versions/1.0.0/javadoc">Javadoc</a>
+    </li>
+    <li>
+      <a href="{{ site.baseurl }}versions/1.0.0/javadoc-devel">Javadoc for Xenon developers</a>
+    </li>
+</ul>
