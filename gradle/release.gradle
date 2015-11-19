@@ -28,7 +28,10 @@ githubPages {
   repoUri = 'git@github.com:sverhoeven/Xenon.git'
   pages {
     from(javadoc) {
-      into "javadoc/$version"
+      into "versions/$version/javadoc"
+    }
+    from(javadoc) {
+      into "versions/$version/javadoc-devel"
     }
   }
   deleteExistingFiles = false
