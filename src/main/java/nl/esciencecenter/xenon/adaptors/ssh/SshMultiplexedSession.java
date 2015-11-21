@@ -24,10 +24,8 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.CredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.xenon.engine.credentials.ProxyCredentialImplementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

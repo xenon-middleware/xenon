@@ -18,16 +18,14 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.io.File;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.xenon.engine.credentials.ProxyCredentialImplementation;
 
 
 public class SshCredentials implements Credentials {
@@ -40,11 +38,9 @@ public class SshCredentials implements Credentials {
         return res;
     }
 
-    private final XenonProperties properties;
     private final SshAdaptor adaptor;
 
-    public SshCredentials(XenonProperties properties, SshAdaptor sshAdaptor) {
-        this.properties = properties;
+    public SshCredentials(SshAdaptor sshAdaptor) {
 
         if (sshAdaptor == null) {
             throw new IllegalArgumentException("Adaptor can not be null!");
