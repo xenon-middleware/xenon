@@ -360,6 +360,32 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobImplementation(getScheduler(), jobID, description, false, false);
     }
 
+    private Job findInteractiveJob(String tag, JobDescription description, Job interactiveJob) throws XenonException {
+
+        //get contents of queue (should include job)
+        Map<String, Map<String, String>> queueInfo = getSqueueInfo();
+
+        //find job with "tag" as a comment in the job info
+        for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
+            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag)) {
+                String jobID = entry.getKey();
+                
+                LOGGER.debug("Found interactive job ID: " + jobID);
+
+                Job result = new JobImplementation(getScheduler(), jobID, description, true, true);
+                
+                synchronized (this) {
+                    //add to set of interactive jobs so we can find it
+                    interactiveJobs.put(result.getIdentifier(), interactiveJob);
+                }
+                
+                return result;
+            }
+        }
+
+        return null;        
+    }
+    
     private Job submitInteractiveJob(JobDescription description) throws XenonException {
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
         
@@ -370,30 +396,14 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         String[] arguments = SlurmJobScriptGenerator.generateInteractiveArguments(description, fsEntryPath, tag);
 
         Job interactiveJob = startInteractiveCommand("salloc", arguments);
+        
+        Job result = findInteractiveJob(tag.toString(), description, interactiveJob);
 
-        //get contents of queue (should include job)
-        Map<String, Map<String, String>> queueInfo = getSqueueInfo();
-
-        //find job with "tag" as a comment in the job info
-        for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
-            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag.toString())) {
-                String jobID = entry.getKey();
-                
-                LOGGER.debug("Found interactivde job ID: " + jobID);
-
-                Job result = new JobImplementation(getScheduler(), jobID, description, true, true);
-                
-                synchronized (this) {
-                    //add to set of interactive jobs so we can find it
-                    interactiveJobs.put(result.getIdentifier(), interactiveJob);
-                }
-                
-                return result;
-
-            }
+        if (result != null) { 
+            return result;
         }
 
-        //job not found. Fetch status of interactive job to return as an error.
+        // job not found. Fetch status of interactive job to return as an error.
         JobStatus status;
         try {
             status = engine.jobs().getJobStatus(interactiveJob);
@@ -401,13 +411,26 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job");
         }
 
+        if (status.isRunning()) { 
+            // Finding the job seems to fail sometimes, returning in an exception even though the job is actually running. 
+            // Retry the find...
+            result = findInteractiveJob(tag.toString(), description, interactiveJob);
+
+            if (result != null) { 
+                return result;
+            }
+    
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to find interactive jobin queue while its state "
+                    + "indicates it is running. state = " + status.getState() + " exit code = " + status.getExitCode(), 
+                    status.getException());
+        }     
+
         if (status.getExitCode() != null && status.getExitCode().equals(1)) {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job, perhaps some job options are invalid? (e.g. too many nodes, or invalid partition name)");
         }
-        
+            
         throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job. Interactive job status is "
-                + status.getState() + " exit code = " + status.getExitCode(), status.getException());
-
+                    + status.getState() + " exit code = " + status.getExitCode(), status.getException());
     }
 
     @Override
