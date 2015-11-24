@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 str=$1
 
 if [ -z $str ]; then
