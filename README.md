@@ -6,6 +6,7 @@ Xenon
 )](https://travis-ci.org/NLeSC/Xenon)
 [![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=develop)](https://codecov.io/github/NLeSC/Xenon?branch=develop)
 [![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
+[![GitHub license](https://img.shields.io/github/license/NLeSC/Xenon.svg?style=flat-square)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 
 Copyright 2013 The Netherlands eScience Center
 

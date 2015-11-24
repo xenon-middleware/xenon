@@ -96,6 +96,8 @@ The default `--tests` argument does not work for the docker integration tests in
 1. Update git master branch
 2. Create a distribution with `./gradlew build`
 3. Create release on https://github.com/NLeSC/Xenon/releases
-4. Upload artifacts to bintray/jcenter
-5. Update website with new Javadoc
+4. Upload artifacts to bintray/jcenter with `BINTRAY_USER=<my bintray username> BINTRAY_KEY=<bintray key> ./gradlew bintrayUpload`
+5. Update website with new version with `./gradlew publishGhPages`
 6. Celebrate
+
+Website is hosted on Github pages. Each version is a Jekyll blog post.
