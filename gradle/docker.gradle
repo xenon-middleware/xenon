@@ -116,7 +116,14 @@ task dockerCopyRequirements(dependsOn: [
 
 ext.testCacheSet = file('.docker-test-cache-set')
 
-task dockerTestCache(dependsOn: [checkDockerComposePresence]) {
+task checkDockerPresence(type: Exec) {
+    description "Whether docker is installed and accessible from gradle"
+    executable 'docker'
+    args = ['version']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+task dockerTestCache(dependsOn: [checkDockerPresence]) {
     description "Cache gradle dependencies in xenon-test Docker container"
     def testCacheSet = file('.docker-test-cache-set')
     onlyIf {
@@ -136,6 +143,7 @@ task dockerTestCache(dependsOn: [checkDockerComposePresence]) {
     }
     finalizedBy 'dockerMarkTestCacheSet', 'dockerTestCacheCleanup'
 }
+
 task dockerMarkTestCacheSet(type: Exec) {
 	description "Avoid re-running test cache generation"
     group 'Docker'
@@ -145,13 +153,14 @@ task dockerMarkTestCacheSet(type: Exec) {
     outputs.file testCacheSet
     commandLine 'touch', testCacheSet.absolutePath
 }
+
 task resetDockerTestCache(type: Delete) {
 	description "Re-run test cache generation"
     group 'Docker'
     delete testCacheSet
 }
 
-task dockerTestCacheCleanup(type: Exec) {
+task dockerTestCacheCleanup(type: Exec, dependsOn: checkDockerPresence) {
     description "Remove temporary Docker cache container"
     group 'Docker'
     onlyIf {
@@ -160,7 +169,7 @@ task dockerTestCacheCleanup(type: Exec) {
     commandLine 'docker', 'rm', dockerCacheContainerName
 }
 
-task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, dockerCopyRequirements]) << {
+task dockerBuild(dependsOn: [checkDockerPresence, resetDockerTestCache, dockerCopyRequirements]) << {
     println "Building docker images for: " + dockerImages
     dockerImages.each { image ->
         exec {
@@ -172,7 +181,7 @@ task dockerBuild(dependsOn: [checkDockerComposePresence, resetDockerTestCache, d
 dockerBuild.description = "Build Docker images from Dockerfile"
 dockerBuild.group = 'Docker'
 
-task dockerPush(dependsOn: checkDockerComposePresence) << {
+task dockerPush(dependsOn: checkDockerPresence) << {
     println "Pushing docker images of: " + dockerImages
     dockerImages.each { image ->
         exec {
@@ -183,3 +192,13 @@ task dockerPush(dependsOn: checkDockerComposePresence) << {
 dockerPush.description = "Push Docker images to Dockerhub (run docker login first)"
 dockerPush.group = 'Docker'
 
+task dockerPull(dependsOn: checkDockerPresence) << {
+    println "Pulling docker images of: " + dockerImages
+    dockerImages.each { image ->
+        exec {
+            commandLine 'docker', 'pull', 'nlesc/xenon-' + image
+        }
+    }
+}
+dockerPull.description = "Pull Docker images from Dockerhub"
+dockerPull.group = 'Docker'
