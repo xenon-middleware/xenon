@@ -114,11 +114,11 @@ understand how to use the Xenon library.
 \subsection{Version information}
 
 It is assumed that you are using one of the Ubuntu-based operating
-systems (I'm using Linux Lubuntu 14.10). Nonetheless, most of
-the material covered in this manual should be usable on other
-Linux distributions with minor changes. The manual is written
-to be consistent with Xenon\url{@6d51d61}\footnote{commit
-\url{https://github.com/NLeSC/Xenon/tree/6d51d61}}.
+systems (I'm using Linux Lubuntu 14.10). Nonetheless, most of the
+material covered in this manual should be usable on other Linux
+distributions with minor changes. The manual is written to be
+consistent with Xenon release 1.1.1\footnote{For releases, see
+\url{https://github.com/NLeSC/Xenon/releases}}.
 
 \section{Conceptual overview}
 
@@ -1228,6 +1228,10 @@ time is slow, because it's downloading all the docker images)
 \begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}] cd
 (*@\mytilde@*)/Xenon ./gradlew dockerIntegrationTest \end{lstlisting}
 results are in: \url{build/reports/integrationTest/index.html}.
+
+
+\url{https://www.codacy.com/app/NLeSC/Xenon}
+\url{https://travis-ci.org/NLeSC/Xenon}
 
 
 \subsection{Continuous integration testing} \index{Testing!continuous
