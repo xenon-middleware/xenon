@@ -96,20 +96,35 @@ by name \usepackage{nameref}
 
 \input{snippets/verifying-the-software-setup}
 
+\clearpage
 
-%\section{Optional software} %\index{Xenon!optional software}
+\input{snippets/eclipse}
 
-%This section describes the software you'll need if you not only want
-to run Xenon software, but also develop it.
+\input{snippets/pmd}
 
 
-%\input{snippets/gradle} %\input{snippets/eclipse}
-%\input{snippets/findbugs} %\input{snippets/docker}
-%\input{snippets/texlive} %\input{snippets/testing}
+\input{snippets/testing}
 
-\input{snippets/unused-simple-xenon-program-from-the-command-line}
+\input{snippets/docker}
+
+
+\clearpage
+
+\section{Deprecated text snippets}
 \input{snippets/unused-checking-the-connectivity}
 \input{snippets/unused-gradle}
+
+% so now I want to play with it some more. I need an editor, including
+static code checking with PMD, a unit testing environment and an
+integration environment.
+
+
+\input{snippets/gradle}
+
+\input{snippets/findbugs}
+
+\input{snippets/texlive}
+
 
 
 \backmatter

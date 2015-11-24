@@ -3,33 +3,72 @@
 
 To check if everything works, we first need to build the example from source and then run the example from the command line.
 
-\subsubsection{Building Xenon}
+\subsubsection{Building}
 
-\index{Xenon!Gradle!building}
+The code is divided into a few sets of files that conceptually belong together. Such sets are referred to as `sourceSets'\index{sourceSets}. Each sourceSet has its own subdirectory; for example, the sourceSet `main'\index{Xenon!sourceSet!main@\texttt{main}} contains the source code for Xenon and is located at \url{src/main/java}. We'll also need a second sourceSet, `examples'\index{Xenon!sourceSet!examples@\texttt{examples}}, which contains the source code for the Xenon examples. It is located at \url{src/examples/java}. We will compile both sourceSets using a build automation tool, which comes in the form of a script called \texttt{gradlew}.
 
-The Xenon repository includes a file \texttt{gradlew} in the root directory. \texttt{gradlew} is a useful little program, and we will discuss it in more detail later. For now, we will just use \texttt{gradlew} to compile the Java source code we need to run the examples, as follows:
+How a project should be built is defined in `*.gradle' files. Xenon has two main ones (`build.gradle' and `build-offline.gradle'), as well as a few auxiliary ones (located in the \texttt{gradle} subdirectory). Together, they define all kinds of neat things you can do with the source code, such as compiling, generating documentation, uploading generated jar files to an external repository, and so on. You can get an overview of what tasks are available by:
 
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd ${HOME}/Xenon
+./gradlew tasks --all
+\end{lstlisting} % dummy $
+
+Under `Build tasks', there should be an item \texttt{examplesClasses}, used for compiling the `examples' sourceSet; \texttt{examplesClasses} has a dependent task \texttt{classes}, used for compiling the `main' sourceSet.
+
+Running
 \begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
 cd ${HOME}/Xenon
 ./gradlew examplesClasses
 \end{lstlisting} % dummy $
+should give you a new directory \mytilde\url{/Xenon/build} with subdirectories \url{classes/examples} and {\url{classes/main} (as well as some other stuff).
 
-This should give you two new directories \mytilde{}/\url{build/classes/examples/} and \mytilde{}/\url{build/classes/main/} with compiled Java classes in them.
 
-As a test, we will use Xenon to list the contents of the current directory. The magic incantation to do so consists of 4 parts:
+\subsubsection{Running an example}
+
+So at this point we have compiled the necessary Java classes; now we need to figure out how to run them.
+
+The general syntax for running compiled Java programs from the command line\index{Java!from the command line} is as follows:
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+java (*@\textit{<fully qualified classname>}@*)
+\end{lstlisting}
+The fully qualified classname for our example is \url{nl.esciencecenter.xenon.examples.files.DirectoryListing}, but if you try to run
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd ${HOME}/Xenon
+java nl.esciencecenter.xenon.examples.files.DirectoryListing
+\end{lstlisting} % dummy $
+you will get the error below:
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+Error: Could not find or load main class \
+nl.esciencecenter.xenon.examples.files.DirectoryListing
+\end{lstlisting}
+
+This is because the \url{java} executable tries to locate our class \url{nl.esciencecenter.xenon.examples.files.DirectoryListing}, but we haven't told \url{java} where to look for it. We can resolve that by specifying a list of one or more directories using \texttt{java}'s classpath option \texttt{-cp}\index{Java!from the command line!classpath}\index{Java!from the command line!-cp@\texttt{-cp}}. There are 3 locations that are relevant for running \url{DirectoryListing}. These are:
 \begin{enumerate}
-\item{the word \texttt{java} invokes the Java program;}
-\item{the classpath option \texttt{-cp} followed by a colon-separated list of paths, defining a list of locations where \texttt{java} is allowed to look for Java classes;}
-\item{the Java class we want to run. The class name needs to be fully qualified and should be present in one of the directories listed in the classpath;}
-\item{the input arguments to the Java class, in our case \texttt{file://\$PWD}.}
+\item{the location of \url{DirectoryListing} itself:\\ \mytilde\url{/Xenon/build/classes/examples}}
+\item{the location of the Xenon classes:\\ \mytilde\url{/Xenon/build/classes/main}}
+\item{the location of any libraries that Xenon depends on:\\ \mytilde\url{/Xenon/lib}}
 \end{enumerate}
+These directories can be passed to \texttt{java} as a colon-separated list, in which directory names can be relative to the current directory. Furthermore, the syntax is slightly different depending on what type of file you want \texttt{java} to find in a given directory: if you want \texttt{java} to find compiled Java classes, use the directory name; if you want \texttt{java} to find jar files, use the directory name followed by \texttt{/*}. Finally, the order within the classpath is significant.
+% TODO find out about the order in java classpath
 
-So, putting all that together you get:
+Using paths relative to \mytilde\url{/Xenon}, our classpath thus becomes \url{build/classes/examples:build/classes/main:lib/*}. However, if we now try to run
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd ${HOME}/Xenon
+java -cp 'build/classes/examples:build/classes/main:lib/*' \
+nl.esciencecenter.xenon.examples.files.DirectoryListing
+\end{lstlisting}
+% dummy $
+it still does not work yet, because \url{DirectoryListing} takes exactly one input argument that defines the location (URI\index{URI}) of the directory whose contents we want to list. URIs generally consist of a \textit{scheme}\index{URI!scheme} followed by an \textit{authority}\index{URI!authority}. For a local file, the scheme is \texttt{file://}. The authority is the name of the directory we want to list the contents of, such as \texttt{\$PWD} (the present working directory).
+
+Putting all that together, we get:
+
 \begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
 cd ${HOME}/Xenon
 java -cp 'build/classes/examples:build/classes/main:lib/*' \
 nl.esciencecenter.xenon.examples.files.DirectoryListing file://$PWD
 \end{lstlisting} % dummy $
-which should list the contents of the current directory when you run it.
+
+If all goes well, you should now see the contents of the current directory.
 
 
