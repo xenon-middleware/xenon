@@ -1,0 +1,17 @@
+\section{Introduction}
+
+Many scientific applications require far more computation or data storage than can be handled on a regular PC or laptop. For such applications, access to remote storage and compute facilities is essential. Unfortunately, there is not a single standardized way to access these facilities. There are many competing protocols and tools in use by the various scientific data centers and commercial online providers.
+
+As a result, application developers are forced to either select a few protocols they wish to support, thereby limiting which remote resources their application can use, or implement support for all of them, leading to excessive development time.
+
+Xenon is a library designed to solve this problem. It offers a simple, unified programming interface to many remote computation and data storage facilities, and hides the complicated protocol and tool specific details from the application. By using Xenon, the application developer can focus on the application itself, without having to worry about which protocols to support, resulting in faster application development.
+
+% TODO examples of what you can do with it
+
+\subsection{Purpose of this document}
+
+This document aims to help users without much prior knowledge about Java programming and without much experience in using remote systems to understand how to use the Xenon library.
+
+\subsection{Version information}
+
+It is assumed that you are using one of the Ubuntu-based operating systems (I'm using Linux Lubuntu 14.10). Nonetheless, most of the material covered in this manual should be usable on other Linux distributions with minor changes. The manual is written to be consistent with Xenon release 1.1.1\footnote{For releases, see \url{https://github.com/NLeSC/Xenon/releases}}.

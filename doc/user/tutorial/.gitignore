@@ -1,11 +1,9 @@
-# exclude everything...
-*
-
-# except these files
-!xenon-tutorial.tex
-!xenon-tutorial.tex.fmt
-!xenon-tutorial.pdf
-!images/*
-!compile.sh
-!notes.txt
+images/xenon-design-eps-converted-to.pdf
+images/xenon-design.eps
+xenon-tutorial.aux
+xenon-tutorial.idx
+xenon-tutorial.ilg
+xenon-tutorial.ind
+xenon-tutorial.log
+xenon-tutorial.toc
 

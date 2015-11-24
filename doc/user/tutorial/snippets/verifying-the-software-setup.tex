@@ -1,0 +1,35 @@
+
+\subsection{Verifying the software setup}
+
+To check if everything works, we first need to build the example from source and then run the example from the command line.
+
+\subsubsection{Building Xenon}
+
+\index{Xenon!Gradle!building}
+
+The Xenon repository includes a file \texttt{gradlew} in the root directory. \texttt{gradlew} is a useful little program, and we will discuss it in more detail later. For now, we will just use \texttt{gradlew} to compile the Java source code we need to run the examples, as follows:
+
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd ${HOME}/Xenon
+./gradlew examplesClasses
+\end{lstlisting} % dummy $
+
+This should give you two new directories \mytilde{}/\url{build/classes/examples/} and \mytilde{}/\url{build/classes/main/} with compiled Java classes in them.
+
+As a test, we will use Xenon to list the contents of the current directory. The magic incantation to do so consists of 4 parts:
+\begin{enumerate}
+\item{the word \texttt{java} invokes the Java program;}
+\item{the classpath option \texttt{-cp} followed by a colon-separated list of paths, defining a list of locations where \texttt{java} is allowed to look for Java classes;}
+\item{the Java class we want to run. The class name needs to be fully qualified and should be present in one of the directories listed in the classpath;}
+\item{the input arguments to the Java class, in our case \texttt{file://\$PWD}.}
+\end{enumerate}
+
+So, putting all that together you get:
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd ${HOME}/Xenon
+java -cp 'build/classes/examples:build/classes/main:lib/*' \
+nl.esciencecenter.xenon.examples.files.DirectoryListing file://$PWD
+\end{lstlisting} % dummy $
+which should list the contents of the current directory when you run it.
+
+

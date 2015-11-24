@@ -1,0 +1,23 @@
+\subsection{Installing Git}
+\index{Installing Git}
+
+Open a terminal (default keybinding Ctrl + Alt + t). The shell should be Bash\index{Bash}. You can check this with:
+\begin{lstlisting}[style=basic,style=bash]
+echo $0
+\end{lstlisting} % fix syntax highlighting by inserting an extra dollar sign $
+which should return \texttt{/bin/bash}.
+
+Now install \texttt{git}\index{Git!git@\texttt{git}} if you don't have it already:
+\begin{lstlisting}[style=basic,style=bash]
+sudo apt-get install git
+\end{lstlisting}
+
+After the install completes, we need to get a copy of the Xenon software. We will use \texttt{git} to do so. Change into the directory that you want to end up containing the top-level repository directory. I want to put the Xenon stuff in my home directory, so for me that means:
+\begin{lstlisting}[style=basic,style=bash]
+cd ${HOME}
+\end{lstlisting} % fix syntax highlighting by inserting an extra dollar sign $
+Then clone the Xenon repository into the current directory:
+\begin{lstlisting}[style=basic,style=bash]
+git clone https://github.com/NLeSC/Xenon.git
+\end{lstlisting}
+This will create a directory \texttt{\mytilde{}/Xenon} that contains the Xenon source code.

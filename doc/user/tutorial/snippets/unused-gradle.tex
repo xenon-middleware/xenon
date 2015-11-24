@@ -1,0 +1,22 @@
+
+Normally, you'd build Xenon while connected to the Internet. The build tool we use is called Gradle. When  Gradle then downloads whatever additional software it needs. Gradle will first try to download such packages from MavenCentral\footnote{\url{https://repo1.maven.org/maven2}} (\index{MavenCentral}a website that hosts many common Java packages, in many different versions); if the package is not available from MavenCentral, or if the download fails for some other reason, Gradle tries a different website (Bintray\index{Bintray}\index{JCenter}\footnote{\url{https://bintray.com/bintray/jcenter}}). The \texttt{repositories} section in \texttt{build-common.gradle} lists the repositories that Gradle will try to connect to.
+
+
+It is also possible to build Xenon while disconnected from the Internet, but in order for that to work, you need to have run \texttt{./gradlew} at least once before (while connected to the Internet). This ensures that the necessary Gradle plugins, as well as any libraries that Xenon is dependant on, will have been downloaded.
+% NEEDS_VERIFICATION the local copy only exists if this is not the first time you build?
+% NEEDS_VERIFICATION MavenCentral only for Java packages
+
+In order to facilitate both online and offline building, we chose to divide the Gradle work over three files, located in the root of the repository:
+\begin{enumerate}
+\item{\texttt{build.gradle}\index{Xenon!Gradle!build.gradle@\texttt{build.gradle}} }
+\item{\texttt{build-offline.gradle}} \index{Xenon!Gradle!build-offline.gradle@\texttt{build-offline.gradle}}}
+\item{\texttt{build-common.gradle}} \index{Xenon!Gradle!build-common.gradle@\texttt{build-common.gradle}}}
+\end{enumerate}
+
+\texttt{build.gradle} and \texttt{build-offline.gradle} can be called directly as argument to \texttt{./gradlew} (or \texttt{gradle}, for that matter); \texttt{build-common.gradle} is not intended to be called directly (it should only get called from within either \texttt{build.gradle} or \texttt{build-offline.gradle}, through the use of \texttt{apply from}\index{Xenon!Gradle!apply from@\texttt{apply from}} lines. Deferring to \texttt{build-common.gradle} avoids duplication of any tasks that are the same, regardless of whether the build is offline or online.
+
+
+
+
+In this section, we will test the software setup by running a small example, \texttt{CreatingXenon}. \texttt{CreatingXenon} establishes a connection to a remote system, does something simple, and returns.
+% FIXME add better description of what CreatingXenon does

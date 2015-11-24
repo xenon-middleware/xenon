@@ -1,0 +1,55 @@
+
+
+\section{Testing}
+\label{sec:testing}
+\index{Testing}
+Testing should be an integral part of developing code.
+
+\subsection{Unit testing}
+\index{Testing!unit testing}
+\index{Xenon!sourceSet!test@\texttt{test}}
+% TODO Unit testing section
+
+% in the package explorer, expand src/test/java and open nl.esciencecenter.xenon.XenonFactoryTest.
+% eclipse opens JUnit pane with test results.
+
+Running unit tests
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd (*@\mytilde@*)/Xenon
+./gradlew test
+\end{lstlisting}
+results are in: \url{build/reports/test/index.html}.
+
+Running just one unit test can be accomplished by filtering using the \texttt{--test} flag to \texttt{gradlew} (see \url{https://docs.gradle.org/current/userguide/java_plugin.html#test_filtering}).
+
+
+\input{snippets/code-coverage}
+
+\subsubsection{Monitoring code quality}
+\index{Testing!Monitoring code quality}
+
+% TODO add text about SonarQube
+\index{SonarQube}
+
+
+
+
+\subsection{Integration testing}
+\label{sec:integration-testing}
+\index{Testing!integration testing}
+\index{Xenon!sourceSet!integrationTest@\texttt{integrationTest}}
+% TODO Integration testing section
+Running integration tests (first time is slow, because it's downloading all the docker images)
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd (*@\mytilde@*)/Xenon
+./gradlew dockerIntegrationTest
+\end{lstlisting}
+results are in: \url{build/reports/integrationTest/index.html}.
+
+
+\url{https://www.codacy.com/app/NLeSC/Xenon}
+\url{https://travis-ci.org/NLeSC/Xenon}
+
+
+\subsection{Continuous integration testing}
+\index{Testing!continuous integration testing}

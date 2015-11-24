@@ -1,0 +1,104 @@
+\subsection{Eclipse}
+
+Eclipse\index{Eclipse} is a very powerful, free, open-source, integrated development environment for Java (and many other languages). It is available in most Linuxes from their respective repositories. By default, Eclipse comes with many features, such as Git (version control)\index{Git}, Mylyn (task management)\index{Mylyn}, Maven (building)\index{Maven}, Ant (building)\index{Ant}, an XML editor, as well as some other stuff. While these features are nice, they can get in the way if you're new to code development with Java using Eclipse. We will therefore set up a minimal Eclipse installation which includes only the Eclipse platform and the Java related tools (most importantly, the debugger). Feel free to skip this next part if you're already familiar with Eclipse.
+
+\subsubsection{A minimal Eclipse installation}
+\index{Eclipse!minimal installation}
+
+Go to \url{http://download.eclipse.org/eclipse/downloads/}. Under `Latest release', click on the link with the highest version number. It will take you to a website that has a menu in the upper left corner. From that menu, select the item `Platform Runtime binary', then download the file corresponding to your platform (for me, that is \url{eclipse-platform-4.5-linux-gtk-x86_64.tar.gz}). Go back to the menu by scrolling up, then select the item `JDT Runtime binary', and download the file (there should be only one; for me that is \url{org.eclipse.jdt-4.5.zip}).
+
+Now go to where you downloaded those two files. Uncompress \url{eclipse-platform-4.5-linux-gtk-x86_64.tar.gz} and move the uncompressed files to a new directory \mytilde\url{/opt/minimal-eclipse/} (they can be anywhere, really, but \mytilde\url{/opt} is the conventional place to install user-space programs on Linux). Start Eclipse by running \url{eclipse} from \mytilde\url{/opt/minimal-eclipse/eclipse}.
+
+In Eclipse's menu go to \textsf{Help}, then select \textsf{Install New Software...}. Near the bottom of the dialog, uncheck \textsf{Group items by category}. Then click the top-right button labeled \textsf{Add...} and click \textsf{Archive...}. Then navigate to the second file you downloaded, \url{org.eclipse.jdt-4.5.zip} and select it. In the dialog, a new item \textsf{Eclipse Java Development Tools} should appear. Make sure it's checked, then click \textsf{Next} and \textsf{Finish}. When Eclipse restarts, you should have everything you need for Java development, without any of the clutter!
+
+\needspace{4em}
+\vspace{2em}
+\textit{Adding a Bash alias}
+\index{Bash!alias}
+\index{Bash!alias!miniclipse@\texttt{miniclipse}}
+
+Adding a Bash alias to \mytilde\url{/.bash_aliases} will make it easier to start the program. I've used
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+echo "alias miniclipse='${HOME}/opt/minimal-eclipse/eclipse/eclipse'" >> \
+${HOME}/.bash_aliases
+\end{lstlisting}
+to do so (restart your terminal to use the \texttt{miniclipse} alias).
+
+\needspace{4em}
+\vspace{2em}
+\textit{Automatic project setup with Gradle}
+\index{Eclipse!automatic project setup}
+\index{Eclipse!gradle eclipse@\texttt{gradle eclipse}}
+\index{Eclipse!./gradlew eclipse@\texttt{./gradlew eclipse}}
+\index{Gradle!automatic Eclipse project setup}
+\index{Gradle!gradle eclipse@\texttt{gradle eclipse}}
+\index{Gradle!./gradlew eclipse@\texttt{./gradlew eclipse}}
+
+Normally, when you start a new project in Eclipse, it takes you through a series of dialogs to set up the Eclipse project in terms of the directory structure, the classpath, etc. The configuration is saved to (hidden) files \url{.project}, \url{.classpath}, and \url{.settings/org.eclipse.jdt.core.prefs}. However, since Gradle already has all the necessary information, you can let Gradle generate these files for you using:
+\begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
+cd ${HOME}/Xenon
+./gradlew eclipse
+\end{lstlisting} % dummy $
+thus avoiding any inconsistencies between what Gradle expects and how your development environment is set up.
+
+\vspace{2em}
+\textit{Opening Xenon in Eclipse}
+\index{Xenon!in Eclipse}
+\index{Eclipse!new project}
+
+After the Eclipse files have been generated, start Eclipse by typing the Bash alias \texttt{miniclipse} at the command line. From Eclipse's menu, select \textsf{File}$\rightarrow$\textsf{Import}. In the \textsf{Select} dialog, select \textsf{Existing projects into Workspace}, then click the button labeled \textsf{Next}.
+
+In the next dialog (\textsf{Import projects}), use the \textsf{Browse...} button to select Xenon's root directory, e.g. \url{/home/daisycutter/Xenon}, then click \textsf{Finish}. An item \textsf{Xenon} should now be visible in the \textsf{Package explorer} pane. Expand it, and navigate to \url{src/examples/java/}, then select \textsf{CreatingXenon.java} from the \textsf{nl.esciencecenter.xenon.examples} package. Double-click \textsf{CreatingXenon.java} to bring up the corresponding Java code in the editor pane.
+
+\vspace{2em}
+\textit{Running and debugging a Java program in Eclipse}
+
+\index{Eclipse!Running a Java program}
+\index{Running a Java program in Eclipse}
+
+\index{Eclipse!Debugging a Java program}
+\index{Debugging a Java program in Eclipse}
+
+\index{Java!Running a Java program in Eclipse}
+\index{Java!Debugging a Java program in Eclipse}
+
+So now that we have the source code open in teh editor, let's see if we can run it. You can start the program in a couple different ways. For example, you can select \textsf{Run}$\rightarrow$\textsf{Run}; you can use the key binding \textsf{Ctrl+F11}, or you can press the `Play' icon in Eclipse's GUI. Run the program and look at the pane labeled \textsf{Console}. The output there should be the same as what you saw before when running in the terminal window.
+
+
+In my opinion, one of the most helpful features of the Eclipse interface is the debugging/inspecting variables capability. This lets you run your program line-by-line. To start debugging, you have to set a breakpoint first. Program execution will halt at this point, such that you can inspect what value each variable has at that point in your program. Setting a breakpoint is most easily accomplished by double-clicking the left margin of the editor; a blue dot will appear. Alternatively, you can press \textsf{Ctrl+b} to set a breakpoint at the current line.
+
+Set a breakpoint at the line
+\begin{lstlisting}[style=basic,style=bash,language=java,escapeinside={(*@}{@*)}]
+Xenon xenon = XenonFactory.newXenon(null);
+\end{lstlisting}
+
+Now that we have a breakpoint, we can run the program up to the position of the breakpoint. There are various ways to start a debug run: e.g. by selecting \textsf{Run}$\rightarrow$\textsf{Debug}; or by pressing \textsf{F11}.
+
+Run \url{CreatingXenon} up to the \texttt{xenon Xenon} line. Eclipse's \textsf{Variables} pane should now list just one variable, \texttt{args}, but since we supplied no arguments to \url{CreatingXenon}, \texttt{args} is currently a \texttt{String} object of length zero.
+
+Press \textsf{F6} to step over (and evaluate) the \texttt{xenon Xenon} line. You'll see a new variable \texttt{xenon} of type \texttt{XenonEngine} appear in the \textsf{Variables} pane. Expand the object to inspect it in more detail.
+
+When you're done inspecting, press \textsf{F8} to make Eclipse evaluate your program, either up to the next breakpoint, or if there are no breakpoints, up to the end your program.
+
+Finally, you can terminate a debug run by pressing \textsf{Ctrl+F2}. Table~\ref{tab:key-bindings-eclipse} summarizes some of the most commonly used Eclipse key bindings used in running and debugging Java programs.
+
+
+\begin{table}[!ht]
+\vspace{1.0em}
+\caption{Default key bindings used for running and debugging Java programs in Eclipse.\label{tab:key-bindings-eclipse}\index{Eclipse!key bindings}}
+\begin{tabular}{lp{10cm}}
+\vspace{0.5em}
+\textbf{Default key binding} & \textbf{Description}                  \\
+\textsf{F5}                  & Step in                               \\
+\textsf{F6}                  & Step over                             \\
+\textsf{F7}                  & Step return                           \\
+\textsf{F8}                  & Continue to the next breakpoint       \\
+\textsf{F11}                 & Start a debug run                     \\
+\textsf{Ctrl+F2}             & Terminate a debug run                 \\
+\textsf{Ctrl+b}              & Set a breakpoint at the current line  \\
+\textsf{Ctrl+F11}            & Start a (non-debug) run               \\
+\end{tabular}
+\end{table}
+
+
+% hover for Javadoc
