@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
 public class RelativePath implements Iterable<RelativePath> {
 
     /** The default separator to use. */
-    public static final char DEFAULT_SEPARATOR = '/';
+    private static final char DEFAULT_SEPARATOR = '/';
 
     /** The path elements in this relative path */
     private final List<String> elements;
@@ -43,7 +43,7 @@ public class RelativePath implements Iterable<RelativePath> {
     private final char separator;
 
     /** Estimate of path element String length. */
-    private final int PATH_ELEMENT_LENGTH = 25;
+    private final static int PATH_ELEMENT_LENGTH = 25;
 
     private class RelativePathIterator implements Iterator<RelativePath> {
         private int index = 1;

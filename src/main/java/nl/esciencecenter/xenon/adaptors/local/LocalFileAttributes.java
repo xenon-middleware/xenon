@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -98,7 +98,7 @@ public class LocalFileAttributes implements FileAttributes {
 
             isWindows = Utils.isWindows(); 
 
-            BasicFileAttributes basicAttributes = null;
+            BasicFileAttributes basicAttributes;
             
             if (isWindows) {                
                 // These should always work.

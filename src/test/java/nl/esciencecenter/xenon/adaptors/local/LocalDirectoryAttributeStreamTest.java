@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.local;
 
 import java.util.HashMap;
@@ -106,10 +105,8 @@ public class LocalDirectoryAttributeStreamTest {
 
     private XenonEngine xenon;
     private FileSystem fs;
-    private Path root;
     private Path testDir;
 
-    private LocalAdaptor localAdaptor;
     private LocalFiles localFiles;
 
     class AllTrue implements DirectoryStream.Filter {
@@ -129,9 +126,9 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Before
     public void prepareTest() throws Exception {
         xenon = Util.createXenonEngine(null);
-        localAdaptor = new LocalAdaptor(xenon, new HashMap<String, String>());
+        LocalAdaptor localAdaptor = new LocalAdaptor(xenon, new HashMap<String, String>());
         localFiles = new LocalFiles(localAdaptor, xenon.getCopyEngine());
-        root = Utils.getLocalCWD(localFiles);
+        Path root = Utils.getLocalCWD(localFiles);
         fs = root.getFileSystem();
         testDir = resolve(localFiles, root, TEST_DIR);
     }
@@ -207,7 +204,8 @@ public class LocalDirectoryAttributeStreamTest {
         LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
                 new AllTrue()));
 
-        while (true) {
+        // expecting at most 10000 items, otherwise, the stream might go on forever
+        for (int i = 0; i < 10000; i++) {
             stream.next();
         }
     }

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,7 +96,7 @@ public class GridEngineXmlParserTest {
 
         Map<String, Map<String, String>> result = parser.parseQueueInfos(input);
 
-        String[] queues = result.keySet().toArray(new String[0]);
+        String[] queues = result.keySet().toArray(new String[result.size()]);
         Arrays.sort(queues);
 
         assertArrayEquals(new Object[] { "all.q", "das3.q", "disabled.q", "fat.q", "gpu.q" }, queues);
@@ -163,7 +163,7 @@ public class GridEngineXmlParserTest {
         Map<String, Map<String, String>> result = parser.parseJobInfos(input);
 
         assertNotNull(result);
-        String[] resultJobIDs = result.keySet().toArray(new String[0]);
+        String[] resultJobIDs = result.keySet().toArray(new String[result.size()]);
         Arrays.sort(resultJobIDs);
 
         assertArrayEquals(expectedJobIDs, resultJobIDs);

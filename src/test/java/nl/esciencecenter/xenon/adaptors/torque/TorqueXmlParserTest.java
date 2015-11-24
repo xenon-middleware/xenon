@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,8 @@
  */
 package nl.esciencecenter.xenon.adaptors.torque;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,7 +33,7 @@ import org.w3c.dom.Document;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TorqueXmlParserTest {
 
-    private static String readFile(String pathName) throws IOException {
+    private static String readFile(String pathName) {
         InputStream is = TorqueXmlParserTest.class.getResourceAsStream(pathName);
         // we read until end of file, delimited by \\A
         Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");

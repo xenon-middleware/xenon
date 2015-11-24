@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,40 +18,33 @@ package nl.esciencecenter.xenon.files;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import nl.esciencecenter.xenon.files.CopyOption;
-
 import org.junit.Test;
 
 public class CopyOptionTest {
 
     @Test
     public void testContains_empty_doesNotContainIt() {
-        assertFalse(CopyOption.contains(CopyOption.CREATE));
+        assertFalse(CopyOption.CREATE.occursIn());
     }
 
     @Test
     public void testContains_filled_doesContainIt() {
-        assertTrue(CopyOption.contains(CopyOption.CREATE, CopyOption.ASYNCHRONOUS, CopyOption.CREATE));
+        assertTrue(CopyOption.CREATE.occursIn(CopyOption.ASYNCHRONOUS, CopyOption.CREATE));
     }
 
     @Test
     public void testContains_filled_doesNotContainIt() {
-        assertFalse(CopyOption.contains(CopyOption.CREATE, CopyOption.REPLACE));
+        assertFalse(CopyOption.CREATE.occursIn(CopyOption.REPLACE));
     }
 
     @Test
     public void testContains_optionsNull_doesNotContainIt() {
-        assertFalse(CopyOption.contains(CopyOption.CREATE, (CopyOption[]) null));
-    }
-
-    @Test
-    public void testContains_optionNull_doesNotContainIt() {
-        assertFalse(CopyOption.contains(null, CopyOption.ASYNCHRONOUS, CopyOption.CREATE));
+        assertFalse(CopyOption.CREATE.occursIn((CopyOption[]) null));
     }
 
     @Test
     public void testContains_optionsFilledNull_doesNotContainIt() {
-        assertFalse(CopyOption.contains(CopyOption.CREATE, new CopyOption[] { null }));
+        assertFalse(CopyOption.CREATE.occursIn(new CopyOption[] { null }));
     }
 
     @Test

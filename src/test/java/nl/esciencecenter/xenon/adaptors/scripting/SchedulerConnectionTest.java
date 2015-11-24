@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -232,7 +232,7 @@ public class SchedulerConnectionTest {
     public void test04a_verifyJobInfoValidInfo_NoException() throws XenonException {
         String jobID = "555";
 
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", "555");
         jobInfo.put("AdditionalField", "AdditionalInfo");
 
@@ -253,7 +253,7 @@ public class SchedulerConnectionTest {
     @Test(expected = XenonException.class)
     public void test04c_verifyJobInfo_NoJobID_ExceptionThrown() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
 
         Job job = new FakeScriptingJob(jobID);
 
@@ -264,7 +264,7 @@ public class SchedulerConnectionTest {
     public void test04d_verifyJobInfo_IncorrectJobID_ExceptionThrown() throws XenonException {
         String jobID = "555";
 
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         //incorrect job ID
         jobInfo.put("JobID", "222");
 
@@ -276,7 +276,7 @@ public class SchedulerConnectionTest {
     @Test(expected = XenonException.class)
     public void test04e_verifyJobInfo_AdditionalFieldNotPresent_ExceptionThrown() throws XenonException {
         String jobID = "555";
-        Map<String, String> jobInfo = new HashMap<String, String>();
+        Map<String, String> jobInfo = new HashMap<>();
         jobInfo.put("JobID", jobID);
         //no job state
         jobInfo.put("Reason", "None");

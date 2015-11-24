@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -83,7 +83,7 @@ public class CommandRunner {
         if (workingDir != null) {
             builder.directory(workingDir);
         }
-        java.lang.Process p = null;
+        java.lang.Process p;
         try {
             p = builder.start();
         } catch (IOException e) {

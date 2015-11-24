@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,26 +60,22 @@ public enum OpenOption {
     WRITE;
 
     /**
-     * Check if a sequence of <code>OpenOption</code>s contains a specific option.
+     * Check if a sequence of <code>OpenOption</code>s contains this option.
      * 
-     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     * If <code>options<code> is <code>null</code>, <code>false</code> will be returned.
      * 
-     * @param toFind
-     *            the option to check for.
      * @param options
      *            the array to check.
      * 
      * @return if <code>options</code> contains <code>option<code>.
      */
-    @SuppressWarnings("PMD.CompareObjectsWithEquals")
-    public static boolean contains(OpenOption toFind, OpenOption... options) {
-
-        if (toFind == null || options == null || options.length == 0) {
+    public boolean occursIn(OpenOption... options) {
+        if (options == null) {
             return false;
         }
 
         for (OpenOption curr : options) {
-            if (curr == toFind) {
+            if (curr == this) {
                 return true;
             }
         }

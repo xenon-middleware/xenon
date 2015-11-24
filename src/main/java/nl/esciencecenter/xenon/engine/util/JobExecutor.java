@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine.util;
 
 import java.io.IOException;
@@ -81,8 +80,7 @@ public class JobExecutor implements Runnable {
         return hasRun;
     }
 
-    public synchronized boolean kill() throws XenonException {
-
+    public synchronized boolean kill() {
         if (done) {
             return true;
         }
@@ -296,8 +294,7 @@ public class JobExecutor implements Runnable {
 
     @Override
     public void run() {
-
-        Process process = null;
+        Process process;
 
         JobDescription description = job.getJobDescription();
 

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon;
 
 import java.util.Set;
@@ -61,7 +60,7 @@ public interface XenonPropertyDescription {
     /**
      * The Component enumeration lists all possible parts of Xenon for which a property can be provided. 
      */
-    public enum Component {
+    enum Component {
         /** 
          * Properties for <code>XENON</code> components can be passed to 
          * {@link nl.esciencecenter.xenon.XenonFactory#newXenon(Map)}. 
@@ -90,7 +89,7 @@ public interface XenonPropertyDescription {
     /**
      * This Type enumeration lists all possible types of properties recognized by Xenon.
      */
-    public enum Type {
+    enum Type {
         /** 
          * Properties of type <code>BOOLEAN</code> can be either <code>"true"</code> or <code>"false"</code>.  
          */        

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine;
 
 import java.util.HashSet;
@@ -59,7 +58,7 @@ public class XenonPropertyDescriptionImplementation implements XenonPropertyDesc
             throw new IllegalArgumentException("No level specified!");
         }
 
-        this.levels = new HashSet<Component>(levels);
+        this.levels = new HashSet<>(levels);
 
         this.defaultValue = defaultValue;
 

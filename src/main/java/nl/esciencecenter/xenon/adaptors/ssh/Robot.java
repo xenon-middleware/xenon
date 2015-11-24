@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import com.jcraft.jsch.UserInfo;
@@ -26,10 +25,10 @@ class Robot implements UserInfo {
 
     private final boolean yesNo;
 
-    Robot(boolean yesyNo) {
-        this.yesNo = yesyNo;
+    Robot(boolean yesNo) {
+        this.yesNo = yesNo;
     }
-
+    
     @Override
     public String getPassphrase() {
         return null;

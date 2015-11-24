@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine;
 
 import static org.junit.Assert.assertEquals;
@@ -63,8 +62,8 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testToString() {
 
-        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<String>("SCHEME1", "SCHEME2"), 
-                new ImmutableArray<String>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
+        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<>("SCHEME1", "SCHEME2"),
+                new ImmutableArray<>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
 
         assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, " +
         		"SCHEME2], supportedProperties=[], adaptorSpecificInformation=null]"));

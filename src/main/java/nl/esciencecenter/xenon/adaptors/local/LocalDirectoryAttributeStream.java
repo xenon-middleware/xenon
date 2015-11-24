@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ class LocalDirectoryAttributeStream implements DirectoryStream<PathAttributesPai
     /** The LocalDirectoryStream to retrieve the files */
     private final LocalDirectoryStream stream;
 
-    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) throws XenonException {
+    LocalDirectoryAttributeStream(LocalFiles localFiles, LocalDirectoryStream stream) {
         this.localFiles = localFiles;
         this.stream = stream;
     }

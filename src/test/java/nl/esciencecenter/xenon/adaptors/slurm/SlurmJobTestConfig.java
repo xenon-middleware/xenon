@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.slurm;
 
 import java.util.HashMap;
@@ -37,7 +36,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     private final String username;
     private final char[] passwd;
 
-    private final String scheme = "slurm";
+    private final static String scheme = "slurm";
     private final String correctLocation;
     private final String wrongLocation;
     private final String correctLocationWrongUser;
@@ -173,7 +172,7 @@ public class SlurmJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public String getInvalidQueueName() throws Exception {
+    public String getInvalidQueueName() {
         return "aap";
     }
 

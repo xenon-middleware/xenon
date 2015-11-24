@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,7 @@ public abstract class Adaptor {
 
     protected Adaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
             ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
-            XenonProperties properties) throws XenonException {
+            XenonProperties properties) {
 
         super();
 

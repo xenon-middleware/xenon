@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -112,7 +112,7 @@ public class FtpFiles implements Files {
     private final XenonEngine xenonEngine;
     private final FtpAdaptor adaptor;
 
-    private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
+    private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     public FtpFiles(FtpAdaptor ftpAdaptor, XenonEngine xenonEngine) {
         this.xenonEngine = xenonEngine;
@@ -152,7 +152,7 @@ public class FtpFiles implements Files {
     }
 
     private String getCurrentWorkingDirectory(FTPClient ftpClient) throws XenonException {
-        String wd = null;
+        String wd;
         try {
             wd = ftpClient.printWorkingDirectory();
         } catch (IOException e) {
@@ -481,7 +481,7 @@ public class FtpFiles implements Files {
         String absolutePath = path.getRelativePath().getAbsolutePath();
         FTPClient ftpClient = getFtpClientByPath(path);
 
-        FTPFile[] listFiles = null;
+        FTPFile[] listFiles;
         try {
             if (filter == null) {
                 throw new XenonException(adaptor.getName(), "Filter is null.");
@@ -493,13 +493,11 @@ public class FtpFiles implements Files {
             throw new XenonException(adaptor.getName(), message);
         }
 
-        return new LinkedList<FTPFile>(Arrays.asList(listFiles));
+        return new LinkedList<>(Arrays.asList(listFiles));
     }
 
     private void assertDirectoryExists(Path path) throws XenonException {
-        boolean directoryExists = false;
-        directoryExists = directoryExists(path);
-        if (!directoryExists) {
+        if (!directoryExists(path)) {
             String absolutePath = path.getRelativePath().getAbsolutePath();
             String message = MessageFormat.format("Directory does not exist at path ", absolutePath);
             throw new XenonException(adaptor.getName(), message);

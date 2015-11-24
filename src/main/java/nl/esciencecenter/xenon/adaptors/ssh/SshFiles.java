@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,22 +38,7 @@ import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.engine.util.CopyInfo;
 import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.engine.util.PosixFileUtils;
-import nl.esciencecenter.xenon.files.Copy;
-import nl.esciencecenter.xenon.files.CopyOption;
-import nl.esciencecenter.xenon.files.CopyStatus;
-import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
-import nl.esciencecenter.xenon.files.DirectoryStream;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.FileSystem;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
-import nl.esciencecenter.xenon.files.NoSuchPathException;
-import nl.esciencecenter.xenon.files.OpenOption;
-import nl.esciencecenter.xenon.files.Path;
-import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
-import nl.esciencecenter.xenon.files.PathAttributesPair;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.files.*;
 import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 
 import org.slf4j.Logger;
@@ -102,7 +86,7 @@ public class SshFiles implements Files {
     private final XenonEngine xenonEngine;
     private final SshAdaptor adaptor;
 
-    private Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
+    private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     public SshFiles(SshAdaptor sshAdaptor, XenonEngine xenonEngine) {
         this.xenonEngine = xenonEngine;
@@ -135,7 +119,7 @@ public class SshFiles implements Files {
         
         ChannelSftp channel = session.getSftpChannel();
 
-        String wd = null;
+        String wd;
 
         try {
             wd = channel.pwd();
@@ -258,12 +242,10 @@ public class SshFiles implements Files {
         if (exists(dir)) {
             throw new PathAlreadyExistsException(SshAdaptor.ADAPTOR_NAME, "Directory " + dir + " already exists!");
         }
-        
-        Iterator<RelativePath> itt = dir.getRelativePath().iterator();
 
-        while (itt.hasNext()) {
-            Path tmp = newPath(dir.getFileSystem(), itt.next());
-            
+        for (RelativePath superDirectory : dir.getRelativePath()) {
+            Path tmp = newPath(dir.getFileSystem(), superDirectory);
+
             if (!exists(tmp)) {
                 createDirectory(tmp);
             }
@@ -419,7 +401,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        List<LsEntry> result = null;
+        List<LsEntry> result;
 
         try {
             result = channel.ls(path.getRelativePath().getAbsolutePath());
@@ -474,7 +456,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        InputStream in = null;
+        InputStream in;
         
         try {
             in = channel.get(path.getRelativePath().getAbsolutePath());
@@ -515,14 +497,14 @@ public class SshFiles implements Files {
 
         int mode = ChannelSftp.OVERWRITE;
 
-        if (OpenOption.contains(OpenOption.APPEND, options)) {
+        if (OpenOption.APPEND.occursIn(options)) {
             mode = ChannelSftp.APPEND;
         }
 
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        OutputStream out = null;
+        OutputStream out;
         
         try {
             out = channel.put(path.getRelativePath().getAbsolutePath(), mode);
@@ -544,7 +526,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        Path result = null;
+        Path result;
 
         try {
             String target = channel.readlink(path.getRelativePath().getAbsolutePath());
@@ -613,7 +595,7 @@ public class SshFiles implements Files {
         SshMultiplexedSession session = getSession(path);
         ChannelSftp channel = session.getSftpChannel();
 
-        SftpATTRS result = null;
+        SftpATTRS result;
 
         try {
             result = channel.lstat(path.getRelativePath().getAbsolutePath());

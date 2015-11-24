@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
@@ -36,16 +37,15 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
  * @since 1.0
  */
 public class JavaJobDescription extends JobDescription {
+    private final List<String> javaOptions = new ArrayList<>();
 
-    private final List<String> javaOptions = new ArrayList<String>();
-
-    private final Map<String, String> javaSystemProperties = new HashMap<String, String>();
+    private final Map<String, String> javaSystemProperties = new HashMap<>();
 
     private String javaMain = null;
 
-    private final List<String> javaArguments = new ArrayList<String>();
+    private final List<String> javaArguments = new ArrayList<>();
 
-    private final List<String> javaClasspath = new ArrayList<String>();
+    private final List<String> javaClasspath = new ArrayList<>();
    
     /**
      * Returns the JVM options.
@@ -302,42 +302,18 @@ public class JavaJobDescription extends JobDescription {
         if (this == obj) {
             return true;
         }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(obj)) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         JavaJobDescription other = (JavaJobDescription) obj;
-        
-        if (!javaArguments.equals(other.javaArguments)) {
-            return false;
-        }
-        
-        if (!javaClasspath.equals(other.javaClasspath)) {
-            return false;
-        }
-        
-        if (javaMain == null) {
-            if (other.javaMain != null) {
-                return false;
-            }        
-        } else if (!javaMain.equals(other.javaMain)) {
-            return false;
-        }
-        
-        if (!javaOptions.equals(other.javaOptions)) {
-            return false;
-        }
-        
-        return javaSystemProperties.equals(other.javaSystemProperties);
+
+        return super.equals(obj) &&
+                javaArguments.equals(other.javaArguments) &&
+                javaClasspath.equals(other.javaClasspath) &&
+                Objects.equals(javaMain, other.javaMain) &&
+                javaOptions.equals(other.javaOptions) &&
+                javaSystemProperties.equals(other.javaSystemProperties);
     }
 
 }

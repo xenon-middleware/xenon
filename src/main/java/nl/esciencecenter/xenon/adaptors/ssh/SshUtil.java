@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import nl.esciencecenter.xenon.XenonException;
@@ -26,23 +25,13 @@ import com.jcraft.jsch.SftpException;
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  */
-public class SshUtil {
-
-    protected SshUtil() {
+public final class SshUtil {
+    private SshUtil() {
         // do not use
     }
 
-    /**
-     * 
-     * 
-     * 
-     * @param a1
-     * @param a2
-     * @return
-     */    
     @SuppressWarnings({ "PMD.CompareObjectsWithEquals", "PMD.NPathComplexity" })
     public static boolean equals(SftpATTRS a1, SftpATTRS a2) {
-
         // Handles case of aliased object + both null
         if (a1 == a2) {
             return true;
@@ -54,31 +43,13 @@ public class SshUtil {
         }
 
         // Test all fields
-        if (a1.getATime() != a2.getATime()) {
-            return false;
-        }
-
-        if (a1.getMTime() != a2.getMTime()) {
-            return false;
-        }
-
-        if (a1.getFlags() != a2.getFlags()) {
-            return false;
-        }
-
-        if (a1.getGId() != a2.getGId()) {
-            return false;
-        }
-
-        if (a1.getUId() != a2.getUId()) {
-            return false;
-        }
-
-        if (a1.getPermissions() != a2.getPermissions()) {
-            return false;
-        }
-
-        return (a1.getSize() == a2.getSize());
+        return a1.getATime() == a2.getATime()
+                && a1.getMTime() == a2.getMTime()
+                && a1.getFlags() == a2.getFlags()
+                && a1.getGId() == a2.getGId()
+                && a1.getUId() == a2.getUId()
+                && a1.getPermissions() == a2.getPermissions()
+                && a1.getSize() == a2.getSize();
     }
     
     

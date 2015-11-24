@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.slurm;
 
 import static org.junit.Assert.assertEquals;
@@ -336,7 +335,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
                 assertTrue(line.equals(message));
             }
 
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(30));
             checkJobDone(status);
         } finally {
             try {
@@ -366,7 +365,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setStartSingleProcess(true);
 
             job = jobs.submitJob(scheduler, description);
-            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(2));
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(30));
             checkJobDone(status);
             
             String outputContent = readFully(resolve(root, "stdout.txt"));

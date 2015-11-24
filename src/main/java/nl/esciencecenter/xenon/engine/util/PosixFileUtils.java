@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine.util;
 
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
  * @since 1.0
  *
  */
+@SuppressWarnings("OctalInteger")
 public class PosixFileUtils {
     
     // FIXME: Are these correct ? Some seem to be missing ?  
@@ -67,7 +67,7 @@ public class PosixFileUtils {
     @SuppressWarnings("PMD.NPathComplexity")
     public static Set<PosixFilePermission> bitsToPermissions(int bit) {
 
-        HashSet<PosixFilePermission> result = new HashSet<PosixFilePermission>();
+        HashSet<PosixFilePermission> result = new HashSet<>();
 
         if ((bit & READ_OWNER) != 0) {
             result.add(PosixFilePermission.OWNER_READ);

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
 
 /**
  * @author Niels Drost
@@ -334,8 +333,7 @@ public final class ScriptingParser {
                 String[] elements = separatorRegEx.split(line, 2);
 
                 if (elements.length != 2) {
-                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Expected two columns in output, got \"" + line
-                            + "\"");
+                    throw new XenonException(adaptorName, "Expected two columns in output, got \"" + line + "\"");
                 }
 
                 String key = elements[0].trim();
@@ -346,7 +344,7 @@ public final class ScriptingParser {
                     currentMap = new HashMap<>(2);
                     result.put(value, currentMap);
                 } else if (currentMap == null) {
-                    throw new XenonException(GridEngineAdaptor.ADAPTOR_NAME, "Expecting \"" + keyField
+                    throw new XenonException(adaptorName, "Expecting \"" + keyField
                             + "\" on first line, got \"" + line + "\"");
                 }
                 currentMap.put(key, value);

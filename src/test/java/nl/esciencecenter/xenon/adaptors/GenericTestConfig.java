@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors;
 
 import java.io.File;
@@ -42,8 +41,9 @@ public abstract class GenericTestConfig {
         this.p = getTestProperties(configfile);
     }
 
-    public static Properties getTestProperties(String configFilename) throws FileNotFoundException, IOException {
+    public static Properties getTestProperties(String defaultConfigFilename) throws FileNotFoundException, IOException {
         Properties props = new Properties();
+        String configFilename = defaultConfigFilename;
         if (configFilename == null) {
             configFilename = System.getProperty("xenon.test.properties");
         }
@@ -82,7 +82,7 @@ public abstract class GenericTestConfig {
         if (value == null) {
             throw new UnknownPropertyException(adaptorName, "Failed to retrieve property " + name);
         }
-        return value;
+        return value.trim();
     }
 
     public final String getPropertyOrFail(String name) throws UnknownPropertyException {

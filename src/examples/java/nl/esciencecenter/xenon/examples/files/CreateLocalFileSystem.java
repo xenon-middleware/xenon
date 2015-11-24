@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.examples.files;
 
 import nl.esciencecenter.xenon.Xenon;
@@ -48,7 +47,7 @@ public class CreateLocalFileSystem {
             Credential c = credentials.getDefaultCredential("file");
 
             // We need to know the OS to determine the root of the file system 
-            String root = null;
+            String root;
             
             if (Utils.isWindows()) { 
                 root = "C:";

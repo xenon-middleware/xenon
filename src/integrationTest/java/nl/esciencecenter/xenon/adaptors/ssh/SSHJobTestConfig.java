@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.util.HashMap;
@@ -36,12 +35,16 @@ public class SSHJobTestConfig extends JobTestConfig {
     private final String username;
     private final char[] passwd;
 
-    private final String scheme = "ssh";
+    private final static String scheme = "ssh";
     
     private final String correctLocation;
     private final String correctLocationWrongUser;
     private final String wrongLocation;
 
+    private final String openCredential;
+    private final String protectedCredential;
+    private final String credentialPassphrase;
+    
     public SSHJobTestConfig(String configfile) throws Exception {
         super("ssh", configfile);
 
@@ -50,6 +53,10 @@ public class SSHJobTestConfig extends JobTestConfig {
         username = getPropertyOrFail("test.ssh.user");
         passwd = getPropertyOrFail("test.ssh.password").toCharArray();
 
+        openCredential = getPropertyOrFail("test.ssh.credential.open");
+        protectedCredential = getPropertyOrFail("test.ssh.credential.protected");
+        credentialPassphrase = getPropertyOrFail("test.ssh.credential.protected.passphrase");
+        
         correctLocation = username + "@" + location;
         correctLocationWrongUser =  "incorrect@" + location;
         wrongLocation = username + "@doesnotexist.com";
@@ -69,7 +76,7 @@ public class SSHJobTestConfig extends JobTestConfig {
     public boolean supportsCredentials() {
         return true;
     }
-
+    
     @Override
     public Credential getDefaultCredential(Credentials credentials) throws Exception {
         return credentials.getDefaultCredential("ssh");
@@ -85,6 +92,18 @@ public class SSHJobTestConfig extends JobTestConfig {
         return credentials.newPasswordCredential("ssh", username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
     }
 
+    public Credential getOpenCredential(Credentials credentials) throws Exception {
+        return credentials.newCertificateCredential("ssh", openCredential, username, null, null);
+    }
+
+    public Credential getProtectedCredential(Credentials credentials) throws Exception {
+        return credentials.newCertificateCredential("ssh", protectedCredential, username, credentialPassphrase.toCharArray(), null);
+    }
+    
+    public Credential getInvalidProtectedCredential(Credentials credentials) throws Exception {
+        return credentials.newCertificateCredential("ssh", protectedCredential, username, "aap".toCharArray(), null);
+    }
+    
     @Override
     public boolean supportNonDefaultCredential() {
         return true;
@@ -116,7 +135,7 @@ public class SSHJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public String getInvalidQueueName() throws Exception {
+    public String getInvalidQueueName() {
         return "aap";
     }
 

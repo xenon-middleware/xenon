@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.util;
 
 import static org.junit.Assert.assertEquals;
@@ -457,6 +456,7 @@ public class RealSandboxTest {
         assertTrue(pair.hashCode() == result);
 
         result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + src.hashCode();
 
@@ -464,12 +464,15 @@ public class RealSandboxTest {
 
         result = 1;
         result = prime * result + dst.hashCode();
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertTrue(pair4.hashCode() == result);
 
         result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertTrue(pair2.hashCode() == result);

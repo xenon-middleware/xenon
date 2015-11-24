@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,9 +37,10 @@ public class SchedulerImplementation implements Scheduler {
     private final boolean supportsInteractive;
     private final boolean supportsBatch;
 
-    public SchedulerImplementation(String adaptorName, String uniqueID, String scheme, String location, String[] queueNames, 
-            Credential credential, XenonProperties properties, boolean isOnline, boolean supportsInteractive, 
-            boolean supportsBatch) {
+    @SuppressWarnings("PMD.ExcessiveParameterList")
+    public SchedulerImplementation(String adaptorName, String uniqueID, String scheme, String location, String[] queueNames,
+                                   Credential credential, XenonProperties properties, boolean isOnline, boolean supportsInteractive,
+                                   boolean supportsBatch) {
 
         if (adaptorName == null) {
             throw new IllegalArgumentException("AdaptorName may not be null!");
@@ -139,11 +140,7 @@ public class SchedulerImplementation implements Scheduler {
             return true;
         }
 
-        if (obj == null) {
-            return false;
-        }
-
-        if (getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 

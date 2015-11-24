@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine.jobs;
 
 import java.io.InputStream;
@@ -30,11 +29,11 @@ public class StreamsImplementation implements Streams {
 
     private final Job job;
 
-    private InputStream stdout;
+    private final InputStream stdout;
 
-    private InputStream stderr;
+    private final InputStream stderr;
 
-    private OutputStream stdin;
+    private final OutputStream stdin;
 
     /**
      * Create a Streams containing the job and its standard streams.

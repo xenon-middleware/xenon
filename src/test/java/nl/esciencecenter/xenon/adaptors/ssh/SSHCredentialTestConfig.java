@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import java.io.File;
+import java.io.IOException;
 
 import nl.esciencecenter.xenon.adaptors.CredentialTestConfig;
 
@@ -39,7 +39,7 @@ public class SSHCredentialTestConfig implements CredentialTestConfig {
     }
 
     @Override
-    public String getCorrectCertFile() {
+    public String getCorrectCertFile() throws IOException {
         
         String location = System.getProperty("user.home");
         
@@ -55,7 +55,7 @@ public class SSHCredentialTestConfig implements CredentialTestConfig {
             return dsa.getAbsolutePath();
         }
 
-        throw new RuntimeException("Cannot find an SSH key in " + location);
+        throw new IOException("Cannot find an SSH key in " + location);
     }
 
     @Override

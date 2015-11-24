@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.junit.Test;
-
 import nl.esciencecenter.xenon.XenonException;
+
+import org.junit.Test;
 
 import com.jcraft.jsch.ChannelSftp;
 
@@ -37,7 +35,7 @@ public class SshOutputStreamTest {
 
     static class DummySession extends SshMultiplexedSession {
 
-        boolean released = false;
+        private boolean released = false;
         
         DummySession() {
             super();
@@ -52,7 +50,7 @@ public class SshOutputStreamTest {
         }
     }
 
-    @org.junit.Test
+    @Test
     public void testWrite() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummySession s = new DummySession();
@@ -67,7 +65,7 @@ public class SshOutputStreamTest {
         assertEquals(data[1], 43);
     }
 
-    @org.junit.Test
+    @Test
     public void testWriteArray() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummySession s = new DummySession();
@@ -83,7 +81,7 @@ public class SshOutputStreamTest {
         assertEquals(data[1], 43);
     }
 
-    @org.junit.Test
+    @Test
     public void testWriteArray2() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummySession s = new DummySession();
@@ -98,7 +96,7 @@ public class SshOutputStreamTest {
         assertEquals(data[0], 43);
     }
 
-    @org.junit.Test
+    @Test
     public void testFlush() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummySession s = new DummySession();
@@ -112,7 +110,7 @@ public class SshOutputStreamTest {
         assertEquals(data[0], 42);
     }
 
-    @org.junit.Test
+    @Test
     public void testClose() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummySession s = new DummySession();
@@ -131,29 +129,11 @@ public class SshOutputStreamTest {
         t.close();
     }
 
-    @org.junit.Test
+    @Test
     public void testToString() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummySession s = new DummySession();
         SshOutputStream t = new SshOutputStream(out, s, null);
         assertEquals(t.toString(), out.toString());
-    }
-
-    @org.junit.Test
-    public void testHashcode() throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        DummySession s = new DummySession();
-        SshOutputStream t = new SshOutputStream(out, s, null);
-        assertEquals(t.hashCode(), out.hashCode());
-    }
-
-    @org.junit.Test
-    public void testEquals() throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        DummySession s = new DummySession();
-        SshOutputStream t = new SshOutputStream(out, s, null);
-        
-        // This equals is weird ? 
-        assertTrue(t.equals(out));
     }
 }

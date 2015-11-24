@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine.files;
 
 import static org.junit.Assert.assertFalse;
@@ -38,11 +37,11 @@ import org.junit.Test;
  */
 public class PathAttributesPairImplementationTest {
 
-    Xenon xenon;
-    Files files;
-    FileSystem filesystem;
-    Path root;
-    FileAttributes att;
+    private Xenon xenon;
+    private Files files;
+    private FileSystem filesystem;
+    private Path root;
+    private FileAttributes att;
 
     @Before
     public void prepare() throws XenonException, XenonException {
@@ -95,6 +94,7 @@ public class PathAttributesPairImplementationTest {
         assertTrue(result == new PathAttributesPairImplementation(root, att).hashCode());
 
         result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + root.hashCode();
 
@@ -102,12 +102,15 @@ public class PathAttributesPairImplementationTest {
 
         result = 1;
         result = prime * result + att.hashCode();
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertTrue(result == new PathAttributesPairImplementation(null, att).hashCode());
 
         result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertTrue(result == new PathAttributesPairImplementation(null, null).hashCode());

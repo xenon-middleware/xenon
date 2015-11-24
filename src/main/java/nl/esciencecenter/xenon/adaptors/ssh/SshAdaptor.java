@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -161,7 +162,7 @@ public class SshAdaptor extends Adaptor {
 
         this.filesAdaptor = new SshFiles(this, xenonEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, xenonEngine);
-        this.credentialsAdaptor = new SshCredentials(getProperties(), this);
+        this.credentialsAdaptor = new SshCredentials(this);
         this.jsch = jsch;
 
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
@@ -183,9 +184,7 @@ public class SshAdaptor extends Adaptor {
             // Connect to the local ssh-agent
             LOGGER.debug("Connecting to ssh-agent");
             
-            //jsch.setConfig("PreferredAuthentications", "publickey");
-            
-            Connector connector = null;
+            Connector connector;
 
             try {
                 ConnectorFactory cf = ConnectorFactory.getDefault();
@@ -236,9 +235,9 @@ public class SshAdaptor extends Adaptor {
     
     private void setConfigFile(String sshConfigFile, boolean ignoreFail) throws XenonException {
         try {
-            ConfigRepository configRepository = com.jcraft.jsch.OpenSSHConfig.parseFile(sshConfigFile);
+            ConfigRepository configRepository = OpenSSHConfig.parse(new File(sshConfigFile));
             jsch.setConfigRepository(configRepository);
-        } catch (IOException ex) {
+        } catch (IOException|XenonException ex) {
             if (ignoreFail) {
                 LOGGER.warn("OpenSSH config file cannot be read.");
             } else {

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 
@@ -36,6 +35,7 @@ import com.jcraft.jsch.SftpATTRS;
  * @since 1.0
  *
  */
+@SuppressWarnings("OctalInteger")
 public class SSHFileAttributeTest {
     
     // Copied from SftpATTRS, needed to set correct flags.
@@ -67,12 +67,6 @@ public class SSHFileAttributeTest {
     public static final int S_IWOTH = 00002; // write by others
     public static final int S_IXOTH = 00001; // execute/search by others
 
-    
-    
-    private SftpATTRS createEmptySftpATTRS() throws Exception {        
-        return createSftpATTRS(new Buffer());
-    }
-    
     private SftpATTRS createSftpATTRS(Buffer buf) throws Exception {        
         Method method = SftpATTRS.class.getDeclaredMethod("getATTR", Buffer.class);
         method.setAccessible(true);
@@ -133,13 +127,7 @@ public class SSHFileAttributeTest {
             return true;
         }
     }
-    
-    private void setFlags(SftpATTRS obj, int flags) throws Exception {
-        Method method = SftpATTRS.class.getDeclaredMethod("setFLAGS", int.class);
-        method.setAccessible(true);
-        method.invoke(obj, flags);
-    }
-    
+
     @org.junit.Test
     public void testDir() throws Exception {
         SftpATTRS s1 = createSftpATTRS(S_IFDIR);
@@ -338,7 +326,9 @@ public class SSHFileAttributeTest {
 
         final int prime = 31;
         int result = 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         
         assertEquals(tmp.hashCode(), result);

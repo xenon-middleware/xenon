@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -125,12 +125,7 @@ public class LocalAdaptor extends Adaptor {
    
     @Override
     public boolean supports(String scheme) {
-
-        if (scheme == null) {
-            return true;
-        }
-
-        return super.supports(scheme);
+        return scheme == null || super.supports(scheme);
     }
 
     @Override
@@ -155,7 +150,7 @@ public class LocalAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        Map<String,String> result = new HashMap<String, String>();
+        Map<String,String> result = new HashMap<>();
         localJobs.getAdaptorSpecificInformation(result);
         return result;
     }

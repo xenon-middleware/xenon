@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,14 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.io.File;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementation;
-import nl.esciencecenter.xenon.engine.credentials.ProxyCredentialImplementation;
 
 
 public class SshCredentials implements Credentials {
@@ -40,11 +38,9 @@ public class SshCredentials implements Credentials {
         return res;
     }
 
-    private final XenonProperties properties;
     private final SshAdaptor adaptor;
 
-    public SshCredentials(XenonProperties properties, SshAdaptor sshAdaptor) {
-        this.properties = properties;
+    public SshCredentials(SshAdaptor sshAdaptor) {
 
         if (sshAdaptor == null) {
             throw new IllegalArgumentException("Adaptor can not be null!");
@@ -62,8 +58,9 @@ public class SshCredentials implements Credentials {
         if (!new File(certfile).exists()) { 
             throw new CertificateNotFoundException(SshAdaptor.ADAPTOR_NAME, "Certificate file not found: " + certfile);
         }
-        
-        return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, certfile, username, password);
+
+        return new SSHCertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, certfile, username, password,
+                adaptor.usingAgent());
     }
 
     @Override
@@ -78,11 +75,6 @@ public class SshCredentials implements Credentials {
     @Override
     public Credential getDefaultCredential(String scheme) throws XenonException {
 
-        // Is ssh-agent is used, we return a ProxyCredential as default.
-        if (adaptor.usingAgent()) { 
-            return new ProxyCredentialImplementation(adaptor.getName(), getNewUniqueID(), properties);
-        }  
-
         // If ssh-agent is not used, we default to a credential adaptor that contains a public-private key pair.          
         String userHome = System.getProperty("user.home");
         
@@ -96,18 +88,16 @@ public class SshCredentials implements Credentials {
             throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot get user name.");
         }
 
-        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
-
-        if (certFile2.exists()) {
-            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), properties, certFile2.getPath(),
-                    user, null);
-        }
-
-        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
+        File certFile = new File(userHome + File.separator + ".ssh" + File.separator + "id_rsa");
 
         if (certFile.exists()) {
-            return new CertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), properties, certFile.getPath(),
-                    user, null);
+            return newCertificateCredential("ssh", certFile.getPath(), user, null, null);
+        }
+
+        File certFile2 = new File(userHome + File.separator + ".ssh" + File.separator + "id_dsa");
+
+        if (certFile2.exists()) {
+            return newCertificateCredential("ssh", certFile2.getPath(), user, null, null);
         }
         
         throw new InvalidCredentialException(SshAdaptor.ADAPTOR_NAME, "Cannot create a default credential for ssh, tried "

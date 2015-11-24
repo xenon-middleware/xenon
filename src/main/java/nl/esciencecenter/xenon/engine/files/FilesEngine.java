@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,12 +61,12 @@ public class FilesEngine implements Files {
         this.xenonEngine = xenonEngine;
     }
 
-    private Files getFilesAdaptorFromEngine(FileSystem filesystem) throws XenonException {        
+    private Files getFilesAdaptorFromEngine(FileSystem filesystem) {
         try {
             Adaptor adaptor = xenonEngine.getAdaptor(filesystem.getAdaptorName());
             return adaptor.filesAdaptor();
         } catch (XenonException e) {
-            // This is a case that should never occur, the adaptor was already created, it cannot dissapear suddenly.
+            // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.
             // Therefore, we make this a runtime exception.
             throw new XenonRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
         }

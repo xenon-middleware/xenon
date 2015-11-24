@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ public final class StreamForwarder extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamForwarder.class);
 
-    public static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 1024;
 
     private final InputStream in;
     private final OutputStream out;

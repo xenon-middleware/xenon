@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,29 +107,15 @@ public final class PathImplementation implements Path {
         if (this == obj) {
             return true;
         }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (!(obj instanceof PathImplementation)) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
         PathImplementation other = (PathImplementation) obj;
 
-        if (!filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())) {
-            return false;
-        }
-
-        if (!filesystem.getScheme().equals(other.filesystem.getScheme())) {
-            return false;
-        }
-
-        if (!filesystem.getLocation().equals(other.filesystem.getLocation())) {
-            return false;
-        }
-        
-        return relativePath.equals(other.relativePath);
+        return filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())
+                && filesystem.getScheme().equals(other.filesystem.getScheme())
+                && filesystem.getLocation().equals(other.filesystem.getLocation())
+                && relativePath.equals(other.relativePath);
     }
 }

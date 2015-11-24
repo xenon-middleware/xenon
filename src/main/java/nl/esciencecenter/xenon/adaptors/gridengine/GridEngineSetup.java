@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,7 +100,7 @@ public class GridEngineSetup {
 
         //qconf returns an error if there are no parallel environments
         if (runner.getExitCode() == 1 && runner.getStderr().contains("no parallel environment defined")) {
-            return new HashMap<String, ParallelEnvironmentInfo>();
+            return new HashMap<>();
         }
 
         if (!runner.success()) {
@@ -117,7 +117,7 @@ public class GridEngineSetup {
         Map<String, Map<String, String>> maps = ScriptingParser.parseKeyValueRecords(peDetailsOutput, "pe_name",
                 ScriptingParser.WHITESPACE_REGEX, GridEngineAdaptor.ADAPTOR_NAME);
 
-        Map<String, ParallelEnvironmentInfo> result = new HashMap<String, ParallelEnvironmentInfo>();
+        Map<String, ParallelEnvironmentInfo> result = new HashMap<>();
 
         for (Map.Entry<String, Map<String, String>> entry : maps.entrySet()) {
             result.put(entry.getKey(), new ParallelEnvironmentInfo(entry.getValue()));

@@ -1,3 +1,18 @@
+/**
+ * Copyright 2013 Netherlands eScience Center
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.esciencecenter.xenon.adaptors.slurm;
 
 import java.util.ArrayList;
@@ -6,7 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.engine.util.CommandLineUtils;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.JobDescription;
@@ -38,10 +52,8 @@ public final class SlurmJobScriptGenerator {
         return path;
     }
     
-    public static String[] generateInteractiveArguments(JobDescription description, RelativePath fsEntryPath, UUID tag) 
-            throws XenonException {
-        
-        ArrayList<String> arguments = new ArrayList<String>();
+    public static String[] generateInteractiveArguments(JobDescription description, RelativePath fsEntryPath, UUID tag) {
+        ArrayList<String> arguments = new ArrayList<>();
 
         //suppress printing of status messages
         arguments.add("--quiet");
@@ -75,7 +87,7 @@ public final class SlurmJobScriptGenerator {
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
-    public static String generate(JobDescription description, RelativePath fsEntryPath) throws XenonException {
+    public static String generate(JobDescription description, RelativePath fsEntryPath) {
         StringBuilder stringBuilder = new StringBuilder();
         Formatter script = new Formatter(stringBuilder, Locale.US);
 

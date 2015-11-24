@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.examples.jobs;
 
 import java.net.URI;
@@ -83,7 +82,7 @@ public class SubmitBatchJobWithOutput {
             } else {
                 
                 // Access output using local or SSH as a scheme.
-                Path workingDir = null;
+                Path workingDir;
                 
                 if (location.getScheme().equals("local") || location.getAuthority() == null) { 
                     workingDir = Utils.getLocalCWD(files);

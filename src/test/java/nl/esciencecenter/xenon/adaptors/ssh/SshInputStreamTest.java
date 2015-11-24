@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +35,7 @@ public class SshInputStreamTest {
 
     static class DummySession extends SshMultiplexedSession {
 
-        boolean released = false;
+        private boolean released = false;
         
         DummySession() {
             super();
@@ -64,14 +63,14 @@ public class SshInputStreamTest {
         return new SshInputStream(in, s, null);
     }
    
-    @org.junit.Test
+    @Test
     public void testRead() throws Exception {
         SshInputStream t = createSshInputStream();
         assertEquals(t.read(), 42);
         assertEquals(t.read(), 43);
     }
 
-    @org.junit.Test
+    @Test
     public void testReadArray1() throws Exception {
         byte [] data = new byte[] { 42, 43 };
         SshInputStream t = createSshInputStream(data);
@@ -81,7 +80,7 @@ public class SshInputStreamTest {
         assertEquals(toRead[1], 43);
     }
     
-    @org.junit.Test
+    @Test
     public void testReadArray2() throws Exception {
         SshInputStream t = createSshInputStream();
 
@@ -94,7 +93,7 @@ public class SshInputStreamTest {
         assertEquals(toRead[0], 43);
     }
 
-    @org.junit.Test
+    @Test
     public void testReadArrayOffset() throws Exception {
         SshInputStream t = createSshInputStream();
 
@@ -107,7 +106,7 @@ public class SshInputStreamTest {
         assertEquals(toRead[1], 42);
     }
       
-    @org.junit.Test
+    @Test
     public void testSkip1() throws Exception {
         SshInputStream t = createSshInputStream();
         t.skip(1);
@@ -116,7 +115,7 @@ public class SshInputStreamTest {
         assertEquals(toRead[0], 43);
     }
    
-    @org.junit.Test
+    @Test
     public void testSkip2() throws Exception {
         SshInputStream t = createSshInputStream();
         t.skip(0);
@@ -125,13 +124,13 @@ public class SshInputStreamTest {
         assertEquals(toRead[0], 42);
     }
 
-    @org.junit.Test
+    @Test
     public void testAvailable() throws Exception {
         SshInputStream t = createSshInputStream();
         assertEquals(t.available(), 2);
     }
     
-    @org.junit.Test
+    @Test
     public void testMarkSupported() throws Exception {
         byte [] data = new byte[] { 42, 43 };
         ByteArrayInputStream in = new ByteArrayInputStream(data);
@@ -141,7 +140,7 @@ public class SshInputStreamTest {
         assertEquals(t.markSupported(), in.markSupported());
     }
     
-    @org.junit.Test
+    @Test
     public void testMark() throws Exception {
         SshInputStream t = createSshInputStream();
         t.mark(5);
@@ -158,7 +157,7 @@ public class SshInputStreamTest {
         assertEquals(toRead[0], 43);        
     }
 
-    @org.junit.Test
+    @Test
     public void testClose() throws Exception {
         byte [] data = new byte[] { 42, 43 };
         ByteArrayInputStream in = new ByteArrayInputStream(data);
@@ -179,7 +178,7 @@ public class SshInputStreamTest {
         t.close();
     }
     
-    @org.junit.Test
+    @Test
     public void testToString() throws Exception {
         byte [] data = new byte[] { 42, 43 };
         ByteArrayInputStream in = new ByteArrayInputStream(data);
@@ -187,26 +186,5 @@ public class SshInputStreamTest {
         SshInputStream t = new SshInputStream(in, s, null);
         
         assertEquals(t.toString(), in.toString());
-    }
-
-    @org.junit.Test
-    public void testHashcode() throws Exception {
-        byte [] data = new byte[] { 42, 43 };
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        DummySession s = new DummySession();        
-        SshInputStream t = new SshInputStream(in, s, null);
-        
-        assertEquals(t.hashCode(), in.hashCode());
-    }
-
-    @org.junit.Test
-    public void testEquals() throws Exception {
-        byte [] data = new byte[] { 42, 43 };
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        DummySession s = new DummySession();        
-        SshInputStream t = new SshInputStream(in, s, null);
-        
-        // This equals is weird ? 
-        assertTrue(t.equals(in));
     }
 }

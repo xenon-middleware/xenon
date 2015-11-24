@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ftp;
 
 import java.util.Map;
@@ -44,7 +43,7 @@ public class FtpCredentials implements Credentials {
         return res;
     }
 
-    private XenonProperties properties;
+    private final XenonProperties properties;
     private FtpAdaptor adaptor;
 
     public FtpCredentials(XenonProperties properties, FtpAdaptor ftpAdaptor) {

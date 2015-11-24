@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.gridengine;
 
 import java.util.HashMap;
@@ -166,7 +165,7 @@ public class GridEngineJobTestConfig extends JobTestConfig {
     }
 
     @Override
-    public String getInvalidQueueName() throws Exception {
+    public String getInvalidQueueName() {
         return "aap";
     }
 

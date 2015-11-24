@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -169,7 +169,6 @@ public class XenonProperties {
     }
 
     private void checkType(XenonPropertyDescription description, String key, String value) throws InvalidPropertyException {
-
         Type t = description.getType();
 
         try {

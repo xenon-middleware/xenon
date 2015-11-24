@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.jobs;
 
 import static org.junit.Assert.assertTrue;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 public class ITJobLocal {
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     final Logger logger = LoggerFactory.getLogger(ITJobLocal.class);
 

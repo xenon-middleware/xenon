@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -141,6 +141,6 @@ public class FtpAdaptor extends Adaptor {
 
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
-        return new HashMap<String, String>();
+        return new HashMap<>();
     }
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors;
 
 import java.io.FileNotFoundException;
@@ -35,7 +34,7 @@ public abstract class JobTestConfig extends GenericTestConfig {
         super(adaptorName, configfile);
     }
 
-    public boolean supportsClose() throws Exception {
+    public boolean supportsClose() {
         return false;
     }
 
@@ -57,7 +56,7 @@ public abstract class JobTestConfig extends GenericTestConfig {
 
     public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
 
-    public abstract String getInvalidQueueName() throws Exception;
+    public abstract String getInvalidQueueName();
 
     public abstract long getQueueWaitTime();
 

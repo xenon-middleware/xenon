@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.engine.util;
 
 import static org.junit.Assert.assertFalse;
@@ -59,13 +58,13 @@ public class JobQueueTest {
 
     static class MyProcessWrapper implements InteractiveProcess {
 
-        final JobImplementation job;
-        final byte[] output;
-        final byte[] error;
+        private final JobImplementation job;
+        private final byte[] output;
+        private final byte[] error;
 
-        boolean destoyed = false;
-        boolean done = false;
-        int exit = -1;
+        private boolean destroyed = false;
+        private boolean done = false;
+        private int exit = -1;
 
         MyProcessWrapper(JobImplementation job, byte[] output, byte[] error) {
             this.job = job;
@@ -99,11 +98,11 @@ public class JobQueueTest {
 
         @Override
         public synchronized void destroy() {
-            destoyed = true;
+            destroyed = true;
         }
 
         public synchronized boolean isDestroyed() {
-            return destoyed;
+            return destroyed;
         }
     }
 
@@ -131,21 +130,17 @@ public class JobQueueTest {
         }
     }
 
-    static Scheduler scheduler;
-    static Xenon xenon;
-    static Path cwd;
-    static Files files;
-    static FileSystem filesystem;
-    static JobQueues jobQueue;
-    static MyFactory myFactory;
+    private static Scheduler scheduler;
+    private static Xenon xenon;
+    private static Path cwd;
+    private static Files files;
+    private static FileSystem filesystem;
+    private static JobQueues jobQueue;
+    private static MyFactory myFactory;
 
-    static MyProcessWrapper currentWrapper;
+    private static MyProcessWrapper currentWrapper;
 
-    synchronized static MyProcessWrapper getCurrentWrapper() {
-        return currentWrapper;
-    }
-
-    synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) {
+    private synchronized static void setCurrentWrapper(MyProcessWrapper wrapper) {
         currentWrapper = wrapper;
     }
 

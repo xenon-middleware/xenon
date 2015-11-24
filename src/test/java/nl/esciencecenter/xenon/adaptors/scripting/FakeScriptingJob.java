@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
 public class FakeScriptingJob implements Job {
-    final String identifier;
+    private final String identifier;
 
     public FakeScriptingJob(String identifier) {
         this.identifier = identifier;

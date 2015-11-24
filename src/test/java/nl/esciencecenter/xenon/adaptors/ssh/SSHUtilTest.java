@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,36 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import static org.junit.Assert.*;
+
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 
+import com.jcraft.jsch.Buffer;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.Buffer;
 import com.jcraft.jsch.SftpException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class SSHUtilTest {
-
-    @org.junit.Test
-    public void testConstructor() throws Exception {
-        // Dummy test for coverage
-        new SshUtil();
-    }
-    
     private SftpATTRS createEmptySftpATTRS() throws Exception {        
         Method method = SftpATTRS.class.getDeclaredMethod("getATTR", Buffer.class);
         method.setAccessible(true);

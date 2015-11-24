@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,6 +69,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final String RUNNING_STATE = "RUNNING";
 
+    private static final String COMPLETING_STATE = "COMPLETING";
+   
     // Retrieve an exit code from the "ExitCode" output field of scontrol
     protected static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
@@ -111,7 +113,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             exception = new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Job failed for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals(RUNNING_STATE),
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, isRunningState(state),
                 isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
@@ -146,7 +148,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                     + "\" for unknown reason");
         }
 
-        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, state.equals("RUNNING"),
+        JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, isRunningState(state),
                 isDoneState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
@@ -168,7 +170,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         String state = jobInfo.get("STATE");
 
-        return new JobStatusImplementation(job, state, null, null, state.equals("RUNNING"), false, jobInfo);
+        return new JobStatusImplementation(job, state, null, null, isRunningState(state), false, jobInfo);
     }
 
     protected static QueueStatus getQueueStatusFromSInfo(Map<String, Map<String, String>> info, String queueName, Scheduler scheduler) {
@@ -182,6 +184,10 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
     }
 
+    protected static boolean isRunningState(String state) {
+        return state.equals(RUNNING_STATE) || state.equals(COMPLETING_STATE); 
+    }
+    
     //failed also implies done
     protected static boolean isDoneState(String state) {
         return state.equals(DONE_STATE) || isFailedState(state);
@@ -255,7 +261,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 .getLongProperty(SlurmAdaptor.POLL_DELAY_PROPERTY));
 
         //map containing references to interactive jobs (normally ssh jobs)
-        interactiveJobs = new HashMap<String, Job>();
+        interactiveJobs = new HashMap<>();
 
         boolean ignoreVersion = getProperties().getBooleanProperty(SlurmAdaptor.IGNORE_VERSION_PROPERTY);
         boolean disableAccounting = getProperties().getBooleanProperty(SlurmAdaptor.DISABLE_ACCOUNTING_USAGE);
@@ -354,6 +360,32 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobImplementation(getScheduler(), jobID, description, false, false);
     }
 
+    private Job findInteractiveJob(String tag, JobDescription description, Job interactiveJob) throws XenonException {
+
+        //get contents of queue (should include job)
+        Map<String, Map<String, String>> queueInfo = getSqueueInfo();
+
+        //find job with "tag" as a comment in the job info
+        for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
+            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag)) {
+                String jobID = entry.getKey();
+                
+                LOGGER.debug("Found interactive job ID: " + jobID);
+
+                Job result = new JobImplementation(getScheduler(), jobID, description, true, true);
+                
+                synchronized (this) {
+                    //add to set of interactive jobs so we can find it
+                    interactiveJobs.put(result.getIdentifier(), interactiveJob);
+                }
+                
+                return result;
+            }
+        }
+
+        return null;        
+    }
+    
     private Job submitInteractiveJob(JobDescription description) throws XenonException {
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
         
@@ -364,30 +396,14 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         String[] arguments = SlurmJobScriptGenerator.generateInteractiveArguments(description, fsEntryPath, tag);
 
         Job interactiveJob = startInteractiveCommand("salloc", arguments);
+        
+        Job result = findInteractiveJob(tag.toString(), description, interactiveJob);
 
-        //get contents of queue (should include job)
-        Map<String, Map<String, String>> queueInfo = getSqueueInfo();
-
-        //find job with "tag" as a comment in the job info
-        for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
-            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag.toString())) {
-                String jobID = entry.getKey();
-                
-                LOGGER.debug("Found interactivde job ID: " + jobID);
-
-                Job result = new JobImplementation(getScheduler(), jobID, description, true, true);
-                
-                synchronized (this) {
-                    //add to set of interactive jobs so we can find it
-                    interactiveJobs.put(result.getIdentifier(), interactiveJob);
-                }
-                
-                return result;
-
-            }
+        if (result != null) { 
+            return result;
         }
 
-        //job not found. Fetch status of interactive job to return as an error.
+        // job not found. Fetch status of interactive job to return as an error.
         JobStatus status;
         try {
             status = engine.jobs().getJobStatus(interactiveJob);
@@ -395,13 +411,26 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job");
         }
 
+        if (status.isRunning()) { 
+            // Finding the job seems to fail sometimes, returning in an exception even though the job is actually running. 
+            // Retry the find...
+            result = findInteractiveJob(tag.toString(), description, interactiveJob);
+
+            if (result != null) { 
+                return result;
+            }
+    
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to find interactive jobin queue while its state "
+                    + "indicates it is running. state = " + status.getState() + " exit code = " + status.getExitCode(), 
+                    status.getException());
+        }     
+
         if (status.getExitCode() != null && status.getExitCode().equals(1)) {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job, perhaps some job options are invalid? (e.g. too many nodes, or invalid partition name)");
         }
-        
+            
         throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job. Interactive job status is "
-                + status.getState() + " exit code = " + status.getExitCode(), status.getException());
-
+                    + status.getState() + " exit code = " + status.getExitCode(), status.getException());
     }
 
     @Override
@@ -479,7 +508,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private Map<String, Map<String, String>> getSacctInfo(Job... jobs) throws XenonException {
         if (!config.accountingAvailable()) {
-            return new HashMap<String, Map<String, String>>();
+            return new HashMap<>();
         }
 
         //this command will not complain if the job given does not exist

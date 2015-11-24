@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,8 +87,7 @@ class BatchProcess implements Process {
     }
 
     private Path processPath(Files files, Path root, String path) throws XenonException {
-
-        Path result = null;
+        Path result;
 
         if (path == null) {
             result = root;

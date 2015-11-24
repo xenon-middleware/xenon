@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.esciencecenter.xenon.jobs;
 
 import static org.junit.Assert.assertEquals;
@@ -26,18 +25,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 /**
  * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class JobDescriptionTest {
 
-    @org.junit.Test
+    @Test
     public void test_new() throws Exception {
         new JobDescription();
     }
 
-    @org.junit.Test
+    @Test
     public void test_setters_getters() throws Exception {
         JobDescription j = new JobDescription();
 
@@ -104,55 +105,55 @@ public class JobDescriptionTest {
         assertTrue(opt.equals(opt2));
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_argumentNull() throws Exception {
         JobDescription j = new JobDescription();
         j.addArgument(null);
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_argumentEmpty() throws Exception {
         JobDescription j = new JobDescription();
         j.addArgument("");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_environmentKeyEmpty() throws Exception {
         JobDescription j = new JobDescription();
         j.addEnvironment("", "value");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_environmentKeyNull() throws Exception {
         JobDescription j = new JobDescription();
         j.addEnvironment(null, "value");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_jobOptionKeyEmpty() throws Exception {
         JobDescription j = new JobDescription();
         j.addJobOption("", "value");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_jobOptionKeyNull() throws Exception {
         JobDescription j = new JobDescription();
         j.addJobOption(null, "value");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_jobOptionValueEmpty() throws Exception {
         JobDescription j = new JobDescription();
         j.addJobOption("key", "");
     }
 
-    @org.junit.Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_jobOptionValueNull() throws Exception {
         JobDescription j = new JobDescription();
         j.addJobOption("key", null);
     }
 
-    @org.junit.Test
+    @Test
     public void test_hashCode() throws Exception {
         JobDescription j = new JobDescription();
 
@@ -164,22 +165,28 @@ public class JobDescriptionTest {
         result = prime * result + new ArrayList<String>(0).hashCode();
         result = prime * result + new HashMap<String, String>(0).hashCode();
         result = prime * result + new HashMap<String, String>(0).hashCode();
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + 1237;
         result = prime * result + 15;
         result = prime * result + 1;
         result = prime * result + 1;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + 1237;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
 
         assertEquals(result, hash);
     }
 
-    @org.junit.Test
+    @Test
     public void test_hashCode2() throws Exception {
 
         JobDescription j = new JobDescription();
@@ -220,15 +227,17 @@ public class JobDescriptionTest {
         result = prime * result + 1;
         result = prime * result + "noot".hashCode();
         result = prime * result + 1231;
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + "stdin".hashCode();
+        //noinspection PointlessArithmeticExpression
         result = prime * result + 0;
         result = prime * result + "aap".hashCode();
 
         assertEquals(result, hash);
     }
 
-    @org.junit.Test
+    @Test
     public void test_equals() throws Exception {
 
         JobDescription j = new JobDescription();
@@ -319,7 +328,7 @@ public class JobDescriptionTest {
         assertTrue(j.equals(other));
     }
 
-    @org.junit.Test
+    @Test
     public void test_toString() throws Exception {
 
         String expected = "JobDescription [queueName=noot, executable=exec, arguments=[a, b, c], stdin=stdin.txt, stdout=stdout.txt,"

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test01a_parseKeyValuePairs_CorrectInput_ResultMap() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -64,7 +64,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test01b_parseKeyValuePairs_ExtraWhiteSpace_Ignored() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -82,7 +82,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test01c_parseKeyValuePairs_EmptyLines_Ignored() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -97,7 +97,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test01d_parseKeyValuePairs_IgnoredLines_Ignored() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -130,7 +130,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test03a_parseKeyValueLines_CorrectInput_ResultMap() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -146,7 +146,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test03b_parseKeyValueLines_InputWithExtraSpaces_ResultMap() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -162,7 +162,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test03c_parseKeyValueLines_SpaceSeparatedPairs_ResultMap() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -179,7 +179,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test03d_parseKeyValueLines_IgnoredLines_Ignored() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -195,7 +195,7 @@ public class ScriptingParserTest {
 
     @Test
     public void test03e_parseKeyValueLines_EmptyLines_Ignored() throws Exception {
-        Map<String, String> expected = new HashMap<String, String>();
+        Map<String, String> expected = new HashMap<>();
         expected.put("key1", "value1");
         expected.put("key2", "value2");
         expected.put("key3", "value3");
@@ -282,9 +282,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test06a_parseTable_SimpleTable_ResultMap() throws Exception {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -301,16 +301,16 @@ public class ScriptingParserTest {
 
     @Test
     public void test06b_parseTable_MultipleRecords_ResultMap() throws Exception {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
         expectedRecord.put("key4", "value4");
         expected.put("value1", expectedRecord);
 
-        Map<String, String> expectedRecord2 = new HashMap<String, String>();
+        Map<String, String> expectedRecord2 = new HashMap<>();
         expectedRecord2.put("key1", "value5");
         expectedRecord2.put("key2", "value6");
         expectedRecord2.put("key3", "value7");
@@ -327,9 +327,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test06c_parseTable_InputWithSuffixes_SuffixesRemoved() throws Exception {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -346,9 +346,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test06d_parseTable_WhiteSpaceInInput_WhiteSpaceRemoved() throws Exception {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -365,9 +365,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test06e_parseTable_AlternateSeparatorAndTrailingWhiteSpace_NormalResult() throws Exception {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -493,9 +493,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test09a_parseKeyValueRecords_SingleRecord_ResultMap() throws XenonException {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -512,16 +512,16 @@ public class ScriptingParserTest {
 
     @Test
     public void test09b_parseKeyValueRecords_MultiRecord_ResultMap() throws XenonException {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
         expectedRecord.put("key4", "value4");
         expected.put("value1", expectedRecord);
 
-        Map<String, String> expectedRecord2 = new HashMap<String, String>();
+        Map<String, String> expectedRecord2 = new HashMap<>();
         expectedRecord2.put("key1", "value5");
         expectedRecord2.put("key2", "value6");
         expectedRecord2.put("key3", "value7");
@@ -539,9 +539,9 @@ public class ScriptingParserTest {
 
     @Test
     public void test09c_parseKeyValueRecords_WhiteSpace_Ignored() throws XenonException {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
@@ -558,16 +558,16 @@ public class ScriptingParserTest {
 
     @Test
     public void test09d_parseKeyValueRecords_EmptyLines_Ignored() throws XenonException {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
         expectedRecord.put("key4", "value4");
         expected.put("value1", expectedRecord);
 
-        Map<String, String> expectedRecord2 = new HashMap<String, String>();
+        Map<String, String> expectedRecord2 = new HashMap<>();
         expectedRecord2.put("key1", "value5");
         expectedRecord2.put("key2", "value6");
         expectedRecord2.put("key3", "value7");
@@ -585,16 +585,16 @@ public class ScriptingParserTest {
 
     @Test
     public void test09e_parseKeyValueRecords_IgnoreLines_Ignored() throws XenonException {
-        Map<String, Map<String, String>> expected = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> expected = new HashMap<>();
 
-        Map<String, String> expectedRecord = new HashMap<String, String>();
+        Map<String, String> expectedRecord = new HashMap<>();
         expectedRecord.put("key1", "value1");
         expectedRecord.put("key2", "value2");
         expectedRecord.put("key3", "value3");
         expectedRecord.put("key4", "value4");
         expected.put("value1", expectedRecord);
 
-        Map<String, String> expectedRecord2 = new HashMap<String, String>();
+        Map<String, String> expectedRecord2 = new HashMap<>();
         expectedRecord2.put("key1", "value5");
         expectedRecord2.put("key2", "value6");
         expectedRecord2.put("key3", "value7");

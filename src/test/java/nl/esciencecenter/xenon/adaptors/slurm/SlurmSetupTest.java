@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ public class SlurmSetupTest {
     public void test_validConfig() throws XenonException {
 
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "2.3.4");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
@@ -50,7 +50,7 @@ public class SlurmSetupTest {
     public void test_versionNumberWithPostfix() throws XenonException {
 
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "2.5.withsomerandomextraversioninfo");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
@@ -62,7 +62,7 @@ public class SlurmSetupTest {
     @Test
     public void test_accountingDisabled() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "2.3.4");
         configInfo.put("AccountingStorageType", "accounting_storage/none");
 
@@ -74,7 +74,7 @@ public class SlurmSetupTest {
     @Test
     public void test_forcedAccountingDisabled() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "2.3.4");
         configInfo.put("AccountingStorageType", "accounting_storage/fixetxt");
 
@@ -86,7 +86,7 @@ public class SlurmSetupTest {
     @Test(expected = XenonException.class)
     public void test_noVersion_Exception() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
         new SlurmSetup(configInfo, false, false);
@@ -95,7 +95,7 @@ public class SlurmSetupTest {
     @Test(expected = IncompatibleVersionException.class)
     public void test_invalidVersion_Exception() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "1.2.3");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
@@ -105,7 +105,7 @@ public class SlurmSetupTest {
     @Test(expected = IncompatibleVersionException.class)
     public void test_invalidVersionWithNoPeriod_Exception() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "2.5thereisnoperiodhere");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
@@ -115,7 +115,7 @@ public class SlurmSetupTest {
     @Test
     public void test_invalidVersion_Ignored() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "1.2.3");
         configInfo.put("AccountingStorageType", "accounting_storage/filetxt");
 
@@ -128,7 +128,7 @@ public class SlurmSetupTest {
     @Test(expected = XenonException.class)
     public void test_noAccountingConfig_Exception() throws XenonException {
         //Relevant part of config used in current implementation
-        Map<String, String> configInfo = new HashMap<String, String>();
+        Map<String, String> configInfo = new HashMap<>();
         configInfo.put("SLURM_VERSION", "2.3.4");
 
         new SlurmSetup(configInfo, false, false);

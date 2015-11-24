@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Netherlands eScience Center
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,11 +71,11 @@ public class JobsEngine implements Jobs {
 
     private String[] getAdaptors(Job[] in) {
 
-        HashSet<String> result = new HashSet<String>();
+        HashSet<String> result = new HashSet<>();
 
-        for (int i = 0; i < in.length; i++) {
-            if (in[i] != null) {
-                result.add(in[i].getScheduler().getAdaptorName());
+        for (Job job : in) {
+            if (job != null) {
+                result.add(job.getScheduler().getAdaptorName());
             }
         }
 
@@ -143,9 +143,9 @@ public class JobsEngine implements Jobs {
         JobStatus[] result = new JobStatus[jobs.length];
         Job[] tmp = new Job[jobs.length];
 
-        for (int i = 0; i < adaptors.length; i++) {
-            selectJobs(adaptors[i], jobs, tmp);
-            getJobStatus(adaptors[i], tmp, result);
+        for (String adaptor : adaptors) {
+            selectJobs(adaptor, jobs, tmp);
+            getJobStatus(adaptor, tmp, result);
         }
 
         return result;
