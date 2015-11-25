@@ -20,7 +20,8 @@ import java.util.Map;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 
 /**
- * XenonFactory is used to create and end Xenon instances.
+ * XenonFactory is used to create and end Xenon instances. Make sure to always 
+ * end instances when you no longer need them, otherwise they remain allocated.
  * 
  * @version 1.0
  * @since 1.0
