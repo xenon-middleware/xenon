@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * AdaptorStatus contains information on a specific adaptor.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

@@ -27,7 +27,6 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
 /**
- * @author Christiaan Meijer <C.Meijer@esciencecenter.nl>
  *
  */
 public class FTPFileTestConfig extends FileTestConfig {

@@ -42,7 +42,6 @@ import nl.esciencecenter.xenon.jobs.Streams;
  * 
  * @see nl.esciencecenter.xenon.jobs.Jobs
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

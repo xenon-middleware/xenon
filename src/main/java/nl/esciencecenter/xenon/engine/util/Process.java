@@ -16,7 +16,6 @@
 package nl.esciencecenter.xenon.engine.util;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public interface Process {

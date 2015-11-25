@@ -32,8 +32,6 @@ import nl.esciencecenter.xenon.util.Utils;
 /**
  * Adaptor for Slurm scheduler.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

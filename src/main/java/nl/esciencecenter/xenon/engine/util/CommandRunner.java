@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Runs a command. Constructor waits for command to finish.
  * 
- * @author Niels Drost
- * 
  */
 public class CommandRunner {
 

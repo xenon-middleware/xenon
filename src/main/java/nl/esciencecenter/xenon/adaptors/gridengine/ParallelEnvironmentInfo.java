@@ -22,8 +22,6 @@ import nl.esciencecenter.xenon.XenonException;
 /**
  * Class that holds some info on parallel environments used in Grid Engine.
  * 
- * @author Niels Drost
- * 
  */
 class ParallelEnvironmentInfo {
 

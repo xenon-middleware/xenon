@@ -32,7 +32,6 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
  * A JavaJobDescription will use the Java specific information provided by the user to build the command line arguments of the
  * JobDescription.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0 
  * @since 1.0
  */

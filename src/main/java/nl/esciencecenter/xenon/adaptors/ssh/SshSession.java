@@ -26,8 +26,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * 
+ *  
  */
 class SshSession {
 

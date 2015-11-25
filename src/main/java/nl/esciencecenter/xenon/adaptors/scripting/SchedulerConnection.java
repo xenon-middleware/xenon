@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Connection to a remote scheduler, implemented by calling command line commands over a ssh connection.
  * 
- * @author Niels Drost
- * 
  */
 public abstract class SchedulerConnection {
 

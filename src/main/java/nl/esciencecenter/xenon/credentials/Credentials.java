@@ -24,7 +24,6 @@ import nl.esciencecenter.xenon.XenonException;
  * 
  * This interface contains various methods for creating and closing credentials.
  * 
- * @author Rob van Nieuwpoort <R.vanNieuwpoort@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

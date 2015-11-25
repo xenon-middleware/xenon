@@ -23,7 +23,6 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 /**
  * XenonPropertyDescription contains a description of an Xenon property.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

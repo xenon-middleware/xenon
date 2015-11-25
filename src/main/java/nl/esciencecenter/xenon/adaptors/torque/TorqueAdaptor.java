@@ -32,9 +32,6 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 /**
  * Adaptor for TORQUE batch system.
  * 
- * @author Joris Borgdorff <J.Borgdorff@esciencecenter.nl>
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

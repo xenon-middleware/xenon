@@ -34,7 +34,6 @@ import nl.esciencecenter.xenon.util.JavaJobDescription;
 import org.junit.Test;
 
 /**
- * @author Niels Drost
  * 
  */
 @SuppressWarnings("ALL")

@@ -33,7 +33,6 @@ import org.junit.rules.TestWatcher;
 import org.junit.runners.MethodSorters;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  *

@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * FileSystem represent a (possibly remote) file system that can be used to access data.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

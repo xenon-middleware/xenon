@@ -33,7 +33,6 @@ import nl.esciencecenter.xenon.credentials.Credential;
  * 
  * This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

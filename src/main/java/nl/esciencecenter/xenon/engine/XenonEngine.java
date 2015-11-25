@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 /**
  * XenonEngine implements the Xenon Interface class by redirecting all calls to {@link Adaptor}s.
  *
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

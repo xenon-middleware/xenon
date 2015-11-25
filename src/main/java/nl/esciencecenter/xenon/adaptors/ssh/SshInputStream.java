@@ -26,8 +26,6 @@ import com.jcraft.jsch.ChannelSftp;
  * We have to implement a special input stream, and delegate all calls to the internal jcraft input stream, because we have to
  * disconnect the channel on a close of the stream.
  * 
- * @author rob
- * 
  */
 public class SshInputStream extends InputStream {
     private final InputStream in;

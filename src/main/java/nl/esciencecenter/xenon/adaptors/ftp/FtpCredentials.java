@@ -29,7 +29,6 @@ import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementati
  *
  * Only getDefaultCredential returns a (dummy) credential. All other methods throw an exception.
  *
- * @author Christiaan Meijer <C.Meijer@esciencecenter.nl>
  * @version 1.1
  * @since 1.1
  */

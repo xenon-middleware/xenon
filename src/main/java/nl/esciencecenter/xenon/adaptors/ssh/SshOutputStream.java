@@ -27,8 +27,6 @@ import com.jcraft.jsch.ChannelSftp;
  * We have to implement a special output stream, and delegate all calls to the internal jcraft output stream, because we have to
  * disconnect the channel on a close of the stream.
  * 
- * @author rob
- * 
  */
 public class SshOutputStream extends OutputStream {
     private final OutputStream out;

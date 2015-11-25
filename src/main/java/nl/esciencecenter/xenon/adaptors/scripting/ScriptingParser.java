@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import nl.esciencecenter.xenon.XenonException;
 
 /**
- * @author Niels Drost
  * 
  */
 public final class ScriptingParser {
