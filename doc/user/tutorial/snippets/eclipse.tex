@@ -26,7 +26,7 @@ to do so (restart your terminal to use the \texttt{miniclipse} alias).
 
 \needspace{4em}
 \vspace{2em}
-\textit{Automatic project setup with Gradle}
+\textit{Automatic project setup with \texttt{gradlew}}
 \index{Eclipse!automatic project setup}
 \index{Eclipse!gradle eclipse@\texttt{gradle eclipse}}
 \index{Eclipse!./gradlew eclipse@\texttt{./gradlew eclipse}}
@@ -34,12 +34,11 @@ to do so (restart your terminal to use the \texttt{miniclipse} alias).
 \index{Gradle!gradle eclipse@\texttt{gradle eclipse}}
 \index{Gradle!./gradlew eclipse@\texttt{./gradlew eclipse}}
 
-Normally, when you start a new project in Eclipse, it takes you through a series of dialogs to set up the Eclipse project in terms of the directory structure, the classpath, etc. The configuration is saved to (hidden) files \url{.project}, \url{.classpath}, and \url{.settings/org.eclipse.jdt.core.prefs}. However, since Gradle already has all the necessary information, you can let Gradle generate these files for you using:
+Normally, when you start a new project in Eclipse, it takes you through a series of dialogs to set up the Eclipse project in terms of the directory structure, the classpath, etc. The configuration is saved to (hidden) files \url{.project}, \url{.classpath}, and \url{.settings/org.eclipse.jdt.core.prefs}. The dialogs offer some freedom in setting up the project. This flexibility is great when you're working on some project by yourself, but when there are multiple people working together, one developer may have a different project setup than the next, and so bugs are introduced. That's why we will use \texttt{gradlew} to generate a standard project setup for us:
 \begin{lstlisting}[style=basic,style=bash,escapeinside={(*@}{@*)}]
 cd ${HOME}/Xenon
 ./gradlew eclipse
 \end{lstlisting} % dummy $
-thus avoiding any inconsistencies between what Gradle expects and how your development environment is set up.
 
 \vspace{2em}
 \textit{Opening Xenon in Eclipse}
@@ -48,21 +47,39 @@ thus avoiding any inconsistencies between what Gradle expects and how your devel
 
 After the Eclipse files have been generated, start Eclipse by typing the Bash alias \texttt{miniclipse} at the command line. From Eclipse's menu, select \textsf{File}$\rightarrow$\textsf{Import}. In the \textsf{Select} dialog, select \textsf{Existing projects into Workspace}, then click the button labeled \textsf{Next}.
 
-In the next dialog (\textsf{Import projects}), use the \textsf{Browse...} button to select Xenon's root directory, e.g. \url{/home/daisycutter/Xenon}, then click \textsf{Finish}. An item \textsf{Xenon} should now be visible in the \textsf{Package explorer} pane. Expand it, and navigate to \url{src/examples/java/}, then select \textsf{CreatingXenon.java} from the \textsf{nl.esciencecenter.xenon.examples} package. Double-click \textsf{CreatingXenon.java} to bring up the corresponding Java code in the editor pane.
+In the next dialog (\textsf{Import projects}), use the \textsf{Browse...} button to select Xenon's root directory, e.g. \url{/home/daisycutter/Xenon}, then click \textsf{Finish}. An item \textsf{Xenon} should now be visible in the \textsf{Package explorer} pane. Expand it, and navigate to \url{src/examples/java/}, then select \textsf{DirectoryListing.java} from the \textsf{nl.esciencecenter.xenon.examples.files} package.
+
+Right-click \textsf{DirectoryListing.java} and select \textsf{Copy}, then right-click again and select \textsf{Paste}. Eclipse should suggest the filename \textsf{DirectoryListing2.java}. Accept it. Now we have a file that we can play around with.
+
+Double-click \textsf{DirectoryListing2.java} to bring up the corresponding Java code in the editor pane.
+
+
+
 
 \vspace{2em}
-\textit{Running and debugging a Java program in Eclipse}
-
+\textit{Running a Java program in Eclipse}
 \index{Eclipse!Running a Java program}
 \index{Running a Java program in Eclipse}
+\index{Java!Running a Java program in Eclipse}
 
+So now that we have the source code open in the editor, let's see if we can run it. You can start the program in a couple different ways. For example, you can select \textsf{Run}$\rightarrow$\textsf{Run}; you can use the key binding \textsf{Ctrl+F11}, or you can press the `Play' icon in Eclipse's GUI. If you try to run the program, however, you will get the error we saw earlier at the command line (Eclipse prints the program's output to the pane labeled \textsf{Console}):
+\begin{lstlisting}[style=basic,style=bash,language=java,escapeinside={(*@}{@*)}]
+Example requires a URI as parameter!
+\end{lstlisting}
+
+So somehow we have to tell Eclipse about the URI (including both its scheme and its directory) that we want to use to get to the contents of a directory of our chosing. You can do this through so-called `Run configurations'\index{Eclipse!Run configurations}. You can make a new run configuration by selecting \textsf{Run} from the Eclipse menu, then \textsf{Run configurations...}. In the left pane of the dialog that pops up, select \textsf{Java Application}, then press the \textsf{New launch configuration} button in the top left of the dialog. A new run configuration item should now become visible under \textsf{Java Application}. By default, the name of the run configuration will be the name of the class, but you can change the name to whatever you like. When you select the \textsf{DirectoryListing2} run configuration in the left pane, the right pane changes to show the details of the run configuration. The information is divided over a few tabs. Select the tab labeled \textsf{Arguments}. You should see a field named \textsf{Program arguments} where you can provide the arguments that you would normally pass through the command line. Earlier, we passed the string \texttt{file://\${PWD}}, but that won't work here, since \texttt{\${PWD}} is a Bash environment variable, and thus not directly available from within Eclipse. Eclipse does provide a workaround for this by way of the \texttt{env\_var} variable. \texttt{env\_var} takes exactly one argument, namely the name of an environment variable, such as \texttt{PWD}. The correct text to enter into \textsf{Program arguments} thus becomes \texttt{file://\$\{env\_var:PWD\}}.
+
+
+
+
+
+
+\vspace{2em}
+\textit{Debugging a Java program in Eclipse}
 \index{Eclipse!Debugging a Java program}
 \index{Debugging a Java program in Eclipse}
-
-\index{Java!Running a Java program in Eclipse}
 \index{Java!Debugging a Java program in Eclipse}
 
-So now that we have the source code open in teh editor, let's see if we can run it. You can start the program in a couple different ways. For example, you can select \textsf{Run}$\rightarrow$\textsf{Run}; you can use the key binding \textsf{Ctrl+F11}, or you can press the `Play' icon in Eclipse's GUI. Run the program and look at the pane labeled \textsf{Console}. The output there should be the same as what you saw before when running in the terminal window.
 
 
 In my opinion, one of the most helpful features of the Eclipse interface is the debugging/inspecting variables capability. This lets you run your program line-by-line. To start debugging, you have to set a breakpoint first. Program execution will halt at this point, such that you can inspect what value each variable has at that point in your program. Setting a breakpoint is most easily accomplished by double-clicking the left margin of the editor; a blue dot will appear. Alternatively, you can press \textsf{Ctrl+b} to set a breakpoint at the current line.

@@ -98,10 +98,9 @@ by name \usepackage{nameref}
 
 \clearpage
 
+\input{snippets/advanced-usage}
+
 \input{snippets/eclipse}
-
-\input{snippets/pmd}
-
 
 \input{snippets/testing}
 
