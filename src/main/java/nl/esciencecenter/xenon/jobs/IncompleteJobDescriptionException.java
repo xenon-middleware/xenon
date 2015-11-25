@@ -20,7 +20,6 @@ import nl.esciencecenter.xenon.XenonException;
 /**
  * Signals that a JobDescription is missing required options.  
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

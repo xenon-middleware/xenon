@@ -19,7 +19,6 @@ package nl.esciencecenter.xenon;
 /**
  * Signals that an adaptor is unable to connect to a resource due to version problems.  
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

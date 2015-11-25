@@ -23,8 +23,6 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 /**
  * Factory interface for scheduling connections. Implemented by adaptors.
  * 
- * @author Niels Drost
- * 
  */
 public interface SchedulerConnectionFactory {
 

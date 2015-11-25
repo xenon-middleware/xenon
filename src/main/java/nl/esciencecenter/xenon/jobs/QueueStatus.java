@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * QueueStatus contains status information for a specific queue.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

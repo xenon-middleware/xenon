@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Interface to the GridEngine command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

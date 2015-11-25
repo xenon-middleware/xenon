@@ -27,8 +27,6 @@ import nl.esciencecenter.xenon.jobs.Jobs;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * 
  */
 public class GridEngineJobTestConfig extends JobTestConfig {

@@ -24,7 +24,6 @@ import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 /**
  * Class that holds some info on queues used in Grid Engine.
  * 
- * @author Niels Drost
  * 
  */
 class QueueInfo {

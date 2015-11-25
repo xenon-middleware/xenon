@@ -25,7 +25,6 @@ package nl.esciencecenter.xenon.files;
  * 
  * The <code>ASYNCHRONOUS</code> option can be combined with all others. 
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A CopyEngine is responsible for performing the asynchronous copy operations.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

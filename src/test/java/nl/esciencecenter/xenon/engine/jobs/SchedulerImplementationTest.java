@@ -25,7 +25,6 @@ import java.util.HashMap;
 import nl.esciencecenter.xenon.engine.jobs.SchedulerImplementation;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class SchedulerImplementationTest {

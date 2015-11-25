@@ -22,7 +22,6 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
 /**
  * XenonFactory is used to create and end Xenon instances.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

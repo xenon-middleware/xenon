@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * Credential represents a user credential uses to gain access to a resource.
  * 
- * @author Rob van Nieuwpoort <R.vanNieuwpoort@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

@@ -27,7 +27,6 @@ import org.apache.commons.net.ftp.FTPClient;
  * Wraps an OutputStream instance. Only functionality added is sending a pending command completed signal after closing the output
  * stream.
  *
- * @author Christiaan Meijer
  *
  */
 public class FtpOutputStream extends OutputStream {

@@ -21,8 +21,6 @@ import java.util.Set;
 /**
  * FileAttributes represents a set of attributes of a path.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

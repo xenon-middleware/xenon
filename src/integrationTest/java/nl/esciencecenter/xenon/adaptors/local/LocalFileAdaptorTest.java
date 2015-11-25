@@ -27,7 +27,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class LocalFileAdaptorTest extends GenericFileAdaptorTestParent {

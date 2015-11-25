@@ -20,7 +20,6 @@ import org.junit.BeforeClass;
 import nl.esciencecenter.xenon.adaptors.GenericCredentialsAdaptorTestParent;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  *

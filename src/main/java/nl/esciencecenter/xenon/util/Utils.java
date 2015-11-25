@@ -54,8 +54,6 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
  *
  * These utilities are used inside Xenon, but may also be used by applications.
  *
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

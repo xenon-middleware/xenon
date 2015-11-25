@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
 public class ImmutableArray<T> implements Iterable<T> {

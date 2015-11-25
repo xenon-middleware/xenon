@@ -26,7 +26,6 @@ import nl.esciencecenter.xenon.jobs.Jobs;
  * 
  * This interface provides an access point to all packages of Xenon and several utility functions.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

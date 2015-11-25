@@ -23,7 +23,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class Util {

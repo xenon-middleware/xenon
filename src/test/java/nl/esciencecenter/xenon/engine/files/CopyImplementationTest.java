@@ -23,7 +23,6 @@ import nl.esciencecenter.xenon.engine.files.CopyImplementation;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class CopyImplementationTest {

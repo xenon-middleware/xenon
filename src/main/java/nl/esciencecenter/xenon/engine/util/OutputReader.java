@@ -23,8 +23,6 @@ import java.nio.charset.StandardCharsets;
 /**
  * Reads output from a stream, buffers it, and makes it available as a string when the stream reaches EndOfStream.
  * 
- * @author Niels Drost
- * 
  */
 public final class OutputReader extends Thread {
 

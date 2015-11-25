@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import com.jcraft.jsch.UserInfo;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 class Robot implements UserInfo {

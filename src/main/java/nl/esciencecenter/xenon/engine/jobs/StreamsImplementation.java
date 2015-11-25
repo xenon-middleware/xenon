@@ -22,7 +22,6 @@ import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.Streams;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class StreamsImplementation implements Streams {

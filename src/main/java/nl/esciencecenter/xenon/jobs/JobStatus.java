@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * JobStatus contains status information for a specific {@link Job}.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

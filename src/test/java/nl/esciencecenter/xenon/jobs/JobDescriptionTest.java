@@ -28,7 +28,6 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class JobDescriptionTest {

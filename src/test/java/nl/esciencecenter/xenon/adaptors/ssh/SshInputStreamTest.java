@@ -28,7 +28,6 @@ import nl.esciencecenter.xenon.XenonException;
 import com.jcraft.jsch.ChannelSftp;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class SshInputStreamTest {

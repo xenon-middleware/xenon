@@ -20,7 +20,6 @@ package nl.esciencecenter.xenon;
  * 
  * Next to the regular exception message and cause, XenonException add a source adaptor name to all exceptions.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

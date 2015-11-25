@@ -20,7 +20,6 @@ import nl.esciencecenter.xenon.XenonException;
 /**
  * Signals that a jobs has been canceled by the user.  
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

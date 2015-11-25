@@ -20,7 +20,6 @@ import nl.esciencecenter.xenon.XenonException;
 /**
  * Signals that an end-of-file was encountered.  
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

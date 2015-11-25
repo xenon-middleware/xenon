@@ -24,7 +24,6 @@ import java.util.HashMap;
 import nl.esciencecenter.xenon.engine.credentials.CertificateCredentialImplementation;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class CertificateCredentialImplementationTest {

@@ -35,7 +35,6 @@ import nl.esciencecenter.xenon.jobs.Jobs;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class AdaptorTest {

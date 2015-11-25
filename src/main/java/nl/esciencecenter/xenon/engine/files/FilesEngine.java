@@ -44,8 +44,6 @@ import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
  * Engine for File operations. Implements functionality using File operations, Xenon create functions, and Adaptors' Files
  * object.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  */
 public class FilesEngine implements Files {
 

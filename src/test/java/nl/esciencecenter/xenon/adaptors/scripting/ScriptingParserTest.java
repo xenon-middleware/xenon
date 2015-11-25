@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 /**
- * @author Niels Drost
  * 
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

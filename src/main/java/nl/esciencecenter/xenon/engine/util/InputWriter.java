@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Writes given content to the given output stream. Closes the output stream when done.
  * 
- * @author Niels Drost
- * 
  */
 public final class InputWriter extends Thread {
 
