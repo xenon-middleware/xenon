@@ -17,21 +17,14 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-task examplesJar(type: Jar) {
-    description "Creates jar file of Xenon examples"
-    classifier = 'examples'
-    from sourceSets.examples.output
-}
-
 artifacts {
     archives sourcesJar
     archives javadocJar
 }
 
-// TODO Distributions:
-// 1. for maven, xenon.jar, xenon-src.jar, xenon-javadoc.jar
-// 2. minimal, xenon.jar + deps*.jar
-// 3. full, xenon.jar + deps*.jar + javadoc + examples + javadocdevel + unit tests +  integration tests
+// Distributions:
+// 1. for maven, xenon.jar, xenon-sources.jar, xenon-javadoc.jar, published on JCenter
+// 2. tarball, xenon.jar + deps*.jar + javadoc, published on Github release
 
 distributions {
     main {
@@ -46,6 +39,7 @@ distributions {
                     from(javadoc.destinationDir)
                 }
                 from(sourcesJar)
+                from('doc')
             }
             from {
                 ['README.md',
@@ -53,11 +47,6 @@ distributions {
                 'NOTICE',
                 'notices'
                 ]
-            }
-            into('examples') {
-                from('src/examples')
-                // TODO would like to have example source code in examples/src/main/java, but it is in examples/java, rename did not work
-                from(examplesJar)
             }
         }
     }
