@@ -68,12 +68,12 @@ public enum CopyOption {
     /**
      * Check if the CopyOption is listed in a sequence.
      * 
-     * If <code>options<code> is <code>null</code><code>false</code> will be returned.
+     * If <code>options</code> is <code>null</code><code>false</code> will be returned.
      * 
      * @param options
      *            the options to check.
      * 
-     * @return if <code>options</code> contains <code>CopyOption<code>.
+     * @return if <code>options</code> contains <code>CopyOption</code>.
      */
     public boolean occursIn(CopyOption... options) {
         if (options == null) {

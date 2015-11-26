@@ -124,14 +124,13 @@ public class GridEngineXmlParser {
     /**
      * Parses queue info from "qstat -g c -xml"
      * 
-     * @param in
+     * @param input
      *            the stream to get the xml data from
      * @return a list containing all queue names found
      * @throws XenonException
      *             if the file could not be parsed
      * @throws XenonException
      *             if the server version is not compatible with this adaptor
-     * @throws Exception
      */
     protected Map<String, Map<String, String>> parseQueueInfos(String input) throws XenonException {
         Document document = parseDocument(input);
@@ -167,14 +166,13 @@ public class GridEngineXmlParser {
     /**
      * Parses job info from "qstat -xml"
      * 
-     * @param in
+     * @param data
      *            the stream to get the xml data from
      * @return a list containing all queue names found
      * @throws XenonException
      *             if the file could not be parsed
      * @throws XenonException
      *             if the server version is not compatible with this adaptor
-     * @throws Exception
      */
     protected Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
         Map<String, Map<String, String>> result = new HashMap<>();

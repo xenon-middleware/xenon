@@ -18,6 +18,10 @@ package nl.esciencecenter.xenon.jobs;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.UnknownPropertyException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
 /**
@@ -178,8 +182,6 @@ public interface Jobs {
      * 
      * @return Job representing the running job.
      * 
-     * @throws NoSchedulerException
-     *             If the scheduler is not known.
      * @throws IncompleteJobDescriptionException
      *             If the description did not contain the required information.
      * @throws InvalidJobDescriptionException
@@ -220,8 +222,6 @@ public interface Jobs {
      * 
      * @return an array of the resulting JobStatusses.
      * 
-     * @throws XenonException
-     *             If the statuses of the job could not be retrieved.
      */
     JobStatus[] getJobStatuses(Job... jobs);
 
@@ -268,7 +268,7 @@ public interface Jobs {
      * expires, the job will continue to run normally.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
+     * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
@@ -294,7 +294,7 @@ public interface Jobs {
      * normally.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
+     * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.

@@ -183,7 +183,6 @@ public class FtpFiles implements Files {
      * Returns true if code is in interval [200,300). See http://en.wikipedia.org/wiki/List_of_FTP_server_return_codes.
      *
      * @param replyCode
-     * @return if code implies successful login
      */
     private void verifyLoginSuccess(int replyCode) throws XenonException {
         if (replyCode < 200 || replyCode >= 300) {
@@ -277,7 +276,6 @@ public class FtpFiles implements Files {
      *            the existing source path.
      * @param target
      *            the non existing target path.
-     * @return the target path.
      *
      * @throws NoSuchPathException
      *             If the source file does not exist or the target parent directory does not exist.

@@ -121,15 +121,6 @@ public class CopyInfo {
         return current;
     }
     
-    /**
-     * @param adaptorName
-     * @param nextID
-     * @param source
-     * @param target
-     * @param options
-     * @return
-     * @throws InvalidCopyOptionsException 
-     */
     public static CopyInfo createCopyInfo(String adaptorName, String nextID, Path source, Path target,
             CopyOption ... options) throws InvalidCopyOptionsException {
 

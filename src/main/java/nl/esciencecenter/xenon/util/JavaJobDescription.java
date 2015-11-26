@@ -93,7 +93,7 @@ public class JavaJobDescription extends JobDescription {
     }
 
     /**
-     * Sets the system properties. A system property should be passed as a key value pair <"a", "b">, not as <"-Da", "b">, Xenon
+     * Sets the system properties. A system property should be passed as a key value pair &lt;"a", "b"&gt;, not as &lt;"-Da", "b"&gt;, Xenon
      * will add the -D to the property.
      * 
      * @param systemProperties

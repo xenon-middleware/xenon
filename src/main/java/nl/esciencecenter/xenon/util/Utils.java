@@ -106,7 +106,7 @@ public final class Utils {
     /**
      * Copy all bytes from an input stream to an output stream.
      *
-     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize <= 0</code> then the
+     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize &lt;= 0</code> then the
      * {@link #DEFAULT_BUFFER_SIZE} will be used.
      * <p>
      * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
@@ -117,7 +117,7 @@ public final class Utils {
      * @param out
      *            the OutputStream to write to.
      * @param bufferSize
-     *            the size of the temporary buffer, or <= 0 to use the {@link #DEFAULT_BUFFER_SIZE}.
+     *            the size of the temporary buffer, or &lt;= 0 to use the {@link #DEFAULT_BUFFER_SIZE}.
      * @return the number of bytes copied.
      * @throws IOException
      *             if an I/O error occurs during the copy operation.
@@ -211,7 +211,7 @@ public final class Utils {
      *            the InputStream to read from
      * @param cs
      *            the Charset to use.
-     * @return a <code>List<String></code> containing all lines in the file.
+     * @return a <code>List&lt;String&gt;</code> containing all lines in the file.
      * @throws IOException
      *             if an I/O error was produced while reading the stream.
      */
@@ -402,8 +402,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> only contains a valid Windows root element such as "C:".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      * 
      * @param root
      *            The root to check.
@@ -424,8 +424,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> only contains a valid Linux root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      * 
      * @param root
      *            The root to check.
@@ -438,8 +438,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> contains a valid OSX root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      * 
      * @param root
      *            The root to check.
@@ -452,8 +452,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      *
      * Note that the result of this method depends on the OS the application is running on.
      *
@@ -740,7 +740,7 @@ public final class Utils {
     }
 
     /**
-     * Read all the bytes from a file and return them as a <code>byte[]<\code>.
+     * Read all the bytes from a file and return them as a <code>byte[]</code>.
      *
      * @param files
      *            the files interface to use for file access.
@@ -759,7 +759,7 @@ public final class Utils {
     }
 
     /**
-     * Read all the bytes from a file and return them as a <code>String<\code> using the <code>Charset</code> for conversion.
+     * Read all the bytes from a file and return them as a <code>String</code> using the <code>Charset</code> for conversion.
      *
      * @param files
      *            the files interface to use for file access.
@@ -796,7 +796,7 @@ public final class Utils {
      * @param cs
      *            the Charset to use.
      * 
-     * @return a <code>List<String></code> containing all lines in the file.
+     * @return a <code>List&lt;String&gt;</code> containing all lines in the file.
      *
      * @throws XenonException
      *             if an I/O error occurs while opening or reading the file.

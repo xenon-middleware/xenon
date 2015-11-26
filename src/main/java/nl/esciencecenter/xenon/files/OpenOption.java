@@ -61,12 +61,12 @@ public enum OpenOption {
     /**
      * Check if a sequence of <code>OpenOption</code>s contains this option.
      * 
-     * If <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     * If <code>options</code> is <code>null</code>, <code>false</code> will be returned.
      * 
      * @param options
      *            the array to check.
      * 
-     * @return if <code>options</code> contains <code>option<code>.
+     * @return if <code>options</code> contains <code>option</code>.
      */
     public boolean occursIn(OpenOption... options) {
         if (options == null) {

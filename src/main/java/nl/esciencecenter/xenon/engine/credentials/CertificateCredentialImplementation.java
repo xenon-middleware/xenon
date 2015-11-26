@@ -29,7 +29,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
     private String certfile = null;
 
     /**
-     * Constructs a {@link CertificateCredentialImplementation} out of a {@link URI} pointing to the private key, a {@link URI}
+     * Constructs a {@link CertificateCredentialImplementation} out of a {@link java.net.URI} pointing to the private key, a {@link java.net.URI}
      * pointing to the certificate, a username and a password.
      * 
      * @param certfile
@@ -47,9 +47,9 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
     }
 
     /**
-     * Returns the {@link URI} of the certificate file.
+     * Returns the {@link java.net.URI} of the certificate file.
      * 
-     * @return the {@link URI} of the certificate file.
+     * @return the {@link java.net.URI} of the certificate file.
      */
     public String getCertfile() {
         return certfile;
