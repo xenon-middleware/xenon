@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.files;
 /**
  * PosixFilePermission is an enumeration containing all supported Posix file permissions.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

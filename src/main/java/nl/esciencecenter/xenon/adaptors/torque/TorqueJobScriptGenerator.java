@@ -31,8 +31,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * Generator for GridEngine job script.
  * 
- * @author Niels Drost
- * 
  */
 @SuppressFBWarnings(value = "VA_FORMAT_STRING_USES_NEWLINE", justification = "Script generated is a Unix script.")
 final class TorqueJobScriptGenerator {

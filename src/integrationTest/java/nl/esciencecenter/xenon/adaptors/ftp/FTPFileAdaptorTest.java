@@ -21,7 +21,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
- * @author Christiaan Meijer <C.Meijer@esciencecenter.nl>
  *
  */
 public class FTPFileAdaptorTest extends GenericFileAdaptorTestParent {

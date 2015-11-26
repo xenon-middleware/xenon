@@ -26,7 +26,6 @@ import nl.esciencecenter.xenon.credentials.Credentials;
  * 
  * Only getDefaultCredential returns a (dummy) credential. All other methods throw an exception.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

@@ -25,7 +25,6 @@ import java.util.Set;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class PosixFileUtilsTest {

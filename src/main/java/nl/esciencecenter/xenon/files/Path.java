@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.files;
 /**
  * Path represents a specific location on a FileSystem, as by the FileSystems root plus a RelativePath. 
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

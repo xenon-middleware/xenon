@@ -26,8 +26,6 @@ import nl.esciencecenter.xenon.credentials.Credential;
  * This interface creates various methods for creating and closing Schedulers, submitting jobs, and retrieving information about
  * schedulers and jobs.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

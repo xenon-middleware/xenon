@@ -44,8 +44,6 @@ import java.util.HashMap;
  * Implementation of Xenon Jobs interface using ssh and scripts. What scripts to run and how to parse the results is implemented
  * in the adaptors.
  * 
- * @author Niels Drost
- * 
  */
 public class ScriptingJobs implements Jobs {
 

@@ -38,7 +38,6 @@ import nl.esciencecenter.xenon.util.Utils;
 /**
  * LocalAdaptor implements an Xenon adaptor for local operations.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

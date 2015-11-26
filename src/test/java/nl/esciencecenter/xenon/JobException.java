@@ -17,7 +17,6 @@ package nl.esciencecenter.xenon;
 
 /**
  *
- * @author joris
  */
 public class JobException extends AssertionError {
     public JobException(String message, Throwable ex) {

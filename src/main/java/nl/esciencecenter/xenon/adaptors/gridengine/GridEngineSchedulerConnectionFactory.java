@@ -26,8 +26,6 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 /**
  * Simple Factory class to create scheduler connections
  * 
- * @author Niels Drost
- * 
  */
 public class GridEngineSchedulerConnectionFactory implements SchedulerConnectionFactory {
 

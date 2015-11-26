@@ -27,7 +27,6 @@ import java.util.StringTokenizer;
  *
  * It is designed to be immutable.
  *
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

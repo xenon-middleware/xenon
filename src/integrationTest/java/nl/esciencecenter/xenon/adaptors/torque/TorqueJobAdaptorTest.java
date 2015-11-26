@@ -23,7 +23,6 @@ import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
 /**
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * 
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

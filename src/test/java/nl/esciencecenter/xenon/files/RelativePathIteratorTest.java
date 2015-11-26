@@ -23,7 +23,6 @@ import java.util.NoSuchElementException;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class RelativePathIteratorTest {

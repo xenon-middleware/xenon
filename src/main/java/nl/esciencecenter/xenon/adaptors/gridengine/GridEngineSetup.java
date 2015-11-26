@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Holds some info on the specifics of the machine we are connected to, such as queues and parallel environments.
  * 
- * @author Niels Drost
- * 
  */
 public class GridEngineSetup {
 

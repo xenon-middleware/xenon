@@ -57,9 +57,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Interface to the TORQUE command line tools. Will run commands to submit/list/cancel jobs and get the status of queues.
  * 
- * @author Joris Borgdorff
- * @author Niels Drost
- * 
  */
 public class TorqueSchedulerConnection extends SchedulerConnection {
 

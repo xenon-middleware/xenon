@@ -28,7 +28,6 @@ import nl.esciencecenter.xenon.adaptors.slurm.SlurmSetup;
 import org.junit.Test;
 
 /**
- * @author Niels Drost
  * 
  */
 public class SlurmSetupTest {

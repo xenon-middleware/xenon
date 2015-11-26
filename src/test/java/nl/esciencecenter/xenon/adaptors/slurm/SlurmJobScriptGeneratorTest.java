@@ -30,7 +30,6 @@ import nl.esciencecenter.xenon.jobs.JobDescription;
 import org.junit.Test;
 
 /**
- * @author Niels Drost
  * 
  */
 public class SlurmJobScriptGeneratorTest {

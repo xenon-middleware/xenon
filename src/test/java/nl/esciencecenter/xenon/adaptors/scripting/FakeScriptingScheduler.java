@@ -20,7 +20,6 @@ import java.util.Map;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 
 /**
- * @author Niels Drost
  * 
  */
 public class FakeScriptingScheduler implements Scheduler {

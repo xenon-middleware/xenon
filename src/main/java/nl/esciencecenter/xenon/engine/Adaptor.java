@@ -31,8 +31,6 @@ import nl.esciencecenter.xenon.jobs.Jobs;
  * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Xenon interface,
  * depending on which functionality they provide.
  * 
- * @author Jason Maassen
- * 
  */
 public abstract class Adaptor {
 

@@ -19,7 +19,6 @@ import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.Path;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class CopyImplementation implements Copy {

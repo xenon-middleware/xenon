@@ -51,7 +51,6 @@ import java.util.Set;
  * </li>
  * </ul>
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
