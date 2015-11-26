@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.CopyOption;
+import nl.esciencecenter.xenon.files.InvalidCopyOptionsException;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
