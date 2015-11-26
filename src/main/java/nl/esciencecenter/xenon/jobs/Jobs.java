@@ -222,8 +222,6 @@ public interface Jobs {
      * 
      * @return an array of the resulting JobStatusses.
      * 
-     * @throws XenonException
-     *             If the statuses of the job could not be retrieved.
      */
     JobStatus[] getJobStatuses(Job... jobs);
 
