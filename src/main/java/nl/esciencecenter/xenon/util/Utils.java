@@ -438,8 +438,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> contains a valid OSX root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      * 
      * @param root
      *            The root to check.
