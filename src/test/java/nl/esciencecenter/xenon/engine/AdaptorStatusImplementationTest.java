@@ -26,7 +26,6 @@ import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class AdaptorStatusImplementationTest {

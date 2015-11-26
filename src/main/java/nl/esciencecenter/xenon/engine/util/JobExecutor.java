@@ -29,7 +29,6 @@ import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Streams;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class JobExecutor implements Runnable {

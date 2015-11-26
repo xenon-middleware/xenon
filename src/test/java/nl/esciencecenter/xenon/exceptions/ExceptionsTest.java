@@ -56,7 +56,6 @@ import nl.esciencecenter.xenon.jobs.UnsupportedJobDescriptionException;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class ExceptionsTest {

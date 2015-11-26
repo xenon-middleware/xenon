@@ -24,7 +24,6 @@ package nl.esciencecenter.xenon.files;
  * using {@link Files#cancelCopy(Copy) Files.cancelCopy}.
  * </p>
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  * @see Files

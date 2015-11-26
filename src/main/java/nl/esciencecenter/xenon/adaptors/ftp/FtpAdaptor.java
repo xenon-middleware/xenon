@@ -41,7 +41,7 @@ public class FtpAdaptor extends Adaptor {
     protected static final int DEFAULT_PORT = 21;
 
     /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remove ftp servers.";
+    private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remote ftp servers.";
 
     /** The schemes supported by this adaptor */
     protected static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ftp");

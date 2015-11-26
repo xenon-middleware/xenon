@@ -40,8 +40,6 @@ import org.xml.sax.SAXException;
  * Parses xml output from various grid engine command line tools. For more info on the output, see the
  * "N1 Grid Engine 6 User's Guide". Retrieved from: http://docs.oracle.com/cd/E19080-01/n1.grid.eng6/817-6117/chp11-1/index.html
  * 
- * @author Niels Drost
- * 
  */
 public class GridEngineXmlParser {
 

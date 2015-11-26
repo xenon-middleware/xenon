@@ -37,7 +37,6 @@ import org.xml.sax.SAXException;
 /**
  * Parses xml output from TORQUE batch system.
  * 
- * @author Joris Borgdorff
  * 
  */
 final class TorqueXmlParser {

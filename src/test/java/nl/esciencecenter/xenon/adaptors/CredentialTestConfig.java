@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors;
 import java.io.IOException;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public interface CredentialTestConfig {

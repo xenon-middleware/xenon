@@ -20,7 +20,6 @@ import java.util.Map;
 /**
  * Scheduler represents a (possibly remote) scheduler that can be used to submit jobs and retrieve queue information.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

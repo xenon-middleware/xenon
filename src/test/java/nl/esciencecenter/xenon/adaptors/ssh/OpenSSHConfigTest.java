@@ -34,7 +34,6 @@ import org.junit.Test;
 
 /**
  *
- * @author joris
  */
 public class OpenSSHConfigTest {
     private static OpenSSHConfig validConfig;

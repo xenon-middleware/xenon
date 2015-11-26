@@ -28,7 +28,6 @@ import nl.esciencecenter.xenon.jobs.Streams;
 /**
  * LocalInteractiveProcess implements a {@link InteractiveProcess} for local interactive processes.
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

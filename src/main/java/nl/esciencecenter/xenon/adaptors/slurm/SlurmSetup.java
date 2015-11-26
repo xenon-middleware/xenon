@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

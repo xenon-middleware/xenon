@@ -18,8 +18,6 @@ package nl.esciencecenter.xenon.engine.util;
 /**
  * Some simple utilities for handling and creating scripts and command lines.
  * 
- * @author Niels Drost
- * 
  */
 public final class CommandLineUtils {
 

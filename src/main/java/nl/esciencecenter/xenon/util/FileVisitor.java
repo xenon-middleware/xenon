@@ -28,8 +28,6 @@ import nl.esciencecenter.xenon.files.Path;
  * {@link Utils#walkFileTree(Files, Path, boolean, int, FileVisitor) FileUtils.walkTree}, an action can be defined for 
  * each file and directory encountered during a tree walk.    
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0 
  * @since 1.0
  */

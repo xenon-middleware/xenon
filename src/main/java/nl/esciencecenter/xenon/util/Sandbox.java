@@ -41,7 +41,6 @@ import nl.esciencecenter.xenon.files.Path;
  * Finally, the Sandbox can be deleted using {@link #delete()}. 
  * </p>       
  * 
- * @author Stefan Verhoeven <S.Verhoeven@esciencecenter.nl>
  * @version 1.0 
  * @since 1.0
  */

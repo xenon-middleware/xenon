@@ -33,7 +33,6 @@ import nl.esciencecenter.xenon.files.RelativePath;
 import org.junit.Test;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class FileSystemImplementationTest {

@@ -19,7 +19,6 @@ import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
 import nl.esciencecenter.xenon.files.OpenOption;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * 
  */
 public class OpenOptions {

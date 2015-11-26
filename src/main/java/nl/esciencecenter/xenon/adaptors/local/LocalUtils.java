@@ -41,8 +41,6 @@ import nl.esciencecenter.xenon.files.RelativePath;
 /**
  * LocalUtils contains various utilities for local file operations.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

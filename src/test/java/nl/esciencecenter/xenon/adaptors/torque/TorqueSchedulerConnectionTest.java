@@ -37,8 +37,6 @@ import org.junit.runners.MethodSorters;
 import java.util.HashMap;
 
 /**
- * @author Niels Drost
- * @author Joris Borgdorff
  * 
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

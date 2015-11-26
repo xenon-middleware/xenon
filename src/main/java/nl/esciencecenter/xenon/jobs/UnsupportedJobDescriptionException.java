@@ -20,7 +20,6 @@ import nl.esciencecenter.xenon.XenonException;
 /**
  * Signals that a combination of options used in a JobDescription is not supported by a resource.  
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

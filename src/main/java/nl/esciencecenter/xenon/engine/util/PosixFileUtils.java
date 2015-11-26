@@ -23,7 +23,6 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
 /**
  * PosixFileUtils contains several utility functions related to Posix files. 
  * 
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  *

@@ -21,7 +21,7 @@ import nl.esciencecenter.xenon.engine.util.InteractiveProcess;
 import nl.esciencecenter.xenon.engine.util.InteractiveProcessFactory;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
+ * 
  * 
  */
 class SshInteractiveProcessFactory implements InteractiveProcessFactory {

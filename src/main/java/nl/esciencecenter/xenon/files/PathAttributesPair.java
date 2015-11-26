@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.files;
 /**
  * Path with its associated Attributes.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

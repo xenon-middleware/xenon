@@ -27,7 +27,6 @@ import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
 /**
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  *
  */
 public class SSHFileTestConfig extends FileTestConfig {

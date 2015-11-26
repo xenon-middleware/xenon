@@ -36,8 +36,6 @@ import com.jcraft.jsch.JSchException;
 /**
  * LocalBatchProcess implements a {@link InteractiveProcess} for local batch processes.
  * 
- * @author Rob van Nieuwpoort <R.vanNieuwpoort@esciencecenter.nl>
- * @author Jason Maassen <J.Maassen@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */

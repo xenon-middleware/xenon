@@ -27,7 +27,6 @@ import org.apache.commons.net.ftp.FTPClient;
  * Wraps an InputStream instance. Only functionality added is sending a pending command completed signal after closing the input
  * stream.
  *
- * @author Christiaan Meijer
  *
  */
 @SuppressWarnings("CanBeFinal")

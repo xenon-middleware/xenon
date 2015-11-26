@@ -27,8 +27,6 @@ import nl.esciencecenter.xenon.engine.XenonEngine;
  * Credentials implementation which forwards all requests to another adaptor by replacing the scheme with the given target, and
  * forwarding the request to the engine again.
  * 
- * @author Niels Drost
- * 
  */
 public class ForwardingCredentials implements Credentials {
 

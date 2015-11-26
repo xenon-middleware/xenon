@@ -76,7 +76,7 @@ public class DirectoryListing {
                 }
 
             } else {
-                System.out.println("Directory " + uri + " does not exists or is not a directory.");
+                System.out.println("Directory " + uri + " does not exist or is not a directory.");
             }
 
             // If we are done we need to close the FileSystem

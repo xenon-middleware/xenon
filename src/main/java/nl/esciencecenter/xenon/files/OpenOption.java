@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.files;
 /**
  * OpenOption is an enumeration containing all possible options for opening a stream to a file.
  * 
- * @author Niels Drost <N.Drost@esciencecenter.nl>
  * @version 1.0
  * @since 1.0
  */
