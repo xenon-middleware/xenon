@@ -296,8 +296,6 @@ public interface Files {
      * @param path
      *            the path to delete.
      * 
-     * @throws NoSuchFileExistsException
-     *             If the <code>path</code> does not exist.
      * @throws XenonException
      *             If an I/O error occurred.
      */
