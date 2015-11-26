@@ -796,7 +796,7 @@ public final class Utils {
      * @param cs
      *            the Charset to use.
      * 
-     * @return a <code>List<String></code> containing all lines in the file.
+     * @return a <code>List&lt;String&gt;</code> containing all lines in the file.
      *
      * @throws XenonException
      *             if an I/O error occurs while opening or reading the file.
