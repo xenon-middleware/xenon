@@ -143,6 +143,7 @@ public interface Files {
      * position is append to the target. For example, if the target contains 100 bytes (0-99) and the source 200 bytes (0-199),
      * the data at bytes 100-199 in the source will be append to target. By default, there is no verification that the existing
      * data in target corresponds to the data in source.</li>
+     * </ul>
      * <p>
      * Note that the five options above are mutually exclusive. Only one can be selected at a time. If more than one of these 
      * options is provided, an exception will be thrown. 
@@ -150,6 +151,7 @@ public interface Files {
      * <p>
      * The following options modify the behavior of the copy operation:
      * </p>
+     * <ul>
      * <li><code>VERIFY</code> (can only be used in combination with <code>RESUME</code>): When resuming a copy, verify that the
      * existing data in target corresponds to the data in source.</li>
      * 
