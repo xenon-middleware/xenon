@@ -63,14 +63,14 @@ public enum PosixFilePermission {
     /**
      * Check if a sequence of <code>PosixFilePermission</code>s contains a specific option.
      * 
-     * If <code>option</code> or <code>options<code> is <code>null</code>, <code>false</code> will be returned.
+     * If <code>option</code> or <code>options</code> is <code>null</code>, <code>false</code> will be returned.
      *
      * @param toFind
      *            the option to find.
      * @param options
      *            the options to check.
      * 
-     * @return if <code>options</code> contains <code>option<code>.
+     * @return if <code>options</code> contains <code>option</code>.
      */
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
     public static boolean contains(PosixFilePermission toFind, PosixFilePermission... options) {

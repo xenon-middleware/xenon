@@ -402,8 +402,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> only contains a valid Windows root element such as "C:".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      * 
      * @param root
      *            The root to check.
@@ -424,8 +424,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> only contains a valid Linux root element, which is "/".
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      * 
      * @param root
      *            The root to check.
@@ -452,8 +452,8 @@ public final class Utils {
     /**
      * Check if <code>root</code> contains a locally valid root element, such as "C:" on Windows or "/" on Linux and OSX.
      *
-     * If <code>root</code> is <code>null</code> or empty, <code>false<code> will be returned.
-     * If <code>root</code> contains more than just a root element, <code>false<code> will be returned.
+     * If <code>root</code> is <code>null</code> or empty, <code>false</code> will be returned.
+     * If <code>root</code> contains more than just a root element, <code>false</code> will be returned.
      *
      * Note that the result of this method depends on the OS the application is running on.
      *
@@ -740,7 +740,7 @@ public final class Utils {
     }
 
     /**
-     * Read all the bytes from a file and return them as a <code>byte[]<\code>.
+     * Read all the bytes from a file and return them as a <code>byte[]</code>.
      *
      * @param files
      *            the files interface to use for file access.
@@ -759,7 +759,7 @@ public final class Utils {
     }
 
     /**
-     * Read all the bytes from a file and return them as a <code>String<\code> using the <code>Charset</code> for conversion.
+     * Read all the bytes from a file and return them as a <code>String</code> using the <code>Charset</code> for conversion.
      *
      * @param files
      *            the files interface to use for file access.
