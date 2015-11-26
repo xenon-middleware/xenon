@@ -7,6 +7,6 @@ license {
     ext.copyright_owner = 'Netherlands eScience Center'
     header rootProject.file('config/license/HEADER')
     strictCheck true
-    excludes(["**/*.examples", "**/create_symlinks", "**/fixtures/**"])
+    excludes(["**/create_symlinks", "**/fixtures/**"])
 }
 

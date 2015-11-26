@@ -27,7 +27,6 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-    examples
 }
 
 configurations {
