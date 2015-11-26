@@ -101,7 +101,7 @@ final class TorqueXmlParser {
     /**
      * Parses job info from "qstat -x"
      * 
-     * @param in
+     * @param data
      *            the stream to get the xml data from
      * @return a list containing all queue names found
      * @throws XenonException

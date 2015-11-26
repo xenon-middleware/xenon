@@ -124,7 +124,7 @@ public class GridEngineXmlParser {
     /**
      * Parses queue info from "qstat -g c -xml"
      * 
-     * @param in
+     * @param input
      *            the stream to get the xml data from
      * @return a list containing all queue names found
      * @throws XenonException
@@ -167,7 +167,7 @@ public class GridEngineXmlParser {
     /**
      * Parses job info from "qstat -xml"
      * 
-     * @param in
+     * @param data
      *            the stream to get the xml data from
      * @return a list containing all queue names found
      * @throws XenonException

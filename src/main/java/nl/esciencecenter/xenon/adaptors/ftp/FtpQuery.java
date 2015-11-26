@@ -27,7 +27,6 @@ public abstract class FtpQuery<T> extends FtpCommand {
     /**
      * Gets the result of the query execution when called after calling execute.
      *
-     * @return
      */
     public T getResult() {
         return result;

@@ -279,9 +279,6 @@ public final class XenonEngine implements Xenon {
         return credentialsEngine;
     }
 
-    /**
-     * @return
-     */
     public CopyEngine getCopyEngine() {
         return copyEngine;
     }

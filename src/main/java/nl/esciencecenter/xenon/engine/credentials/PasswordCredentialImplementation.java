@@ -18,7 +18,7 @@ package nl.esciencecenter.xenon.engine.credentials;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 
 /**
- * A {@link Credential} based on a user name and password.
+ * A {@link nl.esciencecenter.xenon.credentials.Credential} based on a user name and password.
  */
 public class PasswordCredentialImplementation extends CredentialImplementation {
 

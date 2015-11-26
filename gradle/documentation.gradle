@@ -3,9 +3,6 @@
 javadoc {
     exclude 'nl/esciencecenter/xenon/engine/**', 'nl/esciencecenter/xenon/adaptors/**'
     options.overview = file("${buildDir}/overview.html")
-
-    // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
-    failOnError = false
 }
 
 task javadocDevel(type: Javadoc) {
@@ -17,9 +14,6 @@ task javadocDevel(type: Javadoc) {
     destinationDir = file("${project.docsDir}/javadoc-devel")
     options.showFromPrivate()
     options.overview = file("${buildDir}/overview.html")
-
-    // FIXME: remove me when all Javadoc warnings by Java 8 have been resolved
-    failOnError = false
 }
 
 
