@@ -106,7 +106,7 @@ public final class Utils {
     /**
      * Copy all bytes from an input stream to an output stream.
      *
-     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize <= 0</code> then the
+     * A temporary buffer of size <code>bufferSize</code> is used. If <code>bufferSize &lt;= 0</code> then the
      * {@link #DEFAULT_BUFFER_SIZE} will be used.
      * <p>
      * NOTE: <code>in</code> and <code>out</code> will NOT be explicitly closed once the end of the stream is reached.
@@ -117,7 +117,7 @@ public final class Utils {
      * @param out
      *            the OutputStream to write to.
      * @param bufferSize
-     *            the size of the temporary buffer, or <= 0 to use the {@link #DEFAULT_BUFFER_SIZE}.
+     *            the size of the temporary buffer, or &lt;= 0 to use the {@link #DEFAULT_BUFFER_SIZE}.
      * @return the number of bytes copied.
      * @throws IOException
      *             if an I/O error occurs during the copy operation.
@@ -211,7 +211,7 @@ public final class Utils {
      *            the InputStream to read from
      * @param cs
      *            the Charset to use.
-     * @return a <code>List<String></code> containing all lines in the file.
+     * @return a <code>List&lt;String&gt;</code> containing all lines in the file.
      * @throws IOException
      *             if an I/O error was produced while reading the stream.
      */
