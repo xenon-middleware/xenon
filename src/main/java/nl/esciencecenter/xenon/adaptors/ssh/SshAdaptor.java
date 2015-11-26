@@ -60,14 +60,14 @@ public class SshAdaptor extends Adaptor {
     protected static final int DEFAULT_PORT = 22;
 
     /** A description of this adaptor */
-    private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remove ssh servers.";
+    private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remote ssh servers.";
 
     /** The schemes supported by this adaptor */
     protected static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ssh", "sftp");
 
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
-    
+
     /** All our own properties start with this prefix. */
     public static final String PREFIX = XenonEngine.ADAPTORS + "ssh.";
 
@@ -79,16 +79,16 @@ public class SshAdaptor extends Adaptor {
 
     /** Enable the use of ssh-agent-forwarding */
     public static final String AGENT_FORWARDING = PREFIX + "agentForwarding";
-    
+
     /** Load the known_hosts file by default. */
     public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
 
     /** Load the OpenSSH config file by default. */
     public static final String LOAD_SSH_CONFIG = PREFIX + "loadSshConfig";
-    
+
     /** OpenSSH config filename. */
     public static final String SSH_CONFIG_FILE = PREFIX + "sshConfigFile";
-    
+
     /** Enable strict host key checking. */
     public static final String AUTOMATICALLY_ADD_HOST_KEY = PREFIX + "autoAddHostKey";
 
@@ -115,31 +115,31 @@ public class SshAdaptor extends Adaptor {
 
     /** Ssh job information start with this prefix. */
     public static final String JOBS = INFO + "jobs.";
-    
+
     /** How many jobs have been submitted using this adaptor. */
     public static final String SUBMITTED = JOBS + "submitted";
-    
+
     /** List of properties supported by this SSH adaptor */
     private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
             new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
                     Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
             new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                    Component.FILESYSTEM), "true", "Enable strict host key checking."), 
-            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON), 
-                    "true", "Load the standard known_hosts file."), 
-            new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN, EnumSet.of(Component.XENON), 
-                    "true", "Load the OpenSSH config file."), 
-            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.BOOLEAN, EnumSet.of(Component.XENON), 
-                    null, "OpenSSH config filename."), 
-            new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN, EnumSet.of(Component.XENON), 
-                    "false", "Use a (local) ssh-agent."), 
-            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, EnumSet.of(Component.XENON), 
-                    "false", "Use ssh-agent forwarding"), 
+                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
+            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                    "true", "Load the standard known_hosts file."),
+            new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                    "true", "Load the OpenSSH config file."),
+            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                    null, "OpenSSH config filename."),
+            new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                    "false", "Use a (local) ssh-agent."),
+            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, EnumSet.of(Component.XENON),
+                    "false", "Use ssh-agent forwarding"),
             new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4", 
-                    "The maximum number of concurrent jobs in the multiq.."), 
-            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), 
+            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
+                    "The maximum number of concurrent jobs in the multiq.."),
+            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM),
                     null, "The gateway machine used to create an SSH tunnel to the target."));
 
     private final SshFiles filesAdaptor;
@@ -149,7 +149,7 @@ public class SshAdaptor extends Adaptor {
     private final SshCredentials credentialsAdaptor;
 
     private final boolean useAgent;
-    
+
     private JSch jsch;
 
     public SshAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
@@ -157,7 +157,7 @@ public class SshAdaptor extends Adaptor {
     }
 
     public SshAdaptor(XenonEngine xenonEngine, JSch jsch, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         this.filesAdaptor = new SshFiles(this, xenonEngine);
@@ -170,7 +170,7 @@ public class SshAdaptor extends Adaptor {
             LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
             setKnownHostsFile(knownHosts);
         }
-        
+
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_SSH_CONFIG)) {
             String sshConfig = getProperties().getProperty(SshAdaptor.SSH_CONFIG_FILE);
             if (sshConfig == null) {
@@ -179,11 +179,11 @@ public class SshAdaptor extends Adaptor {
             LOGGER.debug("Setting ssh known hosts file to: " + sshConfig);
             setConfigFile(sshConfig, !getProperties().propertySet(SshAdaptor.LOAD_SSH_CONFIG));
         }
-        
+
         if (getProperties().getBooleanProperty(SshAdaptor.AGENT)) {
             // Connect to the local ssh-agent
             LOGGER.debug("Connecting to ssh-agent");
-            
+
             Connector connector;
 
             try {
@@ -195,17 +195,17 @@ public class SshAdaptor extends Adaptor {
 
             IdentityRepository ident = new RemoteIdentityRepository(connector);
             jsch.setIdentityRepository(ident);
-            
+
             useAgent = true;
-        } else { 
+        } else {
             useAgent = false;
         }
-        
+
         if (getProperties().getBooleanProperty(SshAdaptor.AGENT_FORWARDING)) {
             // Enable ssh-agent-forwarding
             LOGGER.warn("TODO: Enabling ssh-agent-forwarding");
         }
-        
+
         if (jsch.getConfigRepository() == null) {
             jsch.setConfigRepository(ConfigRepository.nullConfig);
         }
@@ -232,7 +232,7 @@ public class SshAdaptor extends Adaptor {
             }
         }
     }
-    
+
     private void setConfigFile(String sshConfigFile, boolean ignoreFail) throws XenonException {
         try {
             ConfigRepository configRepository = OpenSSHConfig.parse(new File(sshConfigFile));
@@ -271,7 +271,7 @@ public class SshAdaptor extends Adaptor {
         jobsAdaptor.end();
         filesAdaptor.end();
     }
-    
+
     public ConfigRepository getSshConfig() {
         return jsch.getConfigRepository();
     }
@@ -281,10 +281,10 @@ public class SshAdaptor extends Adaptor {
         return new SshMultiplexedSession(this, jsch, location, credential, properties);
     }
 
-    protected boolean usingAgent() { 
+    protected boolean usingAgent() {
         return useAgent;
     }
-    
+
     @Override
     public Map<String, String> getAdaptorSpecificInformation() {
         Map<String,String> result = new HashMap<>(2);
