@@ -268,7 +268,7 @@ public interface Jobs {
      * expires, the job will continue to run normally.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
+     * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
@@ -294,7 +294,7 @@ public interface Jobs {
      * normally.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be >= 0, where 0 means an infinite timeout.
+     * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
