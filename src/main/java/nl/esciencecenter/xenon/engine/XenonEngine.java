@@ -143,8 +143,6 @@ public final class XenonEngine implements Xenon {
      *
      * @throws UnknownPropertyException
      *             If an unknown property was passed.
-     * @throws IllegalPropertyException
-     *             If a known property was passed with an illegal value.
      * @throws XenonException
      *             If the Xenon failed initialize.
      */
