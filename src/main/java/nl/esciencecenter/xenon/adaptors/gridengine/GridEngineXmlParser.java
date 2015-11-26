@@ -174,7 +174,6 @@ public class GridEngineXmlParser {
      *             if the file could not be parsed
      * @throws XenonException
      *             if the server version is not compatible with this adaptor
-     * @throws Exception
      */
     protected Map<String, Map<String, String>> parseJobInfos(String data) throws XenonException {
         Map<String, Map<String, String>> result = new HashMap<>();
