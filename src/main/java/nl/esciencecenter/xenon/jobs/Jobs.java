@@ -182,8 +182,6 @@ public interface Jobs {
      * 
      * @return Job representing the running job.
      * 
-     * @throws NoSchedulerException
-     *             If the scheduler is not known.
      * @throws IncompleteJobDescriptionException
      *             If the description did not contain the required information.
      * @throws InvalidJobDescriptionException
