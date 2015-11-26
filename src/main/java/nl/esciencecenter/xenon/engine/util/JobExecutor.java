@@ -182,10 +182,6 @@ public class JobExecutor implements Runnable {
         return getStatus();
     }
 
-    /**
-     * @param timeout
-     * @return
-     */
     public synchronized JobStatus waitUntilDone(long timeout) {
 
         long deadline = System.currentTimeMillis() + timeout;
@@ -268,7 +264,7 @@ public class JobExecutor implements Runnable {
     /**
      * Sleep for a certain amount of time, provide the job is not done, and no one requested an update.
      * 
-     * @param pollingDelay
+     * @param maxDelay
      *            the maximum amount of time to wait
      */
     private synchronized void sleep(long maxDelay) {

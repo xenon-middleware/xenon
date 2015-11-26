@@ -174,7 +174,6 @@ public final class ScriptingParser {
      *            the value to clean
      * @param suffixes
      *            the possible suffixes to remove
-     * @return
      */
     public static String cleanValue(String value, String... suffixes) {
         String trimmed = value.trim();
