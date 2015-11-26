@@ -329,7 +329,6 @@ public class SshFiles implements Files {
      *            the existing source path.
      * @param target
      *            the non existing target path.
-     * @return the target path.
      * 
      * @throws NoSuchPathException
      *             If the source file does not exist or the target parent directory does not exist.
