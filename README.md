@@ -17,7 +17,6 @@ Xenon is a middleware abstraction library. It provides a simple
 programming interface to various pieces of software that can be used
 to access distributed compute and storage resources.
 
-
 Why Xenon?
 ----------
 
@@ -29,9 +28,10 @@ those applications to be developed more rapidly. The experience
 gained during end-user application development is used to improve
 the Xenon API and implementation.
 
-
 The Latest Version
 ------------------
+
+Available in [JCenter](https://bintray.com/bintray/jcenter?filterByPkgName=xenon)
 
 Details of the latest official release of Xenon can be found at:
 
@@ -42,19 +42,65 @@ found at:
 
 <https://github.com/NLeSC/Xenon>.
 
+Quick start
+-----------
+
+Add Xenon library as a dependency to your project. For a Maven project use
+```
+<dependency>
+  <groupId>nl.esciencecenter.xenon</groupId>
+  <artifactId>xenon</artifactId>
+  <version>1.1.0-beta1</version>
+</dependency>
+```
+
+### Copy a file
+
+Following code copies local /etc/passwd file using ssh to /tmp/password on somemachine:
+```
+xenon = XenonFactory.newXenon(null);
+Files files = xenon.files();
+FileSystem sourceFS = files.newFileSystem("local", null, null, null);
+FileSystem targetFS = files.newFileSystem("ssh", "somemachine", null, null);
+Path sourcePath = files.newPath(sourceFS, new RelativePath("/etc/passwd"));
+Path targetPath = files.newPath(targetFS, new RelativePath("/tmp/passwd"));
+
+files.copy(sourcePath, targetPath, CopyOption.CREATE);
+
+files.close(sourceFS);
+files.close(targetFS);
+XenonFactory.endXenon(xenon);
+```
+
+### Run a job
+
+Following code performs a wordcount of a file on somemachine using ssh:  
+```
+xenon = XenonFactory.newXenon(null);
+Jobs jobs = xenon.jobs();
+Scheduler scheduler = jobs.newScheduler("ssh", "somemachine", null, null);
+JobDescription description = new JobDescription();
+description.setExecutable("/bin/wc");
+description.setArguments("-l", "/tmp/passwd");
+description.setStdout("/tmp/stdout.txt");
+
+Job job = jobs.submitJob(scheduler, description);
+
+jobs.close(scheduler);
+XenonFactory.endXenon(xenon);
+```
+The output of the job will be written to /tmp/stdout.txt file on somemachine.
 
 Documentation
 -------------
 
-See the file "INSTALL.md" for a description of how to install Xenon.
+See <https://github.com/NLeSC/Xenon-examples> for examples how to use the Xenon library.
 
-See the file "src/examples/README.md" for information on how to compile and
-run Xenon examples.
+See <https://github.com/NLeSC/Xenon-examples/raw/master/doc/tutorial/xenon-tutorial.pdf> for a tutorial pdf targeting inexperienced users.
 
-The javadoc of Xenon library can be found in "doc/javadoc". It is
-also available online at <http://nlesc.github.io/Xenon/javadoc>
+The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.1.0/javadoc>.
 
-See the file "doc/devel/README.md" for information for developers of the Xenon library.
+See the file "doc/README.md" for information for developers of the Xenon library.
 
 Copyrights & Disclaimers
 ------------------------
@@ -66,7 +112,6 @@ See <http://www.esciencecenter.nl> for more information on the
 Netherlands eScience Center.
 
 See the "LICENSE" and "NOTICE" files for more information.
-
 
 Third party libraries
 ---------------------
