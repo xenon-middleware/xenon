@@ -129,7 +129,7 @@ public class SshAdaptor extends Adaptor {
                     "true", "Load the standard known_hosts file."),
             new XenonPropertyDescriptionImplementation(LOAD_SSH_CONFIG, Type.BOOLEAN, EnumSet.of(Component.XENON),
                     "true", "Load the OpenSSH config file."),
-            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.BOOLEAN, EnumSet.of(Component.XENON),
+            new XenonPropertyDescriptionImplementation(SSH_CONFIG_FILE, Type.STRING, EnumSet.of(Component.XENON),
                     null, "OpenSSH config filename."),
             new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN, EnumSet.of(Component.XENON),
                     "false", "Use a (local) ssh-agent."),
