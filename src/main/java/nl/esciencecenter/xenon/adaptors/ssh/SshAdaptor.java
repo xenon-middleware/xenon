@@ -168,7 +168,15 @@ public class SshAdaptor extends Adaptor {
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
             String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
             LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
-            setKnownHostsFile(knownHosts);
+            if (new File(knownHosts).exists()) {
+                setKnownHostsFile(knownHosts);
+            } else if (getProperties().propertySet(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
+                // property was explicitly set, throw an error because it does not exist
+                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot load known_hosts file: " + knownHosts + " does not exist");
+            } else {
+                // implictly ignore
+                LOGGER.debug("known_hosts file " + knownHosts + " does not exist, not checking hosts with signatures of known hosts.");
+            }
         }
 
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_SSH_CONFIG)) {
