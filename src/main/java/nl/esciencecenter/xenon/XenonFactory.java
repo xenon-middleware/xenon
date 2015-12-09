@@ -64,9 +64,10 @@ public final class XenonFactory {
     /**
      * Ends a Xenon instance.
      * 
-     * Ending a Xenon instance will automatically close local resources, such as <code>Schedulers</code>, 
-     * <code>FileSystems</code> and <code>Credentials</code>. In addition, all non online <code>Jobs</code> it has creates will 
-     * be killed (for example jobs that run locally).
+     * Ending a Xenon instance will automatically close local resources, such as 
+     * <code>Schedulers</code>, <code>FileSystems</code> and <code>Credentials</code>. 
+     * In addition, all non online <code>Jobs</code> it has created will be killed 
+     * (for example jobs that run locally).
      * 
      * @param xenon
      *            the Xenon to end.
@@ -83,7 +84,7 @@ public final class XenonFactory {
     /**
      * End all Xenon instances created by this factory.
      * 
-     * All exceptions throw during endAll are ignored.
+     * All exceptions thrown during endAll are ignored.
      */
     public static void endAll() {
         XenonEngine.endAll();
