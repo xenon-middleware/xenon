@@ -34,7 +34,7 @@ public interface Credentials {
      * 
      * A certificate credential is created out of a certificate file 
      * (containing the certificate), a user name, and (optionally) a password 
-     * needed to access the credential. Make sure to always close Credentials
+     * needed to access the credential. Make sure to always close Credential
      * instances by calling close() when you no longer need them, otherwise 
      * their associated resources remain allocated.
      *
