@@ -32,8 +32,11 @@ public interface Credentials {
     /**
      * Constructs a certificate Credential.
      * 
-     * A certificate credential is created out of a certificate file (containing the certificate), a user name, and (optionally)
-     * a password needed to access the credential.
+     * A certificate credential is created out of a certificate file 
+     * (containing the certificate), a user name, and (optionally) a password 
+     * needed to access the credential. Make sure to always close Credentials
+     * instances by calling close() when you no longer need them, otherwise 
+     * their associated resources remain allocated.
      *
      * @param scheme
      *          the scheme for which to create a credential.                
