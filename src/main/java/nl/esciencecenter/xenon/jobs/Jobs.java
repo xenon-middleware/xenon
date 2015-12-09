@@ -36,8 +36,12 @@ import nl.esciencecenter.xenon.credentials.Credential;
 public interface Jobs {
 
     /**
-     * Create a new Scheduler that represents a (possibly remote) job scheduler at the <code>location</code>, using the
-     * <code>scheme</code> and <code>credentials</code> to get access.
+     * Create a new Scheduler that represents a (possibly remote) job 
+     * scheduler at the <code>location</code>, using the <code>scheme</code>
+     * and <code>credentials</code> to get access. Make sure to always close 
+     * {@code Scheduler} instances by calling {@code close(Scheduler)} when
+     * you no longer need them, otherwise their associated resources remain 
+     * allocated.
      * 
      * @param scheme
      *            the scheme used to access the Scheduler.
