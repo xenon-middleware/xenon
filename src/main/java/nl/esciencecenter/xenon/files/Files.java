@@ -31,7 +31,8 @@ import nl.esciencecenter.xenon.credentials.Credential;
 /**
  * Files represents the Files interface Xenon.
  * 
- * This interface contains various methods for creating and closing FileSystems, creating Paths and operations on these Paths.
+ * This interface contains various methods for creating and closing 
+ * FileSystems, creating Paths and operations on these Paths.
  * 
  * @version 1.0
  * @since 1.0
@@ -39,8 +40,12 @@ import nl.esciencecenter.xenon.credentials.Credential;
 public interface Files {
 
     /**
-     * Create a new FileSystem that represents a (possibly remote) data store at the <code>location</code>, using the
-     * <code>scheme</code> and <code>credentials</code> to get access.
+     * Create a new FileSystem that represents a (possibly remote) data store 
+     * at the <code>location</code>, using the <code>scheme</code> and 
+     * <code>credentials</code> to get access. Make sure to always close 
+     * {@code FileSystem} instances by calling {@code close(FileSystem)} when
+     * you no longer need them, otherwise their associated resources remain 
+     * allocated.
      * 
      * @param scheme
      *            the scheme to use to access the FileSystem.
