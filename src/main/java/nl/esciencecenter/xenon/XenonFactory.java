@@ -38,8 +38,12 @@ public final class XenonFactory {
     /**
      * Create a new Xenon instance using the given properties.
      * 
-     * The properties provided will be passed to the Xenon instance and its adaptors on creation time. Note that an
-     * {@link XenonException} will be thrown if properties contains any unknown keys.
+     * The properties provided will be passed to the Xenon instance and its 
+     * adaptors on creation time. Note that a {@link XenonException} will be 
+     * thrown if {@code properties} contains any unknown keys. Also, make
+     * sure to always end Xenon instances by calling endXenon() when you no 
+     * longer need them, otherwise their associated resources remain allocated.
+     * 
      * 
      * @param properties
      *            (optional) properties used to configure the newly created Xenon instance.
