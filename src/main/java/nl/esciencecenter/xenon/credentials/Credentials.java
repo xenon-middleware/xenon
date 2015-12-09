@@ -22,7 +22,10 @@ import nl.esciencecenter.xenon.XenonException;
 /**
  * Credentials represents the credentials interface of Xenon.
  * 
- * This interface contains various methods for creating and closing credentials.
+ * This interface contains various methods for creating and closing 
+ * credentials. Make sure to always close Credential instances by calling 
+ * {@code close()} when you no longer need them, otherwise their associated 
+ * resources remain allocated.
  * 
  * @version 1.0
  * @since 1.0
