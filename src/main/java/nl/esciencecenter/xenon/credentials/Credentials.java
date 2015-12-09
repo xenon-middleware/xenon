@@ -64,9 +64,10 @@ public interface Credentials {
             Map<String, String> properties) throws XenonException;
 
     /**
-     * Constructs a password credential.
-     * 
-     * A password credential consists of a user name and a password.
+     * Constructs a password credential out of a {@code username} and a 
+     * {@code password}. Make sure to always close Credential instances 
+     * by calling close() when you no longer need them, otherwise their 
+     * associated resources remain allocated.
      * 
      * @param scheme
      *          the scheme for which to create a credential.                
