@@ -38,8 +38,12 @@ public final class XenonFactory {
     /**
      * Create a new Xenon instance using the given properties.
      * 
-     * The properties provided will be passed to the Xenon instance and its adaptors on creation time. Note that an
-     * {@link XenonException} will be thrown if properties contains any unknown keys.
+     * The properties provided will be passed to the Xenon instance and its 
+     * adaptors on creation time. Note that a {@link XenonException} will be 
+     * thrown if {@code properties} contains any unknown keys. Also, make
+     * sure to always end Xenon instances by calling endXenon() when you no 
+     * longer need them, otherwise their associated resources remain allocated.
+     * 
      * 
      * @param properties
      *            (optional) properties used to configure the newly created Xenon instance.
@@ -60,9 +64,10 @@ public final class XenonFactory {
     /**
      * Ends a Xenon instance.
      * 
-     * Ending a Xenon instance will automatically close local resources, such as <code>Schedulers</code>, 
-     * <code>FileSystems</code> and <code>Credentials</code>. In addition, all non online <code>Jobs</code> it has creates will 
-     * be killed (for example jobs that run locally).
+     * Ending a Xenon instance will automatically close local resources, such as 
+     * <code>Schedulers</code>, <code>FileSystems</code> and <code>Credentials</code>. 
+     * In addition, all non online <code>Jobs</code> it has created will be killed 
+     * (for example jobs that run locally).
      * 
      * @param xenon
      *            the Xenon to end.
@@ -79,7 +84,7 @@ public final class XenonFactory {
     /**
      * End all Xenon instances created by this factory.
      * 
-     * All exceptions throw during endAll are ignored.
+     * All exceptions thrown during endAll are ignored.
      */
     public static void endAll() {
         XenonEngine.endAll();
