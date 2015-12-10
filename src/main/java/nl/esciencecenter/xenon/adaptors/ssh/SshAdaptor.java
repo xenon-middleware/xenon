@@ -165,27 +165,38 @@ public class SshAdaptor extends Adaptor {
         this.credentialsAdaptor = new SshCredentials(this);
         this.jsch = jsch;
 
+        String openSshDir = System.getProperty("user.home") + File.separator + ".ssh";
+
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
-            String knownHosts = System.getProperty("user.home") + "/.ssh/known_hosts";
+            String knownHosts = openSshDir + File.separator + "known_hosts";
             LOGGER.debug("Setting ssh known hosts file to: " + knownHosts);
-            if (new File(knownHosts).exists()) {
+            if (new File(knownHosts).canRead()) {
                 setKnownHostsFile(knownHosts);
             } else if (getProperties().propertySet(SshAdaptor.LOAD_STANDARD_KNOWN_HOSTS)) {
                 // property was explicitly set, throw an error because it does not exist
                 throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot load known_hosts file: " + knownHosts + " does not exist");
             } else {
                 // implictly ignore
-                LOGGER.debug("known_hosts file " + knownHosts + " does not exist, not checking hosts with signatures of known hosts.");
+                LOGGER.debug("known_hosts file " + knownHosts + " is not readable, not checking hosts with signatures of known hosts.");
             }
         }
 
         if (getProperties().getBooleanProperty(SshAdaptor.LOAD_SSH_CONFIG)) {
             String sshConfig = getProperties().getProperty(SshAdaptor.SSH_CONFIG_FILE);
             if (sshConfig == null) {
-                sshConfig = System.getProperty("user.home") + "/.ssh/config";
+                sshConfig = openSshDir + File.separator + "config";
             }
-            LOGGER.debug("Setting ssh known hosts file to: " + sshConfig);
-            setConfigFile(sshConfig, !getProperties().propertySet(SshAdaptor.LOAD_SSH_CONFIG));
+            File sshConfigFile = new File(sshConfig);
+            if (sshConfigFile.canRead()) {
+                LOGGER.debug("Setting ssh config file to: " + sshConfigFile.getAbsolutePath());
+                setConfigFile(sshConfigFile.getAbsolutePath());
+            } else if (getProperties().propertySet(SshAdaptor.LOAD_SSH_CONFIG) || getProperties().propertySet(SshAdaptor.SSH_CONFIG_FILE)) {
+                // property was explicitly set, throw an error because it does not exist
+                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot read OpenSSH config file at " + sshConfigFile.getAbsolutePath());
+            } else {
+                // implictly ignore
+                LOGGER.debug("OpenSSH config file " + sshConfigFile.getAbsolutePath() + " is not readable, not setting any default SSH values.");
+            }
         }
 
         if (getProperties().getBooleanProperty(SshAdaptor.AGENT)) {
@@ -241,16 +252,12 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
-    private void setConfigFile(String sshConfigFile, boolean ignoreFail) throws XenonException {
+    private void setConfigFile(String sshConfigFile) throws XenonException {
         try {
             ConfigRepository configRepository = OpenSSHConfig.parse(new File(sshConfigFile));
             jsch.setConfigRepository(configRepository);
         } catch (IOException|XenonException ex) {
-            if (ignoreFail) {
-                LOGGER.warn("OpenSSH config file cannot be read.");
-            } else {
-                throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot read OpenSSH config file", ex);
-            }
+            throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot read OpenSSH config file", ex);
         }
     }
 
