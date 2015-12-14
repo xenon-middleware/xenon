@@ -129,11 +129,8 @@ class SshMultiplexedSession {
             LOGGER.debug("Gateway session via {} created!", gatewayLocation);
         }
 
-        if (properties.propertySet(SshAdaptor.AGENT_FORWARDING)) { 
-            useAgentForwarding = properties.getBooleanProperty(SshAdaptor.AGENT_FORWARDING);    
-        } else { 
-            useAgentForwarding = adaptor.useAgentForwarding();
-        }
+        // TODO: allow the uses to set agent forwarding for each scheduler connection ?
+        useAgentForwarding = adaptor.useAgentForwarding();
 
         createSession();
     }

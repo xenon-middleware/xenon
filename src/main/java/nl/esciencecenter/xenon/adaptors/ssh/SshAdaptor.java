@@ -133,14 +133,14 @@ public class SshAdaptor extends Adaptor {
                     null, "OpenSSH config filename."),
             new XenonPropertyDescriptionImplementation(AGENT, Type.BOOLEAN, EnumSet.of(Component.XENON),
                     "false", "Use a (local) ssh-agent."),
-            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, EnumSet.of(Component.XENON),
-                    "false", "Use ssh-agent forwarding"),
+            new XenonPropertyDescriptionImplementation(AGENT_FORWARDING, Type.BOOLEAN, EnumSet.of(Component.XENON), "false", 
+                    "Use ssh-agent forwarding"),
             new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                     "The polling delay for monitoring running jobs (in milliseconds)."),
             new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
                     "The maximum number of concurrent jobs in the multiq.."),
-            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM),
-                    null, "The gateway machine used to create an SSH tunnel to the target."));
+            new XenonPropertyDescriptionImplementation(GATEWAY, Type.STRING, EnumSet.of(Component.SCHEDULER, 
+                    Component.FILESYSTEM), null, "The gateway machine used to create an SSH tunnel to the target."));
 
     private final SshFiles filesAdaptor;
 

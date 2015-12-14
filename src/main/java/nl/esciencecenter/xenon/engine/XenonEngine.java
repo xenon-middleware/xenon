@@ -163,7 +163,7 @@ public final class XenonEngine implements Xenon {
 
         adaptors = loadAdaptors(this.properties);
 
-        LOGGER.info("Xenon engine initialized with adaptors: " + Arrays.toString(adaptors));
+        LOGGER.debug("Xenon engine initialized with adaptors: " + Arrays.toString(adaptors));
     }
 
     private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
