@@ -150,6 +150,8 @@ public class SshAdaptor extends Adaptor {
 
     private final boolean useAgent;
 
+    private final boolean useAgentForwarding;
+   
     private JSch jsch;
 
     public SshAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
@@ -222,7 +224,11 @@ public class SshAdaptor extends Adaptor {
 
         if (getProperties().getBooleanProperty(SshAdaptor.AGENT_FORWARDING)) {
             // Enable ssh-agent-forwarding
-            LOGGER.warn("TODO: Enabling ssh-agent-forwarding");
+            LOGGER.debug("Enabling ssh-agent-forwarding");
+
+            useAgentForwarding = true;            
+        } else { 
+            useAgentForwarding = false;
         }
 
         if (jsch.getConfigRepository() == null) {
@@ -230,6 +236,15 @@ public class SshAdaptor extends Adaptor {
         }
     }
 
+    /**
+     * Returns if agent forwarding should be used according to the adaptor properties.  
+     * 
+     * @return if agent forwarding should be used.
+     */
+    protected boolean useAgentForwarding() {
+        return useAgentForwarding;
+    }
+    
     private void setKnownHostsFile(String knownHostsFile) throws XenonException {
         try {
             jsch.setKnownHosts(knownHostsFile);

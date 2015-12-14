@@ -47,7 +47,8 @@ class SshMultiplexedSession {
 
     private final JSch jsch;
     private final XenonProperties properties;
-
+    private final boolean useAgentForwarding;
+    
     private Credential credential;
 
     private SshLocation location;
@@ -56,13 +57,14 @@ class SshMultiplexedSession {
     private SshSession gatewaySession;
 
     private int nextSessionID = 0;
-
+    
     private final List<SshSession> sessions = new ArrayList<>();
 
     protected SshMultiplexedSession() {
         // Needed for unit testing
         jsch = null;
         properties = null;
+        useAgentForwarding = false;
     }
     
     @SuppressWarnings("PMD.EmptyIfStmt")
@@ -125,6 +127,12 @@ class SshMultiplexedSession {
             gatewaySession = createSession(jsch, -1, gatewayLocation, credential, null, null, properties);
             
             LOGGER.debug("Gateway session via {} created!", gatewayLocation);
+        }
+
+        if (properties.propertySet(SshAdaptor.AGENT_FORWARDING)) { 
+            useAgentForwarding = properties.getBooleanProperty(SshAdaptor.AGENT_FORWARDING);    
+        } else { 
+            useAgentForwarding = adaptor.useAgentForwarding();
         }
 
         createSession();
@@ -241,10 +249,19 @@ class SshMultiplexedSession {
                 throw new InvalidLocationException(SshAdaptor.ADAPTOR_NAME, e.getMessage(), e);
             }
         }
-
+        
         return new SshSession(session, tunnelPort, sessionID);
     }
 
+    /**
+     * Returns if agent forwarding should be used. 
+     * 
+     * @return if agent forwarding should be used.
+     */
+    protected boolean useAgentForwarding() {
+        return useAgentForwarding;
+    }
+    
     /**
      * Get a new exec channel. The channel is not connected yet, because the input and output streams should be set before
      * connecting.
@@ -334,5 +351,5 @@ class SshMultiplexedSession {
         if (gatewaySession != null) {
             gatewaySession.disconnect();
         }
-    }
+    }    
 }

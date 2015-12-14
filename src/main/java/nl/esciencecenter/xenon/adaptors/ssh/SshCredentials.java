@@ -59,6 +59,8 @@ public class SshCredentials implements Credentials {
             throw new CertificateNotFoundException(SshAdaptor.ADAPTOR_NAME, "Certificate file not found: " + certfile);
         }
 
+        // TODO: Allow the agent use to be reconfigured here ?         
+        
         return new SSHCertificateCredentialImplementation(adaptor.getName(), getNewUniqueID(), p, certfile, username, password,
                 adaptor.usingAgent());
     }

@@ -64,6 +64,7 @@ class SshInteractiveProcess implements InteractiveProcess {
         // set the streams first, then connect the channel.
         try {
             streams = new StreamsImplementation(job, channel.getInputStream(), channel.getOutputStream(), channel.getErrStream());
+            channel.setAgentForwarding(session.useAgentForwarding());
             channel.connect();
         } catch (JSchException|IOException e) {
             session.failedExecChannel(channel);
