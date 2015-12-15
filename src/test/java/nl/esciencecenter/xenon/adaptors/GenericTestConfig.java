@@ -43,6 +43,7 @@ public abstract class GenericTestConfig {
     public static Properties getTestProperties(String defaultConfigFilename) throws FileNotFoundException, IOException {
         Properties props = new Properties();
         String configFilename = defaultConfigFilename;
+        
         if (configFilename == null) {
             configFilename = System.getProperty("xenon.test.properties");
         }
@@ -64,10 +65,10 @@ public abstract class GenericTestConfig {
         }
 
         if (configFilename == null) { 
-            props.putAll(System.getProperties());
-        } else { 
-            props.load(new FileInputStream(configFilename));
+            throw new FileNotFoundException("Failed to find any file containing test configuration (default is $CWD/xenon.test.properties)");
         }
+        
+        props.load(new FileInputStream(configFilename));
         return props;
     }
 
