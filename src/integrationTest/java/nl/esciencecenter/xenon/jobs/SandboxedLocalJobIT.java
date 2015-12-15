@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.jobs;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
@@ -58,7 +59,7 @@ public class SandboxedLocalJobIT {
      * Xenon usage example:
      * <ol>
      * <li>Create temporary work directory</li>
-     * <li>Copy `src/test/resources/fixtures/lorem_ipsum.txt` input file to work directory</li>
+     * <li>Copy `/fixtures/lorem_ipsum.txt` input file to work directory</li>
      * <li>Upload input file from work dir to sandbox.</li>
      * <li>Submit `/usr/bin/wc` of sandboxed file to local.</li>
      * <li>Poll job until isDone</li>
@@ -93,8 +94,8 @@ public class SandboxedLocalJobIT {
             files.createDirectory(workdir);
 
             // fill workdir
-            String input_file = System.getProperty("user.dir") + "/src/test/resources/fixtures/lorem_ipsum.txt";
-            files.copy(files.newPath(localrootfs, new RelativePath(input_file)),
+            URL inputURL = SandboxedLocalJobIT.class.getClassLoader().getResource("/fixtures/lorem_ipsum.txt");
+            files.copy(files.newPath(localrootfs, new RelativePath(inputURL.getPath())),
                     files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
             sandbox.addUploadFile(files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")),
