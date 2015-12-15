@@ -393,7 +393,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         UUID tag = UUID.randomUUID();
 
         String[] arguments = SlurmJobScriptGenerator.generateInteractiveArguments(description, fsEntryPath, tag);
-
+        // TODO: Why is there an two step Job creation here ? This leads to a potential race condition if the job is very short...        
         Job interactiveJob = startInteractiveCommand("salloc", arguments);
         
         Job result = findInteractiveJob(tag.toString(), description, interactiveJob);
@@ -422,8 +422,12 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to find interactive jobin queue while its state "
                     + "indicates it is running. state = " + status.getState() + " exit code = " + status.getExitCode(), 
                     status.getException());
-        }     
+        }      
 
+        if (status.isDone() && status.getExitCode() != null && status.getExitCode().equals(0)) {
+            return result;
+        }
+        
         if (status.getExitCode() != null && status.getExitCode().equals(1)) {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job, perhaps some job options are invalid? (e.g. too many nodes, or invalid partition name)");
         }
