@@ -51,7 +51,7 @@ Add Xenon library as a dependency to your project. For a Maven project use
 <dependency>
   <groupId>nl.esciencecenter.xenon</groupId>
   <artifactId>xenon</artifactId>
-  <version>1.1.0-beta1</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
