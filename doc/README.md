@@ -106,13 +106,14 @@ The default `--tests` argument does not work for the docker integration tests in
 
 # Release a new version
 
-1. Update version in `gradle/common.gradle` and `README.md` file
+1. Update version in `gradle/common.gradle`, `README.md` and `doc/README.md` files
 2. Update git master branch
 3. Create a distribution with `./gradlew build`
 4. Create release on https://github.com/NLeSC/Xenon/releases
 5. Upload artifacts to bintray/jcenter with `BINTRAY_USER=<my bintray username> BINTRAY_KEY=<bintray API key> ./gradlew bintrayUpload`
 6. Make version public on bintray
 7. Update website with new version with `./gradlew publishGhPages`
-8. Celebrate
+8. Update related repros such as Xenon-examples, pyXenon, Osmium, etc. 
+9. Celebrate
 
 Website is hosted on Github pages. Each version is a Jekyll blog post.
