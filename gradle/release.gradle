@@ -46,7 +46,7 @@ task versionPost(type: Exec) {
 }
 
 githubPages {
-    repoUri = 'git@github.com:sverhoeven/Xenon.git'
+    repoUri = 'git@github.com:NLeSC/Xenon.git'
     pages {
         from(javadoc) {
             into "versions/$version/javadoc"
