@@ -31,6 +31,8 @@ mkdir -p /var/spool/slurmd.node-3 && \
 mkdir -p /var/spool/slurmd.node-4 && \
 chmod 600 /etc/munge/munge.key && \
 chown root.root /var/lib/munge /etc/munge && \
+touch /var/spool/slurmctld/accounting.txt && \
+chown slurm /var/spool/slurmctld/accounting.txt && \
 chown slurm /var/spool/slurmctld/state && \
 chown slurm /etc/slurm-llnl/slurm.key
 
