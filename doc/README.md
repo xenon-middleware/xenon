@@ -17,7 +17,7 @@ Use `./gradlew tasks` to list all available tasks.
 Prerequisites:
 
 * JDK
-* Gradle, http://gradle.org/
+* Gradle, http://gradle.org/, tested with version 2.9
 
 The dist can be built offline with
 ```
@@ -66,9 +66,9 @@ Prerequisites:
   * 2 Cores (required by some schedulers)
   * Xenon repo not residing on a Virtualbox share
   * Minimal 2Gb RAM
-* Docker, https://www.docker.com/
+* Docker, https://www.docker.com/, tested with version 1.9.1
   * Without sudo
-* Docker compose, https://docs.docker.com/compose/
+* Docker compose, https://docs.docker.com/compose/, tested with version 1.5.0
 
 Integrations tests will be run inside a docker image against several docker containers containing servers for all the Xenon adaptors.
 
