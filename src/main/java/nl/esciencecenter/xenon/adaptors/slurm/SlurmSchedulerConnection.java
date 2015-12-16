@@ -57,19 +57,48 @@ import org.slf4j.LoggerFactory;
 public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
-
+    
+    private static final long SLURM_UPDATE_TIMEOUT = 60*1000; // 30 second update timeout
+    
+    private static final long SLURM_UPDATE_SLEEP = 1000; // 1 second update sleep
+    
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
     private static final String[] VALID_JOB_OPTIONS = new String[] { JOB_OPTION_JOB_SCRIPT };
 
-    private static final String[] FAILED_STATES = new String[] { "FAILED", "CANCELLED", "NODE_FAIL", "TIMEOUT", "PREEMPTED" };
+    /**
+     * These are the states a job can be in when it has failed:
+     * FAILED:    the job terminated with non-zero exit code or other failure condition. 
+     * CANCELLED: the job was explicitly cancelled by the user or system administrator.
+     * NODE_FAIL: the job terminated due to failure of one or more allocated nodes. 
+     * TIMEOUT:   the job terminated upon reaching its time limit.
+     * PREEMPTED: the job terminated due to preemption (a more important job took its place). 
+     * BOOT_FAIL: the job terminated due to a launch failure (typically a hardware failure).
+     */
+    private static final String[] FAILED_STATES = new String[] { "FAILED", "CANCELLED", "NODE_FAIL", "TIMEOUT", "PREEMPTED", "BOOT_FAIL" };
 
+    /**
+     * These are the states a job can be in when it is running:
+     * 
+     * CONFIGURING: the resources are available and being preparing to run the job (for example by booting).
+     * RUNNING:     the resources are running the job.
+     * COMPLETING:  the job is in process of completing. Some processes may have completed, others may still be running.
+     */
+    private static final String[] RUNNING_STATES = new String[] { "CONFIGURING", "RUNNING", "COMPLETING" };
+
+    /**
+     * These are the states a job can be in when it is pending:
+     * 
+     * PENDING:      the job is awaiting resource allocation. 
+     * STOPPED:      the job has an allocation, but execution has been stopped with SIGSTOP signal (allocation is retained).
+     * SUSPENDED:    the job has an allocation, but execution has been suspended (resources have been released for other jobs). 
+     * SPECIAL_EXIT: The job was requeued in a special state. 
+     */
+    private static final String[] PENDING_STATES = new String[] { "PENDING", "STOPPED", "SUSPENDED", "SPECIAL_EXIT" };
+    
+    /** In completed state, the job has terminated and all processes have returned exit code 0. */ 
     private static final String DONE_STATE = "COMPLETED";
-
-    private static final String RUNNING_STATE = "RUNNING";
-
-    private static final String COMPLETING_STATE = "COMPLETING";
-   
+    
     // Retrieve an exit code from the "ExitCode" output field of scontrol
     protected static Integer exitcodeFromString(String value) throws XenonException {
         if (value == null) {
@@ -113,7 +142,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
 
         JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, isRunningState(state),
-                isDoneState(state), jobInfo);
+                isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from sacct output {}", result);
 
@@ -148,7 +177,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
 
         JobStatus result = new JobStatusImplementation(job, state, exitcode, exception, isRunningState(state),
-                isDoneState(state), jobInfo);
+                isDoneOrFailedState(state), jobInfo);
 
         LOGGER.debug("Got job status from scontrol output {}", result);
 
@@ -182,16 +211,63 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         return new QueueStatusImplementation(scheduler, queueName, null, queueInfo);
     }
-
+    
+    /**
+     * Is the given state a running state ? 
+     * 
+     * @param state the state to check
+     * @return if the state is a running state.
+     */
     protected static boolean isRunningState(String state) {
-        return state.equals(RUNNING_STATE) || state.equals(COMPLETING_STATE); 
+        for (String validState : RUNNING_STATES) {
+            if (state.startsWith(validState)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is the given state a pending state ? 
+     * 
+     * @param state the state to check
+     * @return if the state is a pending state.
+     */
+    protected static boolean isPendingState(String state) {
+        for (String validState : PENDING_STATES) {
+            if (state.startsWith(validState)) {
+                return true;
+            }
+        }
+        return false;
     }
     
-    //failed also implies done
-    protected static boolean isDoneState(String state) {
-        return state.equals(DONE_STATE) || isFailedState(state);
+    /**
+     * Is the given state a done or failed state ? 
+     * 
+     * @param state the state to check
+     * @return if the state is a done or failed state.
+     */
+    protected static boolean isDoneOrFailedState(String state) {
+        return isDoneState(state) || isFailedState(state);
     }
 
+    /**
+     * Is the given state a done state ? 
+     * 
+     * @param state the state to check
+     * @return if the state is a done state.
+     */
+    protected static boolean isDoneState(String state) {
+        return state.equals(DONE_STATE);
+    }
+    
+    /**
+     * Is the given state a failed state ? 
+     * 
+     * @param state the state to check
+     * @return if the state is failed state.
+     */    
     protected static boolean isFailedState(String state) {
         for (String validState : FAILED_STATES) {
             if (state.startsWith(validState)) {
@@ -359,14 +435,14 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return new JobImplementation(getScheduler(), jobID, description, false, false);
     }
 
-    private Job findInteractiveJob(String tag, JobDescription description, Job interactiveJob) throws XenonException {
-
-        //get contents of queue (should include job)
-        Map<String, Map<String, String>> queueInfo = getSqueueInfo();
+    private Job findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, JobDescription description, 
+            Job interactiveJob) throws XenonException {
 
         //find job with "tag" as a comment in the job info
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {
-            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag)) {
+            if (entry.getValue().containsKey("COMMENT") && entry.getValue().get("COMMENT").equals(tag) ||
+                entry.getValue().containsKey("Comment") && entry.getValue().get("Comment").equals(tag)) {
+                
                 String jobID = entry.getKey();
                 
                 LOGGER.debug("Found interactive job ID: " + jobID);
@@ -384,6 +460,20 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
         return null;        
     }
+
+    
+    private Job findInteractiveJob(String tag, JobDescription description, Job interactiveJob) throws XenonException {
+
+        // See if the job can be found in the queue.
+        Job result = findInteractiveJobInMap(getSqueueInfo(), tag, description, interactiveJob);
+
+        if (result != null) { 
+            return result;
+        }
+        
+        // See if the job can be found in the accounting.                
+        return findInteractiveJobInMap(getSacctInfo(), tag, description, interactiveJob);
+    }
     
     private Job submitInteractiveJob(JobDescription description) throws XenonException {
         RelativePath fsEntryPath = getFsEntryPath().getRelativePath();
@@ -393,39 +483,43 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         UUID tag = UUID.randomUUID();
 
         String[] arguments = SlurmJobScriptGenerator.generateInteractiveArguments(description, fsEntryPath, tag);
-        // TODO: Why is there an two step Job creation here ? This leads to a potential race condition if the job is very short...        
+
+        // There is a two step job submission here, since we submit a job to via a subscheduler (typically SSH). 
+        // So the job we get back here is the local SSH job that connects to the remote machine running slurm. 
         Job interactiveJob = startInteractiveCommand("salloc", arguments);
         
+        // Next we try to find information on the remote slurm job. Note that this job may not be visible in the queue yet, or
+        // if may already have finished. 
         Job result = findInteractiveJob(tag.toString(), description, interactiveJob);
 
+        long end = System.currentTimeMillis() + SLURM_UPDATE_TIMEOUT; 
+        
+        while (result == null && System.currentTimeMillis() < end) {
+            
+            try { 
+                Thread.sleep(SLURM_UPDATE_SLEEP);
+            } catch (InterruptedException e) { 
+                // ignored
+            }
+            
+            result = findInteractiveJob(tag.toString(), description, interactiveJob);
+        }
+        
         if (result != null) { 
             return result;
         }
-
-        // job not found. Fetch status of interactive job to return as an error.
+        
+        // Failed to find job within timeout. Fetch status of interactive job to return as an error.
         JobStatus status;
+        
         try {
             status = engine.jobs().getJobStatus(interactiveJob);
         } catch (XenonException e) {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job");
         }
 
-        if (status.isRunning()) { 
-            // Finding the job seems to fail sometimes, returning in an exception even though the job is actually running. 
-            // Retry the find...
-            result = findInteractiveJob(tag.toString(), description, interactiveJob);
-
-            if (result != null) { 
-                return result;
-            }
-    
-            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to find interactive jobin queue while its state "
-                    + "indicates it is running. state = " + status.getState() + " exit code = " + status.getExitCode(), 
-                    status.getException());
-        }      
-
-        if (status.isDone() && status.getExitCode() != null && status.getExitCode().equals(0)) {
-            return result;
+        if (status.isDone() && status.hasException()) { 
+            throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job", status.getException());               
         }
         
         if (status.getExitCode() != null && status.getExitCode().equals(1)) {
@@ -433,7 +527,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         }
             
         throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Failed to submit interactive job. Interactive job status is "
-                    + status.getState() + " exit code = " + status.getExitCode(), status.getException());
+                    + status.getState() + " exit code = " + status.getExitCode() + " tag=" + tag.toString(), status.getException());
     }
 
     @Override
@@ -486,16 +580,16 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         return ScriptingParser.parseKeyValuePairs(runner.getStdout(), SlurmAdaptor.ADAPTOR_NAME, "WorkDir=", "Command=");
     }
 
-    private Map<String, Map<String, String>> getSqueueInfo() throws XenonException {
-        String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k");
-
-        return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
-                "*", "~");
-    }
-
     private Map<String, Map<String, String>> getSqueueInfo(Job... jobs) throws XenonException {
-        String squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k", "--jobs="
+        
+        String squeueOutput;
+        
+        if (jobs == null || jobs.length == 0)  {
+            squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k");
+        } else { 
+            squeueOutput = runCheckedCommand(null, "squeue", "--format=%i %P %j %u %T %M %l %D %R %k", "--jobs="
                 + SchedulerConnection.identifiersAsCSList(jobs));
+        }
 
         return ScriptingParser.parseTable(squeueOutput, "JOBID", ScriptingParser.WHITESPACE_REGEX, SlurmAdaptor.ADAPTOR_NAME,
                 "*", "~");
@@ -514,12 +608,20 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             return new HashMap<>();
         }
 
-        //this command will not complain if the job given does not exist
-        //but it may produce output on stderr when it finds non-standard lines in the accounting log
-        RemoteCommandRunner runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
-                + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
-                + "Suspended,Start,User,End,NNodes,Timelimit,Comment,Priority",
-                "--jobs=" + SchedulerConnection.identifiersAsCSList(jobs));
+        RemoteCommandRunner runner;
+        
+        // This command will not complain if the job given does not exist
+        // but it may produce output on stderr when it finds non-standard lines in the accounting log        
+        if (jobs == null || jobs.length == 0) { 
+            runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+                    + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
+                    + "Suspended,Start,User,End,NNodes,Timelimit,Comment,Priority");
+        } else { 
+            runner = runCommand(null, "sacct", "-X", "-p", "--format=JobID,JobName,Partition,NTasks,"
+                    + "Elapsed,State,ExitCode,AllocCPUS,DerivedExitCode,Submit,"
+                    + "Suspended,Start,User,End,NNodes,Timelimit,Comment,Priority",
+                    "--jobs=" + SchedulerConnection.identifiersAsCSList(jobs));
+        }
 
         if (runner.getExitCode() != 0) {
             throw new XenonException(SlurmAdaptor.ADAPTOR_NAME, "Error in getting sacct job status: " + runner);
@@ -528,7 +630,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         if (!runner.getStderr().isEmpty()) {
             LOGGER.warn("Sacct produced error output: " + runner.getStderr());
         }
-
+ 
         return ScriptingParser.parseTable(runner.getStdout(), "JobID", ScriptingParser.BAR_REGEX, SlurmAdaptor.ADAPTOR_NAME, "*",
                 "~");
     }
@@ -655,7 +757,6 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
         synchronized (this) {
             interactiveJob = interactiveJobs.get(job.getIdentifier());
         }
-        
         
         if (interactiveJob == null) {
             throw new NoSuchJobException(SlurmAdaptor.ADAPTOR_NAME, "Unknown Job, or not an interactive job: " + job);

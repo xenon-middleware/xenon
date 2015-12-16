@@ -481,13 +481,13 @@ public class SlurmSchedulerConnectionTest {
  
     @Test
     public void test06_isDoneState() {
-        assertTrue(SlurmSchedulerConnection.isDoneState("COMPLETED"));
+        assertTrue(SlurmSchedulerConnection.isDoneOrFailedState("COMPLETED"));
 
-        assertTrue(SlurmSchedulerConnection.isDoneState("FAILED"));
+        assertTrue(SlurmSchedulerConnection.isDoneOrFailedState("FAILED"));
 
-        assertFalse(SlurmSchedulerConnection.isDoneState("SOMERANDOMSTATE"));
+        assertFalse(SlurmSchedulerConnection.isDoneOrFailedState("SOMERANDOMSTATE"));
 
-        assertFalse(SlurmSchedulerConnection.isDoneState("RUNNING"));
+        assertFalse(SlurmSchedulerConnection.isDoneOrFailedState("RUNNING"));
     }
 
     @Test

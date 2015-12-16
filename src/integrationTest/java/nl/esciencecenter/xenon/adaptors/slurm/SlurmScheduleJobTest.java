@@ -18,6 +18,8 @@ package nl.esciencecenter.xenon.adaptors.slurm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -317,7 +319,11 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             description.setProcessesPerNode(2);
 
             job = jobs.submitJob(scheduler, description);
-
+            
+            if (job == null) { 
+                throw new Exception("Job submission returned null!");
+            }
+            
             Streams streams = jobs.getStreams(job);
             streams.getStdin().close();
 
@@ -344,6 +350,55 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             }
         }
     }
+
+    @Test
+    public void slurm_test07b_interactiveJob() throws Exception {
+        String message = "Hello World! Test Slurm 07b";
+        String workingDir = getWorkingDir("slurm_test07");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = new JobDescription();
+            description.setInteractive(true);
+            description.setWorkingDirectory(workingDir);
+            description.setExecutable("/bin/cat");
+            description.setNodeCount(2);
+            description.setProcessesPerNode(2);
+
+            job = jobs.submitJob(scheduler, description);
+
+            Streams streams = jobs.getStreams(job);
+            
+            PrintWriter w = new PrintWriter(streams.getStdin());
+            w.println(message);
+            w.flush();
+            w.close();
+
+            String out = Utils.readToString(streams.getStdout());
+            String err = Utils.readToString(streams.getStderr());
+
+            logger.debug("got back stdout : {}", out);
+            logger.debug("got back stderr : {}", err);
+
+            String[] lines = out.split("\\r?\\n");
+
+            assertTrue(lines.length == 1);
+            for (String line : lines) {
+                assertTrue(line.equals(message));
+            }
+
+            JobStatus status = jobs.waitUntilDone(job, config.getJobTimeout(30));
+            checkJobDone(status);
+        } finally {
+            try {
+                files.delete(root);
+            } finally {
+                files.close(root.getFileSystem());
+            }
+        }
+    }
+
+    
     
     @Test
     public void slurm_test08_parallel_batchJob_singleProcess() throws Exception {

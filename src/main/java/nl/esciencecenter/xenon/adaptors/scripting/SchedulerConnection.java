@@ -269,8 +269,7 @@ public abstract class SchedulerConnection {
     public Job startInteractiveCommand(String executable, String... arguments) throws XenonException {
         JobDescription description = new JobDescription();
         description.setInteractive(true);
-        description.setQueueName("unlimited");
-        
+        description.setQueueName("unlimited");        
         description.setExecutable(executable);
         description.setArguments(arguments);
 

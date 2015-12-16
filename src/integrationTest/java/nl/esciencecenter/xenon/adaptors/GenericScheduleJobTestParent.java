@@ -194,6 +194,17 @@ public abstract class GenericScheduleJobTestParent {
     }
     
     protected String readFully(Path p) throws XenonException, IOException {
+        
+        long end = System.currentTimeMillis() + 60*1000;
+        
+        while (!files.exists(p) && System.currentTimeMillis() < end) { 
+            try { 
+                Thread.sleep(1000);
+            } catch (InterruptedException e) { 
+                // ignore
+            }
+        }
+        
         return Utils.readToString(files.newInputStream(p));
     }
 

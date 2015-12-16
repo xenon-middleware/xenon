@@ -196,6 +196,9 @@ public class JobQueues {
     }
 
     private JobExecutor findJob(List<JobExecutor> queue, Job job) throws XenonException {
+        
+        LOGGER.debug("{}: findJob for job {}", adaptorName, job.getIdentifier());
+        
         for (JobExecutor e : queue) {
             if (e.getJob().equals(job)) {
                 return e;
@@ -206,10 +209,15 @@ public class JobQueues {
     }
 
     private JobExecutor findJob(Job job) throws XenonException {
+
+        LOGGER.debug("{}: findJob for job {}", adaptorName, job.getIdentifier());
+
         return findJob(findQueue(job.getJobDescription().getQueueName()), job);
     }
 
     private void cleanupJob(List<JobExecutor> queue, Job job) {
+
+        LOGGER.debug("{}: cleanupJob for job {}", adaptorName, job.getIdentifier());
 
         Iterator<JobExecutor> itt = queue.iterator();
 
@@ -394,6 +402,9 @@ public class JobQueues {
         }
 
         if (copyOfDescription.isInteractive()) {
+        
+            LOGGER.debug("{}: Waiting for interactive job in queue {} to start.", adaptorName, queueName);
+
             executor.waitUntilRunning(0);
 
             if (executor.isDone() && !executor.hasRun()) {
