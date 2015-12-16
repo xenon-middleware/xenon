@@ -94,7 +94,7 @@ public class SandboxedLocalJobIT {
             files.createDirectory(workdir);
 
             // fill workdir
-            URL inputURL = SandboxedLocalJobIT.class.getClassLoader().getResource("/fixtures/lorem_ipsum.txt");
+            URL inputURL = SandboxedLocalJobIT.class.getResource("/fixtures/lorem_ipsum.txt");
             files.copy(files.newPath(localrootfs, new RelativePath(inputURL.getPath())),
                     files.newPath(localrootfs, new RelativePath(workFn + "/lorem_ipsum.txt")));
 
