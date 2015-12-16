@@ -13,6 +13,7 @@ Notable changes compared to v1.0.0:
 - added support for SSH agent and agent proxies
 - added a -lot- of unit and integration tests
 - javadoc is java 8 compliant.
+- the adaptor documentation is now part of the javadoc.
 - Xenon releases are now available in jCenter.
 - switched from and ant to gradle based build system, this is reflected in the directory structure 
 - split unit and integration tests
