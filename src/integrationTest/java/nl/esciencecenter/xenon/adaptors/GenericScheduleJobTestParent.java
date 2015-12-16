@@ -432,7 +432,7 @@ public abstract class GenericScheduleJobTestParent {
         Streams streams = jobs.getStreams(job);
         
         PrintWriter w = new PrintWriter(streams.getStdin());
-        w.println(message);
+        w.print(message);
         w.flush();
         w.close();
 
