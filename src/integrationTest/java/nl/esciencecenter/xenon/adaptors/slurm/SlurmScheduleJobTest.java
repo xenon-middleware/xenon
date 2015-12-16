@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.slurm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
