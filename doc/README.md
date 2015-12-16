@@ -1,5 +1,18 @@
-- [Xenon development](#xenon-development)
-- [Offline build](#offline-build)
+# Xenon development documentation
+
+This documentation is only intended for developers working on Xenon itself. 
+
+For more information, examples and a tutorial on how to use the Xenon library see <https://github.com/NLeSC/Xenon-examples>.
+
+The javadoc aimed at users of the Xenon library is available at <http://nlesc.github.io/Xenon/versions/1.1.0/javadoc>.
+
+The javadoc aimed at developers of the Xenon library is available at <http://nlesc.github.io/Xenon/versions/1.1.0/javadoc-devel>.
+
+
+
+
+- [Building Xenon online](#building-xenon-online)
+- [Building Xenon offline](#building-xenon-offline)
 	- [Update offline jars](#update-offline-jars)
 - [Integration tests](#integration-tests)
 	- [Using live systems](#using-live-systems)
@@ -7,12 +20,12 @@
 		- [Filtering tests](#filtering-tests)
 - [Release a new version](#release-a-new-version)
 
-# Xenon development
+# Building Xenon online
 
 Xenon uses the Gradle build automation tool.
 Use `./gradlew tasks` to list all available tasks.
 
-# Offline build
+# Building Xenon offline
 
 Prerequisites:
 
