@@ -1,7 +1,20 @@
+# eclipse
 /.classpath
 /.project
 /.settings
-/tmp_eclipse
-/dist
-/bin
-build
+
+# intellij
+/.idea
+/*.iml
+
+# gradle
+/build
+/.gradle
+
+# integration tests
+xenon.test.properties
+/xenon_test
+
+# docker cache
+.docker-test-cache-set
+/bin/

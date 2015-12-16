@@ -1,0 +1,85 @@
+// Depends on plugins:
+//    id 'org.hidetake.ssh' version '1.1.3'
+//    id 'jacoco'
+
+//      TEST
+// ==============
+// integrationTest itself is defined in common.gradle.
+
+task prepareIntegrationTest(dependsOn: testPropertiesFileExists) {
+    description "Set up files and directories to run integration tests"
+    def integrationTestProperties = new Properties()
+    doFirst {
+        xenonPropertiesFile.withReader { reader ->
+            integrationTestProperties.load(reader)
+            if (integrationTestProperties.getProperty('test.ssh.location') == null) {
+                throw new GradleException('SSH test location not set in ' + xenonPropertiesFile + '. Set the test.ssh.location property.');
+            }
+            if (integrationTestProperties.getProperty('test.ssh.user') == null) {
+                throw new GradleException('SSH test user not set in ' + xenonPropertiesFile + '. Set the test.ssh.user property.');
+            }
+            if (integrationTestProperties.getProperty('test.ssh.password') == null) {
+                throw new GradleException('SSH test password not set in ' + xenonPropertiesFile + '. Set the test.ssh.password property.');
+            }
+        }
+    }
+
+    doLast {
+        def testDir = file('build/integrationTest')
+        testDir.mkdir()
+
+        def create_symlinks = file('src/integrationTest/resources/scripts/create_symlinks')
+
+        // Initialize testing symlinks locally
+        exec {
+            workingDir testDir
+            executable = '/bin/bash'
+            args = [create_symlinks.absolutePath]
+        }
+
+        // Initialize testing symlinks on remote side
+        ssh.run {
+            session(host: integrationTestProperties.getProperty("test.ssh.location"),
+                    user: integrationTestProperties.getProperty("test.ssh.user"),
+                    // TODO use privata key instead of password,
+                    // so we dont need to have password in cleartext
+                    //identity: file(userProps.getProperty("test.ssh.identity")),
+                    password: integrationTestProperties.getProperty("test.ssh.password")
+                    ) {
+                shell interaction: {
+                    create_symlinks.withInputStream { stream ->
+                        standardInput << stream << '\n' << 'exit 0' << '\n'
+                    }
+                }
+            }
+        }
+    }
+}
+
+//Ensure that integration tests are prepared
+integrationTest.dependsOn prepareIntegrationTest
+integrationTest.group = 'Verification'
+integrationTest.description = 'Run the integration tests.'
+
+//    COVERAGE
+// ==============
+
+jacocoTestReport {
+    description 'Generate coverage report of unit tests'
+    group 'Code coverage reporting'
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+        html.enabled = true
+    }
+}
+
+task jacocoIntegrationTestReport(type: JacocoReport){
+    description 'Generate coverage report of integration tests'
+    group 'Code coverage reporting'
+    executionData integrationTest
+    sourceSets sourceSets.main
+    reports {
+        xml.enabled = true // codecov depends on xml format report
+        html.enabled = true
+    }
+}

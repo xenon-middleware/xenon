@@ -1,0 +1,27 @@
+// Check coding style with PMD
+// Depends on plugins:
+//    id 'pmd'
+
+dependencies {
+    pmd(
+        'net.sourceforge.pmd:pmd-core:5.4.0',
+        'net.sourceforge.pmd:pmd-java:5.4.0'
+    )
+}
+
+pmd {
+    // TODO: remove when PMD warnings are fixed
+    ignoreFailures = true
+
+    toolVersion = '5.4.0'
+    ruleSets = []
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+pmdTest {
+    ruleSetFiles = files("config/pmd/test_ruleset.xml")
+}
+
+pmdIntegrationTest {
+    ruleSetFiles = files("config/pmd/test_ruleset.xml")
+}
