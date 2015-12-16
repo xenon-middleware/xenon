@@ -301,7 +301,7 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             cleanupJobRecursive(root);
         }
     }
-
+/*
     @Test
     public void slurm_test07_interactiveJob() throws Exception {
         String message = "Hello World! Test Slurm 07";
@@ -349,9 +349,9 @@ public class SlurmScheduleJobTest extends GenericScheduleJobTestParent {
             }
         }
     }
-
+*/
     @Test
-    public void slurm_test07b_interactiveJob() throws Exception {
+    public void slurm_test07_interactiveJob() throws Exception {
         String message = "Hello World! Test Slurm 07b";
         String workingDir = getWorkingDir("slurm_test07");
         Path root = initJobDirectory(workingDir);

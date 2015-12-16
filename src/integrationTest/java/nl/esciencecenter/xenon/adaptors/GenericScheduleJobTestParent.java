@@ -24,6 +24,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 import nl.esciencecenter.xenon.JobException;
@@ -334,6 +335,28 @@ public abstract class GenericScheduleJobTestParent {
     }
 
     /**
+     * Job description to echo a message.
+     * Does not set stderr and stdout files. In Windows, this prints the hostname, not the message.
+     *
+     * @param workingDir directory to run in
+     * @param message message to print, if not in Windows.
+     * @return generated job description
+     */
+    protected JobDescription catJobDescription(String workingDir, String message) {
+        JobDescription description = new JobDescription();
+        
+        if (config.targetIsWindows()) { 
+            description.setExecutable("hostname");
+        } else { 
+            description.setExecutable("/bin/cat");
+        }
+
+        description.setWorkingDirectory(workingDir);
+        return description;
+    }
+
+    
+    /**
      * Job description that takes approximately a fixed time.
      * Does not set stderr and stdout files.
      *
@@ -397,7 +420,7 @@ public abstract class GenericScheduleJobTestParent {
 
         String message = "Hello World! test30";
 
-        JobDescription description = echoJobDescription(null, message);
+        JobDescription description = catJobDescription(null, message);
         description.setInteractive(true);
 
         logger.info("Submitting interactive job to " + scheduler.getScheme() + "://" + scheduler.getLocation());
@@ -407,7 +430,11 @@ public abstract class GenericScheduleJobTestParent {
         logger.info("Interactive job submitted to " + scheduler.getScheme() + "://" + scheduler.getLocation());
 
         Streams streams = jobs.getStreams(job);
-        streams.getStdin().close();
+        
+        PrintWriter w = new PrintWriter(streams.getStdin());
+        w.println(message);
+        w.flush();
+        w.close();
 
         String out = Utils.readToString(streams.getStdout());
         String err = Utils.readToString(streams.getStderr());
