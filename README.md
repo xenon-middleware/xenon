@@ -7,6 +7,7 @@ Xenon
 [![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
 [![GitHub license](https://img.shields.io/github/license/NLeSC/Xenon.svg?style=flat-square)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 [![Download](https://api.bintray.com/packages/nlesc/xenon/xenon/images/download.svg) ](https://bintray.com/nlesc/xenon/xenon/_latestVersion)
+[![DOI](https://zenodo.org/badge/19641/NLeSC/Xenon.svg)](https://zenodo.org/badge/latestdoi/19641/NLeSC/Xenon)
 
 Copyright 2013 The Netherlands eScience Center
 
