@@ -5,7 +5,7 @@ Xenon
 [![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=master)](https://travis-ci.org/NLeSC/Xenon)
 [![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
-[![GitHub license](https://camo.githubusercontent.com/9ba23549a15562f17a9645efff771dfc06b9075b/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6c6963656e73652f4e4c6553432f58656e6f6e2e7376673f7374796c653d666c61742d737175617265)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 [![Download](https://api.bintray.com/packages/nlesc/xenon/xenon/images/download.svg) ](https://bintray.com/nlesc/xenon/xenon/_latestVersion)
 [![DOI](https://zenodo.org/badge/19641/NLeSC/Xenon.svg)](https://zenodo.org/badge/latestdoi/19641/NLeSC/Xenon)
 
