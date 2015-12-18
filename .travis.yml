@@ -17,26 +17,18 @@ matrix:
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
+        - INTEGRATION_TEST=0
         - JDK=openjdk7
       sudo: false
     - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
+        - INTEGRATION_TEST=0
         - JDK=oraclejdk8
       sudo: false
   # Stop when one of the Java versions do not work
   fast_finish: true
-
-# Install documentation dependencies
-addons:
-  apt_packages:
-    - pandoc
-    - texlive
-    - texlive-latex-extra
-    - texlive-font-utils
-    - inkscape
-    - lmodern
 
 # Install Docker compose
 before_install:
