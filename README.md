@@ -2,8 +2,8 @@
 Xenon
 =====
 
-[![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=master)](https://travis-ci.org/NLeSC/Xenon)
-[![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=master)](https://codecov.io/github/NLeSC/Xenon?branch=master)
+[![Build Status](https://travis-ci.org/NLeSC/Xenon.svg?branch=develop)](https://travis-ci.org/NLeSC/Xenon)
+[![codecov.io](https://codecov.io/github/NLeSC/Xenon/coverage.svg?branch=develop)](https://codecov.io/github/NLeSC/Xenon?branch=develop)
 [![Codacy Badge](https://api.codacy.com/project/badge/457da68977d1406c9ea93d340720d340)](https://www.codacy.com/app/NLeSC/Xenon)
 [![GitHub license](https://img.shields.io/badge/license-Apache--2.0%20-blue.svg)](https://github.com/NLeSC/Xenon/blob/master/LICENSE)
 [![Download](https://api.bintray.com/packages/nlesc/xenon/xenon/images/download.svg) ](https://bintray.com/nlesc/xenon/xenon/_latestVersion)
