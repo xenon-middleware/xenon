@@ -16,7 +16,7 @@ public class WebdavLocation extends Location {
     public WebdavLocation(String location, String scheme) throws InvalidLocationException {
         this(location);
         if (getScheme() == null) {
-            //setScheme(scheme); // TODO: this method doesn't exist yet.
+            //setScheme(scheme); // TODO: this method doesn't exist yet. Also, this is somewhat weird maybe considering the super with scheme parameter exists nowadays.
         }
     }
 
@@ -28,11 +28,6 @@ public class WebdavLocation extends Location {
     @Override
     protected int getDefaultPort() {
         return WebdavAdaptor.DEFAULT_PORT;
-    }    
-
-    @Override
-    public String toString() {
-        return super.toString() + getPath();
     }
 
     public static WebdavLocation parse(String location) throws InvalidLocationException {
