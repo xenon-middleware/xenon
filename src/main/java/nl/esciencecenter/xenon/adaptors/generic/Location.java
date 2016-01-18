@@ -126,6 +126,6 @@ public abstract class Location {
     }
 
     public String getPath() {
-        return this.path;
+        return path;
     }
 }
