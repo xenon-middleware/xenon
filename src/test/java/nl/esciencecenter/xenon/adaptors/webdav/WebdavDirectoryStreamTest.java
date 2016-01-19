@@ -22,8 +22,18 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.junit.Test;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.engine.files.FilesEngine;
+import nl.esciencecenter.xenon.engine.files.PathImplementation;
+import nl.esciencecenter.xenon.files.FileSystem;
+import nl.esciencecenter.xenon.files.Path;
+import nl.esciencecenter.xenon.files.RelativePath;
 
 /**
  * @author Christiaan Meijer <C.Meijer@esciencecenter.nl>
@@ -87,6 +97,73 @@ public class WebdavDirectoryStreamTest {
         List<String> parentElements = new LinkedList<String>(Arrays.asList(new String("a")));
         boolean cleaned = WebdavDirectoryStream.isSame(entryElements, parentElements);
         assertTrue(cleaned);
+    }
+
+    @Test
+    public void next_responseOtherAsPath_correctResult() throws XenonException {
+        Path dir = new PathImplementation(getDummyFileSystem(), new RelativePath("/public/xenon/"));
+        List<MultiStatusResponse> listing = new LinkedList<MultiStatusResponse>();
+        listing.add(new MultiStatusResponse("/public/xenon/sub1/", 200));
+        WebdavDirectoryStream webdavDirectoryStream = new WebdavDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER, listing);
+        Path path = webdavDirectoryStream.next();
+        assertEquals("RelativePath [element=[public, xenon, sub1], seperator=/]", path.getRelativePath().toString());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void next_responseSameAsPath_zeroResults() throws XenonException {
+        Path dir = new PathImplementation(getDummyFileSystem(), new RelativePath("/public/xenon/"));
+        List<MultiStatusResponse> listing = new LinkedList<MultiStatusResponse>();
+        listing.add(new MultiStatusResponse("/public/xenon/", 200));
+        WebdavDirectoryStream webdavDirectoryStream = new WebdavDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER, listing);
+        webdavDirectoryStream.next();
+    }
+
+    @Test
+    public void next_responseNestedSimilarAsPath_oneResult() throws XenonException {
+        Path dir = new PathImplementation(getDummyFileSystem(), new RelativePath("/public/xenon/"));
+        List<MultiStatusResponse> listing = new LinkedList<MultiStatusResponse>();
+        listing.add(new MultiStatusResponse("/public/xenon/public/xenon/", 200));
+        WebdavDirectoryStream webdavDirectoryStream = new WebdavDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER, listing);
+        webdavDirectoryStream.next();
+    }
+
+    @Test
+    public void next_responseSubstringOfPath_oneResult() throws XenonException {
+        Path dir = new PathImplementation(getDummyFileSystem(), new RelativePath("/public/xenon/public/xenon/"));
+        List<MultiStatusResponse> listing = new LinkedList<MultiStatusResponse>();
+        listing.add(new MultiStatusResponse("/public/xenon/", 200));
+        WebdavDirectoryStream webdavDirectoryStream = new WebdavDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER, listing);
+        Path path = webdavDirectoryStream.next();
+    }
+
+    private FileSystem getDummyFileSystem() {
+        return new FileSystem() {
+
+            @Override
+            public String getScheme() {
+                return null;
+            }
+
+            @Override
+            public Map<String, String> getProperties() {
+                return null;
+            }
+
+            @Override
+            public String getLocation() {
+                return null;
+            }
+
+            @Override
+            public Path getEntryPath() {
+                return null;
+            }
+
+            @Override
+            public String getAdaptorName() {
+                return null;
+            }
+        };
     }
 
 }
