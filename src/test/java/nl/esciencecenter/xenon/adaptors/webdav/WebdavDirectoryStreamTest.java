@@ -17,9 +17,7 @@
 package nl.esciencecenter.xenon.adaptors.webdav;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,64 +38,6 @@ import nl.esciencecenter.xenon.files.RelativePath;
  *
  */
 public class WebdavDirectoryStreamTest {
-    @Test
-    public void clean_empty_returnsNoElements() {
-        String path = "";
-        List<String> cleaned = WebdavDirectoryStream.clean(path);
-        assertEquals(0, cleaned.size());
-    }
-
-    @Test
-    public void clean_onlyDoubleSlash_returnsNoElements() {
-        String path = "//";
-        List<String> cleaned = WebdavDirectoryStream.clean(path);
-        assertEquals(0, cleaned.size());
-    }
-
-    @Test
-    public void clean_onlySlash_returnsNoElements() {
-        String path = "/";
-        List<String> cleaned = WebdavDirectoryStream.clean(path);
-        assertEquals(0, cleaned.size());
-    }
-
-    @Test
-    public void clean_slashText_returns1Element() {
-        String path = "/text";
-        List<String> cleaned = WebdavDirectoryStream.clean(path);
-        assertEquals(1, cleaned.size());
-    }
-
-    @Test
-    public void clean_slashText_returnsCorrectElement() {
-        String path = "/text";
-        List<String> cleaned = WebdavDirectoryStream.clean(path);
-        assertEquals("text", cleaned.get(0));
-    }
-
-    @Test
-    public void clean_completeUrl_returnsCorrectNumberOfElements() {
-        String path = "http://stackoverflow.com/questions/13565876/remove-all-occurrences-of-an-element-from-arraylist";
-        List<String> cleaned = WebdavDirectoryStream.clean(path);
-        assertEquals(4, cleaned.size());
-    }
-
-    @Test
-    public void isSame_sameString_returnTrue() {
-        String element = new String("a");
-        List<String> entryElements = new LinkedList<String>(Arrays.asList(element));
-        List<String> parentElements = new LinkedList<String>(Arrays.asList(element));
-        boolean cleaned = WebdavDirectoryStream.isSame(entryElements, parentElements);
-        assertTrue(cleaned);
-    }
-
-    @Test
-    public void isSame_differentStringsInstancesSameValue_returnTrue() {
-        List<String> entryElements = new LinkedList<String>(Arrays.asList(new String("a")));
-        List<String> parentElements = new LinkedList<String>(Arrays.asList(new String("a")));
-        boolean cleaned = WebdavDirectoryStream.isSame(entryElements, parentElements);
-        assertTrue(cleaned);
-    }
 
     @Test
     public void next_responseOtherAsPath_correctResult() throws XenonException {
@@ -127,13 +67,14 @@ public class WebdavDirectoryStreamTest {
         webdavDirectoryStream.next();
     }
 
-    @Test
-    public void next_responseSubstringOfPath_oneResult() throws XenonException {
+    @Test(expected = IllegalArgumentException.class)
+    public void next_responseSubstringOfPath_throw() throws XenonException {
+        // Response must be longer or equal than path so it can't be a substring.
         Path dir = new PathImplementation(getDummyFileSystem(), new RelativePath("/public/xenon/public/xenon/"));
         List<MultiStatusResponse> listing = new LinkedList<MultiStatusResponse>();
         listing.add(new MultiStatusResponse("/public/xenon/", 200));
         WebdavDirectoryStream webdavDirectoryStream = new WebdavDirectoryStream(dir, FilesEngine.ACCEPT_ALL_FILTER, listing);
-        Path path = webdavDirectoryStream.next();
+        webdavDirectoryStream.next();
     }
 
     private FileSystem getDummyFileSystem() {
