@@ -25,20 +25,6 @@ public class WebdavFileAttributes implements FileAttributes {
         }
 
         this.properties = properties;
-
-        printProperties(properties);
-    }
-
-    private void printProperties(DavPropertySet properties) {
-        System.out.println("***** Printing out properties *****");
-        for (DavPropertyName propertyName : properties.getPropertyNames()) {
-            DavProperty<?> davProperty = properties.get(propertyName);
-            String name = propertyName == null ? "null" : propertyName.getName();
-            String valueDescription = davProperty.getValue() == null ? "nullvalue" : davProperty.getValue().toString();
-            String classDescription = davProperty.getValue() == null ? "nullClass" : davProperty.getValue().getClass().toString();
-            System.out.println(name + " with value " + valueDescription + " and class " + classDescription);
-        }
-        System.out.println("***** End *****");
     }
 
     private Object getProperty(String name) {

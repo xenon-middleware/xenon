@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,6 +68,7 @@ public class WebdavFiles implements Files {
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     private static int currentID = 1;
+    static int OK = 200;
 
     private static synchronized String getNewUniqueID() {
         String res = "webdav" + currentID;
@@ -314,15 +317,16 @@ public class WebdavFiles implements Files {
         if (filter == null) {
             throw new XenonException(adaptor.getName(), "Filter cannot be null.");
         }
-        assertExists(path);
-        MultiStatusResponse[] responses = executePropFindMethod(path);
 
-        DirectoryStream<Path> result = new WebdavDirectoryStream(path, filter, Arrays.asList(responses));
+        List<MultiStatusResponse> responses = listDirectory(path);
+
+        DirectoryStream<Path> result = new WebdavDirectoryStream(path, filter, responses);
         LOGGER.debug("newDirectoryStream OK");
         return result;
     }
 
-    private MultiStatusResponse[] executePropFindMethod(Path path) throws XenonException {
+    private List<MultiStatusResponse> listDirectory(Path path) throws XenonException {
+        assertExists(path);
         HttpClient client = getFileSystemByPath(path);
         String folderPath = toFolderPath(path.toString());
         PropFindMethod method = null;
@@ -333,7 +337,7 @@ public class WebdavFiles implements Files {
             throwDirectoryListingException(folderPath, e);
         }
         MultiStatusResponse[] responses = getResponsesFromPropFindMethod(folderPath, method);
-        return responses;
+        return new LinkedList<>(Arrays.asList(responses));
     }
 
     private MultiStatusResponse[] getResponsesFromPropFindMethod(String folderPath, PropFindMethod method) throws XenonException {
@@ -352,13 +356,21 @@ public class WebdavFiles implements Files {
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
-        return null;
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path) throws XenonException {
+        LOGGER.debug("newAttributesDirectoryStream path = {}", path);
+        return newAttributesDirectoryStream(path, FilesEngine.ACCEPT_ALL_FILTER);
     }
 
     @Override
-    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, Filter filter) throws XenonException {
-        return null;
+    public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path path, Filter filter) throws XenonException {
+        LOGGER.debug("newAttributesDirectoryStream path = {} filter = <?>", path);
+        if (path == null) {
+            throw new XenonException(adaptor.getName(), "Cannot open attribute directory stream of null path");
+        }
+        if (filter == null) {
+            throw new XenonException(adaptor.getName(), "Filter cannot be null.");
+        }
+        return new WebdavDirectoryAttributeStream(path, filter, listDirectory(path));
     }
 
     @Override
@@ -416,7 +428,7 @@ public class WebdavFiles implements Files {
         MultiStatusResponse[] responses = document.getResponses();
         DavPropertySet properties = null;
         for (MultiStatusResponse multiStatusResponse : responses) {
-            properties = multiStatusResponse.getProperties(200);
+            properties = multiStatusResponse.getProperties(OK);
         }
         return properties;
     }
