@@ -18,17 +18,18 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * @author Christiaan Meijer <C.Meijer@esciencecenter.nl>
@@ -39,6 +40,7 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
     private static final String NONEXISTENTPARENT_NEWDIR_PATH = "/public/nonexistentparent/newdir";
     private static final String NEWFILE_PATH = "/public/newfile";
     private static final String NEWDIR_PATH = "/public/xenonnewdir";
+    private static final String NEWFILE_IN_NEWDIR_PATH = "/public/xenonnewdir/newfile";
     private static final String NONEXISTENT_PATH = "/public/nonexistent.txt";
     private static final String DIR_PATH = "/public/sub";
     private static final String FILE_PATH = "/public/bla5.txt";
@@ -121,15 +123,6 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void delete_newFile_noFileExists() throws Exception {
-        FileSystem fs = config.getTestFileSystem(files, credentials);
-        Path path = files.newPath(fs, new RelativePath(NEWFILE_PATH));
-        files.createFile(path);
-        files.delete(path);
-        assertFalse(files.exists(path));
-    }
-
-    @Test
     public void createDir_newDir_fileExists() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         Path path = files.newPath(fs, new RelativePath(NEWDIR_PATH));
@@ -139,12 +132,32 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
     }
 
     @Test
+    public void delete_newFile_noFileExists() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path path = files.newPath(fs, new RelativePath(NEWFILE_PATH));
+        files.createFile(path);
+        files.delete(path);
+        assertFalse(files.exists(path));
+    }
+
+    @Test
     public void delete_newDir_noDirectoryExists() throws Exception {
         FileSystem fs = config.getTestFileSystem(files, credentials);
         Path path = files.newPath(fs, new RelativePath(NEWDIR_PATH));
         files.createDirectory(path);
         files.delete(path);
         assertFalse(files.exists(path));
+    }
+
+    @Ignore
+    @Test(expected = XenonException.class)
+    public void delete_dirWithFile_throw() throws Exception {
+        FileSystem fs = config.getTestFileSystem(files, credentials);
+        Path dirPath = files.newPath(fs, new RelativePath(NEWDIR_PATH));
+        Path filePath = files.newPath(fs, new RelativePath(NEWFILE_IN_NEWDIR_PATH));
+        files.createDirectory(dirPath);
+        files.createFile(filePath);
+        files.delete(dirPath);
     }
 
     @Test(expected = XenonException.class)

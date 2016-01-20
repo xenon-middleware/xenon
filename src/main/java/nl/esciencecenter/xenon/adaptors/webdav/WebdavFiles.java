@@ -9,6 +9,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.apache.jackrabbit.webdav.DavConstants;
+import org.apache.jackrabbit.webdav.DavException;
+import org.apache.jackrabbit.webdav.MultiStatus;
+import org.apache.jackrabbit.webdav.MultiStatusResponse;
+import org.apache.jackrabbit.webdav.client.methods.DavMethod;
+import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
+import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
+import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
+import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
+import org.apache.jackrabbit.webdav.client.methods.PutMethod;
+import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.property.DavPropertySet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -33,36 +59,9 @@ import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpConnectionManager;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.jackrabbit.webdav.DavConstants;
-import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.MultiStatus;
-import org.apache.jackrabbit.webdav.MultiStatusResponse;
-import org.apache.jackrabbit.webdav.client.methods.DavMethod;
-import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
-import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
-import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
-import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
-import org.apache.jackrabbit.webdav.client.methods.PutMethod;
-import org.apache.jackrabbit.webdav.property.DavProperty;
-import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
-import org.apache.jackrabbit.webdav.property.DavPropertySet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class WebdavFiles implements Files {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebdavFiles.class);
-    private WebdavAdaptor adaptor;
+    private final WebdavAdaptor adaptor;
 
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
@@ -312,39 +311,44 @@ public class WebdavFiles implements Files {
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path path, Filter filter) throws XenonException {
         LOGGER.debug("newDirectoryStream path = {} filter = <?>", path);
+        if (filter == null) {
+            throw new XenonException(adaptor.getName(), "Filter cannot be null.");
+        }
         assertExists(path);
+        MultiStatusResponse[] responses = executePropFindMethod(path);
+
+        DirectoryStream<Path> result = new WebdavDirectoryStream(path, filter, Arrays.asList(responses));
+        LOGGER.debug("newDirectoryStream OK");
+        return result;
+    }
+
+    private MultiStatusResponse[] executePropFindMethod(Path path) throws XenonException {
         HttpClient client = getFileSystemByPath(path);
         String folderPath = toFolderPath(path.toString());
-
-        DavMethod method = null;
+        PropFindMethod method = null;
         try {
             method = new PropFindMethod(folderPath, DavConstants.PROPFIND_ALL_PROP, DavConstants.DEPTH_1);
             client.executeMethod(method);
         } catch (IOException e) {
-            throw new XenonException(adaptor.getName(), "Could not create directory listing of " + folderPath, e);
+            throwDirectoryListingException(folderPath, e);
         }
+        MultiStatusResponse[] responses = getResponsesFromPropFindMethod(folderPath, method);
+        return responses;
+    }
 
+    private MultiStatusResponse[] getResponsesFromPropFindMethod(String folderPath, PropFindMethod method) throws XenonException {
         MultiStatus multiStatus = null;
         try {
             multiStatus = method.getResponseBodyAsMultiStatus();
         } catch (IOException | DavException e) {
-            throw new XenonException(adaptor.getName(), "Could not create directory listing of " + folderPath, e);
+            throwDirectoryListingException(folderPath, e);
         }
         MultiStatusResponse[] responses = multiStatus.getResponses();
-        System.out.println("********* Requested path is " + path.toString());
-        System.out.println("********* Corrected path is " + folderPath);
-        System.out.println("********* Folders and files in " + folderPath + ":");
-        for (MultiStatusResponse response : responses) {
-            System.out.println("*********   # Element path: " + response.getHref());
-            for (DavProperty a : response.getProperties(200)) {
-                //                System.out.println("*********     o " + a.getName() + " = " + a.getValue());
-            }
-        }
+        return responses;
+    }
 
-        DirectoryStream<Path> result = new WebdavDirectoryStream(path, filter, Arrays.asList(responses));
-
-        LOGGER.debug("newDirectoryStream OK");
-        return result;
+    private void throwDirectoryListingException(String folderPath, Exception e) throws XenonException {
+        throw new XenonException(adaptor.getName(), "Could not create directory listing of " + folderPath, e);
     }
 
     @Override
@@ -429,8 +433,18 @@ public class WebdavFiles implements Files {
     public void end() {
     }
 
-    private void assertIsEmpty(Path path) {
-        // TODO throw if path not empty
+    private void assertIsEmpty(Path path) throws XenonException {
+        DirectoryStream<Path> newDirectoryStream = newDirectoryStream(path);
+        boolean isEmpty = newDirectoryStream.iterator().hasNext() == false;
+        try {
+            newDirectoryStream.close();
+        } catch (IOException e) {
+            LOGGER.warn("Could not close stream at {} because of IOException with message \"{}\"", path.toString(),
+                    e.getMessage());
+        }
+        if (isEmpty == false) {
+            throw new XenonException(adaptor.getName(), "Path is not empty: " + path.getRelativePath().getAbsolutePath());
+        }
     }
 
     private void assertExists(Path path) throws XenonException {
