@@ -21,6 +21,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
@@ -229,7 +230,7 @@ public class WebdavFiles implements Files {
         LOGGER.debug("createDirectory OK");
     }
 
-    private static void executeMethod(HttpClient client, DavMethod method) throws IOException, HttpException {
+    private static void executeMethod(HttpClient client, HttpMethod method) throws IOException, HttpException {
         int response = client.executeMethod(method);
         String responseBodyAsString = method.getStatusLine().toString();
         method.releaseConnection();
@@ -375,7 +376,22 @@ public class WebdavFiles implements Files {
 
     @Override
     public InputStream newInputStream(Path path) throws XenonException {
-        return null;
+        assertExists(path);
+        String filePath = toFilePath(path.toString());
+        if (getAttributes(path).isDirectory()) {
+            String message = "Cannot open input stream from a directory: " + filePath;
+            throw new XenonException(adaptor.getName(), message);
+        }
+        HttpClient client = getFileSystemByPath(path);
+        GetMethod method = new GetMethod(filePath);
+        try {
+            executeMethod(client, method);
+            client.executeMethod(method);
+            InputStream stream = method.getResponseBodyAsStream();
+            return stream;
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not open inputstream to " + filePath, e);
+        }
     }
 
     @Override
@@ -455,7 +471,7 @@ public class WebdavFiles implements Files {
                     e.getMessage());
         }
         if (isEmpty == false) {
-            throw new XenonException(adaptor.getName(), "Path is not empty: " + path.getRelativePath().getAbsolutePath());
+            throw new XenonException(adaptor.getName(), "Path is not empty: " + path.toString());
         }
     }
 
