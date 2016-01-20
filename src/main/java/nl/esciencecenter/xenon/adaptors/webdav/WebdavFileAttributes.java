@@ -3,18 +3,19 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
-import nl.esciencecenter.xenon.files.FileAttributes;
-import nl.esciencecenter.xenon.files.PosixFilePermission;
-
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.joda.time.DateTime;
 
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.files.AttributeNotSupportedException;
+import nl.esciencecenter.xenon.files.FileAttributes;
+import nl.esciencecenter.xenon.files.PosixFilePermission;
+
 public class WebdavFileAttributes implements FileAttributes {
     static private final String CREATION_DATE_KEY = "creationdate";
+    static private final String MODIFIED_DATE_KEY = "getlastmodified";
 
     protected DavPropertySet properties;
 
@@ -29,6 +30,7 @@ public class WebdavFileAttributes implements FileAttributes {
     }
 
     private void printProperties(DavPropertySet properties) {
+        System.out.println("***** Printing out properties *****");
         for (DavPropertyName propertyName : properties.getPropertyNames()) {
             DavProperty<?> davProperty = properties.get(propertyName);
             String name = propertyName == null ? "null" : propertyName.getName();
@@ -36,6 +38,7 @@ public class WebdavFileAttributes implements FileAttributes {
             String classDescription = davProperty.getValue() == null ? "nullClass" : davProperty.getValue().getClass().toString();
             System.out.println(name + " with value " + valueDescription + " and class " + classDescription);
         }
+        System.out.println("***** End *****");
     }
 
     private Object getProperty(String name) {
@@ -76,12 +79,30 @@ public class WebdavFileAttributes implements FileAttributes {
 
     @Override
     public long lastAccessTime() {
-        return 0;
+        return lastModifiedTime();
     }
 
     @Override
     public long lastModifiedTime() {
-        return 0;
+        DateTime dateTime = tryGetLastModifiedTime();
+        if (dateTime == null) {
+            return creationTime();
+        }
+        return dateTime.getMillis();
+    }
+
+    private DateTime tryGetLastModifiedTime() {
+        Object property = getProperty(MODIFIED_DATE_KEY);
+        if (property == null) {
+            return null;
+        }
+        try {
+            DateTime dateTime = DateTime.parse((String) property);
+            return dateTime;
+        } catch (IllegalArgumentException e) {
+            // Failed to parse.
+        }
+        return null;
     }
 
     @Override
