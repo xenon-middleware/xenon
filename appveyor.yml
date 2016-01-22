@@ -3,7 +3,6 @@ build_script:
   - cmd: ./gradlew.bat assemble
 test_script:
   - cmd: ./gradlew.bat check
-after_test:
   - pip install --user codecov
   - codecov -e OS -f build/reports/jacoco/test/jacocoTestReport.xml
   # TODO submit multiple junit xml or combine all into single file
