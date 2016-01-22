@@ -42,7 +42,7 @@ matrix:
       os: osx
     - env:
         - GRADLE_BUILD_TASKS="assemble"
-        - GRADLE_SCRIPT_TASKS="integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests='*adaptors.local*'"
+        - GRADLE_SCRIPT_TASKS="integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local*"
         - INTEGRATION_TEST="local"
         - JDK=oraclejdk7
         - OS=osx
