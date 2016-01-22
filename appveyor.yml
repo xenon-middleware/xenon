@@ -1,0 +1,5 @@
+version: '{branch}-{build}'
+build_script:
+- cmd: ./gradlew.bat assemble
+test_script:
+- cmd: ./gradlew.bat check
