@@ -5,15 +5,16 @@ test_script:
   - cmd: ./gradlew.bat check
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - "SET JDK=oraclejdk7"
+  - ./gradlew.bat jacocoTestReport
   - pip install codecov
   - codecov -e OS -f build/reports/jacoco/test/jacocoTestReport.xml
-  # TODO submit multiple junit xml or combine all into single file
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      $file = '.\build\test-results\TEST-nl.esciencecenter.xenon.util.RealFileUtilsTest.xml'
-      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
-      $file = '.\build\test-results\TEST-nl.esciencecenter.xenon.adaptors.local.LocalUtilsTest.xml'
-      (New-Object 'System.Net.WebClient').UploadFile($url, (Resolve-Path $file))
+      $files = Get-ChildItem "build/test-results/" -Filter *.xml
+      for ($i=0; $i -lt $files.Count; $i++) {
+        (New-Object 'System.Net.WebClient').UploadFile($url, $files[$i])
+      }
 artifacts:
   - path: build/distributions/*.zip
     name: Java archive
