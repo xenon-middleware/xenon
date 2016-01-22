@@ -13,20 +13,27 @@ matrix:
       sudo: true
       services:
         - docker
+      os: linux
     - jdk: openjdk7
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
-        - INTEGRATION_TEST=0
         - JDK=openjdk7
       sudo: false
+      os: linux
     - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
-        - INTEGRATION_TEST=0
         - JDK=oraclejdk8
       sudo: false
+      os: linux
+    - jdk: oraclejdk7
+      env:
+        - GRADLE_BUILD_TASKS="assemble"
+        - GRADLE_SCRIPT_TASKS="check"
+        - JDK=oraclejdk7
+      os: osx
   # Stop when one of the Java versions do not work
   fast_finish: true
 
@@ -56,4 +63,3 @@ after_script:
     ./gradlew jacocoTestReport;
     bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml;
     fi
-
