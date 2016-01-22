@@ -28,8 +28,7 @@ matrix:
         - JDK=oraclejdk8
       sudo: false
       os: linux
-    - jdk: oraclejdk7
-      env:
+    - env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
         - JDK=oraclejdk7
