@@ -11,9 +11,8 @@ on_finish:
   - codecov -e OS -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      $files = Get-ChildItem "build/test-results/" -Filter *.xml
-      for ($i=0; $i -lt $files.Count; $i++) {
-        (New-Object 'System.Net.WebClient').UploadFile($url, $files[$i].FullName)
+      Get-ChildItem "build/test-results/" -Filter *.xml | Foreach-Object{
+        (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
 artifacts:
   - path: build/distributions/*.zip
