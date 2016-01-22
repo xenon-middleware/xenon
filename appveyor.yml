@@ -13,7 +13,7 @@ on_finish:
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       $files = Get-ChildItem "build/test-results/" -Filter *.xml
       for ($i=0; $i -lt $files.Count; $i++) {
-        (New-Object 'System.Net.WebClient').UploadFile($url, $files[$i])
+        (New-Object 'System.Net.WebClient').UploadFile($url, $files[$i].FullName)
       }
 artifacts:
   - path: build/distributions/*.zip
