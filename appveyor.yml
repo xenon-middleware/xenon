@@ -17,6 +17,9 @@ on_finish:
       Get-ChildItem "build/test-results/" -Filter *.xml | Foreach-Object{
         (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
+  - "SET INTEGRATION_TEST=local"
+  - ./gradlew.bat jacocoIntegrationTestReport
+  - codecov -e OS,JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml
   - ps: |
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
       Get-ChildItem "build/integrationTest-results/" -Filter *.xml | Foreach-Object{
