@@ -1,6 +1,3 @@
-if exists xenon_test exit /B
-
-
 mkdir xenon_test\links
 echo "Hello World" > xenon_test\links\file0
 echo "" > xenon_test\links\file1
