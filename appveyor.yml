@@ -17,6 +17,11 @@ on_finish:
       Get-ChildItem "build/test-results/" -Filter *.xml | Foreach-Object{
         (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
       }
+  - ps: |
+      $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
+      Get-ChildItem "build/integrationTest-results/" -Filter *.xml | Foreach-Object{
+        (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
+      }
 artifacts:
   - path: build/distributions/*.zip
     name: Java archive
