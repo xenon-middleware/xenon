@@ -2,7 +2,11 @@ version: '{branch}-{build}'
 build_script:
   - cmd: ./gradlew.bat assemble
 test_script:
-  - cmd: ./gradlew.bat check
+  - echo '' > xenon.test.properties
+  - src\integrationTest\resources\scripts\create_symlinks.bat
+  - cmd: ./gradlew.bat check integrationTest -x prepareIntegrationTest -x 
+testPropertiesFileExists 
+--tests=*adaptors.local*"
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - "SET JDK=oraclejdk7"
