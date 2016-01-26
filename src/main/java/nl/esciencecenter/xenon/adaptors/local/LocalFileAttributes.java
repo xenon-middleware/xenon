@@ -93,13 +93,15 @@ public class LocalFileAttributes implements FileAttributes {
             executable = Files.isExecutable(javaPath);
             readable = Files.isReadable(javaPath);
             writable = Files.isWritable(javaPath);
-            hidden = Files.isHidden(javaPath);
-
+            
             isWindows = Utils.isWindows(); 
 
             BasicFileAttributes basicAttributes;
             
             if (isWindows) {                
+                // TODO: Seems to fail in Windows ?
+                hidden = false;
+                
                 // These should always work.
                 basicAttributes = Files.readAttributes(javaPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 
@@ -110,7 +112,9 @@ public class LocalFileAttributes implements FileAttributes {
                 group = null;
                 permissions = null;
                 owner = null;
-            } else { 
+            } else {
+                hidden = Files.isHidden(javaPath);
+                
                 // Note: when in a posix environment, basicAttributes point to posixAttributes.
                 PosixFileAttributes posixAttributes = Files.readAttributes(javaPath, PosixFileAttributes.class, 
                         LinkOption.NOFOLLOW_LINKS);
