@@ -506,7 +506,7 @@ public final class Utils {
 
     /**
      * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
-     * represents the part of <code>path</code> that is realtive to the <code>root</code>.
+     * represents the part of <code>path</code> that is relative to the <code>root</code>.
      *
      * For example, if "C:\dir\file" is provided as <code>path</code> and "C:" as <code>root</code>, a <code>RelativePath</code>
      * will be returned that represents "dir\file".

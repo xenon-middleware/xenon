@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * LocalUtils contains various utilities for local file operations.
@@ -47,7 +48,7 @@ import nl.esciencecenter.xenon.files.RelativePath;
 final class LocalUtils {
 
     private LocalUtils() {
-        // DO NOTE USE
+        // DO NOT USE
     }
 
     /**
@@ -57,24 +58,31 @@ final class LocalUtils {
      *
      * @param path Xenon Path
      * @return a normalized java Path
+     * @throws XenonException 
      */
-    public static java.nio.file.Path javaPath(Path path) {
+    public static java.nio.file.Path javaPath(Path path) throws XenonException {
         FileSystem fs = path.getFileSystem();
         RelativePath relPath = path.getRelativePath().normalize();
         int numElems = relPath.getNameCount();
-        // replace tilde
+        String root = fs.getLocation();                
+
+        // replace tilde        
         if (numElems != 0) {
             String firstPart = relPath.getName(0).getRelativePath();
-            if ("~".equals(firstPart)) {
-                RelativePath home = new RelativePath(System.getProperty("user.home"));
+            if ("~".equals(firstPart)) {                
+                String tmp = System.getProperty("user.home");        
+                root = Utils.getLocalRoot(tmp);
+                RelativePath home = Utils.getRelativePath(tmp, root);
+                
                 if (numElems == 1) {
                     relPath = home;
                 } else {
                     relPath = home.resolve(relPath.subpath(1, numElems));
                 }
-            }
+            } 
         }
-        return FileSystems.getDefault().getPath(fs.getLocation() + relPath.getAbsolutePath());
+        
+        return FileSystems.getDefault().getPath(root, relPath.getAbsolutePath());
     }
 
     public static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
