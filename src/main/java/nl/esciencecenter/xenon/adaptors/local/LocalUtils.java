@@ -47,6 +47,10 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 final class LocalUtils {
 
+    // Windows occasionally refuses to delete a directory because is it locked by some external service (i.e., virus scanner). 
+    // The only solution to this is to retry the delete a couple of times. This constant sets the number of attempts to be done.
+    private static final int WINDOWS_EXTRA_DELETE_ATTEMPTS = 1000;
+
     private LocalUtils() {
         // DO NOT USE
     }
@@ -196,7 +200,7 @@ final class LocalUtils {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
-        } catch (java.nio.file.DirectoryNotEmptyException e2) {
+        } catch (java.nio.file.DirectoryNotEmptyException e2) {            
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
         } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);

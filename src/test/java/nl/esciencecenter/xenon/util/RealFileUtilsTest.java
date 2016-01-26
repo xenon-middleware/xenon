@@ -67,29 +67,9 @@ public class RealFileUtilsTest {
         files.createDirectory(testDir);
     }
     
-    public static void delete(Path path) throws Exception {
-
-        if (Utils.isWindows()) { 
-            
-            for (int i=0;i<3;i++) {
-                try { 
-                    files.delete(path);
-                    return;
-                } catch (DirectoryNotEmptyException e) { 
-                    // Windows may occasionally refuse to delete a directory as it seems to be confused if it is in use or not,
-                    // so we retry a few times.
-                }
-            }
-            
-        } else { 
-            files.delete(path);
-        }
-    }
-    
-
     @AfterClass
     public static void cleanup() throws Exception {
-        delete(testDir);
+        files.delete(testDir);
         XenonFactory.endXenon(xenon);
     }
 
@@ -108,7 +88,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(message.equals(new String(tmp)));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -127,7 +107,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(message.equals(new String(tmp)));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -146,7 +126,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message + message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -168,7 +148,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -191,7 +171,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -214,7 +194,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message + message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -234,7 +214,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -258,7 +238,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -282,7 +262,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.length > 0);
         assertTrue(new String(tmp).equals(message + message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -302,7 +282,7 @@ public class RealFileUtilsTest {
         assertNotNull(tmp);
         assertTrue(tmp.equals(message));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -327,7 +307,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp1.equals("Hello World!"));
         assertTrue(tmp2.equals("Hello World!"));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -351,7 +331,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp.get(2).equals("line3"));
         assertTrue(tmp.get(3).equals("line4"));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @Test
@@ -378,7 +358,7 @@ public class RealFileUtilsTest {
         assertTrue(tmp2.get(2).equals("line3"));
         assertTrue(tmp2.get(3).equals("line4"));
 
-        delete(testFile);
+        files.delete(testFile);
     }
 
     @SuppressWarnings("CanBeFinal")
@@ -453,11 +433,11 @@ public class RealFileUtilsTest {
         Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
-            delete(tmp[i]);
+            files.delete(tmp[i]);
         }
 
-        delete(dirs[1]);
-        delete(dirs[0]);
+        files.delete(dirs[1]);
+        files.delete(dirs[0]);
     }
 
     class MyFileVisitor2 implements FileVisitor {
@@ -507,11 +487,11 @@ public class RealFileUtilsTest {
         Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
-            delete(tmp[i]);
+            files.delete(tmp[i]);
         }
 
-        delete(dirs[1]);
-        delete(dirs[0]);
+        files.delete(dirs[1]);
+        files.delete(dirs[0]);
     }
 
     class MyFileVisitor3 implements FileVisitor {
@@ -561,11 +541,11 @@ public class RealFileUtilsTest {
         Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
-            delete(tmp[i]);
+            files.delete(tmp[i]);
         }
 
-        delete(dirs[1]);
-        delete(dirs[0]);
+        files.delete(dirs[1]);
+        files.delete(dirs[0]);
     }
 
     class MyFileVisitor4 implements FileVisitor {
@@ -632,12 +612,12 @@ public class RealFileUtilsTest {
         Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
-            delete(tmp[i]);
+            files.delete(tmp[i]);
         }
 
-        delete(dirs[2]);
-        delete(dirs[1]);
-        delete(dirs[0]);
+        files.delete(dirs[2]);
+        files.delete(dirs[1]);
+        files.delete(dirs[0]);
     }
 
     class MyFileVisitor5 implements FileVisitor {
@@ -687,11 +667,11 @@ public class RealFileUtilsTest {
         Utils.walkFileTree(files, dirs[0], fv);
 
         for (int i = 0; i < 10; i++) {
-            delete(tmp[i]);
+            files.delete(tmp[i]);
         }
 
-        delete(dirs[1]);
-        delete(dirs[0]);
+        files.delete(dirs[1]);
+        files.delete(dirs[0]);
     }
 
     class MyFileVisitor6 implements FileVisitor {
