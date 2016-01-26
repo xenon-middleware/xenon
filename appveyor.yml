@@ -3,7 +3,7 @@ build_script:
   - cmd: ./gradlew.bat assemble
 test_script:
   - echo '' > xenon.test.properties
-  - src\integrationTest\resources\scripts\create_symlinks.bat
+  - mkdir build\integrationTest & cd build\integrationTest & src\integrationTest\resources\scripts\create_symlinks.bat & cd ..\..
   - cmd: ./gradlew.bat check integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local* --continue
 on_finish:
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
