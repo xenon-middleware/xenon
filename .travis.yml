@@ -40,6 +40,7 @@ matrix:
         - JDK=oraclejdk7
         - OS=osx
       os: osx
+    # dont specify jdk because not all osx travis build have all java versions
     - env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local*"
