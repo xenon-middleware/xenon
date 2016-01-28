@@ -8,31 +8,52 @@ matrix:
       env:
         - GRADLE_BUILD_TASKS="assemble dockerBuild"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
-        - INTEGRATION_TEST=1
+        - INTEGRATION_TEST="docker"
         - JDK=oraclejdk7
+        - OS=linux
       sudo: true
       services:
         - docker
+      os: linux
     - jdk: openjdk7
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
         - INTEGRATION_TEST=0
         - JDK=openjdk7
+        - OS=linux
       sudo: false
+      os: linux
     - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
         - INTEGRATION_TEST=0
         - JDK=oraclejdk8
+        - OS=linux
       sudo: false
+      os: linux
+    - env:
+        - GRADLE_BUILD_TASKS="assemble"
+        - GRADLE_SCRIPT_TASKS="check"
+        - INTEGRATION_TEST=0
+        - JDK=oraclejdk7
+        - OS=osx
+      os: osx
+    # dont specify jdk because not all osx travis build have all java versions
+    - env:
+        - GRADLE_BUILD_TASKS="assemble"
+        - GRADLE_SCRIPT_TASKS="integrationTest -x prepareIntegrationTest -x testPropertiesFileExists --tests=*adaptors.local*"
+        - INTEGRATION_TEST="local"
+        - JDK=oraclejdk7
+        - OS=osx
+      os: osx
   # Stop when one of the Java versions do not work
   fast_finish: true
 
 # Install Docker compose
 before_install:
-  - if [ $INTEGRATION_TEST == "1" ]; then
+  - if [ $INTEGRATION_TEST == "docker" ]; then
     sudo apt-get install -y docker-engine;
     docker version;
     mkdir -p "$HOME/bin";
@@ -40,6 +61,12 @@ before_install:
     curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > "$HOME/bin/docker-compose";
     chmod +x "$HOME/bin/docker-compose";
     touch .docker-test-cache-set;
+    elif [ $INTEGRATION_TEST == "local" ]; then
+    touch xenon.test.properties;
+    mkdir -p build/integrationTest;
+    cd build/integrationTest;
+    ../../src/integrationTest/resources/scripts/create_symlinks;
+    cd ../..;
     fi
 
 install:
@@ -49,11 +76,13 @@ script:
   - ./gradlew $GRADLE_SCRIPT_TASKS -Pdocker.uid=$UID
 
 after_script:
-  - if [ $INTEGRATION_TEST == "1" ]; then
+  - if [ $INTEGRATION_TEST == "docker" ]; then
     ./gradlew jacocoIntegrationTestReport;
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+    elif [ $INTEGRATION_TEST == "local" ]; then
+    ./gradlew jacocoIntegrationTestReport;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
     else
     ./gradlew jacocoTestReport;
-    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST -f build/reports/jacoco/test/jacocoTestReport.xml;
+    bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/test/jacocoTestReport.xml;
     fi
-
