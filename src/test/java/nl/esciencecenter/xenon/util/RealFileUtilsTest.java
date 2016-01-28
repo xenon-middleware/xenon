@@ -29,6 +29,7 @@ import java.util.List;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
+import nl.esciencecenter.xenon.files.DirectoryNotEmptyException;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -65,7 +66,7 @@ public class RealFileUtilsTest {
         testDir = files.newPath(fileSystem, cwd.getRelativePath().resolve(ROOT));
         files.createDirectory(testDir);
     }
-
+    
     @AfterClass
     public static void cleanup() throws Exception {
         files.delete(testDir);

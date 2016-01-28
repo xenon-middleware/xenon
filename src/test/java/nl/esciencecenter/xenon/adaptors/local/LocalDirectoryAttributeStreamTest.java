@@ -140,7 +140,31 @@ public class LocalDirectoryAttributeStreamTest {
     @org.junit.Test(expected = XenonException.class)
     public void test_nonexistant_dir() throws Exception {
         Path path = new PathImplementation(fs, new RelativePath("aap"));
-        new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(path, new AllTrue()));
+        
+        LocalDirectoryStream s1 = null;
+        LocalDirectoryAttributeStream s2 = null;
+        
+        // NOTE: we need to properly close the streams, or the test will alway fail on windows.        
+        try { 
+            s1 = new LocalDirectoryStream(path, new AllTrue());
+            s2 = new LocalDirectoryAttributeStream(localFiles, s1);
+        } finally { 
+            if (s1 != null) {
+                try { 
+                    s1.close();
+                } catch (Exception e) { 
+                    // ignored
+                }
+            }
+            
+            if (s2 != null) {
+                try { 
+                    s2.close();
+                } catch (Exception e) { 
+                    // ignored
+                }
+            }
+        }
     }
 
     @org.junit.Test
@@ -194,7 +218,11 @@ public class LocalDirectoryAttributeStreamTest {
         LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
                 new AllFalse()));
 
-        stream.next();
+        try { 
+            stream.next();
+        } finally { 
+            stream.close();
+        }
     }
 
     @org.junit.Test(expected = NoSuchElementException.class)
@@ -203,9 +231,13 @@ public class LocalDirectoryAttributeStreamTest {
         LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
                 new AllTrue()));
 
-        // expecting at most 10000 items, otherwise, the stream might go on forever
-        for (int i = 0; i < 10000; i++) {
-            stream.next();
+        try { 
+            // expecting at most 10000 items, otherwise, the stream might go on forever
+            for (int i = 0; i < 10000; i++) {
+                stream.next();
+            }
+        } finally { 
+            stream.close();
         }
     }
 
@@ -225,12 +257,14 @@ public class LocalDirectoryAttributeStreamTest {
         LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(dir0,
                 new AllTrue()));
 
-        while (stream.hasNext()) {
-            localFiles.delete(file4);
-            stream.next();
+        try { 
+            while (stream.hasNext()) {
+                localFiles.delete(file4);
+                stream.next();
+            }
+        } finally { 
+            stream.close();
         }
-
-        stream.close();
     }
 
     @org.junit.Test(expected = UnsupportedOperationException.class)
@@ -239,7 +273,11 @@ public class LocalDirectoryAttributeStreamTest {
         LocalDirectoryAttributeStream stream = new LocalDirectoryAttributeStream(localFiles, new LocalDirectoryStream(testDir,
                 new AllTrue()));
 
-        stream.remove();
+        try { 
+            stream.remove();
+        } finally { 
+            stream.close();
+        }
     }
 
     @org.junit.Test
@@ -250,4 +288,5 @@ public class LocalDirectoryAttributeStreamTest {
         stream.close();
         stream.close();
     }
+    
 }

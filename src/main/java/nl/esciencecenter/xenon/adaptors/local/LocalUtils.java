@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * LocalUtils contains various utilities for local file operations.
@@ -46,8 +47,12 @@ import nl.esciencecenter.xenon.files.RelativePath;
  */
 final class LocalUtils {
 
+    // Windows occasionally refuses to delete a directory because is it locked by some external service (i.e., virus scanner). 
+    // The only solution to this is to retry the delete a couple of times. This constant sets the number of attempts to be done.
+    private static final int WINDOWS_EXTRA_DELETE_ATTEMPTS = 1000;
+
     private LocalUtils() {
-        // DO NOTE USE
+        // DO NOT USE
     }
 
     /**
@@ -57,24 +62,31 @@ final class LocalUtils {
      *
      * @param path Xenon Path
      * @return a normalized java Path
+     * @throws XenonException 
      */
-    public static java.nio.file.Path javaPath(Path path) {
+    public static java.nio.file.Path javaPath(Path path) throws XenonException {
         FileSystem fs = path.getFileSystem();
         RelativePath relPath = path.getRelativePath().normalize();
         int numElems = relPath.getNameCount();
-        // replace tilde
+        String root = fs.getLocation();                
+
+        // replace tilde        
         if (numElems != 0) {
             String firstPart = relPath.getName(0).getRelativePath();
-            if ("~".equals(firstPart)) {
-                RelativePath home = new RelativePath(System.getProperty("user.home"));
+            if ("~".equals(firstPart)) {                
+                String tmp = System.getProperty("user.home");        
+                root = Utils.getLocalRoot(tmp);
+                RelativePath home = Utils.getRelativePath(tmp, root);
+                
                 if (numElems == 1) {
                     relPath = home;
                 } else {
                     relPath = home.resolve(relPath.subpath(1, numElems));
                 }
-            }
+            } 
         }
-        return FileSystems.getDefault().getPath(fs.getLocation() + relPath.getAbsolutePath());
+        
+        return FileSystems.getDefault().getPath(root, relPath.getAbsolutePath());
     }
 
     public static Set<java.nio.file.attribute.PosixFilePermission> javaPermissions(Set<PosixFilePermission> permissions) {
@@ -188,7 +200,7 @@ final class LocalUtils {
             Files.delete(LocalUtils.javaPath(path));
         } catch (java.nio.file.NoSuchFileException e1) {
             throw new NoSuchPathException(LocalAdaptor.ADAPTOR_NAME, "File " + path + " does not exist!", e1);
-        } catch (java.nio.file.DirectoryNotEmptyException e2) {
+        } catch (java.nio.file.DirectoryNotEmptyException e2) {            
             throw new DirectoryNotEmptyException(LocalAdaptor.ADAPTOR_NAME, "Directory " + path + " not empty!", e2);
         } catch (IOException e) {
             throw new XenonException(LocalAdaptor.ADAPTOR_NAME, "Failed to delete file " + path, e);
