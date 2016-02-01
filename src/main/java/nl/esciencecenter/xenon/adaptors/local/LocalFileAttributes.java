@@ -105,10 +105,10 @@ public class LocalFileAttributes implements FileAttributes {
                 // These should always work.
                 basicAttributes = Files.readAttributes(javaPath, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 
-                // These are windows only.
+//               // These are windows only.
 //                AclFileAttributeView aclAttributes = Files.getFileAttributeView(javaPath, AclFileAttributeView.class, 
 //                        LinkOption.NOFOLLOW_LINKS);
-//                
+                
                 group = null;
                 permissions = null;
                 owner = null;
