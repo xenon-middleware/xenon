@@ -1,5 +1,6 @@
 package nl.esciencecenter.xenon.adaptors.webdav;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +23,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
@@ -46,6 +48,7 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.files.PathImplementation;
+import nl.esciencecenter.xenon.engine.util.OpenOptions;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
@@ -54,6 +57,7 @@ import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
+import nl.esciencecenter.xenon.files.InvalidOpenOptionsException;
 import nl.esciencecenter.xenon.files.NoSuchPathException;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -230,27 +234,18 @@ public class WebdavFiles implements Files {
         LOGGER.debug("createDirectory OK");
     }
 
-    private static void executeMethod(HttpClient client, HttpMethod method) throws IOException, HttpException {
-        int response = client.executeMethod(method);
-        String responseBodyAsString = method.getStatusLine().toString();
-        method.releaseConnection();
-        if (!isOkish(response)) {
-            throw new IOException(responseBodyAsString);
-        }
-    }
-
-    private static boolean isOkish(int response) {
-        return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS
-                || response == HttpStatus.SC_NO_CONTENT;
-    }
-
     @Override
     public void createFile(Path path) throws XenonException {
+        createFile(path, new byte[0]);
+    }
+
+    public void createFile(Path path, byte[] data) throws XenonException {
         LOGGER.debug("createFile path = {}", path);
         assertNotExists(path);
         HttpClient client = getFileSystemByPath(path);
         String filePath = toFilePath(path.toString());
-        DavMethod method = new PutMethod(filePath);
+        PutMethod method = new PutMethod(filePath);
+        method.setRequestEntity(new InputStreamRequestEntity(new ByteArrayInputStream(data)));
         try {
             executeMethod(client, method);
         } catch (IOException e) {
@@ -376,16 +371,12 @@ public class WebdavFiles implements Files {
 
     @Override
     public InputStream newInputStream(Path path) throws XenonException {
-        assertExists(path);
         String filePath = toFilePath(path.toString());
-        if (getAttributes(path).isDirectory()) {
-            String message = "Cannot open input stream from a directory: " + filePath;
-            throw new XenonException(adaptor.getName(), message);
-        }
+        assertRegularFileExists(path);
         HttpClient client = getFileSystemByPath(path);
         GetMethod method = new GetMethod(filePath);
         try {
-            executeMethod(client, method);
+            //            executeMethod(client, method);
             client.executeMethod(method);
             InputStream stream = method.getResponseBodyAsStream();
             return stream;
@@ -396,7 +387,39 @@ public class WebdavFiles implements Files {
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
-        return null;
+        OpenOptions tmp = OpenOptions.processOptions(adaptor.getName(), options);
+        assertValidArgumentsForNewOutputStream(path, tmp);
+        if (tmp.getOpenMode() == OpenOption.CREATE) {
+            assertNotExists(path);
+        } else {
+            assertRegularFileExists(path);
+        }
+
+        return new WebdavOutputStream(path, this);
+    }
+
+    private void assertValidArgumentsForNewOutputStream(Path path, OpenOptions processedOptions) throws XenonException {
+        if (processedOptions.getReadMode() != null) {
+            throw new InvalidOpenOptionsException(adaptor.getName(), "Disallowed open option: READ");
+        }
+
+        if (processedOptions.getAppendMode() == null) {
+            throw new InvalidOpenOptionsException(adaptor.getName(), "No append mode provided!");
+        }
+
+        if (processedOptions.getAppendMode() == OpenOption.APPEND) {
+            throw new XenonException(adaptor.getName(), "Webdav adaptor does not support appending when writing files.");
+        }
+
+        if (processedOptions.getWriteMode() == null) {
+            processedOptions.setWriteMode(OpenOption.WRITE);
+        }
+
+        if (processedOptions.getOpenMode() == OpenOption.CREATE) {
+            assertNotExists(path);
+        } else if (processedOptions.getOpenMode() == OpenOption.OPEN) {
+            assertRegularFileExists(path);
+        }
     }
 
     @Override
@@ -475,6 +498,14 @@ public class WebdavFiles implements Files {
         }
     }
 
+    private void assertRegularFileExists(Path path) throws XenonException {
+        assertExists(path);
+        if (getAttributes(path).isDirectory()) {
+            String message = "Specified path should be a file but is a directory: " + path.toString();
+            throw new XenonException(adaptor.getName(), message);
+        }
+    }
+
     private void assertExists(Path path) throws XenonException {
         if (!exists(path)) {
             throw new NoSuchPathException(adaptor.getName(), "Path does not exist " + path.toString());
@@ -500,4 +531,19 @@ public class WebdavFiles implements Files {
         FileSystemImplementation fileSystem = (FileSystemImplementation) path.getFileSystem();
         return fileSystems.get(fileSystem.getUniqueID()).getClient();
     }
+
+    public static void executeMethod(HttpClient client, HttpMethod method) throws IOException, HttpException {
+        int response = client.executeMethod(method);
+        String responseBodyAsString = method.getStatusLine().toString();
+        method.releaseConnection();
+        if (!isOkish(response)) {
+            throw new IOException(responseBodyAsString);
+        }
+    }
+
+    private static boolean isOkish(int response) {
+        return response == HttpStatus.SC_OK || response == HttpStatus.SC_CREATED || response == HttpStatus.SC_MULTI_STATUS
+                || response == HttpStatus.SC_NO_CONTENT;
+    }
+
 }

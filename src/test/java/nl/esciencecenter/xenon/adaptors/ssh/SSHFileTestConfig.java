@@ -57,6 +57,11 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsAppending() {
+        return true;
+    }
+
+    @Override
     public boolean supportUserInUri() {
         return true;
     }

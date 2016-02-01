@@ -79,6 +79,11 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsAppending() {
+        return true;
+    }
+
+    @Override
     public String getScheme() throws Exception {
         return scheme;
     }
