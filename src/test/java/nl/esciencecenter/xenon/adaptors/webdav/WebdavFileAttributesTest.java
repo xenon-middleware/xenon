@@ -3,7 +3,6 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import nl.esciencecenter.xenon.XenonException;
 
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
@@ -13,9 +12,11 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.esciencecenter.xenon.XenonException;
+
 public class WebdavFileAttributesTest {
     private WebdavFileAttributes defaultFileAttributes;
-    private DateTime defaultDateTime = new DateTime("2015-06-18T09:29:39Z");
+    private final DateTime defaultDateTime = new DateTime("2015-06-18T09:29:39Z");
 
     @Test(expected = XenonException.class)
     public void construct_null_throwException() throws XenonException {
@@ -24,13 +25,10 @@ public class WebdavFileAttributesTest {
 
     @Test
     public void permissions_none_containsZeroPermissions() throws XenonException {
-        // Arrange
         DavPropertySet testProperties = getNewDefaultProperties();
 
-        // Act
         WebdavFileAttributes fileAttributes = new WebdavFileAttributes(testProperties);
 
-        // Assert
         assertEquals(0, fileAttributes.permissions().size());
     }
 
@@ -57,21 +55,35 @@ public class WebdavFileAttributesTest {
 
     @Test
     public void equals_otherDate_false() throws XenonException {
-        // Arrange
         DateTime otherTime = defaultDateTime.plusHours(5);
         DavPropertySet otherProperties = getNewProperties(otherTime);
         WebdavFileAttributes otherAttributes = new WebdavFileAttributes(otherProperties);
 
-        // Assert
         assertFalse(defaultFileAttributes.equals(otherAttributes));
     }
 
     @Test
+    public void size_length5_return5() throws XenonException {
+        Object contentLength = "5";
+        DavPropertySet otherProperties = getNewProperties(contentLength);
+        WebdavFileAttributes otherAttributes = new WebdavFileAttributes(otherProperties);
+
+        assertEquals(5, otherAttributes.size());
+    }
+
+    @Test
+    public void size_lengthInvalid_return0() throws XenonException {
+        Object contentLength = " not an integer ";
+        DavPropertySet otherProperties = getNewProperties(contentLength);
+        WebdavFileAttributes otherAttributes = new WebdavFileAttributes(otherProperties);
+
+        assertEquals(0, otherAttributes.size());
+    }
+
+    @Test
     public void getHash_sameAttributes_sameHashes() throws XenonException {
-        // Arrange
         WebdavFileAttributes otherAttributes = new WebdavFileAttributes(getNewDefaultProperties());
 
-        // Act & Assert
         assertEquals(defaultFileAttributes.hashCode(), otherAttributes.hashCode());
     }
 
@@ -87,7 +99,16 @@ public class WebdavFileAttributesTest {
 
     private DavPropertySet getNewProperties(DateTime dateTime) {
         DavPropertySet davPropertySet = new DavPropertySet();
-        DavProperty<String> property = new DefaultDavProperty<String>(DavPropertyName.create("creationdate"), dateTime.toString());
+        DavProperty<String> property = new DefaultDavProperty<String>(DavPropertyName.create("creationdate"),
+                dateTime.toString());
+        davPropertySet.add(property);
+        return davPropertySet;
+    }
+
+    private DavPropertySet getNewProperties(Object contentLength) {
+        DavPropertySet davPropertySet = new DavPropertySet();
+        DavProperty<String> property = new DefaultDavProperty<String>(DavPropertyName.create("getcontentlength"),
+                contentLength.toString());
         davPropertySet.add(property);
         return davPropertySet;
     }

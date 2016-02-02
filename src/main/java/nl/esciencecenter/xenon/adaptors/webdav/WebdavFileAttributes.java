@@ -16,6 +16,7 @@ import nl.esciencecenter.xenon.files.PosixFilePermission;
 public class WebdavFileAttributes implements FileAttributes {
     static private final String CREATION_DATE_KEY = "creationdate";
     static private final String MODIFIED_DATE_KEY = "getlastmodified";
+    private static final String CONTENT_LENGTH = "getcontentlength";
 
     protected DavPropertySet properties;
 
@@ -93,7 +94,13 @@ public class WebdavFileAttributes implements FileAttributes {
 
     @Override
     public long size() {
-        return 0;
+        try {
+            Object contentLength = getProperty(CONTENT_LENGTH);
+            return Long.parseLong((String) contentLength);
+        } catch (NumberFormatException e) {
+            // Unable to determine size, return default.
+            return 0;
+        }
     }
 
     @Override
