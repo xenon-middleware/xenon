@@ -88,8 +88,12 @@ public final class StreamForwarder extends Thread {
             }
         }
         
-        if (!done) { 
+        if (!done) {
             close(in, "InputStream did not close within " + timeout + " ms. Forcing close!");
+            
+            if (out != null) { 
+                close(out, null);
+            }
         }
     }
     
@@ -101,6 +105,13 @@ public final class StreamForwarder extends Thread {
                 int read = in.read(buffer);
 
                 if (read == -1) {
+                    // NOTE: Streams must be closed before done is called, or we'll have a race condition!
+                    close(in, null);
+
+                    if (out != null) {
+                        close(out, null);
+                    }
+
                     done();
                     return;
                 }
@@ -110,13 +121,12 @@ public final class StreamForwarder extends Thread {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Cannot forward stream", e);
-        } finally {
             close(in, null);
 
             if (out != null) {
                 close(out, null);
             }
+            LOGGER.error("Cannot forward stream", e);
         }
     }
 }

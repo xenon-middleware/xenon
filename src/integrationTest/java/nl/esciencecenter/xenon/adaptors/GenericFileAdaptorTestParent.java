@@ -2303,7 +2303,8 @@ public abstract class GenericFileAdaptorTestParent {
         InputStream in = files.newInputStream(path);
 
         byte[] tmp = Utils.readAllBytes(in);
-
+        close(in);
+        
         if (expected == null) {
             if (data.length != 0) {
                 throwWrong("test21_newOutputStream", "zero bytes", tmp.length + " bytes");
