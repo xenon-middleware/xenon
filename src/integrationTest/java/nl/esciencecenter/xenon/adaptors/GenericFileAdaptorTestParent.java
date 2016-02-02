@@ -128,7 +128,6 @@ public abstract class GenericFileAdaptorTestParent {
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
-            // REMOVED FOR DEBUGGING
             Utils.recursiveDelete(files, root);
         }
 
@@ -152,7 +151,6 @@ public abstract class GenericFileAdaptorTestParent {
     public void cleanup() throws Exception {
         try {
             if (testDir != null && files.exists(testDir)) {
-                // REMOVED For testing 
                 Utils.recursiveDelete(files, testDir);
             }
         } finally {
@@ -2205,9 +2203,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path dir0 = createTestDir(testDir);
         test20_newInputStream(dir0, null, true);
 
-        // cleanup
-        
-        // REMOVED FOR DEBUGGING...
+        // cleanup       
         deleteTestFile(file1);
         deleteTestFile(file2);
         deleteTestDir(dir0);
