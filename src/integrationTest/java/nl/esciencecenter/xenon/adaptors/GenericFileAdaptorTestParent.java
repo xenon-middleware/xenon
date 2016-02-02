@@ -261,6 +261,9 @@ public abstract class GenericFileAdaptorTestParent {
         Path file = resolve(root, "file" + counter);
         counter++;
 
+        
+        
+        
         assertFalse("Generated NEW test file already exists! " + file, files.exists(file));
 
         return file;
@@ -268,10 +271,21 @@ public abstract class GenericFileAdaptorTestParent {
 
     // Depends on: newOutputStream
     private void writeData(Path testFile, byte[] data) throws Exception {
-        try (OutputStream out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE)) {
+        
+        OutputStream out = null;
+        
+        try { 
+            out = files.newOutputStream(testFile, OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE);
+        
             if (data != null) {
                 out.write(data);
             }
+        } finally {
+            try { 
+                out.close();
+            } catch (Exception e) { 
+                //ignore
+            }            
         }
     }
 
@@ -280,6 +294,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path file = createNewTestFileName(root);
 
         files.createFile(file);
+                
         if (data != null && data.length > 0) {
             writeData(file, data);
         }
@@ -2145,6 +2160,8 @@ public abstract class GenericFileAdaptorTestParent {
 
         byte[] data = Utils.readAllBytes(in);
 
+        close(in);
+        
         if (expected == null) {
             if (data.length != 0) {
                 throwWrong("test20_newInputStream", "zero bytes", data.length + " bytes");
@@ -2186,7 +2203,7 @@ public abstract class GenericFileAdaptorTestParent {
         Path dir0 = createTestDir(testDir);
         test20_newInputStream(dir0, null, true);
 
-        // cleanup
+        // cleanup       
         deleteTestFile(file1);
         deleteTestFile(file2);
         deleteTestDir(dir0);
@@ -2282,7 +2299,8 @@ public abstract class GenericFileAdaptorTestParent {
         InputStream in = files.newInputStream(path);
 
         byte[] tmp = Utils.readAllBytes(in);
-
+        close(in);
+        
         if (expected == null) {
             if (data.length != 0) {
                 throwWrong("test21_newOutputStream", "zero bytes", tmp.length + " bytes");
