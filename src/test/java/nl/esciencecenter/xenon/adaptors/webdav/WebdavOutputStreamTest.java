@@ -2,6 +2,7 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,10 +30,17 @@ public class WebdavOutputStreamTest {
     }
 
     @Test
-    public void close_deleteExistingFileWasCalled() throws IOException, XenonException {
-        webdavOutputStream.close();
+    public void close_deleteExistingFile() throws IOException, XenonException {
         when(files.exists(Mockito.isA(Path.class))).thenReturn(true);
+        webdavOutputStream.close();
         verify(files, atLeastOnce()).delete(Mockito.isA(Path.class));
+    }
+
+    @Test
+    public void close_dontDeleteNonexistingFile() throws IOException, XenonException {
+        when(files.exists(Mockito.isA(Path.class))).thenReturn(false);
+        webdavOutputStream.close();
+        verify(files, never()).delete(Mockito.isA(Path.class));
     }
 
     private Path getPathMock() {
