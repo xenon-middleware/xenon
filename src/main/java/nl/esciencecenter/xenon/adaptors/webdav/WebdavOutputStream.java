@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.Path;
 
+/**
+ * Webdav does not support resuming or appending. This class acts as a buffer. On closing, the complete content is written at once
+ * using the WebdavFiles adaptor.
+ *
+ * @author Christiaan Meijer
+ *
+ */
 public class WebdavOutputStream extends OutputStream {
     private final WebdavFiles files;
     private final Path path;
@@ -26,9 +33,9 @@ public class WebdavOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        // first delete the file otherwise we get a 405 when executing the put
         try {
             if (files.exists(path)) {
+                // first delete the file otherwise we get a 405 when executing the put
                 files.delete(path);
             }
             files.createFile(path, outputStream.toByteArray());
