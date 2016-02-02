@@ -47,10 +47,6 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 final class LocalUtils {
 
-    // Windows occasionally refuses to delete a directory because is it locked by some external service (i.e., virus scanner). 
-    // The only solution to this is to retry the delete a couple of times. This constant sets the number of attempts to be done.
-    private static final int WINDOWS_EXTRA_DELETE_ATTEMPTS = 1000;
-
     private LocalUtils() {
         // DO NOT USE
     }
@@ -224,26 +220,28 @@ final class LocalUtils {
     public static void unixDestroy(Process process) {
         boolean success = false;
 
-        try {
-            final Field pidField = process.getClass().getDeclaredField("pid");
+        if (!Utils.isWindows()) { 
+            try {
+                final Field pidField = process.getClass().getDeclaredField("pid");
 
-            AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Object run() {
-                    pidField.setAccessible(true);
-                    return null;
+                AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                    public Object run() {
+                        pidField.setAccessible(true);
+                        return null;
+                    }
+                });
+
+                int pid = pidField.getInt(process);
+
+                if (pid > 0) {
+                    CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
+                    success = (killRunner.getExitCode() == 0);
                 }
-            });
-
-            int pid = pidField.getInt(process);
-
-            if (pid > 0) {
-                CommandRunner killRunner = new CommandRunner("kill", "-9", "" + pid);
-                success = (killRunner.getExitCode() == 0);
+            } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
+                // Failed, so use the regular Java destroy.
             }
-        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException | XenonException e) {
-            // Failed, so use the regular Java destroy.
         }
-
+            
         if (!success) {
             process.destroy();
         }

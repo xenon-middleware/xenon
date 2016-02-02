@@ -272,6 +272,7 @@ public abstract class GenericScheduleJobTestParent {
                     }
                 } catch (XenonException ex) {
                     cleanupFailed = ex;
+                    logger.warn("cleanupJob failed to delete file {}", p);
                 }
             }
         }
