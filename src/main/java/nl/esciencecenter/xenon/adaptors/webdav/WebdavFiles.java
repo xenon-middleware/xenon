@@ -32,6 +32,7 @@ import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.client.methods.DavMethod;
 import org.apache.jackrabbit.webdav.client.methods.DeleteMethod;
 import org.apache.jackrabbit.webdav.client.methods.MkColMethod;
+import org.apache.jackrabbit.webdav.client.methods.MoveMethod;
 import org.apache.jackrabbit.webdav.client.methods.OptionsMethod;
 import org.apache.jackrabbit.webdav.client.methods.PropFindMethod;
 import org.apache.jackrabbit.webdav.client.methods.PutMethod;
@@ -129,7 +130,7 @@ public class WebdavFiles implements Files {
         HttpClient client = getClient(webdavLocation);
         HttpMethod method;
         try {
-            method = new OptionsMethod(toFolderPath(webdavLocation.toString())); // TODO
+            method = new OptionsMethod(toFolderPath(webdavLocation.toString()));
             int response = client.executeMethod(method);
             String responseBodyAsString = method.getStatusLine().toString();
             method.releaseConnection();
@@ -204,7 +205,7 @@ public class WebdavFiles implements Files {
         assertValidOptionsForCopy(options);
 
         // Extra check just to match behavior of other files adaptors and tests.
-        if (source.equals(target) && CopyOption.CREATE.occursIn(options)) {
+        if (areSamePaths(source, target) && CopyOption.CREATE.occursIn(options)) {
             return null;
         }
 
@@ -259,6 +260,29 @@ public class WebdavFiles implements Files {
 
     @Override
     public void move(Path source, Path target) throws XenonException {
+        LOGGER.debug("move source = {} to target = {}", source, target);
+        if (areSamePaths(source, target)) {
+            return;
+        }
+
+        assertExists(source);
+        String sourcePath;
+        String targetPath;
+        if (getAttributes(source).isDirectory()) {
+            sourcePath = toFolderPath(source.toString());
+            targetPath = toFolderPath(target.toString());
+        } else {
+            sourcePath = toFilePath(source.toString());
+            targetPath = toFilePath(target.toString());
+        }
+        HttpClient client = getFileSystemByPath(source);
+        MoveMethod method = new MoveMethod(sourcePath, targetPath, false);
+        try {
+            executeMethod(client, method);
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Could not move " + sourcePath + " to " + targetPath, e);
+        }
+        LOGGER.debug("move OK");
     }
 
     @Override
@@ -564,6 +588,12 @@ public class WebdavFiles implements Files {
         if (isEmpty == false) {
             throw new XenonException(adaptor.getName(), "Path is not empty: " + path.toString());
         }
+    }
+
+    private boolean areSamePaths(Path source, Path target) {
+        RelativePath sourceName = source.getRelativePath().normalize();
+        RelativePath targetName = target.getRelativePath().normalize();
+        return sourceName.equals(targetName);
     }
 
     private void assertRegularFileExists(Path path) throws XenonException {
