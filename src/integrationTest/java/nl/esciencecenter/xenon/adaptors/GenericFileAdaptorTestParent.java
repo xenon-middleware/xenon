@@ -32,6 +32,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TestWatcher;
+import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.Xenon;
@@ -55,17 +66,6 @@ import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.util.Utils;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TestWatcher;
-import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -326,13 +326,12 @@ public abstract class GenericFileAdaptorTestParent {
     //
     // Depends on: newFileSystem, close
 
-    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p)
-            throws XenonException {
+    private void test00_newFileSystem(String scheme, String location, Credential c, Map<String, String> p) throws XenonException {
         FileSystem fs = files.newFileSystem(scheme, location, c, p);
         files.close(fs);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test00_newFileSystem_nullUriAndCredentials_shouldThrow() throws Exception {
         test00_newFileSystem(null, null, null, null);
     }
@@ -359,7 +358,7 @@ public abstract class GenericFileAdaptorTestParent {
         test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null);
     }
 
-    @Test(expected=XenonException.class)
+    @Test(expected = XenonException.class)
     public void test00_newFileSystem_wrongLocation_throw() throws Exception {
         // test with correct scheme with, wrong location
         test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null);
@@ -990,13 +989,13 @@ public abstract class GenericFileAdaptorTestParent {
         prepareTestDir("test09_delete");
 
         files.close(cwd.getFileSystem());
-        
+
         try {
             files.delete(testDir);
-        } catch (FileSystemClosedException e) { 
-            // This is the expected exception 
+        } catch (FileSystemClosedException e) {
+            // This is the expected exception
         } catch (Exception e) {
-            // We do not expect another exception 
+            // We do not expect another exception
             throwUnexpected("test09_delete", e);
         } finally {
             // set up for cleaning again
@@ -1367,7 +1366,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test12_newDirectoryStreamWithFilter_closedFileSystem_throwIfSupported() throws Exception {
-       if (!config.supportsClose()) {
+        if (!config.supportsClose()) {
             return;
         }
         prepareTestDir("test12_newDirectoryStream_with_filter");
@@ -1608,9 +1607,7 @@ public abstract class GenericFileAdaptorTestParent {
         }
         prepareTestDir("test14_setPosixFilePermissions");
         Path existingFile = createTestFile(testDir, null);
-        Set<PosixFilePermission> permissions = EnumSet.of(
-                PosixFilePermission.OWNER_EXECUTE,
-                PosixFilePermission.OWNER_READ,
+        Set<PosixFilePermission> permissions = EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ,
                 PosixFilePermission.OWNER_WRITE);
 
         test14_setPosixFilePermissions(existingFile, permissions, false);
@@ -1683,12 +1680,8 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     private Set<PosixFilePermission> getVariousPosixPermissions() {
-        return EnumSet.of(
-                PosixFilePermission.OWNER_EXECUTE,
-                PosixFilePermission.OWNER_READ,
-                PosixFilePermission.OWNER_WRITE,
-                PosixFilePermission.OTHERS_READ,
-                PosixFilePermission.GROUP_READ);
+        return EnumSet.of(PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
+                PosixFilePermission.OTHERS_READ, PosixFilePermission.GROUP_READ);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2162,33 +2155,49 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void test20_newInputStream() throws Exception {
-        byte[] data = "Hello World".getBytes();
-
-        // test with null
+    public void test20_newInputStream_null_throw() throws Exception {
         test20_newInputStream(null, null, true);
+    }
 
+    @Test
+    public void test20_newInputStream_nonExistingFile_throw() throws Exception {
         prepareTestDir("test20_newInputStream");
-
-        // test with non-existing file
         Path file0 = createNewTestFileName(testDir);
+
         test20_newInputStream(file0, null, true);
+    }
 
-        // test with existing empty file
+    @Test
+    public void test20_newInputStream_existingEmptyFile_noThrow() throws Exception {
+        prepareTestDir("test20_newInputStream");
         Path file1 = createTestFile(testDir, null);
+
         test20_newInputStream(file1, null, false);
-
-        // test with existing non-empty file
-        Path file2 = createTestFile(testDir, data);
-        test20_newInputStream(file2, data, false);
-
-        // test with existing dir
-        Path dir0 = createTestDir(testDir);
-        test20_newInputStream(dir0, null, true);
 
         // cleanup
         deleteTestFile(file1);
+    }
+
+    @Test
+    public void test20_newInputStream_existingNonEmptyFile_noThrow() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test20_newInputStream");
+        Path file2 = createTestFile(testDir, data);
+
+        test20_newInputStream(file2, data, false);
+
+        // cleanup
         deleteTestFile(file2);
+    }
+
+    @Test
+    public void test20_newInputStream_existingDir_throw() throws Exception {
+        prepareTestDir("test20_newInputStream");
+        Path dir0 = createTestDir(testDir);
+
+        test20_newInputStream(dir0, null, true);
+
+        // cleanup
         deleteTestDir(dir0);
     }
 
@@ -2300,110 +2309,327 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void test21_newOutputStream() throws Exception {
-
-        byte[] data = "Hello World".getBytes();
-        byte[] data2 = "Hello WorldHello World".getBytes();
-
-        // test with null
+    public void test21_newOutputStream_nullPath_throw() throws Exception {
         test21_newOutputStream(null, null, null, null, true);
+    }
 
+    @Test
+    public void test21_newOutputStream_nullOptions_throw() throws Exception {
         prepareTestDir("test21_newOuputStream");
-
-        // test with existing file and null options
         Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, null, null, null, true);
 
-        // test with existing file and empty options
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_emptyOptions_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[0], null, null, true);
 
-        // test with existing file and CREATE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndCreateOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.CREATE }, null, null, true);
 
-        // test with existing file and OPEN option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndOpenOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN }, null, null, true);
 
-        // test with existing file and OPEN_OR_CREATE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndOpenOrCreateOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE }, null, null, true);
 
-        // test with existing file and APPEND option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndAppendOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.APPEND }, null, null, true);
 
-        // test with existing file and TRUNCATE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndTruncateOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.TRUNCATE }, null, null, true);
 
-        // test with existing file and READ option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndReadOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.READ }, null, null, true);
 
-        // test with existing file and WRITE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndWriteOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.WRITE }, null, null, true);
 
-        // test with existing file and CREATE + APPEND option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndCreateAndAppendOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, null, null, true);
 
-        // test with existing file and CREATE + APPEND + READ option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_noDataAndCreateAndAppendAndReadOption_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND, OpenOption.READ }, null, null,
                 true);
 
-        // test with existing file and OPEN_OR_CREATE + APPEND option
-        test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, data, data, false);
+        // cleanup
+        deleteTestFile(file0);
+    }
 
-        // test with existing file and OPEN + APPEND option
-        test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND }, data, data2, false);
+    @Test
+    public void test21_newOutputStream_dataAppendToEmptyFile_dataInFile() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
 
-        // test with existing file and OPEN_OR_CREATE + APPEND + WRITE option
+        test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, data, data,
+                !config.supportsAppending());
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_dataAppendToNonemptyFile_dataAppendedToFile() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        byte[] data2 = "Hello WorldHello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, data);
+
+        test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND }, data, data2,
+                !config.supportsAppending());
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_dataTruncateToNonEmptyFile_onlyDataInFile() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        byte[] data2 = "Hello WorldHello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, data2);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.WRITE }, data, data,
                 false);
 
-        // test with existing file and CREATE + TRUNCATE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_nullDataCreateAndTruncate_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.CREATE, OpenOption.TRUNCATE }, null, null, true);
 
-        // test with existing file and OPEN_OR_CREATE + TRUNCATE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_dataOpenOrCreateAndTruncate_dataInFile() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.TRUNCATE }, data, data, false);
 
-        // test with existing file and OPEN + TRUNCATE option
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test21_newOutputStream_dataOpenAndTruncate_dataInFile() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
+        Path file0 = createTestFile(testDir, null);
+
         test21_newOutputStream(file0, new OpenOption[] { OpenOption.OPEN, OpenOption.TRUNCATE }, data, data, false);
 
+        // cleanup
         deleteTestFile(file0);
+    }
 
-        // test with non-existing and CREATE + APPEND option
+    @Test
+    public void test21_newOutputStream_nonExistingWithCreateAndAppend_noThrow() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
         Path file1 = createNewTestFileName(testDir);
-        test21_newOutputStream(file1, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, false);
-        deleteTestFile(file1);
+        boolean mustFail = !config.supportsAppending();
 
-        // test with non-existing and OPEN_OR_CREATE + APPEND option
+        test21_newOutputStream(file1, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, mustFail);
+
+        // cleanup
+        if (!mustFail) {
+            deleteTestFile(file1);
+        }
+    }
+
+    @Test
+    public void test21_newOutputStream_nonExistingWithOpenAndCreateAndAppend_noThrow() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
         Path file2 = createNewTestFileName(testDir);
-        test21_newOutputStream(file2, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, data, data, false);
-        deleteTestFile(file2);
+        boolean mustFail = !config.supportsAppending();
 
-        // test with non-existing and OPEN + APPEND option
+        test21_newOutputStream(file2, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, data, data, mustFail);
+
+        // cleanup
+        if (!mustFail) {
+            deleteTestFile(file2);
+        }
+    }
+
+    @Test
+    public void test21_newOutputStream_nonExistingOpenAndAppend_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
         Path file3 = createNewTestFileName(testDir);
-        test21_newOutputStream(file3, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND }, null, null, true);
 
-        // test with exising dir
+        test21_newOutputStream(file3, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND }, null, null, true);
+    }
+
+    @Test
+    public void test21_newOutputStream_dirAsPathWithCreateAndAppend_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
         Path dir0 = createTestDir(testDir);
 
         test21_newOutputStream(dir0, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, null, null, true);
+
+        // cleanup
+        deleteTestDir(dir0);
+    }
+
+    @Test
+    public void test21_newOutputStream_dirAsPathWithOpenOrCreateAndAppend_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path dir0 = createTestDir(testDir);
+
         test21_newOutputStream(dir0, new OpenOption[] { OpenOption.OPEN_OR_CREATE, OpenOption.APPEND }, null, null, true);
+
+        // cleanup
+        deleteTestDir(dir0);
+    }
+
+    @Test
+    public void test21_newOutputStream_dirAsPathWithOpenAndAppend_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path dir0 = createTestDir(testDir);
+
         test21_newOutputStream(dir0, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND }, null, null, true);
 
+        // cleanup
         deleteTestDir(dir0);
+    }
 
-        // test with conflicting options
+    @Test
+    public void test21_newOutputStream_nullDataConflictingCreateAndOpenAndAppend_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
         Path file4 = createTestFile(testDir, null);
 
         test21_newOutputStream(file4, new OpenOption[] { OpenOption.CREATE, OpenOption.OPEN, OpenOption.APPEND }, null, null,
                 true);
+
+        // cleanup
+        deleteTestFile(file4);
+    }
+
+    @Test
+    public void test21_newOutputStream_nullDataConflictingOpenAndTruncateAndAppend_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file4 = createTestFile(testDir, null);
+
         test21_newOutputStream(file4, new OpenOption[] { OpenOption.OPEN, OpenOption.TRUNCATE, OpenOption.APPEND }, null, null,
                 true);
+
+        // cleanup
+        deleteTestFile(file4);
+    }
+
+    @Test
+    public void test21_newOutputStream_nullDataConflictingOpenAndAppendAndRead_throw() throws Exception {
+        prepareTestDir("test21_newOuputStream");
+        Path file4 = createTestFile(testDir, null);
+
         test21_newOutputStream(file4, new OpenOption[] { OpenOption.OPEN, OpenOption.APPEND, OpenOption.READ }, null, null, true);
 
+        // cleanup
         deleteTestFile(file4);
+    }
 
-        // test with non-existing and CREATE option
+    @Test
+    public void test21_newOutputStream_existingAndCreateOption_noThrow() throws Exception {
+        byte[] data = "Hello World".getBytes();
+        prepareTestDir("test21_newOuputStream");
         Path file5 = createNewTestFileName(testDir);
-        test21_newOutputStream(file5, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, false);
-        deleteTestFile(file5);
+        boolean mustFail = !config.supportsAppending();
+
+        test21_newOutputStream(file5, new OpenOption[] { OpenOption.CREATE, OpenOption.APPEND }, data, data, mustFail);
+
+        // cleanup
+        if (!mustFail) {
+            deleteTestFile(file5);
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -2444,124 +2670,488 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void test23_copy() throws Exception {
-        byte[] data = "Hello World!".getBytes();
-        byte[] data2 = "Goodbye World!".getBytes();
-        byte[] data3 = "Hello World!Goodbye World!".getBytes();
-        byte[] data4 = "Hello World!Hello World!".getBytes();
-        byte[] data5 = "Hello World!Hello World!Hello World!".getBytes();
-
-        // test with null
+    public void test23_copy_null_throw() throws Exception {
         test23_copy(null, null, null, null, true);
 
-        prepareTestDir("test23_copy");
+    }
 
+    @Test
+    public void test23_copy_nullTarget_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
         Path file0 = createTestFile(testDir, data);
 
-        // test without target
         test23_copy(file0, null, new CopyOption[] { CopyOption.CREATE }, null, true);
 
-        // test without source
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_nullSource_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+
         test23_copy(null, file0, new CopyOption[] { CopyOption.CREATE }, null, true);
 
-        Path file1 = createNewTestFileName(testDir);
-        Path file2 = createNewTestFileName(testDir);
-        Path file3 = createNewTestFileName(testDir);
+        // cleanup
+        deleteTestFile(file0);
+    }
 
-        Path file4 = createTestFile(testDir, data2);
-        Path file5 = createTestFile(testDir, data3);
+    @Test
+    public void test23_copy_nonExistingSource_throw() throws Exception {
+        prepareTestDir("test23_copy");
+        Path nonExistingSource = createNewTestFileName(testDir);
+        Path target = createNewTestFileName(testDir);
 
+        test23_copy(nonExistingSource, target, new CopyOption[0], null, true);
+    }
+
+    @Test
+    public void test23_copy_directoryAsSource_throw() throws Exception {
+        prepareTestDir("test23_copy");
+        Path target = createNewTestFileName(testDir);
         Path dir0 = createTestDir(testDir);
-        Path dir1 = createNewTestDirName(testDir);
 
-        Path file6 = createNewTestFileName(dir1);
+        test23_copy(dir0, target, new CopyOption[] { CopyOption.CREATE }, null, true);
 
-        // test copy with non-existing source
-        test23_copy(file1, file2, new CopyOption[0], null, true);
+        // cleanup
+        deleteTestDir(dir0);
+    }
 
-        // test copy with dir source
-        test23_copy(dir0, file1, new CopyOption[] { CopyOption.CREATE }, null, true);
+    @Test
+    public void test23_copy_conflictingOptionsIgnoreAndCreate_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
 
-        // test copy using conflicting options should fail
         test23_copy(file0, file1, new CopyOption[] { CopyOption.IGNORE, CopyOption.CREATE }, null, true);
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_conflictingOptionsCreateAndIgnore_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.IGNORE }, null, true);
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_conflictingOptionsCreateAndReplace_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.REPLACE }, null, true);
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_conflictingOptionsCreateAndResume_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.RESUME }, null, true);
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_conflictingOptionsCreateAndAppend_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.APPEND }, null, true);
 
-        // test copy with non-existing target
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_nonExistingTarget_copiedFile() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createNewTestFileName(testDir);
+
         test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE }, data, false);
-        test23_copy(file0, file2, new CopyOption[] { CopyOption.CREATE, CopyOption.CREATE }, data, false);
 
-        // test copy with non-existing target with non-existing parent
-        test23_copy(file0, file6, new CopyOption[] { CopyOption.CREATE }, null, true);
+        // cleanup
+        deleteTestFile(file0);
+    }
 
-        // test copy with existing target
-        test23_copy(file0, file1, new CopyOption[0], null, true);
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.CREATE }, null, true);
+    @Test
+    public void test23_copy_existingTarget_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path source = createTestFile(testDir, data);
+        Path target = createTestFile(testDir, data);
 
-        // test copy with same target as source
-        test23_copy(file0, file0, new CopyOption[] { CopyOption.CREATE }, data, false);
+        test23_copy(source, target, new CopyOption[0], null, true);
 
-        // test ignore with existing target
-        test23_copy(file4, file1, new CopyOption[] { CopyOption.IGNORE }, data, false);
-        test23_copy(file4, file1, new CopyOption[] { CopyOption.IGNORE, CopyOption.IGNORE }, data, false);
+        // cleanup
+        deleteTestFile(target);
+        deleteTestFile(source);
+    }
 
-        // test resume with existing target
-        test23_copy(file4, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
-        test23_copy(file1, file5, new CopyOption[] { CopyOption.RESUME }, null, true);
-        test23_copy(file5, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, data3, false);
-        test23_copy(file5, file1, new CopyOption[] { CopyOption.RESUME }, data3, false);
-        test23_copy(file5, file2, new CopyOption[] { CopyOption.RESUME, CopyOption.RESUME }, data3, false);
-        test23_copy(file4, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+    @Test
+    public void test23_copy_existingTargetCreateOption_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path source = createTestFile(testDir, data);
+        Path target = createTestFile(testDir, data);
 
-        // test resume with non-existing source
-        test23_copy(file3, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(source, target, new CopyOption[] { CopyOption.CREATE }, null, true);
 
-        // test resume with non-exising target
-        test23_copy(file5, file3, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        // cleanup
+        deleteTestFile(source);
+        deleteTestFile(target);
+    }
 
-        // test resume with dir source
-        test23_copy(dir0, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+    @Test
+    public void test23_copy_sameSourceAsTarget_noThrow() throws Exception {
+        /*TODO Equal source as target sounds invalid to me. I think this should throw an exception but as I'm only
+         * refactoring right now, I won't change it.*/
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path source = createTestFile(testDir, data);
 
-        // test resume with dir target
-        test23_copy(file5, dir0, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+        test23_copy(source, source, new CopyOption[] { CopyOption.CREATE }, data, false);
 
-        // test resume with same dir and target
-        test23_copy(file5, file5, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, data3, false);
+        // cleanup
+        deleteTestFile(source);
+    }
 
-        // test replace with existing target
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.REPLACE }, data, false);
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.REPLACE, CopyOption.REPLACE }, data, false);
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.REPLACE, CopyOption.VERIFY }, null, true);
+    @Test
+    public void test23_copy_existingTargetIgnoreOption_noThrow() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path source = createTestFile(testDir, data);
+        Path target = createTestFile(testDir, data);
 
-        // test append with existing target
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND }, data4, false);
-        test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND, CopyOption.APPEND }, data5, false);
+        test23_copy(source, target, new CopyOption[] { CopyOption.IGNORE }, data, false);
 
-        // test append with non-existing source
-        test23_copy(file3, file1, new CopyOption[] { CopyOption.APPEND }, null, true);
+        // cleanup
+        deleteTestFile(source);
+        deleteTestFile(target);
+    }
 
-        // test append with non-existing target
-        test23_copy(file0, file3, new CopyOption[] { CopyOption.APPEND }, null, true);
+    @Test
+    public void test23_copy_existingTargetDoubleIgnoreOption_noThrow() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path source = createTestFile(testDir, data);
+        Path target = createTestFile(testDir, data);
 
-        // test append with dir source
-        test23_copy(dir0, file1, new CopyOption[] { CopyOption.APPEND }, null, true);
+        test23_copy(source, target, new CopyOption[] { CopyOption.IGNORE, CopyOption.IGNORE }, data, false);
 
-        // test append with dir target
-        test23_copy(file0, dir0, new CopyOption[] { CopyOption.APPEND }, null, true);
+        // cleanup
+        deleteTestFile(source);
+        deleteTestFile(target);
+    }
 
-        // test append with source equals target
-        test23_copy(file0, file0, new CopyOption[] { CopyOption.APPEND }, null, true);
+    @Test
+    public void test23_copy_nonExistingTargetNonExistingParent_throw1() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path source = createTestFile(testDir, data);
+        Path nonExistingDirectory = createNewTestDirName(testDir);
+        Path fileNameWithoutParentDirectory = createNewTestFileName(nonExistingDirectory);
 
-        // test with source equals target and empty option
-        test23_copy(file0, file0, new CopyOption[] { null }, null, true);
+        test23_copy(source, fileNameWithoutParentDirectory, new CopyOption[] { CopyOption.CREATE }, null, true);
 
+        // cleanup
+        deleteTestFile(source);
+    }
+
+    @Test
+    public void test23_copy_resumeAndVerifyAndSourceNotAhead_throw() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data2 = "Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path fileWithData1 = createTestFile(testDir, data1);
+        Path fileWithData2 = createTestFile(testDir, data2);
+
+        test23_copy(fileWithData2, fileWithData1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+
+        // cleanup
+        deleteTestFile(fileWithData2);
+        deleteTestFile(fileWithData1);
+    }
+
+    @Test
+    public void test23_copy_resumeAndSourceNotAhead_throw() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data1And2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path fileWithData1 = createTestFile(testDir, data1);
+        Path fileWithData1And2 = createTestFile(testDir, data1And2);
+
+        test23_copy(fileWithData1, fileWithData1And2, new CopyOption[] { CopyOption.RESUME }, null, true);
+
+        // cleanup
+        deleteTestFile(fileWithData1And2);
+        deleteTestFile(fileWithData1);
+    }
+
+    @Test
+    public void test23_copy_resumeAndVerifyAndSourceIsAhead_copyCompleted() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data1And2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path fileWithData1 = createTestFile(testDir, data1);
+        Path fileWithData1And2 = createTestFile(testDir, data1And2);
+
+        test23_copy(fileWithData1And2, fileWithData1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, data1And2,
+                !config.supportsResuming());
+
+        // cleanup
+        deleteTestFile(fileWithData1And2);
+        deleteTestFile(fileWithData1);
+    }
+
+    @Test
+    public void test23_copy_resumeAndCopyAlreadyCompleted_noThrow() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data1And2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path fileWithData1 = createTestFile(testDir, data1);
+        Path fileWithData1And2 = createTestFile(testDir, data1And2);
+
+        test23_copy(fileWithData1And2, fileWithData1, new CopyOption[] { CopyOption.RESUME }, data1And2,
+                !config.supportsResuming());
+
+        // cleanup
+        deleteTestFile(fileWithData1And2);
+        deleteTestFile(fileWithData1);
+    }
+
+    @Test
+    public void test23_copy_doubleResumeAndSourceIsAhead_copyCompleted() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data1And2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path fileWithData1 = createTestFile(testDir, data1);
+        Path fileWithData1And2 = createTestFile(testDir, data1And2);
+
+        test23_copy(fileWithData1And2, fileWithData1, new CopyOption[] { CopyOption.RESUME, CopyOption.RESUME }, data1And2,
+                !config.supportsResuming());
+
+        // cleanup
+        deleteTestFile(fileWithData1And2);
+        deleteTestFile(fileWithData1);
+    }
+
+    @Test
+    public void test23_copy_resumeNonExistingSource_throw() throws Exception {
+        byte[] data = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data);
+        Path nonExisting = createNewTestFileName(testDir);
+
+        test23_copy(nonExisting, file1, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+
+        // cleanup
+        deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_resumeNonExistingTarget_throw() throws Exception {
+        byte[] data = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data);
+        Path nonExisting = createNewTestFileName(testDir);
+
+        test23_copy(file1, nonExisting, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+
+        // cleanup
+        deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_resumeDirectoryAsTarget_throw() throws Exception {
+        byte[] data = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data);
+        Path dir0 = createTestDir(testDir);
+
+        test23_copy(file1, dir0, new CopyOption[] { CopyOption.RESUME, CopyOption.VERIFY }, null, true);
+
+        // cleanup
+        deleteTestFile(file1);
         deleteTestDir(dir0);
-        deleteTestFile(file5);
-        deleteTestFile(file4);
+    }
+
+    @Test
+    public void test23_copy_replaceExistingTarget_copyComplete() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data1);
+        Path file2 = createTestFile(testDir, data2);
+
+        test23_copy(file1, file2, new CopyOption[] { CopyOption.REPLACE }, data1, false);
+
+        // cleanup
         deleteTestFile(file2);
         deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_doubleReplaceExistingTarget_copyComplete() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data1);
+        Path file2 = createTestFile(testDir, data2);
+
+        test23_copy(file1, file2, new CopyOption[] { CopyOption.REPLACE, CopyOption.REPLACE }, data1, false);
+
+        // cleanup
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_replaceAndVerifyExistingTarget_throw() throws Exception {
+        byte[] data1 = "Hello World!".getBytes();
+        byte[] data2 = "Hello World!Goodbye World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data1);
+        Path file2 = createTestFile(testDir, data2);
+
+        test23_copy(file1, file2, new CopyOption[] { CopyOption.REPLACE, CopyOption.VERIFY }, null, true);
+
+        // cleanup
+        deleteTestFile(file2);
+        deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_appendExistingFiles_appendComplete() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data4 = "Hello World!Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createTestFile(testDir, data);
+
+        test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND }, data4, config.supportsAppending() == false);
+
+        // cleanup
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_doubleAppendExistingFiles_appendComplete() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        byte[] data4 = "Hello World!Hello World!".getBytes();
+        byte[] data5 = "Hello World!Hello World!Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path file1 = createTestFile(testDir, data4);
+
+        test23_copy(file0, file1, new CopyOption[] { CopyOption.APPEND, CopyOption.APPEND }, data5,
+                config.supportsAppending() == false);
+
+        // cleanup
+        deleteTestFile(file1);
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_appendNonExistingSource_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data);
+        Path nonExisting = createNewTestFileName(testDir);
+
+        test23_copy(nonExisting, file1, new CopyOption[] { CopyOption.APPEND }, null, true);
+
+        // cleanup
+        deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_appendNonExistingTarget_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path nonExisting = createNewTestFileName(testDir);
+
+        test23_copy(file0, nonExisting, new CopyOption[] { CopyOption.APPEND }, null, true);
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_appendDirectoryAsTarget_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+        Path dir0 = createTestDir(testDir);
+
+        test23_copy(file0, dir0, new CopyOption[] { CopyOption.APPEND }, null, true);
+
+        // cleanup
+        deleteTestDir(dir0);
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_appendDirectoryAsSource_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file1 = createTestFile(testDir, data);
+        Path dir0 = createTestDir(testDir);
+
+        test23_copy(dir0, file1, new CopyOption[] { CopyOption.APPEND }, null, true);
+
+        // cleanup
+        deleteTestDir(dir0);
+        deleteTestFile(file1);
+    }
+
+    @Test
+    public void test23_copy_appendSourceEqualsTarget_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+
+        test23_copy(file0, file0, new CopyOption[] { CopyOption.APPEND }, null, true);
+
+        // cleanup
+        deleteTestFile(file0);
+    }
+
+    @Test
+    public void test23_copy_sourceEqualsTargetEmptyOption_throw() throws Exception {
+        byte[] data = "Hello World!".getBytes();
+        prepareTestDir("test23_copy");
+        Path file0 = createTestFile(testDir, data);
+
+        test23_copy(file0, file0, new CopyOption[] { null }, null, true);
+
+        // cleanup
         deleteTestFile(file0);
     }
 
@@ -2579,6 +3169,10 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test24_copy_async() throws Exception {
+        if (!config.supportsAsynchronousCopy()) {
+            return;
+        }
+
         byte[] data = "Hello World!".getBytes();
 
         prepareTestDir("test24_copy_async");
@@ -2682,42 +3276,78 @@ public abstract class GenericFileAdaptorTestParent {
     }
 
     @Test
-    public void test27_move() throws Exception {
-
+    public void test27_move_nullSourceAndTarget_throw() throws Exception {
         test27_move(null, null, true);
+    }
 
+    @Test
+    public void test27_move_nonExistingSource() throws Exception {
         prepareTestDir("test27_move");
+        Path nonExistingFile = createNewTestFileName(testDir);
+        Path nonExistingFile2 = createNewTestFileName(testDir);
 
-        // test with non-existing source
-        Path file0 = createNewTestFileName(testDir);
-        Path file1 = createNewTestFileName(testDir);
-        test27_move(file0, file1, true);
+        test27_move(nonExistingFile, nonExistingFile2, true);
+    }
 
-        // test with existing source, non-existing target
-        Path file2 = createTestFile(testDir, null);
-        test27_move(file2, file0, false);
+    @Test
+    public void test27_move_existingSourceNonExistingTarget_success() throws Exception {
+        prepareTestDir("test27_move");
+        Path nonExistingFile = createNewTestFileName(testDir);
+        Path existingFile = createTestFile(testDir, null);
 
-        // test with existing source and target
-        Path file3 = createTestFile(testDir, null);
-        test27_move(file3, file0, true);
+        test27_move(existingFile, nonExistingFile, false);
 
-        // test file existing source, and target with non-existing parent
-        Path dir0 = createNewTestDirName(testDir);
-        Path file4 = createNewTestFileName(dir0);
+        // cleanup
+        deleteTestFile(nonExistingFile);
+    }
 
-        test27_move(file0, file4, true);
+    @Test
+    public void test27_move_existingSourceAndTarget_throw() throws Exception {
+        prepareTestDir("test27_move");
+        Path existingFile1 = createTestFile(testDir, null);
+        Path existingFile2 = createTestFile(testDir, null);
 
-        // test with source equals target
-        test27_move(file0, file0, false);
+        test27_move(existingFile1, existingFile2, true);
 
-        deleteTestFile(file0);
-        deleteTestFile(file3);
+        // cleanup
+        deleteTestFile(existingFile2);
+        deleteTestFile(existingFile1);
+    }
 
-        // test with existing dir
-        Path dir1 = createTestDir(testDir);
-        test27_move(dir1, file1, false);
+    @Test
+    public void test27_move_existingSourceNonExistingTargetParent_throw() throws Exception {
+        prepareTestDir("test27_move");
+        Path existingFile = createTestFile(testDir, null);
+        Path nonExistingDirectory = createNewTestDirName(testDir);
+        Path nonExistingFile = createNewTestFileName(nonExistingDirectory);
 
-        deleteTestDir(file1);
+        test27_move(existingFile, nonExistingFile, true);
+
+        // cleanup
+        deleteTestFile(existingFile);
+    }
+
+    @Test
+    public void test27_move_sourceEqualsTarget_noThrow() throws Exception {
+        prepareTestDir("test27_move");
+        Path existingFile3 = createTestFile(testDir, null);
+
+        test27_move(existingFile3, existingFile3, false);
+
+        // cleanup
+        deleteTestFile(existingFile3);
+    }
+
+    @Test
+    public void test27_move_existingDirectoryNonExistingFile_noThrow() throws Exception {
+        prepareTestDir("test27_move");
+        Path nonExistingFile = createNewTestFileName(testDir);
+        Path existingDirectory = createTestDir(testDir);
+
+        test27_move(existingDirectory, nonExistingFile, false);
+
+        // cleanup
+        deleteTestDir(nonExistingFile);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------
