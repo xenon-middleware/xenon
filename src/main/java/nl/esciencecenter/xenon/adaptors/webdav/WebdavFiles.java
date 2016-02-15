@@ -263,12 +263,12 @@ public class WebdavFiles implements Files {
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws XenonException {
-        return null;
+        throw new XenonException(adaptor.getName(), "Webdav adaptor does not support copy status requests.");
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws XenonException {
-        return null;
+        throw new XenonException(adaptor.getName(), "Webdav adaptor does not support canceling a copy.");
     }
 
     @Override
