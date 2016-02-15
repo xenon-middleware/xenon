@@ -84,6 +84,16 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsResuming() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsAsynchronousCopy() {
+        return true;
+    }
+
+    @Override
     public String getScheme() throws Exception {
         return scheme;
     }

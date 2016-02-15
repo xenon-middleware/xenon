@@ -53,6 +53,16 @@ public class WebdavFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsResuming() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsAsynchronousCopy() {
+        return false;
+    }
+
+    @Override
     public Path getWorkingDir(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getNonDefaultCredential(credentials), null).getEntryPath();
     }

@@ -71,9 +71,12 @@ public class WebdavFiles implements Files {
     private final WebdavAdaptor adaptor;
 
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
+    private final XenonEngine xenonEngine;
 
     private static int currentID = 1;
     static int OK = 200;
+    /** The default buffer size for copy. Webdav doesn't use the standard copy engine. */
+    private static final int BUFFER_SIZE = 4 * 1024;
 
     private static synchronized String getNewUniqueID() {
         String res = "webdav" + currentID;
@@ -112,6 +115,7 @@ public class WebdavFiles implements Files {
 
     public WebdavFiles(WebdavAdaptor webdavAdaptor, XenonEngine xenonEngine) {
         adaptor = webdavAdaptor;
+        this.xenonEngine = xenonEngine;
     }
 
     @Override
@@ -185,9 +189,72 @@ public class WebdavFiles implements Files {
         return result;
     }
 
+    private void streamCopy(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int size = in.read(buffer);
+        while (size > 0) {
+            out.write(buffer, 0, size);
+            size = in.read(buffer);
+        }
+    }
+
     @Override
     public Copy copy(Path source, Path target, CopyOption... options) throws XenonException {
-        return null;
+        LOGGER.debug("copy source = {} target = {} options = {}", source, target, options);
+        assertValidOptionsForCopy(options);
+
+        // Extra check just to match behavior of other files adaptors and tests.
+        if (source.equals(target) && CopyOption.CREATE.occursIn(options)) {
+            return null;
+        }
+
+        InputStream inputStream = newInputStream(source);
+        OutputStream outputStream = newOutputStream(target, createOutputStreamOptions(options));
+        try {
+            streamCopy(inputStream, outputStream);
+            inputStream.close();
+            // NB. Webdav output stream buffers all and writes it all at once upon close.
+            outputStream.close();
+        } catch (IOException e) {
+            throw new XenonException(adaptor.getName(), "Copy failed!", e);
+        }
+
+        Copy result = null;
+        LOGGER.debug("copy OK result = {}", result);
+        return result;
+
+    }
+
+    private void assertValidOptionsForCopy(CopyOption... options) throws InvalidOpenOptionsException {
+        if (CopyOption.APPEND.occursIn(options)) {
+            throw new InvalidOpenOptionsException(adaptor.getName(),
+                    "Webdav adaptor does not support appending when copying files.");
+        }
+        if (CopyOption.RESUME.occursIn(options)) {
+            throw new InvalidOpenOptionsException(adaptor.getName(),
+                    "Webdav adaptor does not support resuming when copying files.");
+        }
+        if (CopyOption.REPLACE.occursIn(options) && CopyOption.CREATE.occursIn(options)) {
+            throw new InvalidOpenOptionsException(adaptor.getName(), "Conflicting copy options REPLACE and CREATE.");
+        }
+        if (CopyOption.REPLACE.occursIn(options) && CopyOption.VERIFY.occursIn(options)) {
+            throw new InvalidOpenOptionsException(adaptor.getName(), "Conflicting copy options REPLACE and VERIFY.");
+        }
+    }
+
+    private OpenOption[] createOutputStreamOptions(CopyOption... options) {
+        LinkedList<OpenOption> openOptions = new LinkedList<OpenOption>();
+        if (CopyOption.REPLACE.occursIn(options)) {
+            openOptions.add(OpenOption.OPEN_OR_CREATE);
+        } else if (CopyOption.IGNORE.occursIn(options)) {
+            openOptions.add(OpenOption.OPEN_OR_CREATE);
+        } else {
+            openOptions.add(OpenOption.CREATE);
+        }
+
+        openOptions.add(OpenOption.TRUNCATE);
+        openOptions.add(OpenOption.WRITE);
+        return openOptions.toArray(new OpenOption[openOptions.size()]);
     }
 
     @Override
@@ -408,7 +475,8 @@ public class WebdavFiles implements Files {
         }
 
         if (processedOptions.getAppendMode() == OpenOption.APPEND) {
-            throw new XenonException(adaptor.getName(), "Webdav adaptor does not support appending when writing files.");
+            throw new InvalidOpenOptionsException(adaptor.getName(),
+                    "Webdav adaptor does not support appending when writing files.");
         }
 
         if (processedOptions.getWriteMode() == null) {

@@ -62,6 +62,16 @@ public class SSHFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsResuming() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsAsynchronousCopy() {
+        return true;
+    }
+
+    @Override
     public boolean supportUserInUri() {
         return true;
     }

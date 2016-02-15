@@ -64,6 +64,16 @@ public class LocalFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public boolean supportsResuming() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsAsynchronousCopy() {
+        return true;
+    }
+
+    @Override
     public boolean supportLocation() {
         return true;
     }
