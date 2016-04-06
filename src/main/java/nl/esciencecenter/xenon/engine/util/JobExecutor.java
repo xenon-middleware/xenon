@@ -328,14 +328,16 @@ public class JobExecutor implements Runnable {
             }
 
             if (getKilled()) {
-                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
+                // Destroy first, update state last, otherwise we have a race condition!
                 process.destroy();
+                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));                
                 return;
             }
 
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
-                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process timed out."));
+                // Destroy first, update state last, otherwise we have a race condition!
                 process.destroy();
+                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process timed out."));
                 return;
             }
 

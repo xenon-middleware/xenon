@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -206,7 +207,17 @@ public abstract class GenericScheduleJobTestParent {
             }
         }
         
-        return Utils.readToString(files.newInputStream(p));
+        InputStream in = files.newInputStream(p);
+                
+        String result = Utils.readToString(in);
+        
+        try { 
+            in.close();
+        } catch (Exception e) {
+            // ignored
+        }
+        
+        return result;
     }
 
     protected void writeFully(Path p, String message) throws IOException, XenonException {
@@ -261,6 +272,7 @@ public abstract class GenericScheduleJobTestParent {
                     }
                 } catch (XenonException ex) {
                     cleanupFailed = ex;
+                    logger.warn("cleanupJob failed to delete file {}", p);
                 }
             }
         }

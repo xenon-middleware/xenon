@@ -7,7 +7,7 @@ license {
     ext.copyright_owner = 'Netherlands eScience Center'
     header rootProject.file('config/license/HEADER')
     strictCheck true
-    excludes(["**/create_symlinks", "**/fixtures/**", "**/logback.xml"])
+    excludes(["**/create_symlinks*", "**/fixtures/**", "**/logback.xml"])
 }
 
 licenseFormat.description = "Applies the license found in the header file in files missing the header"

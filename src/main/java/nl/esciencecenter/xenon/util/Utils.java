@@ -37,6 +37,7 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.files.CopyOption;
+import nl.esciencecenter.xenon.files.DirectoryStream;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
@@ -506,7 +507,7 @@ public final class Utils {
 
     /**
      * Provided with an absolute <code>path</code> and a <code>root</code>, this method returns a <code>RelativePath</code> that
-     * represents the part of <code>path</code> that is realtive to the <code>root</code>.
+     * represents the part of <code>path</code> that is relative to the <code>root</code>.
      *
      * For example, if "C:\dir\file" is provided as <code>path</code> and "C:" as <code>root</code>, a <code>RelativePath</code>
      * will be returned that represents "dir\file".
@@ -964,8 +965,13 @@ public final class Utils {
             if (attributes.isDirectory() && maxDepth > 0) {
                 visitResult = visitor.preVisitDirectory(path, attributes, files);
                 if (visitResult == FileVisitResult.CONTINUE) {
+                    
+                    DirectoryStream<PathAttributesPair> stream = null;
+                    
                     try {
-                        for (PathAttributesPair attributesEntry : files.newAttributesDirectoryStream(path)) {
+                        stream = files.newAttributesDirectoryStream(path); 
+                       
+                        for (PathAttributesPair attributesEntry : stream) {
                             // recursion step
                             FileVisitResult result = walk(files, attributesEntry.path(), attributesEntry.attributes(),
                                     followLinks, maxDepth - 1, visitor);
@@ -979,6 +985,14 @@ public final class Utils {
                         }
                     } catch (XenonException e) {
                         exception = e;
+                    } finally { 
+                        if (stream != null) { 
+                            try {
+                                stream.close();
+                            } catch (IOException e) {
+                                // TODO: ignored for now, should log ?  
+                            }
+                        }
                     }
                     return visitor.postVisitDirectory(path, exception, files);
                 } else if (visitResult == FileVisitResult.SKIP_SIBLINGS) {
@@ -1053,11 +1067,27 @@ public final class Utils {
             } else {
                 files.createDirectories(target);
             }
-            for (Path f : files.newDirectoryStream(source)) {
-                Path ftarget = files.newPath(target.getFileSystem(),
-                        target.getRelativePath().resolve(f.getRelativePath().getFileName()));
-                recursiveCopy(files, f, ftarget, options);
+            
+            DirectoryStream<Path> stream  = null;
+            
+            try { 
+                stream = files.newDirectoryStream(source);
+
+                for (Path f : stream) {
+                    Path ftarget = files.newPath(target.getFileSystem(),
+                            target.getRelativePath().resolve(f.getRelativePath().getFileName()));
+                    recursiveCopy(files, f, ftarget, options);
+                }
+            } finally { 
+                if (stream != null) { 
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        // TODO: ignored for now -- should LOG ?
+                    }
+                } 
             }
+                
         } else {
             if (exist) {
                 if (ignore) {
@@ -1089,8 +1119,23 @@ public final class Utils {
         FileAttributes att = files.getAttributes(path);
 
         if (att.isDirectory()) {
-            for (Path f : files.newDirectoryStream(path)) {
-                Utils.recursiveDelete(files, f);
+
+            DirectoryStream<Path> stream = null;
+            
+            try {             
+                stream = files.newDirectoryStream(path);
+                
+                for (Path f : stream) {
+                    Utils.recursiveDelete(files, f);
+                }
+            } finally { 
+                if (stream != null) { 
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        // TODO: ignored for now, should LOG
+                    }
+                }
             }
         }
         files.delete(path);
