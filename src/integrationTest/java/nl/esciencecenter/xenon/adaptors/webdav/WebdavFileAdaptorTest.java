@@ -35,12 +35,12 @@ public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
     private static final String FILE_PATH = "/public/bla5.txt";
 
     @BeforeClass
-    public static void prepareFTPFileAdaptorTest() throws Exception {
+    public static void prepareWebdavFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.prepareClass(new WebdavFileTestConfig(null));
     }
 
     @AfterClass
-    public static void cleanupFTPFileAdaptorTest() throws Exception {
+    public static void cleanupWebdavFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.cleanupClass();
     }
 }
