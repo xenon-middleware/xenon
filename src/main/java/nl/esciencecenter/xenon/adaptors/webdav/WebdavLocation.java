@@ -28,13 +28,6 @@ public class WebdavLocation extends Location {
         super(location, WebdavAdaptor.ADAPTOR_SCHEME.get(0));
     }
 
-    public WebdavLocation(String location, String scheme) throws InvalidLocationException {
-        this(location);
-        if (getScheme() == null) {
-            //setScheme(scheme); // TODO: this method doesn't exist yet. Also, this is somewhat weird maybe considering the super with scheme parameter exists nowadays.
-        }
-    }
-
     @Override
     protected String getAdaptorName() {
         return WebdavAdaptor.ADAPTOR_NAME;
@@ -50,6 +43,6 @@ public class WebdavLocation extends Location {
     }
 
     public static WebdavLocation parse(String location, String scheme) throws InvalidLocationException {
-        return new WebdavLocation(location, scheme);
+        return new WebdavLocation(location);
     }
 }

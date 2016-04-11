@@ -25,15 +25,6 @@ import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
  *
  */
 public class WebdavFileAdaptorTest extends GenericFileAdaptorTestParent {
-
-    private static final String NONEXISTENTPARENT_NEWDIR_PATH = "/public/nonexistentparent/newdir";
-    private static final String NEWFILE_PATH = "/public/newfile";
-    private static final String NEWDIR_PATH = "/public/xenonnewdir";
-    private static final String NEWFILE_IN_NEWDIR_PATH = "/public/xenonnewdir/newfile";
-    private static final String NONEXISTENT_PATH = "/public/nonexistent.txt";
-    private static final String DIR_PATH = "/public/sub";
-    private static final String FILE_PATH = "/public/bla5.txt";
-
     @BeforeClass
     public static void prepareWebdavFileAdaptorTest() throws Exception {
         GenericFileAdaptorTestParent.prepareClass(new WebdavFileTestConfig(null));

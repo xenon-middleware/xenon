@@ -165,10 +165,7 @@ public class WebdavFileAttributes implements FileAttributes {
     }
 
     private boolean areIdentical(WebdavFileAttributes a, WebdavFileAttributes b) {
-        if (a.creationTime() != b.creationTime()) {
-            return false;
-        }
-        return true;
+        return a.creationTime() == b.creationTime();
     }
 
     /**

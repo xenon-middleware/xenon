@@ -33,8 +33,8 @@ import nl.esciencecenter.xenon.files.Path;
 public class WebdavOutputStream extends OutputStream {
     private final WebdavFiles files;
     private final Path path;
-    ArrayList<Byte> buffer = new ArrayList<Byte>();
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private final ArrayList<Byte> buffer = new ArrayList<Byte>();
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     public WebdavOutputStream(Path path, WebdavFiles webdavFiles) {
         this.path = path;

@@ -26,8 +26,7 @@ import nl.esciencecenter.xenon.engine.credentials.PasswordCredentialImplementati
 
 public class WebdavCredentials implements Credentials {
     private static int currentID = 1;
-    private XenonProperties properties;
-    private WebdavAdaptor adaptor;
+    private final WebdavAdaptor adaptor;
 
     private static synchronized String getNewUniqueID() {
         String res = "webdav" + currentID;
@@ -36,8 +35,6 @@ public class WebdavCredentials implements Credentials {
     }
 
     public WebdavCredentials(XenonProperties properties, WebdavAdaptor webdavAdaptor) {
-        this.properties = properties;
-
         if (webdavAdaptor == null) {
             throw new IllegalArgumentException("Adaptor can not be null!");
         }

@@ -87,10 +87,9 @@ public class WebdavFiles implements Files {
     private final WebdavAdaptor adaptor;
 
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
-    private final XenonEngine xenonEngine;
 
     private static int currentID = 1;
-    static int OK = 200;
+    public static int OK_code = 200;
     /** The default buffer size for copy. Webdav doesn't use the standard copy engine. */
     private static final int BUFFER_SIZE = 4 * 1024;
 
@@ -131,7 +130,6 @@ public class WebdavFiles implements Files {
 
     public WebdavFiles(WebdavAdaptor webdavAdaptor, XenonEngine xenonEngine) {
         adaptor = webdavAdaptor;
-        this.xenonEngine = xenonEngine;
     }
 
     @Override
@@ -140,7 +138,7 @@ public class WebdavFiles implements Files {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
-        WebdavLocation webdavLocation = new WebdavLocation(location, scheme);
+        WebdavLocation webdavLocation = new WebdavLocation(location);
 
         HttpClient client = getClient(webdavLocation);
         HttpMethod method;
@@ -385,15 +383,6 @@ public class WebdavFiles implements Files {
         }
     }
 
-    private String getFileOrFolderPath(Path path) throws XenonException {
-        FileAttributes attributes = getAttributes(path);
-        if (attributes.isDirectory()) {
-            return toFolderPath(path.toString());
-        } else {
-            return toFilePath(path.toString());
-        }
-    }
-
     @Override
     public boolean exists(Path path) {
         LOGGER.debug("exists path = {}", path);
@@ -574,7 +563,7 @@ public class WebdavFiles implements Files {
         MultiStatusResponse[] responses = document.getResponses();
         DavPropertySet properties = null;
         for (MultiStatusResponse multiStatusResponse : responses) {
-            properties = multiStatusResponse.getProperties(OK);
+            properties = multiStatusResponse.getProperties(OK_code);
         }
         return properties;
     }
@@ -586,21 +575,23 @@ public class WebdavFiles implements Files {
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
+        // Not possible with webdav.
     }
 
     public void end() {
+        LOGGER.debug("end OK");
     }
 
     private void assertIsEmpty(Path path) throws XenonException {
         DirectoryStream<Path> newDirectoryStream = newDirectoryStream(path);
-        boolean isEmpty = newDirectoryStream.iterator().hasNext() == false;
+        boolean hasNext = newDirectoryStream.iterator().hasNext();
         try {
             newDirectoryStream.close();
         } catch (IOException e) {
             LOGGER.warn("Could not close stream at {} because of IOException with message \"{}\"", path.toString(),
                     e.getMessage());
         }
-        if (isEmpty == false) {
+        if (hasNext) {
             throw new XenonException(adaptor.getName(), "Path is not empty: " + path.toString());
         }
     }
