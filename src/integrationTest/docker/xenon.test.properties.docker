@@ -173,7 +173,7 @@ test.ftp.password=javagat
 # password must be provided to test password authentication to the 
 # host.
 #
-test.webdav.privatelocation=xenon-webdav/~xenon/uploads
+test.webdav.privatelocation=xenon-webdav/xenon/uploads
 test.webdav.publiclocation=xenon-webdav/uploads
 test.webdav.user=xenon
 test.webdav.password=javagat
