@@ -34,7 +34,7 @@ public class WebdavCredentials implements Credentials {
         return res;
     }
 
-    public WebdavCredentials(XenonProperties properties, WebdavAdaptor webdavAdaptor) {
+    public WebdavCredentials(WebdavAdaptor webdavAdaptor) {
         if (webdavAdaptor == null) {
             throw new IllegalArgumentException("Adaptor can not be null!");
         }

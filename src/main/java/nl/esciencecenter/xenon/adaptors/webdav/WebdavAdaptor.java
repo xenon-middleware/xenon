@@ -110,8 +110,8 @@ public class WebdavAdaptor extends Adaptor {
         super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
-        filesAdaptor = new WebdavFiles(this, xenonEngine);
-        credentialsAdaptor = new WebdavCredentials(getProperties(), this);
+        filesAdaptor = new WebdavFiles(this);
+        credentialsAdaptor = new WebdavCredentials(this);
     }
 
     @Override

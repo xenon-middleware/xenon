@@ -59,7 +59,6 @@ import org.slf4j.LoggerFactory;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
 import nl.esciencecenter.xenon.engine.files.FileSystemImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
@@ -128,7 +127,7 @@ public class WebdavFiles implements Files {
         }
     }
 
-    public WebdavFiles(WebdavAdaptor webdavAdaptor, XenonEngine xenonEngine) {
+    public WebdavFiles(WebdavAdaptor webdavAdaptor) {
         adaptor = webdavAdaptor;
     }
 

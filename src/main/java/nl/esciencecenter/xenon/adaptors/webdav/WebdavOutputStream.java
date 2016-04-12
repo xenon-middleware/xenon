@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors.webdav;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.files.Path;
@@ -33,7 +32,6 @@ import nl.esciencecenter.xenon.files.Path;
 public class WebdavOutputStream extends OutputStream {
     private final WebdavFiles files;
     private final Path path;
-    private final ArrayList<Byte> buffer = new ArrayList<Byte>();
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     public WebdavOutputStream(Path path, WebdavFiles webdavFiles) {
