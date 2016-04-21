@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.AdaptorStatus;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.InvalidSchemeException;
@@ -38,6 +41,7 @@ import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
 import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptor;
+import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptor;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
@@ -45,9 +49,6 @@ import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * XenonEngine implements the Xenon Interface class by redirecting all calls to {@link Adaptor}s.
@@ -169,20 +170,21 @@ public final class XenonEngine implements Xenon {
     private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
 
         // Copy the map so we can manipulate it.
-        Map<String, String> tmp = new HashMap<>(properties);
+        Map<String, String> unprocesedProperties = new HashMap<>(properties);
 
         List<Adaptor> result = new ArrayList<>(10);
 
-        result.add(new LocalAdaptor(this, extract(tmp, LocalAdaptor.PREFIX)));
-        result.add(new SshAdaptor(this, extract(tmp, SshAdaptor.PREFIX)));
-        result.add(new FtpAdaptor(this, extract(tmp, FtpAdaptor.PREFIX)));
-        result.add(new GridEngineAdaptor(this, extract(tmp, GridEngineAdaptor.PREFIX)));
-        result.add(new SlurmAdaptor(this, extract(tmp, SlurmAdaptor.PREFIX)));
-        result.add(new TorqueAdaptor(this, extract(tmp, TorqueAdaptor.PREFIX)));
+        result.add(new LocalAdaptor(this, extract(unprocesedProperties, LocalAdaptor.PREFIX)));
+        result.add(new SshAdaptor(this, extract(unprocesedProperties, SshAdaptor.PREFIX)));
+        result.add(new FtpAdaptor(this, extract(unprocesedProperties, FtpAdaptor.PREFIX)));
+        result.add(new GridEngineAdaptor(this, extract(unprocesedProperties, GridEngineAdaptor.PREFIX)));
+        result.add(new SlurmAdaptor(this, extract(unprocesedProperties, SlurmAdaptor.PREFIX)));
+        result.add(new TorqueAdaptor(this, extract(unprocesedProperties, TorqueAdaptor.PREFIX)));
+        result.add(new WebdavAdaptor(this, extract(unprocesedProperties, WebdavAdaptor.PREFIX)));
 
         // Check if there are any properties left. If so, this is a problem.
-        if (!tmp.isEmpty()) {
-            throw new UnknownPropertyException("XenonEngine", "Unknown properties: " + tmp);
+        if (!unprocesedProperties.isEmpty()) {
+            throw new UnknownPropertyException("XenonEngine", "Unknown properties: " + unprocesedProperties);
         }
 
         return result.toArray(new Adaptor[result.size()]);

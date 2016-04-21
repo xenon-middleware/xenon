@@ -23,14 +23,12 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
 import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.engine.Adaptor;
-import nl.esciencecenter.xenon.engine.XenonEngine;
-
-import org.junit.Test;
 
 public class XenonEngineTest {
 
@@ -164,8 +162,8 @@ public class XenonEngineTest {
     public void getAdaptorInfos_StandardAdaptors_Succeeds() throws Exception {
 
         // We currently have adaptors:
-        // local, ssh, gridengine, slurm, ftp, torque
-        int count = 6;
+        // local, ssh, gridengine, slurm, ftp, torque, webdav
+        int count = 7;
 
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
 

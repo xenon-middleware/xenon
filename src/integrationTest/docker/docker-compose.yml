@@ -13,6 +13,8 @@ xenon-torque:
     - SYS_RESOURCE
 xenon-slurm:
   image: nlesc/xenon-slurm
+xenon-webdav:
+  image: nlesc/xenon-webdav
 xenon-gridengine:
   image: nlesc/xenon-gridengine
 # TODO Docker test on travis-ci can not run multi host gridengine due hostname resolving errors
@@ -33,6 +35,7 @@ xenon-test:
     - xenon-ssh
     - xenon-ssh2
     - xenon-ftp
+    - xenon-webdav
     - xenon-torque
     - xenon-slurm
     - xenon-gridengine

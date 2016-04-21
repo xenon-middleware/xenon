@@ -10,3 +10,4 @@ license {
     excludes(["**/create_symlinks*", "**/fixtures/**", "**/logback.xml"])
 }
 
+licenseFormat.description = "Applies the license found in the header file in files missing the header"

@@ -57,6 +57,12 @@ public abstract class FileTestConfig extends GenericTestConfig {
         return false;
     }
 
+    public abstract boolean supportsAppending();
+
+    public abstract boolean supportsResuming();
+
+    public abstract boolean supportsAsynchronousCopy();
+
     public String getNonDefaultCredentialLocation() throws Exception {
         return getCorrectLocation();
     }
