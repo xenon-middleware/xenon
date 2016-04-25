@@ -11,8 +11,15 @@ xenon-torque:
   image: nlesc/xenon-torque
   cap_add:
     - SYS_RESOURCE
+# Slurm stores accounting in MySQL
+mysql:
+  image: mysql:5.5
+  environment:
+  - MYSQL_ROOT_PASSWORD=xenon-slurm-pw
 xenon-slurm:
   image: nlesc/xenon-slurm
+  links:
+  - mysql
 xenon-webdav:
   image: nlesc/xenon-webdav
 xenon-gridengine:
