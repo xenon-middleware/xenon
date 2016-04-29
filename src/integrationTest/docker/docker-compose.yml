@@ -9,6 +9,7 @@ xenon-ftp:
   image: nlesc/xenon-ftp
 xenon-torque:
   image: nlesc/xenon-torque
+  hostname: xenon-torque
   cap_add:
     - SYS_RESOURCE
 # Slurm stores accounting in MySQL
