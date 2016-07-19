@@ -53,4 +53,7 @@ public interface Cloud {
      */
     Map<String, String> getProperties();
     
+    
+    
+    
 }

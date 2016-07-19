@@ -17,15 +17,31 @@
 package nl.esciencecenter.xenon.clouds;
 
 /**
- * @version 1.0
- * @since 1.0
+ * @version 2.0
+ * @since 2.0
  *
  */
 public interface VirtualMachine {
 
     /**
+     * Returns the {@link VirtualMachineDescription} that was used to create this VirtualMachine.
+     * 
+     * @return the VirtualMachineDescription that belongs to this VirtualMachine
+     */
+    VirtualMachineDescription getVirtualMachineDescription();
+
+    /**
+     * Returns the {@link Cloud} that was used to create this VitualMachine.
+     * 
      * @return the <code>Cloud</code> to which this <code>VirtualMachine</code> belongs.
      */
     Cloud getCloud();
 
+    /**
+     * Returns the identifier that was assigned to this VirtualMachine by the Cloud.
+     * 
+     * @return the identifier that was assigned to this VirtualMachine by the Cloud.
+     */
+    String getIdentifier();
+    
 }
