@@ -91,4 +91,72 @@ public interface Clouds {
      *             If an I/O error occurred.
      */
     boolean isOpen(Cloud cloud) throws XenonException;
+    
+    /**
+     * Create and launch a new <code>VirtualMachine</code> instance in the specified <code>Cloud</code>. 
+     * 
+     * @param cloud
+     * @param description
+     * @return the <code>VirtualMachine</code> that has been launched
+     * @throws XenonException
+     */
+    VirtualMachine launchVirtualMachine(Cloud cloud, VirtualMachineDescription description) throws XenonException;
+
+    /**
+     * Suspend a running <code>VirtualMachine</code> instance. Once suspended, the instance is usually free of charge and some
+     * (but not necessarily all) disk state is kept. The instance can be resumed later using <code>resumeVirtualMachine</code>.   
+     * 
+     * @param virtualMachine
+     * @return the <code>VirtualMachineStatus</code> of the <code>VirtualMachine</code> 
+     * @throws XenonException
+     */
+    VirtualMachineStatus startVirtualMachine(VirtualMachine virtualMachine) throws XenonException;
+    
+    /** 
+     * Resume a <code>VirtualMachine</code> that was suspended earlier. It is very likely that the  <code>VirtualMachine</code>
+     * will be resumed on a different physical host, getting a different IP address, etc. 
+     * 
+     * @param virtualMachine
+     * @return the <code>VirtualMachineStatus</code> of the <code>VirtualMachine</code>
+     * @throws XenonException
+     */
+    VirtualMachineStatus stopVirtualMachine(VirtualMachine virtualMachine) throws XenonException;
+    
+    /** 
+     * Terminate a <code>VirtualMachine</code>, removing the instance and all data on disk is removed and cannot be restarted.
+     * 
+     * @param virtualMachine
+     * @return the <code>VirtualMachineStatus</code> of the <code>VirtualMachine</code>
+     * @throws XenonException
+     */    
+    VirtualMachineStatus terminateVirtualMachine(VirtualMachine virtualMachine) throws XenonException;
+
+    /**
+     * Reboot a <code>VirtualMachine</code>. Unlike suspend-resume, the <code>VirtualMachine</code> will remain on the same 
+     * physical host, usually keeping its IP address, etc. 
+     * 
+     * @param virtualMachine
+     * @return the <code>VirtualMachineStatus</code> of the <code>VirtualMachine</code>
+     * @throws XenonException
+     */    
+    VirtualMachineStatus rebootVirtualMachine(VirtualMachine virtualMachine) throws XenonException;
+    
+    
+    
+    
+    
+    
+    VirtualMachineStatus getVirtualMachineStatus(VirtualMachine virtualMachine) throws XenonException;
+    
+    VirtualMachineStatus [] getVirtualMachineStatuses(VirtualMachine... virtualMachines) throws XenonException;
+    
+    VirtualMachineStatus waitUntilRunning(VirtualMachine virtualMachine, long timeout) throws XenonException;
+    
+    VirtualMachineStatus waitUntilDone(VirtualMachine virtualMachine, long timeout) throws XenonException;
+    
+        
+    
+    
+    
+    
 }
