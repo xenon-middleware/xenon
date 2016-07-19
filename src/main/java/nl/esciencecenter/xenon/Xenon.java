@@ -20,13 +20,15 @@ import java.util.Map;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.clouds.Clouds;
+
 
 /**
  * Main Xenon interface.
  * 
  * This interface provides an access point to all packages of Xenon and several utility functions.
  * 
- * @version 1.0
+ * @version 2.0
  * @since 1.0
  */
 public interface Xenon {
@@ -52,6 +54,13 @@ public interface Xenon {
      */
     Credentials credentials();
 
+    /**
+     * Retrieve the <code>Clouds</code> package interface.
+     * 
+     * @return a reference to the Clouds package interface.
+     */
+    Clouds clouds();
+    
     /**
      * Returns the properties that where used to create this Xenon.
      * 

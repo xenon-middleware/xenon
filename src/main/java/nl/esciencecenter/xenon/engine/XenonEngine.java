@@ -42,7 +42,9 @@ import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptor;
 import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptor;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.engine.clouds.CloudsEngine;
 import nl.esciencecenter.xenon.engine.credentials.CredentialsEngineImplementation;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
@@ -53,7 +55,7 @@ import nl.esciencecenter.xenon.jobs.Jobs;
 /**
  * XenonEngine implements the Xenon Interface class by redirecting all calls to {@link Adaptor}s.
  *
- * @version 1.0
+ * @version 2.0
  * @since 1.0
  */
 public final class XenonEngine implements Xenon {
@@ -130,6 +132,8 @@ public final class XenonEngine implements Xenon {
 
     private final JobsEngine jobsEngine;
 
+    private final CloudsEngine cloudsEngine;
+    
     private final CredentialsEngineImplementation credentialsEngine;
 
     private final Adaptor[] adaptors;
@@ -160,6 +164,7 @@ public final class XenonEngine implements Xenon {
         filesEngine = new FilesEngine(this);
         jobsEngine = new JobsEngine(this);
         credentialsEngine = new CredentialsEngineImplementation(this);
+        cloudsEngine = new CloudsEngine(this);
         copyEngine = new CopyEngine(filesEngine);
 
         adaptors = loadAdaptors(this.properties);
@@ -279,6 +284,11 @@ public final class XenonEngine implements Xenon {
         return credentialsEngine;
     }
 
+    @Override
+    public Clouds clouds() {
+        return cloudsEngine;
+    }
+    
     public CopyEngine getCopyEngine() {
         return copyEngine;
     }
