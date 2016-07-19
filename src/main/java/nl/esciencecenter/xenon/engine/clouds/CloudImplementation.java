@@ -19,48 +19,63 @@ package nl.esciencecenter.xenon.engine.clouds;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.clouds.Cloud;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.engine.XenonProperties;
 
-/**
- * @version 1.0
- * @since 1.0
- *
- */
 public class CloudImplementation implements Cloud {
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.xenon.clouds.Cloud#getAdaptorName()
-     */
+    private final String adaptorName;
+    private final String uniqueID;
+    private final String scheme;
+    private final String location;
+    
+    private final Credential credential;
+    
+    private final XenonProperties properties;
+    
+    
+    public CloudImplementation(String adaptorName, String uniqueID, String scheme, String location, 
+            Credential credential, XenonProperties properties) { 
+     
+        this.adaptorName = adaptorName;
+        this.uniqueID = uniqueID;
+        this.scheme = scheme;
+        this.location = location;
+        this.credential = credential;
+        
+        if (properties == null) {
+            this.properties = new XenonProperties();
+        } else {
+            this.properties = properties;
+        }        
+    }
+    
+    public Credential getCredential() {
+        return credential;
+    }
+
+    public String getUniqueID() {
+        return uniqueID;
+    }
+    
     @Override
     public String getAdaptorName() {
-        // TODO Auto-generated method stub
-        return null;
+        return adaptorName;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.xenon.clouds.Cloud#getLocation()
-     */
     @Override
     public String getLocation() {
-        // TODO Auto-generated method stub
-        return null;
+        return location;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.xenon.clouds.Cloud#getScheme()
-     */
     @Override
     public String getScheme() {
-        // TODO Auto-generated method stub
-        return null;
+        return scheme;
     }
 
-    /* (non-Javadoc)
-     * @see nl.esciencecenter.xenon.clouds.Cloud#getProperties()
-     */
     @Override
     public Map<String, String> getProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return properties.toMap();
     }
 
 }

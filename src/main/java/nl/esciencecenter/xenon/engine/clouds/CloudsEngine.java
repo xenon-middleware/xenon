@@ -46,8 +46,9 @@ public class CloudsEngine implements Clouds {
     @Override
     public Cloud newCloud(String scheme, String location, Credential credential, Map<String, String> properties)
             throws XenonException {
-        // Dummy
-        return new CloudImplementation();
+        
+        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
+        return adaptor.cloudsAdaptor().newCloud(scheme, location, credential, properties);
     }
 
     @Override
