@@ -40,9 +40,6 @@ public class VirtualMachineDescription {
     /** The options of this virtual machine */
     private final Map<String, String> vmOptions = new HashMap<>(5);
 
-    /** The number of nodes to start */
-    private int nodeCount;
-    
     public String getImageID() {
         return imageID;
     }
@@ -65,14 +62,6 @@ public class VirtualMachineDescription {
 
     public void setNodeType(String nodeType) {
         this.nodeType = nodeType;
-    }
-
-    public int getNodeCount() {
-        return nodeCount;
-    }
-
-    public void setNodeCount(int nodeCount) {
-        this.nodeCount = nodeCount;
     }
 
     /**

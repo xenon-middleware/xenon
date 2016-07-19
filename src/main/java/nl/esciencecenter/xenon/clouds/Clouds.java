@@ -102,6 +102,18 @@ public interface Clouds {
      */
     VirtualMachine launchVirtualMachine(Cloud cloud, VirtualMachineDescription description) throws XenonException;
 
+    
+    /**
+     * Create and launch a set of <code>VirtualMachine</code>s instances in the specified <code>Cloud</code>. 
+     * 
+     * @param cloud
+     * @param description
+     * @param count
+     * @return an array of the <code>VirtualMachine</code> that has been launched
+     * @throws XenonException
+     */
+    VirtualMachine [] launchVirtualMachines(Cloud cloud, VirtualMachineDescription description, int count) throws XenonException;
+    
     /**
      * Suspend a running <code>VirtualMachine</code> instance. Once suspended, the instance is usually free of charge and some
      * (but not necessarily all) disk state is kept. The instance can be resumed later using <code>resumeVirtualMachine</code>.   
