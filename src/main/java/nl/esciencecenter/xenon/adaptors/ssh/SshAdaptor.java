@@ -25,6 +25,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
@@ -291,6 +292,11 @@ public class SshAdaptor extends Adaptor {
         return jobsAdaptor;
     }
 
+    @Override
+    public Clouds cloudsAdaptor() throws XenonException {
+        throw new XenonException(getName(), "cloudsAdaptor(): Not implemented");
+    }
+    
     @Override
     public Credentials credentialsAdaptor() {
         return credentialsAdaptor;

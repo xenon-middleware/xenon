@@ -27,6 +27,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
@@ -60,6 +61,11 @@ public class AdaptorTest {
 
         @Override
         public Jobs jobsAdaptor() throws XenonException {
+            return null;
+        }
+        
+        @Override
+        public Clouds cloudsAdaptor() throws XenonException {
             return null;
         }
 

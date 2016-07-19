@@ -24,6 +24,7 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
@@ -142,6 +143,11 @@ public class LocalAdaptor extends Adaptor {
         return localJobs;
     }
 
+    @Override
+    public Clouds cloudsAdaptor() throws XenonException {
+        throw new XenonException(getName(), "cloudsAdaptor(): Not implemented");
+    }
+    
     @Override
     public Credentials credentialsAdaptor() throws XenonException {
         return localCredentials;

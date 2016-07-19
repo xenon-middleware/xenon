@@ -23,6 +23,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
@@ -129,6 +130,11 @@ public class FtpAdaptor extends Adaptor {
         throw new XenonException(getName(), "jobsAdaptor(): Not implemented");
     }
 
+    @Override
+    public Clouds cloudsAdaptor() throws XenonException {
+        throw new XenonException(getName(), "cloudsAdaptor(): Not implemented");
+    }
+    
     @Override
     public Credentials credentialsAdaptor() {
         return credentialsAdaptor;

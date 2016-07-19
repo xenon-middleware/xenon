@@ -22,6 +22,7 @@ import nl.esciencecenter.xenon.AdaptorStatus;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
@@ -132,5 +133,7 @@ public abstract class Adaptor {
 
     public abstract Credentials credentialsAdaptor() throws XenonException;
 
+    public abstract Clouds cloudsAdaptor() throws XenonException;
+    
     public abstract void end();
 }

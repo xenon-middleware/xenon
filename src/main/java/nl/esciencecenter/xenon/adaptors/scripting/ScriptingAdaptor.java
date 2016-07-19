@@ -17,6 +17,7 @@ package nl.esciencecenter.xenon.adaptors.scripting;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.clouds.Clouds;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
@@ -66,6 +67,11 @@ public abstract class ScriptingAdaptor extends Adaptor {
         throw new XenonException(getName(), "Adaptor does not support files.");
     }
 
+    @Override
+    public Clouds cloudsAdaptor() throws XenonException {
+        throw new XenonException(getName(), "cloudsAdaptor(): Not implemented");
+    }
+    
     @Override
     public Credentials credentialsAdaptor() throws XenonException {
         return credentialsAdaptor;

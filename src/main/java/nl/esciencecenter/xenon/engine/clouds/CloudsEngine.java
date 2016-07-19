@@ -16,7 +16,13 @@
 
 package nl.esciencecenter.xenon.engine.clouds;
 
+import java.util.Map;
+
+import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.clouds.Cloud;
 import nl.esciencecenter.xenon.clouds.Clouds;
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 
 /**
@@ -33,4 +39,24 @@ public class CloudsEngine implements Clouds {
         this.xenonEngine = xenonEngine;
     }
     
+    private Adaptor getAdaptor(Cloud cloud) throws XenonException {
+        return xenonEngine.getAdaptor(cloud.getAdaptorName());
+    }
+       
+    @Override
+    public Cloud newCloud(String scheme, String location, Credential credential, Map<String, String> properties)
+            throws XenonException {
+        // Dummy
+        return new CloudImplementation();
+    }
+
+    @Override
+    public void close(Cloud cloud) throws XenonException {
+        getAdaptor(cloud).cloudsAdaptor().close(cloud);
+    }
+
+    @Override
+    public boolean isOpen(Cloud cloud) throws XenonException {
+        return getAdaptor(cloud).cloudsAdaptor().isOpen(cloud);
+    }
 }
