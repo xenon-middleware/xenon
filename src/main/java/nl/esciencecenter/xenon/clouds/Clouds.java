@@ -21,6 +21,12 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
 
+import nl.esciencecenter.xenon.UnknownPropertyException;
+import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidCredentialException;
+import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
+
 /**
  * The Clouds API of Xenon.
  * 
