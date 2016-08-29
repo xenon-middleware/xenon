@@ -187,4 +187,11 @@ public class CloudsEngine implements Clouds {
     public VirtualMachineStatus waitUntilDone(VirtualMachine virtualMachine, long timeout) throws XenonException {
         return getAdaptor(virtualMachine.getCloud()).cloudsAdaptor().waitUntilDone(virtualMachine, timeout);
     }
+
+    @Override
+    public VirtualMachine[] launchVirtualMachines(Cloud cloud, VirtualMachineDescription description, int count)
+            throws XenonException {
+        // TODO Auto-generated method stub
+        throw new XenonException("launchVirtualMachines not implemented yet!", null);
+    }
 }
