@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.scripting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +36,11 @@ public final class ScriptingParser {
 
     public static final Pattern EQUALS_REGEX = Pattern.compile("\\s*=\\s*");
 
+    // public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
     public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
-
+    // "\\((.+?)\\)"
+    
+    
     private ScriptingParser() {
         //DO NOT USE
     }
@@ -245,11 +249,12 @@ public final class ScriptingParser {
                 // do not parse separators
                 continue;
             }
-            String[] values = fieldSeparatorRegEx.split(lines[i]);
-
+ 
+            String[] values = mergeTuples(fieldSeparatorRegEx.split(lines[i]));
+            
             if (fields.length != values.length) {
-                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output, got line with "
-                        + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values));
+                throw new XenonException(adaptorName, "Expected " + fields.length + " fields in output " + Arrays.toString(fields) 
+                    + ", got line with " + values.length + " values: " + lines[i] + "parsed to: " + Arrays.toString(values) + " original input\n\n" + input + "\n\n");
             }
 
             Map<String, String> map = new HashMap<>(rowSize);
@@ -267,6 +272,43 @@ public final class ScriptingParser {
         return result;
     }
 
+   
+    private static String [] mergeTuples(String [] values) { 
+    
+        boolean inTuple = false;
+        
+        ArrayList<String> tmp = new ArrayList<>();
+        
+        String current = null; 
+        
+        for (String v : values) {  
+
+            if (!inTuple) {
+                if (v.startsWith("(") && !v.endsWith(")")) { 
+                    inTuple = true;
+                    current = v;
+                } else { 
+                    tmp.add(v);
+                }
+            } else { 
+                current = current + " " + v; // Damn.. no clue which whitespace to use here :-(
+
+                if (v.endsWith(")") && !v.startsWith("(")) {
+                    inTuple = false;
+                    tmp.add(current);
+                    current = null;
+                } 
+            }
+        }
+        
+        if (inTuple) { 
+            // Our tuple merging has gone pear shaped... resort to the original output! 
+            return values;
+        } else { 
+            return tmp.toArray(new String[tmp.size()]);
+        }
+    }
+    
     /**
      * Checks if the given text contains any of the given options. Returns which option it contains, throws an exception if it
      * doesn't.
