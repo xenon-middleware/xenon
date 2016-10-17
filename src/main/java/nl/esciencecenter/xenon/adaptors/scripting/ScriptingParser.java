@@ -272,7 +272,18 @@ public final class ScriptingParser {
         return result;
     }
 
-   
+    /*
+     * Attempt to support simple tuples in the output. The splitter will typically split these into two elements. For example:
+     * 
+     *     "(bla, bla)" 
+     *     
+     * will be split into 
+     * 
+     *     "(bla," 
+     *     "bla)
+     *     
+     * while we typically expect these to remain as one string.    
+     */
     private static String [] mergeTuples(String [] values) { 
     
         boolean inTuple = false;
