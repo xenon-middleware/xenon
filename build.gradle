@@ -8,7 +8,7 @@ plugins {
     id 'distribution'
     // publishing
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.4'
+    id 'com.jfrog.bintray' version '1.7.3'
     // ide
     id 'idea'
     id 'eclipse'
