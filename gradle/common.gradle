@@ -76,7 +76,7 @@ tasks.withType(Test) {
 task wrapper(type: Wrapper) {
     description 'Generates gradle wrapper'
     group 'Build Setup'
-    gradleVersion = '2.4'
+    gradleVersion = '2.11'
 }
 
 cleanIdeaWorkspace.group = 'IDE'
