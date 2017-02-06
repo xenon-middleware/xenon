@@ -4,7 +4,10 @@
 FROM nlesc/xenon-phusion-base
 MAINTAINER Stefan Verhoeven "s.verhoeven@esciencecenter.nl"
 
-RUN apt-get update && apt-get install -y openjdk-8-jdk expect && \
+RUN apt-get update && apt-get install -y python-software-properties && \
+add-apt-repository ppa:webupd8team/java -y && apt-get update && \
+echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+apt-get install -y  oracle-java8-installer oracle-java8-set-default expect && \
 apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
 mkdir /code && mkdir -p /etc/my_init.d && touch /etc/service/sshd/down
 
