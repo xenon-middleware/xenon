@@ -12,6 +12,7 @@ matrix:
         - JDK=oraclejdk7
         - OS=linux
       sudo: true
+      dist: trusty
       services:
         - docker
       os: linux
