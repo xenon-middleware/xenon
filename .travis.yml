@@ -1,17 +1,18 @@
 language: java
 
 matrix:
-  # Only do docker integration tests with Oracle JDK 7: the docker
+  # Only do docker integration tests with Oracle JDK 8: the docker
   # tests are not affected by JDK on host system.
   include:
-    - jdk: oraclejdk7
+    - jdk: oraclejdk8
       env:
         - GRADLE_BUILD_TASKS="assemble dockerBuild"
         - GRADLE_SCRIPT_TASKS="check dockerIntegrationTest"
         - INTEGRATION_TEST="docker"
-        - JDK=oraclejdk7
+        - JDK=oraclejdk8
         - OS=linux
       sudo: true
+      dist: trusty
       services:
         - docker
       os: linux
@@ -24,12 +25,12 @@ matrix:
         - OS=linux
       sudo: false
       os: linux
-    - jdk: oraclejdk8
+    - jdk: oraclejdk7
       env:
         - GRADLE_BUILD_TASKS="assemble"
         - GRADLE_SCRIPT_TASKS="check"
         - INTEGRATION_TEST=0
-        - JDK=oraclejdk8
+        - JDK=oraclejdk7
         - OS=linux
       sudo: false
       os: linux
