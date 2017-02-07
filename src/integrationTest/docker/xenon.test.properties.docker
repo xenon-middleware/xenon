@@ -136,7 +136,7 @@ test.torque.password=javagat
 #
 test.torque.default.queue=batch
 test.torque.queues=debug,batch
-test.torque.queue.wait.time=2000
+test.torque.queue.wait.time=10000
 test.torque.update.time=5000
 
 ######################################################################
