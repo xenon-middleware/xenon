@@ -5,7 +5,7 @@ defaultTasks 'clean', 'assemble', 'test'
 
 //    METADATA
 // ==============
-version = '1.1.0'
+version = '1.2.0-beta'
 description = 'Xenon: a middleware abstraction library that provides a simple programming interface to various compute and storage resources.'
 
 // will generate a warning with JDK 8, since the runtime jar (rt.jar) of
