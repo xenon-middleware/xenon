@@ -27,7 +27,7 @@ import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
- * 
+ *
  */
 public class LocalFileTestConfig extends FileTestConfig {
 
@@ -35,18 +35,18 @@ public class LocalFileTestConfig extends FileTestConfig {
     private final String correctLocation;
     private final String wrongLocation;
     private final boolean supportPosix;
-    
+
     public LocalFileTestConfig() throws Exception {
         super("local", null);
 
         scheme = "file";
-        
+
         String os = System.getProperty("os.name");
-        
+
         if (os.startsWith("Windows")) {
             correctLocation = "C:";
             supportPosix = false;
-        } else { 
+        } else {
             correctLocation = "/";
             supportPosix = true;
         }
@@ -58,6 +58,22 @@ public class LocalFileTestConfig extends FileTestConfig {
         return Utils.getLocalCWD(files).getFileSystem();
     }
 
+    @Override
+    public boolean supportsAppending() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsResuming() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsAsynchronousCopy() {
+        return true;
+    }
+
+    @Override
     public boolean supportLocation() {
         return true;
     }
@@ -72,6 +88,7 @@ public class LocalFileTestConfig extends FileTestConfig {
         return null;
     }
 
+    @Override
     public boolean supportNullCredential() {
         return true;
     }

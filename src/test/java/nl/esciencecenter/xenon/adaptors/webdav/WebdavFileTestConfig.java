@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.adaptors.ftp;
+package nl.esciencecenter.xenon.adaptors.webdav;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,36 +28,53 @@ import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 
-/**
- *
- */
-public class FTPFileTestConfig extends FileTestConfig {
+public class WebdavFileTestConfig extends FileTestConfig {
 
-    private final String username;
-    private final char[] passwd;
+    private String username;
+    private char[] password;
 
-    private static final String scheme = "ftp";
-    private final String correctLocation;
-    private final String wrongLocation;
-    private final String correctLocationWrongUser;
+    private static String scheme = "http";
+    private String correctLocation;
+    private String wrongLocation;
+    private String correctLocationWrongUser;
+    private String correctLocationWithUser;
+    private String privateLocation;
 
-    public FTPFileTestConfig(String configfile) throws Exception {
+    protected WebdavFileTestConfig(String adaptorName, String configfile) throws FileNotFoundException, IOException {
+        super(adaptorName, configfile);
+    }
 
+    public WebdavFileTestConfig(String configfile) throws Exception {
         super(scheme, configfile);
 
-        String location = getPropertyOrFail("test.ftp.location");
+        username = getPropertyOrFail("test.webdav.user");
+        password = getPropertyOrFail("test.webdav.password").toCharArray();
 
-        username = getPropertyOrFail("test.ftp.user");
-        passwd = getPropertyOrFail("test.ftp.password").toCharArray();
-
-        correctLocation = username + "@" + location;
+        privateLocation = getPropertyOrFail("test.webdav.privatelocation");
+        correctLocation = getPropertyOrFail("test.webdav.publiclocation");
         wrongLocation = username + "@doesnotexist71093880.com";
-        correctLocationWrongUser = "incorrect@" + location;
+        correctLocationWrongUser = "incorrect@" + getPropertyOrFail("test.webdav.publiclocation");
+        correctLocationWithUser = username + "@" + getPropertyOrFail("test.webdav.publiclocation");
     }
 
     @Override
     public FileSystem getTestFileSystem(Files files, Credentials credentials) throws XenonException {
         return files.newFileSystem(scheme, correctLocation, getDefaultCredential(credentials), null);
+    }
+
+    @Override
+    public boolean supportsAppending() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsResuming() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsAsynchronousCopy() {
+        return false;
     }
 
     @Override
@@ -69,28 +88,8 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
-    public boolean supportsLocalCWD() {
-        return true;
-    }
-
-    @Override
     public boolean supportsSymboliclinks() {
         return false;
-    }
-
-    @Override
-    public boolean supportsAppending() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsResuming() {
-        return true;
-    }
-
-    @Override
-    public boolean supportsAsynchronousCopy() {
-        return true;
     }
 
     @Override
@@ -110,12 +109,17 @@ public class FTPFileTestConfig extends FileTestConfig {
 
     @Override
     public String getCorrectLocationWithUser() throws Exception {
-        return correctLocation;
+        return correctLocationWithUser;
     }
 
     @Override
     public String getCorrectLocationWithWrongUser() throws Exception {
         return correctLocationWrongUser;
+    }
+
+    @Override
+    public String getNonDefaultCredentialLocation() throws Exception {
+        return privateLocation;
     }
 
     @Override
@@ -129,32 +133,17 @@ public class FTPFileTestConfig extends FileTestConfig {
     }
 
     @Override
+    public Credential getNonDefaultCredential(Credentials credential) throws XenonException {
+        return getPasswordCredential(credential);
+    }
+
+    @Override
     public Credential getPasswordCredential(Credentials credentials) throws XenonException {
-        return credentials.newPasswordCredential(scheme, username, passwd, new HashMap<String, String>(0));
+        return credentials.newPasswordCredential(scheme, username, password, new HashMap<String, String>());
     }
 
     @Override
-    public Credential getInvalidCredential(Credentials credentials) throws XenonException {
-        return credentials.newPasswordCredential(scheme, username, "wrongpassword".toCharArray(), new HashMap<String, String>(0));
-    }
-
-    @Override
-    public Credential getNonDefaultCredential(Credentials credentials) throws XenonException {
-        return getPasswordCredential(credentials);
-    }
-
-    @Override
-    public boolean supportLocation() {
-        return true;
-    }
-
-    @Override
-    public boolean supportUserInUri() {
-        return false;
-    }
-
-    @Override
-    public boolean supportsCredentials() {
+    public boolean supportNullCredential() {
         return true;
     }
 
@@ -162,15 +151,4 @@ public class FTPFileTestConfig extends FileTestConfig {
     public boolean supportNonDefaultCredential() {
         return true;
     }
-
-    @Override
-    public boolean supportNullCredential() {
-        return false;
-    }
-
-    @Override
-    public boolean supportsClose() {
-        return true;
-    }
-
 }

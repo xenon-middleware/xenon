@@ -9,6 +9,7 @@ ext.dockerDirectories = [
     'slurm': 'xenon-slurm',
     'ssh': 'xenon-ssh',
     'torque': 'xenon-torque' ,
+    'webdav' : 'xenon-webdav',
     'test': '.'
 ]
 ext.dockerImages = ext.dockerDirectories.keySet()

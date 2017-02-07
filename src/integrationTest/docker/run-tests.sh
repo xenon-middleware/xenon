@@ -42,6 +42,6 @@ if [ "$BOOT_DELAY" != "" ]; then
     echo 'Torque queues should be enabled'
     setuser xenon ssh-keyscan -t rsa xenon-torque >> /home/xenon/.ssh/known_hosts
     chown xenon.xenon /home/xenon/.ssh/known_hosts
-    setuser xenon ssh xenon-torque qstat -Q
+    setuser xenon ssh xenon-torque qstat -q
 fi
 setuser xenon "$@"

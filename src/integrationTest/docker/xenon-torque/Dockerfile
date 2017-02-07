@@ -6,6 +6,13 @@
 #
 # Run with:
 #
+#     docker run -d -h xenon-torque -p 10022:22 --privileged nlesc/xenon-torque
+#
+#     ssh -p 10022 xenon@localhost
+#     # password: javagat
+#     qstat -q
+#
+# Note: Torque does not like hostname that start with number, so hostname is required
 #
 
 FROM agaveapi/torque
@@ -22,3 +29,5 @@ ADD create_symlinks /tmp/
 RUN /tmp/create_symlinks && rm -f /tmp/create_symlinks && chown -R xenon.xenon .
 
 RUN chown -R xenon.xenon .
+
+ADD docker_entrypoint.sh /docker_entrypoint.sh

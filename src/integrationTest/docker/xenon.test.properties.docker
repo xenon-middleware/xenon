@@ -136,7 +136,7 @@ test.torque.password=javagat
 #
 test.torque.default.queue=batch
 test.torque.queues=debug,batch
-test.torque.queue.wait.time=2000
+test.torque.queue.wait.time=10000
 test.torque.update.time=5000
 
 ######################################################################
@@ -157,3 +157,23 @@ test.torque.update.time=5000
 test.ftp.location=xenon-ftp
 test.ftp.user=xenon
 test.ftp.password=javagat
+
+######################################################################
+#
+# This is the configuration of the WebDAV tests. To completely run 
+# these test the following setup is required:
+# 
+# An account on a machine that can be accessed via FTP using both 
+# guest account and a password.
+#
+####
+#
+# This is the location of the machine of the form host[:port], 
+# where both user and port are optional. In addition, a username and 
+# password must be provided to test password authentication to the 
+# host.
+#
+test.webdav.privatelocation=xenon-webdav/xenon/uploads
+test.webdav.publiclocation=xenon-webdav/uploads
+test.webdav.user=xenon
+test.webdav.password=javagat

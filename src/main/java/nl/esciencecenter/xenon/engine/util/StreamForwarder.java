@@ -61,13 +61,13 @@ public final class StreamForwarder extends Thread {
         }
     }
 
-    private synchronized void done() { 
+    private synchronized void done() {
         done = true;
         notifyAll();
     }
     
     public synchronized void terminate(long timeout) { 
-    
+
         if (done) { 
             return;
         }
@@ -88,8 +88,12 @@ public final class StreamForwarder extends Thread {
             }
         }
         
-        if (!done) { 
+        if (!done) {
             close(in, "InputStream did not close within " + timeout + " ms. Forcing close!");
+            
+            if (out != null) { 
+                close(out, null);
+            }
         }
     }
     
@@ -101,17 +105,22 @@ public final class StreamForwarder extends Thread {
                 int read = in.read(buffer);
 
                 if (read == -1) {
+                    // NOTE: Streams must be closed before done is called, or we'll have a race condition!                  
+                    close(in, null);
+
+                    if (out != null) {
+                        close(out, null);
+                    }
+
                     done();
                     return;
                 }
-
+                                
                 if (out != null) {
                     out.write(buffer, 0, read);
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Cannot forward stream", e);
-        } finally {
             close(in, null);
 
             if (out != null) {
