@@ -55,8 +55,32 @@ Add Xenon library as a dependency to your project. For a Maven project use
   <version>1.1.0</version>
 </dependency>
 ```
+For a gradle project make sure to include `jcenter` in the list of repositories, for example:
+```
+repositories {
+    mavenCentral()
+    jcenter()
+}
+```
+Then include Xenon as a compile dependency:
+```
+dependencies {
+    compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '1.1.0'
+    // other dependencies ...
+}
+``` 
+To compile Xenon from source, download the source distribution below and type:
+```
+gradlew installDist
+```
+This will create a binary distribution in `./build/install`
 
-### Copy a file
+Simple examples
+---------------
+
+Here are some examples of basic operations you can perform with Xenon: 
+
+#### Copy a file
 
 Following code copies local /etc/passwd file using ssh to /tmp/password on somemachine:
 ```
@@ -74,7 +98,7 @@ files.close(targetFS);
 XenonFactory.endXenon(xenon);
 ```
 
-### Run a job
+#### Run a job
 
 Following code performs a wordcount of a file on somemachine using ssh:  
 ```
@@ -92,6 +116,33 @@ jobs.close(scheduler);
 XenonFactory.endXenon(xenon);
 ```
 The output of the job will be written to /tmp/stdout.txt file on somemachine.
+
+Supported middleware
+--------------------
+
+Xenon currently supports the following file access mechanisms:
+- local
+- ssh
+- ftp
+- sftp 
+- WebDAV
+
+Xenon currently supports the following job submission mechanisms:
+- local (interactive jobs only)
+- ssh (interactive jobs only)
+- Slurm (interactive and batch jobs)
+- Torque (batch jobs only)  
+- GridEngine (batch jobs only)
+
+Planned extensions include: 
+- S3
+- Swift
+- HDFS 
+- YARN
+- GridFTP
+- glite
+- Azure-Batch
+
 
 Documentation
 -------------
