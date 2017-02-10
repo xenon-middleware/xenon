@@ -131,7 +131,7 @@ public class Sandbox {
      * @param sandboxName
      *            Name of the sandbox. If null a random name will be used.
      * @throws XenonException
-     * @throws XenonException
+     *            If an I/O error occurred.
      */
     public Sandbox(Files files, Path root, String sandboxName) throws XenonException {
 
@@ -181,7 +181,8 @@ public class Sandbox {
      * Any existing upload files will be discarded.
      * 
      * @param files the files to upload.
-     * @throws XenonException 
+     * @throws XenonException
+     *                   If an I/O error occurred.
      */
     public void setUploadFiles(Path... files) throws XenonException {
         uploadFiles = new LinkedList<>();
@@ -196,6 +197,7 @@ public class Sandbox {
      * @param src
      *            Source path of file. May not be <code>null</code>.
      * @throws XenonException 
+     *            If an I/O error occurred.
      */
     public void addUploadFile(Path src) throws XenonException {
         addUploadFile(src, null);
@@ -208,7 +210,8 @@ public class Sandbox {
      *            The source file. May not be <code>null</code>.
      * @param dest
      *            The name of file in the sandbox. If <code>null</code> then <code>src.getFilename()</code> will be used.
-     * @throws XenonException 
+     * @throws XenonException
+     *            If an I/O error occurred. 
      */
     public void addUploadFile(Path src, String dest) throws XenonException {
 
@@ -241,7 +244,8 @@ public class Sandbox {
      *            Name of the source file in the sandbox. When <code>null</code> the <code>dest.getFilename()</code> will be used.
      * @param dest
      *            The target file. May not be <code>null</code>.
-     * @throws XenonException 
+     * @throws XenonException
+     *            If an I/O error occurred.  
      */
     public void addDownloadFile(String src, Path dest) throws XenonException {
 

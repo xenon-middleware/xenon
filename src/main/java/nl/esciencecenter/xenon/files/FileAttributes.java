@@ -28,27 +28,33 @@ public interface FileAttributes {
 
     /**
      * Does the path refer to a directory ?
+     * 
+     * @return
+     *          if the path refers to a directory.
      */
     boolean isDirectory(); 
 
     /**
      * Is the path not a file, link or directory ?
      * 
-     * @return If the file is a directory.
+     * @return 
+     *          if the path does not refer to a file, link or directory.
      */
     boolean isOther();
 
     /**
      * Does the path refer to a regular file ?
      * 
-     * @return If the path refers to a regular file.
+     * @return 
+     *          if the path refers to a regular file.
      */
     boolean isRegularFile();
 
     /**
      * Does the path refer to a symbolic link ?
      * 
-     * @return If the path refers to a symbolic link.
+     * @return 
+     *          if the path refers to a symbolic link.
      */
     boolean isSymbolicLink();
 
@@ -57,7 +63,8 @@ public interface FileAttributes {
      * 
      * If creationTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
      * 
-     * @return The creation time for this file.
+     * @return 
+     *          the creation time for this file.
      */
     long creationTime();
 
@@ -66,7 +73,8 @@ public interface FileAttributes {
      * 
      * If lastAccessTime is not supported by the adaptor, the {@link #lastModifiedTime()} will be returned instead.
      *
-     * @return The last access time for this file.
+     * @return 
+     *          the last access time for this file.
      */
     long lastAccessTime();
 
@@ -75,7 +83,8 @@ public interface FileAttributes {
      * 
      * If lastModifiedTime is not supported by the adaptor, <code>0</code> will be returned instead.
      *
-     * @return The last modified time for this file.
+     * @return 
+     *          the last modified time for this file.
      */
     long lastModifiedTime();
 
@@ -84,65 +93,73 @@ public interface FileAttributes {
      * 
      * If the file is not a regular file, <code>0</code> will be returned. 
      * 
-     * @return The size of this file.
+     * @return 
+     *          the size of this file.
      */
     long size();
     
     /**
      * Does the path refer to an executable file ?
      * 
-     * @return If the path refers an executable file ?
+     * @return 
+     *          if the path refers an executable file ?
      */
     boolean isExecutable();
 
     /**
      * Does the path refer to an hidden file ?
      * 
-     * @return If the path refers an hidden file ?
+     * @return 
+     *          if the path refers an hidden file ?
      */
     boolean isHidden();
 
     /**
      * Does the path refer to an readable file ?
      * 
-     * @return If the path refers an readable file ?
+     * @return 
+     *          if the path refers an readable file ?
      */
     boolean isReadable();
 
     /**
      * Does the path refer to a writable file ?
      * 
-     * @return If the path refers a writable file ?
+     * @return 
+     *          if the path refers a writable file ?
      */
     boolean isWritable();
 
     /**
      * Get the group of this file.
      * 
-     * @return The group of this file.
+     * @return 
+     *          the group of this file.
      * 
      * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
+     *          If the attribute is not supported by the adaptor.
      */
     String group() throws AttributeNotSupportedException;
 
     /**
      * Get the owner of this file.
      * 
-     * @return The owner of this file.
+     * @return 
+     *          the owner of this file.
      * 
      * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
+     *          If the attribute is not supported by the adaptor.
      */
     String owner() throws AttributeNotSupportedException;
 
     /**
      * Get the permissions of this file.
      * 
-     * @return The permissions of this file.
+     * @return 
+     *          the permissions of this file.
      * 
      * @throws AttributeNotSupportedException
-     *             If the attribute is not supported by the adaptor.
+     *          If the attribute is not supported by the adaptor.
      */
     Set<PosixFilePermission> permissions() throws AttributeNotSupportedException;
 }

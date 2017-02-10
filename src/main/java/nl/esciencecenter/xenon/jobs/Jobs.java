@@ -83,7 +83,7 @@ public interface Jobs {
     void close(Scheduler scheduler) throws XenonException;
 
     /**
-     * Test if a Scheduler is open.
+     * Test if the connection to a Scheduler is open.
      * 
      * @param scheduler
      *            the Scheduler to test.
@@ -92,6 +92,9 @@ public interface Jobs {
      *             If the test failed.
      * @throws XenonException
      *             If an I/O error occurred.
+     * @return  
+     *          <code>true</code> if the connection to the Scheduler is still open, <code>false</code> otherwise.             
+     *             
      */
     boolean isOpen(Scheduler scheduler) throws XenonException;
 

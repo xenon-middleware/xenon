@@ -102,13 +102,15 @@ public interface Files {
     void close(FileSystem filesystem) throws XenonException;
 
     /**
-     * Test is a FileSystem is open.
+     * Return if the connection to the FileSystem is open.
      * 
      * @param filesystem
-     *            the FileSystem to test.
+     *          the FileSystem to test.
      * 
      * @throws XenonException
-     *             If the test failed or an I/O error occurred.
+     *          if the test failed or an I/O error occurred.
+     * @return
+     *          if the connection to the FileSystem is open.                     
      */
     boolean isOpen(FileSystem filesystem) throws XenonException;
 
@@ -250,6 +252,9 @@ public interface Files {
      *             If the copy is not known.
      * @throws XenonException
      *             If an I/O error occurred.
+     * @return
+     *             a {@link CopyStatus} containing the status of the copy.
+     *                         
      */
     CopyStatus cancelCopy(Copy copy) throws XenonException;
 

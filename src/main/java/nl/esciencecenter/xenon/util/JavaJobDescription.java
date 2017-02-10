@@ -173,6 +173,7 @@ public class JavaJobDescription extends JobDescription {
      * arguments.
      * 
      * @param arguments
+     *          Arguments for the Job. <b>Not supported!</b>, use {@link #setJavaArguments(String[])} instead.
      */
     public void setArguments(String... arguments) {
         throw new XenonRuntimeException("Utils", "Setting arguments not supported by the JavaJobDescription");

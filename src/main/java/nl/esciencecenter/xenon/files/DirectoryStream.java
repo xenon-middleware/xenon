@@ -24,10 +24,6 @@ import java.util.Iterator;
  * 
  * The elements typically consist of {@link Path} objects when returned by one of the <code>Files.newDirectoryStream</code> calls
  * or {@link PathAttributesPair} objects when returned by one of the <code>Files.newAttributesDirectoryStream</code> calls. 
- * 
- * @version 1.0
- * @since 1.0
- * @param <T>
  */
 public interface DirectoryStream<T> extends Closeable, Iterable<T> {
 
