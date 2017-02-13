@@ -17,13 +17,13 @@ package nl.esciencecenter.xenon.adaptors.scripting;
 
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.engine.util.InputWriter;
-import nl.esciencecenter.xenon.engine.util.OutputReader;
 import nl.esciencecenter.xenon.jobs.Job;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
+import nl.esciencecenter.xenon.util.InputWriter;
+import nl.esciencecenter.xenon.util.OutputReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
