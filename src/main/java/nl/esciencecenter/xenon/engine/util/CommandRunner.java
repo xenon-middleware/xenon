@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.util.InputWriter;
+import nl.esciencecenter.xenon.util.OutputReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
