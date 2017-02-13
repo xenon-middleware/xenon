@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
  * A simple output reader that uses a daemon thread to read from an {#link InputStream} and buffer this data. Once end-of-stream
  * is reached, this data will be made available as a {#link String}. 
  * 
- * Note that since the data is buffered in memory, it is not advisable to use this OutputReader to read large amounts of data. 
+ * Note that since the data is buffered in memory, so it is not advisable to use this OutputReader to read large amounts of data. 
  */
 public final class OutputReader extends Thread {
 

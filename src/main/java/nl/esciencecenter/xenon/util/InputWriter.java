@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Writes given content to the given output stream. Closes the output stream when done.
- * 
+ * A simple input writer that uses a daemon thread to write from an {#link String} to an {#link OuputStream}. Once the end of the 
+ * string is reached, the destination stream will be closed.
  */
 public final class InputWriter extends Thread {
 
@@ -37,6 +37,12 @@ public final class InputWriter extends Thread {
     // written all content or got exception.
     private boolean finished = false;
 
+    /**
+     * Create a new InputWriter that writes <code>content</code> to the <code>destination</code>.
+     * 
+     * @param content the data to write to the destination.
+     * @param destination the destination to write to.
+     */
     public InputWriter(String content, OutputStream destination) {
         this.destination = destination;
 
@@ -52,10 +58,19 @@ public final class InputWriter extends Thread {
         notifyAll();
     }
 
+    /**
+     * Poll if the InputWriter has finished writing.
+     * 
+     * @return
+     *          if the InputWriter has finished writing.
+     */   
     public synchronized boolean isFinished() {
         return finished;
     }
 
+    /**
+     * Wait until the InputWriter has finished writing.
+     */   
     public synchronized void waitUntilFinished() {
         while (!finished) {
             try {
@@ -66,6 +81,9 @@ public final class InputWriter extends Thread {
         }
     }
 
+    /**
+     * Entry point for the Daemon thread.
+     */    
     public void run() {
         try {
             if (content != null) {

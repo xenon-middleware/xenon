@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A simple stream forwarder that uses a daemon thread to read from an {#link InputStream} and write it to a {#link OuputStream}. 
- * Internally a small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
+ * A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
  */
 public final class StreamForwarder extends Thread {
 
