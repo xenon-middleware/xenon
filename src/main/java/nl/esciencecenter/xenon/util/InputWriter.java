@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple input writer that uses a daemon thread to write from an {#link String} to an {#link OuputStream}. Once the end of the 
- * string is reached, the destination stream will be closed.
+ * A simple input writer that uses a daemon thread to write from an {@link java.lang.String} to an {@link java.io.OutputStream}. 
+ * Once the end of the string is reached, the destination stream will be closed.
  */
 public final class InputWriter extends Thread {
 

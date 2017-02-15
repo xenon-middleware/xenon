@@ -24,7 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple stream forwarder that uses a daemon thread to read from an {#link InputStream} and write it to a {#link OuputStream}. 
+ * A simple stream forwarder that uses a daemon thread to read from an {@link java.io.InputStream} and write it to a 
+ * {@link java.io.OutputStream}. 
  * A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
  */
 public final class StreamForwarder extends Thread {
@@ -41,8 +42,8 @@ public final class StreamForwarder extends Thread {
     /**
      * Create a new StreamForwarder and start it immediately.
      * 
-     * @param in the {#link InputStream} to read from.
-     * @param out the {#link OuputStream} to write to.
+     * @param in the {@link java.io.InputStream} to read from.
+     * @param out the {@link java.io.OutputStream} to write to.
      */
     public StreamForwarder(InputStream in, OutputStream out) {
         this.in = in;
@@ -56,7 +57,7 @@ public final class StreamForwarder extends Thread {
     /**
      * Closes the input stream, thereby stopping the stream forwarder, and closing the output stream.
      * 
-     * @param c The {#link Closable} to close (i.e., the {#link InputStream} or {#link OutputStream}) 
+     * @param c The {@link java.io.Closable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream}) 
      * @param error The error message to print if the close results in an Exception
      */
     private void close(Closeable c, String error) {

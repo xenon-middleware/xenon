@@ -21,8 +21,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * A simple output reader that uses a daemon thread to read from an {#link InputStream} and buffer this data. Once end-of-stream
- * is reached, this data will be made available as a {#link String}. 
+ * A simple output reader that uses a daemon thread to read from an {@link java.io.InputStream} and buffer this data. Once 
+ * end-of-stream is reached, this data will be made available as a {@link java.lang.String}. 
  * 
  * Note that since the data is buffered in memory, so it is not advisable to use this OutputReader to read large amounts of data. 
  */
@@ -38,7 +38,7 @@ public final class OutputReader extends Thread {
     private boolean finished = false;
 
     /**
-     * Create an OutputReader that reads from the <code>source</code>.
+     * Create an OutputReader that reads from <code>source</code>.
      * 
      * @param source
      *          the {#link InputStream} to read from.
@@ -61,7 +61,7 @@ public final class OutputReader extends Thread {
 
     /**
      * Returns if the OutputReader has finished (i.e., has reached the end-of-stream on the input). If so, the data that has been 
-     * read is now available through {#link getResult()}.
+     * read is now available through {@link #getResult()}.
      * 
      * @return
      *          if the OutputReader has finished reading.
@@ -72,7 +72,7 @@ public final class OutputReader extends Thread {
 
     /**
      * Waits until the OutputReader has finished (i.e., has reached the end-of-stream on the input). After this method returns, 
-     * the data that has been read is available through {#link getResult()}.
+     * the data that has been read is available through {@link #getResult()}.
      */
     public synchronized void waitUntilFinished() {
         while (!finished) {
@@ -129,8 +129,8 @@ public final class OutputReader extends Thread {
     }
 
     /**
-     * Returns the data that has been read from the {@link InputStream} as a {@link String}. If the OutputReader has not finished
-     * reading, this method will block until end-of-stream has been reached.
+     * Returns the data that has been read from the {@link java.io.InputStream} as a {@link java.lang.String}. If the 
+     * OutputReader has not finished reading, this method will block until end-of-stream has been reached.
      *  
      * @return
      *          the data that has been read.
