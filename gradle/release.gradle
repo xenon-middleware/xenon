@@ -45,20 +45,29 @@ task versionPost(type: Exec) {
     commandLine 'touch', versionPostFile.absolutePath
 }
 
-githubPages {
-    repoUri = 'git@github.com:NLeSC/Xenon.git'
-    pages {
-        from(javadoc) {
-            into "versions/$version/javadoc"
-        }
-        from(javadocDevel) {
-            into "versions/$version/javadoc-devel"
-        }
-        from(versionPost) {
-            into "_posts"
-        }
+//githubPages {
+//    repoUri = 'git@github.com:NLeSC/Xenon.git'
+//    pages {
+//        from(javadoc) {
+//            into "versions/$version/javadoc"
+//        }
+//        from(javadocDevel) {
+//            into "versions/$version/javadoc-devel"
+//        }
+//        from(versionPost) {
+//            into "_posts"
+//        }
+//    }
+//    deleteExistingFiles = false
+//}
+
+task copyJavadoc {
+    copy {
+       from 'build/docs'
+       into 'docs'
+       include 'javadoc/**'
     }
-    deleteExistingFiles = false
 }
 
-tasks.publish.dependsOn 'bintrayUpload', 'publishGhPages'
+//tasks.publish.dependsOn 'bintrayUpload', 'copyJavadoc'
+tasks.publish.dependsOn 'copyJavadoc'
