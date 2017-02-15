@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.esciencecenter.xenon.engine.util;
+package nl.esciencecenter.xenon.util;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -24,9 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
- * Simple stream forwarder. Uses a daemon thread to read and write data, has a small buffer, and ignores all exceptions.
- * 
+ * A simple stream forwarder that uses a daemon thread to read from an {#link InputStream} and write it to a {#link OuputStream}. 
+ * A small buffer is used (typically 1 KB) to improve performance. Any exceptions will be ignored.
  */
 public final class StreamForwarder extends Thread {
 
@@ -39,6 +38,12 @@ public final class StreamForwarder extends Thread {
 
     private boolean done = false;
     
+    /**
+     * Create a new StreamForwarder and start it immediately.
+     * 
+     * @param in the {#link InputStream} to read from.
+     * @param out the {#link OuputStream} to write to.
+     */
     public StreamForwarder(InputStream in, OutputStream out) {
         this.in = in;
         this.out = out;
@@ -50,6 +55,9 @@ public final class StreamForwarder extends Thread {
 
     /**
      * Closes the input stream, thereby stopping the stream forwarder, and closing the output stream.
+     * 
+     * @param c The {#link Closable} to close (i.e., the {#link InputStream} or {#link OutputStream}) 
+     * @param error The error message to print if the close results in an Exception
      */
     private void close(Closeable c, String error) {
         try {
@@ -61,11 +69,21 @@ public final class StreamForwarder extends Thread {
         }
     }
 
+    /**
+     * Tell the daemon thread that we are done.
+     */
     private synchronized void done() {
         done = true;
         notifyAll();
     }
     
+    /**
+     * Wait for a given timeout for the StreamForwarder to terminate by reading an end-of-stream on the input. When the timeout
+     * expires both input and output streams will be closed, regardless of whether the input has reached end-of-line.
+     * 
+     * @param timeout
+     *          The number of milliseconds to wait for termination. 
+     */
     public synchronized void terminate(long timeout) { 
 
         if (done) { 
@@ -97,6 +115,9 @@ public final class StreamForwarder extends Thread {
         }
     }
     
+    /**
+     * Main entry method for the daemon thread.
+     */
     public void run() {
         try {
             byte[] buffer = new byte[BUFFER_SIZE];

@@ -26,6 +26,7 @@ import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.Streams;
+import nl.esciencecenter.xenon.util.StreamForwarder;
 import nl.esciencecenter.xenon.util.Utils;
 
 /**
