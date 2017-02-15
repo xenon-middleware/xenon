@@ -1,10 +1,19 @@
-Xenon 1.1.0
-------------------
+Xenon 1.2.0
+-----------
 
-This is release 1.1.0 of Xenon. 
+This is release 1.2.0 of Xenon. 
 
-Notable changes compared to v1.0.0:
-------------------------------------------------------
+Notable changes compared to v1.1.0:
+-----------------------------------
+
+- added support for WebDAV file access.
+- added OSX testing in Travis
+- fixed several bugs related to Windows local file system semantics
+- many small bugfixes, additional tests, etc. 
+
+
+Notable changes between v1.1.0 and v1.0.0:
+------------------------------------------
  
 - added support for FTP file access.
 - added support for Torque resource manager.
@@ -23,20 +32,19 @@ Notable changes compared to v1.0.0:
 - now using codecov for unit and integration test coverage
 - moved examples and tutorial to a separate repository https://github.com/NLeSC/Xenon-examples
 
-Bugfixes:
---------------
-
-Many bugfixes in adaptors and tests.
 
 What's missing:
------------------------
-
-The GridFTP and WebDAV adaptors are not considered stable yet. They are not part of this release.
+---------------
+	
+The GridFTP adaptor is not considered stable yet. It is not part of this release.
 
 There is no adaptor writing documentation at the moment, nor is the Javadoc complete for the internals methods of the adaptor implementations.
 
-We can always use more adaptors.
+It should be made easier to inspect at runtime which adaptors are available and what properties they support.
 
-We can always use more interfaces, e.g. for bandwidth-on-demand or clouds.
+We can always use more adaptors, e.g, for S3, SWIFT, HDFS, YARN, Azure-Batch, etc. These are planned for 1.3 or later.
+
+We can always use more interfaces, e.g. for clouds. This is planned for 2.0.
+
 
 
