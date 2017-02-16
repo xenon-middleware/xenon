@@ -35,12 +35,11 @@ The Latest Version
 
 Available in [JCenter](https://bintray.com/bintray/jcenter?filterByPkgName=xenon)
 
-Details of the latest official release of Xenon can be found at:
+Details of the latest official 1.2.0 release of Xenon can be found at:
 
 <https://github.com/NLeSC/Xenon/releases>
 
-Alternatively, the latest development versions of Xenon can be
-found at:
+Alternatively, the latest development versions of Xenon can be found at:
 
 <https://github.com/NLeSC/Xenon>.
 
@@ -151,7 +150,7 @@ See <https://github.com/NLeSC/Xenon-examples> for examples how to use the Xenon 
 
 See <https://github.com/NLeSC/Xenon-examples/raw/master/doc/tutorial/xenon-tutorial.pdf> for a tutorial pdf targeting inexperienced users.
 
-The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.1.0/javadoc>.
+The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.2.0/javadoc>.
 
 See the file <https://github.com/NLeSC/Xenon/blob/master/doc/README.md> for information for developers of the Xenon library.
 
