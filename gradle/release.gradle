@@ -63,9 +63,9 @@ task versionPost(type: Exec) {
 
 task copyJavadoc {
     copy {
-       from 'build/docs'
-       into 'docs'
-       include 'javadoc/**'
+       from "build/docs"
+       into "docs/versions/${version}"
+       include "javadoc/**"
     }
 }
 
