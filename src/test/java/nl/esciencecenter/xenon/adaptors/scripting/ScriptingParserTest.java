@@ -463,6 +463,118 @@ public class ScriptingParserTest {
     }
 
     @Test
+    public void test06m_parseTable_RealSlurmTableWithTuple1() throws Exception {
+        
+        String input = "JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON) COMMENT\n" +
+                       "1100870 defq hostname jason COMPLETING 0:00 15:00 1 node019 d711f8a0-46bb-445c-84a7-acf0aa27496a\n"; 
+        
+        Map<String, Map<String, String>> expected = new HashMap<>();
+
+        Map<String, String> expectedRecord1 = new HashMap<>();
+        expectedRecord1.put("JOBID",             "1100870");
+        expectedRecord1.put("PARTITION",         "defq");
+        expectedRecord1.put("NAME",              "hostname");
+        expectedRecord1.put("USER",              "jason");
+        expectedRecord1.put("STATE",             "COMPLETING");
+        expectedRecord1.put("TIME",              "0:00");
+        expectedRecord1.put("TIME_LIMIT",        "15:00");
+        expectedRecord1.put("NODES",             "1");
+        expectedRecord1.put("NODELIST(REASON)",  "node019");
+        expectedRecord1.put("COMMENT",           "d711f8a0-46bb-445c-84a7-acf0aa27496a");
+        
+        expected.put("1100870", expectedRecord1);
+        
+        Map<String, Map<String, String>> result = ScriptingParser.parseTable(input, "JOBID", ScriptingParser.WHITESPACE_REGEX, 
+                "slurm-test", "*", "~");
+
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    public void test06m_parseTable_RealSlurmTableWithTuple2() throws Exception {
+        
+        String input = "JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON) COMMENT\n" +
+                       "1091452 das4 prun-job mdn355 PENDING 0:00 7-00:01:00 1 (ReqNodeNotAvail, UnavailableNodes:node[070-071,076-084]) (null)\n"; 
+        
+        Map<String, Map<String, String>> expected = new HashMap<>();
+
+        Map<String, String> expectedRecord1 = new HashMap<>();
+        expectedRecord1.put("JOBID",             "1091452");
+        expectedRecord1.put("PARTITION",         "das4");
+        expectedRecord1.put("NAME",              "prun-job");
+        expectedRecord1.put("USER",              "mdn355");
+        expectedRecord1.put("STATE",             "PENDING");
+        expectedRecord1.put("TIME",              "0:00");
+        expectedRecord1.put("TIME_LIMIT",        "7-00:01:00");
+        expectedRecord1.put("NODES",             "1");
+        expectedRecord1.put("NODELIST(REASON)",  "(ReqNodeNotAvail, UnavailableNodes:node[070-071,076-084])");
+        expectedRecord1.put("COMMENT",           "(null)");
+        
+        expected.put("1091452", expectedRecord1);
+        
+        Map<String, Map<String, String>> result = ScriptingParser.parseTable(input, "JOBID", ScriptingParser.WHITESPACE_REGEX, 
+                "slurm-test", "*", "~");
+
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    public void test06m_parseTable_RealSlurmTableWithTuple3() throws Exception {
+        
+        String input = "JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON) COMMENT\n" +
+                       "1090974 das4 prun-job mdn355 PENDING 0:00 7-00:01:00 1 (launch failed requeued held) (null)";
+        
+        Map<String, Map<String, String>> expected = new HashMap<>();
+
+        Map<String, String> expectedRecord1 = new HashMap<>();
+        expectedRecord1.put("JOBID",             "1090974");
+        expectedRecord1.put("PARTITION",         "das4");
+        expectedRecord1.put("NAME",              "prun-job");
+        expectedRecord1.put("USER",              "mdn355");
+        expectedRecord1.put("STATE",             "PENDING");
+        expectedRecord1.put("TIME",              "0:00");
+        expectedRecord1.put("TIME_LIMIT",        "7-00:01:00");
+        expectedRecord1.put("NODES",             "1");
+        expectedRecord1.put("NODELIST(REASON)",  "(launch failed requeued held)");
+        expectedRecord1.put("COMMENT",           "(null)");
+        
+        expected.put("1090974", expectedRecord1);
+        
+        Map<String, Map<String, String>> result = ScriptingParser.parseTable(input, "JOBID", ScriptingParser.WHITESPACE_REGEX, 
+                "slurm-test", "*", "~");
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void test06m_parseTable_RealSlurmTableWithTuple4() throws Exception {
+        
+        String input = "JOBID PARTITION NAME USER STATE TIME TIME_LIMIT NODES NODELIST(REASON) COMMENT\n" +
+                       "1100838 defq prun-job sma2 RUNNING 5:26:45 1-00:01:00 50 node[009-018,029-068] (null)";
+        
+        Map<String, Map<String, String>> expected = new HashMap<>();
+
+        Map<String, String> expectedRecord1 = new HashMap<>();
+        expectedRecord1.put("JOBID",             "1100838");
+        expectedRecord1.put("PARTITION",         "defq");
+        expectedRecord1.put("NAME",              "prun-job");
+        expectedRecord1.put("USER",              "sma2");
+        expectedRecord1.put("STATE",             "RUNNING");
+        expectedRecord1.put("TIME",              "5:26:45");
+        expectedRecord1.put("TIME_LIMIT",        "1-00:01:00");
+        expectedRecord1.put("NODES",             "50");
+        expectedRecord1.put("NODELIST(REASON)",  "node[009-018,029-068]");
+        expectedRecord1.put("COMMENT",           "(null)");
+        
+        expected.put("1100838", expectedRecord1);
+        
+        Map<String, Map<String, String>> result = ScriptingParser.parseTable(input, "JOBID", ScriptingParser.WHITESPACE_REGEX, 
+                "slurm-test", "*", "~");
+
+        assertEquals(expected, result);
+    }
+    
+    @Test
     public void test07a_checkIfContains_DoesContain_Index() throws XenonException {
 
         String input = "which one will it contain?";
@@ -623,4 +735,10 @@ public class ScriptingParserTest {
         ScriptingParser.parseKeyValueRecords(input, "key0", ScriptingParser.EQUALS_REGEX, "fake");
     }
 
+
+    
+    
+    
+    
+    
 }
