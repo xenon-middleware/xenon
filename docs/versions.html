@@ -1,0 +1,17 @@
+---
+layout: default
+---
+
+<h3 class="page-heading">Older versions</h3>
+<ul class="post-list">
+  {% for post in site.posts offset:1 %}
+  <li>
+      {{ post.title }}
+      {% if page.content %}
+      {{ post.content }}
+      {% else %}
+      {% include version.html version=post.title %}
+      {% endif %}
+  </li>
+  {% endfor %}
+</ul>
