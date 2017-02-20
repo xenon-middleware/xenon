@@ -8,6 +8,7 @@ Notable changes compared to v1.1.0:
 
 - added support for WebDAV file access.
 - added OSX testing in Travis
+- added support for Slurm version 15.08.6
 - fixed several bugs related to Windows local file system semantics
 - many small bugfixes, additional tests, etc. 
 
