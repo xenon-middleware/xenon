@@ -31,7 +31,7 @@ public class SlurmSetup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSetup.class);
 
-    private static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0"};
+    private static final String[] SUPPORTED_VERSIONS = { "2.3.", "2.5.", "2.6.", "14.03.0", "14.11.9-Bull.1.0", "15.08.6"};
 
     private final boolean accountingAvailable;
     private final String version;
