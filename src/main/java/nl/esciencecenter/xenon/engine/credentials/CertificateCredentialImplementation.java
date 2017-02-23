@@ -32,12 +32,18 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
      * Constructs a {@link CertificateCredentialImplementation} out of a {@link java.net.URI} pointing to the private key, a {@link java.net.URI}
      * pointing to the certificate, a username and a password.
      * 
+     * @param adaptorName
+     *          the name of the adaptor
+     * @param uniqueID
+     *          the unique ID of this certificate
+     * @param properties
+     *          the properties used to configure the implementation
      * @param certfile
-     *            the certificate file (for example usercert.pem)
+     *          the certification file
      * @param username
-     *            the username
+     *          the username for this certificate
      * @param password
-     *            the password or passphrase belonging to the key and certificate.
+     *          the password or passphrase for this certificate
      */
     public CertificateCredentialImplementation(String adaptorName, String uniqueID, XenonProperties properties,
             String certfile, String username, char[] password) {
@@ -45,7 +51,7 @@ public class CertificateCredentialImplementation extends CredentialImplementatio
         super(adaptorName, uniqueID, properties, username, password);
         this.certfile = certfile;
     }
-
+    
     /**
      * Returns the {@link java.net.URI} of the certificate file.
      * 

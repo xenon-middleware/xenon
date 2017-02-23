@@ -167,7 +167,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
                 queueNames, credential, getProperties(), false, false, true);
     }
 
-    /** Query the queue names of the TORQUE batch system. */
+    /* Query the queue names of the TORQUE batch system. */
     private String[] queryQueueNames() throws XenonException {
         Set<String> queueNameSet = queryQueues().keySet();
         return queueNameSet.toArray(new String[queueNameSet.size()]);
@@ -221,7 +221,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
         deletedJobs.add(job.getIdentifier());
     }
 
-    /**
+    /*
      * Note: Works exactly once per job.
      */
     private synchronized boolean jobWasDeleted(Job job) {

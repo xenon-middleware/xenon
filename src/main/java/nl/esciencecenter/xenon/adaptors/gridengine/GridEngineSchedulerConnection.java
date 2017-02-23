@@ -252,7 +252,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
         deletedJobs.add(Long.parseLong(job.getIdentifier()));
     }
 
-    /**
+    /*
      * Note: Works exactly once per job.
      */
     private synchronized boolean jobWasDeleted(Job job) {

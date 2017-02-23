@@ -22,7 +22,7 @@ import nl.esciencecenter.xenon.engine.XenonProperties;
  */
 public class PasswordCredentialImplementation extends CredentialImplementation {
 
-    /**
+    /*
      * Constructs a {@link PasswordCredentialImplementation} with the given <code>username</code> and <code>password</code>.
      * 
      * @param username

@@ -265,6 +265,7 @@ class SshMultiplexedSession {
      * 
      * @return the channel
      * @throws XenonException
+     *          if an error occurred
      */
     protected synchronized ChannelExec getExecChannel() throws XenonException {
 
@@ -297,6 +298,7 @@ class SshMultiplexedSession {
      * 
      * @return the channel
      * @throws XenonException
+     *          if an error occurred
      */
     protected synchronized ChannelSftp getSftpChannel() throws XenonException {
 

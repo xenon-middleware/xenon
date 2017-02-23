@@ -57,7 +57,7 @@ public final class StreamForwarder extends Thread {
     /**
      * Closes the input stream, thereby stopping the stream forwarder, and closing the output stream.
      * 
-     * @param c The {@link java.io.Closable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream}) 
+     * @param c The {@link java.io.Closeable} to close (i.e., the {@link java.io.InputStream} or {@link java.io.OutputStream}) 
      * @param error The error message to print if the close results in an Exception
      */
     private void close(Closeable c, String error) {

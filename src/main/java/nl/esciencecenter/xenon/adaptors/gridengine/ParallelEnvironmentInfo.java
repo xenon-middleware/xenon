@@ -83,7 +83,7 @@ class ParallelEnvironmentInfo {
         }
     }
 
-    /**
+    /*
      * Testing constructor.
      */
     ParallelEnvironmentInfo(String name, int slots, AllocationRule allocationRule, int ppn) {

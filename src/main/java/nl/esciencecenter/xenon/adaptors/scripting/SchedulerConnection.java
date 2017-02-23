@@ -242,13 +242,35 @@ public abstract class SchedulerConnection {
 
     /**
      * Run a command on the remote scheduler machine.
+     * 
+     * @param stdin
+     *          the text to write to the input of the executable. 
+     * @param executable
+     *          the executable to run
+     * @param arguments
+     *          the arguments to the executable
+     * @return
+     *          a {@link RemoteCommandRunner} that can be used to monitor the running command
+     * @throws XenonException
+     *          if an error occurs
      */
     public RemoteCommandRunner runCommand(String stdin, String executable, String... arguments) throws XenonException {
         return new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable, arguments);
     }
 
     /**
-     * Run a command. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
+     * Run a command until completion. Throw an exception if the command returns a non-zero exit code, or prints to stderr.
+      * 
+     * @param stdin
+     *          the text to write to the input of the executable. 
+     * @param executable
+     *          the executable to run
+     * @param arguments
+     *          the arguments to the executable
+     * @return
+     *          the text produced by the executable on the stdout stream. 
+     * @throws XenonException
+     *          if an error occurred
      */
     public String runCheckedCommand(String stdin, String executable, String... arguments) throws XenonException {
         RemoteCommandRunner runner = new RemoteCommandRunner(engine, subScheduler, adaptor.getName(), stdin, executable,
@@ -265,7 +287,16 @@ public abstract class SchedulerConnection {
 
     /**
      * Start an interactive command on the remote machine (usually via ssh).
-     */
+     * 
+     * @param executable
+     *          the executable to start
+     * @param arguments
+     *          the arguments to pass to the executable
+     * @return
+     *          the {@link Job} that represents the interactive command 
+     * @throws XenonException
+     *          if an error occurred
+     */    
     public Job startInteractiveCommand(String executable, String... arguments) throws XenonException {
         JobDescription description = new JobDescription();
         description.setInteractive(true);
@@ -279,6 +310,11 @@ public abstract class SchedulerConnection {
     /**
      * Checks if the queue names given are valid, and throw an exception otherwise. Checks against the list of queues when the
      * scheduler was created.
+      * 
+     * @param givenQueueNames
+     *          the queue names to check for validity
+     * @throws NoSuchQueueException
+     *          if one or more of the queue names is not known in the scheduler
      */
     protected void checkQueueNames(String[] givenQueueNames) throws NoSuchQueueException {
         //create a hash set with all given queues
@@ -294,6 +330,21 @@ public abstract class SchedulerConnection {
         }
     }
 
+    /**
+     * Wait until a Job is done, or until the give timeout expires (whichever comes first). 
+     * 
+     * Providing a negative timeout will cause the status of the job to be returned immediately. A timeout of 0 will result in an 
+     * infinite timeout. 
+     * 
+     * @param job
+     *          the Job to wait for
+     * @param timeout
+     *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.  
+     * @return
+     *          the status of the job 
+     * @throws XenonException
+     *          if an error occurs
+     */
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         long deadline = System.currentTimeMillis() + timeout;
 
@@ -321,6 +372,21 @@ public abstract class SchedulerConnection {
         return status;
     }
 
+    /**
+     * Wait until a Job is running (or already done), or until the give timeout expires (whichever comes first). 
+     * 
+     * Providing a negative timeout will cause the status of the job to be returned immediately. A timeout of 0 will result in an 
+     * infinite timeout. 
+     * 
+     * @param job
+     *          the Job to wait for
+     * @param timeout
+     *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.  
+     * @return
+     *          the status of the job 
+     * @throws XenonException
+     *          if an error occurs
+     */
     public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
         long deadline = System.currentTimeMillis() + timeout;
 
@@ -349,10 +415,12 @@ public abstract class SchedulerConnection {
     }
 
     /**
-     * check if the given working directory exists. Useful for schedulers that do not check this (like Slurm)
+     * Check if the given working directory exists. Useful for schedulers that do not check this (like Slurm)
      * 
      * @param workingDirectory
-     *            the working directory (either absolute or relative) as given by the user.
+     *          the working directory (either absolute or relative) as given by the user.
+     * @throws XenonException
+     *          if workingDirectory does not exist, or an error occurred.
      */
     protected void checkWorkingDirectory(String workingDirectory) throws XenonException {
         if (workingDirectory == null) {
@@ -378,9 +446,6 @@ public abstract class SchedulerConnection {
 
     //implemented by sub-class
 
-    /**
-     * As the SchedulerImplementation contains the list of queues, the subclass is responsible of implementing this function
-     */
     public abstract Scheduler getScheduler();
 
     public abstract String[] getQueueNames();
