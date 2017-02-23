@@ -175,7 +175,7 @@ public final class ScriptingParser {
     /**
      * Remove suffix from a string if present. 
      * 
-     * Although more than one possible suffix can be provided, only the first one encountered will be removed.
+     * Although more than one possible suffix can be provided, only the first suffix encountered will be removed.
      * 
      * @param value
      *          the text to clean

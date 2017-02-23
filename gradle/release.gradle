@@ -65,9 +65,10 @@ task copyJavadoc {
     copy {
        from "build/docs"
        into "docs/versions/${version}"
-       include "javadoc/**"
     }
 }
 
 //tasks.publish.dependsOn 'bintrayUpload', 'copyJavadoc'
 tasks.publish.dependsOn 'copyJavadoc'
+
+tasks.copyJavadoc.dependsOn 'adaptorDocumentation', 'javadoc', 'javadocDevel'
