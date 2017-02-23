@@ -234,6 +234,8 @@ public final class XenonEngine implements Xenon {
      * @param scheme
      *            the scheme for which to get the adaptor
      * @return the adaptor
+     * @throws InvalidSchemeException
+     *          if the scheme is not known
      */
     public Adaptor getAdaptorFor(String scheme) throws InvalidSchemeException {
 

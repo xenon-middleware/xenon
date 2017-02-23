@@ -110,6 +110,7 @@ public class XenonProperties {
      * @param supportedProperties
      *            the properties to support
      * @param level
+     *          the level at which the property is valid
      * @param properties
      *            the set of properties to store
      * @throws UnknownPropertyException
@@ -142,7 +143,9 @@ public class XenonProperties {
      * @param properties
      *            the properties to add.
      * @throws UnknownPropertyException
+     *            if the property can not be fonud
      * @throws InvalidPropertyException
+     *            if the type of the value does not match the expected type
      */
     private void addProperties(Map<String, String> properties) throws UnknownPropertyException, InvalidPropertyException {
 
@@ -341,7 +344,8 @@ public class XenonProperties {
      * @return the value of an integer property with the given name.
      * @param name
      *            the name of the property
-     * 
+     * @param defaultValue
+     *            the value to return if the property is not found  
      * @throws UnknownPropertyException
      *             if the given name is not a supported property.
      * @throws PropertyTypeException

@@ -59,6 +59,7 @@ final class LocalUtils {
      * @param path Xenon Path
      * @return a normalized java Path
      * @throws XenonException 
+     *          if an error occurred
      */
     public static java.nio.file.Path javaPath(Path path) throws XenonException {
         FileSystem fs = path.getFileSystem();
@@ -145,7 +146,7 @@ final class LocalUtils {
         return result.toArray(new java.nio.file.OpenOption[result.size()]);
     }
 
-    /**
+    /*
      * @param path
      * @throws XenonException
      */
@@ -157,7 +158,7 @@ final class LocalUtils {
         }
     }
 
-    /**
+    /*
      * @param path
      * @param permissions
      * @throws XenonException
@@ -171,7 +172,7 @@ final class LocalUtils {
         }
     }
 
-    /**
+    /*
      * Create a local file
      * @param path
      * @throws XenonException
@@ -185,7 +186,7 @@ final class LocalUtils {
         }
     }
 
-    /**
+    /*
      * Delete a local file
      * @param path
      * @throws XenonException
@@ -203,11 +204,6 @@ final class LocalUtils {
         }
     }
 
-    /**
-     * @param source
-     * @param target
-     * @throws XenonException
-     */
     public static void move(Path source, Path target) throws XenonException {
 
         try {

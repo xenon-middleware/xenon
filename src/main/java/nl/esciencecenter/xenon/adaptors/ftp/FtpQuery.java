@@ -24,7 +24,7 @@ package nl.esciencecenter.xenon.adaptors.ftp;
 public abstract class FtpQuery<T> extends FtpCommand {
     private T result;
 
-    /**
+    /*
      * Gets the result of the query execution when called after calling execute.
      *
      */

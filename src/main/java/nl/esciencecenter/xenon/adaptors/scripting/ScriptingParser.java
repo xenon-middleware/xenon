@@ -147,6 +147,7 @@ public final class ScriptingParser {
      *            a number of possible prefixes before the job ID.
      * @return the job ID found on the input line.
      * @throws XenonException
+     *          if the input could not be parsed.
      */
     public static String parseJobIDFromLine(String input, String adaptorName, String... possiblePrefixes) throws XenonException {
         for (String prefix : possiblePrefixes) {
@@ -172,12 +173,16 @@ public final class ScriptingParser {
     }
 
     /**
-     * Trims value, remove suffixes if present. Only supports removing a single suffix.
+     * Remove suffix from a string if present. 
+     * 
+     * Although more than one possible suffix can be provided, only the first suffix encountered will be removed.
      * 
      * @param value
-     *            the value to clean
+     *          the text to clean
      * @param suffixes
-     *            the possible suffixes to remove
+     *          the possible suffixes to remove
+     * @return
+     *          the cleaned text             
      */
     public static String cleanValue(String value, String... suffixes) {
         String trimmed = value.trim();

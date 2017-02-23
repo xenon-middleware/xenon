@@ -120,7 +120,7 @@ public abstract class Location {
         return result.toString();
     }
 
-    /** Whether the default port was used because none was provided. */
+    /* Whether the default port was used because none was provided. */
     public boolean usesDefaultPort() {
         return port == -1;
     }

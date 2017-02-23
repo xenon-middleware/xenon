@@ -56,7 +56,7 @@ public abstract class FtpCommand {
         }
     }
 
-    /**
+    /*
      * Returns true if code is in interval [100,300). See http://en.wikipedia.org/wiki/List_of_FTP_server_return_codes.
      *
      * @param replyCode

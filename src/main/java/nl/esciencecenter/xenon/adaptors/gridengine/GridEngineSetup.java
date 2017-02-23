@@ -144,7 +144,7 @@ public class GridEngineSetup {
         return queueNames.clone();
     }
 
-    /**
+    /*
      * Get SGE to give us the required number of nodes. Since sge uses the rather abstract notion of slots, the number we need to
      * give is dependent on the parallel environment settings.
      */

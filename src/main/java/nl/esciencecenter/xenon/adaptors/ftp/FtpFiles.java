@@ -80,7 +80,7 @@ public class FtpFiles implements Files {
         return res;
     }
 
-    /**
+    /*
      * Used to store all state attached to a filesystem. This way, FileSystemImplementation is immutable.
      */
     static class FileSystemInfo {
@@ -179,7 +179,7 @@ public class FtpFiles implements Files {
         }
     }
 
-    /**
+    /*
      * Returns true if code is in interval [200,300). See http://en.wikipedia.org/wiki/List_of_FTP_server_return_codes.
      *
      * @param replyCode
@@ -264,7 +264,7 @@ public class FtpFiles implements Files {
         return result;
     }
 
-    /**
+    /*
      * Move or rename an existing source path to a non-existing target path.
      *
      * The parent of the target path (e.g. <code>target.getParent</code>) must exist.
@@ -561,7 +561,7 @@ public class FtpFiles implements Files {
         return ftpOutputStream;
     }
 
-    /**
+    /*
      * Creates a copy of the file system of the path and returns a copy of the path that refers to the new file system. This way
      * structures like streams can have their own dedicated ftp client. This is necessary because ftp can't do two things over the
      * same connection like uploading to a stream and reading from another stream for example.

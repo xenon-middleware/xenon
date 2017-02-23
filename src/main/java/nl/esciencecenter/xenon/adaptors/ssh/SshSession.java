@@ -74,6 +74,9 @@ class SshSession {
 
     /**
      * Cached channel from putSftpChannelInCache() is returned and removed from cache.
+     * 
+     * @return
+     *          the channel
      */
     protected ChannelSftp getSftpChannelFromCache() {
         ChannelSftp channel = sftpChannelCache;

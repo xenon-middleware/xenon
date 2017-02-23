@@ -46,7 +46,9 @@ public class SSHCertificateCredentialImplementation extends CertificateCredentia
      * @param passphrase
      *          the passphrase needed to access the certificate. May be null if the certificate has no passphrase or if the 
      *          access is delegated to an ssh-agent. 
-     */
+     * @param useAgent
+     *          should an SSH agent be used to deligate certificate access?
+     */    
     protected SSHCertificateCredentialImplementation(String adaptorName, String uniqueID, XenonProperties properties,
             String certfile, String username, char[] passphrase, boolean useAgent) {
         super(adaptorName, uniqueID, properties, certfile, username, passphrase);
