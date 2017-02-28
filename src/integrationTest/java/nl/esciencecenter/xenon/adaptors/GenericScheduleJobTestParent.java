@@ -981,4 +981,27 @@ public abstract class GenericScheduleJobTestParent {
             cleanupJob(job, root, stdin);
         }
     }
+    
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void test45_batchJobSubmitWithIllegalWait() throws Exception {
+        String workingDir = getWorkingDir("test45");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 60000);
+            description.setStdout("stdout.txt");
+            description.setStderr("stderr.txt");
+
+            job = jobs.submitJob(scheduler, description);
+
+            // Should throw exception
+            jobs.waitUntilRunning(job, -1);
+        } finally {
+            jobs.cancelJob(job);
+            jobs.waitUntilDone(job, 0);
+            cleanupJob(job, root);
+        }
+    }
+
 }

@@ -271,11 +271,12 @@ public interface Jobs {
     /**
      * Wait until a job is done or until a timeout expires.
      * <p>
-     * This method will wait until a job is done, killed, or produces an error, or until a timeout expires. If the timeout
-     * expires, the job will continue to run normally.
+     * This method will wait until a job is done (either gracefully or by being killed or producing an error), or until the 
+     * timeout expires, whichever comes first. If the timeout expires, the job will continue to run.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
+     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
+     * the jobs is done.  
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.
@@ -296,14 +297,15 @@ public interface Jobs {
     JobStatus waitUntilDone(Job job, long timeout) throws XenonException;
 
     /**
-     * Wait for as long a job is waiting in a queue, or until a timeout expires.
+     * Wait while a job is waiting in a queue, or until a timeout expires.
      * <p>
-     * This method will return as soon as the job is no longer waiting in the queue or when the timeout expires, whichever comes
-     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or produce 
+     * This method will return as soon as the job is no longer waiting in the queue, or when the timeout expires, whichever comes
+     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or produced 
      * an error. If the timeout expires, the job will continue to be queued normally.
      * </p>
      * <p>
-     * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
+     * The timeout is in milliseconds and must be &gt;= 0. When timeout is 0, it will be ignored and this method will wait until
+     * the job is no longer queued.  
      * </p>
      * <p>
      * A JobStatus is returned that can be used to determine why the call returned.

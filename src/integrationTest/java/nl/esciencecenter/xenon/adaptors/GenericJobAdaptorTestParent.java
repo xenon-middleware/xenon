@@ -25,7 +25,16 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.InvalidCredentialException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
@@ -45,16 +54,6 @@ import nl.esciencecenter.xenon.jobs.NoSuchSchedulerException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.util.Utils;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestWatcher;
-import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
