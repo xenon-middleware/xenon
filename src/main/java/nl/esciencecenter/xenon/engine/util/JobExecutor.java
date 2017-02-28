@@ -154,29 +154,34 @@ public class JobExecutor implements Runnable {
 
         throw new XenonException(adaptorName, "Job is not interactive!");
     }
-
+        
     public synchronized JobStatus waitUntilRunning(long timeout) {
 
-        long deadline = System.currentTimeMillis() + timeout;
-        long leftover = timeout;
-
+        long deadline;
+        
+        if (timeout > 0) { 
+            deadline = System.currentTimeMillis() + timeout;
+        } else if (timeout == 0) { 
+            deadline = Long.MAX_VALUE;
+        } else { 
+            throw new IllegalArgumentException("Illegal timeout " + timeout);
+        }
+                
         triggerStatusUpdate();
 
         while ("PENDING".equals(state)) {
-            // Note: will wait forever if leftover == 0.
+            long leftover = deadline - System.currentTimeMillis();
+            
+            if (leftover <= 0) {
+                // We passed the deadline
+                break;
+            }
+            
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
                 // ignored
             }
-
-            long now = System.currentTimeMillis();
-
-            if (now >= deadline) {
-                break;
-            }
-
-            leftover = deadline - now;
         }
 
         return getStatus();
@@ -184,30 +189,32 @@ public class JobExecutor implements Runnable {
 
     public synchronized JobStatus waitUntilDone(long timeout) {
 
-        long deadline = System.currentTimeMillis() + timeout;
-        long leftover = timeout;
-
+        long deadline;
+        
+        if (timeout > 0) { 
+            deadline = System.currentTimeMillis() + timeout;
+        } else if (timeout == 0) { 
+            deadline = Long.MAX_VALUE;
+        } else { 
+            throw new IllegalArgumentException("Illegal timeout " + timeout);
+        }
+        
         triggerStatusUpdate();
 
         while (!done) {
 
+            long leftover = deadline - System.currentTimeMillis();
+            
             if (leftover <= 0) {
+                // We passed the deadline
                 break;
             }
-
+   
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
                 // ignored
             }
-
-            long now = System.currentTimeMillis();
-
-            if (now >= deadline) {
-                break;
-            }
-
-            leftover = deadline - now;
         }
 
         return getStatus();

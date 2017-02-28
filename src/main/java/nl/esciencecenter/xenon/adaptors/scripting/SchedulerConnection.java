@@ -333,8 +333,7 @@ public abstract class SchedulerConnection {
     /**
      * Wait until a Job is done, or until the give timeout expires (whichever comes first). 
      * 
-     * Providing a negative timeout will cause the status of the job to be returned immediately. A timeout of 0 will result in an 
-     * infinite timeout. 
+     * A timeout of 0 will result in an infinite timeout, a negative timeout will result in an exception. 
      * 
      * @param job
      *          the Job to wait for
@@ -342,41 +341,43 @@ public abstract class SchedulerConnection {
      *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.  
      * @return
      *          the status of the job 
+     * @throws IllegalArgumentException
+     *          if the value to timeout is negative         
      * @throws XenonException
      *          if an error occurs
      */
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
-        long deadline = System.currentTimeMillis() + timeout;
-
-        if (timeout == 0) {
+        
+        long deadline;
+        
+        if (timeout > 0) { 
+            deadline = System.currentTimeMillis() + timeout;
+        } else if (timeout == 0) { 
             deadline = Long.MAX_VALUE;
+        } else { 
+            throw new IllegalArgumentException("Illegal timeout " + timeout);
         }
+        
+        JobStatus status = getJobStatus(job);
 
-        JobStatus status = null;
-
-        //make sure status is retrieved at least once
-        while (status == null || System.currentTimeMillis() < deadline) {
-            status = getJobStatus(job);
-
-            if (status.isDone()) {
-                return status;
-            }
-
+        // wait until we are done, or the timeout expires
+        while (!status.isDone() && System.currentTimeMillis() < deadline) {
             try {
                 Thread.sleep(pollDelay);
             } catch (InterruptedException e) {
                 return status;
             }
+            
+            status = getJobStatus(job);
         }
 
         return status;
     }
 
     /**
-     * Wait until a Job is running (or already done), or until the give timeout expires (whichever comes first). 
+     * Wait until a Job is running (or already done), or until the given timeout expires, whichever comes first. 
      * 
-     * Providing a negative timeout will cause the status of the job to be returned immediately. A timeout of 0 will result in an 
-     * infinite timeout. 
+     * A timeout of 0 will result in an infinite timeout. A negative timeout will result in an exception.
      * 
      * @param job
      *          the Job to wait for
@@ -384,31 +385,34 @@ public abstract class SchedulerConnection {
      *          the maximum number of milliseconds to wait, 0 to wait forever, or negative to return immediately.  
      * @return
      *          the status of the job 
+     * @throws IllegalArgumentException
+     *          if the value of timeout was negative         
      * @throws XenonException
      *          if an error occurs
      */
     public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
-        long deadline = System.currentTimeMillis() + timeout;
 
-        if (timeout == 0) {
+        long deadline;
+        
+        if (timeout > 0) { 
+            deadline = System.currentTimeMillis() + timeout;
+        } else if (timeout == 0) { 
             deadline = Long.MAX_VALUE;
+        } else { 
+            throw new IllegalArgumentException("Illegal timeout " + timeout);
         }
+        
+        JobStatus status = getJobStatus(job);
 
-        JobStatus status = null;
-
-        //make sure status is retrieved at least once
-        while (status == null || System.currentTimeMillis() < deadline) {
-            status = getJobStatus(job);
-
-            if (status.isRunning() || status.isDone()) {
-                return status;
-            }
-
+        // wait until we are done, or the timeout expires
+        while (!(status.isRunning() || status.isDone()) && System.currentTimeMillis() < deadline) {
             try {
                 Thread.sleep(pollDelay);
             } catch (InterruptedException e) {
                 return status;
             }
+            
+            status = getJobStatus(job);
         }
 
         return status;
