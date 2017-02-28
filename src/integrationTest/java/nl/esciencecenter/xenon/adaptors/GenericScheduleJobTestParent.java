@@ -1005,7 +1005,7 @@ public abstract class GenericScheduleJobTestParent {
 
     @Test
     public void test46a_batchJobSubmitWithPollingWaitUntilDone() throws Exception {
-        String workingDir = getWorkingDir("test46");
+        String workingDir = getWorkingDir("test46a");
         Path root = initJobDirectory(workingDir);
 
         try {
@@ -1017,7 +1017,7 @@ public abstract class GenericScheduleJobTestParent {
 
             JobStatus status = jobs.waitUntilDone(job, 1000);
             
-            while (status.isRunning()) {
+            while (!status.isDone()) {
                 status = jobs.waitUntilDone(job, 1000);
             }
             
@@ -1035,7 +1035,7 @@ public abstract class GenericScheduleJobTestParent {
 
     @Test
     public void test46b_batchJobSubmitWithPollingWaitUntilDone() throws Exception {
-        String workingDir = getWorkingDir("test46");
+        String workingDir = getWorkingDir("test46b");
         Path root = initJobDirectory(workingDir);
 
         try {
@@ -1046,7 +1046,7 @@ public abstract class GenericScheduleJobTestParent {
             JobStatus status = jobs.waitUntilDone(job, 1000);
             int count = 1;
             
-            while (status.isRunning()) {
+            while (!status.isDone()) {
                 status = jobs.waitUntilDone(job, 1000);
                 count++;
             }
@@ -1064,7 +1064,7 @@ public abstract class GenericScheduleJobTestParent {
     
     @Test
     public void test46c_batchJobSubmitWithPollingWaitUntilDone() throws Exception {
-        String workingDir = getWorkingDir("test46");
+        String workingDir = getWorkingDir("test46c");
         Path root = initJobDirectory(workingDir);
 
         try {
@@ -1074,7 +1074,7 @@ public abstract class GenericScheduleJobTestParent {
 
             JobStatus status = jobs.waitUntilDone(job, 1000);
             
-            while (status.isRunning()) {
+            while (!status.isDone()) {
                 long now = System.currentTimeMillis();
                 
                 status = jobs.waitUntilDone(job, 1000);
@@ -1096,7 +1096,7 @@ public abstract class GenericScheduleJobTestParent {
     
     @Test
     public void test47_batchJobSubmitWithSingleWaitUntilDone() throws Exception {
-        String workingDir = getWorkingDir("test46");
+        String workingDir = getWorkingDir("test47");
         Path root = initJobDirectory(workingDir);
 
         try {
@@ -1124,7 +1124,7 @@ public abstract class GenericScheduleJobTestParent {
     
     @Test
     public void test48_batchJobSubmitWithSingleWaitUntilRunning() throws Exception {
-        String workingDir = getWorkingDir("test46");
+        String workingDir = getWorkingDir("test48");
         Path root = initJobDirectory(workingDir);
 
         try {
@@ -1149,7 +1149,7 @@ public abstract class GenericScheduleJobTestParent {
 
     @Test(expected = IllegalArgumentException.class)
     public void test49_batchJobSubmitWithIllegalWaitUntilDone() throws Exception {
-        String workingDir = getWorkingDir("test46");
+        String workingDir = getWorkingDir("test49");
         Path root = initJobDirectory(workingDir);
 
         try {
