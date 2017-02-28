@@ -293,17 +293,13 @@ public class JobQueues {
 
         LOGGER.debug("{}: Waiting for job {} to start for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
-        if (timeout < 0) {
-            throw new XenonException(adaptorName, "Illegal timeout " + timeout);
-        }
-
         checkScheduler(job.getScheduler());
 
         List<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
         JobStatus status = findJob(queue, job).waitUntilRunning(timeout);
 
         if (status.isDone()) {
-            LOGGER.debug("{}: Job {} is done after {} ms.", adaptorName, job.getIdentifier(), timeout);
+            LOGGER.debug("{}: Job {} is done within {} ms.", adaptorName, job.getIdentifier(), timeout);
             cleanupJob(queue, job);
         } else {
             LOGGER.debug("{}: Job {} is NOT done after {} ms.", adaptorName, job.getIdentifier(), timeout);

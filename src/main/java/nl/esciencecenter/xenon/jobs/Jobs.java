@@ -286,6 +286,8 @@ public interface Jobs {
      *            the maximum time to wait for the job in milliseconds.
      * @return the status of the Job.
      * 
+     * @throws IllegalArgumentException 
+     *             If the value of timeout is negative
      * @throws NoSuchJobException
      *             If the job is not known.
      * @throws XenonException
@@ -296,9 +298,9 @@ public interface Jobs {
     /**
      * Wait for as long a job is waiting in a queue, or until a timeout expires.
      * <p>
-     * This method will return as soon as the job is no longer waiting in the queue. This is generally the case when it starts
-     * running, but it may also be killed or produce an error. If the timeout expires, the job will continue to be queued
-     * normally.
+     * This method will return as soon as the job is no longer waiting in the queue or when the timeout expires, whichever comes
+     * first. If the job is no longer waiting in the queue, it may be running, but it may also be killed, finished or produce 
+     * an error. If the timeout expires, the job will continue to be queued normally.
      * </p>
      * <p>
      * The timeout is in milliseconds and must be &gt;= 0, where 0 means an infinite timeout.
@@ -312,6 +314,8 @@ public interface Jobs {
      *            the maximum time to wait in milliseconds.
      * @return the status of the Job.
      * 
+     * @throws IllegalArgumentException 
+     *             If the value of timeout is negative
      * @throws NoSuchJobException
      *             If the job is not known.
      * @throws XenonException
