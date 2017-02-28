@@ -1004,4 +1004,67 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
 
+    @Test
+    public void test46_batchJobSubmitWithPollingWait() throws Exception {
+        String workingDir = getWorkingDir("test46");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 10000);
+            
+            long start = System.currentTimeMillis();
+            
+            job = jobs.submitJob(scheduler, description);
+
+            JobStatus status = jobs.waitUntilDone(job, 1000);
+            int count = 1;
+            
+            while (status.isRunning()) {
+                status = jobs.waitUntilDone(job, 1000);
+                count++;
+            }
+            
+            long end = System.currentTimeMillis(); 
+            
+            checkJobDone(status);
+            
+            // We expect the job to have lasted at least 10000 milliseconds, which would require 9 or more times polling.
+            assertTrue((end-start) >= 10000);
+            assertTrue(count >= 9);
+            
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
+
+    @Test
+    public void test76_batchJobSubmitWithSingleWait() throws Exception {
+        String workingDir = getWorkingDir("test46");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 10000);
+            
+            long start = System.currentTimeMillis();
+            
+            job = jobs.submitJob(scheduler, description);
+
+            // Should wait until the job is finished, however long it takes.
+            JobStatus status = jobs.waitUntilDone(job, 0);
+            
+            long end = System.currentTimeMillis(); 
+            
+            // Job must be in done state
+            checkJobDone(status);
+            
+            // We expect the job to have lasted at least 10000 milliseconds, which would require 9 or more times polling.
+            assertTrue((end-start) >= 10000);
+            
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
+    
+    
+    
 }
