@@ -1,10 +1,15 @@
-Xenon 1.2.0
+Xenon 1.2.1
 -----------
 
-This is release 1.2.0 of Xenon. 
+This is release 1.2.1 of Xenon. 
 
-Notable changes compared to v1.1.0:
+Notable changes compared to v1.2.0:
 -----------------------------------
+
+- fixed nasty inconsistency in adaptor implementations of waiting for jobs to start or finish.
+
+Notable changes between v1.2.0 and v1.1.0:
+------------------------------------------
 
 - added support for WebDAV file access.
 - added OSX testing in Travis
