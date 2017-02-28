@@ -998,7 +998,6 @@ public abstract class GenericScheduleJobTestParent {
             // Should throw exception
             jobs.waitUntilRunning(job, -1);
         } finally {
-            jobs.cancelJob(job);
             jobs.waitUntilDone(job, 0);
             cleanupJob(job, root);
         }
@@ -1163,7 +1162,6 @@ public abstract class GenericScheduleJobTestParent {
             
         } finally {
             jobs.cancelJob(job);
-            jobs.waitUntilDone(job, 0);
             cleanupJob(job, root);
         }
     }
