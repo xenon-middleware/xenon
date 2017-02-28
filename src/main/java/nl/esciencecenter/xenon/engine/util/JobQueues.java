@@ -270,10 +270,6 @@ public class JobQueues {
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         LOGGER.debug("{}: Waiting for job {} for {} ms.", adaptorName, job.getIdentifier(), timeout);
 
-        if (timeout < 0) {
-            throw new XenonException(adaptorName, "Illegal timeout " + timeout);
-        }
-
         checkScheduler(job.getScheduler());
 
         List<JobExecutor> queue = findQueue(job.getJobDescription().getQueueName());
