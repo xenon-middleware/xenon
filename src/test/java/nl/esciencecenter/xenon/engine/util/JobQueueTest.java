@@ -58,8 +58,8 @@ public class JobQueueTest {
     static class MyProcessWrapper implements InteractiveProcess {
 
         private final JobImplementation job;
-        private final byte[] output;
         private final byte[] error;
+        private final byte[] output;
 
         private boolean destroyed = false;
         private boolean done = false;
@@ -322,7 +322,7 @@ public class JobQueueTest {
         }
     }
 
-    @Test(expected = XenonException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test_invalidWaitTimeout() throws Exception {
         // throws exception
         jobQueue.waitUntilDone(mock(Job.class), -42);
