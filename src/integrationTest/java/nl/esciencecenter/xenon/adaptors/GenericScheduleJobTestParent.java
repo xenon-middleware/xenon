@@ -989,7 +989,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 60000);
+            JobDescription description = timedJobDescription(workingDir, 5);
             description.setStdout("stdout.txt");
             description.setStderr("stderr.txt");
 
@@ -1010,7 +1010,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 10000);
+            JobDescription description = timedJobDescription(workingDir, 10);
             
             long start = System.currentTimeMillis();
             
@@ -1040,7 +1040,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 10000);
+            JobDescription description = timedJobDescription(workingDir, 10);
             
             job = jobs.submitJob(scheduler, description);
 
@@ -1069,7 +1069,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 10000);
+            JobDescription description = timedJobDescription(workingDir, 10);
             
             job = jobs.submitJob(scheduler, description);
 
@@ -1101,7 +1101,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 10000);
+            JobDescription description = timedJobDescription(workingDir, 10);
             
             long start = System.currentTimeMillis();
             
@@ -1129,7 +1129,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 5000);
+            JobDescription description = timedJobDescription(workingDir, 5);
             
             job = jobs.submitJob(scheduler, description);
 
@@ -1154,7 +1154,7 @@ public abstract class GenericScheduleJobTestParent {
         Path root = initJobDirectory(workingDir);
 
         try {
-            JobDescription description = timedJobDescription(workingDir, 1000);
+            JobDescription description = timedJobDescription(workingDir, 1);
             
             job = jobs.submitJob(scheduler, description);
 
