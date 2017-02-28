@@ -984,7 +984,7 @@ public abstract class GenericScheduleJobTestParent {
     
     
     @Test(expected = IllegalArgumentException.class)
-    public void test45_batchJobSubmitWithIllegalWait() throws Exception {
+    public void test45_batchJobSubmitWithIllegalWaitUntilRunning() throws Exception {
         String workingDir = getWorkingDir("test45");
         Path root = initJobDirectory(workingDir);
 
@@ -1005,7 +1005,7 @@ public abstract class GenericScheduleJobTestParent {
     }
 
     @Test
-    public void test46_batchJobSubmitWithPollingWait() throws Exception {
+    public void test46a_batchJobSubmitWithPollingWaitUntilDone() throws Exception {
         String workingDir = getWorkingDir("test46");
         Path root = initJobDirectory(workingDir);
 
@@ -1017,11 +1017,9 @@ public abstract class GenericScheduleJobTestParent {
             job = jobs.submitJob(scheduler, description);
 
             JobStatus status = jobs.waitUntilDone(job, 1000);
-            int count = 1;
             
             while (status.isRunning()) {
                 status = jobs.waitUntilDone(job, 1000);
-                count++;
             }
             
             long end = System.currentTimeMillis(); 
@@ -1030,7 +1028,6 @@ public abstract class GenericScheduleJobTestParent {
             
             // We expect the job to have lasted at least 10000 milliseconds, which would require 9 or more times polling.
             assertTrue((end-start) >= 10000);
-            assertTrue(count >= 9);
             
         } finally {
             cleanupJob(job, root);
@@ -1038,7 +1035,68 @@ public abstract class GenericScheduleJobTestParent {
     }
 
     @Test
-    public void test76_batchJobSubmitWithSingleWait() throws Exception {
+    public void test46b_batchJobSubmitWithPollingWaitUntilDone() throws Exception {
+        String workingDir = getWorkingDir("test46");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 10000);
+            
+            job = jobs.submitJob(scheduler, description);
+
+            JobStatus status = jobs.waitUntilDone(job, 1000);
+            int count = 1;
+            
+            while (status.isRunning()) {
+                status = jobs.waitUntilDone(job, 1000);
+                count++;
+            }
+            
+            checkJobDone(status);
+            
+            // We expect the job to have lasted at least 10000 milliseconds, which would require 9 or more times polling.
+            assertTrue(count >= 9);
+            
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
+
+    
+    @Test
+    public void test46c_batchJobSubmitWithPollingWaitUntilDone() throws Exception {
+        String workingDir = getWorkingDir("test46");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 10000);
+            
+            job = jobs.submitJob(scheduler, description);
+
+            JobStatus status = jobs.waitUntilDone(job, 1000);
+            
+            while (status.isRunning()) {
+                long now = System.currentTimeMillis();
+                
+                status = jobs.waitUntilDone(job, 1000);
+                
+                long diff = System.currentTimeMillis() - now;
+              
+                // The wait should have lasted at least 1000 millis
+                if (status.isRunning()) { 
+                    assertTrue(diff >= 1000);
+                }
+            }
+            
+            checkJobDone(status);
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
+
+    
+    @Test
+    public void test47_batchJobSubmitWithSingleWaitUntilDone() throws Exception {
         String workingDir = getWorkingDir("test46");
         Path root = initJobDirectory(workingDir);
 
@@ -1049,8 +1107,8 @@ public abstract class GenericScheduleJobTestParent {
             
             job = jobs.submitJob(scheduler, description);
 
-            // Should wait until the job is finished, however long it takes.
             JobStatus status = jobs.waitUntilDone(job, 0);
+            // Should wait until the job is finished, however long it takes.
             
             long end = System.currentTimeMillis(); 
             
@@ -1065,6 +1123,51 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
     
+    @Test
+    public void test48_batchJobSubmitWithSingleWaitUntilRunning() throws Exception {
+        String workingDir = getWorkingDir("test46");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 5000);
+            
+            job = jobs.submitJob(scheduler, description);
+
+            JobStatus status = jobs.waitUntilRunning(job, 0);
+            // Should wait until the job is finished, however long it takes.
+            
+            assert(status.isRunning());
+            
+            status = jobs.waitUntilDone(job, 0);
+            
+            // Job must be in done state
+            checkJobDone(status);
+            
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test49_batchJobSubmitWithIllegalWaitUntilDone() throws Exception {
+        String workingDir = getWorkingDir("test46");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 1000);
+            
+            job = jobs.submitJob(scheduler, description);
+
+            // Should throw exception!
+            jobs.waitUntilDone(job, -1);
+            
+        } finally {
+            jobs.cancelJob(job);
+            jobs.waitUntilDone(job, 0);
+            cleanupJob(job, root);
+        }
+    }
+
     
     
 }
