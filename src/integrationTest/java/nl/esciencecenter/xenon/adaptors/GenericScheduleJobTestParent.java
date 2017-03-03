@@ -1166,6 +1166,55 @@ public abstract class GenericScheduleJobTestParent {
         }
     }
 
+    @Test
+    public void test50_batchJobSubmitWithLongWaitUntilRunning() throws Exception {
+        String workingDir = getWorkingDir("test50");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 5);
+            
+            job = jobs.submitJob(scheduler, description);
+
+            // Should wait until the job is finished, however long it takes.
+            JobStatus status = jobs.waitUntilRunning(job, Long.MAX_VALUE);
+            
+            assert(status.isRunning());
+            
+            status = jobs.waitUntilDone(job, 0);
+            
+            // Job must be in done state
+            checkJobDone(status);
+            
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
     
+    @Test
+    public void test51_batchJobSubmitWithLongWaitUntilDone() throws Exception {
+        String workingDir = getWorkingDir("test51");
+        Path root = initJobDirectory(workingDir);
+
+        try {
+            JobDescription description = timedJobDescription(workingDir, 5);
+            
+            job = jobs.submitJob(scheduler, description);
+
+            JobStatus status = jobs.waitUntilRunning(job, 0);
+            
+            assert(status.isRunning());
+            
+            // Should wait until the job is finished, however long it takes. 
+            // If the timeout overflows this will return immediately?
+            status = jobs.waitUntilDone(job, Long.MAX_VALUE);
+            
+            // Job must be in done state
+            checkJobDone(status);
+            
+        } finally {
+            cleanupJob(job, root);
+        }
+    }
     
 }
