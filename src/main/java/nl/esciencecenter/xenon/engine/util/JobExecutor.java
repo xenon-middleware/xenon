@@ -161,6 +161,11 @@ public class JobExecutor implements Runnable {
         
         if (timeout > 0) { 
             deadline = System.currentTimeMillis() + timeout;
+            
+            if (deadline < System.currentTimeMillis()) { 
+                // Timeout overflow. Partial fix by setting timeout to end of epoch.
+                deadline = Long.MAX_VALUE;
+            }     
         } else if (timeout == 0) { 
             deadline = Long.MAX_VALUE;
         } else { 
@@ -193,6 +198,11 @@ public class JobExecutor implements Runnable {
         
         if (timeout > 0) { 
             deadline = System.currentTimeMillis() + timeout;
+            
+            if (deadline < System.currentTimeMillis()) { 
+                // Timeout overflow. Partial fix by setting timeout to end of epoch.
+                deadline = Long.MAX_VALUE;
+            }     
         } else if (timeout == 0) { 
             deadline = Long.MAX_VALUE;
         } else { 
