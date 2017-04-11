@@ -402,7 +402,7 @@ public final class CopyEngine {
 
         RelativePath sourceName = source.getRelativePath().normalize();
         RelativePath targetName = target.getRelativePath().normalize();
-        
+            
         if (sourceName.equals(targetName)) {
             return;
         }
