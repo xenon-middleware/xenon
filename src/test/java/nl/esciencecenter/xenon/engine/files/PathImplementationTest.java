@@ -18,6 +18,10 @@ package nl.esciencecenter.xenon.engine.files;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import nl.esciencecenter.xenon.credentials.Credential;
+import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.engine.credentials.CredentialTestUtil;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.RelativePath;
@@ -92,24 +96,77 @@ public class PathImplementationTest {
     }
 
     @Test
-    public void test_equals() throws Exception {
+    public void test_notEqualsNull() throws Exception {
+        Path path = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
+        assertFalse(path.equals(null));
+    }
+
+    @Test
+    public void test_notEqualsString() throws Exception {
+        Path path = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
+        assertFalse(path.equals("AAP"));
+    }
+
+    @Test
+    public void test_notEqualsPath() throws Exception {
         Path path = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
 
         FileSystem fs2 = new FileSystemImplementation("other", "other-fs-0", "file", "/", new RelativePath("/"), null,
                 null);
-        FileSystem fs3 = new FileSystemImplementation("local", "local-fs-0", "aap", "/", new RelativePath("/"), null,
+          
+        Path path2 = new PathImplementation(fs2, new RelativePath("/aap/noot/mies/bla"));
+  
+        assertFalse(path.equals(path2));
+      }
+
+    @Test
+    public void test_notEqualsPath2() throws Exception {
+        Path path = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
+
+        FileSystem fs3 = new FileSystemImplementation("local", "local-fs-1", "aap", "/", new RelativePath("/"), null,
                 null);
 
-        Path path2 = new PathImplementation(fs2, new RelativePath("/aap/noot/mies/bla"));
         Path path3 = new PathImplementation(fs3, new RelativePath("/aap/noot/mies/bla"));
+
+        assertFalse(path.equals(path3));
+    }
+
+    @Test
+    public void test_equalsPath() throws Exception {
+        Path path = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
+
+        FileSystem fs2 = new FileSystemImplementation("local", "local-fs-0", "file", "/", new RelativePath("/"), null, null);
+       
+        Path path3 = new PathImplementation(fs2, new RelativePath("/aap/noot/mies/bla"));
+
+        assertTrue(path.equals(path3));
+    }
+
+    
+    @Test
+    public void test_equalsPath2() throws Exception {
+        Path path = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
 
         Path path4 = new PathImplementation(fs, new RelativePath("/aap/noot/mies/bla"));
 
-        assertFalse(path.equals(null));
-        assertFalse(path.equals("AAP"));
-        assertFalse(path.equals(path2));
-        assertFalse(path.equals(path3));
-
         assertTrue(path.equals(path4));
     }
+
+    @Test
+    public void test_notEqualsCredentials() throws Exception {
+        
+        Credential c1 = CredentialTestUtil.createPasswordCredential("aap", "aap0", "jason", "welcome01");
+        Credential c2 = CredentialTestUtil.createPasswordCredential("aap", "aap0", "stefan", "welcome01");
+        
+        // NOTE: the identifier (second argument) cannot be the same if any of the other parameters is different... 
+        FileSystem fs1 = new FileSystemImplementation("local", "local-fs-0", "file", "/", new RelativePath("/"), c1, null);
+        FileSystem fs2 = new FileSystemImplementation("local", "local-fs-1", "file", "/", new RelativePath("/"), c2, null);
+        
+        Path path1 = new PathImplementation(fs1, new RelativePath("/aap1/noot2/mies3/bla4"));
+        Path path2 = new PathImplementation(fs2, new RelativePath("/aap1/noot2/mies3/bla4"));
+
+        assertFalse(path1.equals(path2));
+    }
+    
+    
 }

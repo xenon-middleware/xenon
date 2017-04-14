@@ -400,13 +400,19 @@ public final class CopyEngine {
             throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
         }
 
-        RelativePath sourceName = source.getRelativePath().normalize();
-        RelativePath targetName = target.getRelativePath().normalize();
-        
-        if (sourceName.equals(targetName)) {
+        //RelativePath sourceName = source.getRelativePath().normalize();
+        //RelativePath targetName = target.getRelativePath().normalize();
+            
+        //if (sourceName.equals(targetName)) {
+        //    System.err.println("BUG TRIGGERED " + sourceName + " " + targetName);
+        //    return;
+        //}
+
+        if (source.equals(target)) { 
+            // should throw exception here ? 
             return;
         }
-
+        
         if (owner.exists(target)) {
             if (ignore) {
                 return;
