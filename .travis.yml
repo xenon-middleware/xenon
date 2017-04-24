@@ -81,6 +81,7 @@ after_script:
   - if [ $INTEGRATION_TEST == "docker" ]; then
     ./gradlew jacocoIntegrationTestReport;
     bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
+    ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN;
     elif [ $INTEGRATION_TEST == "local" ]; then
     ./gradlew jacocoIntegrationTestReport;
     bash <(curl -s https://codecov.io/bash) -e JDK,INTEGRATION_TEST,OS -f build/reports/jacoco/jacocoIntegrationTestReport/jacocoIntegrationTestReport.xml;
