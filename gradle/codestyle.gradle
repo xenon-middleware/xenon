@@ -30,10 +30,12 @@ group = 'nlesc'
 sonarqube {
     properties {
         property 'sonar.host.url', 'https://sonarqube.com'
+        property 'sonar.projectName', 'Xenon'
         property 'sonar.organization', project.group
         property 'sonar.language', 'java'
         property 'sonar.links.homepage', 'https://github.com/NLeSC/Xenon'
-        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
+        property 'sonar.sources', sourceSets.main.allJava
+//        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
         property 'sonar.jacoco.reportPaths', [jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData]
     }
 }
