@@ -25,3 +25,16 @@ pmdTest {
 pmdIntegrationTest {
     ruleSetFiles = files("config/pmd/test_ruleset.xml")
 }
+
+group = 'nlesc'
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarqube.com'
+        property 'sonar.organization', project.group
+        property 'sonar.language', 'java'
+        property 'sonar.links.homepage', 'https://github.com/NLeSC/Xenon'
+        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
+        property 'sonar.jacoco.reportPaths', [jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData]
+    }
+}
+//project.tasks["sonarqube"].dependsOn "integrationTest"
