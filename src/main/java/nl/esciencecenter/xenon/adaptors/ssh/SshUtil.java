@@ -31,7 +31,7 @@ public final class SshUtil {
     }
 
     @SuppressWarnings({ "PMD.CompareObjectsWithEquals", "PMD.NPathComplexity" })
-    public static boolean equals(SftpATTRS a1, SftpATTRS a2) {
+    public static boolean equalSFTPAttributes(SftpATTRS a1, SftpATTRS a2) {
         // Handles case of aliased object + both null
         if (a1 == a2) {
             return true;

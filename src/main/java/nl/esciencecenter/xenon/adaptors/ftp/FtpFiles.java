@@ -497,7 +497,7 @@ public class FtpFiles implements Files {
     private void assertDirectoryExists(Path path) throws XenonException {
         if (!directoryExists(path)) {
             String absolutePath = path.getRelativePath().getAbsolutePath();
-            String message = MessageFormat.format("Directory does not exist at path ", absolutePath);
+            String message = MessageFormat.format("Directory does not exist at path {0}", absolutePath);
             throw new XenonException(adaptor.getName(), message);
         }
     }

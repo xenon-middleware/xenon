@@ -171,6 +171,7 @@ public class XenonProperties {
         }
     }
 
+    
     private void checkType(XenonPropertyDescription description, String key, String value) throws InvalidPropertyException {
         Type t = description.getType();
 
@@ -182,13 +183,13 @@ public class XenonProperties {
                 }
                 break;
             case INTEGER:
-                Integer.valueOf(value);
+                Integer.parseInt(value);
                 break;
             case DOUBLE:
-                Double.valueOf(value);
+                Double.parseDouble(value);
                 break;
             case LONG:
-                Long.valueOf(value);
+                Long.parseLong(value);
                 break;
             case SIZE:
                 parseSizeValue(value);

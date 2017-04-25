@@ -79,7 +79,7 @@ public final class OutputReader extends Thread {
             try {
                 wait();
             } catch (InterruptedException t) {
-                // Ignore.
+                // ignored ?
             }
         }
     }

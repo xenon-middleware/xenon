@@ -160,7 +160,7 @@ public class SshFileAttributes implements FileAttributes {
 
         SshFileAttributes other = (SshFileAttributes) obj;
 
-        if (!SshUtil.equals(attributes, other.attributes)) {
+        if (!SshUtil.equalSFTPAttributes(attributes, other.attributes)) {
             return false;
         }
 

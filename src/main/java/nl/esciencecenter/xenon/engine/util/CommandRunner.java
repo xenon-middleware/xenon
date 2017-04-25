@@ -77,7 +77,7 @@ public class CommandRunner {
         // expand command using path
         command[0] = getExeFile(command[0]);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("CommandRunner running: " + Arrays.toString(command));
+            LOGGER.debug("CommandRunner running {}", Arrays.toString(command));
         }
         ProcessBuilder builder = new ProcessBuilder(command);
         if (workingDir != null) {
@@ -107,11 +107,13 @@ public class CommandRunner {
             err.waitUntilFinished();
 
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("CommandRunner out: " + out.getResult() + "\n" + "CommandRunner err: " + err.getResult());
+                LOGGER.debug("CommandRunner out: {}\nCommandRunner err: {}\n", out.getResult(), err.getResult());
             }
 
         } catch (InterruptedException e) {
-            // IGNORE
+            LOGGER.warn("CommandRunner was interrupted before termination!");
+            Thread.currentThread().interrupt();
+            exit = -1;
         }
 
         exitCode = exit;

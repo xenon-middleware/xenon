@@ -37,7 +37,7 @@ public class JobExecutor implements Runnable {
     private static final long POLLING_DELAY = 1000L;
     
     /** Number of ms. per min. */
-    private static final long MILLISECONDS_IN_MINUTE = 60 * 1000;
+    private static final long MILLISECONDS_IN_MINUTE = 60L * 1000L;
 
     private final JobImplementation job;
 
@@ -185,7 +185,8 @@ public class JobExecutor implements Runnable {
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
-                // ignored
+                Thread.currentThread().interrupt();
+                break;
             }
         }
 
@@ -223,7 +224,8 @@ public class JobExecutor implements Runnable {
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
-                // ignored
+                Thread.currentThread().interrupt();
+                break;
             }
         }
 
@@ -261,7 +263,8 @@ public class JobExecutor implements Runnable {
             try {
                 wait(left);
             } catch (InterruptedException e) {
-                // ignored
+                Thread.currentThread().interrupt();
+                break;
             }
 
             if (maxDelay > 0) { 
@@ -297,7 +300,8 @@ public class JobExecutor implements Runnable {
             try {
                 wait(left);
             } catch (InterruptedException e) {
-                // ignored
+                Thread.currentThread().interrupt();
+                break;
             }
 
             left = deadline - System.currentTimeMillis();

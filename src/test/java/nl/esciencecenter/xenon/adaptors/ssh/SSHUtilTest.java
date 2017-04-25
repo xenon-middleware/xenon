@@ -46,31 +46,31 @@ public class SSHUtilTest {
     @org.junit.Test
     public void testEqualsIdentity() throws Exception {       
         SftpATTRS s1 = createEmptySftpATTRS();
-        assertTrue(SshUtil.equals(s1, s1));        
+        assertTrue(SshUtil.equalSFTPAttributes(s1, s1));        
     }
     
     @org.junit.Test
     public void testEqualsToNull1() throws Exception {       
         SftpATTRS s1 = createEmptySftpATTRS();
-        assertFalse(SshUtil.equals(s1, null));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, null));        
     }
 
     @org.junit.Test
     public void testEqualsToNull2() throws Exception {       
         SftpATTRS s1 = createEmptySftpATTRS();
-        assertFalse(SshUtil.equals(null, s1));        
+        assertFalse(SshUtil.equalSFTPAttributes(null, s1));        
     }
     
     @org.junit.Test
     public void testEqualsNullNull() throws Exception {       
-        assertTrue(SshUtil.equals(null, null));        
+        assertTrue(SshUtil.equalSFTPAttributes(null, null));        
     }
 
     @org.junit.Test
     public void testEquals() throws Exception {       
         SftpATTRS s1 = createEmptySftpATTRS();
         SftpATTRS s2 = createEmptySftpATTRS();
-        assertTrue(SshUtil.equals(s1, s2));        
+        assertTrue(SshUtil.equalSFTPAttributes(s1, s2));        
     }
     
     @org.junit.Test
@@ -81,7 +81,7 @@ public class SSHUtilTest {
         s1.setACMODTIME(42, 42);
         s2.setACMODTIME(22, 22);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
 
     @org.junit.Test
@@ -92,7 +92,7 @@ public class SSHUtilTest {
         s1.setACMODTIME(42, 42);
         s2.setACMODTIME(42, 22);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
     
     @org.junit.Test
@@ -103,7 +103,7 @@ public class SSHUtilTest {
         s1.setUIDGID(42, 42);
         s2.setUIDGID(42, 22);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
     
     @org.junit.Test
@@ -114,7 +114,7 @@ public class SSHUtilTest {
         s1.setUIDGID(42, 42);
         s2.setUIDGID(22, 22);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
 
     @org.junit.Test
@@ -125,7 +125,7 @@ public class SSHUtilTest {
         s1.setPERMISSIONS(42);
         s2.setPERMISSIONS(0);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
 
     @org.junit.Test
@@ -136,7 +136,7 @@ public class SSHUtilTest {
         s1.setSIZE(42);
         s2.setSIZE(0);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
     
     @org.junit.Test
@@ -146,7 +146,7 @@ public class SSHUtilTest {
         
         setFlags(s1, 42);
         
-        assertFalse(SshUtil.equals(s1, s2));        
+        assertFalse(SshUtil.equalSFTPAttributes(s1, s2));        
     }
 
     
