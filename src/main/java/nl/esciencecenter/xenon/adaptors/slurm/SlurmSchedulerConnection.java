@@ -58,9 +58,9 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SlurmSchedulerConnection.class);
     
-    private static final long SLURM_UPDATE_TIMEOUT = 60*1000; // 30 second update timeout
+    private static final long SLURM_UPDATE_TIMEOUT = 60L*1000L; // 30 second update timeout
     
-    private static final long SLURM_UPDATE_SLEEP = 1000; // 1 second update sleep
+    private static final long SLURM_UPDATE_SLEEP = 1000L; // 1 second update sleep
     
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
 
@@ -445,7 +445,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
                 
                 String jobID = entry.getKey();
                 
-                LOGGER.debug("Found interactive job ID: " + jobID);
+                LOGGER.debug("Found interactive job ID: %s", jobID);
 
                 Job result = new JobImplementation(getScheduler(), jobID, description, true, true);
                 
@@ -499,7 +499,8 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
             try { 
                 Thread.sleep(SLURM_UPDATE_SLEEP);
             } catch (InterruptedException e) { 
-                // ignored
+                LOGGER.warn("Interrupted!", e);
+                Thread.currentThread().interrupt();
             }
             
             result = findInteractiveJob(tag.toString(), description, interactiveJob);

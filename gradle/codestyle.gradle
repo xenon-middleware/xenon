@@ -27,16 +27,24 @@ pmdIntegrationTest {
 }
 
 group = 'nlesc'
+
 sonarqube {
     properties {
-        property 'sonar.host.url', 'https://sonarqube.com'
-        property 'sonar.projectName', 'Xenon'
-        property 'sonar.organization', project.group
-        property 'sonar.language', 'java'
-        property 'sonar.links.homepage', 'https://github.com/NLeSC/Xenon'
-        property 'sonar.sources', sourceSets.main.allJava
-//        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
-        property 'sonar.jacoco.reportPaths', [jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData]
+        property "sonar.host.url", "https://sonarqube.com"
+        property "sonar.projectName", "Xenon"
+        property "sonar.organization", project.group
+        property "sonar.language", "java"
+        property "sonar.links.homepage", "https://github.com/NLeSC/Xenon"
+        property "sonar.sources", sourceSets.main.java
+        property "sonar.exclusions", ["**/AdaptorDocGenerator.java"]
+//, sourceSets.test.allJava, sourceSets.integrationTest.allJava]
+//        property "sonar.test.exclusions", [sourceSets.test.java, sourceSets.integrationTest.java]
+//        property "sonar.tests", [sourceSets.test.allJava, sourceSets.integrationTest.allJava]
+//        property "sonar.java.binaries", "${project.buildDir}/classes/main"
+//        property "sonar.java.test.binaries", ["${project.buildDir}/classes/test", "${project.buildDir}/classes/integrationTest"]
+        property "sonar.jacoco.reportPaths", [jacocoTestReport.executionData, jacocoIntegrationTestReport.executionData]
     }
 }
+
+//        properties["sonar.tests"] += sourceSets.integrationTest.allSource.srcDirs
 //project.tasks["sonarqube"].dependsOn "integrationTest"

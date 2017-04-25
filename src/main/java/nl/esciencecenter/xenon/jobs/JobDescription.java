@@ -474,10 +474,10 @@ public class JobDescription {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
-        result = prime * result + ((environment == null) ? 0 : environment.hashCode());
+        result = prime * result + arguments.hashCode();
+        result = prime * result + environment.hashCode();
         result = prime * result + ((executable == null) ? 0 : executable.hashCode());
-        result = prime * result + ((jobOptions == null) ? 0 : jobOptions.hashCode());
+        result = prime * result + jobOptions.hashCode();
         result = prime * result + (interactive ? 1231 : 1237);
         result = prime * result + maxTime;
         result = prime * result + nodeCount;
