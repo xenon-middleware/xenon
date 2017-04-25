@@ -79,7 +79,8 @@ public final class OutputReader extends Thread {
             try {
                 wait();
             } catch (InterruptedException t) {
-                // ignored ?
+                Thread.currentThread().interrupt();
+                break;
             }
         }
     }

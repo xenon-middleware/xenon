@@ -558,6 +558,15 @@ public final class Utils {
      *             If the creation of the FileSystem failed.
      */
     public static Path fromLocalPath(Files files, String path) throws XenonException {
+        
+        if (files == null) { 
+            throw new IllegalArgumentException("Files may not be null");
+        }
+     
+        if (path == null) { 
+            throw new IllegalArgumentException("Path may not be null");
+        }
+        
         String root = getLocalRoot(path);
         FileSystem fs = files.newFileSystem("file", root, null, null);
         return files.newPath(fs, getRelativePath(path, root));

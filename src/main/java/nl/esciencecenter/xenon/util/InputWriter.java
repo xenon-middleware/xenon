@@ -76,7 +76,8 @@ public final class InputWriter extends Thread {
             try {
                 wait();
             } catch (InterruptedException e) {
-                // Ignore.
+                Thread.currentThread().interrupt();
+                break;
             }
         }
     }
