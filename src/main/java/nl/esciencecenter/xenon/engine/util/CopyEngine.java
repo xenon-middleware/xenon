@@ -520,7 +520,9 @@ public final class CopyEngine {
             try {
                 wait(POLLING_DELAY);
             } catch (InterruptedException e) {
-                // ignore ?
+                LOGGER.warn("CopyEngine.dequeue interrupted!");
+                Thread.currentThread().interrupt();
+                return null;
             }
         }
 
@@ -541,7 +543,8 @@ public final class CopyEngine {
             try {
                 wait(POLLING_DELAY);
             } catch (InterruptedException e) {
-                // ignored.
+                LOGGER.warn("CopyEngine.waitUntilCancelled interrupted before copy {} has finished!", copyID);
+                Thread.currentThread().interrupt();
             }
         }
     }

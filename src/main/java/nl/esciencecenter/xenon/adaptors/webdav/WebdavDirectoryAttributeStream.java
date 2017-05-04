@@ -33,6 +33,6 @@ public class WebdavDirectoryAttributeStream extends WebdavDirectoryStreamBase<Pa
 
     @Override
     protected PathAttributesPair getStreamElementFromEntry(MultiStatusResponse entry, Path entryPath) throws XenonException {
-        return new PathAttributesPairImplementation(entryPath, new WebdavFileAttributes(entry.getProperties(WebdavFiles.OK_code)));
+        return new PathAttributesPairImplementation(entryPath, new WebdavFileAttributes(entry.getProperties(WebdavFiles.OK_CODE)));
     }
 }

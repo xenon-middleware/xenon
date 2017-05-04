@@ -3,6 +3,7 @@
 javadoc {
     exclude 'nl/esciencecenter/xenon/engine/**', 'nl/esciencecenter/xenon/adaptors/**'
     options.overview = file("${buildDir}/overview.html")
+    options.setNoTimestamp(true)
 }
 
 task javadocDevel(type: Javadoc) {

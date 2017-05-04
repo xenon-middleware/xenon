@@ -215,7 +215,7 @@ public abstract class SchedulerConnection {
             subLocation = location;
         }
 
-        LOGGER.debug("creating sub scheduler for {} adaptor at {}", adaptor.getName(), (subJobScheme + "://" + subLocation));
+        LOGGER.debug("creating sub scheduler for {} adaptor at {}://{}", adaptor.getName(), subJobScheme, subLocation);
         Map<String, String> subSchedulerProperties = new HashMap<>(2);
 
         //since we expect commands to be done almost instantaneously, we poll quite frequently (local operation anyway)
@@ -224,7 +224,7 @@ public abstract class SchedulerConnection {
         }
         subScheduler = engine.jobs().newScheduler(subJobScheme, subLocation, credential, subSchedulerProperties);
 
-        LOGGER.debug("creating file system for {} adaptor at {}", adaptor.getName(), (subFileScheme + "://" + subLocation));
+        LOGGER.debug("creating file system for {} adaptor at {}://{}", adaptor.getName(), subFileScheme, subLocation);
         subFileSystem = engine.files().newFileSystem(subFileScheme, subLocation, credential, null);
     }
 
@@ -370,6 +370,7 @@ public abstract class SchedulerConnection {
             try {
                 Thread.sleep(pollDelay);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return status;
             }
             
@@ -419,6 +420,7 @@ public abstract class SchedulerConnection {
             try {
                 Thread.sleep(pollDelay);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 return status;
             }
             

@@ -25,3 +25,7 @@ pmdTest {
 pmdIntegrationTest {
     ruleSetFiles = files("config/pmd/test_ruleset.xml")
 }
+
+group = 'nlesc'
+
+

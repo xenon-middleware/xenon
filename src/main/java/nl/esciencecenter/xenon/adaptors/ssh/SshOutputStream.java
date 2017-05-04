@@ -61,15 +61,29 @@ public class SshOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
+        
+        IOException tmp = null;
+        
         try {
+            // First attempt to close the in stream.
             out.close();
-        } finally {
-            try { 
-                session.releaseSftpChannel(channel);
-            } catch (XenonException e) { 
-                throw new IOException("Failed to release SSH channel!", e);
-            }
+        } catch (IOException e) {
+            tmp = new IOException("Failed to close the SSH output stream!", e);
         } 
+        
+        try { 
+            // Next, attempt to release the channel, even if in failed to close. 
+            session.releaseSftpChannel(channel);
+        } catch (XenonException e) { 
+            if (tmp == null) {  
+                tmp = new IOException("Failed to release SSH channel!", e);
+            }
+        }
+        
+        if (tmp != null) { 
+            // throw the first exception we encountered, if any
+            throw tmp;
+        }
     }
 
     @Override

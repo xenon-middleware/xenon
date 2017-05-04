@@ -139,12 +139,11 @@ public class FilesEngine implements Files {
         FileSystem sourcefs = source.getFileSystem();
         FileSystem targetfs = target.getFileSystem();
 
-        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
+        if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName()) ||
+                targetfs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(source).copy(source, target, options);
         } else if (sourcefs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).copy(source, target, options);
-        } else if (targetfs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).copy(source, target, options);
         } else {
             throw new XenonException("FilesEngine", "Cannot do inter-scheme third party copy!");
         }

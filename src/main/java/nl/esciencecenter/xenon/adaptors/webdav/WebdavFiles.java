@@ -88,7 +88,8 @@ public class WebdavFiles implements Files {
     private final Map<String, FileSystemInfo> fileSystems = Collections.synchronizedMap(new HashMap<String, FileSystemInfo>());
 
     private static int currentID = 1;
-    public static int OK_code = 200;
+    public static final int OK_CODE = 200;
+    
     /** The default buffer size for copy. Webdav doesn't use the standard copy engine. */
     private static final int BUFFER_SIZE = 4 * 1024;
 
@@ -256,10 +257,9 @@ public class WebdavFiles implements Files {
     }
 
     private OpenOption[] createOutputStreamOptions(CopyOption... options) {
-        LinkedList<OpenOption> openOptions = new LinkedList<OpenOption>();
-        if (CopyOption.REPLACE.occursIn(options)) {
-            openOptions.add(OpenOption.OPEN_OR_CREATE);
-        } else if (CopyOption.IGNORE.occursIn(options)) {
+        LinkedList<OpenOption> openOptions = new LinkedList<>();
+        
+        if (CopyOption.REPLACE.occursIn(options) || CopyOption.IGNORE.occursIn(options)) {
             openOptions.add(OpenOption.OPEN_OR_CREATE);
         } else {
             openOptions.add(OpenOption.CREATE);
@@ -437,8 +437,7 @@ public class WebdavFiles implements Files {
         } catch (IOException | DavException e) {
             throwDirectoryListingException(folderPath, e);
         }
-        MultiStatusResponse[] responses = multiStatus.getResponses();
-        return responses;
+        return multiStatus.getResponses();
     }
 
     private void throwDirectoryListingException(String folderPath, Exception e) throws XenonException {
@@ -470,10 +469,8 @@ public class WebdavFiles implements Files {
         HttpClient client = getFileSystemByPath(path);
         GetMethod method = new GetMethod(filePath);
         try {
-            //            executeMethod(client, method);
             client.executeMethod(method);
-            InputStream stream = method.getResponseBodyAsStream();
-            return stream;
+            return method.getResponseBodyAsStream();
         } catch (IOException e) {
             throw new XenonException(adaptor.getName(), "Could not open inputstream to " + filePath, e);
         }
@@ -562,7 +559,7 @@ public class WebdavFiles implements Files {
         MultiStatusResponse[] responses = document.getResponses();
         DavPropertySet properties = null;
         for (MultiStatusResponse multiStatusResponse : responses) {
-            properties = multiStatusResponse.getProperties(OK_code);
+            properties = multiStatusResponse.getProperties(OK_CODE);
         }
         return properties;
     }
@@ -635,7 +632,7 @@ public class WebdavFiles implements Files {
         return fileSystems.get(fileSystem.getUniqueID()).getClient();
     }
 
-    public static void executeMethod(HttpClient client, HttpMethod method) throws IOException, HttpException {
+    public static void executeMethod(HttpClient client, HttpMethod method) throws IOException {
         int response = client.executeMethod(method);
         String responseBodyAsString = method.getStatusLine().toString();
         method.releaseConnection();

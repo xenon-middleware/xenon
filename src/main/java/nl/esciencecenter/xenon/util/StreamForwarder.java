@@ -100,7 +100,9 @@ public final class StreamForwarder extends Thread {
                 try { 
                     wait(left);
                 } catch (InterruptedException e) { 
-                    // ignored
+                    LOGGER.warn("StreamForwarder.terminate was interrupted!");
+                    Thread.currentThread().interrupt();
+                    break;
                 }
 
                 left = deadline - System.currentTimeMillis();

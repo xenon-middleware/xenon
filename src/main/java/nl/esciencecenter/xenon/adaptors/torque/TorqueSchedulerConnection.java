@@ -494,6 +494,11 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     @Override
     public JobStatus getJobStatus(Job job) throws XenonException {
+        
+        if (job == null) { 
+            throw new NoSuchJobException(TorqueAdaptor.ADAPTOR_NAME, "Job <null> not found on server");
+        }
+        
         Map<String, Map<String, String>> info = getQstatInfo();
 
         JobStatus result = getJobStatus(info, job);
