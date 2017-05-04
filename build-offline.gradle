@@ -13,7 +13,6 @@ plugins {
     id 'idea'
     id 'eclipse'
     id 'pmd'
-    id 'org.sonarqube' version '2.3'
 }
 
 apply from: 'gradle/common.gradle'

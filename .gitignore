@@ -21,3 +21,7 @@ xenon.test.properties
 
 # Rendered Jekyll site
 /docs/_site
+
+# Sonar
+/.scannerwork
+/.sonarlint
