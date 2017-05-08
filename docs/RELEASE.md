@@ -67,3 +67,45 @@ you should get something like this:
 
 Add and commit these files using `git add` and `git commit` and `git push`.
 
+## Create a release
+
+On github, go to the releases tab and add the release text. Typically this 
+will describe the bugfixes, changes and todo's. Also create a tag for this 
+release (the version number). 
+
+## Check if DOI is created in Zenodo
+
+Zenodo is linked to the Xenon github, so when a release is created, a DOI 
+will be created automatically. Click the DOI badge on the github page to check 
+this.
+
+### Add jar to bintray
+
+To add the necessary jar and pom files to bintray, it is easiest to ensure you 
+have them locally first. By calling: 
+
+    ./gradlew publishToMavenLocal
+
+gradle should put the required files in:
+
+    ~/.m2/repository/nl/esciencecenter/xenon/xenon/<version>/
+
+Next goto: 
+
+    https://bintray.com/nlesc/xenon/xenon
+
+Click on 'new version' and insert <version> as name. Next, in the overview page 
+click on the version number and on `UI` (in the version files box). Bintray will 
+ask for the 'Target Repository Path', which should be: 
+
+    /nl/esciencecenter/xenon/xenon/<version>
+
+Click on the `click to add files` button and add the files that where generated in 
+the .m2 repository. Click on `save` and then on `publish` to publish the version.
+
+
+
+
+
+
+    

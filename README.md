@@ -151,7 +151,7 @@ See <https://github.com/NLeSC/Xenon-examples> for examples how to use the Xenon 
 
 See <https://github.com/NLeSC/Xenon-examples/raw/master/doc/tutorial/xenon-tutorial.pdf> for a tutorial pdf targeting inexperienced users.
 
-The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.2.0/javadoc>.
+The javadoc of Xenon library is available online at <http://nlesc.github.io/Xenon/versions/1.2.2/javadoc>.
 
 See the file <https://github.com/NLeSC/Xenon/blob/master/doc/README.md> for information for developers of the Xenon library.
 
