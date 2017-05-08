@@ -65,5 +65,5 @@ you should get something like this:
 	docs/_posts/2017-05-08-1.2.2.yml
 	docs/versions/1.2.2/
 
-Add and commit these files using `git add` and `git commit`.
+Add and commit these files using `git add` and `git commit` and `git push`.
 
