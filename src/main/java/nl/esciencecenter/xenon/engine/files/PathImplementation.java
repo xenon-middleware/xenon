@@ -113,17 +113,6 @@ public final class PathImplementation implements Path {
 
         PathImplementation other = (PathImplementation) obj;
         
-        //System.out.println("FS = " + filesystem + " " + other.filesystem + " " + filesystem.equals(other.filesystem));
-        //System.out.println("PATH = " + relativePath + " " + other.relativePath + " " + relativePath.equals(other.relativePath));
-        
         return filesystem.equals(other.filesystem) && relativePath.equals(other.relativePath);
-        
-        /*
-        return filesystem.getAdaptorName().equals(other.filesystem.getAdaptorName())
-                && filesystem.getScheme().equals(other.filesystem.getScheme())
-                && filesystem.getLocation().equals(other.filesystem.getLocation())
-                && relativePath.equals(other.relativePath);
-                */
-        
     }
 }

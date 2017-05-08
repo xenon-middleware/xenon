@@ -174,20 +174,18 @@ public class JobExecutor implements Runnable {
                 
         triggerStatusUpdate();
 
-        while ("PENDING".equals(state)) {
-            long leftover = deadline - System.currentTimeMillis();
-            
-            if (leftover <= 0) {
-                // We passed the deadline
-                break;
-            }
-            
+        long leftover = deadline - System.currentTimeMillis();
+        
+        while (leftover > 0 && "PENDING".equals(state)) {
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
+                // We were interrupted
                 Thread.currentThread().interrupt();
                 break;
             }
+            
+            leftover = deadline - System.currentTimeMillis();
         }
 
         return getStatus();
@@ -212,21 +210,20 @@ public class JobExecutor implements Runnable {
         
         triggerStatusUpdate();
 
-        while (!done) {
-
-            long leftover = deadline - System.currentTimeMillis();
+        long leftover = deadline - System.currentTimeMillis();
+        
+        while (leftover > 0 && !done) {
             
-            if (leftover <= 0) {
-                // We passed the deadline
-                break;
-            }
-   
             try {
+                // We were interrupted
                 wait(leftover);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
             }
+            
+            leftover = deadline - System.currentTimeMillis();
+
         }
 
         return getStatus();
@@ -263,6 +260,7 @@ public class JobExecutor implements Runnable {
             try {
                 wait(left);
             } catch (InterruptedException e) {
+                // We were interrupted
                 Thread.currentThread().interrupt();
                 break;
             }
@@ -300,6 +298,7 @@ public class JobExecutor implements Runnable {
             try {
                 wait(left);
             } catch (InterruptedException e) {
+                // We were interrupted
                 Thread.currentThread().interrupt();
                 break;
             }

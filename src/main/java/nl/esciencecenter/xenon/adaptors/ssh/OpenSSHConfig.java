@@ -33,7 +33,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.adaptors.scripting.ScriptingParser;
 
 import com.jcraft.jsch.ConfigRepository;
-import com.jcraft.jsch.ConfigRepository.Config;
 
 /**
  * This class implements ConfigRepository interface, and parses OpenSSH's

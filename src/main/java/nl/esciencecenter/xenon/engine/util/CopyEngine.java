@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 public final class CopyEngine {
 
     private class CopyThread extends Thread {
+        @Override
         public void run() {
             CopyInfo ac = dequeue();
 
@@ -400,14 +401,6 @@ public final class CopyEngine {
             throw new IllegalSourcePathException(NAME, "Source " + source + " is a directory");
         }
 
-        //RelativePath sourceName = source.getRelativePath().normalize();
-        //RelativePath targetName = target.getRelativePath().normalize();
-            
-        //if (sourceName.equals(targetName)) {
-        //    System.err.println("BUG TRIGGERED " + sourceName + " " + targetName);
-        //    return;
-        //}
-
         if (source.equals(target)) { 
             // should throw exception here ? 
             return;
@@ -516,7 +509,7 @@ public final class CopyEngine {
             notifyAll();
         }
 
-        while (!done && pending.size() == 0) {
+        while (!done && pending.isEmpty()) {
             try {
                 wait(POLLING_DELAY);
             } catch (InterruptedException e) {

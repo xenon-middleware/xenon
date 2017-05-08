@@ -29,10 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.esciencecenter.xenon.InvalidCredentialException;
-import nl.esciencecenter.xenon.InvalidLocationException;
-import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
@@ -62,11 +64,6 @@ import nl.esciencecenter.xenon.files.PathAlreadyExistsException;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
-
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FtpFiles implements Files {
 
@@ -121,7 +118,7 @@ public class FtpFiles implements Files {
 
     @Override
     public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties)
-            throws InvalidCredentialException, InvalidLocationException, UnknownPropertyException, InvalidPropertyException, XenonException {
+            throws XenonException {
         LOGGER.debug("newFileSystem scheme = {} location = {} credential = {} properties = {}", scheme, location, credential,
                 properties);
 
