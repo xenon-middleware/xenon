@@ -1,7 +1,15 @@
-Xenon 1.2.1
+Xenon 1.2.2
 -----------
 
-This is release 1.2.1 of Xenon. 
+This is release 1.2.2 of Xenon. 
+
+Notable changes compared to v1.2.1:
+-----------------------------------
+
+- fixed bug in the copy engine that would ignore a copy if source and destination had exactly the same path (even when on different machines).
+- added timeout overflow detection in Jobs.waitUntilDone and Jobs.waitUntilRunning.
+- added SonarQube code for quality analysis and coverage
+- we have a new logo!
 
 Notable changes compared to v1.2.0:
 -----------------------------------

@@ -36,7 +36,7 @@ The Latest Version
 
 Available in [JCenter](https://bintray.com/bintray/jcenter?filterByPkgName=xenon)
 
-Details of the latest official 1.2.1 release of Xenon can be found at:
+Details of the latest official 1.2.2 release of Xenon can be found at:
 
 <https://github.com/NLeSC/Xenon/releases>
 
@@ -52,7 +52,7 @@ Add Xenon library as a dependency to your project. For a Maven project use
 <dependency>
   <groupId>nl.esciencecenter.xenon</groupId>
   <artifactId>xenon</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
 </dependency>
 ```
 For a gradle project make sure to include `jcenter` in the list of repositories, for example:
@@ -65,7 +65,7 @@ repositories {
 Then include Xenon as a compile dependency:
 ```
 dependencies {
-    compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '1.2.1'
+    compile group: 'nl.esciencecenter.xenon', name: 'xenon', version: '1.2.2'
     // other dependencies ...
 }
 ``` 
