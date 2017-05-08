@@ -231,8 +231,8 @@ public class OpenSSHConfig implements ConfigRepository {
         public String getValue(String property) {
             String value = getSingleValue(property);
 
-            if (property.equalsIgnoreCase("compression")) {
-                if (value == null || value.equalsIgnoreCase("no")) {
+            if ("compression".equalsIgnoreCase(property)) {
+                if (value == null || "no".equalsIgnoreCase(value)) {
                     return "none,zlib@openssh.com,zlib";
                 } else {
                     return "zlib@openssh.com,zlib,none";
