@@ -108,7 +108,7 @@ public class XenonEngineTest {
             x.getAdaptorStatus("hupsefluts");
             fail();
         } catch (XenonException e) {
-            assertEquals("engine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
+            assertEquals("XenonEngine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
         }
     }
 
@@ -126,7 +126,7 @@ public class XenonEngineTest {
             x.getAdaptorFor("hupsefluts");
             fail();
         } catch (XenonException e) {
-            assertEquals("engine adaptor: Could not find adaptor for scheme hupsefluts", e.getMessage());
+            assertEquals("XenonEngine adaptor: Could not find adaptor for scheme hupsefluts", e.getMessage());
         }
     }
 
@@ -144,7 +144,7 @@ public class XenonEngineTest {
             x.getAdaptor("hupsefluts");
             fail();
         } catch (XenonException e) {
-            assertEquals("engine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
+            assertEquals("XenonEngine adaptor: Could not find adaptor named hupsefluts", e.getMessage());
         }
     }
 
