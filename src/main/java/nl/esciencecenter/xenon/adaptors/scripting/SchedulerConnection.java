@@ -330,6 +330,27 @@ public abstract class SchedulerConnection {
         }
     }
 
+    private long getDeadline(long timeout) {
+
+        long deadline;
+        
+        if (timeout > 0) { 
+            deadline = System.currentTimeMillis() + timeout;
+            
+            if (deadline < System.currentTimeMillis()) { 
+                // Timeout overflow. Partial fix by setting timeout to end of epoch.
+                deadline = Long.MAX_VALUE;
+            }            
+        } else if (timeout == 0) { 
+            deadline = Long.MAX_VALUE;
+        } else { 
+            throw new IllegalArgumentException("Illegal timeout " + timeout);
+        }
+        
+        return deadline;
+    }
+    
+    
     /**
      * Wait until a Job is done, or until the give timeout expires (whichever comes first). 
      * 
@@ -348,21 +369,8 @@ public abstract class SchedulerConnection {
      */
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         
-        long deadline;
-        
-        if (timeout > 0) { 
-            deadline = System.currentTimeMillis() + timeout;
-            
-            if (deadline < System.currentTimeMillis()) { 
-                // Timeout overflow. Partial fix by setting timeout to end of epoch.
-                deadline = Long.MAX_VALUE;
-            }            
-        } else if (timeout == 0) { 
-            deadline = Long.MAX_VALUE;
-        } else { 
-            throw new IllegalArgumentException("Illegal timeout " + timeout);
-        }
-        
+        long deadline = getDeadline(timeout);
+              
         JobStatus status = getJobStatus(job);
 
         // wait until we are done, or the timeout expires
@@ -398,20 +406,7 @@ public abstract class SchedulerConnection {
      */
     public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
 
-        long deadline;
-        
-        if (timeout > 0) { 
-            deadline = System.currentTimeMillis() + timeout;
-            
-            if (deadline < System.currentTimeMillis()) { 
-                // Timeout overflow. Partial fix by setting timeout to end of epoch.
-                deadline = Long.MAX_VALUE;
-            }     
-        } else if (timeout == 0) { 
-            deadline = Long.MAX_VALUE;
-        } else { 
-            throw new IllegalArgumentException("Illegal timeout " + timeout);
-        }
+        long deadline = getDeadline(timeout);
         
         JobStatus status = getJobStatus(job);
 
