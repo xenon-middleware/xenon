@@ -3198,7 +3198,10 @@ public abstract class GenericFileAdaptorTestParent {
         Copy copy = files.copy(file0, file1, new CopyOption[] { CopyOption.CREATE, CopyOption.ASYNCHRONOUS });
         CopyStatus status = files.getCopyStatus(copy);
 
-        while (!status.isDone()) {
+        // Deadline for operation is 60 seconds 
+        long deadline = System.currentTimeMillis() + 60*1000;
+        
+        while (!status.isDone() && System.currentTimeMillis() < deadline) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -3208,6 +3211,8 @@ public abstract class GenericFileAdaptorTestParent {
             status = files.getCopyStatus(copy);
         }
 
+        assertTrue(status.isDone());
+        
         // Test the cancel
         copy = files.copy(file0, file1, new CopyOption[] { CopyOption.REPLACE, CopyOption.ASYNCHRONOUS });
         files.cancelCopy(copy);

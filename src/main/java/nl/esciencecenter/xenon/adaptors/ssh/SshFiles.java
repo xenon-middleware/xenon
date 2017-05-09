@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon.adaptors.ssh;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,6 +84,34 @@ public class SshFiles implements Files {
         }
     }
 
+    static void close(Closeable stream, SshMultiplexedSession session, ChannelSftp channel, String name) throws IOException {
+        
+        IOException tmp = null;
+        
+        try {
+            // First attempt to close the in stream.
+            stream.close();
+        } catch (IOException e) {
+            tmp = new IOException("Failed to close the SSH " + name + " stream!", e);
+        } 
+        
+        try { 
+            // Next, attempt to release the channel, even if in failed to close. 
+            session.releaseSftpChannel(channel);
+        } catch (XenonException e) { 
+            if (tmp == null) {  
+                tmp = new IOException("Failed to release SSH channel!", e);
+            }
+        }
+        
+        if (tmp != null) { 
+            // throw the first exception we encountered, if any
+            throw tmp;
+        }
+    }
+    
+    
+    
     private final XenonEngine xenonEngine;
     private final SshAdaptor adaptor;
 
