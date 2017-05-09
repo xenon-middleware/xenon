@@ -24,10 +24,10 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 
-public class CredentialsEngineImplementation implements Credentials {
+public class CredentialsEngine implements Credentials {
     private final XenonEngine xenonEngine;
 
-    public CredentialsEngineImplementation(XenonEngine xenonEngine) {
+    public CredentialsEngine(XenonEngine xenonEngine) {
         this.xenonEngine = xenonEngine;
     }
 

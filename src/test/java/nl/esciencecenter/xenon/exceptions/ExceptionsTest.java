@@ -31,6 +31,8 @@ import nl.esciencecenter.xenon.adaptors.ssh.EndOfFileException;
 import nl.esciencecenter.xenon.adaptors.ssh.NotConnectedException;
 import nl.esciencecenter.xenon.adaptors.ssh.PermissionDeniedException;
 import nl.esciencecenter.xenon.adaptors.ssh.UnsupportedIOOperationException;
+import nl.esciencecenter.xenon.adaptors.webdav.PathUninspectableException;
+import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
 import nl.esciencecenter.xenon.engine.PropertyTypeException;
 import nl.esciencecenter.xenon.engine.util.BadParameterException;
 import nl.esciencecenter.xenon.engine.util.CommandNotFoundException;
@@ -269,6 +271,29 @@ public class ExceptionsTest {
         testException(new InvalidCredentialException("name", "message", t), t);
     }
 
+    @Test
+    public void testCertificateNotFoundException1() throws Exception {
+        testException(new CertificateNotFoundException("name", "message"));
+    }
+
+    @Test
+    public void testCertificateNotFoundException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new CertificateNotFoundException("name", "message", t), t);
+    }
+
+    @Test
+    public void testPathUninspectableException1() throws Exception {
+        testException(new PathUninspectableException("name", "message"));
+    }
+
+    @Test
+    public void testPathUninspectableException2() throws Exception {
+        Throwable t = new Throwable();
+        testException(new PathUninspectableException("name", "message", t), t);
+    }
+
+    
     @Test
     public void testInvalidDataException1() throws Exception {
         testException(new InvalidResumeTargetException("name", "message"));

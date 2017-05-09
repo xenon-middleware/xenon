@@ -43,7 +43,7 @@ import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
 import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptor;
 import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptor;
 import nl.esciencecenter.xenon.credentials.Credentials;
-import nl.esciencecenter.xenon.engine.credentials.CredentialsEngineImplementation;
+import nl.esciencecenter.xenon.engine.credentials.CredentialsEngine;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
@@ -67,11 +67,14 @@ public final class XenonEngine implements Xenon {
     public static final String PREFIX = "xenon.";
 
     /** All our own adaptor properties start with this prefix. */
-    public static final String ADAPTORS = PREFIX + "adaptors.";
+    public static final String ADAPTORS_PREFIX = PREFIX + "adaptors.";
 
+    /** The name of this component, for use in exceptions */
+    private static final String COMPONENT_NAME = "XenonEngine";
+    
     /** All XenonEngines created so far */
     private static final List<XenonEngine> XENON_ENGINES = new ArrayList<>(1);
-
+    
     /**
      * Create a new Xenon using the given properties.
      *
@@ -104,7 +107,7 @@ public final class XenonEngine implements Xenon {
         }
 
         if (result == null) {
-            throw new NoSuchXenonException("engine", "No such XenonEngine");
+            throw new NoSuchXenonException(COMPONENT_NAME, "No such XenonEngine");
         }
 
         result.end();
@@ -130,7 +133,7 @@ public final class XenonEngine implements Xenon {
 
     private final JobsEngine jobsEngine;
 
-    private final CredentialsEngineImplementation credentialsEngine;
+    private final CredentialsEngine credentialsEngine;
 
     private final Adaptor[] adaptors;
 
@@ -159,12 +162,12 @@ public final class XenonEngine implements Xenon {
         // NOTE: Order is important here! We initialize the abstract engines first, as the adaptors may want to use them!
         filesEngine = new FilesEngine(this);
         jobsEngine = new JobsEngine(this);
-        credentialsEngine = new CredentialsEngineImplementation(this);
+        credentialsEngine = new CredentialsEngine(this);
         copyEngine = new CopyEngine(filesEngine);
 
         adaptors = loadAdaptors(this.properties);
 
-        LOGGER.debug("Xenon engine initialized with adaptors: " + Arrays.toString(adaptors));
+        LOGGER.debug("Xenon engine initialized with adaptors: {}", Arrays.toString(adaptors));
     }
 
     private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
@@ -184,7 +187,7 @@ public final class XenonEngine implements Xenon {
 
         // Check if there are any properties left. If so, this is a problem.
         if (!unprocesedProperties.isEmpty()) {
-            throw new UnknownPropertyException("XenonEngine", "Unknown properties: " + unprocesedProperties);
+            throw new UnknownPropertyException(COMPONENT_NAME, "Unknown properties: " + unprocesedProperties);
         }
 
         return result.toArray(new Adaptor[result.size()]);
@@ -240,7 +243,7 @@ public final class XenonEngine implements Xenon {
     public Adaptor getAdaptorFor(String scheme) throws InvalidSchemeException {
 
         if (scheme == null || scheme.isEmpty()) {
-            throw new InvalidSchemeException("engine", "Invalid scheme " + scheme);
+            throw new InvalidSchemeException(COMPONENT_NAME, "Invalid scheme " + scheme);
         }
 
         for (Adaptor adaptor : adaptors) {
@@ -248,7 +251,7 @@ public final class XenonEngine implements Xenon {
                 return adaptor;
             }
         }
-        throw new InvalidSchemeException("engine", "Could not find adaptor for scheme " + scheme);
+        throw new InvalidSchemeException(COMPONENT_NAME, "Could not find adaptor for scheme " + scheme);
     }
 
     public Adaptor getAdaptor(String name) throws XenonException {
@@ -258,7 +261,7 @@ public final class XenonEngine implements Xenon {
             }
         }
 
-        throw new XenonException("engine", "Could not find adaptor named " + name);
+        throw new XenonException(COMPONENT_NAME, "Could not find adaptor named " + name);
     }
 
     @Override

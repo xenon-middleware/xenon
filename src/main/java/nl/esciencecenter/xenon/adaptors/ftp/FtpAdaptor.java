@@ -50,7 +50,7 @@ public class FtpAdaptor extends Adaptor {
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS + "ftp.";
+    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "ftp.";
 
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";

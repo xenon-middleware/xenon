@@ -436,7 +436,7 @@ public class SlurmSchedulerConnection extends SchedulerConnection {
     }
 
     private Job findInteractiveJobInMap(Map<String, Map<String, String>> queueInfo, String tag, JobDescription description, 
-            Job interactiveJob) throws XenonException {
+            Job interactiveJob) {
 
         //find job with "tag" as a comment in the job info
         for (Map.Entry<String, Map<String, String>> entry : queueInfo.entrySet()) {

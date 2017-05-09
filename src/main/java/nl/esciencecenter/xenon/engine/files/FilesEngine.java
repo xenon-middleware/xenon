@@ -46,7 +46,10 @@ import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
  * 
  */
 public class FilesEngine implements Files {
-
+    
+    /** The name of this component, for use in exceptions */
+    private static final String COMPONENT_NAME = "FilesEngine";
+    
     public static final DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
         public boolean accept(Path file) {
             return true;
@@ -66,7 +69,7 @@ public class FilesEngine implements Files {
         } catch (XenonException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new XenonRuntimeException("FilesEngine", "Could not find adaptor named " + filesystem.getAdaptorName(), e);
+            throw new XenonRuntimeException(COMPONENT_NAME, "Could not find adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
         
@@ -75,7 +78,7 @@ public class FilesEngine implements Files {
         Files files = getFilesAdaptorFromEngine(filesystem);
         
         if (!files.isOpen(filesystem)) {
-            throw new FileSystemClosedException("FilesEngine", "FileSystem " + filesystem.getLocation() + " is closed");
+            throw new FileSystemClosedException(COMPONENT_NAME, "FileSystem " + filesystem.getLocation() + " is closed");
         }
         
         return files;
@@ -145,7 +148,7 @@ public class FilesEngine implements Files {
         } else if (sourcefs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
             return getFilesAdaptor(target).copy(source, target, options);
         } else {
-            throw new XenonException("FilesEngine", "Cannot do inter-scheme third party copy!");
+            throw new XenonException(COMPONENT_NAME, "Cannot do inter-scheme third party copy!");
         }
     }
 
@@ -160,7 +163,7 @@ public class FilesEngine implements Files {
             return;
         }
 
-        throw new XenonException("FilesEngine", "Cannot do inter-scheme third party move!");
+        throw new XenonException(COMPONENT_NAME, "Cannot do inter-scheme third party move!");
     }
 
     @Override

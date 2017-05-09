@@ -48,7 +48,7 @@ public class CredentialsEngineImplementationTest {
     @org.junit.Test
     public void testPassword() throws Exception {
 
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
+        CredentialsEngine ce = new CredentialsEngine(xenonEngine);
         Credential c = ce.newPasswordCredential("ssh", "username", "password".toCharArray(), null);
 
         assertTrue(c instanceof PasswordCredentialImplementation);

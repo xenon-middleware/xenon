@@ -217,7 +217,6 @@ class SshMultiplexedSession {
 
         if (credential instanceof PasswordCredentialImplementation) {
             PasswordCredentialImplementation passwordCredential = (PasswordCredentialImplementation) credential;
-            // session.setPassword(new String(passwordCredential.getPassword()));
             session.setPassword(convertPassword(passwordCredential.getPassword()));
         }
 

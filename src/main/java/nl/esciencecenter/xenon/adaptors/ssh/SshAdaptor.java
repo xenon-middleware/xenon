@@ -69,7 +69,7 @@ public class SshAdaptor extends Adaptor {
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
 
     /** All our own properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS + "ssh.";
+    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "ssh.";
 
     /** Enable strict host key checking. */
     public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
@@ -179,7 +179,7 @@ public class SshAdaptor extends Adaptor {
                 throw new XenonException(SshAdaptor.ADAPTOR_NAME, "Cannot load known_hosts file: " + knownHosts + " does not exist");
             } else {
                 // implictly ignore
-                LOGGER.debug("known_hosts file " + knownHosts + " is not readable, not checking hosts with signatures of known hosts.");
+                LOGGER.debug("known_hosts file {} is not readable, not checking hosts with signatures of known hosts.", knownHosts);
             }
         }
 

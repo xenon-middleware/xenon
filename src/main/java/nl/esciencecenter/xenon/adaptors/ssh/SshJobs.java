@@ -65,10 +65,6 @@ public class SshJobs implements Jobs {
             this.jobQueues = jobQueues;
         }
 
-        private SshMultiplexedSession getSession() {
-            return session;
-        }
-
         private JobQueues getJobQueues() {
             return jobQueues;
         }

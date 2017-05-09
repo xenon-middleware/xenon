@@ -42,7 +42,7 @@ public class WebdavLocation extends Location {
         return new WebdavLocation(location);
     }
 
-    public static WebdavLocation parse(String location, String scheme) throws InvalidLocationException {
-        return new WebdavLocation(location);
-    }
+//    public static WebdavLocation parse(String location, String scheme) throws InvalidLocationException {
+//        return new WebdavLocation(location);
+//    }
 }

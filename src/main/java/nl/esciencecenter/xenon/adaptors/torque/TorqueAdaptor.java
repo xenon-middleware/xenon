@@ -41,7 +41,7 @@ public class TorqueAdaptor extends ScriptingAdaptor {
     public static final String ADAPTOR_NAME = "torque";
 
     /** The prefix used by all properties related to this adaptor */
-    public static final String PREFIX = XenonEngine.ADAPTORS + TorqueAdaptor.ADAPTOR_NAME + ".";
+    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + TorqueAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("torque");
