@@ -41,7 +41,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     public static final String ADAPTOR_NAME = "gridengine";
 
     /** The prefix used by all properties related to this adaptor */
-    public static final String PREFIX = XenonEngine.ADAPTORS + GridEngineAdaptor.ADAPTOR_NAME + ".";
+    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + GridEngineAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("ge", "sge");

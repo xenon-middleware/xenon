@@ -49,7 +49,7 @@ public class ITCredentialsEngineImplementationTest {
 
     @org.junit.Test
     public void testDefault() throws Exception {
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
+        CredentialsEngine ce = new CredentialsEngine(xenonEngine);
         Credential c = ce.getDefaultCredential("ssh");
 
         assertEquals("ssh", c.getAdaptorName());
@@ -57,7 +57,7 @@ public class ITCredentialsEngineImplementationTest {
 
     @org.junit.Test
     public void testCertificate() throws Exception {
-        CredentialsEngineImplementation ce = new CredentialsEngineImplementation(xenonEngine);
+        CredentialsEngine ce = new CredentialsEngine(xenonEngine);
         
         String certfile = Utils.getHome() + Utils.getLocalSeparator() + ".ssh" + Utils.getLocalSeparator() + "id_rsa";  
         

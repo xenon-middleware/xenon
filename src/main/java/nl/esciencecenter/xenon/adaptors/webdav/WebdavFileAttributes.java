@@ -29,8 +29,8 @@ import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 
 public class WebdavFileAttributes implements FileAttributes {
-    static private final String CREATION_DATE_KEY = "creationdate";
-    static private final String MODIFIED_DATE_KEY = "getlastmodified";
+    private static final String CREATION_DATE_KEY = "creationdate";
+    private static final String MODIFIED_DATE_KEY = "getlastmodified";
     private static final String CONTENT_LENGTH = "getcontentlength";
 
     protected DavPropertySet properties;
@@ -99,12 +99,11 @@ public class WebdavFileAttributes implements FileAttributes {
             return null;
         }
         try {
-            DateTime dateTime = DateTime.parse((String) property);
-            return dateTime;
+            return DateTime.parse((String) property);
         } catch (IllegalArgumentException e) {
             // Failed to parse.
+            return null;
         }
-        return null;
     }
 
     @Override

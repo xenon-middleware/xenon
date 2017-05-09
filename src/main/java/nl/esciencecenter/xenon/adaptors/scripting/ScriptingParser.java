@@ -36,10 +36,7 @@ public final class ScriptingParser {
 
     public static final Pattern EQUALS_REGEX = Pattern.compile("\\s*=\\s*");
 
-    // public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
     public static final Pattern HORIZONTAL_LINE_REGEX = Pattern.compile("^\\s*([=_-]{3,}\\s*)+$");
-    // "\\((.+?)\\)"
-    
     
     private ScriptingParser() {
         //DO NOT USE

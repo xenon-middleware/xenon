@@ -47,7 +47,7 @@ public class LocalAdaptor extends Adaptor {
     public static final String ADAPTOR_NAME = XenonEngine.LOCAL_ADAPTOR_NAME;
 
     /** Local properties start with this prefix. */
-    public static final String PREFIX = XenonEngine.ADAPTORS + "local.";
+    public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "local.";
 
     /** Description of the adaptor */
     public static final String ADAPTOR_DESCRIPTION = "The local adaptor implements all functionality with "
