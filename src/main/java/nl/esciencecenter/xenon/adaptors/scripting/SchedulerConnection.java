@@ -39,6 +39,7 @@ import nl.esciencecenter.xenon.jobs.NoSuchQueueException;
 import nl.esciencecenter.xenon.jobs.QueueStatus;
 import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -329,27 +330,6 @@ public abstract class SchedulerConnection {
                     + Arrays.toString(invalidQueues.toArray(new String[invalidQueues.size()])));
         }
     }
-
-    private long getDeadline(long timeout) {
-
-        long deadline;
-        
-        if (timeout > 0) { 
-            deadline = System.currentTimeMillis() + timeout;
-            
-            if (deadline < System.currentTimeMillis()) { 
-                // Timeout overflow. Partial fix by setting timeout to end of epoch.
-                deadline = Long.MAX_VALUE;
-            }            
-        } else if (timeout == 0) { 
-            deadline = Long.MAX_VALUE;
-        } else { 
-            throw new IllegalArgumentException("Illegal timeout " + timeout);
-        }
-        
-        return deadline;
-    }
-    
     
     /**
      * Wait until a Job is done, or until the give timeout expires (whichever comes first). 
@@ -369,7 +349,7 @@ public abstract class SchedulerConnection {
      */
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
         
-        long deadline = getDeadline(timeout);
+        long deadline = Utils.getDeadline(timeout);
               
         JobStatus status = getJobStatus(job);
 
@@ -406,7 +386,7 @@ public abstract class SchedulerConnection {
      */
     public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
 
-        long deadline = getDeadline(timeout);
+        long deadline = Utils.getDeadline(timeout);
         
         JobStatus status = getJobStatus(job);
 
