@@ -211,7 +211,7 @@ public class JavaJobDescription extends JobDescription {
                 if (classpath == null) {
                     classpath = element;
                 } else {
-                    classpath = classpath + pathSeparator + element;
+                    classpath = Utils.concat(classpath, "" + pathSeparator, element);
                 }
             }
             result.add(classpath);

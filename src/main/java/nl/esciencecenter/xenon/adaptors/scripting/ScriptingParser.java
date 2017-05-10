@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * 
@@ -304,7 +305,7 @@ public final class ScriptingParser {
                     tmp.add(v);
                 }
             } else { 
-                current = current + " " + v; // Damn.. no clue which whitespace to use here :-(
+                current = Utils.concat(current, " ", v); // Damn.. no clue which whitespace to use here :-(
 
                 if (v.endsWith(")") && !v.startsWith("(")) {
                     inTuple = false;

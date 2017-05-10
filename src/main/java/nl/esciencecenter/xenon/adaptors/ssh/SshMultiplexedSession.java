@@ -327,7 +327,7 @@ class SshMultiplexedSession {
 
     protected synchronized void disconnect() {
 
-        while (sessions.size() > 0) {
+        while (!sessions.isEmpty()) {
 
             SshSession s = sessions.remove(0);
 

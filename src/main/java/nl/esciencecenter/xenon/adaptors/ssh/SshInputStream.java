@@ -18,8 +18,6 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.io.IOException;
 import java.io.InputStream;
 
-import nl.esciencecenter.xenon.XenonException;
-
 import com.jcraft.jsch.ChannelSftp;
 
 /**

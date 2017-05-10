@@ -181,7 +181,7 @@ public abstract class SchedulerConnection {
                 if (result == null) {
                     result = job.getIdentifier();
                 } else {
-                    result += "," + job.getIdentifier();
+                    result = Utils.concat(result, ",", job.getIdentifier());
                 }
             }
         }
