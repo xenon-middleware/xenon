@@ -871,7 +871,7 @@ public final class Utils {
             out = files.newOutputStream(target, openOptionsForWrite(truncate));
             writeLines(lines, cs, out);
         } catch (IOException e) {
-            throw new XenonException("FileUtils", "failed to write lines", e);
+            throw new XenonException(NAME, "failed to write lines", e);
         } finally {
             close(out);
         }
@@ -1055,7 +1055,7 @@ public final class Utils {
         boolean replace = CopyOption.REPLACE.occursIn(options);
         boolean ignore = CopyOption.IGNORE.occursIn(options);
         if (replace && ignore) {
-            throw new InvalidCopyOptionsException("FileUtils", "Can not replace and ignore existing files at the same time");
+            throw new InvalidCopyOptionsException(NAME, "Can not replace and ignore existing files at the same time");
         }
 
         FileAttributes att = files.getAttributes(source);
