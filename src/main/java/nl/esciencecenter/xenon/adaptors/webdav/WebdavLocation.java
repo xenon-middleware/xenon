@@ -41,8 +41,4 @@ public class WebdavLocation extends Location {
     public static WebdavLocation parse(String location) throws InvalidLocationException {
         return new WebdavLocation(location);
     }
-
-//    public static WebdavLocation parse(String location, String scheme) throws InvalidLocationException {
-//        return new WebdavLocation(location);
-//    }
 }

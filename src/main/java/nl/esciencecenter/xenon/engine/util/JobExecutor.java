@@ -27,6 +27,7 @@ import nl.esciencecenter.xenon.jobs.JobCanceledException;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Streams;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * 
@@ -157,20 +158,7 @@ public class JobExecutor implements Runnable {
         
     public synchronized JobStatus waitUntilRunning(long timeout) {
 
-        long deadline;
-        
-        if (timeout > 0) { 
-            deadline = System.currentTimeMillis() + timeout;
-            
-            if (deadline < System.currentTimeMillis()) { 
-                // Timeout overflow. Partial fix by setting timeout to end of epoch.
-                deadline = Long.MAX_VALUE;
-            }     
-        } else if (timeout == 0) { 
-            deadline = Long.MAX_VALUE;
-        } else { 
-            throw new IllegalArgumentException("Illegal timeout " + timeout);
-        }
+        long deadline = Utils.getDeadline(timeout);
                 
         triggerStatusUpdate();
 
@@ -193,20 +181,7 @@ public class JobExecutor implements Runnable {
 
     public synchronized JobStatus waitUntilDone(long timeout) {
 
-        long deadline;
-        
-        if (timeout > 0) { 
-            deadline = System.currentTimeMillis() + timeout;
-            
-            if (deadline < System.currentTimeMillis()) { 
-                // Timeout overflow. Partial fix by setting timeout to end of epoch.
-                deadline = Long.MAX_VALUE;
-            }     
-        } else if (timeout == 0) { 
-            deadline = Long.MAX_VALUE;
-        } else { 
-            throw new IllegalArgumentException("Illegal timeout " + timeout);
-        }
+        long deadline = Utils.getDeadline(timeout);
         
         triggerStatusUpdate();
 
@@ -215,9 +190,9 @@ public class JobExecutor implements Runnable {
         while (leftover > 0 && !done) {
             
             try {
-                // We were interrupted
                 wait(leftover);
             } catch (InterruptedException e) {
+                // We were interrupted
                 Thread.currentThread().interrupt();
                 break;
             }
@@ -252,8 +227,9 @@ public class JobExecutor implements Runnable {
         if (done || !updateSignal) {
             return;
         }
-
-        long deadline = System.currentTimeMillis() + maxDelay;
+        
+        long deadline = Utils.getDeadline(maxDelay);
+        
         long left = maxDelay > 0 ? maxDelay : POLLING_DELAY; 
         
         while (!done && updateSignal && left > 0) { 
@@ -291,8 +267,9 @@ public class JobExecutor implements Runnable {
             return;
         }
         
-        long deadline = System.currentTimeMillis() + maxDelay;
-        long left = maxDelay; 
+        long deadline = Utils.getDeadline(maxDelay);
+        
+        long left = deadline - System.currentTimeMillis();
         
         while (!done && !updateSignal && left > 0) { 
             try {

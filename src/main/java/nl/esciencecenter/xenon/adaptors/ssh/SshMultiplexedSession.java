@@ -175,7 +175,7 @@ class SshMultiplexedSession {
                 gatewayLocation, gateway);
                 
         if (gateway != null) {
-            LOGGER.debug("Using tunnel to " + gatewayLocation);
+            LOGGER.debug("Using tunnel to {}", gatewayLocation);
             tunnelPort = gateway.addTunnel(0, location.getHost(), location.getPort());
             sessionPort = tunnelPort;
             sessionHost = "localhost";
