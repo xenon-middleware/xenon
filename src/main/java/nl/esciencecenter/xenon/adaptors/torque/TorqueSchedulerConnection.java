@@ -62,7 +62,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TorqueSchedulerConnection.class);
 
-    private final static Pattern queueInfoName = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
+    private static final Pattern queueInfoName = Pattern.compile("^Queue: ([a-zA-Z_]+)$");
     
     public static final String JOB_OPTION_JOB_SCRIPT = "job.script";
     public static final String JOB_OPTION_JOB_CONTENTS = "job.contents";
@@ -254,7 +254,7 @@ public class TorqueSchedulerConnection extends SchedulerConnection {
                     jobsFromStatus(runner.getStdout(), getScheduler(), result);
                 } else if (runner.getExitCode() == 172) {
                     //slurm returns "172" as the exit code if there is something wrong with the queue, ignore
-                    LOGGER.warn("Failed to get queue status for queue " + runner);
+                    LOGGER.warn("Failed to get queue status for queue {}", runner);
                     throw new NoSuchQueueException(TorqueAdaptor.ADAPTOR_NAME, "Failed to get queue status for queue \""
                             + queueName + "\": " + runner);                    
                 } else {

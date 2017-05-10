@@ -64,13 +64,13 @@ public abstract class DirectoryStreamBase<I, O> implements DirectoryStream<O>, I
 
     @Override
     public synchronized boolean hasNext() {
-        return (stream.size() > 0);
+        return !stream.isEmpty();
     }
 
     @Override
     public synchronized O next() {
 
-        if (stream.size() > 0) {
+        if (!stream.isEmpty()) {
             return stream.removeFirst();
         }
 

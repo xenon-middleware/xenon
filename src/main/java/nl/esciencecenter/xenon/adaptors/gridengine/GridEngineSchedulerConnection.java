@@ -415,7 +415,7 @@ public class GridEngineSchedulerConnection extends SchedulerConnection {
 
         if (!runner.success()) {
             LOGGER.debug("failed to get job status {}", runner);
-            return new HashMap<>();
+            return new HashMap<>(0);
         }
 
         Map<String, Map<String, String>> result = parser.parseJobInfos(runner.getStdout());

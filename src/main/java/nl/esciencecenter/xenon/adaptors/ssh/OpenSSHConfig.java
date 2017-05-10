@@ -42,9 +42,9 @@ import com.jcraft.jsch.ConfigRepository;
  * information on the format of the config file, see man page ssh_config(5).
  */
 public class OpenSSHConfig implements ConfigRepository {
-    private final static Pattern DELIMITER_PATTERN = Pattern.compile("[= \t]+");
+    private static final Pattern DELIMITER_PATTERN = Pattern.compile("[= \t]+");
     /** Matches text without wildcards, or, individual wildcards. */
-    private final static Pattern WILDCARD_PATTERN = Pattern.compile("[^*?]+|(\\*)|(\\?)");
+    private static final Pattern WILDCARD_PATTERN = Pattern.compile("[^*?]+|(\\*)|(\\?)");
 
     /**
      * Parses the given string, and returns an instance of ConfigRepository.
@@ -106,12 +106,12 @@ public class OpenSSHConfig implements ConfigRepository {
             }
 
             // parse `host = something` or `Host something`
-            String[] key_value = DELIMITER_PATTERN.split(line, 2);
-            if (key_value.length < 2) {
+            String[] keyValue = DELIMITER_PATTERN.split(line, 2);
+            if (keyValue.length < 2) {
                 throw new XenonException(SshAdaptor.ADAPTOR_NAME, "SSH argument '" + line + "' must have value on line " + lineNumber + ".");
             }
-            String key = key_value[0].toLowerCase();
-            args.add(new OpenSSHArgument(key, key_value[1], lineNumber));
+            String key = keyValue[0].toLowerCase();
+            args.add(new OpenSSHArgument(key, keyValue[1], lineNumber));
         }
         return args;
     }
@@ -156,7 +156,8 @@ public class OpenSSHConfig implements ConfigRepository {
     }
 
     private static class HostConfig implements Config {
-        private final static HashMap<String, String> jschToOpenSSHMap = new HashMap<>(15);
+        private static final HashMap<String, String> jschToOpenSSHMap = new HashMap<>(15);
+      
         static {
             jschToOpenSSHMap.put("kex", "KexAlgorithms");
             jschToOpenSSHMap.put("server_host_key", "HostKeyAlgorithms");
@@ -267,8 +268,8 @@ public class OpenSSHConfig implements ConfigRepository {
          * Matches all text before a quote, or if
          * the text starts with a quote, all text between quotes.
          */
-        private final static Pattern quotesPattern = Pattern.compile("^([^\"]+)|^\"([^\"]*)\"");
-        private final static Pattern commaPattern = Pattern.compile(",");
+        private static final Pattern quotesPattern = Pattern.compile("^([^\"]+)|^\"([^\"]*)\"");
+        private static final Pattern commaPattern = Pattern.compile(",");
         private final String key;
         private final String value;
         private final String[] values;

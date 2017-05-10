@@ -73,7 +73,7 @@ public interface Files {
      *             If the creation of the FileSystem failed.
      */
     FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
-            throws UnknownPropertyException, InvalidPropertyException, InvalidSchemeException, InvalidLocationException, InvalidCredentialException, XenonException;
+            throws XenonException;
         
     /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>

@@ -42,7 +42,7 @@ public class RelativePath implements Iterable<RelativePath> {
     private final char separator;
 
     /** Estimate of path element String length. */
-    private final static int PATH_ELEMENT_LENGTH = 25;
+    private static final int PATH_ELEMENT_LENGTH = 25;
 
     private class RelativePathIterator implements Iterator<RelativePath> {
         private int index = 1;
@@ -157,18 +157,18 @@ public class RelativePath implements Iterable<RelativePath> {
      */
     public RelativePath(char separator, List<String> elts) {
         
-        List<String> elements = elts;
+        List<String> tmp = elts;
         
-        if (elements == null) {
-            elements = new ArrayList<>(0);
+        if (tmp == null) {
+            tmp = new ArrayList<>(0);
         }
         
         this.separator = separator;
 
         String delim = String.valueOf(separator);
 
-        this.elements = new ArrayList<>(elements.size());
-        for (String elt : elements) {
+        this.elements = new ArrayList<>(tmp.size());
+        for (String elt : tmp) {
             if (elt == null || elt.isEmpty()) {
                 continue;
             }
