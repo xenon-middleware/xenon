@@ -59,6 +59,12 @@ public class JobQueues {
         }
     }
 
+    private static final String SINGLE_QUEUE_NAME = "single";
+    
+    private static final String MULTI_QUEUE_NAME = "multi";
+    
+    private static final String UNLIMITED_QUEUE_NAME = "unlimited";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(JobQueues.class);
 
     /** The minimal allowed value for the polling delay */
@@ -150,7 +156,7 @@ public class JobQueues {
     }
 
     public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
-        return "single";
+        return SINGLE_QUEUE_NAME;
     }
 
     public Job[] getJobs(String... queueNames) throws NoSuchQueueException {
@@ -165,11 +171,11 @@ public class JobQueues {
             getJobs(unlimitedQ, out);
         } else {
             for (String name : queueNames) {
-                if ("single".equals(name)) {
+                if (SINGLE_QUEUE_NAME.equals(name)) {
                     getJobs(singleQ, out);
-                } else if ("multi".equals(name)) {
+                } else if (MULTI_QUEUE_NAME.equals(name)) {
                     getJobs(multiQ, out);
-                } else if ("unlimited".equals(name)) {
+                } else if (UNLIMITED_QUEUE_NAME.equals(name)) {
                     getJobs(unlimitedQ, out);
                 } else {
                     throw new NoSuchQueueException(adaptorName, "Queue \"" + name + "\" does not exist");
@@ -184,11 +190,11 @@ public class JobQueues {
 
     private List<JobExecutor> findQueue(String queueName) throws XenonException {
 
-        if (queueName == null || "single".equals(queueName)) {
+        if (queueName == null || SINGLE_QUEUE_NAME.equals(queueName)) {
             return singleQ;
-        } else if ("multi".equals(queueName)) {
+        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
             return multiQ;
-        } else if ("unlimited".equals(queueName)) {
+        } else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
             return unlimitedQ;
         } else {
             throw new XenonException(adaptorName, "Queue \"" + queueName + "\" does not exist!");
@@ -310,11 +316,11 @@ public class JobQueues {
         String queue = description.getQueueName();
 
         if (queue == null) {
-            queue = "single";
-            description.setQueueName("single");
+            queue = SINGLE_QUEUE_NAME;
+            description.setQueueName(SINGLE_QUEUE_NAME);
         }
 
-        if (!("single".equals(queue) || "multi".equals(queue) || "unlimited".equals(queue))) {
+        if (!(SINGLE_QUEUE_NAME.equals(queue) || MULTI_QUEUE_NAME.equals(queue) || UNLIMITED_QUEUE_NAME.equals(queue))) {
             throw new InvalidJobDescriptionException(adaptorName, "Queue " + queue + " not available locally!");
         }
 
@@ -381,14 +387,13 @@ public class JobQueues {
         LOGGER.debug("{}: Submitting job to queue {}", adaptorName, queueName);
 
         // NOTE: the verifyJobDescription ensures that the queueName has a valid value!
-        if ("unlimited".equals(queueName)) {
+        if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
             unlimitedQ.add(executor);
             unlimitedExecutor.execute(executor);
-        } else if ("multi".equals(queueName)) {
+        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
             multiQ.add(executor);
             multiExecutor.execute(executor);
-        } else {
-            // queueName == "single"  
+        } else { // queueName must be SINGLE_QUEUE_NAME
             singleQ.add(executor);
             singleExecutor.execute(executor);
         }
@@ -444,12 +449,12 @@ public class JobQueues {
 
         checkScheduler(scheduler);
 
-        if ("single".equals(queueName)) {
-            return new QueueStatusImplementation(scheduler, "single", null, null);
-        } else if ("multi".equals(queueName)) {
-            return new QueueStatusImplementation(scheduler, "multi", null, null);
-        } else if ("unlimited".equals(queueName)) {
-            return new QueueStatusImplementation(scheduler, "unlimited", null, null);
+        if (SINGLE_QUEUE_NAME.equals(queueName)) {
+            return new QueueStatusImplementation(scheduler, SINGLE_QUEUE_NAME, null, null);
+        } else if (MULTI_QUEUE_NAME.equals(queueName)) {
+            return new QueueStatusImplementation(scheduler, MULTI_QUEUE_NAME, null, null);
+        } else if (UNLIMITED_QUEUE_NAME.equals(queueName)) {
+            return new QueueStatusImplementation(scheduler, UNLIMITED_QUEUE_NAME, null, null);
         } else {
             throw new NoSuchQueueException(adaptorName, "No such queue: " + queueName);
         }
@@ -464,7 +469,7 @@ public class JobQueues {
         }
 
         if (names.length == 0) {
-            names = new String[] { "single", "multi", "unlimited" };
+            names = new String[] { SINGLE_QUEUE_NAME, MULTI_QUEUE_NAME, UNLIMITED_QUEUE_NAME };
         }
 
         checkScheduler(scheduler);

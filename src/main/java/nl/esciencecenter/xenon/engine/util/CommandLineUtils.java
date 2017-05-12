@@ -15,6 +15,8 @@
  */
 package nl.esciencecenter.xenon.engine.util;
 
+import nl.esciencecenter.xenon.util.Utils;
+
 /**
  * Some simple utilities for handling and creating scripts and command lines.
  * 
@@ -62,7 +64,7 @@ public final class CommandLineUtils {
                 if (result == null) {
                     result = value;
                 } else {
-                    result += "," + value;
+                    result = Utils.concat(result, ",", value);
                 }
             }
         }

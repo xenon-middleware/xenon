@@ -34,6 +34,12 @@ import nl.esciencecenter.xenon.util.Utils;
  */
 public class JobExecutor implements Runnable {
 
+    private static final String PENDING_STATE = "PENDING"; 
+    private static final String RUNNING_STATE = "RUNNING"; 
+    private static final String DONE_STATE = "DONE"; 
+    private static final String ERROR_STATE = "ERROR"; 
+    private static final String KILLED_STATE = "KILLED";
+    
     /** Polling delay in ms. */
     private static final long POLLING_DELAY = 1000L;
     
@@ -61,7 +67,7 @@ public class JobExecutor implements Runnable {
     private boolean done = false;
     private boolean hasRun = false;
 
-    private String state = "PENDING";
+    private String state = PENDING_STATE;
 
     private Exception error;
 
@@ -88,7 +94,7 @@ public class JobExecutor implements Runnable {
         killed = true;
 
         if (!isRunning) {
-            updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
+            updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return true;
         }
 
@@ -104,12 +110,12 @@ public class JobExecutor implements Runnable {
     }
 
     public synchronized JobStatus getStatus() {
-        if (!done && state.equals("RUNNING")) {
+        if (!done && RUNNING_STATE.equals(state)) {
             triggerStatusUpdate();
             waitForStatusUpdate(pollingDelay);
         }
 
-        return new JobStatusImplementation(job, state, exitStatus, error, state.equals("RUNNING"), done, null);
+        return new JobStatusImplementation(job, state, exitStatus, error, RUNNING_STATE.equals(state), done, null);
     }
 
     public synchronized String getState() {
@@ -122,13 +128,13 @@ public class JobExecutor implements Runnable {
 
     private synchronized void updateState(String state, int exitStatus, Exception e) {
 
-        if ("ERROR".equals(state) || "KILLED".equals(state)) {
+        if (ERROR_STATE.equals(state) || KILLED_STATE.equals(state)) {
             error = e;
             done = true;
-        } else if ("DONE".equals(state)) {
+        } else if (DONE_STATE.equals(state)) {
             this.exitStatus = exitStatus;
             done = true;
-        } else if ("RUNNING".equals(state)) {
+        } else if (RUNNING_STATE.equals(state)) {
             hasRun = true;
         } else {
             throw new InternalError("Illegal state: " + state);
@@ -164,7 +170,7 @@ public class JobExecutor implements Runnable {
 
         long leftover = deadline - System.currentTimeMillis();
         
-        while (leftover > 0 && "PENDING".equals(state)) {
+        while (leftover > 0 && PENDING_STATE.equals(state)) {
             try {
                 wait(leftover);
             } catch (InterruptedException e) {
@@ -291,7 +297,7 @@ public class JobExecutor implements Runnable {
         JobDescription description = job.getJobDescription();
 
         if (getKilled()) {
-            updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
+            updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));
             return;
         }
 
@@ -311,30 +317,30 @@ public class JobExecutor implements Runnable {
                 process = new BatchProcess(files, workingDirectory, job, factory);
             }
         } catch (IOException | XenonException e) {
-            updateState("ERROR", -1, e);
+            updateState(ERROR_STATE, -1, e);
             return;
         }
 
-        updateState("RUNNING", -1, null);
+        updateState(RUNNING_STATE, -1, null);
 
         while (true) {
 
             if (process.isDone()) {
-                updateState("DONE", process.getExitStatus(), null);
+                updateState(DONE_STATE, process.getExitStatus(), null);
                 return;
             }
 
             if (getKilled()) {
                 // Destroy first, update state last, otherwise we have a race condition!
                 process.destroy();
-                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process cancelled by user."));                
+                updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process cancelled by user."));                
                 return;
             }
 
             if (maxTime > 0 && System.currentTimeMillis() > endTime) {
                 // Destroy first, update state last, otherwise we have a race condition!
                 process.destroy();
-                updateState("KILLED", -1, new JobCanceledException(adaptorName, "Process timed out."));
+                updateState(KILLED_STATE, -1, new JobCanceledException(adaptorName, "Process timed out."));
                 return;
             }
 

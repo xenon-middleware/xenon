@@ -871,7 +871,7 @@ public final class Utils {
             out = files.newOutputStream(target, openOptionsForWrite(truncate));
             writeLines(lines, cs, out);
         } catch (IOException e) {
-            throw new XenonException("FileUtils", "failed to write lines", e);
+            throw new XenonException(NAME, "failed to write lines", e);
         } finally {
             close(out);
         }
@@ -1055,7 +1055,7 @@ public final class Utils {
         boolean replace = CopyOption.REPLACE.occursIn(options);
         boolean ignore = CopyOption.IGNORE.occursIn(options);
         if (replace && ignore) {
-            throw new InvalidCopyOptionsException("FileUtils", "Can not replace and ignore existing files at the same time");
+            throw new InvalidCopyOptionsException(NAME, "Can not replace and ignore existing files at the same time");
         }
 
         FileAttributes att = files.getAttributes(source);
@@ -1238,6 +1238,29 @@ public final class Utils {
         return deadline;
     }
     
+    /**
+     * Concatinate a series of <code>String</code>s using a <code>StringBuilder</code>.
+     * 
+     * @param strings
+     *          Strings to concatinate. Any Strings that are <code>null</code> will be ignored.  
+     * 
+     * @return
+     *          the concatination of the provided strings, or the empty string is no strings where provided.
+     */
+    public static String concat(String ... strings) {
+
+        if (strings == null || strings.length == 0) { 
+            return "";
+        }
+        
+        StringBuilder b = new StringBuilder("");
+        
+        for (String s : strings) { 
+            if (s != null && !s.isEmpty()) {
+                b.append(s);
+            }
+        }
     
-    
+        return b.toString();
+    }   
 }
