@@ -31,7 +31,6 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
-import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
 
@@ -72,15 +71,6 @@ public class AdaptorTest {
 
         @Override
         public void end() { /* noop */ }
-
-        /**
-         * @return
-         */
-        public String[] getSupportedJobSchemes() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
     }
 
     @Test
@@ -167,7 +157,7 @@ public class AdaptorTest {
         TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", null, schemesFile, locations, 
                 new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
 
-        String[] tmp = t.getSupportedFileSchemes();
+        String[] tmp = t.getSupportedJobSchemes();
         
         assert (tmp != null);
         assert (Arrays.equals(new String[0], tmp));
@@ -228,7 +218,7 @@ public class AdaptorTest {
 
         ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
 
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", null, null, locations, 
+        new TestAdaptor(null, "test", "DESCRIPTION", null, null, locations,
                 new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
     }
     
