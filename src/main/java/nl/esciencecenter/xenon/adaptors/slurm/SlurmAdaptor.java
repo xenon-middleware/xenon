@@ -44,7 +44,7 @@ public class SlurmAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + SlurmAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("slurm");
+    private static final ImmutableArray<String> ADAPTOR_JOB_SCHEMES = new ImmutableArray<>("slurm");
     
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)",
@@ -87,7 +87,7 @@ public class SlurmAdaptor extends ScriptingAdaptor {
      *             if the adaptor creation fails.
      */
     public SlurmAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_JOB_SCHEMES, null, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties), new SlurmSchedulerConnectionFactory());
     }
 

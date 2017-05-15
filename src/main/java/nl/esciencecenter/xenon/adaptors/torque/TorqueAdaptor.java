@@ -44,7 +44,7 @@ public class TorqueAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + TorqueAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("torque");
+    private static final ImmutableArray<String> ADAPTOR_JOB_SCHEMES = new ImmutableArray<>("torque");
     
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)", 
@@ -86,7 +86,7 @@ public class TorqueAdaptor extends ScriptingAdaptor {
      *             if the adaptor creation fails.
      */
     public TorqueAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_JOB_SCHEMES, null, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties), new TorqueSchedulerConnectionFactory());
     }
 

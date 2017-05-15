@@ -27,7 +27,7 @@ public class SshLocation extends Location {
     }
 
     protected SshLocation(String location) throws InvalidLocationException {
-        super(location, SshAdaptor.ADAPTOR_SCHEME.get(0));
+        super(location, SshAdaptor.ADAPTOR_JOB_SCHEME.get(0));
     }
 
     @Override

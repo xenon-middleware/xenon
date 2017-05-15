@@ -31,6 +31,7 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.util.Utils;
 
 import org.junit.Test;
 
@@ -41,11 +42,12 @@ public class AdaptorTest {
 
     class TestAdaptor extends Adaptor {
 
-        public TestAdaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-                ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
-                XenonProperties p) throws XenonException {
+        public TestAdaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedJobSchemes,
+                ImmutableArray<String> supportedFileSchemes, ImmutableArray<String> supportedLocations, 
+                ImmutableArray<XenonPropertyDescription> validProperties, XenonProperties p) throws XenonException {
 
-            super(xenonEngine, name, description, supportedSchemes, supportedLocations, validProperties, p);
+            super(xenonEngine, name, description, supportedJobSchemes, supportedFileSchemes, supportedLocations, validProperties,
+                    p);
         }
 
         @Override
@@ -71,25 +73,167 @@ public class AdaptorTest {
         @Override
         public void end() { /* noop */ }
 
+        /**
+         * @return
+         */
+        public String[] getSupportedJobSchemes() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     }
 
     @Test
-    public void test0() throws XenonException {
+    public void testJobScheme1() throws XenonException {
 
-        ImmutableArray<String> schemes = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> schemesJob = new ImmutableArray<>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
 
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, 
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemesJob, null, locations, 
                 new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
 
         String[] tmp = t.getSupportedSchemes();
-
+        
         assert (tmp != null);
-        assert (Arrays.equals(schemes.asArray(), tmp));
+        assert (Arrays.equals(schemesJob.asArray(), tmp));
     }
 
     @Test
-    public void test1() throws XenonException {
+    public void testJobScheme2() throws XenonException {
+
+        ImmutableArray<String> schemesJob = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemesJob, null, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedJobSchemes();
+        
+        assert (tmp != null);
+        assert (Arrays.equals(schemesJob.asArray(), tmp));
+    }
+
+    @Test
+    public void testJobScheme3() throws XenonException {
+
+        ImmutableArray<String> schemesJob = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemesJob, null, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedFileSchemes();
+        
+        assert (tmp != null);
+        assert (Arrays.equals(new String[0], tmp));
+    }
+
+    @Test
+    public void testFileScheme1() throws XenonException {
+
+        ImmutableArray<String> schemesFile = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", null, schemesFile, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedSchemes();
+        
+        assert (tmp != null);
+        assert (Arrays.equals(schemesFile.asArray(), tmp));
+    }
+
+    @Test
+    public void testFileScheme2() throws XenonException {
+
+        ImmutableArray<String> schemesFile = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", null, schemesFile,locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedFileSchemes();
+        
+        assert (tmp != null);
+        assert (Arrays.equals(schemesFile.asArray(), tmp));
+    }
+
+    @Test
+    public void testFileScheme3() throws XenonException {
+
+        ImmutableArray<String> schemesFile = new ImmutableArray<>("SCHEME1", "SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", null, schemesFile, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedFileSchemes();
+        
+        assert (tmp != null);
+        assert (Arrays.equals(new String[0], tmp));
+    }
+
+    @Test
+    public void testJobAndFileScheme1() throws XenonException {
+
+        ImmutableArray<String> schemesJob = new ImmutableArray<>("SCHEME1");
+        ImmutableArray<String> schemesFile = new ImmutableArray<>("SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemesJob, schemesFile, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedSchemes();
+        String[] result = new String[] { "SCHEME1", "SCHEME2" };         
+        assert (tmp != null);
+        assert (Arrays.equals(result, tmp));
+    }
+
+    
+    @Test
+    public void testJobAndFileScheme2() throws XenonException {
+
+        ImmutableArray<String> schemesJob = new ImmutableArray<>("SCHEME1");
+        ImmutableArray<String> schemesFile = new ImmutableArray<>("SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemesJob, schemesFile, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedJobSchemes();
+         
+        assert (tmp != null);
+        assert (Arrays.equals(schemesJob.asArray(), tmp));
+    }
+
+    
+    @Test
+    public void testJobAndFileScheme3() throws XenonException {
+
+        ImmutableArray<String> schemesJob = new ImmutableArray<>("SCHEME1");
+        ImmutableArray<String> schemesFile = new ImmutableArray<>("SCHEME2");
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemesJob, schemesFile, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+
+        String[] tmp = t.getSupportedFileSchemes();
+         
+        assert (tmp != null);
+        assert (Arrays.equals(schemesFile.asArray(), tmp));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testJobAndFileSchemeNull() throws XenonException {
+
+        ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
+
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", null, null, locations, 
+                new ImmutableArray<XenonPropertyDescription>(), new XenonProperties());
+    }
+    
+    @Test
+    public void testSupportedProperties1() throws XenonException {
 
         ImmutableArray<String> schemes = new ImmutableArray<>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
@@ -102,7 +246,7 @@ public class AdaptorTest {
                         "noot2", "test property p2"));
 
         XenonProperties prop = new XenonProperties(supportedProperties, new HashMap<String, String>(0));
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, null, locations, supportedProperties, prop);
 
         XenonPropertyDescription[] p = t.getSupportedProperties();
 
@@ -118,7 +262,7 @@ public class AdaptorTest {
     }
 
     @Test
-    public void test2() throws XenonException {
+    public void testSupportedProperties2() throws XenonException {
         ImmutableArray<String> schemes = new ImmutableArray<>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
 
@@ -133,7 +277,7 @@ public class AdaptorTest {
         m.put("xenon.adaptors.test.p2", "zus");
 
         XenonProperties prop = new XenonProperties(supportedProperties, m);
-        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
+        TestAdaptor t = new TestAdaptor(null, "test", "DESCRIPTION", schemes, null, locations, supportedProperties, prop);
 
         XenonPropertyDescription[] p = t.getSupportedProperties();
 
@@ -150,7 +294,7 @@ public class AdaptorTest {
 }
 
     @Test(expected = XenonException.class)
-    public void test3() throws XenonException {
+    public void testSupportedPropertiesFails() throws XenonException {
 
         ImmutableArray<String> schemes = new ImmutableArray<>("SCHEME1", "SCHEME2");
         ImmutableArray<String> locations = new ImmutableArray<>("L1", "L2");
@@ -167,7 +311,7 @@ public class AdaptorTest {
 
         XenonProperties prop = new XenonProperties(supportedProperties, p);
 
-        new TestAdaptor(null, "test", "DESCRIPTION", schemes, locations, supportedProperties, prop);
+        new TestAdaptor(null, "test", "DESCRIPTION", schemes, null, locations, supportedProperties, prop);
     }
 
 }

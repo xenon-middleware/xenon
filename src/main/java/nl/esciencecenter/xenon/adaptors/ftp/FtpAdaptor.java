@@ -44,7 +44,7 @@ public class FtpAdaptor extends Adaptor {
     private static final String ADAPTOR_DESCRIPTION = "The FTP adaptor implements all functionality with remote ftp servers.";
 
     /** The schemes supported by this adaptor */
-    protected static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ftp");
+    protected static final ImmutableArray<String> ADAPTOR_FILE_SCHEME = new ImmutableArray<>("ftp");
 
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
@@ -107,7 +107,7 @@ public class FtpAdaptor extends Adaptor {
     private final FtpCredentials credentialsAdaptor;
 
     public FtpAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, null, ADAPTOR_FILE_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         filesAdaptor = new FtpFiles(this, xenonEngine);

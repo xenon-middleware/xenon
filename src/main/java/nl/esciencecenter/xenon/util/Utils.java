@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1263,4 +1264,43 @@ public final class Utils {
     
         return b.toString();
     }   
+    
+    /**
+     * Merge two String arrays into a single one. 
+     * 
+     * If one of the arrays is <code>null</code>, a copy of the other will be returned. If both arrays are <code>null</code> an 
+     * empty String [] will be returned. If both arrays are not <code>null</code>, a new array will be returned containing the 
+     * content of a1 and a2 (in that order). 
+     * 
+     * Note that any <code>null</code> value in the arrays will be copied as is.      
+     * 
+     * @param a1
+     *          Array to merge   
+     * @param a2
+     *          Array to merge   
+     * 
+     * @return
+     *          A new array containing the values contained in a1 and a2, in that order.
+     */
+    public static String[] merge(String [] a1, String[] a2) {
+    
+        if (a1 == null && a2 == null) { 
+            return new String[0];
+        }
+        
+        if (a1 == null) { 
+            return a2.clone();
+        }
+        
+        if (a2 == null) { 
+            return a1.clone();
+        }
+        
+        String [] tmp = Arrays.copyOf(a1, a1.length + a2.length);
+        
+        System.arraycopy(a2, 0, tmp, a1.length, a2.length);
+        
+        return tmp;
+    }
+    
 }

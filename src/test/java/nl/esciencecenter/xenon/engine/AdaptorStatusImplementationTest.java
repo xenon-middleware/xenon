@@ -31,10 +31,10 @@ import org.junit.Test;
 public class AdaptorStatusImplementationTest {
 
     @Test
-    public void testGetters() {
+    public void testGetters1() {
 
         AdaptorStatusImplementation a = new AdaptorStatusImplementation("NAME", "DESCRIPTION", 
-                new ImmutableArray<>("SCHEME1", "SCHEME2"),new ImmutableArray<>("L1", "L2"), 
+                new ImmutableArray<>("SCHEME1"), new ImmutableArray<>("SCHEME2"), new ImmutableArray<>("L1", "L2"), 
                 new ImmutableArray<XenonPropertyDescription>(), null);
 
         assertEquals("NAME", a.getName());
@@ -46,6 +46,18 @@ public class AdaptorStatusImplementationTest {
         assertEquals(2, schemes.length);
         assertEquals("SCHEME1", schemes[0]);
         assertEquals("SCHEME2", schemes[1]);
+
+        String[] jobschemes = a.getSupportedJobSchemes();
+
+        assertNotNull(jobschemes);
+        assertEquals(1, jobschemes.length);
+        assertEquals("SCHEME1", jobschemes[0]);
+
+        String[] fileschemes = a.getSupportedFileSchemes();
+
+        assertNotNull(fileschemes);
+        assertEquals(1, fileschemes.length);
+        assertEquals("SCHEME2", fileschemes[0]);
 
         String[] locations = a.getSupportedLocations();
 
@@ -61,11 +73,11 @@ public class AdaptorStatusImplementationTest {
     @Test
     public void testToString() {
 
-        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<>("SCHEME1", "SCHEME2"),
+        String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<>("SCHEME1", "SCHEME2"), null,
                 new ImmutableArray<>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
 
-        assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedSchemes=[SCHEME1, " +
-        		"SCHEME2], supportedProperties=[], adaptorSpecificInformation=null]"));
+        assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedJobSchemes=[SCHEME1, " +
+        		"SCHEME2], supportedJobSchemes=[] supportedProperties=[], adaptorSpecificInformation=null]"));
     }
 
 }

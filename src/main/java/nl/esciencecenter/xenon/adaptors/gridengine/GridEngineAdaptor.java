@@ -44,7 +44,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
     public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + GridEngineAdaptor.ADAPTOR_NAME + ".";
 
     /** The schemes supported by this adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEMES = new ImmutableArray<>("ge", "sge");
+    private static final ImmutableArray<String> ADAPTOR_JOB_SCHEMES = new ImmutableArray<>("ge", "sge");
     
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(locations supported by local)",
@@ -86,7 +86,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
      *             if the adaptor creation fails.
      */
     public GridEngineAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEMES, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_JOB_SCHEMES, null, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
                 new XenonProperties(VALID_PROPERTIES, Component.XENON, properties), new GridEngineSchedulerConnectionFactory());
     }
 

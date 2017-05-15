@@ -41,11 +41,12 @@ public abstract class ScriptingAdaptor extends Adaptor {
     private final ForwardingCredentials credentialsAdaptor;
 
     protected ScriptingAdaptor(XenonEngine xenonEngine, String name, String description, 
-            ImmutableArray<String> supportedSchemes, ImmutableArray<String> supportedLocations, 
-            ImmutableArray<XenonPropertyDescription> validProperties, 
+            ImmutableArray<String> supportedJobSchemes, ImmutableArray<String> supportedFileSchemes, 
+            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
             XenonProperties properties, SchedulerConnectionFactory factory) throws XenonException {
 
-        super(xenonEngine, name, description, supportedSchemes, supportedLocations, validProperties, properties);
+        super(xenonEngine, name, description, supportedJobSchemes, supportedFileSchemes, supportedLocations, validProperties, 
+                properties);
 
         jobsAdaptor = new ScriptingJobs(this, xenonEngine, factory);
         credentialsAdaptor = new ForwardingCredentials(xenonEngine, "ssh");

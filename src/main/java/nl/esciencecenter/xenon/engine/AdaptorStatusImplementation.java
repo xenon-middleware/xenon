@@ -20,29 +20,43 @@ import java.util.Map;
 import nl.esciencecenter.xenon.AdaptorStatus;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
+import nl.esciencecenter.xenon.util.Utils;
 
 public class AdaptorStatusImplementation implements AdaptorStatus {
 
     private final String name;
     private final String description;
-    private final ImmutableArray<String> supportedSchemes;
+    private final ImmutableArray<String> supportedJobSchemes;
+    private final ImmutableArray<String> supportedFileSchemes;
+
     private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<XenonPropertyDescription> supportedProperties;
     private final Map<String, String> adaptorSpecificInformation;
 
-    public AdaptorStatusImplementation(String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> supportedProperties, 
-            Map<String, String> adaptorSpecificInformation) {
+    public AdaptorStatusImplementation(String name, String description, ImmutableArray<String> supportedJobSchemes,
+            ImmutableArray<String> supportedFileSchemes, ImmutableArray<String> supportedLocations, 
+            ImmutableArray<XenonPropertyDescription> supportedProperties, Map<String, String> adaptorSpecificInformation) {
 
         super();
         this.name = name;
         this.description = description;
         
-        if (supportedSchemes == null) { 
-            throw new IllegalArgumentException("Schemes is null!");
+        if (supportedJobSchemes == null && supportedFileSchemes == null) { 
+            throw new IllegalArgumentException("Both Job and File schemes are null!");
         }
         
-        this.supportedSchemes = supportedSchemes;
+        if (supportedJobSchemes == null) { 
+            this.supportedJobSchemes = new ImmutableArray<>();
+        } else { 
+            this.supportedJobSchemes = supportedJobSchemes;
+        }
+            
+        if (supportedFileSchemes == null) { 
+            this.supportedFileSchemes = new ImmutableArray<>();
+        } else { 
+            this.supportedFileSchemes = supportedFileSchemes;
+        }
+        
         this.supportedLocations = supportedLocations;
         
         if (supportedProperties == null) { 
@@ -64,8 +78,18 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
     }
 
     @Override
+    public String[] getSupportedJobSchemes() {
+        return supportedJobSchemes.asArray();
+    }
+
+    @Override
+    public String[] getSupportedFileSchemes() {
+        return supportedFileSchemes.asArray();
+    }
+    
+    @Override
     public String[] getSupportedSchemes() {
-        return supportedSchemes.asArray();
+        return Utils.merge(getSupportedJobSchemes(), getSupportedFileSchemes());
     }
 
     @Override
@@ -85,8 +109,8 @@ public class AdaptorStatusImplementation implements AdaptorStatus {
 
     @Override
     public String toString() {
-        return "AdaptorStatusImplementation [name=" + name + ", description=" + description + ", supportedSchemes="
-                + supportedSchemes + ", supportedProperties=" + supportedProperties + ", adaptorSpecificInformation=" 
-                + adaptorSpecificInformation + "]";
+        return "AdaptorStatusImplementation [name=" + name + ", description=" + description + ", supportedJobSchemes="
+                + supportedJobSchemes + ", supportedFileSchemes=" + supportedFileSchemes +", supportedProperties=" 
+                + supportedProperties + ", adaptorSpecificInformation=" + adaptorSpecificInformation + "]";
     }
 }

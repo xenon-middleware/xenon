@@ -26,6 +26,21 @@ import java.util.Map;
 public interface AdaptorStatus {
 
     /**
+     * Get the supported job submission schemes for this adaptor.
+     * 
+     * @return the schemes supported by this adaptor.
+     */
+    String[] getSupportedJobSchemes();
+
+    
+    /**
+     * Get the supported file access schemes for this adaptor.
+     * 
+     * @return the schemes supported by this adaptor.
+     */
+    String[] getSupportedFileSchemes();
+    
+    /**
      * Get the supported schemes for this adaptor.
      * 
      * @return the schemes supported by this adaptor.
