@@ -62,9 +62,12 @@ public class SshAdaptor extends Adaptor {
     /** A description of this adaptor */
     private static final String ADAPTOR_DESCRIPTION = "The SSH adaptor implements all functionality with remote ssh servers.";
 
-    /** The schemes supported by this adaptor */
-    protected static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("ssh", "sftp");
+    /** The job schemes supported by this adaptor */
+    protected static final ImmutableArray<String> ADAPTOR_JOB_SCHEME = new ImmutableArray<>("ssh");
 
+    /** The file schemes supported by this adaptor */
+    protected static final ImmutableArray<String> ADAPTOR_FILE_SCHEME = new ImmutableArray<>("sftp");
+    
     /** The locations supported by this adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("[user@]host[:port]");
 
@@ -159,8 +162,8 @@ public class SshAdaptor extends Adaptor {
     }
 
     public SshAdaptor(XenonEngine xenonEngine, JSch jsch, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES,
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_JOB_SCHEME, ADAPTOR_FILE_SCHEME, ADAPTOR_LOCATIONS,
+                VALID_PROPERTIES, new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         this.filesAdaptor = new SshFiles(this, xenonEngine);
         this.jobsAdaptor = new SshJobs(getProperties(), this, xenonEngine);

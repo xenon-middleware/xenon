@@ -76,6 +76,16 @@ public interface Files {
             throws XenonException;
         
     /**
+     * Get a list of file schemes supported by Xenon. 
+     * 
+     * @return the list of file schemes supported by Xenon.
+     * 
+     * @throws XenonException
+     *             If the list of file schemes could not be retrieved.
+     */
+    String [] getSupportedSchemes() throws XenonException;
+    
+    /**
      * Create a new Path that represents a (possibly non existing) location on <code>filesystem.</code>
      *  
      * @param filesystem

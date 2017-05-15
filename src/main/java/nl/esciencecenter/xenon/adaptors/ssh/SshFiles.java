@@ -188,7 +188,12 @@ public class SshFiles implements Files {
 
         return newFileSystem(session, scheme, location, credential, xenonProperties);
     }
-
+    
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedFileSchemes();
+    }
+    
     private SshMultiplexedSession getSession(Path path) throws XenonException {
 
         FileSystemImplementation fs = (FileSystemImplementation) path.getFileSystem();

@@ -135,7 +135,12 @@ public class FtpFiles implements Files {
         login(credential, ftpClient);
         return createAndRegisterFileSystem(scheme, location, credential, xenonProperties, ftpClient);
     }
-
+    
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedFileSchemes();
+    }
+    
     private FileSystemImplementation createAndRegisterFileSystem(String scheme, String location, Credential credential,
             XenonProperties xenonProperties, FTPClient ftpClient) throws XenonException {
         String cwd = getCurrentWorkingDirectory(ftpClient);

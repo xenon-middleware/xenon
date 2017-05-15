@@ -42,6 +42,7 @@ public class JobsEngine implements Jobs {
         return xenonEngine.getAdaptor(scheduler.getAdaptorName());
     }
 
+    @Override
     public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
 
@@ -49,6 +50,26 @@ public class JobsEngine implements Jobs {
         return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
     }
 
+    @Override
+    public String [] getSupportedSchemes() { 
+        return xenonEngine.getSupportedJobsSchemes();
+    }
+    
+    @Override
+    public boolean isOnline(String scheme) throws XenonException { 
+        return xenonEngine.getAdaptorFor(scheme).jobsAdaptor().isOnline(scheme);
+    }
+    
+    @Override
+    public boolean supportsInteractive(String scheme) throws XenonException { 
+        return xenonEngine.getAdaptorFor(scheme).jobsAdaptor().supportsInteractive(scheme);
+    }
+
+    @Override
+    public  boolean supportsBatch(String scheme) throws XenonException { 
+        return xenonEngine.getAdaptorFor(scheme).jobsAdaptor().supportsBatch(scheme);    
+    }
+    
     @Override
     public void close(Scheduler scheduler) throws XenonException {
         getAdaptor(scheduler).jobsAdaptor().close(scheduler);

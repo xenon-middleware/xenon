@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.ssh;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -130,7 +131,41 @@ public class SshJobs implements Jobs {
 
         return scheduler;
     }
+    
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedJobSchemes();
+    }
+    
+    @Override
+    public boolean isOnline(String scheme) throws XenonException {
+        
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public boolean supportsInteractive(String scheme) throws XenonException { 
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+        
+        return true;
+    }
 
+    @Override
+    public boolean supportsBatch(String scheme) throws XenonException { 
+
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+
+        return true;
+    }
+    
     private JobQueues getJobQueue(Scheduler scheduler) throws XenonException {
 
         if (!(scheduler instanceof SchedulerImplementation)) {

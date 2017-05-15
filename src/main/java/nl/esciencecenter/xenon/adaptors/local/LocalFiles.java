@@ -46,7 +46,7 @@ import nl.esciencecenter.xenon.util.Utils;
 public class LocalFiles implements Files {
 
     /** The parent adaptor */
-    private final LocalAdaptor localAdaptor;
+    private final LocalAdaptor adaptor;
 
     /** The copy engine */
     private final CopyEngine copyEngine;
@@ -59,7 +59,7 @@ public class LocalFiles implements Files {
     }
 
     public LocalFiles(LocalAdaptor localAdaptor, CopyEngine copyEngine) {
-        this.localAdaptor = localAdaptor;
+        this.adaptor = localAdaptor;
         this.copyEngine = copyEngine;
     }
 
@@ -102,6 +102,11 @@ public class LocalFiles implements Files {
         }
 
         throw new InvalidLocationException(LocalAdaptor.ADAPTOR_NAME, "Location must only contain a file system root! (not " + location + ")");
+    }
+    
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedFileSchemes();
     }
     
     /**
@@ -271,9 +276,9 @@ public class LocalFiles implements Files {
             throws XenonException {
         checkFileLocation(location);
 
-        localAdaptor.checkCredential(credential);
+        adaptor.checkCredential(credential);
 
-        XenonProperties p = new XenonProperties(localAdaptor.getSupportedProperties(Component.FILESYSTEM), properties);
+        XenonProperties p = new XenonProperties(adaptor.getSupportedProperties(Component.FILESYSTEM), properties);
 
         String root = Utils.getLocalRoot(location);
         RelativePath relativePath = new RelativePath(root).relativize(new RelativePath(location));

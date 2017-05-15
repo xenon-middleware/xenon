@@ -19,6 +19,7 @@ import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.InvalidLocationException;
+import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.credentials.Credential;
 import nl.esciencecenter.xenon.engine.XenonEngine;
@@ -48,7 +49,7 @@ import nl.esciencecenter.xenon.jobs.Streams;
 public class LocalJobs implements Jobs, InteractiveProcessFactory {
     
     /** The parent adaptor */
-    private final LocalAdaptor localAdaptor;
+    private final LocalAdaptor adaptor;
 
     private final Scheduler localScheduler;
     private final JobQueues jobQueues;
@@ -56,7 +57,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public LocalJobs(LocalAdaptor localAdaptor, XenonProperties properties, Path cwd, XenonEngine engine)
             throws XenonException {
         
-        this.localAdaptor = localAdaptor;
+        this.adaptor = localAdaptor;
 
         localScheduler = new SchedulerImplementation(LocalAdaptor.ADAPTOR_NAME, "LocalScheduler", "local", "/", 
                 new String[] { "single", "multi", "unlimited" }, null, properties, true, true, true);
@@ -83,7 +84,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
                     + location);
         }
         
-        localAdaptor.checkCredential(credential);
+        adaptor.checkCredential(credential);
 
         if (properties != null && properties.size() > 0) {
             throw new UnknownPropertyException(LocalAdaptor.ADAPTOR_NAME, "Cannot create local scheduler with additional properties!");
@@ -95,7 +96,7 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     @Override
     public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
         return jobQueues.getJobs(queueNames);
-    }
+    }   
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
@@ -145,7 +146,41 @@ public class LocalJobs implements Jobs, InteractiveProcessFactory {
     public void close(Scheduler scheduler) throws XenonException {
         // ignored
     }
+    
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedJobSchemes();
+    }
+    
+    @Override
+    public boolean isOnline(String scheme) throws XenonException {
+        
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public boolean supportsInteractive(String scheme) throws XenonException { 
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+        
+        return true;
+    }
 
+    @Override
+    public boolean supportsBatch(String scheme) throws XenonException { 
+
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+
+        return true;
+    }
+        
     @Override
     public boolean isOpen(Scheduler scheduler) throws XenonException {
         return true;

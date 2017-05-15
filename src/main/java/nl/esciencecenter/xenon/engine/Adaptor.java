@@ -26,6 +26,7 @@ import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Xenon interface,
@@ -36,22 +37,39 @@ public abstract class Adaptor {
 
     private final String name;
     private final String description;
-    private final ImmutableArray<String> supportedSchemes;
+    private final ImmutableArray<String> supportedJobSchemes;
+    private final ImmutableArray<String> supportedFileSchemes;
     private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<XenonPropertyDescription> validProperties;
     private final XenonProperties properties;
     private final XenonEngine xenonEngine;
 
-    protected Adaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
-            ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
-            XenonProperties properties) {
+    protected Adaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedJobSchemes,
+            ImmutableArray<String> supportedFileSchemes, ImmutableArray<String> supportedLocations, 
+            ImmutableArray<XenonPropertyDescription> validProperties, XenonProperties properties) {
 
         super();
 
         this.xenonEngine = xenonEngine;
         this.name = name;
         this.description = description;
-        this.supportedSchemes = supportedSchemes;
+        
+        if (supportedJobSchemes == null && supportedFileSchemes == null) { 
+            throw new IllegalArgumentException("Both Job and File schemes are null!");
+        }
+        
+        if (supportedJobSchemes == null) { 
+            this.supportedJobSchemes = new ImmutableArray<>();
+        } else { 
+            this.supportedJobSchemes = supportedJobSchemes;
+        }
+            
+        if (supportedFileSchemes == null) { 
+            this.supportedFileSchemes = new ImmutableArray<>();
+        } else { 
+            this.supportedFileSchemes = supportedFileSchemes;
+        }
+        
         this.supportedLocations = supportedLocations;
         
         if (validProperties == null) {
@@ -75,15 +93,29 @@ public abstract class Adaptor {
         return name;
     }
 
-    public boolean supports(String scheme) {
-
-        for (String s : supportedSchemes) {
+    public boolean supportsJob(String scheme) {
+        for (String s : supportedJobSchemes) {
             if (s.equalsIgnoreCase(scheme)) {
                 return true;
             }
         }
 
         return false;
+    } 
+    
+    
+    public boolean supportsFile(String scheme) {
+        for (String s : supportedFileSchemes) {
+            if (s.equalsIgnoreCase(scheme)) {
+                return true;
+            }
+        }
+
+        return false;
+    } 
+    
+    public boolean supports(String scheme) {
+        return supportsJob(scheme) || supportsFile(scheme);
     }
 
     public XenonPropertyDescription[] getSupportedProperties() {
@@ -107,12 +139,20 @@ public abstract class Adaptor {
     }
 
     public AdaptorStatus getAdaptorStatus() {
-        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedLocations, validProperties,
-                getAdaptorSpecificInformation());
+        return new AdaptorStatusImplementation(name, description, supportedJobSchemes, supportedFileSchemes, supportedLocations, 
+                validProperties, getAdaptorSpecificInformation());
+    }
+
+    public String[] getSupportedJobSchemes() {
+        return supportedJobSchemes.asArray();
+    }
+
+    public String[] getSupportedFileSchemes() {
+        return supportedFileSchemes.asArray();
     }
 
     public String[] getSupportedSchemes() {
-        return supportedSchemes.asArray();
+        return Utils.merge(supportedJobSchemes.asArray(), supportedFileSchemes.asArray());
     }
 
     public String[] getSupportedLocations() {

@@ -49,6 +49,7 @@ import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
 import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
+import nl.esciencecenter.xenon.util.Utils;
 
 /**
  * XenonEngine implements the Xenon Interface class by redirecting all calls to {@link Adaptor}s.
@@ -212,8 +213,30 @@ public final class XenonEngine implements Xenon {
         return tmp;
     }
 
-    // ************** Xenon Interface Implementation ***************\\
+    public String [] getSupportedJobsSchemes() { 
 
+        String [] tmp = null;
+        
+        for (int i = 0; i < adaptors.length; i++) {
+            tmp = Utils.merge(tmp, adaptors[i].getSupportedJobSchemes());
+        }
+
+        return tmp;
+    }
+
+    public String [] getSupportedFileSchemes() { 
+
+        String [] tmp = null;
+        
+        for (int i = 0; i < adaptors.length; i++) {
+            tmp = Utils.merge(tmp, adaptors[i].getSupportedFileSchemes());
+        }
+
+        return tmp;
+    }
+    
+    // ************** Xenon Interface Implementation ***************\\
+    
     @Override
     public AdaptorStatus[] getAdaptorStatuses() {
 

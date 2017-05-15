@@ -25,7 +25,7 @@ public class FtpLocation extends Location {
     }
 
     protected FtpLocation(String location) throws InvalidLocationException {
-        super(location, FtpAdaptor.ADAPTOR_SCHEME.get(0));
+        super(location, FtpAdaptor.ADAPTOR_FILE_SCHEME.get(0));
     }
 
     @Override

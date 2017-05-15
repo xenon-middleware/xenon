@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.scripting;
 import java.util.Collection;
 import java.util.Map;
 
+import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
 import nl.esciencecenter.xenon.XenonRuntimeException;
@@ -113,6 +114,41 @@ public class ScriptingJobs implements Jobs {
         return connection.getScheduler();
     }
 
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedJobSchemes();
+    }
+    
+    @Override
+    public boolean isOnline(String scheme) throws XenonException {
+        
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public boolean supportsInteractive(String scheme) throws XenonException { 
+        
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+        
+        return true;
+    }
+
+    @Override
+    public boolean supportsBatch(String scheme) throws XenonException { 
+
+        if (!adaptor.supportsJob(scheme)) { 
+            throw new InvalidSchemeException(adaptor.getName(), scheme);
+        }
+
+        return true;
+    }
+    
     @Override
     public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
         //find connection

@@ -164,6 +164,11 @@ public class WebdavFiles implements Files {
         return fileSystem;
     }
 
+    @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return adaptor.getSupportedFileSchemes();
+    }
+    
     private HttpClient getClient(WebdavLocation webdavLocation) {
         HostConfiguration hostConfig = new HostConfiguration();
         hostConfig.setHost(webdavLocation.getHost(), webdavLocation.getPort());

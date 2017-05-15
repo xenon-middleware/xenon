@@ -77,8 +77,11 @@ public class LocalAdaptor extends Adaptor {
     /** How many jobs have been submitted locally. */
     public static final String SUBMITTED = JOBS + "submitted";
     
-    /** The schemes supported by the adaptor */
-    private static final ImmutableArray<String> ADAPTOR_SCHEME = new ImmutableArray<>("local", "file");
+    /** The job schemes supported by the adaptor */
+    private static final ImmutableArray<String> ADAPTOR_JOB_SCHEME = new ImmutableArray<>("local");
+
+    /** The file schemes supported by the adaptor */
+    private static final ImmutableArray<String> ADAPTOR_FILE_SCHEME = new ImmutableArray<>("file");
 
     /** The locations supported by the adaptor */
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(null)", "(empty string)", "/");
@@ -101,8 +104,8 @@ public class LocalAdaptor extends Adaptor {
     private final LocalCredentials localCredentials;
 
     public LocalAdaptor(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
-        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_SCHEME, ADAPTOR_LOCATIONS, VALID_PROPERTIES, 
-                new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
+        super(xenonEngine, ADAPTOR_NAME, ADAPTOR_DESCRIPTION, ADAPTOR_JOB_SCHEME, ADAPTOR_FILE_SCHEME, ADAPTOR_LOCATIONS, 
+                VALID_PROPERTIES, new XenonProperties(VALID_PROPERTIES, Component.XENON, properties));
 
         localFiles = new LocalFiles(this, xenonEngine.getCopyEngine());
         localJobs = new LocalJobs(this, getProperties(), Utils.getLocalCWD(localFiles), xenonEngine);
