@@ -75,9 +75,9 @@ public class AdaptorStatusImplementationTest {
 
         String tmp = new AdaptorStatusImplementation("NAME", "DESCRIPTION", new ImmutableArray<>("SCHEME1", "SCHEME2"), null,
                 new ImmutableArray<>("L1", "L2"), new ImmutableArray<XenonPropertyDescription>(), null).toString();
-
+        
         assert (tmp.equals("AdaptorStatusImplementation [name=NAME, description=DESCRIPTION, supportedJobSchemes=[SCHEME1, " +
-        		"SCHEME2], supportedFileSchemes=[] supportedProperties=[], adaptorSpecificInformation=null]"));
+        		"SCHEME2], supportedFileSchemes=[], supportedProperties=[], adaptorSpecificInformation=null]"));
     }
 
 }
