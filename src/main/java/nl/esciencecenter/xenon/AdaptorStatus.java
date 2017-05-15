@@ -31,7 +31,6 @@ public interface AdaptorStatus {
      * @return the schemes supported by this adaptor.
      */
     String[] getSupportedJobSchemes();
-
     
     /**
      * Get the supported file access schemes for this adaptor.

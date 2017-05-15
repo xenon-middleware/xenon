@@ -98,6 +98,11 @@ public class FilesEngine implements Files {
     }
 
     @Override
+    public String [] getSupportedSchemes() throws XenonException { 
+        return xenonEngine.getSupportedFileSchemes();
+    }
+    
+    @Override
     public Path newPath(FileSystem filesystem, RelativePath location) throws XenonException {
         return getFilesAdaptor(filesystem).newPath(filesystem, location);
     }

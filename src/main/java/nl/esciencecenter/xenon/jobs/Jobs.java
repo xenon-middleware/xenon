@@ -70,6 +70,66 @@ public interface Jobs {
             throws XenonException;
     
     /**
+     * Get a list of job schemes supported by Xenon. 
+     * 
+     * @return the list of job schemes supported by Xenon.
+     * 
+     * @throws XenonException
+     *             If the list of schemes could not be retrieved.
+     */
+    String [] getSupportedSchemes() throws XenonException;
+    
+    /**
+     * Does this scheme require an online scheduler ?
+     * 
+     * Online schedulers need to remain active for their jobs to run. Ending an online scheduler will kill all jobs that were
+     * submitted to it.
+     * 
+     * Offline schedulers do not need to remains active for their jobs to run. A submitted job will typically be handed over to
+     * some external server that will manage the job for the rest of its lifetime.
+     * 
+     * Online schedulers typically support both interactive jobs (where the user controls the standard streams) and batch jobs
+     * (where the standard streams are redirected to/from files).
+     * 
+     * Since it is impossible to continue an interactive jobs when a scheduler ends, interactive jobs will always be killed,
+     * even in an offline scheduler.
+     * 
+     * @return if this scheme requires an online scheduler.
+     * 
+     * @throws XenonException
+     *             If information on the scheme could not be retrieved.
+     */
+    boolean isOnline(String scheme) throws XenonException;
+    
+    /**
+     * Does this scheme supports the submission of interactive jobs ?
+     * 
+     * For interactive jobs the standard streams of the job must be handled by the submitting process. Failing to do so may cause
+     * the job to hang indefinitely.
+     * 
+     * Note that it is impossible to continue an interactive jobs when its scheduler ends. This will cause the interactive job
+     * to be killed,
+     * 
+     * @return if this scheme supports the submission of interactive jobs ?
+     * 
+     * @throws XenonException
+     *             If information on the scheme could not be retrieved.
+     */
+    boolean supportsInteractive(String scheme) throws XenonException;
+
+    /**
+     * Does this scheme support the submission of batch jobs ?
+     * 
+     * For batch jobs the standard streams of the jobs are redirected from / to files.
+     * 
+     * @return if this scheme supports the submission of batch jobs ?
+     * 
+     * @throws XenonException
+     *             If information on the scheme could not be retrieved.
+     */
+    boolean supportsBatch(String scheme) throws XenonException;
+    
+    /**
      * Close a Scheduler.
      * 
      * @param scheduler
