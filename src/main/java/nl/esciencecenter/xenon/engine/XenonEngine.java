@@ -35,13 +35,14 @@ import nl.esciencecenter.xenon.NoSuchXenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
-import nl.esciencecenter.xenon.adaptors.ftp.FtpAdaptor;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptor;
-import nl.esciencecenter.xenon.adaptors.local.LocalAdaptor;
-import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptor;
-import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptor;
-import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptor;
-import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptor;
+import nl.esciencecenter.xenon.XenonPropertyDescription;
+import nl.esciencecenter.xenon.adaptors.ftp.FtpAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.local.LocalAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.credentials.CredentialsEngine;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
@@ -72,8 +73,44 @@ public final class XenonEngine implements Xenon {
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "XenonEngine";
     
+    /** Factories for all supported adaptors */
+    private static final AdaptorFactory [] ADAPTOR_FACTORIES = new AdaptorFactory [] { 
+            new LocalAdaptorFactory(), 
+            new SshAdaptorFactory(),
+            new FtpAdaptorFactory(),
+            new GridEngineAdaptorFactory(),
+            new SlurmAdaptorFactory(),
+            new TorqueAdaptorFactory(),
+            new WebdavAdaptorFactory()
+    };
+   
     /** All XenonEngines created so far */
     private static final List<XenonEngine> XENON_ENGINES = new ArrayList<>(1);
+ 
+    /**
+     * Return the list of all properties that can to be set at Xenon creation time. 
+     * 
+     * These properties will be extracted from the different AdaptorFactories. 
+     * 
+     * @return
+     *          the list of all properties that can to be set at Xenon creation time.
+     */
+    public static XenonPropertyDescription [] getSupportedProperties() {
+   
+        ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
+        
+        for (AdaptorFactory a : ADAPTOR_FACTORIES) {
+            XenonPropertyDescription [] properties = a.getSupportedProperties();
+            
+            for (XenonPropertyDescription p : properties) { 
+                if (p.getLevels().contains(XenonPropertyDescription.Component.XENON)) { 
+                    tmp.add(p);
+                }
+            }
+        }
+        
+        return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
+    }
     
     /**
      * Create a new Xenon using the given properties.
@@ -175,15 +212,20 @@ public final class XenonEngine implements Xenon {
         // Copy the map so we can manipulate it.
         Map<String, String> unprocesedProperties = new HashMap<>(properties);
 
+        
         List<Adaptor> result = new ArrayList<>(10);
 
-        result.add(new LocalAdaptor(this, extract(unprocesedProperties, LocalAdaptor.PREFIX)));
-        result.add(new SshAdaptor(this, extract(unprocesedProperties, SshAdaptor.PREFIX)));
-        result.add(new FtpAdaptor(this, extract(unprocesedProperties, FtpAdaptor.PREFIX)));
-        result.add(new GridEngineAdaptor(this, extract(unprocesedProperties, GridEngineAdaptor.PREFIX)));
-        result.add(new SlurmAdaptor(this, extract(unprocesedProperties, SlurmAdaptor.PREFIX)));
-        result.add(new TorqueAdaptor(this, extract(unprocesedProperties, TorqueAdaptor.PREFIX)));
-        result.add(new WebdavAdaptor(this, extract(unprocesedProperties, WebdavAdaptor.PREFIX)));
+        for (AdaptorFactory a : ADAPTOR_FACTORIES) { 
+            result.add(a.createAdaptor(this, extract(unprocesedProperties, a.getPropertyPrefix())));
+        }
+        
+//        result.add(LocalAdaptorFactory.createAdaptor(this, extract(unprocesedProperties, LocalAdaptorFactory.getPropertyPrefix())));
+//        result.add(new SshAdaptor(this, extract(unprocesedProperties, SshAdaptor.PREFIX)));
+//        result.add(new FtpAdaptor(this, extract(unprocesedProperties, FtpAdaptor.PREFIX)));
+//        result.add(new GridEngineAdaptor(this, extract(unprocesedProperties, GridEngineAdaptor.PREFIX)));
+//        result.add(new SlurmAdaptor(this, extract(unprocesedProperties, SlurmAdaptor.PREFIX)));
+//        result.add(new TorqueAdaptor(this, extract(unprocesedProperties, TorqueAdaptor.PREFIX)));
+//        result.add(new WebdavAdaptor(this, extract(unprocesedProperties, WebdavAdaptor.PREFIX)));
 
         // Check if there are any properties left. If so, this is a problem.
         if (!unprocesedProperties.isEmpty()) {
@@ -310,4 +352,6 @@ public final class XenonEngine implements Xenon {
     public String toString() {
         return "XenonEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
     }
+
+   
 }

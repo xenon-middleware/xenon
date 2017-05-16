@@ -15,6 +15,7 @@
  */
 package nl.esciencecenter.xenon;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Constructor;
@@ -65,5 +66,16 @@ public class XenonFactoryTest {
         XenonFactory.endAll();
         XenonFactory.endXenon(x1);
         XenonFactory.endXenon(x2);        
+    }
+    
+    @Test
+    public void testProperties() throws Exception {
+        XenonPropertyDescription [] tmp = XenonFactory.getSupportedProperties();
+   
+        assertNotNull(tmp);
+        
+        for (XenonPropertyDescription x : tmp) { 
+            assertTrue(x.getLevels().contains(XenonPropertyDescription.Component.XENON));
+        }
     }
 }

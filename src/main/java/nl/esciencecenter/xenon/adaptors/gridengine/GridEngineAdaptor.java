@@ -64,7 +64,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
             + " This adaptor uses either the local or the ssh adaptor to gain access to the scheduler machine.";
 
     /** List of all properties supported by this adaptor */
-    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
+    protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<XenonPropertyDescription>(
         new XenonPropertyDescriptionImplementation(IGNORE_VERSION_PROPERTY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER),
                 "false", "Skip version check is skipped when connecting to remote machines. "
@@ -74,7 +74,7 @@ public class GridEngineAdaptor extends ScriptingAdaptor {
 
         new XenonPropertyDescriptionImplementation(POLL_DELAY_PROPERTY, Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
                 "Number of milliseconds between polling the status of a job."));
-
+    
     /**
      * Create a new GridEngineAdaptor.
      * 

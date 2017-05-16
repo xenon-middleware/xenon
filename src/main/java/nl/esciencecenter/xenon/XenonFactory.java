@@ -36,6 +36,23 @@ public final class XenonFactory {
     }
 
     /**
+     * Return the description of the properties that can be set a creation time of 
+     * a Xenon instance. These properties may be passed when invoking 
+     * <code>newXenon</code>.
+     * 
+     * Note that the set of property descriptions returned here will depend on the 
+     * set of scheme adaptors Xenon has available.
+     * 
+     * @return a XenonPropertyDescription describing the properties.
+     * 
+     * @throws XenonException
+     *             If the XenonPropertyDescription could not be created.
+     */
+    public static XenonPropertyDescription [] getSupportedProperties() throws XenonException {
+        return XenonEngine.getSupportedProperties();
+    }
+    
+    /**
      * Create a new Xenon instance using the given properties.
      * 
      * The properties provided will be passed to the Xenon instance and its 

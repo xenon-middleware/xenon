@@ -120,7 +120,7 @@ public class SshAdaptor extends Adaptor {
     public static final String SUBMITTED = JOBS + "submitted";
 
     /** List of properties supported by this SSH adaptor */
-    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
+    protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
             new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
                     Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
             new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,

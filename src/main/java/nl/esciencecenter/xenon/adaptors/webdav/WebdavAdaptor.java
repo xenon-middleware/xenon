@@ -15,19 +15,16 @@
  */
 package nl.esciencecenter.xenon.adaptors.webdav;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
-import nl.esciencecenter.xenon.XenonPropertyDescription.Type;
 import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.engine.XenonProperties;
-import nl.esciencecenter.xenon.engine.XenonPropertyDescriptionImplementation;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -52,57 +49,10 @@ public class WebdavAdaptor extends Adaptor {
     /** All our own properties start with this prefix. */
     public static final String PREFIX = XenonEngine.ADAPTORS_PREFIX + "webdav.";
 
-    /** Enable strict host key checking. */
-    public static final String STRICT_HOST_KEY_CHECKING = PREFIX + "strictHostKeyChecking";
-
-    /** Load the known_hosts file by default. */
-    public static final String LOAD_STANDARD_KNOWN_HOSTS = PREFIX + "loadKnownHosts";
-
-    /** Enable strict host key checking. */
-    public static final String AUTOMATICALLY_ADD_HOST_KEY = PREFIX + "autoAddHostKey";
-
-    /** Add gateway to access machine. */
-    public static final String GATEWAY = PREFIX + "gateway";
-
-    /** All our own queue properties start with this prefix. */
-    public static final String QUEUE = PREFIX + "queue.";
-
-    /** Maximum history length for finished jobs */
-    public static final String MAX_HISTORY = QUEUE + "historySize";
-
-    /** Property for maximum history length for finished jobs */
-    public static final String POLLING_DELAY = QUEUE + "pollingDelay";
-
-    /** Local multi queue properties start with this prefix. */
-    public static final String MULTIQ = QUEUE + "multi.";
-
-    /** Property for the maximum number of concurrent jobs in the multi queue. */
-    public static final String MULTIQ_MAX_CONCURRENT = MULTIQ + "maxConcurrentJobs";
-
-    /** Ssh adaptor information start with this prefix. */
-    public static final String INFO = PREFIX + "info.";
-
-    /** Ssh job information start with this prefix. */
-    public static final String JOBS = INFO + "jobs.";
-
-    /** How many jobs have been submitted using this adaptor. */
-    public static final String SUBMITTED = JOBS + "submitted";
-
     /** List of properties supported by this FTP adaptor */
-    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = new ImmutableArray<XenonPropertyDescription>(
-            new XenonPropertyDescriptionImplementation(AUTOMATICALLY_ADD_HOST_KEY, Type.BOOLEAN,
-                    EnumSet.of(Component.FILESYSTEM), "true", "Automatically add unknown host keys to known_hosts."),
-            new XenonPropertyDescriptionImplementation(STRICT_HOST_KEY_CHECKING, Type.BOOLEAN, EnumSet.of(Component.SCHEDULER,
-                    Component.FILESYSTEM), "true", "Enable strict host key checking."),
-                            new XenonPropertyDescriptionImplementation(LOAD_STANDARD_KNOWN_HOSTS, Type.BOOLEAN, EnumSet.of(Component.XENON),
-                                    "true", "Load the standard known_hosts file."), new XenonPropertyDescriptionImplementation(POLLING_DELAY,
-                                            Type.LONG, EnumSet.of(Component.SCHEDULER), "1000",
-                    "The polling delay for monitoring running jobs (in milliseconds)."),
-            new XenonPropertyDescriptionImplementation(MULTIQ_MAX_CONCURRENT, Type.INTEGER, EnumSet.of(Component.SCHEDULER), "4",
-                                                    "The maximum number of concurrent jobs in the multiq.."), new XenonPropertyDescriptionImplementation(GATEWAY,
-                                                            Type.STRING, EnumSet.of(Component.SCHEDULER, Component.FILESYSTEM), null,
-                                                            "The gateway machine used to create an SSH tunnel to the target."));
-
+    protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
+            new ImmutableArray<XenonPropertyDescription>();
+   
     private final WebdavFiles filesAdaptor;
     private Credentials credentialsAdaptor;
 

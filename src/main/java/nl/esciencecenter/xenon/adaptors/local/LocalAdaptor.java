@@ -84,7 +84,7 @@ public class LocalAdaptor extends Adaptor {
     private static final ImmutableArray<String> ADAPTOR_LOCATIONS = new ImmutableArray<>("(null)", "(empty string)", "/");
     
     /** The properties supported by this adaptor */
-    private static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
+    protected static final ImmutableArray<XenonPropertyDescription> VALID_PROPERTIES = 
             new ImmutableArray<XenonPropertyDescription>(
                     new XenonPropertyDescriptionImplementation(POLLING_DELAY, Type.INTEGER, EnumSet.of(Component.XENON), 
                             "1000", "The polling delay for monitoring running jobs (in milliseconds)."),
