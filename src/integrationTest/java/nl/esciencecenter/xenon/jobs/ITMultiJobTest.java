@@ -23,7 +23,7 @@ import java.util.HashMap;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.adaptors.ssh.SSHJobTestConfig;
-import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.credentials.DefaultCredential;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
@@ -47,11 +47,10 @@ public class ITMultiJobTest {
         Xenon xenon = XenonFactory.newXenon(null);
         Files files = xenon.files();
         Jobs jobs = xenon.jobs();
-        Credentials credentials = xenon.credentials();
-
-        FileSystem filesystem = files.newFileSystem("sftp", user + "@" + location, credentials.getDefaultCredential("sftp"),
+     
+        FileSystem filesystem = files.newFileSystem("sftp", user + "@" + location, new DefaultCredential(),
                 new HashMap<String, String>(0));
-        Scheduler scheduler = jobs.newScheduler("ssh", user + "@" + location, credentials.getDefaultCredential("ssh"),
+        Scheduler scheduler = jobs.newScheduler("ssh", user + "@" + location, new DefaultCredential(),
                 new HashMap<String, String>(0));
 
         String workingDir = TEST_ROOT + "/" + testName;

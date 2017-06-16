@@ -17,18 +17,31 @@ package nl.esciencecenter.xenon.engine.files;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import nl.esciencecenter.xenon.DuplicateAdaptorException;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
+import nl.esciencecenter.xenon.adaptors.file.file.LocalFileAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.file.ftp.FtpFileAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.file.sftp.SftpFileAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.file.webdav.WebdavFileAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
+import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
 import nl.esciencecenter.xenon.files.CopyStatus;
 import nl.esciencecenter.xenon.files.DirectoryStream;
+import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
+import nl.esciencecenter.xenon.files.FileAdaptorDescription;
 import nl.esciencecenter.xenon.files.FileAttributes;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.files.FileSystemClosedException;
@@ -38,7 +51,6 @@ import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.files.PathAttributesPair;
 import nl.esciencecenter.xenon.files.PosixFilePermission;
 import nl.esciencecenter.xenon.files.RelativePath;
-import nl.esciencecenter.xenon.files.DirectoryStream.Filter;
 
 /**
  * Engine for File operations. Implements functionality using File operations, Xenon create functions, and Adaptors' Files
@@ -50,91 +62,167 @@ public class FilesEngine implements Files {
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "FilesEngine";
     
+    // TODO: make this configurable!!
+    /** Factories for all supported file adaptors */
+    private static final FileAdaptorFactory [] ADAPTOR_FACTORIES = new FileAdaptorFactory [] { 
+            new LocalFileAdaptorFactory(),
+            new SftpFileAdaptorFactory(),
+            new FtpFileAdaptorFactory(), 
+            new WebdavFileAdaptorFactory()
+    };    
+    
     public static final DirectoryStream.Filter ACCEPT_ALL_FILTER = new DirectoryStream.Filter() {
         public boolean accept(Path file) {
             return true;
         }
     };
-
+    
+    private final HashMap<String, FileAdaptor> adaptors = new HashMap<>();
+    
     private final XenonEngine xenonEngine;
 
-    public FilesEngine(XenonEngine xenonEngine) {
+    private final CopyEngine copyEngine;
+    
+    public FilesEngine(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
         this.xenonEngine = xenonEngine;
+        this.copyEngine = new CopyEngine(this);
+        loadAdaptors(properties);
     }
 
-    private Files getFilesAdaptorFromEngine(FileSystem filesystem) {
-        try {
-            Adaptor adaptor = xenonEngine.getAdaptor(filesystem.getAdaptorName());
-            return adaptor.filesAdaptor();
-        } catch (XenonException e) {
+    // TODO: Move to shared utils ?
+    private Map<String, String> extract(Map<String, String> source, String prefix) {
+
+        HashMap<String, String> tmp = new HashMap<>(source.size());
+
+        Iterator<Entry<String, String>> itt = source.entrySet().iterator();
+
+        while (itt.hasNext()) {
+
+            Entry<String, String> e = itt.next();
+
+            if (e.getKey().startsWith(prefix)) {
+                tmp.put(e.getKey(), e.getValue());
+                itt.remove();
+            }
+        }
+
+        return tmp;
+    }
+    
+    private void loadAdaptors(Map<String, String> properties) throws XenonException {
+        
+        for (FileAdaptorFactory a : ADAPTOR_FACTORIES) {
+        	
+        	FileAdaptor adaptor = a.createAdaptor(this, extract(properties, a.getPropertyPrefix()));
+        	
+        	String name = adaptor.getName();
+            
+            if (adaptors.containsKey(name)) { 
+                throw new DuplicateAdaptorException(COMPONENT_NAME, "File adaptor " + name + " already exists!");
+            }
+            
+            adaptors.put(name, adaptor);	
+        }
+    }
+     
+    public FileAdaptorDescription [] getAdaptorDescriptions() { 
+        ArrayList<FileAdaptorDescription> tmp = new ArrayList<>();
+        
+        for (FileAdaptor a : adaptors.values()) { 
+            tmp.add(a.getAdaptorDescription());
+        }
+        
+        return tmp.toArray(new FileAdaptorDescription[tmp.size()]);
+    }
+
+    public FileAdaptorDescription getAdaptorDescription(String adaptorName) throws InvalidAdaptorException { 
+        return getFileAdaptorByName(adaptorName).getAdaptorDescription();
+    }
+    
+    private FileAdaptor getFileAdaptorByName(String adaptorName) throws InvalidAdaptorException {
+        FileAdaptor adaptor = adaptors.get(adaptorName);
+        
+        if (adaptor == null) { 
+            throw new InvalidAdaptorException(COMPONENT_NAME, "Could not find file adaptor named " + adaptorName);
+        }
+        
+        return adaptor;
+    }
+        
+    private FileAdaptor getFileAdaptorFromEngine(FileSystem filesystem) {
+        try { 
+            return getFileAdaptorByName(filesystem.getAdaptorName());
+        } catch (InvalidAdaptorException e) {
             // This is a case that should never occur, the adaptor was already created, it cannot disappear suddenly.
             // Therefore, we make this a runtime exception.
-            throw new XenonRuntimeException(COMPONENT_NAME, "Could not find adaptor named " + filesystem.getAdaptorName(), e);
+            throw new XenonRuntimeException(COMPONENT_NAME, "Could not find file adaptor named " + filesystem.getAdaptorName(), e);
         }
     }
         
-    private Files getFilesAdaptor(FileSystem filesystem) throws XenonException {        
+    private FileAdaptor getFileAdaptor(FileSystem filesystem) throws XenonException {        
 
-        Files files = getFilesAdaptorFromEngine(filesystem);
+        FileAdaptor adaptor = getFileAdaptorFromEngine(filesystem);
         
-        if (!files.isOpen(filesystem)) {
+        if (!adaptor.isOpen(filesystem)) {
             throw new FileSystemClosedException(COMPONENT_NAME, "FileSystem " + filesystem.getLocation() + " is closed");
         }
         
-        return files;
+        return adaptor;
     }
 
-    private Files getFilesAdaptor(Path path) throws XenonException {
-        return getFilesAdaptor(path.getFileSystem());
+    private FileAdaptor getFileAdaptor(Path path) throws XenonException {
+        return getFileAdaptor(path.getFileSystem());
+    }
+     
+    public CopyEngine getCopyEngine() {
+        return copyEngine;
     }
     
-        
     @Override
-    public FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
+    public FileSystem newFileSystem(String adaptorName, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
         
-        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
-        return adaptor.filesAdaptor().newFileSystem(scheme, location, credential, properties);
+        return getFileAdaptorByName(adaptorName).newFileSystem(location, credential, properties);
     }
 
     @Override
     public Path newPath(FileSystem filesystem, RelativePath location) throws XenonException {
-        return getFilesAdaptor(filesystem).newPath(filesystem, location);
+        return getFileAdaptor(filesystem).newPath(filesystem, location);
     }
 
     @Override
     public void close(FileSystem filesystem) throws XenonException {
-        getFilesAdaptor(filesystem).close(filesystem);
+        getFileAdaptor(filesystem).close(filesystem);
     }
 
     @Override
     public boolean isOpen(FileSystem filesystem) throws XenonException {
-        return getFilesAdaptorFromEngine(filesystem).isOpen(filesystem);
+        return getFileAdaptorFromEngine(filesystem).isOpen(filesystem);
     }
 
     @Override
     public void createDirectories(Path dir) throws XenonException {
-        getFilesAdaptor(dir).createDirectories(dir);
+        getFileAdaptor(dir).createDirectories(dir);
     }
 
     @Override
     public void createDirectory(Path dir) throws XenonException {
-        getFilesAdaptor(dir).createDirectory(dir);
+        getFileAdaptor(dir).createDirectory(dir);
     }
 
     @Override
     public void createFile(Path path) throws XenonException {
-        getFilesAdaptor(path).createFile(path);
+        getFileAdaptor(path).createFile(path);
     }
 
     @Override
     public void delete(Path path) throws XenonException {
-        getFilesAdaptor(path).delete(path);
+        getFileAdaptor(path).delete(path);
     }
 
     @Override
     public boolean exists(Path path) throws XenonException {
-        return getFilesAdaptor(path).exists(path);
+        return getFileAdaptor(path).exists(path);
     }
 
     @Override
@@ -144,9 +232,9 @@ public class FilesEngine implements Files {
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName()) ||
                 targetfs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(source).copy(source, target, options);
+            return getFileAdaptor(source).copy(source, target, options);
         } else if (sourcefs.getAdaptorName().equals(XenonEngine.LOCAL_ADAPTOR_NAME)) {
-            return getFilesAdaptor(target).copy(source, target, options);
+            return getFileAdaptor(target).copy(source, target, options);
         } else {
             throw new XenonException(COMPONENT_NAME, "Cannot do inter-scheme third party copy!");
         }
@@ -159,7 +247,7 @@ public class FilesEngine implements Files {
         FileSystem targetfs = target.getFileSystem();
 
         if (sourcefs.getAdaptorName().equals(targetfs.getAdaptorName())) {
-            getFilesAdaptor(source).move(source, target);
+            getFileAdaptor(source).move(source, target);
             return;
         }
 
@@ -168,62 +256,66 @@ public class FilesEngine implements Files {
 
     @Override
     public CopyStatus getCopyStatus(Copy copy) throws XenonException {
-        return getFilesAdaptor(copy.getSource()).getCopyStatus(copy);
+        return getFileAdaptor(copy.getSource()).getCopyStatus(copy);
     }
 
     @Override
     public CopyStatus cancelCopy(Copy copy) throws XenonException {
-        return getFilesAdaptor(copy.getSource()).cancelCopy(copy);
+        return getFileAdaptor(copy.getSource()).cancelCopy(copy);
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir) throws XenonException {
-        return getFilesAdaptor(dir).newDirectoryStream(dir);
+        return getFileAdaptor(dir).newDirectoryStream(dir);
     }
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir) throws XenonException {
-        return getFilesAdaptor(dir).newAttributesDirectoryStream(dir);
+        return getFileAdaptor(dir).newAttributesDirectoryStream(dir);
     }
 
     @Override
     public DirectoryStream<Path> newDirectoryStream(Path dir, Filter filter) throws XenonException {
-        return getFilesAdaptor(dir).newDirectoryStream(dir, filter);
+        return getFileAdaptor(dir).newDirectoryStream(dir, filter);
     }
 
     @Override
     public DirectoryStream<PathAttributesPair> newAttributesDirectoryStream(Path dir, Filter filter)
             throws XenonException {
-        return getFilesAdaptor(dir).newAttributesDirectoryStream(dir, filter);
+        return getFileAdaptor(dir).newAttributesDirectoryStream(dir, filter);
     }
 
     @Override
     public InputStream newInputStream(Path path) throws XenonException {
-        return getFilesAdaptor(path).newInputStream(path);
+        return getFileAdaptor(path).newInputStream(path);
     }
 
     @Override
     public OutputStream newOutputStream(Path path, OpenOption... options) throws XenonException {
-        return getFilesAdaptor(path).newOutputStream(path, options);
+        return getFileAdaptor(path).newOutputStream(path, options);
     }
 
     @Override
     public FileAttributes getAttributes(Path path) throws XenonException {
-        return getFilesAdaptor(path).getAttributes(path);
+        return getFileAdaptor(path).getAttributes(path);
     }
 
     @Override
     public Path readSymbolicLink(Path link) throws XenonException {
-        return getFilesAdaptor(link).readSymbolicLink(link);
+        return getFileAdaptor(link).readSymbolicLink(link);
     }
 
     @Override
     public void setPosixFilePermissions(Path path, Set<PosixFilePermission> permissions) throws XenonException {
-        getFilesAdaptor(path).setPosixFilePermissions(path, permissions);
+        getFileAdaptor(path).setPosixFilePermissions(path, permissions);
     }
     
     @Override
     public String toString() {
         return "FilesEngine [XenonEngine=" + xenonEngine + "]";
     }
+    
+    public void end() { 
+        copyEngine.done();
+    }    
 }

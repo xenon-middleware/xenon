@@ -17,7 +17,7 @@ package nl.esciencecenter.xenon.exceptions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import nl.esciencecenter.xenon.InvalidSchemeException;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonRuntimeException;
 import nl.esciencecenter.xenon.IncompatibleVersionException;
@@ -26,12 +26,12 @@ import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
 import nl.esciencecenter.xenon.NoSuchXenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
-import nl.esciencecenter.xenon.adaptors.ssh.ConnectionLostException;
-import nl.esciencecenter.xenon.adaptors.ssh.EndOfFileException;
-import nl.esciencecenter.xenon.adaptors.ssh.NotConnectedException;
-import nl.esciencecenter.xenon.adaptors.ssh.PermissionDeniedException;
-import nl.esciencecenter.xenon.adaptors.ssh.UnsupportedIOOperationException;
-import nl.esciencecenter.xenon.adaptors.webdav.PathUninspectableException;
+import nl.esciencecenter.xenon.adaptors.file.webdav.PathUninspectableException;
+import nl.esciencecenter.xenon.adaptors.file.sftp.ConnectionLostException;
+import nl.esciencecenter.xenon.adaptors.file.sftp.EndOfFileException;
+import nl.esciencecenter.xenon.adaptors.file.sftp.NotConnectedException;
+import nl.esciencecenter.xenon.adaptors.file.sftp.PermissionDeniedException;
+import nl.esciencecenter.xenon.adaptors.file.sftp.UnsupportedIOOperationException;
 import nl.esciencecenter.xenon.credentials.CertificateNotFoundException;
 import nl.esciencecenter.xenon.engine.PropertyTypeException;
 import nl.esciencecenter.xenon.engine.util.BadParameterException;
@@ -505,13 +505,13 @@ public class ExceptionsTest {
 
     @Test
     public void testInvalidSchemeException1() throws Exception {
-        testException(new InvalidSchemeException("name", "message"));
+        testException(new InvalidAdaptorException("name", "message"));
     }
 
     @Test
     public void testInvalidSchemeException2() throws Exception {
         Throwable t = new Throwable();
-        testException(new InvalidSchemeException("name", "message", t), t);
+        testException(new InvalidAdaptorException("name", "message", t), t);
     }
 
     @Test

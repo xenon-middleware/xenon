@@ -24,7 +24,7 @@ import java.util.Properties;
 
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
+
 
 /**
  * 
@@ -123,17 +123,17 @@ public abstract class GenericTestConfig {
         return false;
     }
 
-    public abstract Credential getDefaultCredential(Credentials c) throws Exception;
+    public abstract Credential getDefaultCredential() throws Exception;
 
-    public Credential getNonDefaultCredential(Credentials c) throws Exception {
+    public Credential getNonDefaultCredential() throws Exception {
         throw new Exception("Adaptor " + adaptorName + " does not support non-default credential!");
     }
 
-    public Credential getPasswordCredential(Credentials c) throws Exception {
+    public Credential getPasswordCredential() throws Exception {
         throw new Exception("Adaptor " + adaptorName + " does not support password credential!");
     }
 
-    public Credential getInvalidCredential(Credentials c) throws Exception {
+    public Credential getInvalidCredential() throws Exception {
         throw new Exception("Adaptor " + adaptorName + " does not support invalid credential!");
     }
 

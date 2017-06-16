@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.AdaptorDescription;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
@@ -97,7 +97,7 @@ public class XenonEngineTest {
     @Test
     public void getAdaptorInfo_LocalAdaptor_Succeeds() throws Exception {
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
-        AdaptorStatus adaptorInfo = x.getAdaptorStatus("local");
+        AdaptorDescription adaptorInfo = x.getAdaptorStatus("local");
         assertEquals("The adaptor info for the local adaptor should contain the name \"local\"", "local", adaptorInfo.getName());
     }
 
@@ -167,7 +167,7 @@ public class XenonEngineTest {
 
         XenonEngine x = (XenonEngine) XenonEngine.newXenon(null);
 
-        AdaptorStatus[] tmp = x.getAdaptorStatuses();
+        AdaptorDescription[] tmp = x.getAdaptorStatuses();
 
         assertNotNull("Expected AdaptorStatus array", tmp);
         assertTrue("Expected " + count + " adaptors to be returned", tmp.length == count);

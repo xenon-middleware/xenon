@@ -16,38 +16,24 @@
 package nl.esciencecenter.xenon.engine;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.InvalidSchemeException;
 import nl.esciencecenter.xenon.NoSuchXenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
-import nl.esciencecenter.xenon.adaptors.ftp.FtpAdaptorFactory;
-import nl.esciencecenter.xenon.adaptors.gridengine.GridEngineAdaptorFactory;
-import nl.esciencecenter.xenon.adaptors.local.LocalAdaptorFactory;
-import nl.esciencecenter.xenon.adaptors.slurm.SlurmAdaptorFactory;
-import nl.esciencecenter.xenon.adaptors.ssh.SshAdaptorFactory;
-import nl.esciencecenter.xenon.adaptors.torque.TorqueAdaptorFactory;
-import nl.esciencecenter.xenon.adaptors.webdav.WebdavAdaptorFactory;
-import nl.esciencecenter.xenon.credentials.Credentials;
-import nl.esciencecenter.xenon.engine.credentials.CredentialsEngine;
 import nl.esciencecenter.xenon.engine.files.FilesEngine;
 import nl.esciencecenter.xenon.engine.jobs.JobsEngine;
-import nl.esciencecenter.xenon.engine.util.CopyEngine;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
@@ -73,20 +59,27 @@ public final class XenonEngine implements Xenon {
     /** The name of this component, for use in exceptions */
     private static final String COMPONENT_NAME = "XenonEngine";
     
-    /** Factories for all supported adaptors */
-    private static final AdaptorFactory [] ADAPTOR_FACTORIES = new AdaptorFactory [] { 
-            new LocalAdaptorFactory(), 
-            new SshAdaptorFactory(),
-            new FtpAdaptorFactory(),
-            new GridEngineAdaptorFactory(),
-            new SlurmAdaptorFactory(),
-            new TorqueAdaptorFactory(),
-            new WebdavAdaptorFactory()
-    };
+//    // TODO: make this configurable!!
+//    /** Factories for all supported adaptors */
+//    private static final AdaptorFactory [] ADAPTOR_FACTORIES = new AdaptorFactory [] { 
+//            new LocalFileAdaptorFactory(),
+//            new FtpFileAdaptorFactory(), 
+//            new WebdavFileAdaptorFactory(),
+//            
+//            
+//            new LocalJobAdaptorFactory(), 
+//            
+//            new SshAdaptorFactory(),
+//            
+//            new GridEngineAdaptorFactory(),
+//            new SlurmAdaptorFactory(),
+//            new TorqueAdaptorFactory(),
+//            
+//    };
    
     /** All XenonEngines created so far */
     private static final List<XenonEngine> XENON_ENGINES = new ArrayList<>(1);
- 
+
     /**
      * Return the list of all properties that can to be set at Xenon creation time. 
      * 
@@ -97,18 +90,21 @@ public final class XenonEngine implements Xenon {
      */
     public static XenonPropertyDescription [] getSupportedProperties() {
    
-        ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
-        
-        for (AdaptorFactory a : ADAPTOR_FACTORIES) {
-            XenonPropertyDescription [] properties = a.getSupportedProperties();
-            
-            for (XenonPropertyDescription p : properties) { 
-                if (p.getLevels().contains(XenonPropertyDescription.Component.XENON)) { 
-                    tmp.add(p);
-                }
-            }
-        }
-        
+    	ArrayList<XenonPropertyDescription> tmp = new ArrayList<>();
+//   
+//    	
+//    	
+//    	
+//        for (AdaptorFactory a : ADAPTOR_FACTORIES) {
+//            XenonPropertyDescription [] properties = a.getSupportedProperties();
+//            
+//            for (XenonPropertyDescription p : properties) { 
+//                if (p.getLevels().contains(XenonPropertyDescription.Component.XENON)) { 
+//                    tmp.add(p);
+//                }
+//            }
+//        }
+//        
         return tmp.toArray(new XenonPropertyDescription[tmp.size()]);
     }
     
@@ -170,11 +166,7 @@ public final class XenonEngine implements Xenon {
 
     private final JobsEngine jobsEngine;
 
-    private final CredentialsEngine credentialsEngine;
-
-    private final Adaptor[] adaptors;
-
-    private final CopyEngine copyEngine;
+    //private final Adaptor[] adaptors;
 
     /**
      * Constructs a XenonEngine.
@@ -197,81 +189,59 @@ public final class XenonEngine implements Xenon {
         }
 
         // NOTE: Order is important here! We initialize the abstract engines first, as the adaptors may want to use them!
-        filesEngine = new FilesEngine(this);
-        jobsEngine = new JobsEngine(this);
-        credentialsEngine = new CredentialsEngine(this);
-        copyEngine = new CopyEngine(filesEngine);
-
-        adaptors = loadAdaptors(this.properties);
-
-        LOGGER.debug("Xenon engine initialized with adaptors: {}", Arrays.toString(adaptors));
-    }
-
-    private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
-
+       
         // Copy the map so we can manipulate it.
-        Map<String, String> unprocesedProperties = new HashMap<>(properties);
-
+        Map<String, String> tmp = new HashMap<>(properties);
         
-        List<Adaptor> result = new ArrayList<>(10);
-
-        for (AdaptorFactory a : ADAPTOR_FACTORIES) { 
-            result.add(a.createAdaptor(this, extract(unprocesedProperties, a.getPropertyPrefix())));
-        }
+        filesEngine = new FilesEngine(this, tmp);
+        jobsEngine = new JobsEngine(this, tmp);
         
-//        result.add(LocalAdaptorFactory.createAdaptor(this, extract(unprocesedProperties, LocalAdaptorFactory.getPropertyPrefix())));
-//        result.add(new SshAdaptor(this, extract(unprocesedProperties, SshAdaptor.PREFIX)));
-//        result.add(new FtpAdaptor(this, extract(unprocesedProperties, FtpAdaptor.PREFIX)));
-//        result.add(new GridEngineAdaptor(this, extract(unprocesedProperties, GridEngineAdaptor.PREFIX)));
-//        result.add(new SlurmAdaptor(this, extract(unprocesedProperties, SlurmAdaptor.PREFIX)));
-//        result.add(new TorqueAdaptor(this, extract(unprocesedProperties, TorqueAdaptor.PREFIX)));
-//        result.add(new WebdavAdaptor(this, extract(unprocesedProperties, WebdavAdaptor.PREFIX)));
-
         // Check if there are any properties left. If so, this is a problem.
-        if (!unprocesedProperties.isEmpty()) {
-            throw new UnknownPropertyException(COMPONENT_NAME, "Unknown properties: " + unprocesedProperties);
+        if (!tmp.isEmpty()) {
+            throw new UnknownPropertyException(COMPONENT_NAME, "Unknown properties: " + tmp);
         }
-
-        return result.toArray(new Adaptor[result.size()]);
+        
+       // LOGGER.debug("Xenon engine initialized with adaptors: {}", Arrays.toString(adaptors));
     }
 
-    private Map<String, String> extract(Map<String, String> source, String prefix) {
+//    private Adaptor[] loadAdaptors(Map<String, String> properties) throws XenonException {
+//
+//        // Copy the map so we can manipulate it.
+//        Map<String, String> unprocesedProperties = new HashMap<>(properties);
+//        
+//        List<Adaptor> result = new ArrayList<>(10);
+//
+//        for (AdaptorFactory a : ADAPTOR_FACTORIES) { 
+//            result.add(a.createAdaptor(this, extract(unprocesedProperties, a.getPropertyPrefix())));
+//        }
+//
+//        // Check if there are any properties left. If so, this is a problem.
+//        if (!unprocesedProperties.isEmpty()) {
+//            throw new UnknownPropertyException(COMPONENT_NAME, "Unknown properties: " + unprocesedProperties);
+//        }
+//
+//        return result.toArray(new Adaptor[result.size()]);
+//    }
 
-        HashMap<String, String> tmp = new HashMap<>(source.size());
-
-        Iterator<Entry<String, String>> itt = source.entrySet().iterator();
-
-        while (itt.hasNext()) {
-
-            Entry<String, String> e = itt.next();
-
-            if (e.getKey().startsWith(prefix)) {
-                tmp.put(e.getKey(), e.getValue());
-                itt.remove();
-            }
-        }
-
-        return tmp;
-    }
 
     // ************** Xenon Interface Implementation ***************\\
 
-    @Override
-    public AdaptorStatus[] getAdaptorStatuses() {
-
-        AdaptorStatus[] status = new AdaptorStatus[adaptors.length];
-
-        for (int i = 0; i < adaptors.length; i++) {
-            status[i] = adaptors[i].getAdaptorStatus();
-        }
-
-        return status;
-    }
-
-    @Override
-    public AdaptorStatus getAdaptorStatus(String adaptorName) throws XenonException {
-        return getAdaptor(adaptorName).getAdaptorStatus();
-    }
+//    @Override
+//    public AdaptorDescription[] getAdaptorStatuses() {
+//
+//        AdaptorDescription[] status = new AdaptorDescription[adaptors.length];
+//
+//        for (int i = 0; i < adaptors.length; i++) {
+//            status[i] = adaptors[i].getAdaptorStatus();
+//        }
+//
+//        return status;
+//    }
+//
+//    @Override
+//    public AdaptorDescription getAdaptorStatus(String adaptorName) throws XenonException {
+//        return getAdaptor(adaptorName).getAdaptorStatus();
+//    }
 
     /**
      * Return the adaptor that provides functionality for the given scheme.
@@ -279,32 +249,33 @@ public final class XenonEngine implements Xenon {
      * @param scheme
      *            the scheme for which to get the adaptor
      * @return the adaptor
-     * @throws InvalidSchemeException
+     * @throws InvalidAdaptorException
      *          if the scheme is not known
      */
-    public Adaptor getAdaptorFor(String scheme) throws InvalidSchemeException {
-
-        if (scheme == null || scheme.isEmpty()) {
-            throw new InvalidSchemeException(COMPONENT_NAME, "Invalid scheme " + scheme);
-        }
-
-        for (Adaptor adaptor : adaptors) {
-            if (adaptor.supports(scheme)) {
-                return adaptor;
-            }
-        }
-        throw new InvalidSchemeException(COMPONENT_NAME, "Could not find adaptor for scheme " + scheme);
-    }
-
-    public Adaptor getAdaptor(String name) throws XenonException {
-        for (Adaptor adaptor : adaptors) {
-            if (adaptor.getName().equals(name)) {
-                return adaptor;
-            }
-        }
-
-        throw new XenonException(COMPONENT_NAME, "Could not find adaptor named " + name);
-    }
+    
+//    public Adaptor getAdaptorFor(String scheme) throws InvalidAdaptorException {
+//
+//        if (scheme == null || scheme.isEmpty()) {
+//            throw new InvalidAdaptorException(COMPONENT_NAME, "Invalid scheme " + scheme);
+//        }
+//
+//        for (Adaptor adaptor : adaptors) {
+//            if (adaptor.supports(scheme)) {
+//                return adaptor;
+//            }
+//        }
+//        throw new InvalidAdaptorException(COMPONENT_NAME, "Could not find adaptor for scheme " + scheme);
+//    }
+//
+//    public Adaptor getAdaptor(String name) throws XenonException {
+//        for (Adaptor adaptor : adaptors) {
+//            if (adaptor.getName().equals(name)) {
+//                return adaptor;
+//            }
+//        }
+//
+//        throw new XenonException(COMPONENT_NAME, "Could not find adaptor named " + name);
+//    }
 
     @Override
     public synchronized Map<String, String> getProperties() {
@@ -321,15 +292,6 @@ public final class XenonEngine implements Xenon {
         return jobsEngine;
     }
 
-    @Override
-    public Credentials credentials() {
-        return credentialsEngine;
-    }
-
-    public CopyEngine getCopyEngine() {
-        return copyEngine;
-    }
-
     private synchronized boolean setEnd() {
         if (ended) {
             return false;
@@ -340,17 +302,19 @@ public final class XenonEngine implements Xenon {
     }
 
     private void end() {
+        
+        filesEngine.end();
+        
         if (setEnd()) {
-            copyEngine.done();
-            for (Adaptor adaptor : adaptors) {
-                adaptor.end();
-            }
+//            for (Adaptor adaptor : adaptors) {
+//                adaptor.end();
+//            }
         }
     }
 
     @Override
     public String toString() {
-        return "XenonEngine [adaptors=" + Arrays.toString(adaptors) + " properties=" + properties + ",  + ended=" + ended + "]";
+    	return "XenonEngine [properties=" + properties + ",  + ended=" + ended + "]";
     }
 
    

@@ -17,7 +17,6 @@ package nl.esciencecenter.xenon;
 
 import java.util.Map;
 
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.jobs.Jobs;
 
@@ -44,14 +43,7 @@ public interface Xenon {
      * @return a reference to the Files package interface.
      */
     Jobs jobs();
-
-    /**
-     * Retrieve the <code>Credentials</code> package interface.
-     * 
-     * @return a reference to the Credentials package interface.
-     */
-    Credentials credentials();
-
+   
     /**
      * Returns the properties that where used to create this Xenon.
      * 
@@ -60,6 +52,8 @@ public interface Xenon {
     Map<String, String> getProperties();
 
     /**
+     * TODO: Remove this. Should be in Files, Jobs and Credentials ? 
+     * 
      * Returns information about the specified adaptor.
      * 
      * @param adaptorName
@@ -68,13 +62,15 @@ public interface Xenon {
      * @throws XenonException
      *             if the adaptor does not exist, or no information could be retrieved.
      */
-    AdaptorStatus getAdaptorStatus(String adaptorName) throws XenonException;
+    //AdaptorDescription getAdaptorStatus(String adaptorName) throws XenonException;
 
     /**
+     * TODO: Remove this. Should be in Files, Jobs and Credentials ? 
+     * 
      * Returns information on all adaptors available to this Xenon.
      * 
      * @return information on all adaptors.
      */
-    AdaptorStatus[] getAdaptorStatuses();
+    //AdaptorDescription[] getAdaptorStatuses();
 
 }

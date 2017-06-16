@@ -18,6 +18,7 @@ package nl.esciencecenter.xenon.adaptors.local;
 import static org.junit.Assert.assertTrue;
 
 import nl.esciencecenter.xenon.adaptors.GenericScheduleJobTestParent;
+import nl.esciencecenter.xenon.adaptors.job.local.LocalJobTestConfig;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 

@@ -43,7 +43,7 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
+import nl.esciencecenter.xenon.credentials.PasswordCredential;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.Job;
@@ -70,8 +70,7 @@ public abstract class GenericJobAdaptorTestParent {
     protected Xenon xenon;
     protected Files files;
     protected Jobs jobs;
-    protected Credentials credentials;
-
+ 
     @Rule
     public TestWatcher watcher = new XenonTestWatcher();
     
@@ -92,9 +91,8 @@ public abstract class GenericJobAdaptorTestParent {
         Xenon xenon = XenonFactory.newXenon(null);
 
         Files files = xenon.files();
-        Credentials credentials = xenon.credentials();
-
-        Path cwd = config.getWorkingDir(files, credentials);
+ 
+        Path cwd = config.getWorkingDir(files);
         Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
@@ -112,7 +110,6 @@ public abstract class GenericJobAdaptorTestParent {
         xenon = XenonFactory.newXenon(null);
         files = xenon.files();
         jobs = xenon.jobs();
-        credentials = xenon.credentials();
     }
 
     @After
@@ -162,7 +159,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test03_newScheduler() throws Exception {
-        Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
+        Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(),
                 null);
         jobs.close(s);
     }
@@ -172,7 +169,7 @@ public abstract class GenericJobAdaptorTestParent {
         if (config.supportsCredentials()) {
             try {
                 Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                        config.getInvalidCredential(credentials), null);
+                        config.getInvalidCredential(), null);
                 
                 jobs.close(s);
                 throw new Exception("newScheduler did NOT throw InvalidCredentialsException");
@@ -186,18 +183,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void test04b_newScheduler() throws Exception {
         if (!config.supportsCredentials()) {
             try {
-                Credential c = new Credential() {
-                    @Override
-                    public Map<String, String> getProperties() {
-                        return null;
-                    }
-
-                    @Override
-                    public String getAdaptorName() {
-                        return "local";
-                    }
-                };
-
+                Credential c = new PasswordCredential("aap", "noot".toCharArray());
                 Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), c, null);
                 jobs.close(s);
 
@@ -212,7 +198,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void test04c_newScheduler() throws Exception {
         if (config.supportsCredentials()) {
             Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                    config.getPasswordCredential(credentials), config.getDefaultProperties());
+                    config.getPasswordCredential(), config.getDefaultProperties());
             jobs.close(s);
         }
     }
@@ -220,14 +206,14 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test05_newScheduler() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getDefaultCredential(credentials), new HashMap<String, String>());
+                config.getDefaultCredential(), new HashMap<String, String>());
         jobs.close(s);
     }
 
     @Test
     public void test06_newScheduler() throws Exception {
         Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                config.getDefaultCredential(credentials), config.getDefaultProperties());
+                config.getDefaultCredential(), config.getDefaultProperties());
         jobs.close(s);
     }
 
@@ -240,7 +226,7 @@ public abstract class GenericJobAdaptorTestParent {
             for (Map<String, String> p : tmp) {
                 try {
                     Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                            config.getDefaultCredential(credentials), p);
+                            config.getDefaultCredential(), p);
                     jobs.close(s);
                     throw new Exception("newScheduler did NOT throw InvalidPropertyException");
                 } catch (InvalidPropertyException e) {
@@ -255,7 +241,7 @@ public abstract class GenericJobAdaptorTestParent {
         if (config.supportsProperties()) {
             try {
                 Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                        config.getDefaultCredential(credentials), config.getUnknownProperties());
+                        config.getDefaultCredential(), config.getUnknownProperties());
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw UnknownPropertyException");
@@ -272,7 +258,7 @@ public abstract class GenericJobAdaptorTestParent {
                 Map<String, String> p = new HashMap<>(2);
                 p.put("aap", "noot");
                 Scheduler s = jobs.newScheduler(config.getScheme(), config.getCorrectLocation(), 
-                        config.getDefaultCredential(credentials), p);
+                        config.getDefaultCredential(), p);
                 jobs.close(s);
 
                 throw new Exception("newScheduler did NOT throw XenonException");
@@ -300,7 +286,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test11_open_close() throws Exception {
         if (config.supportsClose()) {
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+            Scheduler s = config.getDefaultScheduler(jobs);
 
             assertTrue(jobs.isOpen(s));
 
@@ -313,7 +299,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test12_open_close() throws Exception {
         if (!config.supportsClose()) {
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+            Scheduler s = config.getDefaultScheduler(jobs);
 
             assertTrue(jobs.isOpen(s));
 
@@ -326,7 +312,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test13_open_close() throws Exception {
         if (config.supportsClose()) {
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+            Scheduler s = config.getDefaultScheduler(jobs);
             jobs.close(s);
 
             try {
@@ -340,21 +326,21 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test14a_getJobs() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         jobs.getJobs(s, s.getQueueNames());
         jobs.close(s);
     }
 
     @Test
     public void test14b_getJobs() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         jobs.getJobs(s);
         jobs.close(s);
     }
 
     @Test
     public void test15_getJobs() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
 
         try {
             jobs.getJobs(s, config.getInvalidQueueName());
@@ -371,7 +357,7 @@ public abstract class GenericJobAdaptorTestParent {
 
         if (config.supportsClose()) {
 
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+            Scheduler s = config.getDefaultScheduler(jobs);
 
             jobs.close(s);
 
@@ -386,14 +372,14 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test17_getQueueStatus() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         jobs.getQueueStatus(s, s.getQueueNames()[0]);
         jobs.close(s);
     }
 
     @Test(expected = NoSuchQueueException.class)
     public void test18a_getQueueStatus() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         try {
             jobs.getQueueStatus(s, config.getInvalidQueueName());
         } finally {
@@ -403,7 +389,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test18b_getQueueStatus() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         String queueName = config.getDefaultQueueName();
 
         try {
@@ -421,7 +407,7 @@ public abstract class GenericJobAdaptorTestParent {
     @Test
     public void test20_getQueueStatus() throws Exception {
         if (config.supportsClose()) {
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+            Scheduler s = config.getDefaultScheduler(jobs);
             jobs.close(s);
 
             try {
@@ -435,7 +421,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test21a_getQueueStatuses() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         QueueStatus[] tmp = jobs.getQueueStatuses(s, s.getQueueNames());
         jobs.close(s);
 
@@ -451,7 +437,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test21b_getQueueStatuses() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         QueueStatus[] tmp = jobs.getQueueStatuses(s);
         jobs.close(s);
 
@@ -468,7 +454,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test
     public void test22a_getQueueStatuses() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         try {
             QueueStatus[] tmp = jobs.getQueueStatuses(s, config.getInvalidQueueName());
 
@@ -488,7 +474,7 @@ public abstract class GenericJobAdaptorTestParent {
 
     @Test(expected = IllegalArgumentException.class)
     public void test22c_getQueueStatuses() throws Exception {
-        Scheduler s = config.getDefaultScheduler(jobs, credentials);
+        Scheduler s = config.getDefaultScheduler(jobs);
         jobs.getQueueStatuses(s, (String[]) null);
     }
 
@@ -501,7 +487,7 @@ public abstract class GenericJobAdaptorTestParent {
     public void test24_getQueueStatuses() throws Exception {
 
         if (config.supportsClose()) {
-            Scheduler s = config.getDefaultScheduler(jobs, credentials);
+            Scheduler s = config.getDefaultScheduler(jobs);
             jobs.close(s);
 
             try {

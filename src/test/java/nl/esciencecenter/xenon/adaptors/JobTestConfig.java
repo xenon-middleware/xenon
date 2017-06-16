@@ -18,7 +18,6 @@ package nl.esciencecenter.xenon.adaptors;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.Path;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -51,9 +50,9 @@ public abstract class JobTestConfig extends GenericTestConfig {
 
     public abstract boolean supportsStatusAfterDone();
 
-    public abstract Scheduler getDefaultScheduler(Jobs jobs, Credentials credentials) throws Exception;
+    public abstract Scheduler getDefaultScheduler(Jobs jobs) throws Exception;
 
-    public abstract Path getWorkingDir(Files files, Credentials credentials) throws Exception;
+    public abstract Path getWorkingDir(Files files) throws Exception;
 
     public abstract String getInvalidQueueName();
 

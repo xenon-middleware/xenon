@@ -16,6 +16,7 @@
 package nl.esciencecenter.xenon.adaptors.local;
 
 import nl.esciencecenter.xenon.adaptors.GenericJobAdaptorTestParent;
+import nl.esciencecenter.xenon.adaptors.job.local.LocalJobTestConfig;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

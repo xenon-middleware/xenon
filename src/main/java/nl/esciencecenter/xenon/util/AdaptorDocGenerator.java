@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
 
-import nl.esciencecenter.xenon.AdaptorStatus;
+import nl.esciencecenter.xenon.AdaptorDescription;
 import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
@@ -57,7 +57,7 @@ public class AdaptorDocGenerator {
         out.println("</tr>");
     }
 
-    private void printAdaptorDoc(PrintWriter out, AdaptorStatus a) {
+    private void printAdaptorDoc(PrintWriter out, AdaptorDescription a) {
 
         out.println("<h2><a name=\"" + a.getName()  + "\">Adaptor: " + a.getName() + "</a></h2>");
 
@@ -68,13 +68,13 @@ public class AdaptorDocGenerator {
 
         out.println("<h4>Supported schemes:</h4><ul>");
 
-        String[] schemes = a.getSupportedSchemes();
-
-        for (int i = 0; i < schemes.length; i++) {
-            out.print("<li>" + schemes[i] + "</li>");
-        }
-
-        out.println("</ul>");
+//        String[] schemes = a.getSupportedSchemes();
+//
+//        for (int i = 0; i < schemes.length; i++) {
+//            out.print("<li>" + schemes[i] + "</li>");
+//        }
+//
+//        out.println("</ul>");
 
         out.println("<h4> Supported locations:</h4><ul>");
 
@@ -117,7 +117,9 @@ public class AdaptorDocGenerator {
     public void generate(PrintWriter out) {
         try {
             Xenon xenon = XenonFactory.newXenon(null);
-            AdaptorStatus[] adaptors = xenon.getAdaptorStatuses();
+
+// FIXME: currently being changed!            
+//            AdaptorDescription[] adaptors = xenon.getAdaptorStatuses();
 
             out.println("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Insert title here</title></head><body>");
             out.println("A middleware abstraction library that provides a simple programming interface to various compute and storage resources.");
@@ -125,18 +127,18 @@ public class AdaptorDocGenerator {
             out.println("<p>This section contains the adaptor documentation which is generated "
                 + "from the information provided by the adaptors themselves.</p>");
 
-            out.print("Xenon currently supports " + adaptors.length + " adaptors: <ul>");
+//            out.print("Xenon currently supports " + adaptors.length + " adaptors: <ul>");
 
-            for (AdaptorStatus a : adaptors) {
-                out.println("<li><a href=\"#" + a.getName() + "\">" + a.getName() + "</a></li>");
-            }
+//            for (AdaptorDescription a : adaptors) {
+//                out.println("<li><a href=\"#" + a.getName() + "\">" + a.getName() + "</a></li>");
+//            }
 
             out.println("</ul>");
             out.println("");
 
-            for (AdaptorStatus a : adaptors) {
-                printAdaptorDoc(out, a);
-            }
+//            for (AdaptorDescription a : adaptors) {
+//                printAdaptorDoc(out, a);
+//            }
 
             XenonFactory.endAll();
 

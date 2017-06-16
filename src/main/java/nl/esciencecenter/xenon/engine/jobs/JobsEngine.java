@@ -15,14 +15,24 @@
  */
 package nl.esciencecenter.xenon.engine.jobs;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import nl.esciencecenter.xenon.DuplicateAdaptorException;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.XenonException;
+import nl.esciencecenter.xenon.adaptors.job.gridengine.GridEngineAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.job.local.LocalJobAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.job.slurm.SlurmAdaptorFactory;
+import nl.esciencecenter.xenon.adaptors.job.torque.TorqueAdaptorFactory;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.engine.Adaptor;
 import nl.esciencecenter.xenon.engine.XenonEngine;
 import nl.esciencecenter.xenon.jobs.Job;
+import nl.esciencecenter.xenon.jobs.JobAdaptorDescription;
 import nl.esciencecenter.xenon.jobs.JobDescription;
 import nl.esciencecenter.xenon.jobs.JobStatus;
 import nl.esciencecenter.xenon.jobs.Jobs;
@@ -31,42 +41,135 @@ import nl.esciencecenter.xenon.jobs.Scheduler;
 import nl.esciencecenter.xenon.jobs.Streams;
 
 public class JobsEngine implements Jobs {
-
+    
+    /** The name of this component, for use in exceptions */
+    private static final String COMPONENT_NAME = "JobsEngine";
+    
+    // TODO: make this configurable!!
+    /** Factories for all supported job adaptors */
+    private static final JobAdaptorFactory [] ADAPTOR_FACTORIES = new JobAdaptorFactory [] { 
+            new LocalJobAdaptorFactory(), 
+          //  new SshJobAdaptorFactory(),
+            new GridEngineAdaptorFactory(),
+            new SlurmAdaptorFactory(),
+            new TorqueAdaptorFactory(),
+    };
+    
     private final XenonEngine xenonEngine;
 
-    public JobsEngine(XenonEngine xenonEngine) {
+    private final HashMap<String, JobAdaptor> adaptors = new HashMap<>();
+    
+    public JobsEngine(XenonEngine xenonEngine, Map<String, String> properties) throws XenonException {
         this.xenonEngine = xenonEngine;
+        loadAdaptors(properties);
+    }
+   
+    // TODO: Move to shared utils ?
+    private Map<String, String> extract(Map<String, String> source, String prefix) {
+
+        HashMap<String, String> tmp = new HashMap<>(source.size());
+
+        Iterator<Entry<String, String>> itt = source.entrySet().iterator();
+
+        while (itt.hasNext()) {
+
+            Entry<String, String> e = itt.next();
+
+            if (e.getKey().startsWith(prefix)) {
+                tmp.put(e.getKey(), e.getValue());
+                itt.remove();
+            }
+        }
+
+        return tmp;
+    }
+    
+    private void loadAdaptors(Map<String, String> properties) throws XenonException {
+        
+        for (JobAdaptorFactory a : ADAPTOR_FACTORIES) {
+        	
+        	JobAdaptor adaptor = a.createAdaptor(this, extract(properties, a.getPropertyPrefix()));
+        	
+        	String name = adaptor.getName();
+            
+            if (adaptors.containsKey(name)) { 
+                throw new DuplicateAdaptorException(COMPONENT_NAME, "File adaptor " + name + " already exists!");
+            }
+            
+            adaptors.put(name, adaptor);	
+        }
     }
 
-    private Adaptor getAdaptor(Scheduler scheduler) throws XenonException {
-        return xenonEngine.getAdaptor(scheduler.getAdaptorName());
+    
+    
+    public XenonEngine getXenonEngine() { 
+        return xenonEngine;
+    }
+    
+    public void registerJobAdaptor(JobAdaptor adaptor) throws DuplicateAdaptorException { 
+        
+        String name = adaptor.getName();
+        
+        if (adaptors.containsKey(name)) { 
+            throw new DuplicateAdaptorException(COMPONENT_NAME, "Job adaptor " + name + " already exists!");
+        }
+        
+        adaptors.put(name, adaptor);
+    }
+    
+    public JobAdaptorDescription [] getAdaptorDescriptions() { 
+        ArrayList<JobAdaptorDescription> tmp = new ArrayList<>();
+        
+        for (JobAdaptor a : adaptors.values()) { 
+            tmp.add(a.getAdaptorDescription());
+        }
+        
+        return tmp.toArray(new JobAdaptorDescription[tmp.size()]);
     }
 
-    public Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+    private JobAdaptor getAdaptor(String adaptorName) throws InvalidAdaptorException {
+        JobAdaptor adaptor = adaptors.get(adaptorName);
+        
+        if (adaptor == null) { 
+            throw new InvalidAdaptorException(COMPONENT_NAME, "Could not find file adaptor named " + adaptorName);
+        }
+        
+        return adaptor;
+    }
+    
+    private JobAdaptor getAdaptor(Scheduler scheduler) throws XenonException {
+        return getAdaptor(scheduler.getAdaptorName());
+    }
+
+    
+    public JobAdaptorDescription getAdaptorDescription(String adaptorName) throws InvalidAdaptorException { 
+        return getAdaptor(adaptorName).getAdaptorDescription();
+    }
+    
+
+    public Scheduler newScheduler(String adaptorName, String location, Credential credential, Map<String, String> properties) 
             throws XenonException {
-
-        Adaptor adaptor = xenonEngine.getAdaptorFor(scheme);
-        return adaptor.jobsAdaptor().newScheduler(scheme, location, credential, properties);
+        return getAdaptor(adaptorName).newScheduler(location, credential, properties);
     }
 
     @Override
     public void close(Scheduler scheduler) throws XenonException {
-        getAdaptor(scheduler).jobsAdaptor().close(scheduler);
+        getAdaptor(scheduler).close(scheduler);
     }
 
     @Override
     public boolean isOpen(Scheduler scheduler) throws XenonException {
-        return getAdaptor(scheduler).jobsAdaptor().isOpen(scheduler);
+        return getAdaptor(scheduler).isOpen(scheduler);
     }
 
     @Override
     public String getDefaultQueueName(Scheduler scheduler) throws XenonException {
-        return getAdaptor(scheduler).jobsAdaptor().getDefaultQueueName(scheduler);
+        return getAdaptor(scheduler).getDefaultQueueName(scheduler);
     }
 
     @Override
     public JobStatus getJobStatus(Job job) throws XenonException {
-        return getAdaptor(job.getScheduler()).jobsAdaptor().getJobStatus(job);
+        return getAdaptor(job.getScheduler()).getJobStatus(job);
     }
 
     private String[] getAdaptors(Job[] in) {
@@ -98,7 +201,7 @@ public class JobsEngine implements Jobs {
         XenonException exception = null;
 
         try {
-            result = xenonEngine.getAdaptor(adaptor).jobsAdaptor().getJobStatuses(in);
+            result = getAdaptor(adaptor).getJobStatuses(in);
         } catch (XenonException e) {
             exception = e;
         }
@@ -153,42 +256,42 @@ public class JobsEngine implements Jobs {
 
     @Override
     public JobStatus waitUntilDone(Job job, long timeout) throws XenonException {
-        return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilDone(job, timeout);
+        return getAdaptor(job.getScheduler()).waitUntilDone(job, timeout);
     }
 
     @Override
     public JobStatus waitUntilRunning(Job job, long timeout) throws XenonException {
-        return getAdaptor(job.getScheduler()).jobsAdaptor().waitUntilRunning(job, timeout);
+        return getAdaptor(job.getScheduler()).waitUntilRunning(job, timeout);
     }
 
     @Override
     public JobStatus cancelJob(Job job) throws XenonException {
-        return getAdaptor(job.getScheduler()).jobsAdaptor().cancelJob(job);
+        return getAdaptor(job.getScheduler()).cancelJob(job);
     }
 
     @Override
     public Job[] getJobs(Scheduler scheduler, String... queueNames) throws XenonException {
-        return getAdaptor(scheduler).jobsAdaptor().getJobs(scheduler, queueNames);
+        return getAdaptor(scheduler).getJobs(scheduler, queueNames);
     }
 
     @Override
     public Job submitJob(Scheduler scheduler, JobDescription description) throws XenonException {
-        return getAdaptor(scheduler).jobsAdaptor().submitJob(scheduler, description);
+        return getAdaptor(scheduler).submitJob(scheduler, description);
     }
 
     @Override
     public QueueStatus getQueueStatus(Scheduler scheduler, String queueName) throws XenonException {
-        return getAdaptor(scheduler).jobsAdaptor().getQueueStatus(scheduler, queueName);
+        return getAdaptor(scheduler).getQueueStatus(scheduler, queueName);
     }
 
     @Override
     public QueueStatus[] getQueueStatuses(Scheduler scheduler, String... queueNames) throws XenonException {
-        return getAdaptor(scheduler).jobsAdaptor().getQueueStatuses(scheduler, queueNames);
+        return getAdaptor(scheduler).getQueueStatuses(scheduler, queueNames);
     }
 
     @Override
     public Streams getStreams(Job job) throws XenonException {
-        return getAdaptor(job.getScheduler()).jobsAdaptor().getStreams(job);
+        return getAdaptor(job.getScheduler()).getStreams(job);
     }
 
     @Override

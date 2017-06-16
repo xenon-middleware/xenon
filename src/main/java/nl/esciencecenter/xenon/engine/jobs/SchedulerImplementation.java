@@ -26,7 +26,6 @@ public class SchedulerImplementation implements Scheduler {
 
     private final String adaptorName;
     private final String uniqueID;
-    private final String scheme;
     private final String location;
     
     private final XenonProperties properties;
@@ -38,7 +37,7 @@ public class SchedulerImplementation implements Scheduler {
     private final boolean supportsBatch;
 
     @SuppressWarnings("PMD.ExcessiveParameterList")
-    public SchedulerImplementation(String adaptorName, String uniqueID, String scheme, String location, String[] queueNames,
+    public SchedulerImplementation(String adaptorName, String uniqueID, String location, String[] queueNames,
                                    Credential credential, XenonProperties properties, boolean isOnline, boolean supportsInteractive,
                                    boolean supportsBatch) {
 
@@ -52,7 +51,6 @@ public class SchedulerImplementation implements Scheduler {
 
         this.adaptorName = adaptorName;
         this.uniqueID = uniqueID;
-        this.scheme = scheme;
         this.location = location;
         this.credential = credential;
         this.isOnline = isOnline;
@@ -79,12 +77,7 @@ public class SchedulerImplementation implements Scheduler {
     public String getUniqueID() {
         return uniqueID;
     }
-
-    @Override
-    public String getScheme() {
-        return scheme;
-    }
-
+    
     @Override
     public String getLocation() {
         return location;
@@ -122,7 +115,7 @@ public class SchedulerImplementation implements Scheduler {
 
     @Override
     public String toString() {
-        return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName + ", scheme=" + scheme 
+        return "SchedulerImplementation [uniqueID=" + uniqueID + ", adaptorName=" + adaptorName  
                 + ", location=" + location + ", properties=" + properties + ", queueNames=" + Arrays.toString(queueNames) 
                 + ", isOnline=" + isOnline + ", supportsInteractive=" + supportsInteractive + ", supportsBatch=" + supportsBatch 
                 + "]";

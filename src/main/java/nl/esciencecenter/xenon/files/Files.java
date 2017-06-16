@@ -23,7 +23,7 @@ import java.util.Set;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
-import nl.esciencecenter.xenon.InvalidSchemeException;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -40,17 +40,47 @@ import nl.esciencecenter.xenon.credentials.Credential;
 public interface Files {
 
     /**
-     * Create a new FileSystem that represents a (possibly remote) data store 
-     * at the <code>location</code>, using the <code>scheme</code> and 
-     * <code>credentials</code> to get access. Make sure to always close 
-     * {@code FileSystem} instances by calling {@code close(FileSystem)} when
-     * you no longer need them, otherwise their associated resources remain 
-     * allocated.
+     * Returns information on all available file adaptors.
      * 
-     * @param scheme
-     *            the scheme to use to access the FileSystem.
+     * For every supported adaptor, a <code>FileAdaptorDescription</code> is returned, 
+     * containing a description of the adaptor, information on the characteristics of its 
+     * implementation, which properties does it accept when creating a <code>FileSystem</code>, 
+     * which locations does it accept, etc.    
+     * 
+     * @return
+     *          information on all available file adaptors.
+     */   
+    FileAdaptorDescription [] getAdaptorDescriptions();
+
+    /**
+     * Returns information on a single adaptor.
+     * 
+     * A <code>FileAdaptorDescription</code> is returned, containing a description of the adaptor
+     * and information on the characteristics of its implementation. For example, 
+     * which properties does it accept when creating a <code>FileSystem</code>, which locations
+     * does it accept, etc.    
+     * 
+     * @param adaptor
+     *          the adaptor for which to retrieve the information.
+     * @return
+     *          a <code>FileAdaptorDescription<code> containing information on the adaptor.
+     * @throws InvalidAdaptorException
+     *          if the adaptor was not found.
+     */
+    FileAdaptorDescription getAdaptorDescription(String adaptor) throws InvalidAdaptorException;
+    
+    
+    /**
+     * Create a new FileSystem that represents a (possibly remote) data store 
+     * at the <code>location</code> using the <code>credentials</code> to get 
+     * access. Make sure to always close {@code FileSystem} instances by calling 
+     * {@code close(FileSystem)} when you no longer need them, otherwise their 
+     * associated resources remain allocated.
+     * 
+     * @param adaptor
+     *            the adaptor to use to access the FileSystem.
      * @param location
-     *            the location of the FileSystem, may be null for a local file system.
+     *            the location of the FileSystem.
      * @param credential
      *            the Credentials to use to get access to the FileSystem.
      * @param properties
@@ -62,8 +92,8 @@ public interface Files {
      *             If a unknown property was provided.
      * @throws InvalidPropertyException
      *             If a known property was provided with an invalid value.
-     * @throws InvalidSchemeException
-     *             If the scheme was invalid.
+     * @throws InvalidAdaptorException
+     *             If the adaptor was invalid.
      * @throws InvalidLocationException
      *             If the location was invalid.
      * @throws InvalidCredentialException
@@ -72,7 +102,7 @@ public interface Files {
      * @throws XenonException
      *             If the creation of the FileSystem failed.
      */
-    FileSystem newFileSystem(String scheme, String location, Credential credential, Map<String, String> properties) 
+    FileSystem newFileSystem(String adaptor, String location, Credential credential, Map<String, String> properties) 
             throws XenonException;
         
     /**

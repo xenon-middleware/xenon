@@ -20,6 +20,7 @@ import java.util.Map;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.UnknownPropertyException;
 import nl.esciencecenter.xenon.InvalidPropertyException;
+import nl.esciencecenter.xenon.InvalidAdaptorException;
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.InvalidCredentialException;
 import nl.esciencecenter.xenon.credentials.Credential;
@@ -36,15 +37,44 @@ import nl.esciencecenter.xenon.credentials.Credential;
 public interface Jobs {
 
     /**
-     * Create a new Scheduler that represents a (possibly remote) job 
-     * scheduler at the <code>location</code>, using the <code>scheme</code>
-     * and <code>credentials</code> to get access. Make sure to always close 
-     * {@code Scheduler} instances by calling {@code close(Scheduler)} when
-     * you no longer need them, otherwise their associated resources remain 
-     * allocated.
+     * Returns information on all available job adaptors.
      * 
-     * @param scheme
-     *            the scheme used to access the Scheduler.
+     * For every supported adaptor, a <code>JobAdaptorDescription</code> is returned, 
+     * containing a description of the adaptor, information on the characteristics of its 
+     * implementation, which properties does it accept when creating a <code>Scheduler</code>, 
+     * which locations does it accept, etc.    
+     * 
+     * @return
+     *          information on all available job adaptors.
+     */   
+    JobAdaptorDescription [] getAdaptorDescriptions();
+
+    /**
+     * Returns information on a single adaptor.
+     * 
+     * A <code>JobAdaptorDescription</code> is returned, containing a description of the adaptor
+     * and information on the characteristics of its implementation. For example, 
+     * which properties does it accept when creating a <code>Scheduler</code>, which locations
+     * does it accept, etc.    
+     * 
+     * @param adaptor
+     *          the adaptor for which to retrieve the information.
+     * @return
+     *          a <code>JobAdaptorDescription<code> containing information on the adaptor.
+     * @throws InvalidAdaptorException
+     *          if the adaptor was not found.
+     */
+    JobAdaptorDescription getAdaptorDescription(String adaptor) throws InvalidAdaptorException;
+    
+    /**
+     * Create a new Scheduler that represents a (possibly remote) job 
+     * scheduler at the <code>location</code> using <code>credentials</code> 
+     * to get access. Make sure to always close {@code Scheduler} instances 
+     * by calling {@code close(Scheduler)} when you no longer need them, 
+     * otherwise their associated resources remain allocated.
+     * 
+     * @param adaptor
+     *            the adaptor used to access the Scheduler.
      * @param location
      *            the location of the Scheduler.
      * @param credential
@@ -66,7 +96,7 @@ public interface Jobs {
      * @throws XenonException
      *             If the creation of the Scheduler failed.
      */
-    Scheduler newScheduler(String scheme, String location, Credential credential, Map<String, String> properties) 
+    Scheduler newScheduler(String adaptor, String location, Credential credential, Map<String, String> properties) 
             throws XenonException;
     
     /**

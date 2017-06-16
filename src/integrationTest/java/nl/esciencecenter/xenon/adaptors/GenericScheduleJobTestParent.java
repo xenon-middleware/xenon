@@ -33,7 +33,6 @@ import nl.esciencecenter.xenon.Xenon;
 import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.files.Files;
 import nl.esciencecenter.xenon.files.OpenOption;
 import nl.esciencecenter.xenon.files.Path;
@@ -72,7 +71,6 @@ public abstract class GenericScheduleJobTestParent {
     protected Xenon xenon;
     protected Files files;
     protected Jobs jobs;
-    protected Credentials credentials;
     protected Scheduler scheduler;
     protected Job job;
 
@@ -98,9 +96,8 @@ public abstract class GenericScheduleJobTestParent {
         Xenon xenon = XenonFactory.newXenon(null);
 
         Files files = xenon.files();
-        Credentials credentials = xenon.credentials();
-
-        Path cwd = config.getWorkingDir(files, credentials);
+    
+        Path cwd = config.getWorkingDir(files);
         Path root = files.newPath(cwd.getFileSystem(), cwd.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
@@ -118,8 +115,7 @@ public abstract class GenericScheduleJobTestParent {
         xenon = XenonFactory.newXenon(null);
         files = xenon.files();
         jobs = xenon.jobs();
-        credentials = xenon.credentials();
-        scheduler = config.getDefaultScheduler(jobs, credentials);
+        scheduler = config.getDefaultScheduler(jobs);
         job = null;
     }
 
@@ -135,7 +131,7 @@ public abstract class GenericScheduleJobTestParent {
     }
 
     protected Path initJobDirectory(String workingDir) throws XenonException, Exception {
-        Path cwd = config.getWorkingDir(files, credentials);
+        Path cwd = config.getWorkingDir(files);
         Path root = resolve(cwd, workingDir);
 
         files.createDirectories(root);
@@ -435,11 +431,11 @@ public abstract class GenericScheduleJobTestParent {
         JobDescription description = catJobDescription(null, message);
         description.setInteractive(true);
 
-        logger.info("Submitting interactive job to " + scheduler.getScheme() + "://" + scheduler.getLocation());
+        logger.info("Submitting interactive job to " + scheduler.getAdaptorName() + "://" + scheduler.getLocation());
 
         job = jobs.submitJob(scheduler, description);
 
-        logger.info("Interactive job submitted to " + scheduler.getScheme() + "://" + scheduler.getLocation());
+        logger.info("Interactive job submitted to " + scheduler.getAdaptorName() + "://" + scheduler.getLocation());
 
         Streams streams = jobs.getStreams(job);
         

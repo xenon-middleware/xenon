@@ -18,14 +18,9 @@ package nl.esciencecenter.xenon.engine;
 import java.util.ArrayList;
 import java.util.Map;
 
-import nl.esciencecenter.xenon.AdaptorStatus;
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 import nl.esciencecenter.xenon.XenonPropertyDescription.Component;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.util.ImmutableArray;
-import nl.esciencecenter.xenon.files.Files;
-import nl.esciencecenter.xenon.jobs.Jobs;
 
 /**
  * New-style adaptor interface. Adaptors are expected to implement one or more create functions of the Xenon interface,
@@ -40,15 +35,13 @@ public abstract class Adaptor {
     private final ImmutableArray<String> supportedLocations;
     private final ImmutableArray<XenonPropertyDescription> validProperties;
     private final XenonProperties properties;
-    private final XenonEngine xenonEngine;
+    ///private final XenonEngine xenonEngine;
 
-    protected Adaptor(XenonEngine xenonEngine, String name, String description, ImmutableArray<String> supportedSchemes,
+    protected Adaptor(String name, String description, ImmutableArray<String> supportedSchemes,
             ImmutableArray<String> supportedLocations, ImmutableArray<XenonPropertyDescription> validProperties, 
             XenonProperties properties) {
 
         super();
-
-        this.xenonEngine = xenonEngine;
         this.name = name;
         this.description = description;
         this.supportedSchemes = supportedSchemes;
@@ -61,10 +54,6 @@ public abstract class Adaptor {
         }
          
         this.properties = properties;
-    }
-
-    protected XenonEngine getXenonEngine() {
-        return xenonEngine;
     }
 
     public XenonProperties getProperties() {
@@ -106,10 +95,10 @@ public abstract class Adaptor {
         return new ImmutableArray<>(tmp.toArray(new XenonPropertyDescription[tmp.size()]));
     }
 
-    public AdaptorStatus getAdaptorStatus() {
-        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedLocations, validProperties,
-                getAdaptorSpecificInformation());
-    }
+//    public AdaptorDescription getAdaptorStatus() {
+//        return new AdaptorStatusImplementation(name, description, supportedSchemes, supportedLocations, validProperties,
+//                getAdaptorSpecificInformation());
+//    }
 
     public String[] getSupportedSchemes() {
         return supportedSchemes.asArray();
@@ -126,11 +115,11 @@ public abstract class Adaptor {
 
     public abstract Map<String, String> getAdaptorSpecificInformation();
 
-    public abstract Files filesAdaptor() throws XenonException;
+//    public abstract Files filesAdaptor() throws XenonException;
 
-    public abstract Jobs jobsAdaptor() throws XenonException;
+//    public abstract Jobs jobsAdaptor() throws XenonException;
 
-    public abstract Credentials credentialsAdaptor() throws XenonException;
+//    public abstract Credentials credentialsAdaptor() throws XenonException;
 
     public abstract void end();
 }

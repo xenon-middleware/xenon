@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 import nl.esciencecenter.xenon.InvalidLocationException;
 import nl.esciencecenter.xenon.adaptors.GenericFileAdaptorTestParent;
+import nl.esciencecenter.xenon.adaptors.file.file.LocalFileTestConfig;
+import nl.esciencecenter.xenon.adaptors.file.file.LocalFiles;
 import nl.esciencecenter.xenon.files.FileSystem;
 import nl.esciencecenter.xenon.util.Utils;
 

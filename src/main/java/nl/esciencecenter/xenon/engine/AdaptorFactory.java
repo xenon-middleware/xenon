@@ -16,9 +16,6 @@
 
 package nl.esciencecenter.xenon.engine;
 
-import java.util.Map;
-
-import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonPropertyDescription;
 
 /**
@@ -26,9 +23,8 @@ import nl.esciencecenter.xenon.XenonPropertyDescription;
  * @since 1.0
  *
  */
-public abstract class AdaptorFactory {
+public interface AdaptorFactory {
     
-    public abstract String getPropertyPrefix();
-    public abstract XenonPropertyDescription [] getSupportedProperties();
-    public abstract Adaptor createAdaptor(XenonEngine engine, Map<String, String> properties) throws XenonException; 
+    String getPropertyPrefix();
+    XenonPropertyDescription [] getSupportedProperties();
 }

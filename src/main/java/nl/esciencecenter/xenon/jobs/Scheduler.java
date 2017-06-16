@@ -39,12 +39,12 @@ public interface Scheduler {
      */
     String getLocation();
 
-    /**
-     * Get the scheme used to access the Scheduler.
-     * 
-     * @return the scheme used to access the Scheduler.
-     */
-    String getScheme();
+//    /**
+//     * Get the scheme used to access the Scheduler.
+//     * 
+//     * @return the scheme used to access the Scheduler.
+//     */
+//    String getScheme();
 
     /**
      * Get the properties used to create this Scheduler.

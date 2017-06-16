@@ -50,7 +50,6 @@ import nl.esciencecenter.xenon.XenonException;
 import nl.esciencecenter.xenon.XenonFactory;
 import nl.esciencecenter.xenon.XenonTestWatcher;
 import nl.esciencecenter.xenon.credentials.Credential;
-import nl.esciencecenter.xenon.credentials.Credentials;
 import nl.esciencecenter.xenon.engine.files.PathAttributesPairImplementation;
 import nl.esciencecenter.xenon.files.Copy;
 import nl.esciencecenter.xenon.files.CopyOption;
@@ -82,7 +81,6 @@ public abstract class GenericFileAdaptorTestParent {
 
     protected Xenon xenon;
     protected Files files;
-    protected Credentials credentials;
     protected Path cwd;
     protected Path testDir;
 
@@ -103,7 +101,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         Files files = xenon.files();
 
-        Path p = config.getWorkingDir(files, xenon.credentials());
+        Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
         if (!files.exists(p)) {
@@ -124,7 +122,7 @@ public abstract class GenericFileAdaptorTestParent {
 
         Files files = xenon.files();
 
-        Path p = config.getWorkingDir(files, xenon.credentials());
+        Path p = config.getWorkingDir(files);
         Path root = files.newPath(p.getFileSystem(), p.getRelativePath().resolve(TEST_ROOT));
 
         if (files.exists(root)) {
@@ -142,8 +140,7 @@ public abstract class GenericFileAdaptorTestParent {
     public void prepare() throws Exception {
         xenon = XenonFactory.newXenon(null);
         files = xenon.files();
-        credentials = xenon.credentials();
-        cwd = config.getWorkingDir(files, credentials);
+        cwd = config.getWorkingDir(files);
         testDir = null;
     }
 
@@ -353,7 +350,7 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsNullFileSystemLocation()) {
             exception.expect(InvalidLocationException.class);
         }
-        test00_newFileSystem(config.getScheme(), null, config.getDefaultCredential(credentials), null);
+        test00_newFileSystem(config.getScheme(), null, config.getDefaultCredential(), null);
     }
 
     @Test
@@ -367,13 +364,13 @@ public abstract class GenericFileAdaptorTestParent {
     @Test
     public void test00_newFileSystem_correctArguments_noThrow() throws Exception {
         // test with correct scheme with, correct location, location
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials), null);
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(), null);
     }
 
     @Test(expected = XenonException.class)
     public void test00_newFileSystem_wrongLocation_throw() throws Exception {
         // test with correct scheme with, wrong location
-        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(credentials), null);
+        test00_newFileSystem(config.getScheme(), config.getWrongLocation(), config.getDefaultCredential(), null);
     }
 
     @Test
@@ -403,13 +400,13 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        Credential nonDefaultCredential = config.getNonDefaultCredential(credentials);
+        Credential nonDefaultCredential = config.getNonDefaultCredential();
         test00_newFileSystem(config.getScheme(), config.getNonDefaultCredentialLocation(), nonDefaultCredential, null);
     }
 
     @Test
     public void test00_newFileSystem_emptyProperties_noThrow() throws Exception {
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(),
                 new HashMap<String, String>(0));
     }
 
@@ -419,7 +416,7 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(credentials),
+        test00_newFileSystem(config.getScheme(), config.getCorrectLocation(), config.getDefaultCredential(),
                 config.getCorrectProperties());
     }
 
@@ -464,7 +461,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test01_isOpen_openFs_true() throws Exception {
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        FileSystem fs = config.getTestFileSystem(files);
         test01_isOpen(fs, true, false);
     }
 
@@ -473,7 +470,7 @@ public abstract class GenericFileAdaptorTestParent {
         if (!config.supportsClose()) {
             return;
         }
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        FileSystem fs = config.getTestFileSystem(files);
         files.close(fs);
         test01_isOpen(fs, false, false);
     }
@@ -484,7 +481,7 @@ public abstract class GenericFileAdaptorTestParent {
             return;
         }
 
-        FileSystem openFileSystem = config.getTestFileSystem(files, credentials);
+        FileSystem openFileSystem = config.getTestFileSystem(files);
         files.close(openFileSystem);
     }
 
@@ -494,7 +491,7 @@ public abstract class GenericFileAdaptorTestParent {
             throw new XenonException(null, null); // Test should always pass in this case.
         }
 
-        FileSystem fileSystem = config.getTestFileSystem(files, credentials);
+        FileSystem fileSystem = config.getTestFileSystem(files);
         files.close(fileSystem);
         files.close(fileSystem);
     }
@@ -541,14 +538,14 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test03_newPath_correctFileSystemAndNullRelativePath_throw() throws Exception {
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        FileSystem fs = config.getTestFileSystem(files);
         test03_newPath(fs, null, null, true);
         files.close(fs);
     }
 
     @Test
     public void test03_newPath_emptyRelativePath_noThrow() throws Exception {
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        FileSystem fs = config.getTestFileSystem(files);
         try {
             String root = "/";
             test03_newPath(fs, new RelativePath(), root, false);
@@ -559,7 +556,7 @@ public abstract class GenericFileAdaptorTestParent {
 
     @Test
     public void test03_newPath_nonEmptyRelativePath_noThrow() throws Exception {
-        FileSystem fs = config.getTestFileSystem(files, credentials);
+        FileSystem fs = config.getTestFileSystem(files);
         try {
             String root = "/";
             test03_newPath(fs, new RelativePath("test"), root + "test", false);
@@ -649,7 +646,7 @@ public abstract class GenericFileAdaptorTestParent {
             test04_createDirectory(testDir, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test04_createDirectory");
         }
     }
@@ -761,7 +758,7 @@ public abstract class GenericFileAdaptorTestParent {
             test05_createDirectories(testDir, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test05_createDirectories");
         }
     }
@@ -851,7 +848,7 @@ public abstract class GenericFileAdaptorTestParent {
             test07_createFile(file0, true);
         } finally {
             // prepare for removal in cleanup
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test07_createFile");
         }
     }
@@ -1011,7 +1008,7 @@ public abstract class GenericFileAdaptorTestParent {
             throwUnexpected("test09_delete", e);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test09_delete");
         }
     }
@@ -1165,7 +1162,7 @@ public abstract class GenericFileAdaptorTestParent {
             test11_newDirectoryStream(testDir, null, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test11_newDirectoryStream");
         }
     }
@@ -1388,7 +1385,7 @@ public abstract class GenericFileAdaptorTestParent {
             test12_newDirectoryStream(testDir, new AllTrue(), null, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test12_newDirectoryStream_with_filter");
         }
     }
@@ -1526,7 +1523,7 @@ public abstract class GenericFileAdaptorTestParent {
             test13_getAttributes(testDir, false, -1, currentTime, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test13_getAttributes");
         }
     }
@@ -1686,7 +1683,7 @@ public abstract class GenericFileAdaptorTestParent {
             test14_setPosixFilePermissions(existingFile, permissions, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test14_setPosixFilePermissions");
         }
     }
@@ -1866,7 +1863,7 @@ public abstract class GenericFileAdaptorTestParent {
             test15_newAttributesDirectoryStream(testDir, null, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test15_newAttributesDirectoryStream");
         }
     }
@@ -2112,7 +2109,7 @@ public abstract class GenericFileAdaptorTestParent {
             test16_newAttributesDirectoryStream(testDir, new AllTrue(), null, true);
         } finally {
             // set up for cleaning again
-            cwd = config.getWorkingDir(files, credentials);
+            cwd = config.getWorkingDir(files);
             testDir = resolve(cwd, TEST_ROOT, "test16_newAttributesDirectoryStreamWithFilter");
         }
     }
@@ -3559,9 +3556,9 @@ public abstract class GenericFileAdaptorTestParent {
     public void test33_multipleFileSystemsOpenSimultaneously() throws Exception {
         // Open two file systems. They should both be open afterwards.
         FileSystem fs0 = files.newFileSystem(config.getScheme(), config.getCorrectLocation(),
-                config.getDefaultCredential(credentials), null);
+                config.getDefaultCredential(), null);
         FileSystem fs1 = files.newFileSystem(config.getScheme(), config.getCorrectLocation(),
-                config.getDefaultCredential(credentials), null);
+                config.getDefaultCredential(), null);
         assert (files.isOpen(fs0));
         assert (files.isOpen(fs1));
 
